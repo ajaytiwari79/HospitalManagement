@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
@@ -14,7 +14,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
 @RelationshipEntity(type = HAS_PERSONALIZED_LOCATION)
 public class OrganizationPersonalizeLocationRelationShip extends UserBaseEntity {
     @StartNode
-    private Organization organization;
+    private Unit unit;
     @EndNode
     private Expertise expertise;
     private Long locationId;
@@ -23,18 +23,18 @@ public class OrganizationPersonalizeLocationRelationShip extends UserBaseEntity 
 
     }
 
-    public OrganizationPersonalizeLocationRelationShip(Organization organization, Expertise expertise, Long locationId) {
-        this.organization = organization;
+    public OrganizationPersonalizeLocationRelationShip(Unit unit, Expertise expertise, Long locationId) {
+        this.unit = unit;
         this.expertise = expertise;
         this.locationId = locationId;
     }
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public Expertise getExpertise() {

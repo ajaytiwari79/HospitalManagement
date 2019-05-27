@@ -15,7 +15,7 @@ import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.OrganizationHierarchyData;
 import com.kairos.persistence.model.organization.union.*;
@@ -146,7 +146,7 @@ public class UnionService {
         if (locationGraphRepository.existsByName("(?i)" + locationDTO.getName(), unionId, -1l)) {
             exceptionService.duplicateDataException(MESSAGE_LOCATION_NAME_ALREADYEXISTS, locationDTO.getName());
         }
-        Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
+        Unit union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
         if (!Optional.ofNullable(union).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_UNIONID_NOTFOUND, unionId);
         }
@@ -249,7 +249,7 @@ public class UnionService {
             sectors.addAll(sectorGraphRepository.findSectorsById(sectorIds));
         }
         sectors.addAll(createSectors(countryId, sectorDTOS));
-        Organization union = new Organization(unionData.getName(), sectors, address, boardingCompleted, country, true);
+        Unit union = new Unit(unionData.getName(), sectors, address, boardingCompleted, country, true);
         if (isCollectionEmpty(union.getLocations()) && publish) {
             union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
@@ -310,7 +310,7 @@ public class UnionService {
         if (CollectionUtils.isEmpty(unionDataQueryResults) || (unionDataQueryResults.size() == 1 && !unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
             exceptionService.dataNotFoundByIdException("message.union.not.found", unionId);
         }
-        Organization union = unionDataQueryResults.get(0).getUnion();
+        Unit union = unionDataQueryResults.get(0).getUnion();
         union.setLocations(unionDataQueryResults.get(0).getLocations());
         if (!publish && union.isBoardingCompleted()) {
             exceptionService.invalidRequestException(MESSAGE_PUBLISH_UNION_UNPUBLISH);
@@ -528,25 +528,25 @@ public class UnionService {
 
         }
         List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, unitId);
-        Organization organization = organizationService.getOrganizationDetail(unitId, type);
-        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
+        Unit unit = organizationService.getOrganizationDetail(unitId, type);
+        if (!Optional.ofNullable(unit).isPresent() || !Optional.ofNullable(unit.getOrganizationSubTypes()).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_NOTFOUND);
 
         }
-        List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
+        List<Long> organizationSubTypeIds = unit.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
         List<UnionResponseDTO> unions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
         List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
-        if (organization.isParentOrganization()) {
-            organizationHierarchy = organizationGraphRepository.getOrganizationHierarchy(organization.getId());
+        if (unit.isParentOrganization()) {
+            organizationHierarchy = organizationGraphRepository.getOrganizationHierarchy(unit.getId());
         } else {
-            OrganizationHierarchyData data = organizationGraphRepository.getChildHierarchyByChildUnit(organization.getId());
+            OrganizationHierarchyData data = organizationGraphRepository.getChildHierarchyByChildUnit(unit.getId());
             Iterator itr = data.getChildUnits().listIterator();
             while (itr.hasNext()) {
-                Organization thisOrganization = (Organization) itr.next();
-                organizationHierarchy.add(new OrganizationBasicResponse(thisOrganization.getId(), thisOrganization.getName()));
+                Unit thisUnit = (Unit) itr.next();
+                organizationHierarchy.add(new OrganizationBasicResponse(thisUnit.getId(), thisUnit.getName()));
             }
         }
-        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
+        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unit.getId(), ReasonCodeType.EMPLOYMENT);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
     }
 }

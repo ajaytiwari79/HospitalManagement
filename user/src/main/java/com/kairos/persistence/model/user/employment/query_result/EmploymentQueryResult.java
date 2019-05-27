@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -25,7 +25,7 @@ public class EmploymentQueryResult {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long id;
-    private Organization union;
+    private Unit union;
     private LocalDate lastWorkingDate;
     private Long parentUnitId;
     private Long unitId;
@@ -47,7 +47,7 @@ public class EmploymentQueryResult {
         //Default Constructor
     }
 
-    public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Boolean published, Long parentUnitId) {
+    public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Unit union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Boolean published, Long parentUnitId) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -61,8 +61,8 @@ public class EmploymentQueryResult {
 
     }
 
-    public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
-                                   Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
+    public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Unit union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
+                                 Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -130,11 +130,11 @@ public class EmploymentQueryResult {
         this.id = id;
     }
 
-    public Organization getUnion() {
+    public Unit getUnion() {
         return union;
     }
 
-    public void setUnion(Organization union) {
+    public void setUnion(Unit union) {
         this.union = union;
     }
 

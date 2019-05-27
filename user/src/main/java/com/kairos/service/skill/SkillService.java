@@ -10,7 +10,7 @@ import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.time_care.TimeCareSkill;
@@ -177,8 +177,8 @@ public class SkillService {
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 
-            Organization unit = organizationGraphRepository.findOne(id, 0);
-            Organization parent = null;
+            Unit unit = organizationGraphRepository.findOne(id, 0);
+            Unit parent = null;
 
             if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
                 parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
@@ -312,9 +312,9 @@ public class SkillService {
     }
 
     public boolean requestForCreateNewSkill(long unitId, Skill skill) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
+        Unit unit = organizationGraphRepository.findOne(unitId);
 
-        if (organization == null) {
+        if (unit == null) {
             return false;
         }
         skill.setEnabled(false);
@@ -334,7 +334,7 @@ public class SkillService {
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unitId = id;
         } else if (TEAM.equalsIgnoreCase(type)) {
-            Organization unit = organizationGraphRepository.getOrganizationByTeamId(id);
+            Unit unit = organizationGraphRepository.getOrganizationByTeamId(id);
             unitId = unit.getId();
         } else {
             exceptionService.dataNotFoundByIdException(MESSAGE_TYPE_NOTVALID);

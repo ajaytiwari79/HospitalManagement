@@ -185,48 +185,48 @@ public class OrganizationService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
-    public Organization getOrganizationById(long id) {
+    public Unit getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
     }
 
     public OrganizationDTO getOrganizationWithCountryId(long id) {
-        Organization organization = organizationGraphRepository.findOne(id);
-        Country country = organization.isParentOrganization() ? organizationGraphRepository.getCountry(organization.getId()) : organizationGraphRepository.getCountryByParentOrganization(organization.getId());
-        OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(organization, OrganizationDTO.class);
+        Unit unit = organizationGraphRepository.findOne(id);
+        Country country = unit.isParentOrganization() ? organizationGraphRepository.getCountry(unit.getId()) : organizationGraphRepository.getCountryByParentOrganization(unit.getId());
+        OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(unit, OrganizationDTO.class);
         organizationDTO.setCountryId(country.getId());
-        organizationDTO.setParentOrganization(organization.isParentOrganization());
+        organizationDTO.setParentOrganization(unit.isParentOrganization());
         return organizationDTO;
     }
 
     public boolean showCountryTagForOrganization(long id) {
-        Organization organization = organizationGraphRepository.findOne(id);
-        return organization.isShowCountryTags();
+        Unit unit = organizationGraphRepository.findOne(id);
+        return unit.isShowCountryTags();
     }
 
     public Long getCountryIdOfOrganization(long orgId) {
-        Organization organization = fetchParentOrganization(orgId);
-        Country country = organizationGraphRepository.getCountry(organization.getId());
+        Unit unit = fetchParentOrganization(orgId);
+        Country country = organizationGraphRepository.getCountry(unit.getId());
         return country != null ? country.getId() : null;
     }
 
-    public Organization createOrganization(Organization organization, Long id, boolean baseOrganization) {
-        Organization parent = (id == null) ? null : getOrganizationById(id);
+    public Unit createOrganization(Unit unit, Long id, boolean baseOrganization) {
+        Unit parent = (id == null) ? null : getOrganizationById(id);
         if(parent != null) {
-            organizationGraphRepository.save(organization);
-            Organization o = organizationGraphRepository.createChildOrganization(parent.getId(), organization.getId());
+            organizationGraphRepository.save(unit);
+            Unit o = organizationGraphRepository.createChildOrganization(parent.getId(), unit.getId());
         } else {
-            organization = organizationGraphRepository.save(organization);
-            if(!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)) {
-                organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
+            unit = organizationGraphRepository.save(unit);
+            if(!baseOrganization && !unit.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)) {
+                organizationGraphRepository.linkWithRegionLevelOrganization(unit.getId());
             }
         }
-        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
-        timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
+        timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.SHIFT_PLANNING);
+        timeSlotService.createDefaultTimeSlots(unit, TimeSlotType.TASK_PLANNING);
         if(!baseOrganization) {
-            accessGroupService.createDefaultAccessGroups(organization);
-            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+            accessGroupService.createDefaultAccessGroups(unit);
+            organizationGraphRepository.assignDefaultSkillsToOrg(unit.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
         }
-        return organization;
+        return unit;
     }
 
     public List<Map<String, Object>> getAllOrganization() {
@@ -234,17 +234,17 @@ public class OrganizationService {
     }
 
     public boolean deleteOrganization(long organizationId) {
-        Organization organization = organizationGraphRepository.findOne(organizationId);
+        Unit unit = organizationGraphRepository.findOne(organizationId);
         boolean success;
-        if(organization != null && organization.isBoardingCompleted()) {
-            organization.setEnable(false);
-            organization.setDeleted(true);
-            organizationGraphRepository.save(organization);
+        if(unit != null && unit.isBoardingCompleted()) {
+            unit.setEnable(false);
+            unit.setDeleted(true);
+            organizationGraphRepository.save(unit);
             success = true;
         } else {
             List<Long> organizationIdsToDelete = new ArrayList<>();
-            organizationIdsToDelete.add(organization.getId());
-            organizationIdsToDelete.addAll(organization.getChildren().stream().map(child -> child.getId()).collect(Collectors.toList()));
+            organizationIdsToDelete.add(unit.getId());
+            organizationIdsToDelete.addAll(unit.getChildren().stream().map(child -> child.getId()).collect(Collectors.toList()));
             organizationGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
             success = true;
         }
@@ -258,7 +258,7 @@ public class OrganizationService {
     public Map<String, Object> getGeneralDetails(long id, String type) {
         Map<String, Object> response = new HashMap<>();
         if(ORGANIZATION.equalsIgnoreCase(type)) {
-            Organization unit = organizationGraphRepository.findOne(id, 0);
+            Unit unit = organizationGraphRepository.findOne(id, 0);
             if(unit == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, id);
             }
@@ -293,7 +293,7 @@ public class OrganizationService {
     }
 
     public boolean updateOrganizationGeneralDetails(OrganizationGeneral organizationGeneral, long unitId) throws ParseException {
-        Organization unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = organizationGraphRepository.findOne(unitId);
         if(unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
@@ -392,18 +392,18 @@ public class OrganizationService {
         return organizationQueryResult;
     }
 
-    public Organization getByPublicPhoneNumber(String phoneNumber) {
+    public Unit getByPublicPhoneNumber(String phoneNumber) {
         return organizationGraphRepository.findOrganizationByPublicPhoneNumber(phoneNumber);
     }
 
-    public Organization getOrganizationByExternalId(String externalId) {
+    public Unit getOrganizationByExternalId(String externalId) {
         return organizationGraphRepository.findByExternalId(externalId);
     }
 
     public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, Long staffExternalId, Long staffTimeCareEmploymentId) {
         OrganizationStaffWrapper organizationStaffWrapper = staffGraphRepository.getStaff(staffExternalId, staffTimeCareEmploymentId);
         if(Optional.ofNullable(organizationStaffWrapper).isPresent()) {
-            organizationStaffWrapper.setOrganization(organizationGraphRepository.findByExternalId(externalId));
+            organizationStaffWrapper.setUnit(organizationGraphRepository.findByExternalId(externalId));
         }
         return organizationStaffWrapper;
     }
@@ -414,21 +414,21 @@ public class OrganizationService {
         return organizationGraphRepository.findOne(childOrganizationId) == null;
     }
 
-    public Organization updateExternalId(long unitId, long externalId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if(organization == null) {
+    public Unit updateExternalId(long unitId, long externalId) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if(unit == null) {
             return null;
         }
-        organization.setExternalId(String.valueOf(externalId));
-        organizationGraphRepository.save(organization);
-        return organization;
+        unit.setExternalId(String.valueOf(externalId));
+        organizationGraphRepository.save(unit);
+        return unit;
     }
 
     public Map setEstimoteCredentials(long organization, Map<String, String> payload) {
-        Organization organizationObj = organizationGraphRepository.findOne(organization);
-        if(organizationObj != null && payload.containsKey("estimoteAppId") && payload.containsKey("estimoteAppToken") && payload.get("estimoteAppId") != null && payload.get("estimoteAppToken") != null) {
-            organizationObj.setEstimoteAppId(payload.get("estimoteAppId"));
-            organizationObj.setEstimoteAppToken(payload.get("estimoteAppToken"));
+        Unit unitObj = organizationGraphRepository.findOne(organization);
+        if(unitObj != null && payload.containsKey("estimoteAppId") && payload.containsKey("estimoteAppToken") && payload.get("estimoteAppId") != null && payload.get("estimoteAppToken") != null) {
+            unitObj.setEstimoteAppId(payload.get("estimoteAppId"));
+            unitObj.setEstimoteAppToken(payload.get("estimoteAppToken"));
             return payload;
         }
         return null;
@@ -436,17 +436,17 @@ public class OrganizationService {
 
     public Map getEstimoteCredentials(long organization) {
         Map returnData = new HashMap();
-        Organization organizationObj = organizationGraphRepository.findOne(organization);
-        if(organizationObj != null) {
-            returnData.put("estimoteAppId", organizationObj.getEstimoteAppId());
-            returnData.put("estimoteAppToken", organizationObj.getEstimoteAppToken());
+        Unit unitObj = organizationGraphRepository.findOne(organization);
+        if(unitObj != null) {
+            returnData.put("estimoteAppId", unitObj.getEstimoteAppId());
+            returnData.put("estimoteAppToken", unitObj.getEstimoteAppToken());
         }
         return returnData;
     }
 
     public Boolean createLinkParentWithChildOrganization(Long parentId, Long childId) {
-        Organization parent = organizationGraphRepository.findOne(parentId);
-        Organization child = organizationGraphRepository.findOne(childId);
+        Unit parent = organizationGraphRepository.findOne(parentId);
+        Unit child = organizationGraphRepository.findOne(childId);
         organizationGraphRepository.createChildOrganization(parent.getId(), child.getId());
         accessGroupService.createDefaultAccessGroups(child);
         timeSlotService.createDefaultTimeSlots(child, TimeSlotType.SHIFT_PLANNING);
@@ -456,11 +456,11 @@ public class OrganizationService {
 
     public Long getOrganizationIdByTeamIdOrGroupIdOrOrganizationId(String type, Long id) {
         if(ORGANIZATION.equalsIgnoreCase(type)) {
-            Organization organization = organizationGraphRepository.findOne(id);
-            if(organization == null) {
+            Unit unit = organizationGraphRepository.findOne(id);
+            if(unit == null) {
                 return null;
             }
-            return organization.getId();
+            return unit.getId();
         } else if(TEAM.equalsIgnoreCase(type)) {
             return organizationGraphRepository.getOrganizationByTeamId(id).getId();
         }
@@ -510,60 +510,60 @@ public class OrganizationService {
     }
 
     public boolean updateOneTimeSyncsettings(long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if(organization == null) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if(unit == null) {
             LOGGER.debug("Searching organization by id " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        organization.setOneTimeSyncPerformed(true);
-        organizationGraphRepository.save(organization);
+        unit.setOneTimeSyncPerformed(true);
+        organizationGraphRepository.save(unit);
         return true;
     }
 
     public boolean updateAutoGenerateTaskSettings(long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if(organization == null) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if(unit == null) {
             LOGGER.debug("Searching organization by id " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        organization.setAutoGeneratedPerformed(true);
-        organizationGraphRepository.save(organization);
+        unit.setAutoGeneratedPerformed(true);
+        organizationGraphRepository.save(unit);
         return true;
     }
 
     public Map<String, Object> getTaskDemandSupplierInfo(Long unitId) {
         Map<String, Object> supplierInfo = new HashMap();
-        Organization weekdaySupplier = organizationGraphRepository.findOne(unitId, 0);
+        Unit weekdaySupplier = organizationGraphRepository.findOne(unitId, 0);
         supplierInfo.put("weekdaySupplier", weekdaySupplier.getName());
         supplierInfo.put("weekdaySupplierId", weekdaySupplier.getId());
         return supplierInfo;
     }
 
-    public Organization getParentOrganizationOfCityLevel(Long unitId) {
+    public Unit getParentOrganizationOfCityLevel(Long unitId) {
         return organizationGraphRepository.getParentOrganizationOfCityLevel(unitId);
     }
 
-    public Organization getParentOfOrganization(Long unitId) {
+    public Unit getParentOfOrganization(Long unitId) {
         return organizationGraphRepository.getParentOfOrganization(unitId);
     }
 
-    public Organization getOrganizationByTeamId(Long teamId) {
+    public Unit getOrganizationByTeamId(Long teamId) {
         return organizationGraphRepository.getOrganizationByTeamId(teamId);
     }
 
     public Map<String, Object> getPrerequisitesForTimeCareTask(GetWorkShiftsFromWorkPlaceByIdResult workShift) {
-        Organization organization = organizationGraphRepository.findByExternalId(workShift.getWorkPlace().getId().toString());
-        if(organization == null) {
+        Unit unit = organizationGraphRepository.findByExternalId(workShift.getWorkPlace().getId().toString());
+        if(unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_EXTERNALID_NOTFOUND);
         }
         Map<String, Object> requiredDataForTimeCareTask = new HashMap<>();
-        OrganizationContactAddress organizationContactData = organizationGraphRepository.getContactAddressOfOrg(organization.getId());
+        OrganizationContactAddress organizationContactData = organizationGraphRepository.getContactAddressOfOrg(unit.getId());
         Staff staff = staffGraphRepository.findByExternalId(workShift.getPerson().getId());
         AbsenceTypes absenceTypes = absenceTypesRepository.findByName(workShift.getActivity().getName());
         requiredDataForTimeCareTask.put("organizationContactAddress", organizationContactData);
         requiredDataForTimeCareTask.put("staff", staff);
         requiredDataForTimeCareTask.put("absenceTypes", absenceTypes);
-        requiredDataForTimeCareTask.put("organization", organization);
+        requiredDataForTimeCareTask.put("organization", unit);
         return requiredDataForTimeCareTask;
     }
 
@@ -583,62 +583,62 @@ public class OrganizationService {
     }
 
     public OrganizationTypeAndSubTypeDTO getOrganizationTypeAndSubTypes(Long id, String type) {
-        Organization organization = getOrganizationDetail(id, type);
+        Unit unit = getOrganizationDetail(id, type);
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = new OrganizationTypeAndSubTypeDTO();
-        if(!organization.isParentOrganization()) {
-            Organization parentOrganization = organizationGraphRepository.getParentOfOrganization(organization.getId());
-            organizationTypeAndSubTypeDTO.setParentOrganizationId(parentOrganization.getId());
+        if(!unit.isParentOrganization()) {
+            Unit parentUnit = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            organizationTypeAndSubTypeDTO.setParentOrganizationId(parentUnit.getId());
             organizationTypeAndSubTypeDTO.setParent(false);
         } else {
             organizationTypeAndSubTypeDTO.setParent(true);
         }
-        List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(organization.getId());
-        List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(organization.getId());
+        List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(unit.getId());
+        List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(unit.getId());
         organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
         organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
-        organizationTypeAndSubTypeDTO.setUnitId(organization.getId());
+        organizationTypeAndSubTypeDTO.setUnitId(unit.getId());
         return organizationTypeAndSubTypeDTO;
     }
 
     public OrganizationExternalIdsDTO saveKMDExternalId(Long unitId, OrganizationExternalIdsDTO organizationExternalIdsDTO) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        organization.setKmdExternalId(organizationExternalIdsDTO.getKmdExternalId());
-        organization.setExternalId(organizationExternalIdsDTO.getTimeCareExternalId());
-        organizationGraphRepository.save(organization);
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        unit.setKmdExternalId(organizationExternalIdsDTO.getKmdExternalId());
+        unit.setExternalId(organizationExternalIdsDTO.getTimeCareExternalId());
+        organizationGraphRepository.save(unit);
         return organizationExternalIdsDTO;
 
     }
 
     public TimeSlotsDeductionDTO saveTimeSlotPercentageDeduction(Long unitId, TimeSlotsDeductionDTO timeSlotsDeductionDTO) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        organization.setDayShiftTimeDeduction(timeSlotsDeductionDTO.getDayShiftTimeDeduction());
-        organization.setNightShiftTimeDeduction(timeSlotsDeductionDTO.getNightShiftTimeDeduction());
-        organizationGraphRepository.save(organization);
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        unit.setDayShiftTimeDeduction(timeSlotsDeductionDTO.getDayShiftTimeDeduction());
+        unit.setNightShiftTimeDeduction(timeSlotsDeductionDTO.getNightShiftTimeDeduction());
+        organizationGraphRepository.save(unit);
         return timeSlotsDeductionDTO;
 
     }
 
     public OrganizationExternalIdsDTO getKMDExternalId(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
+        Unit unit = organizationGraphRepository.findOne(unitId);
         OrganizationExternalIdsDTO organizationExternalIdsDTO = new OrganizationExternalIdsDTO();
-        organizationExternalIdsDTO.setKmdExternalId(organization.getKmdExternalId());
-        organizationExternalIdsDTO.setTimeCareExternalId(organization.getExternalId());
+        organizationExternalIdsDTO.setKmdExternalId(unit.getKmdExternalId());
+        organizationExternalIdsDTO.setTimeCareExternalId(unit.getExternalId());
         return organizationExternalIdsDTO;
 
     }
 
     public TimeSlotsDeductionDTO getTimeSlotPercentageDeduction(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
+        Unit unit = organizationGraphRepository.findOne(unitId);
         TimeSlotsDeductionDTO timeSlotsDeductionDTO = new TimeSlotsDeductionDTO();
-        timeSlotsDeductionDTO.setNightShiftTimeDeduction(organization.getNightShiftTimeDeduction());
-        timeSlotsDeductionDTO.setDayShiftTimeDeduction(organization.getDayShiftTimeDeduction());
+        timeSlotsDeductionDTO.setNightShiftTimeDeduction(unit.getNightShiftTimeDeduction());
+        timeSlotsDeductionDTO.setDayShiftTimeDeduction(unit.getDayShiftTimeDeduction());
         return timeSlotsDeductionDTO;
 
     }
 
     public List<VehicleQueryResult> getVehicleList(long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if(!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if(!Optional.ofNullable(unit).isPresent()) {
             LOGGER.debug("Searching organization by id " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
 
@@ -648,27 +648,27 @@ public class OrganizationService {
     }
 
     public Long getOrganization(Long id, String type) {
-        Organization organization = getOrganizationDetail(id, type);
-        return organization.getId();
+        Unit unit = getOrganizationDetail(id, type);
+        return unit.getId();
     }
 
-    public Organization getOrganizationDetail(Long id, String type) {
-        Organization organization = null;
+    public Unit getOrganizationDetail(Long id, String type) {
+        Unit unit = null;
         switch (type.toUpperCase()) {
             case ORGANIZATION:
-                organization = organizationGraphRepository.findOne(id, 1);
+                unit = organizationGraphRepository.findOne(id, 1);
                 break;
             case TEAM:
-                organization = teamService.getOrganizationByTeamId(id);
+                unit = teamService.getOrganizationByTeamId(id);
                 break;
             default:
                 exceptionService.unsupportedOperationException(MESSAGE_ORGANIZATION_TYPE_NOTVALID);
         }
-        if(!Optional.ofNullable(organization).isPresent()) {
+        if(!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, id);
 
         }
-        return organization;
+        return unit;
     }
 
     public OrganizationSkillAndOrganizationTypesDTO getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(Long unitId) {
@@ -695,7 +695,7 @@ public class OrganizationService {
         List<String> zoneList = new ArrayList<>(allZones);
         Collections.sort(zoneList);
         Map<String, Object> timeZonesData = new HashMap<>();
-        Organization unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = organizationGraphRepository.findOne(unitId);
         if(!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
 
@@ -711,7 +711,7 @@ public class OrganizationService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ZONEID_NOTFOUND, zoneIdString);
 
         }
-        Organization unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = organizationGraphRepository.findOne(unitId);
         schedulerServiceRestClient.publishRequest(zoneId, unitId, true, IntegrationOperation.CREATE, "/scheduler_panel/time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
         unit.setTimeZone(zoneId);
@@ -719,9 +719,9 @@ public class OrganizationService {
         return true;
     }
 
-    public Organization fetchParentOrganization(Long unitId) {
-        Organization parent = null;
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+    public Unit fetchParentOrganization(Long unitId) {
+        Unit parent = null;
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
         if(!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
         } else if(!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
@@ -751,10 +751,10 @@ public class OrganizationService {
             }
         }
         if(Optional.ofNullable(organizationId).isPresent()) {
-            Organization organization = organizationGraphRepository.findOne(organizationId, 0);
-            if(organization != null) {
+            Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+            if(unit != null) {
                 OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
-                BeanUtils.copyProperties(organization, organizationBasicDTO);
+                BeanUtils.copyProperties(unit, organizationBasicDTO);
                 wtaBasicDetailsDTO.setOrganization(organizationBasicDTO);
             }
         }
@@ -773,8 +773,8 @@ public class OrganizationService {
             BeanUtils.copyProperties(organizationType, organizationTypeDTO);
             wtaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
         }
-        List<Organization> organizations;
-        organizations = CollectionUtils.isNotEmpty(unitIds) ? organizationGraphRepository.findOrganizationsByIdsIn(unitIds) : organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        List<Unit> units;
+        units = CollectionUtils.isNotEmpty(unitIds) ? organizationGraphRepository.findOrganizationsByIdsIn(unitIds) : organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
         if(Optional.ofNullable(organizationSubTypeId).isPresent()) {
             OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
             if(Optional.ofNullable(organizationSubType).isPresent()) {
@@ -783,9 +783,9 @@ public class OrganizationService {
                 wtaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
             }
         }
-        if(CollectionUtils.isNotEmpty(organizations)) {
+        if(CollectionUtils.isNotEmpty(units)) {
             List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
-            organizations.forEach(organization -> {
+            units.forEach(organization -> {
                 OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
                 ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
                 organizationBasicDTOS.add(organizationBasicDTO);
@@ -796,7 +796,7 @@ public class OrganizationService {
     }
 
     public ZoneId getTimeZoneStringOfUnit(Long unitId) {
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
         if(!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
@@ -853,12 +853,12 @@ public class OrganizationService {
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(organization.getId()).getId();
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unit.getId()).getId();
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
-        List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organization);
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(unit);
         List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p -> new PresenceTypeDTO(p.getName(), p.getId())).collect(Collectors.toList());
         dayTypes.forEach(dayType -> {
             DayTypeDTO dayTypeDTO = new DayTypeDTO();
@@ -926,20 +926,20 @@ public class OrganizationService {
             }
         }
         OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
-        List<Organization> organizations;
+        List<Unit> units;
         if(CollectionUtils.isNotEmpty(unitIds)) {
-            organizations = organizationGraphRepository.findOrganizationsByIdsIn(unitIds);
+            units = organizationGraphRepository.findOrganizationsByIdsIn(unitIds);
         } else {
-            organizations = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+            units = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
         }
         if(Optional.ofNullable(organizationSubType).isPresent()) {
             OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
             BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
             ctaBasicDetailsDTO.setOrganizationSubType(organizationSubTypeDTO);
         }
-        if(CollectionUtils.isNotEmpty(organizations)) {
+        if(CollectionUtils.isNotEmpty(units)) {
             List<OrganizationBasicDTO> organizationBasicDTOS = new ArrayList<>();
-            organizations.forEach(organization -> {
+            units.forEach(organization -> {
                 OrganizationBasicDTO organizationBasicDTO = new OrganizationBasicDTO();
                 ObjectMapperUtils.copyProperties(organization, organizationBasicDTO);
                 organizationBasicDTOS.add(organizationBasicDTO);
@@ -964,10 +964,10 @@ public class OrganizationService {
     }
 
     public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if(organization != null && !organization.isDeleted()) {
-            organization.setPayRollTypeId(payRollTypeId);
-            organizationGraphRepository.save(organization);
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if(unit != null && !unit.isDeleted()) {
+            unit.setPayRollTypeId(payRollTypeId);
+            organizationGraphRepository.save(unit);
         } else {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Organization", unitId);
         }
@@ -979,7 +979,7 @@ public class OrganizationService {
         if(isNull(unitId)) {
             organizationIds = organizationGraphRepository.findAllOrganizationIds();
         } else {
-            Optional<Organization> optionalOrganization = organizationGraphRepository.findById(unitId);
+            Optional<Unit> optionalOrganization = organizationGraphRepository.findById(unitId);
             if(optionalOrganization.isPresent()) {
                 organizationIds = optionalOrganization.get().getChildren().stream().map(unit -> unit.getId()).collect(Collectors.toList());
             }

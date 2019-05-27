@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -32,10 +32,10 @@ public class Employment extends UserBaseEntity {
     private Staff staff;
 
     @Relationship(type = SUPPORTED_BY_UNION)
-    private Organization union;
+    private Unit union;
 
     @Relationship(type = IN_UNIT)
-    private Organization unit;
+    private Unit unit;
 
     @Relationship(type = HAS_REASON_CODE)
     private ReasonCode reasonCode;
@@ -63,7 +63,7 @@ public class Employment extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public Employment(Organization unit, LocalDate startDate, Long timeCareExternalId, boolean published, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
+    public Employment(Unit unit, LocalDate startDate, Long timeCareExternalId, boolean published, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.unit = unit;
         this.startDate = startDate;
         this.timeCareExternalId = timeCareExternalId;
@@ -90,12 +90,12 @@ public class Employment extends UserBaseEntity {
     }
 
 
-    public Organization getUnion() {
+    public Unit getUnion() {
         return union;
     }
 
 
-    public void setUnion(Organization union) {
+    public void setUnion(Unit union) {
         this.union = union;
     }
 
@@ -123,11 +123,11 @@ public class Employment extends UserBaseEntity {
         this.lastWorkingDate = lastWorkingDate;
     }
 
-    public Organization getUnit() {
+    public Unit getUnit() {
         return unit;
     }
 
-    public void setUnit(Organization unit) {
+    public void setUnit(Unit unit) {
         this.unit = unit;
     }
 

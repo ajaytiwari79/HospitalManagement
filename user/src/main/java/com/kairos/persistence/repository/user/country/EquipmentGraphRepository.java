@@ -50,7 +50,7 @@ public interface EquipmentGraphRepository extends Neo4jBaseRepository<Equipment,
     void detachEquipmentCategory(long equipmentId);
 
 
-    @Query("MATCH (o:Organization)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(res:Resource{deleted:false})-[:"+RESOURCE_HAS_EQUIPMENT+"]->(equipment:Equipment{deleted:{2}}) where id(o)={0} AND id(res)={1}\n" +
+    @Query("MATCH (o:Unit)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(res:Resource{deleted:false})-[:"+RESOURCE_HAS_EQUIPMENT+"]->(equipment:Equipment{deleted:{2}}) where id(o)={0} AND id(res)={1}\n" +
             "return id(equipment) as id, equipment.name as name, equipment.description as description")
     List<EquipmentQueryResult> getResourcesSelectedEquipments(Long organizationId, Long resourceId, boolean deleted);
 

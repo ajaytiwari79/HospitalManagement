@@ -9,7 +9,7 @@ import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.common.QueryResult;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -108,22 +108,22 @@ public class OrganizationHierarchyService {
     public QueryResult generateOrganizationHierarchyByFilter(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
         List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchyByFilters(parentOrganizationId, organizationHierarchyFilterDTO);
         if (units.isEmpty()) {
-            Organization organization = organizationGraphRepository.findOne(parentOrganizationId);
-            if (organization == null) {
+            Unit unit = organizationGraphRepository.findOne(parentOrganizationId);
+            if (unit == null) {
                 return null;
             }
             QueryResult queryResult = new QueryResult();
-            queryResult.setId(organization.getId());
-            queryResult.setUnion(organization.isUnion());
-            queryResult.setName(organization.getName());
-            queryResult.setKairosHub(organization.isKairosHub());
+            queryResult.setId(unit.getId());
+            queryResult.setUnion(unit.isUnion());
+            queryResult.setName(unit.getName());
+            queryResult.setKairosHub(unit.isKairosHub());
             queryResult.setAccessable(true);
             queryResult.setType(ORGANIZATION_LABEL);
-            queryResult.setPreKairos(organization.isPrekairos());
-            queryResult.setEnabled(organization.isEnable());
-            queryResult.setParentOrganization(organization.isParentOrganization());
-            queryResult.setTimeZone(organization.getTimeZone() != null ? organization.getTimeZone().getId() : null);
-            queryResult.setOrganizationLevel(organization.getOrganizationLevel());
+            queryResult.setPreKairos(unit.isPrekairos());
+            queryResult.setEnabled(unit.isEnable());
+            queryResult.setParentOrganization(unit.isParentOrganization());
+            queryResult.setTimeZone(unit.getTimeZone() != null ? unit.getTimeZone().getId() : null);
+            queryResult.setOrganizationLevel(unit.getOrganizationLevel());
             return queryResult;
         }
 
@@ -166,7 +166,7 @@ public class OrganizationHierarchyService {
      * @return
      */
     public FilterAndFavouriteFilterDTO getOrganizationHierarchyFilters(long unitId) {
-        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Unit parent = organizationService.fetchParentOrganization(unitId);
         FilterAndFavouriteFilterDTO filterAndFavouriteFilter = new FilterAndFavouriteFilterDTO();
         Map<String, Object> filterTypeDataMap = organizationGraphRepository.getFiltersByParentOrganizationId(parent.getId());
         List<FilterResponseDTO> filterResponseDTOList = new ArrayList<>();

@@ -2,7 +2,7 @@ package com.kairos.utils.validator.company;
 
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.user.organization.CompanyType;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.service.exception.ExceptionService;
@@ -17,8 +17,8 @@ import static com.kairos.constants.UserMessagesConstants.*;
  * CreatedBy vipulpandey on 22/8/18
  **/
 public class OrganizationDetailsValidator {
-    public static void validateBasicDetails(List<Organization> organizations, ExceptionService exceptionService) {
-        organizations.forEach(organization -> {
+    public static void validateBasicDetails(List<Unit> units, ExceptionService exceptionService) {
+        units.forEach(organization -> {
             if (!Optional.ofNullable(organization.getDesiredUrl()).isPresent()) {
                 exceptionService.invalidRequestException(ERROR_ORGANIZATION_DESIREDURL_NOTNULL, organization.getName());
             }
@@ -35,15 +35,15 @@ public class OrganizationDetailsValidator {
         });
     }
 
-    private static void validateTypeDetails(ExceptionService exceptionService, Organization organization) {
-        if (!Optional.ofNullable(organization.getOrganizationType()).isPresent()) {
-            exceptionService.invalidRequestException(ERROR_ORGANIZATION_ORGTYPE_NOTNULL, organization.getName());
+    private static void validateTypeDetails(ExceptionService exceptionService, Unit unit) {
+        if (!Optional.ofNullable(unit.getOrganizationType()).isPresent()) {
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_ORGTYPE_NOTNULL, unit.getName());
         }
-        if (!Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent() || organization.getOrganizationSubTypes().isEmpty()) {
-            exceptionService.invalidRequestException(ERROR_ORGANIZATION_ORGSUBTYPE_NOTNULL, organization.getName());
+        if (!Optional.ofNullable(unit.getOrganizationSubTypes()).isPresent() || unit.getOrganizationSubTypes().isEmpty()) {
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_ORGSUBTYPE_NOTNULL, unit.getName());
         }
-        if (!Optional.ofNullable(organization.getBusinessTypes()).isPresent()) {
-            exceptionService.invalidRequestException(ERROR_ORGANIZATION_BUSINESSTYPE_NOTNULL, organization.getName());
+        if (!Optional.ofNullable(unit.getBusinessTypes()).isPresent()) {
+            exceptionService.invalidRequestException(ERROR_ORGANIZATION_BUSINESSTYPE_NOTNULL, unit.getName());
         }
     }
 
@@ -74,16 +74,16 @@ public class OrganizationDetailsValidator {
     public static void validateAddressDetails(List<OrganizationContactAddress> organizationContactAddresses, ExceptionService exceptionService) {
         organizationContactAddresses.forEach(address -> {
             if (!Optional.ofNullable(address.getContactAddress()).isPresent() || !Optional.ofNullable(address.getContactAddress().getHouseNumber()).isPresent()) {
-                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_HOUSENUMBER_NOTNULL, address.getOrganization().getName());
+                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_HOUSENUMBER_NOTNULL, address.getUnit().getName());
             }
             if (!Optional.ofNullable(address.getContactAddress().getStreet()).isPresent()) {
-                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_STREET_NOTNULL, address.getOrganization().getName());
+                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_STREET_NOTNULL, address.getUnit().getName());
             }
             if (!Optional.ofNullable(address.getZipCode()).isPresent()) {
-                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_ZIPCODE_NOTNULL, address.getOrganization().getName());
+                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_ZIPCODE_NOTNULL, address.getUnit().getName());
             }
             if (!Optional.ofNullable(address.getMunicipality()).isPresent()) {
-                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_MUNICIPALITY_NOTNULL, address.getOrganization().getName());
+                exceptionService.invalidRequestException(ERROR_CONTACTADDRESS_MUNICIPALITY_NOTNULL, address.getUnit().getName());
             }
         });
     }

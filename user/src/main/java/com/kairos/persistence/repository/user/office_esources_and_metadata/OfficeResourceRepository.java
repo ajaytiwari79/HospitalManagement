@@ -14,10 +14,10 @@ import java.util.Map;
 @Repository
 public interface OfficeResourceRepository extends Neo4jBaseRepository<OfficeResources,Long>{
 
-    @Query("MATCH (o:Organization)-[r:ORGANIZATION_HAS_OFFICE_RESOURCE]->(n:OfficeResources) WHERE id(o)={0} " +
+    @Query("MATCH (o:Unit)-[r:ORGANIZATION_HAS_OFFICE_RESOURCE]->(n:OfficeResources) WHERE id(o)={0} " +
             "RETURN {type:n.resourceType,resources:collect({id:id(n),name:n.name, resourceType:n.resourceType})} as data;")
     List<Map> getOfficeResourcesByOrganizationId(long organizationId);
 
-    @Query("MATCH(o:Organization)-[r:ORGANIZATION_HAS_OFFICE_RESOURCE]->(n:OfficeResources) WHERE id(o)={0} RETURN n;")
+    @Query("MATCH(o:Unit)-[r:ORGANIZATION_HAS_OFFICE_RESOURCE]->(n:OfficeResources) WHERE id(o)={0} RETURN n;")
     List<OfficeResources> getByOrganization(long organization);
 }

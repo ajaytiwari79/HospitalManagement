@@ -21,7 +21,7 @@ import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
@@ -593,7 +593,7 @@ public class CountryService {
     }
 
     public Long getCountryIdByUnitId(long unitId) {
-        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Unit parent = organizationService.fetchParentOrganization(unitId);
         return countryGraphRepository.getCountryIdByUnitId(parent.getId());
     }
 }

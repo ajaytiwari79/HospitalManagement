@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.staff.personal_details;
 
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.employment.Employment;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -9,7 +9,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
  */
 @QueryResult
 public class OrganizationStaffWrapper {
-    private Organization organization;
+    private Unit unit;
     private Staff staff;
     private Employment employment;
 
@@ -17,12 +17,12 @@ public class OrganizationStaffWrapper {
         //Default Constructor
     }
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public Staff getStaff() {

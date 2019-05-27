@@ -2,7 +2,7 @@ package com.kairos.persistence.model.user.employment.query_result;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 
@@ -18,10 +18,10 @@ public class CtaWtaQueryResult {
     private List<WTAResponseDTO> wta;
     private Expertise expertise;
     private SeniorityLevelQueryResult applicableSeniorityLevel;
-    private Organization union;
+    private Unit union;
 
 
-    public CtaWtaQueryResult(List<CTAResponseDTO> cta, List<WTAResponseDTO> wta, Expertise expertise, SeniorityLevelQueryResult applicableSeniorityLevel, Organization union) {
+    public CtaWtaQueryResult(List<CTAResponseDTO> cta, List<WTAResponseDTO> wta, Expertise expertise, SeniorityLevelQueryResult applicableSeniorityLevel, Unit union) {
         this.cta = cta;
         this.wta = wta;
         this.expertise = expertise;
@@ -65,11 +65,11 @@ public class CtaWtaQueryResult {
         this.applicableSeniorityLevel = applicableSeniorityLevel;
     }
 
-    public Organization getUnion() {
+    public Unit getUnion() {
         return union;
     }
 
-    public void setUnion(Organization union) {
+    public void setUnion(Unit union) {
         this.union = union;
     }
 }

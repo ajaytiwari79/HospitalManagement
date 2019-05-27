@@ -6,7 +6,7 @@ import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
@@ -79,7 +79,7 @@ public class TeamService {
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
 
         OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByOrganizationId(unitId);
-        if (organizationContactAddress.getOrganization() == null) {
+        if (organizationContactAddress.getUnit() == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP);
         }
         boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
@@ -87,7 +87,7 @@ public class TeamService {
             exceptionService.duplicateDataException(MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT, teamDTO.getName());
         }
 
-        Organization organization = organizationContactAddress.getOrganization();
+        Unit unit = organizationContactAddress.getUnit();
 
         ContactAddress contactAddress;
         ZipCode zipCode;
@@ -118,8 +118,8 @@ public class TeamService {
         teamGraphRepository.save(team);
         teamDTO.setId(team.getId());
 
-        organization.getTeams().add(team);
-        organizationGraphRepository.save(organization, 2);
+        unit.getTeams().add(team);
+        organizationGraphRepository.save(unit, 2);
         teamDTO.setId(team.getId());
         assignTeamLeadersToTeam(teamDTO, team);
         return teamDTO;
@@ -296,11 +296,11 @@ public class TeamService {
     }
 
     public Long getOrganizationIdByTeamId(Long teamId) {
-        Organization organization = organizationGraphRepository.getOrganizationByTeamId(teamId);
-        return organization.getId();
+        Unit unit = organizationGraphRepository.getOrganizationByTeamId(teamId);
+        return unit.getId();
     }
 
-    public Organization getOrganizationByTeamId(Long teamId) {
+    public Unit getOrganizationByTeamId(Long teamId) {
         return organizationGraphRepository.getOrganizationByTeamId(teamId);
     }
 

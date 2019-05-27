@@ -7,7 +7,7 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -52,7 +52,7 @@ public class Expertise extends UserBaseEntity {
     private Set<OrganizationService> organizationServices;
 
     @Relationship(type = SUPPORTED_BY_UNION)
-    private Organization union;
+    private Unit union;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
     private BreakPaymentSetting breakPaymentSetting;
@@ -141,11 +141,11 @@ public class Expertise extends UserBaseEntity {
         this.organizationServices = organizationServices;
     }
 
-    public Organization getUnion() {
+    public Unit getUnion() {
         return union;
     }
 
-    public void setUnion(Organization union) {
+    public void setUnion(Unit union) {
         this.union = union;
     }
 

@@ -4,7 +4,7 @@ import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
 import com.kairos.utils.response.ResponseHandler;
@@ -104,11 +104,11 @@ public class AuthController {
     ResponseEntity<Map<String, Object>> checkUserByMobileNumber(@Param("mobileNumber") String mobileNumber) {
         Map<String, Object> responseData = userService.authenticateUserFromMobileNumber(mobileNumber);
         if (responseData == null) {
-            Organization organization = organizationService.getByPublicPhoneNumber(mobileNumber);
-            if (organization != null) {
+            Unit unit = organizationService.getByPublicPhoneNumber(mobileNumber);
+            if (unit != null) {
                 responseData = new HashMap<String, Object>();
                 responseData.put("isPublic", true);
-                responseData.put("organization", organization.getId());
+                responseData.put("organization", unit.getId());
             } else {
                 return ResponseHandler.generateResponse(HttpStatus.UNAUTHORIZED, false, null);
             }

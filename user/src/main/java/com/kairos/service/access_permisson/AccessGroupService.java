@@ -22,7 +22,7 @@ import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountTypeAccessGroupCountQueryResult;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
@@ -103,16 +103,16 @@ public class AccessGroupService {
             exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
 
         }
-        Organization organization = organizationGraphRepository.findOne(organizationId);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(organizationId);
+        if (unit == null) {
             return null;
         }
-        Organization parent;
-        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
+        Unit parent;
+        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
+            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
         List<DayType> dayTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
@@ -122,12 +122,12 @@ public class AccessGroupService {
         accessGroup.setDayTypes(dayTypes);
 
         if (parent == null) {
-            organization.getAccessGroups().add(accessGroup);
-            organizationGraphRepository.save(organization, 2);
+            unit.getAccessGroups().add(accessGroup);
+            organizationGraphRepository.save(unit, 2);
 
             //set default permission of access page while creating access group
-            Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
-            setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), organizationService.getOrganizationCategory(organization.getCompanyType()));
+            Long countryId = organizationService.getCountryIdOfOrganization(unit.getId());
+            setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), organizationService.getOrganizationCategory(unit.getCompanyType()));
             accessGroupDTO.setId(accessGroup.getId());
             return accessGroupDTO;
         } else {
@@ -180,26 +180,26 @@ public class AccessGroupService {
     }
 
     /**
-     * @param organization
+     * @param unit
      * @author prabjot
      * this method will find the root organization, if root node exist then will return access group of root node
      * otherwise new access group will be created for organization
      */
-    public Map<Long, Long> createDefaultAccessGroups(Organization organization) {
+    public Map<Long, Long> createDefaultAccessGroups(Unit unit) {
 
         //get root organization
-        Organization parent;
+        Unit parent;
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
-        if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
+        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
+            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
-        Long countryId = organizationService.getCountryIdOfOrganization(organization.getId());
+        Long countryId = organizationService.getCountryIdOfOrganization(unit.getId());
         List<AccessGroup> accessGroupList = null;
         if (parent == null) {
-            List<AccessGroupQueryResult> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organizationService.getOrganizationCategory(organization.getCompanyType()).toString());
+            List<AccessGroupQueryResult> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organizationService.getOrganizationCategory(unit.getCompanyType()).toString());
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroupQueryResult countryAccessGroup : countryAccessGroups) {
                 AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole(), countryAccessGroup.getDayTypes(), countryAccessGroup.getStartDate(), countryAccessGroup.getEndDate());
@@ -209,7 +209,7 @@ public class AccessGroupService {
                 accessGroupList.add(accessGroup);
             }
 
-            organization.setAccessGroups(accessGroupList);
+            unit.setAccessGroups(accessGroupList);
         } else {
             // Remove AG_COUNTRY_ADMIN access group to be copied
             List<AccessGroup> accessGroups = new ArrayList<>(parent.getAccessGroups());
@@ -218,9 +218,9 @@ public class AccessGroupService {
                     accessGroups.remove(accessGroup);
                 }
             }
-            organization.setAccessGroups(accessGroups);
+            unit.setAccessGroups(accessGroups);
         }
-        organizationGraphRepository.save(organization);
+        organizationGraphRepository.save(unit);
         return countryAndOrgAccessGroupIdsMap;
     }
 
@@ -228,21 +228,21 @@ public class AccessGroupService {
         accessGroupRepository.removeDefaultCopiedAccessGroup(organizationIds);
     }
 
-    public void createDefaultAccessGroups(Organization parentOrg, List<Organization> organizations) {
+    public void createDefaultAccessGroups(Unit parentOrg, List<Unit> units) {
         List<AccessGroupQueryResult> accessGroupList = accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId());
         createDefaultAccessGroupsInOrganization(parentOrg, accessGroupList, true);
-        organizations.forEach(org -> {
+        units.forEach(org -> {
             createDefaultAccessGroupsInOrganization(org, accessGroupList, false);
         });
     }
 
     /**
-     * @param organization,accountTypeId
+     * @param unit,accountTypeId
      * @author vipul
      * this method will create accessgroup to the organization
      * @Extra Need to optimize
      */
-    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Organization organization, List<AccessGroupQueryResult> accessGroupList, boolean company) {
+    public Map<Long, Long> createDefaultAccessGroupsInOrganization(Unit unit, List<AccessGroupQueryResult> accessGroupList, boolean company) {
 
 
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new LinkedHashMap<>();
@@ -270,13 +270,13 @@ public class AccessGroupService {
         //List<Long> organizationAccessGroupIds = newAccessGroupList.stream().map(AccessGroup::getId).collect(Collectors.toList());
         //List<Long> countryAccessGroupIds = newAccessGroupList.stream().map(AccessGroup::getId).collect(Collectors.toList());
         //accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroupIds, organizationAccessGroupIds);
-        organization.setAccessGroups(newAccessGroupList);
-        organizationGraphRepository.save(organization);
+        unit.setAccessGroups(newAccessGroupList);
+        organizationGraphRepository.save(unit);
         return countryAndOrgAccessGroupIdsMap;
     }
 
     public List<AccessGroupQueryResult> getAccessGroupsForUnit(long organizationId) {
-        Organization unit = organizationGraphRepository.findOne(organizationId, 0);
+        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
         if (!unit.isParentOrganization()) {
             unit = organizationGraphRepository.getParentOfOrganization(unit.getId());
         }
@@ -346,9 +346,9 @@ public class AccessGroupService {
     }
 
     public List<AccessPageQueryResult> getAccessPageByAccessGroup(long accessGroupId, long unitId, long staffId) {
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
 
-        Organization parent;
+        Unit parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
         } else {
@@ -494,11 +494,11 @@ public class AccessGroupService {
 
     public void assignPermission(long accessGroupId, AccessPermissionDTO accessPermissionDTO) {
 
-        Organization unit = organizationGraphRepository.findOne(accessPermissionDTO.getUnitId(), 0);
+        Unit unit = organizationGraphRepository.findOne(accessPermissionDTO.getUnitId(), 0);
         if (unit == null) {
             exceptionService.internalServerError(ERROR_UNIT_NOTNULL);
         }
-        Organization parent;
+        Unit parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
         } else {
@@ -751,12 +751,12 @@ public class AccessGroupService {
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
-        Optional<Organization> organization = organizationGraphRepository.findById(organizationId);
+        Optional<Unit> organization = organizationGraphRepository.findById(organizationId);
         if (!organization.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
 
         }
-        Organization parent;
+        Unit parent;
         if (organization.get().getOrganizationLevel().equals(OrganizationLevel.CITY)) {
             parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.get().getId());
 
@@ -920,7 +920,7 @@ public class AccessGroupService {
 
     }
 
-    public void linkParentOrganizationAccessGroup(Organization unit, Long parentOrganizationId) {
+    public void linkParentOrganizationAccessGroup(Unit unit, Long parentOrganizationId) {
         List<AccessGroupQueryResult> accessGroupQueryResults = getOrganizationAccessGroups(parentOrganizationId);
         List<AccessGroup> accessGroupList = ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupQueryResults, AccessGroup.class);
         unit.setAccessGroups(accessGroupList);

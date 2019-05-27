@@ -136,8 +136,8 @@ public class BootDataService {
 
     private Country denmark = null;
 
-    private Organization kairosCountryLevel = null;
-    private Organization kairosRegionLevel = null;
+    private Unit kairosCountryLevel = null;
+    private Unit kairosRegionLevel = null;
 
     private Team nestingTeam;
 
@@ -485,7 +485,7 @@ public class BootDataService {
 
 //        accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
         UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setOrganization(kairosCountryLevel);
+        unitPermission.setUnit(kairosCountryLevel);
         unitPermission.setAccessGroup(accessGroup);
 //        accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
 

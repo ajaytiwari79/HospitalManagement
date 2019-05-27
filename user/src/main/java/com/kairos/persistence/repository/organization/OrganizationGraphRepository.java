@@ -28,29 +28,29 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Interface for CRUD operation on Organization
  */
 @Repository
-public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organization, Long>, CustomOrganizationGraphRepository {
+public interface OrganizationGraphRepository extends Neo4jBaseRepository<Unit, Long>, CustomOrganizationGraphRepository {
 
-    @Query("MATCH (o:Organization {isEnable:true}) RETURN {name:o.name, id:id(o)} as organization")
+    @Query("MATCH (o:Unit {isEnable:true}) RETURN {name:o.name, id:id(o)} as organization")
     List<Map<String, Object>> findAllOrganizations();
 
-    Organization findByName(String name);
+    Unit findByName(String name);
 
 
-    Organization findByExternalId(String externalId);
+    Unit findByExternalId(String externalId);
 
-    List<Organization> findByOrganizationLevel(OrganizationLevel organizationLevel);
+    List<Unit> findByOrganizationLevel(OrganizationLevel organizationLevel);
 
 
-    @Query("MATCH (o:Organization {isEnable:true} ),(o1:Organization) WHERE id(o)={0} AND id(o1)={1} create (o)-[:HAS_SUB_ORGANIZATION]->(o1) RETURN o1")
-    Organization createChildOrganization(long parentOrganizationId, long childOrganizationId);
+    @Query("MATCH (o:Unit {isEnable:true} ),(o1:Unit) WHERE id(o)={0} AND id(o1)={1} create (o)-[:HAS_SUB_ORGANIZATION]->(o1) RETURN o1")
+    Unit createChildOrganization(long parentOrganizationId, long childOrganizationId);
 
-    @Query("MATCH(n:Organization {isEnable:true}),(d:Department),(u:User) WHERE id(n)={0} And id(d)={1} And id(u)={2}  create(d)-[:has_staff]->(u)")
-    Organization addStaff(long organzationId, long departmentId, long userId);
+    @Query("MATCH(n:Unit {isEnable:true}),(d:Department),(u:User) WHERE id(n)={0} And id(d)={1} And id(u)={2}  create(d)-[:has_staff]->(u)")
+    Unit addStaff(long organzationId, long departmentId, long userId);
 
-    @Query("MATCH (n:Organization) WHERE id(n)={0} WITH n " +
-            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) " +
+    @Query("MATCH (n:Unit) WHERE id(n)={0} WITH n " +
+            "MATCH (n)<-[:HAS_SUB_ORGANIZATION*]-(org:Unit{isParentOrganization:true,isKairosHub:false}) " +
             "MATCH (country:Country)<-[r:"+BELONGS_TO+" ]-(org) RETURN org,r, country    limit 1")
-    Organization getParentOfOrganization(Long organizationId);
+    Unit getParentOfOrganization(Long organizationId);
 
     @Query("MATCH (organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
             "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill{isEnabled:true}) WITH distinct skill,organization\n" +
@@ -61,7 +61,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
             " RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             " UNION\n" +
-            " MATCH (unit:Organization)-[:SUB_TYPE_OF]->(subType:OrganizationType) WHERE id(unit)={1} WITH subType,unit\n" +
+            " MATCH (unit:Unit)-[:SUB_TYPE_OF]->(subType:OrganizationType) WHERE id(unit)={1} WITH subType,unit\n" +
             " MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL+"{deleted:false}]->(skill:Skill{isEnabled:true}) WITH distinct skill,unit\n" +
             " MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,unit,r\n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags WITH  skill,unit,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
@@ -70,7 +70,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             " RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfChildOrganizationWithActualName(long organizationId, long unitId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} \n" +
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} \n" +
             "MATCH (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) \n" +
             "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH DISTINCT skill,organization\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH distinct skill,skillCategory,organization\n" +
@@ -86,7 +86,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfParentOrganization(long unitId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} \n" +
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} \n" +
             "MATCH (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType)  \n" +
             "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill) WITH DISTINCT skill,organization\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH distinct skill,skillCategory,organization \n" +
@@ -95,7 +95,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "WITH {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags})} as availableSkills\n" +
             "RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             "UNION\n" +
-            "MATCH (organization:Organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(organization)={0} \n" +
+            "MATCH (organization:Unit)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(organization)={0} \n" +
             "MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) \n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) \n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE tag.countryTag=organization.showCountryTags WITH  skill,organization,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
@@ -104,7 +104,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
     List<Map<String, Object>> getSkillsOfParentOrganizationWithActualName(long unitId);
 
-    @Query("MATCH (o:Organization)-[:CONTACT_ADDRESS]->(ca:ContactAddress) WHERE id(o)={0} RETURN ca")
+    @Query("MATCH (o:Unit)-[:CONTACT_ADDRESS]->(ca:ContactAddress) WHERE id(o)={0} RETURN ca")
     ContactAddress getOrganizationAddressDetails(Long organizationId);
 
     @Query("MATCH(t:Team)-[:" + TEAM_HAS_SERVICES + "]-(os:OrganizationService) WHERE id(t)={0} WITH os as ss " +
@@ -119,7 +119,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "} as serviceList")
     List<Map<String, Object>> getTeamAllSelectedSubServices(Long teamId);
 
-    @Query("MATCH (user:User)<-[:" + IS_A + "]-(c:Client)-[:GET_SERVICE_FROM]->(o:Organization)  WHERE id(o)= {0} WITH c,user\n" +
+    @Query("MATCH (user:User)<-[:" + IS_A + "]-(c:Client)-[:GET_SERVICE_FROM]->(o:Unit)  WHERE id(o)= {0} WITH c,user\n" +
             "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  WITH ca,c,user\n" +
             "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(contactDetail:ContactDetail) WITH contactDetail, ca, c,user\n" +
             "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(civilianStatus:CitizenStatus) WITH civilianStatus, contactDetail, ca, c,user\n" +
@@ -129,7 +129,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "localAreaTag:CASE WHEN lat IS NOT NULL THEN {id:id(lat), name:lat.name} ELSE NULL END}  as Client  ORDER BY c.firstName")
     List<Map<String, Object>> getClientsOfOrganization(Long organizationId, String imageUrl);
 
-    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]->(o:Organization) WHERE id(o)= {0}  WITH c,r\n" +
+    @Query("MATCH (c:Client{citizenDead:false})-[r:GET_SERVICE_FROM]->(o:Unit) WHERE id(o)= {0}  WITH c,r\n" +
             "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  WITH ca,c,r\n" +
             "OPTIONAL MATCH (c)-[:HAS_CONTACT_DETAIL]->(cd:ContactDetail)  WITH cd,ca,c,r\n" +
             "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus) WITH cs,cd,ca,c,r\n" +
@@ -143,7 +143,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH (c:Client{citizenDead:false}) WHERE id(c) IN {0} RETURN {name:c.firstName+\" \" +c.lastName,id:id(c) , gender:c.gender, cprNumber:c.cprNumber  , citizenDead:c.citizenDead }  as Client  ORDER BY c.firstName")
     List<Map<String, Object>> getClientsByClintIdList(List<Long> clientIds);
 
-    @Query("MATCH (organization:Organization)-[:HAS_SUB_ORGANIZATION]->(unit:Organization) WHERE id(organization)={0} WITH unit  " +
+    @Query("MATCH (organization:Unit)-[:HAS_SUB_ORGANIZATION]->(unit:Unit) WHERE id(organization)={0} WITH unit  " +
             "OPTIONAL MATCH (unit)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress) WITH " +
             "contactAddress,unit " +
             "MATCH (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) WITH zipCode,contactAddress,unit " +
@@ -153,28 +153,28 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "municipalityName:contactAddress.municipalityName} end}) AS unitList")
     List<Map<String, Object>> getUnits(long organizationId);
 
-    @Query("MATCH (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.isEnabled=false")
+    @Query("MATCH (o:Unit)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.isEnabled=false")
     void removeServiceFromOrganization(long unitId, long serviceId);
 
-    @Query("MATCH (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
+    @Query("MATCH (o:Unit)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
     void updateServiceFromOrganization(long unitId, long serviceId);
 
-    @Query("MATCH (o:Organization)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
+    @Query("MATCH (o:Unit)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
     int isServiceAlreadyExist(long unitId, long serviceId);
 
-    @Query("MATCH (o:Organization)-[:" + HAS_SUB_ORGANIZATION + "*..4]-(co:Organization) WHERE id(o)={0}  RETURN " +
+    @Query("MATCH (o:Unit)-[:" + HAS_SUB_ORGANIZATION + "*..4]-(co:Unit) WHERE id(o)={0}  RETURN " +
             "COLLECT ({name:co.name,id:id(co),level:co.organizationLevel}) as organizationList")
     List<Map<String, Object>> getOrganizationChildList(Long id);
 
 
-    @Query("MATCH (o:Organization)-[:"+HAS_TEAMS+"]-(t:Team) WHERE id(o)={0} RETURN { id:id(t) , name:t.name} as result")
+    @Query("MATCH (o:Unit)-[:"+HAS_TEAMS+"]-(t:Team) WHERE id(o)={0} RETURN { id:id(t) , name:t.name} as result")
     List<Map<String, Object>> getUnitTeams(Long unitId);
 
-    @Query("MATCH (o:Organization {isEnable:true})-[:HAS_SETTING]-(os:OrganizationSetting) WHERE id(o)={0} WITH os as setting MATCH (setting)-[:OPENING_HOUR]-(oh:OpeningHours) RETURN oh order by oh.index")
+    @Query("MATCH (o:Unit {isEnable:true})-[:HAS_SETTING]-(os:OrganizationSetting) WHERE id(o)={0} WITH os as setting MATCH (setting)-[:OPENING_HOUR]-(oh:OpeningHours) RETURN oh order by oh.index")
     List<OpeningHours> getOpeningHours(Long organizationId);
 
 
-    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} \n" +
+    @Query("MATCH (org:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} \n" +
             "OPTIONAL MATCH (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) WITH org,ot\n" +
             "OPTIONAL MATCH (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH COLLECT(id(subType)) as organizationSubTypeIds,org,ot\n" +
             "OPTIONAL MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH organizationSubTypeIds,org,ot,zipCode\n" +
@@ -183,7 +183,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY org.name")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
-    @Query("MATCH (organization:Organization)-[:" + HAS_SUB_ORGANIZATION + "]->(org:Organization{union:false,deleted:false}) WHERE id(organization)={0}  \n" +
+    @Query("MATCH (organization:Unit)-[:" + HAS_SUB_ORGANIZATION + "]->(org:Unit{union:false,deleted:false}) WHERE id(organization)={0}  \n" +
             "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]-(companyCategory:CompanyCategory) WITH companyCategory, org\n" +
             "OPTIONAL Match (org)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false}) WITH companyCategory, org, level \n"+
             "OPTIONAL MATCH (org)-[:" + HAS_UNIT_TYPE + "]-(unitType:UnitType) WITH companyCategory, org,unitType, level\n" +
@@ -214,11 +214,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes,accountTypes,unitTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 
-    @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org " +
-            "MATCH path=(org)-[:HAS_SUB_ORGANIZATION]->(child:Organization{isEnable:true,boardingCompleted:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
+    @Query("MATCH (org:Unit) WHERE id(org)={0} WITH org " +
+            "MATCH path=(org)-[:HAS_SUB_ORGANIZATION]->(child:Unit{isEnable:true,boardingCompleted:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
     List<Map<String, Object>> getSubOrgHierarchy(long organizationId);
 
-    @Query("MATCH (c:Client{healthStatus:'ALIVE'})-[r:GET_SERVICE_FROM]-(o:Organization) WHERE id(o)= {0}  WITH c,r\n" +
+    @Query("MATCH (c:Client{healthStatus:'ALIVE'})-[r:GET_SERVICE_FROM]-(o:Unit) WHERE id(o)= {0}  WITH c,r\n" +
             "OPTIONAL MATCH (c)-[:CIVILIAN_STATUS]->(cs:CitizenStatus)  WITH cs,c,r\n" +
             "OPTIONAL MATCH (c)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  WITH ca,c,r,cs\n" +
             "OPTIONAL MATCH (ca)-[:ZIP_CODE]->(zipCode:ZipCode) WITH ca,c,r,zipCode,cs \n" +
@@ -227,15 +227,15 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Map<String, Object>> getAllClientsOfOrganization(long organizationId);
 
 
-    @Query("MATCH (cityLevel:Organization),(regionLevel:Organization{organizationLevel:'REGION'}) WHERE id(cityLevel)={0} " +
+    @Query("MATCH (cityLevel:Unit),(regionLevel:Unit{organizationLevel:'REGION'}) WHERE id(cityLevel)={0} " +
             "CREATE UNIQUE (regionLevel)-[r:" + HAS_SUB_ORGANIZATION + "]->(cityLevel) RETURN count(r)")
     int linkWithRegionLevelOrganization(long organizationId);
 
-    @Query("MATCH (o:Organization {isEnable:true})-[:HAS_PUBLIC_PHONE_NUMBER]-> (p:PublicPhoneNumber) WHERE p.phoneNumber={0} RETURN o")
-    Organization findOrganizationByPublicPhoneNumber(String phoneNumber);
+    @Query("MATCH (o:Unit {isEnable:true})-[:HAS_PUBLIC_PHONE_NUMBER]-> (p:PublicPhoneNumber) WHERE p.phoneNumber={0} RETURN o")
+    Unit findOrganizationByPublicPhoneNumber(String phoneNumber);
 
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} " +
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} " +
             "RETURN  " +
             "CASE 'COUNTRY' " +
             "when organization.organizationLevel " +
@@ -244,32 +244,32 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     boolean isThisKairosHub(long organizationId);
 
 
-    @Query("MATCH (org:Organization{isEnable:true,boardingCompleted: true}) where id(org) IN {0} WITH org  MATCH path=(org)-[:"+HAS_SUB_ORGANIZATION+"*]->({isEnable:true,boardingCompleted: true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],preKairos:ps.p.isPrekairos,kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],preKairos:ps.c.isPrekairos,kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data\n" +
+    @Query("MATCH (org:Unit{isEnable:true,boardingCompleted: true}) where id(org) IN {0} WITH org  MATCH path=(org)-[:"+HAS_SUB_ORGANIZATION+"*]->({isEnable:true,boardingCompleted: true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],preKairos:ps.p.isPrekairos,kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],preKairos:ps.c.isPrekairos,kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data\n" +
             "UNION\n" +
-            "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) where id(org) IN {0} WITH org  MATCH path=(org)-[:"+HAS_SUB_ORGANIZATION+"*]->({isEnable:true,boardingCompleted: true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data\n" +
+            "MATCH (org:Unit{isEnable:true,boardingCompleted: true}) where id(org) IN {0} WITH org  MATCH path=(org)-[:"+HAS_SUB_ORGANIZATION+"*]->({isEnable:true,boardingCompleted: true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data\n" +
             "UNION\n" +
-            "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) where id(org) IN {0} WITH org optional MATCH path=(org)-[:"+HAS_SUB_ORGANIZATION+"*]->({isEnable:true,boardingCompleted: true}) WITH NODES(path) AS np,org WITH CASE WHEN np is null THEN org ELSE np end as np ,org \n" +
+            "MATCH (org:Unit{isEnable:true,boardingCompleted: true}) where id(org) IN {0} WITH org optional MATCH path=(org)-[:"+HAS_SUB_ORGANIZATION+"*]->({isEnable:true,boardingCompleted: true}) WITH NODES(path) AS np,org WITH CASE WHEN np is null THEN org ELSE np end as np ,org \n" +
             "WITH CASE WHEN size(np)=1 THEN  \n" +
             "REDUCE(s=[], i IN RANGE(0, 1-1, 1) | s + {p:np}) \n" +
             "ELSE  REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) end as cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data \n" +
             "UNION\n" +
-            "MATCH (org:Organization{isEnable:true,boardingCompleted: true}) where id(org) IN {0} WITH org MATCH path=(org) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data")
+            "MATCH (org:Unit{isEnable:true,boardingCompleted: true}) where id(org) IN {0} WITH org MATCH path=(org) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p),type:labels(ps.p)[0],kairosHub:case when labels(ps.p)[0]='Organization' then ps.p.isKairosHub else false end,preKairos:ps.p.isPrekairos,enabled:case when labels(ps.p)[0]='Organization' then ps.p.isEnable else ps.p.isEnabled end,oneTimeSyncPerformed:ps.p.isOneTimeSyncPerformed,union:ps.p.union,autoGeneratedPerformed:ps.p.isAutoGeneratedPerformed,parentOrganization:ps.p.isParentOrganization,organizationLevel:ps.p.organizationLevel},child:{name:ps.c.name,id:id(ps.c),type:labels(ps.c)[0],kairosHub:case when labels(ps.c)[0]='Organization' then ps.c.isKairosHub else false end,preKairos:ps.c.isPrekairos,enabled:case when labels(ps.c)[0]='Organization' then ps.c.isEnable else ps.c.isEnabled end,oneTimeSyncPerformed:ps.c.isOneTimeSyncPerformed,autoGeneratedPerformed:ps.c.isAutoGeneratedPerformed,parentOrganization:ps.c.isParentOrganization,timeZone:ps.c.timeZone,union:ps.c.union,organizationLevel:ps.c.organizationLevel}} as data")
     List<Map<String, Object>> getOrganizationHierarchy(List<Long> parentOrganizationId);
 
 
-    @Query("MATCH (parentO:Organization)-[rel]-(childO:Organization) WHERE id(parentO)={0} AND id(childO)={1} DELETE rel")
+    @Query("MATCH (parentO:Unit)-[rel]-(childO:Unit) WHERE id(parentO)={0} AND id(childO)={1} DELETE rel")
     void deleteChildRelationOrganizationById(long parentOrganizationId, long childOrganizationId);
 
-    @Query("MATCH (childO:Organization) WHERE id(childO)={0} DELETE childO")
+    @Query("MATCH (childO:Unit) WHERE id(childO)={0} DELETE childO")
     void deleteOrganizationById(long childOrganizationId);
 
-    @Query("MATCH (child:Organization) WHERE id(child)={0} " +
-            "MATCH (child)<-[:HAS_SUB_ORGANIZATION*]-(n:Organization{organizationLevel:'CITY'}) RETURN n limit 1")
-    Organization getParentOrganizationOfCityLevel(long unitId);
+    @Query("MATCH (child:Unit) WHERE id(child)={0} " +
+            "MATCH (child)<-[:HAS_SUB_ORGANIZATION*]-(n:Unit{organizationLevel:'CITY'}) RETURN n limit 1")
+    Unit getParentOrganizationOfCityLevel(long unitId);
 
 
-    @Query("MATCH (o:Organization)-[rel:" + ORGANISATION_HAS_SKILL + "]->(s:Skill) WHERE id(o)={0}  AND  id(s)={1} \n" +
-            "OPTIONAL MATCH (o)-[:" + HAS_SUB_ORGANIZATION + "]->(sub:Organization)-[subRel:" + ORGANISATION_HAS_SKILL + "]->(s) SET rel.isEnabled=false, " +
+    @Query("MATCH (o:Unit)-[rel:" + ORGANISATION_HAS_SKILL + "]->(s:Skill) WHERE id(o)={0}  AND  id(s)={1} \n" +
+            "OPTIONAL MATCH (o)-[:" + HAS_SUB_ORGANIZATION + "]->(sub:Unit)-[subRel:" + ORGANISATION_HAS_SKILL + "]->(s) SET rel.isEnabled=false, " +
             "rel.lastModificationDate={2},subRel.isEnabled=false,subRel.lastModificationDate={2} ")
     void removeSkillFromOrganization(long unitId, long skillId, long lastModificationDate);
 
@@ -286,7 +286,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN {ownershipTypes:case when ownerships[0].id is null then [] else ownerships end,industryTypes:case when industryTypes[0].id is null then [] else industryTypes end,employeeLimits:case when employeeLimits[0].id is null then [] else employeeLimits end,vatTypes:case when vatTypes[0].id is null then [] else vatTypes end,contractTypes:case when contractTypes[0].id is null then [] else contractTypes end,organizationTypes:case when organizationTypes is null then [] else COLLECT(organizationTypes) end,kairosStatusList:case when kairosStatus[0].id is null then [] else kairosStatus end,businessTypes:case when businessTypes[0].id is null then [] else businessTypes end} as data")
     List<Map<String, Object>> getGeneralTabMetaData(long countryId);
 
-    @Query("MATCH (n:Organization) WHERE id(n)={0}\n" +
+    @Query("MATCH (n:Unit) WHERE id(n)={0}\n" +
             "OPTIONAL MATCH (n)-[:" + TYPE_OF + "]->(orgType:OrganizationType) WITH id(orgType) as orgId,n\n" +
             "OPTIONAL MATCH (n)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH COLLECT(distinct id(subType)) as subTypeId,orgId,n\n" +
             "OPTIONAL MATCH (n)-[:" + BUSINESS_TYPE + "]->(businessType:BusinessType) WITH subTypeId,orgId,n,COLLECT(distinct id(businessType)) as businessTypeId\n" +
@@ -305,7 +305,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Map<String, Object> getGeneralTabInfo(long organizationId);
 
 
-    @Query("MATCH (organization:Organization),(unit:Organization) WHERE id(organization)={0} AND id(unit)={1} \n" +
+    @Query("MATCH (organization:Unit),(unit:Unit) WHERE id(organization)={0} AND id(unit)={1} \n" +
             "MATCH (unit)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,unit,organization \n" +
             "MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true})<-[r:PROVIDE_SERVICE{isEnabled:true}]-(organization) WITH distinct os,r,unit \n" +
             "MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os)  WITH os,r,unit ,organizationService\n" +
@@ -314,7 +314,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "customName: CASE WHEN orgServiceCustomNameRelation IS NULL THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END\n" +
             ", description:organizationService.description} as availableServices RETURN {availableServices:COLLECT(availableServices)} as data \n" +
             "UNION \n" +
-            "MATCH (organization:Organization),(unit:Organization) WHERE id(unit)={1} and id(organization)={0}\n" +
+            "MATCH (organization:Unit),(unit:Unit) WHERE id(unit)={1} and id(organization)={0}\n" +
             "MATCH (unit)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,unit,organization\n" +
             "MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true})<-[:PROVIDE_SERVICE{isEnabled:true}]-(organization) WITH distinct os,unit, organization\n" +
             "MATCH (unit)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os) WITH distinct os,r,unit, organization\n" +
@@ -326,10 +326,10 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "description:organizationService.description} as selectedServices RETURN {selectedServices:COLLECT(selectedServices)} as data")
     List<Map<String, Object>> getServicesForUnit(long organizationId, long unitId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} WITH organization MATCH (organization)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,organization MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true}) WITH os,organization MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) \n" +
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} WITH organization MATCH (organization)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,organization MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true}) WITH os,organization MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) \n" +
             "WITH {children: case when os is NULL then [] else COLLECT(distinct {id:id(os),name:os.name,description:os.description}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as availableServices RETURN {availableServices:COLLECT(availableServices)} as data\n" +
             "UNION\n" +
-            "MATCH (organization:Organization) WHERE id(organization)={0} WITH organization MATCH (organization)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,organization \n" +
+            "MATCH (organization:Unit) WHERE id(organization)={0} WITH organization MATCH (organization)-[:SUB_TYPE_OF]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,organization \n" +
             "MATCH (organizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]-(os:OrganizationService{isEnabled:true}) WITH distinct os,organization \n" +
             "MATCH (organization)-[r:PROVIDE_SERVICE{isEnabled:true}]->(os) WITH os, r, organization MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os) WITH os, r, organization, organizationService\n" +
             "OPTIONAL MATCH (organization)-[orgServiceCustomNameRelation:HAS_CUSTOM_SERVICE_NAME_FOR]-(organizationService:OrganizationService) \n" +
@@ -338,19 +338,19 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "customName:CASE WHEN orgServiceCustomNameRelation IS null THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END} as selectedServices RETURN {selectedServices:COLLECT(selectedServices)} as data")
     List<Map<String, Object>> getServicesForParent(long organizationId);
 
-    @Query("MATCH (unit:Organization),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:skill.name}]->(skill)")
+    @Query("MATCH (unit:Unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:skill.name}]->(skill)")
     void addSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (unit:Organization),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) set r.creationDate={2},r.lastModificationDate={3},r.isEnabled=true")
+    @Query("MATCH (unit:Unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) set r.creationDate={2},r.lastModificationDate={3},r.isEnabled=true")
     void updateSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (unit:Organization),(organizationService:OrganizationService) WHERE id(unit)={0} AND id(organizationService) IN {1} create unique (unit)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService)")
+    @Query("MATCH (unit:Unit),(organizationService:OrganizationService) WHERE id(unit)={0} AND id(organizationService) IN {1} create unique (unit)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService)")
     void addOrganizationServiceInUnit(long unitId, List<Long> organizationServiceId, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (o:Organization)-[r:" + ORGANISATION_HAS_SKILL + "]->(os:Skill) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
+    @Query("MATCH (o:Unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(os:Skill) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
     int isSkillAlreadyExist(long unitId, long serviceId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} WITH organization MATCH (organization)-[:" + HAS_BILLING_ADDRESS + "]->(billingAddress:ContactAddress) WITH billingAddress \n" +
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} WITH organization MATCH (organization)-[:" + HAS_BILLING_ADDRESS + "]->(billingAddress:ContactAddress) WITH billingAddress \n" +
             "OPTIONAL MATCH (billingAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,billingAddress\n" +
             "OPTIONAL MATCH (billingAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,zipCode,billingAddress\n" +
             "OPTIONAL MATCH (billingAddress)-[:" + PAYMENT_TYPE + "]->(paymentType:PaymentType) WITH paymentType,zipCode,billingAddress,municipality \n" +
@@ -359,27 +359,27 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Map<String, Object> getBillingAddress(long unitId);
 
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} MATCH (organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress) MATCH (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) MATCH (contactAddress)-[:MUNICIPALITY]->(municipality:Municipality) RETURN organization,contactAddress,zipCode,municipality")
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} MATCH (organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress) MATCH (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) MATCH (contactAddress)-[:MUNICIPALITY]->(municipality:Municipality) RETURN organization,contactAddress,zipCode,municipality")
     OrganizationContactAddress getOrganizationByOrganizationId(long organizationId);
 
-    @Query("MATCH (organization:Organization)-[:" + HAS_TEAMS + "]->(team:Team) WHERE id(team)={0} RETURN organization")
-    Organization getOrganizationByTeamId(long groupId);
+    @Query("MATCH (organization:Unit)-[:" + HAS_TEAMS + "]->(team:Team) WHERE id(team)={0} RETURN organization")
+    Unit getOrganizationByTeamId(long groupId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} WITH organization " +
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} WITH organization " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,zipCode,contactAddress\n" +
             "RETURN municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
     OrganizationContactAddress getContactAddressOfOrg(long unitId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} WITH organization " +
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} WITH organization " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,zipCode,contactAddress\n" +
             "RETURN {houseNumber:contactAddress.houseNumber,municipalityName: municipality.name, id:id(contactAddress),floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCodeId:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street:contactAddress.street,municipalityId:id(municipality)} as contactAddress")
     Map<String, Object> getContactAddressOfParentOrganization(Long unitId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization) IN {0}  " +
+    @Query("MATCH (organization:Unit) WHERE id(organization) IN {0}  " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH contactAddress ,organization\n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress,organization \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,zipCode,contactAddress,organization \n" +
@@ -389,7 +389,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "contactAddress.latitude as latitude,contactAddress.street as street,id(municipality) as municipalityId,municipality.name as municipalityName")
     List<Map<String, Object>> getContactAddressOfParentOrganization(List<Long> unitId);
 
-    @Query("MATCH (unit:Organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(unit)={0} \n" +
+    @Query("MATCH (unit:Unit)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(unit)={0} \n" +
             "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill) WITH distinct skill,unit\n" +
             "MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH skill,r,unit\n" +
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH unit,skillCategory,skill,r\n" +
@@ -400,38 +400,38 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:case when r is null or r.customName is null then skill.name else r.customName end,description:skill.description,isSelected:case when r is null then false else true end, customName:case when r is null or r.customName is null then skill.name else r.customName end, isEdited:true,staff:staff.staff,tags:ctags+otags})} as data")
     List<Map<String, Object>> getAssignedSkillsOfStaffByOrganization(long unitId, List<Long> staffId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization)={0} \n" +
+    @Query("MATCH (organization:Unit) WHERE id(organization)={0} \n" +
             "MATCH (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) \n" +
             "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "]->(skill:Skill) WITH skill,organization\n" +
             "create unique (organization)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{1},lastModificationDate:{2},isEnabled:true,customName:skill.name}]->(skill)")
     void assignDefaultSkillsToOrg(long orgId, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (n:Organization) WHERE id(n)={0}\n" +
+    @Query("MATCH (n:Unit) WHERE id(n)={0}\n" +
             "MATCH (n)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH subType,n\n" +
             "MATCH (subType)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(organizationService:OrganizationService) WITH organizationService,n\n" +
             "create unique (n)-[:" + PROVIDE_SERVICE + "{isEnabled:true,creationDate:{1},lastModificationDate:{2}}]->(organizationService) ")
     void assignDefaultServicesToOrg(long orgId, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (unit:Organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WHERE id(unit)={0} WITH skill,unit,r\n" +
+    @Query("MATCH (unit:Unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WHERE id(unit)={0} WITH skill,unit,r\n" +
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH  unit,skill,skillCategory,r\n" +
             "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags WITH  unit,skill,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
             "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(unit) WITH skill,skillCategory,r,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:COLLECT(distinct {id:id(skill),name:skill.name,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
     List<Map<String, Object>> getSkillsOfOrganization(long unitId);
 
-    Organization findByKmdExternalId(String kmdExternalId);
+    Unit findByKmdExternalId(String kmdExternalId);
 
-    @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org\n" +
-            "OPTIONAL MATCH (org)-[:" + HAS_SUB_ORGANIZATION + "*]->(unit:Organization) WITH org+[unit] as coll\n" +
+    @Query("MATCH (org:Unit) WHERE id(org)={0} WITH org\n" +
+            "OPTIONAL MATCH (org)-[:" + HAS_SUB_ORGANIZATION + "*]->(unit:Unit) WITH org+[unit] as coll\n" +
             "unwind coll as units WITH distinct units\n" +
             "RETURN units")
-    List<Organization> getUnitsWithBasicInfo(long organizationId);
+    List<Unit> getUnitsWithBasicInfo(long organizationId);
 
-    @Query("MATCH (org:Organization)-[r:" + HAS_SUB_ORGANIZATION + "]->(unit:Organization) WHERE id(org)={0} AND id(unit)={1} RETURN count(r)")
+    @Query("MATCH (org:Unit)-[r:" + HAS_SUB_ORGANIZATION + "]->(unit:Unit) WHERE id(org)={0} AND id(unit)={1} RETURN count(r)")
     Integer checkParentChildRelation(Long organizationId, Long unitId);
 
 
-    @Query(" MATCH (organization:Organization) WHERE id(organization)={0} WITH organization\n" +
+    @Query(" MATCH (organization:Unit) WHERE id(organization)={0} WITH organization\n" +
             "MATCH (organization)-[r:PROVIDE_SERVICE]->(os) WHERE os.imported=true WITH distinct os,r\n" +
             "MATCH (organizationService:OrganizationService{isEnabled:true})-[:ORGANIZATION_SUB_SERVICE]->(os)  WITH r,os,organizationService\n" +
             "OPTIONAL MATCH (organizationService)<-[:" + LINK_WITH_EXTERNAL_SERVICE + "]-(ms:OrganizationService)  WITH r,ms,os,organizationService \n" +
@@ -445,15 +445,15 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Long findAllOrgCountMatchedByIds(List<Long> Ids);
 
 
-    @Query("MATCH (o:Organization{deleted:false,boardingCompleted:true}) RETURN id(o)")
+    @Query("MATCH (o:Unit{deleted:false,boardingCompleted:true}) RETURN id(o)")
     List<Long> findAllOrganizationIds();
 
 
-    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o:Organization) WHERE id(o)={0}  RETURN id(country) ")
+    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o:Unit) WHERE id(o)={0}  RETURN id(country) ")
     Long getCountryId(Long organizationId);
 
 
-    @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
+    @Query("MATCH (organization:Unit) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(organization)={0} AND et.deleted={1}\n" +
             "RETURN id(et) as id, et.name as name, et.description as description, \n" +
             "et.allowedForContactPerson as allowedForContactPerson,et.markMainEmployment as markMainEmployment, et.allowedForShiftPlan as allowedForShiftPlan, et.allowedForFlexPool as allowedForFlexPool,et.paymentFrequency as paymentFrequency, " +
@@ -461,42 +461,42 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Map<String, Object>> getEmploymentTypeByOrganization(Long organizationId, Boolean isDeleted);
 
 
-    @Query("MATCH (n:Organization) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n" +
+    @Query("MATCH (n:Unit) - [r:BELONGS_TO] -> (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType)\n" +
             "WHERE id(n)={0} AND id(et)={1} AND et.deleted={2}\n" +
             "RETURN et ORDER BY et.name ASC")
     EmploymentType getEmploymentTypeByOrganizationAndEmploymentId(Long organizationId, Long employmentId, Boolean isDeleted);
 
     @Query("MATCH (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os:OrganizationService)\n" +
             "WHERE id(os)={0} WITH organizationService\n" +
-            "MATCH (org:Organization) WHERE id(org)={1} WITH org, organizationService\n" +
+            "MATCH (org:Unit) WHERE id(org)={1} WITH org, organizationService\n" +
             "CREATE UNIQUE (org)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name RETURN true")
     Boolean addCustomNameOfServiceForOrganization(Long subServiceId, Long organizationId);
 
-    //    @Query("MATCH (o:Organization)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(os:OrganizationService) WHERE id(os)={0} AND id(o) ={1} SET r.customName={2} RETURN os")
-    @Query("MATCH (org:Organization),(os:OrganizationService) WHERE  id(org)={1} AND id(os)={0} WITH org,os\n" +
+    //    @Query("MATCH (o:Unit)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(os:OrganizationService) WHERE id(os)={0} AND id(o) ={1} SET r.customName={2} RETURN os")
+    @Query("MATCH (org:Unit),(os:OrganizationService) WHERE  id(org)={1} AND id(os)={0} WITH org,os\n" +
             "MERGE (org)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(os) \n" +
             "ON CREATE SET r.customName={2}\n" +
             "ON MATCH SET r.customName={2}\n" +
             " RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")
     OrganizationServiceQueryResult addCustomNameOfServiceForOrganization(Long serviceId, Long organizationId, String customName);
 
-    @Query("MATCH (o:Organization)-[r:" + PROVIDE_SERVICE + "{isEnabled:true}]->(os:OrganizationService) WHERE id(os)={0} AND id(o) ={1} SET r.customName={2}\n" +
+    @Query("MATCH (o:Unit)-[r:" + PROVIDE_SERVICE + "{isEnabled:true}]->(os:OrganizationService) WHERE id(os)={0} AND id(o) ={1} SET r.customName={2}\n" +
             "RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")
     OrganizationServiceQueryResult addCustomNameOfSubServiceForOrganization(Long serviceId, Long organizationId, String customName);
 
 
-    @Query("MATCH (organization:Organization) - [r:BELONGS_TO] -> (country:Country)\n" +
+    @Query("MATCH (organization:Unit) - [r:BELONGS_TO] -> (country:Country)\n" +
             "WHERE id(organization)={0}\n" +
             "RETURN country")
     Country getCountry(Long organizationId);
 
-    @Query("MATCH (organization:Organization)  WHERE id(organization)={0} \n" +
-            " MATCH(organization)<-[:HAS_SUB_ORGANIZATION*]-(parentOrganization:Organization{isKairosHub:false}) \n" +
+    @Query("MATCH (organization:Unit)  WHERE id(organization)={0} \n" +
+            " MATCH(organization)<-[:HAS_SUB_ORGANIZATION*]-(parentOrganization:Unit{isKairosHub:false}) \n" +
             " MATCH(parentOrganization)-[r:BELONGS_TO] -> (country:Country)\n" +
             " RETURN country limit 1")
     Country getCountryByParentOrganization(Long organizationId);
 
-    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} WITH org\n" +
+    @Query("MATCH (org:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} WITH org\n" +
             "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]->(companyCategory:CompanyCategory) WITH companyCategory, org\n" +
             "MATCH (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) WITH id(ot) as organizationTypeIds,org,companyCategory\n" +
             "OPTIONAL MATCH (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH  COLLECT(id(subType)) as organizationSubTypeIds,organizationTypeIds,org,companyCategory\n" +
@@ -514,77 +514,77 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN COLLECT({unitManager:CASE WHEN unitManager IS NULL THEN null ELSE  {id:id(unitManager), email:unitManager.email, firstName:unitManager.firstName, lastName:unitManager.lastName, cprNumber:unitManager.cprNumber, accessGroupId:id(accessGroup), accessGroupName:accessGroup.name} END, id:id(org),levelId:id(level),companyCategoryId:id(companyCategory),businessTypeIds:businessTypeIds,typeId:organizationTypeIds,subTypeId:organizationSubTypeIds,name:org.name,prekairos:org.isPrekairos,kairosHub:org.isKairosHub,description:org.description,externalId:org.externalId,desiredUrl:org.desiredUrl,shortCompanyName:org.shortCompanyName,kairosCompanyId:org.kairosCompanyId,companyType:org.companyType,vatId:org.vatId,costCenter:org.costCenter,costCenterId:org.costCenterId,companyUnitType:org.companyUnitType,contactAddress:{houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCode:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street:contactAddress.street,municipalityId:id(municipality)}}) as organizations")
     OrganizationQueryResult getAllUnionOfCountry(long countryId);
 
-    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(subType) IN {0} " +
+    @Query("MATCH (org:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(subType) IN {0} " +
             "RETURN  id(org) as id,org.name as name")
     List<UnionResponseDTO> getAllUnionsByOrganizationSubType(List<Long> organizationSubTypesId);
 
 
-    @Query("MATCH (o:Organization)-[rel:" + ORGANIZATION_HAS_UNIONS + "]->(union:Organization) WHERE id(o)={0}  AND  id(union)={1} \n" +
+    @Query("MATCH (o:Unit)-[rel:" + ORGANIZATION_HAS_UNIONS + "]->(union:Unit) WHERE id(o)={0}  AND  id(union)={1} \n" +
             "SET rel.disabled=true, rel.dateOfSeparation={2} ")
     void removeUnionFromOrganization(long unitId, long unionId, long dateOfSeparation);
 
-    @Query("MATCH (unit:Organization),(union:Organization) WHERE id (unit)={0} AND id(union) = {1} merge (unit)-[r:" + ORGANIZATION_HAS_UNIONS + "{dateOfJoining:{2},disabled:false}]->(union)")
+    @Query("MATCH (unit:Unit),(union:Unit) WHERE id (unit)={0} AND id(union) = {1} merge (unit)-[r:" + ORGANIZATION_HAS_UNIONS + "{dateOfJoining:{2},disabled:false}]->(union)")
     void addUnionInOrganization(long unitId, Long unionId, long dateOfJoining);
 
 
-    @Query("MATCH (union:Organization{union:true,isEnable:true}) WHERE id (union)={0}  RETURN union")
-    Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
+    @Query("MATCH (union:Unit{union:true,isEnable:true}) WHERE id (union)={0}  RETURN union")
+    Unit findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
 
 
-    @Query("MATCH(o:Organization)-[:" + HAS_SUB_ORGANIZATION + "*]->(s:Organization{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n" +
+    @Query("MATCH(o:Unit)-[:" + HAS_SUB_ORGANIZATION + "*]->(s:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n" +
             "RETURN s.name as name ,id(s) as id")
     List<OrganizationBasicResponse> getOrganizationHierarchy(Long parentOrganizationId);
 
-    @Query("MATCH(o:Organization)-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,boardingCompleted:true}) WHERE id(o)={0} \n"
-            + "MATCH(parentOrganization)-[:" + HAS_SUB_ORGANIZATION + "]-(units:Organization{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) " +
+    @Query("MATCH(o:Unit)-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganization:Unit{isEnable:true,isKairosHub:false,union:false,boardingCompleted:true}) WHERE id(o)={0} \n"
+            + "MATCH(parentOrganization)-[:" + HAS_SUB_ORGANIZATION + "]-(units:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) " +
             " WITH parentOrganization ,COLLECT (units)  as data " +
             " RETURN parentOrganization as parent,data as childUnits")
     OrganizationHierarchyData getChildHierarchyByChildUnit(Long childUnitId);
 
     //for getting Unions by Ids
 
-    @Query("MATCH (union:Organization{union:true,isEnable:true}) WHERE id (union) IN {0}  RETURN union")
-    List<Organization> findUnionsByIdsIn(List<Long> unionIds);
+    @Query("MATCH (union:Unit{union:true,isEnable:true}) WHERE id (union) IN {0}  RETURN union")
+    List<Unit> findUnionsByIdsIn(List<Long> unionIds);
 
-    @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  WHERE id(country)={0} RETURN id(union) as id, union.name as name")
+    @Query("MATCH (union:Unit{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  WHERE id(country)={0} RETURN id(union) as id, union.name as name")
     List<UnionQueryResult> findAllUnionsByCountryId(Long countryId);
 
     // This 8 is hardCoded because we only need to get the last Integer value of the organization's company Id
     // OOD-KAI-01    OOD-KAI-    >>  8
-    @Query("OPTIONAL MATCH (org:Organization{isEnable:true}) WHERE org.desiredUrl=~{0} with org,\n" +
+    @Query("OPTIONAL MATCH (org:Unit{isEnable:true}) WHERE org.desiredUrl=~{0} with org,\n" +
             "CASE WHEN {0} is NOT NULL THEN \n" +
             "    CASE WHEN count(org)>0 THEN  TRUE ELSE FALSE  END\n" +
             "ELSE FALSE END  AS desiredUrl\n" +
-            "OPTIONAL MATCH (org:Organization{isEnable:true}) WHERE org.name =~{1} WITH desiredUrl, case when count(org)>0 THEN  true ELSE false END as name\n" +
-            "OPTIONAL MATCH(org:Organization)" +
+            "OPTIONAL MATCH (org:Unit{isEnable:true}) WHERE org.name =~{1} WITH desiredUrl, case when count(org)>0 THEN  true ELSE false END as name\n" +
+            "OPTIONAL MATCH(org:Unit)" +
             "RETURN name,desiredUrl,org.kairosCompanyId as kairosCompanyId  ORDER BY subString(org.kairosCompanyId,8,size(org.kairosCompanyId)) DESC LIMIT 1")
     CompanyValidationQueryResult checkOrgExistWithUrlOrName(String desiredUrl, String name, String first3Char);
 
-    @Query("MATCH (org:Organization{isEnable:true}) WHERE org.desiredUrl={0}\n" +
+    @Query("MATCH (org:Unit{isEnable:true}) WHERE org.desiredUrl={0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithUrl(String desiredUrl);
 
-    @Query("MATCH (org:Organization{isEnable:true}) WHERE org.name={0}\n" +
+    @Query("MATCH (org:Unit{isEnable:true}) WHERE org.name={0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithName(String name);
 
-    @Query("MATCH (org:Organization)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) WHERE id(org)={0} RETURN orgSetting")
+    @Query("MATCH (org:Unit)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) WHERE id(org)={0} RETURN orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
-    @Query("MATCH (org:Organization)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
+    @Query("MATCH (org:Unit)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
             "MATCH(org)-[:" + SUB_TYPE_OF + "]->(organizationType:OrganizationType) \n" +
             "RETURN id(org) as unitId, COLLECT(id(organizationType)) as orgTypeIds")
     List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
 
-    @Query("MATCH (child:Organization) \n" +
-            "OPTIONAL MATCH (child)<-[:" + HAS_SUB_ORGANIZATION + "]-(parent:Organization) WITH child,parent\n" +
-            "MATCH (child)<-[:" + HAS_SUB_ORGANIZATION + "]-(superParent:Organization) WITH child,parent,superParent\n" +
+    @Query("MATCH (child:Unit) \n" +
+            "OPTIONAL MATCH (child)<-[:" + HAS_SUB_ORGANIZATION + "]-(parent:Unit) WITH child,parent\n" +
+            "MATCH (child)<-[:" + HAS_SUB_ORGANIZATION + "]-(superParent:Unit) WITH child,parent,superParent\n" +
             "MATCH (superParent)-[:" + BELONGS_TO + "]-(country:Country)\n" +
             "RETURN id(child) as unitId, CASE WHEN parent IS NULL THEN id(child) ELSE id(parent) END as parentOrganizationId, id(country) as countryId")
     List<Map<String, Object>> getUnitAndParentOrganizationAndCountryIds();
 
 
-    @Query("MATCH (org:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) WHERE id(org)={0} \n" +
+    @Query("MATCH (org:Unit)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Unit) WHERE id(org)={0} \n" +
             "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]->(companyCategory:CompanyCategory) WITH companyCategory, org,hub \n" +
             "OPTIONAL MATCH (org)-[:" + HAS_ACCOUNT_TYPE + "]->(accountType:AccountType) WITH companyCategory,accountType, org,hub \n" +
             "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,org,companyCategory,accountType,hub \n" +
@@ -593,7 +593,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "org.companyUnitType as companyUnitType,id(accountType) as accountTypeId, id(hub) as hubId ")
     OrganizationBasicResponse getOrganizationDetailsById(Long organizationId);
 
-    @Query("MATCH (organization:Organization) WHERE id(organization) IN {0} " +
+    @Query("MATCH (organization:Unit) WHERE id(organization) IN {0} " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH organization,contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress,organization \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) \n" +
@@ -601,24 +601,24 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<OrganizationContactAddress> getContactAddressOfOrganizations(List<Long> unitIds);
 
 
-    @Query("MATCH (parent:Organization) WHERE id(parent)={0} \n" +
-            "OPTIONAL MATCH (parent)-[:HAS_SUB_ORGANIZATION]->(child:Organization) WITH child\n" +
+    @Query("MATCH (parent:Unit) WHERE id(parent)={0} \n" +
+            "OPTIONAL MATCH (parent)-[:HAS_SUB_ORGANIZATION]->(child:Unit) WITH child\n" +
             "OPTIONAL MATCH (child)-[rel:HAS_ACCOUNT_TYPE]->(accountType:AccountType) \n" +
             " DETACH DELETE rel \n" +
             "WITH child MATCH(accountType:AccountType) WHERE id(accountType)={1}\n" +
             "MERGE (child)-[:HAS_ACCOUNT_TYPE]->(accountType)")
     void updateAccountTypeOfChildOrganization(Long parentOrganization, Long accountTypeId);
 
-    @Query("MATCH (org:Organization) WHERE id(org) IN {0} DETACH DELETE org")
+    @Query("MATCH (org:Unit) WHERE id(org) IN {0} DETACH DELETE org")
     void removeOrganizationCompletely(List<Long> organizationIdsToDelete);
 
-    @Query("MATCH(org:Organization{deleted:false}) RETURN id(org) as id, org.timeZone as timezone ORDER BY id")
+    @Query("MATCH(org:Unit{deleted:false}) RETURN id(org) as id, org.timeZone as timezone ORDER BY id")
     List<OrganizationBasicResponse> findTimezoneforAllorganizations();
 
-    @Query("MATCH(org:Organization{deleted:false}) WHERE id(org) IN {0} RETURN id(org) as id, org.timeZone as timezone ORDER BY id")
+    @Query("MATCH(org:Unit{deleted:false}) WHERE id(org) IN {0} RETURN id(org) as id, org.timeZone as timezone ORDER BY id")
     List<OrganizationBasicResponse> findTimezoneByUnitIds(Set<Long> unitIds);
 
-    @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={0} or union.name={1} WITH union MATCH(union)-[:" + BELONGS_TO + "]-(country:Country) WITH union,country OPTIONAL " +
+    @Query("MATCH(union:Unit{deleted:false,union:true}) WHERE id(union)={0} or union.name={1} WITH union MATCH(union)-[:" + BELONGS_TO + "]-(country:Country) WITH union,country OPTIONAL " +
             "MATCH(union)-[:" + HAS_SECTOR + "]-(sector:Sector) WITH union,collect(sector) as sectors,country OPTIONAL MATCH(union)-[:" + CONTACT_ADDRESS + "]-" +
             "(address:ContactAddress) OPTIONAL MATCH(address)-[:" + ZIP_CODE + "]-(zipCode:ZipCode) WITH union,sectors,address,zipCode,country OPTIONAL MATCH(address)-[:" + MUNICIPALITY + "]-" +
             "(municipality:Municipality) WITH union,sectors,address,zipCode,country,municipality " +
@@ -626,17 +626,17 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN union,country,address,zipCode,sectors,municipality,collect(location) as locations ")
     List<UnionDataQueryResult> getUnionCompleteById(Long unionId, String name);
 
-    @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)={1} MATCH(union)-[unionSectorRelDel:"+HAS_SECTOR+"]-(sector:Sector) WHERE id(sector) in {0} WITH union, " +
+    @Query("MATCH(union:Unit{deleted:false,union:true}) WHERE id(union)={1} MATCH(union)-[unionSectorRelDel:"+HAS_SECTOR+"]-(sector:Sector) WHERE id(sector) in {0} WITH union, " +
             "unionSectorRelDel DELETE unionSectorRelDel")
     void deleteUnionSectorRelationShip(List<Long> deleteSectorIds,Long unionId);
 
-    @Query("MATCH(union:Organization) WHERE id(union)={1} MATCH(sector:Sector) WHERE id(sector)in {0} create unique (union)-[:"+HAS_SECTOR+"]-(sector)")
+    @Query("MATCH(union:Unit) WHERE id(union)={1} MATCH(sector:Sector) WHERE id(sector)in {0} create unique (union)-[:"+HAS_SECTOR+"]-(sector)")
     void createUnionSectorRelationShip(List<Long> createSectorIds,Long unionId);
 
-    @Query("MATCH(union:Organization{deleted:false,union:true}) WHERE id(union)<>{1} AND union.name=~{0} RETURN count(union)>0")
+    @Query("MATCH(union:Unit{deleted:false,union:true}) WHERE id(union)<>{1} AND union.name=~{0} RETURN count(union)>0")
     boolean existsByName(String name,Long unionId);
 
-    @Query("MATCH(union:Organization{union:true,deleted:false})-[:" + BELONGS_TO + "]-(country:Country) WHERE id(country)={0}\n" +
+    @Query("MATCH(union:Unit{union:true,deleted:false})-[:" + BELONGS_TO + "]-(country:Country) WHERE id(country)={0}\n" +
             "WITH union OPTIONAL MATCH(union)-[:" + HAS_SECTOR + "]-(sector:Sector) WITH union,collect(sector) as sectors OPTIONAL MATCH(union)-[:" + CONTACT_ADDRESS + "]-" +
             "(address:ContactAddress) WITH union,sectors,address OPTIONAL MATCH(address)-[:" + ZIP_CODE + "]-(zipCode:ZipCode) WITH union,sectors,address,zipCode\n" +
             "OPTIONAL MATCH(address)-[:" + MUNICIPALITY + "]-(municipality:Municipality) WITH union,sectors,address,zipCode,municipality OPTIONAL MATCH(zipCode)-\n" +
@@ -644,18 +644,18 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH(union)-[:" + HAS_LOCATION + "]-(location:Location{deleted:false,defaultLocation:false}) RETURN union,sectors,address,zipCode,municipality,municipalities,collect(location) as locations")
     List<UnionDataQueryResult> getUnionData(Long countryId);
 
-    @Query("MATCH(union:Organization{deleted:false}) WHERE id(union)={0} RETURN union.boardingCompleted")
+    @Query("MATCH(union:Unit{deleted:false}) WHERE id(union)={0} RETURN union.boardingCompleted")
     boolean isPublishedUnion(Long unionId);
 
-    @Query("MATCH(union:Organization) WHERE id(union)={0} " +
+    @Query("MATCH(union:Unit) WHERE id(union)={0} " +
             "MATCH(sector:Sector) WHERE id(sector)={1} " +
             "CREATE UNIQUE (union)-[:HAS_SECTOR]-(sector)")
     void linkUnionSector(Long unionId,Long sectorId);
 
 
 
-    @Query("MATCH(parentOrg:Organization{isEnable:true,boardingCompleted: true}) WHERE id(parentOrg)={0}\n" +
-            "OPTIONAL MATCH (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Organization{isEnable:true,boardingCompleted: true}) \n" +
+    @Query("MATCH(parentOrg:Unit{isEnable:true,boardingCompleted: true}) WHERE id(parentOrg)={0}\n" +
+            "OPTIONAL MATCH (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Unit{isEnable:true,boardingCompleted: true}) \n" +
             "OPTIONAL MATCH(parentOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizationType:OrganizationType{deleted:false})\n" +
             "OPTIONAL MATCH(childOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizationType:OrganizationType{deleted:false})\n" +
             "OPTIONAL MATCH(parentOrganizationService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizationService:OrganizationService{deleted:false})\n" +
@@ -671,21 +671,21 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Map<String,Object> getFiltersByParentOrganizationId(long parentOrganizationId);
 
 
-    @Query("MATCH (organizations:Organization{deleted:false,isEnable:true}) WHERE id (organizations) IN {0}  RETURN organizations")
-    List<Organization> findOrganizationsByIdsIn(List<Long> orgIds);
+    @Query("MATCH (organizations:Unit{deleted:false,isEnable:true}) WHERE id (organizations) IN {0}  RETURN organizations")
+    List<Unit> findOrganizationsByIdsIn(List<Long> orgIds);
 
-    @Query("MATCH(organization:Organization),(hub:Organization) WHERE id(organization)={0} AND id(hub)={1} " +
+    @Query("MATCH(organization:Unit),(hub:Unit) WHERE id(organization)={0} AND id(hub)={1} " +
             "CREATE UNIQUE(hub)-[r:"+HAS_SUB_ORGANIZATION+"]->(organization)  ")
     void linkOrganizationToHub(Long organizationId,Long hubId);
 
-    @Query("MATCH(organization:Organization) WHERE organization.isKairosHub=true AND organization.organizationLevel='COUNTRY' RETURN id(organization) as id, organization.name as name, organization.organizationLevel as organizationLevel")
+    @Query("MATCH(organization:Unit) WHERE organization.isKairosHub=true AND organization.organizationLevel='COUNTRY' RETURN id(organization) as id, organization.name as name, organization.organizationLevel as organizationLevel")
     List<OrganizationWrapper> getAllHubByCountryId(Long countryId);
 
-    @Query("MATCH(organization:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) WHERE id(organization)={0}  RETURN id(hub)")
+    @Query("MATCH(organization:Unit)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Unit) WHERE id(organization)={0}  RETURN id(hub)")
     Long getHubIdByOrganizationId(Long organizationId);
 
 
-    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Organization) where id(staff)={0} RETURN id(organization) as id,organization.name as name")
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Unit) where id(staff)={0} RETURN id(organization) as id,organization.name as name")
     List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
 
 }

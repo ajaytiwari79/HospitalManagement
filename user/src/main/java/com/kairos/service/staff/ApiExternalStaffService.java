@@ -2,7 +2,7 @@ package com.kairos.service.staff;
 
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.enums.OrganizationLevel;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
@@ -66,14 +66,14 @@ public class ApiExternalStaffService {
             staffList.add(staff.getId());
             logger.info("Creating Staff using organizationId " + orgnaizationId);
 
-            Organization unit =organizationGraphRepository.findOne(orgnaizationId,0);
+            Unit unit =organizationGraphRepository.findOne(orgnaizationId,0);
 
             if(unit == null){
                 exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND,orgnaizationId);
                 //throw new InternalError("unit can't be null");
             }
 
-            Organization parent = null;
+            Unit parent = null;
             if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
                 parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
@@ -117,7 +117,7 @@ public class ApiExternalStaffService {
             logger.info(" Staffs---> " + personsResponse.getGetEmploymentByIdResult().size());
             for (GetEmploymentByIdResult person : personsResponse.getGetEmploymentByIdResult()) {
                 Staff staff = staffService.getByExternalId(person.getId());
-                Organization organization = organizationService.getOrganizationByExternalId(person.getParentWorkPlaceId().toString());
+                Unit unit = organizationService.getOrganizationByExternalId(person.getParentWorkPlaceId().toString());
                 if(staff == null) {
                     Map<String, Object> engineerMetaData = new HashMap<>();
                     engineerMetaData.put("firstName", person.getFirstName());
@@ -125,7 +125,7 @@ public class ApiExternalStaffService {
                     engineerMetaData.put("familyName", person.getShortName());
                     engineerMetaData.put("employmentNumber", person.getEmploymentNumber());
                     engineerMetaData.put("externalId", person.getId());
-                    engineerMetaData.put("organizationId", organization.getId());
+                    engineerMetaData.put("organizationId", unit.getId());
                     createTimeCareStaff(engineerMetaData);
                 }
 

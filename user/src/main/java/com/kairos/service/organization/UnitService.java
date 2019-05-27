@@ -4,7 +4,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.*;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -64,7 +64,7 @@ public class UnitService {
     private final Logger logger = LoggerFactory.getLogger(UnitService.class);
 
 
-    private Map<String, Object> parentOrgDefaultDetails(Organization parentOrg) {
+    private Map<String, Object> parentOrgDefaultDetails(Unit parentOrg) {
         Map<String, Object> response = new HashMap<>(5);
         response.put("orgType", parentOrg.getOrganizationType());
         response.put("orgSubType", parentOrg.getOrganizationSubTypes());
@@ -80,20 +80,20 @@ public class UnitService {
 
     public Map<String, Object> getManageHierarchyData(long organizationId) {
 
-        Organization organization = organizationGraphRepository.findOne(organizationId);
+        Unit unit = organizationGraphRepository.findOne(organizationId);
 
-        if (!Optional.ofNullable(organization).isPresent()) {
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
         }
 
-        Organization parentOrganization = organization.isParentOrganization()? organization : organizationService.fetchParentOrganization(organizationId);
+        Unit parentUnit = unit.isParentOrganization()? unit : organizationService.fetchParentOrganization(organizationId);
         Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
         }
 
         Map<String, Object> response = new HashMap<>(2);
-        response.put("parentInfo", parentOrgDefaultDetails(parentOrganization));
+        response.put("parentInfo", parentOrgDefaultDetails(parentUnit));
         List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(organizationId);
         response.put("units", units.size() != 0 ? units : Collections.emptyList());
 
@@ -135,7 +135,7 @@ public class UnitService {
     }
 
     public Map<String, Object> getEligibleUnitsForCtaAndWtaCreation(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId, 2);
+        Unit organization = organizationGraphRepository.findOne(unitId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
@@ -152,7 +152,7 @@ public class UnitService {
 
         OrganizationCommonDTO organizationCommonDTO;
         List<OrganizationCommonDTO> organizationCommonDTOS = new ArrayList<>();
-        for(Organization unit : organization.getChildren()){
+        for(Unit unit : organization.getChildren()){
             organizationCommonDTO = new OrganizationCommonDTO();
             organizationCommonDTO.setId(unit.getId());
             organizationCommonDTO.setName(unit.getName());

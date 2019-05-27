@@ -17,7 +17,7 @@ import java.util.List;
 public class OrganizationBuilder {
     private String name;
     private Long id;
-    private List<Organization> children;
+    private List<Unit> children;
     private boolean parentOrganization;
     private Country country;
     private AccountType accountType;
@@ -49,7 +49,7 @@ public class OrganizationBuilder {
         return this;
     }
 
-    public OrganizationBuilder setChildren(List<Organization> children) {
+    public OrganizationBuilder setChildren(List<Unit> children) {
         this.children = children;
         return this;
     }
@@ -191,7 +191,7 @@ public class OrganizationBuilder {
         this.id = id;
     }
 
-    public List<Organization> getChildren() {
+    public List<Unit> getChildren() {
         return children;
     }
 
@@ -300,8 +300,8 @@ public class OrganizationBuilder {
         return workcentre;
     }
 
-    public Organization createOrganization() {
-        return new  Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
+    public Unit createOrganization() {
+        return new Unit( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
                 vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
                 parentOrganization, country,accountType,boardingCompleted,children,unitType, workcentre);
     }

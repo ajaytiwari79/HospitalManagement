@@ -5,7 +5,7 @@ import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.client.query_results.*;
 import com.kairos.persistence.model.client.relationships.ClientContactPersonRelationship;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonQueryResultByService;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -26,7 +26,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long> {
 
 
-    @Query("MATCH (client:Client)-[r:" + GET_SERVICE_FROM + "]->(org:Organization) where id(client)={0} and id(org)={1} return client")
+    @Query("MATCH (client:Client)-[r:" + GET_SERVICE_FROM + "]->(org:Unit) where id(client)={0} and id(org)={1} return client")
     Client findOne(long clientId, long unitId);
 
     @Query("MATCH (c:Client) return c order by c.firstName")
@@ -108,8 +108,8 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
             "}) as RelativeList ")
     List<Map<String, Object>> getRelativesListByClientId(Long clientId);
 
-    @Query("MATCH (c:Client)-[r:GET_SERVICE_FROM]->(org:Organization) where id(c)={0} return org")
-    List<Organization> getClientOrganizationIdList(Long clientId);
+    @Query("MATCH (c:Client)-[r:GET_SERVICE_FROM]->(org:Unit) where id(c)={0} return org")
+    List<Unit> getClientOrganizationIdList(Long clientId);
 
     @Query("MATCH (c:Client)-[r:" + SERVED_BY_STAFF + "]->(s:Staff) WHERE id(c)={0} AND r.type='PREFERRED' " +
             "RETURN " +
@@ -144,7 +144,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
             "             with staff, r as served_by_staff,user  \n" +
             "             OPTIONAL MATCH (staff)-[r:STAFF_HAS_SKILLS{isEnabled:true}]-(s:Skill)\n" +
             "             with staff, served_by_staff, s as skill, r as r,user\n" +
-            "             Match (unit:Organization)-[orgSkillRelation:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WHERE id(unit) = {3} WITH staff, served_by_staff, skill, r,user, orgSkillRelation\n" +
+            "             Match (unit:Unit)-[orgSkillRelation:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WHERE id(unit) = {3} WITH staff, served_by_staff, skill, r,user, orgSkillRelation\n" +
             "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isDisabled:staff.isDisabled,  skillList: collect ({name: orgSkillRelation.customName,level:r.skillLevel})  }as staffList")
     List<Map<String, Object>> getTeamMembers(Long teamID, Long clientId, String imageUrl, Long unitId);
 
@@ -177,13 +177,13 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
             "ON MATCH SET r.type = {2},r.lastModificationDate = {4} return true")
     void assignStaffToClient(long clientId, long staffId, ClientStaffRelation.StaffType staffType, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (client:Client)-[:GET_SERVICE_FROM]-(org:Organization),(staff:Staff) where id(org)={0} AND id(staff) IN {1}\n" +
+    @Query("MATCH (client:Client)-[:GET_SERVICE_FROM]-(org:Unit),(staff:Staff) where id(org)={0} AND id(staff) IN {1}\n" +
             "MERGE (client)-[r:SERVED_BY_STAFF]->(staff)\n" +
             "ON CREATE SET r.type = {2},r.creationDate = {3},r.lastModificationDate = {4}\n" +
             "ON MATCH SET r.type = {2},r.lastModificationDate = {4} return true")
     void assignMultipleStaffToClient(long unitId, List<Long> staffId, ClientStaffRelation.StaffType staffType, long creationDate, long lastModificationDate);
 
-    @Query("Match (client:Client{citizenDead:false})-[:" + GET_SERVICE_FROM + "]->(organization:Organization) where id(organization)={0} with client\n" +
+    @Query("Match (client:Client{citizenDead:false})-[:" + GET_SERVICE_FROM + "]->(organization:Unit) where id(organization)={0} with client\n" +
             "Match (staff:Staff) where id(staff) in {1} with staff,client\n" +
             "optional Match (client)-[r:" + SERVED_BY_STAFF + "]->(staff) with id(staff) as staffId,client,r\n" +
             "OPTIONAL MATCH (client)-[:HAS_HOME_ADDRESS]->(ca:ContactAddress)  with ca,staffId,client,r\n" +
@@ -226,13 +226,13 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
     @Query("MATCH (c:Client)-[:NEXT_TO_KIN]->(n:Client) where id(c)={0}  return n")
     Client getNextToKin(Long id);
 
-    @Query("MATCH (c:Client{citizenDead:false})-[r:" + GET_SERVICE_FROM + "]-(o:Organization) where id(o)= {0} return id(c) as id")
+    @Query("MATCH (c:Client{citizenDead:false})-[r:" + GET_SERVICE_FROM + "]-(o:Unit) where id(o)= {0} return id(c) as id")
     List<Long> getCitizenIds(long unitId);
 
     @Query("Match (n:Client) where id(n) in {0} return n order by id(n)")
     List<Client> findByIdIn(List<Long> ids);
 
-    @Query("MATCH (c:Client)-[r:" + GET_SERVICE_FROM + "]->(o:Organization) where id(c)={0} and id(o)={1} " +
+    @Query("MATCH (c:Client)-[r:" + GET_SERVICE_FROM + "]->(o:Unit) where id(c)={0} and id(o)={1} " +
             "match(c)-[:" + IS_A + "]->(u:User) return c ,u as `c.user`")
     Client getClientByClientIdAndUnitId(Long clientId, Long unitId);
 
@@ -280,7 +280,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
             "delete houseHoldHomeAddressRel,r")
     void deleteHouseHoldWhoseAddressNotSame(Long clientId, Long houseHoldId);
 
-    @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Organization)  where id(o)= {0} with citizen\n" +
+    @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Unit)  where id(o)= {0} with citizen\n" +
             "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,citizen\n" +
             "MATCH (citizen)-[:HAS_HOME_ADDRESS]->(homeAddress:ContactAddress) WHERE homeAddress IS NOT NULL return citizen, homeAddress, id(lat) as localAreaTagId")
     List<ClientHomeAddressQueryResult> getClientsAndHomeAddressByUnitId(long unitId);
@@ -316,7 +316,7 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
     Boolean hasAlreadyNextToKin(Long clientId, Long nextToKinId);
 
 
-    @Query("MATCH (c:Client{citizenDead:false})-[r:" + GET_SERVICE_FROM + "]-(o:Organization) where id(o)in {0} with id(c) as citizenId, id(o) as organizationId\n" +
+    @Query("MATCH (c:Client{citizenDead:false})-[r:" + GET_SERVICE_FROM + "]-(o:Unit) where id(o)in {0} with id(c) as citizenId, id(o) as organizationId\n" +
             "return citizenId, organizationId")
     List<ClientOrganizationIdsDTO> getCitizenIdsByUnitIds(List<Long> unitIds);
 

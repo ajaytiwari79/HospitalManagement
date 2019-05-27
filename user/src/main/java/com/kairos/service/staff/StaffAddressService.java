@@ -3,7 +3,7 @@ package com.kairos.service.staff;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -144,11 +144,11 @@ public class StaffAddressService {
 
         ContactAddress staffAddress = staff.getContactAddress();
 
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if (unit == null) {
             return null;
         }
-        ContactAddress address = organization.getContactAddress();
+        ContactAddress address = unit.getContactAddress();
         double distance = 0;
         if (address != null && staffAddress != null) {
             distance = DistanceCalculator.distance(address.getLatitude(), address.getLongitude(), staffAddress.getLatitude(), staffAddress.getLongitude(), "K");
@@ -181,8 +181,8 @@ public class StaffAddressService {
         return contactAddressDTO;
     }
 
-     ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
-        ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
+     ContactAddress getStaffContactAddressByOrganizationAddress(Unit unit) {
+        ContactAddress organizationAddress = contactAddressGraphRepository.findOne(unit.getContactAddress().getId());
         if (Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();
             contactAddress.setCity(organizationAddress.getCity());

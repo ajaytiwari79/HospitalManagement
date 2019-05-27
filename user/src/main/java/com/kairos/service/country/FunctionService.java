@@ -5,7 +5,7 @@ import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationship;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationshipQueryResult;
@@ -62,7 +62,7 @@ public class FunctionService {
         if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
             levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
         }
-        List<Organization> unions = new ArrayList<>();
+        List<Unit> unions = new ArrayList<>();
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
@@ -104,7 +104,7 @@ public class FunctionService {
         if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
             levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
         }
-        List<Organization> unions = new ArrayList<>();
+        List<Unit> unions = new ArrayList<>();
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
@@ -196,11 +196,11 @@ public class FunctionService {
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsAtUnit(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
+        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
 
         return functionGraphRepository.findFunctionsByCountry(countryId);
     }

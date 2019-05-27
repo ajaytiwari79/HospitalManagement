@@ -5,7 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.enums.TimeSlotType;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSetTimeSlotRelationship;
@@ -50,12 +50,12 @@ public class TimeSlotService {
 
     public Map<String, Object> getTimeSlots(long unitId) {
 
-        Organization organization = organizationGraphRepository.findOne(unitId, 0);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
         }
-        return prepareTimeSlotResponse(organization);
+        return prepareTimeSlotResponse(unit);
     }
 
     public List<TimeSlotWrapper> getTimeSlotByTimeSlotSet(Long timeSlotSetId) {
@@ -63,19 +63,19 @@ public class TimeSlotService {
     }
 
     public Map<String, Object> getTimeSlotSets(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId, 0);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
         }
-        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.TASK_PLANNING);
+        List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, unit.getTimeSlotMode(), TimeSlotType.TASK_PLANNING);
         Map<String, Object> timeSlotSetData = new HashMap<>();
         timeSlotSetData.put("timeSlotSets", timeSlotSets);
-        timeSlotSetData.put("standardTimeSlot", STANDARD.equals(organization.getTimeSlotMode()) ? true : false);
+        timeSlotSetData.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()) ? true : false);
         return timeSlotSetData;
     }
 
     public TimeSlotSet createTimeSlotSet(long unitId, TimeSlotSetDTO timeSlotSetDTO) {
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
@@ -129,7 +129,7 @@ public class TimeSlotService {
     }
 
     public List<TimeSlotSet> updateTimeSlotSet(Long unitId, Long timeSlotSetId, TimeSlotSetDTO timeSlotSetDTO) {
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.unitNotFoundException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
@@ -166,13 +166,13 @@ public class TimeSlotService {
 
 
     public Map<String, Object> updateTimeSlotType(long unitId, boolean standardTimeSlot) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
         }
-        organization.setTimeSlotMode((standardTimeSlot) ? STANDARD : ADVANCE);
-        organizationGraphRepository.save(organization);
+        unit.setTimeSlotMode((standardTimeSlot) ? STANDARD : ADVANCE);
+        organizationGraphRepository.save(unit);
         return getTimeSlotSets(unitId);
 
     }
@@ -224,7 +224,7 @@ public class TimeSlotService {
     }
 
     public boolean deleteTimeSlotSet(Long unitId, Long timeSlotSetId) {
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.unitNotFoundException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
@@ -250,7 +250,7 @@ public class TimeSlotService {
         return true;
     }
 
-    private Map<String, Object> prepareTimeSlotResponse(Organization unit) {
+    private Map<String, Object> prepareTimeSlotResponse(Unit unit) {
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
         Map<String, Object> response = new HashMap<>();
         response.put("timeSlots", timeSlotWrappers);
@@ -259,9 +259,9 @@ public class TimeSlotService {
         return response;
     }
 
-    public void createDefaultTimeSlots(Organization organization, TimeSlotType timeSlotType) {
+    public void createDefaultTimeSlots(Unit unit, TimeSlotType timeSlotType) {
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
-        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode());
+        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), unit.getTimeSlotMode());
         timeSlotSet.setDefaultSet(true);
         timeSlotSet.setTimeSlotType(timeSlotType);
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
@@ -283,10 +283,10 @@ public class TimeSlotService {
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
         }
         timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
-        List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
+        List<TimeSlotSet> timeSlotSets = unit.getTimeSlotSets();
         timeSlotSets.add(timeSlotSet);
-        organization.setTimeSlotSets(timeSlotSets);
-        organizationGraphRepository.save(organization);
+        unit.setTimeSlotSets(timeSlotSets);
+        organizationGraphRepository.save(unit);
     }
 
 
@@ -313,20 +313,20 @@ public class TimeSlotService {
         return timeSlotSetTimeSlotRelationships;
     }
 
-    public void createDefaultTimeSlots(Organization organization, List<TimeSlot> timeSlots) {
-        logger.info("Creating default time slot for organization "+organization.getName());
+    public void createDefaultTimeSlots(Unit unit, List<TimeSlot> timeSlots) {
+        logger.info("Creating default time slot for organization "+ unit.getName());
         if (timeSlots.isEmpty()){
              timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         }
         List<TimeSlotSet> timeSlotSets = new ArrayList<>();
-        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING));
-        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode(), TimeSlotType.TASK_PLANNING));
+        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), unit.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING));
+        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), unit.getTimeSlotMode(), TimeSlotType.TASK_PLANNING));
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
         timeSlotSetTimeSlotRelationships.addAll(setTimeSlotSet(timeSlots, timeSlotSets.get(0)));
         timeSlotSetTimeSlotRelationships.addAll(setTimeSlotSet(timeSlots, timeSlotSets.get(1)));
         timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
-        organization.setTimeSlotSets(timeSlotSets);
-        organizationGraphRepository.save(organization);
+        unit.setTimeSlotSets(timeSlotSets);
+        organizationGraphRepository.save(unit);
     }
 
     /*private void validateTimeSlot(long unitId,OrganizationTimeSlotRelationship objToCreate,TimeSlot.TimeSlotMode timeSlotMode){
@@ -386,7 +386,7 @@ public class TimeSlotService {
      * @auther anil maurya
      */
     public List<TimeSlotWrapper> getCurrentTimeSlotOfUnit(Long unitId) {
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
@@ -454,26 +454,26 @@ public class TimeSlotService {
 
 
     public List<TimeSlotSet> getShiftPlanningTimeSlotSetsByUnit(Long unitId) {
-        Organization organization = organizationGraphRepository.findById(unitId, 0).get();
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = organizationGraphRepository.findById(unitId, 0).get();
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
         }
-        return timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
+        return timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, unit.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
     }
 
     public List<TimeSlotWrapper> getShiftPlanningTimeSlotsById(Long timeSlotSetId) {
         return timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSetId);
     }
 
-    public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Organization organization) {
+    public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Unit unit) {
         List<TimeSlotDTO> timeSlotDTOS=new ArrayList<>();
-        List<TimeSlotSet> timeSlotSets= timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organization.getId(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
+        List<TimeSlotSet> timeSlotSets= timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unit.getId(), unit.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         if(isNotEmpty(timeSlotSets)) {
             List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
             timeSlotDTOS= ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, TimeSlotDTO.class);
         }else{
-            logger.info("Time Slot is not present for organization "+organization.getName());
+            logger.info("Time Slot is not present for organization "+ unit.getName());
         }
         return timeSlotDTOS;
     }

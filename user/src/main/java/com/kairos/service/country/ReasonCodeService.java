@@ -5,7 +5,7 @@ import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
@@ -58,15 +58,15 @@ public class ReasonCodeService {
     }
 
     public ReasonCodeDTO createReasonCodeForUnit(long unitId, ReasonCodeDTO reasonCodeDTO) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         boolean isAlreadyExists = reasonCodeGraphRepository.findByUnitIdAndNameExcludingCurrent(unitId, -1L, "(?i)" + reasonCodeDTO.getName().trim(), reasonCodeDTO.getReasonCodeType());
         if (isAlreadyExists) {
             exceptionService.duplicateDataException(MESSAGE_REASONCODE_NAME_ALREADYEXIST, reasonCodeDTO.getName());
         }
-        ReasonCode reasonCode = new ReasonCode(reasonCodeDTO.getName(), reasonCodeDTO.getCode(), reasonCodeDTO.getDescription(), reasonCodeDTO.getReasonCodeType(), organization, reasonCodeDTO.getTimeTypeId());
+        ReasonCode reasonCode = new ReasonCode(reasonCodeDTO.getName(), reasonCodeDTO.getCode(), reasonCodeDTO.getDescription(), reasonCodeDTO.getReasonCodeType(), unit, reasonCodeDTO.getTimeTypeId());
         reasonCodeGraphRepository.save(reasonCode);
 
         return new ReasonCodeDTO(reasonCode.getId(), reasonCode.getName(), reasonCode.getCode(), reasonCode.getDescription(), reasonCode.getReasonCodeType(), reasonCode.getTimeTypeId());
@@ -138,19 +138,19 @@ public class ReasonCodeService {
         return reasonCodeGraphRepository.save(reasonCode);
     }
 
-    public void createDefaultDataForUnit(Organization organization, long countryId) {
+    public void createDefaultDataForUnit(Unit unit, long countryId) {
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO = reasonCodeGraphRepository.findReasonCodeByCountryId(countryId);
-        createDefaultData(reasonCodeResponseDTO, organization);
+        createDefaultData(reasonCodeResponseDTO, unit);
     }
 
-    public void createDefaultDataForSubUnit(Organization organization, long parentId) {
+    public void createDefaultDataForSubUnit(Unit unit, long parentId) {
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO = reasonCodeGraphRepository.findReasonCodeByUnitId(parentId);
-        createDefaultData(reasonCodeResponseDTO, organization);
+        createDefaultData(reasonCodeResponseDTO, unit);
     }
 
-    private void createDefaultData(List<ReasonCodeResponseDTO> reasonCodeResponseDTO, Organization organization) {
+    private void createDefaultData(List<ReasonCodeResponseDTO> reasonCodeResponseDTO, Unit unit) {
         if (!reasonCodeResponseDTO.isEmpty()) {
-            List<ReasonCode> reasonCodes=reasonCodeResponseDTO.stream().map(reasonCode->new ReasonCode(reasonCode.getName(), reasonCode.getCode(), reasonCode.getDescription(), reasonCode.getReasonCodeType(), organization, reasonCode.getTimeTypeId())).collect(Collectors.toList());
+            List<ReasonCode> reasonCodes=reasonCodeResponseDTO.stream().map(reasonCode->new ReasonCode(reasonCode.getName(), reasonCode.getCode(), reasonCode.getDescription(), reasonCode.getReasonCodeType(), unit, reasonCode.getTimeTypeId())).collect(Collectors.toList());
             reasonCodeGraphRepository.saveAll(reasonCodes);
         }
     }

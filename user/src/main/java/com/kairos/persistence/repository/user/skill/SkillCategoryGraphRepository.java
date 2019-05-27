@@ -57,7 +57,7 @@ public interface SkillCategoryGraphRepository extends Neo4jBaseRepository<SkillC
             "description:sc.description} AS result")
     List<Map<String,Object>> findSkillCategoryByCountryId(Long id);
 
-    @Query("MATCH (s:Skill)<-[:"+ORGANISATION_HAS_SKILL+"]-(organization:Organization) where id(organization)={0} AND s.isEnabled=true " +
+    @Query("MATCH (s:Skill)<-[:"+ORGANISATION_HAS_SKILL+"]-(organization:Unit) where id(organization)={0} AND s.isEnabled=true " +
             " OPTIONAL MATCH (s)-[:HAS_CATEGORY]->(sc:SkillCategory) WHERE sc.isEnabled=true with sc,s \n" +
             "return  { skillList: case when s is NULL then [] else collect({   \n" +
             "id:id(s), name:s.name, shortName:s.shortName, description:s.description}) END ,\n" +

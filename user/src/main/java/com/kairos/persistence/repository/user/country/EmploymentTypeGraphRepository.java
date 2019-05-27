@@ -22,11 +22,11 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
 
     List<EmploymentType> findAll();
 
-    @Query("MATCH (n:Organization) - [r:" + BELONGS_TO + "] -> (c:Country)-[r1:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
+    @Query("MATCH (n:Unit) - [r:" + BELONGS_TO + "] -> (c:Country)-[r1:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(n)={0} AND id(et)={1} AND et.deleted={2} return et")
     EmploymentType getEmploymentTypeByOrganization(Long organizationId, Long employmentTypeId, Boolean isDeleted);
 
-    @Query("Match (o:Organization),(et:EmploymentType) where id(o) = {0} AND id(et) = {1}\n" +
+    @Query("Match (o:Unit),(et:EmploymentType) where id(o) = {0} AND id(et) = {1}\n" +
             "MERGE (o)-[r:" + EMPLOYMENT_TYPE_SETTINGS + "]->(et)\n" +
             "ON CREATE SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.creationDate = {6},r.lastModificationDate = {7}\n" +
             "ON MATCH SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.lastModificationDate = {7} return true")
@@ -36,7 +36,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
                                                      boolean allowedForFlexPool, PaidOutFrequencyEnum paymentFrequency, long creationDate, long lastModificationDate);
 
     @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND et.deleted={2}  with et\n" +
-            "MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
+            "MATCH (o:Unit)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
             "o,et,r \n" +
             "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories, \n" +
             "CASE WHEN r IS null THEN et.paymentFrequency ELSE r.paymentFrequency END as paymentFrequency, \n" +
@@ -46,7 +46,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     List<EmploymentTypeDTO> getCustomizedEmploymentTypeSettingsForOrganization(long countryId, long organizationId, boolean isDeleted);
 
     @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND  NOT (ID(et) IN {3}) AND et.deleted={2}  with et\n" +
-            "OPTIONAL MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
+            "OPTIONAL MATCH (o:Unit)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
             "o,et,r \n" +
             "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency, \n" +
             "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +
@@ -54,7 +54,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
             "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")
     List<EmploymentTypeDTO> getEmploymentTypeSettingsForOrganization(long countryId, long organizationId, boolean isDeleted, List<Long> excludeEmploymentTypeIds);
 
-    @Query("MATCH (n:Organization) - [r:" + BELONGS_TO + "] -> (c:Country)-[r1:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
+    @Query("MATCH (n:Unit) - [r:" + BELONGS_TO + "] -> (c:Country)-[r1:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(n)={0} AND id(et)={1} AND et.deleted={2} return count(et) > 0 as etExists")
     Boolean isEmploymentTypeExistInOrganization(Long organizationId, Long employmentTypeId, Boolean isDeleted);
 
@@ -64,7 +64,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     @Query("MATCH (et:EmploymentType{deleted:false}) WHERE id(et) IN {0}  return et")
     List<EmploymentType> getEmploymentTypeByIds(Set<Long> employmentTypeIds);
 
-    @Query("MATCH (n:Organization) - [:" + BELONGS_TO + "] -> (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
+    @Query("MATCH (n:Unit) - [:" + BELONGS_TO + "] -> (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(n)={0} AND et.deleted={1} return et")
     List<EmploymentType> getAllEmploymentTypeByOrganization(Long organizationId, Boolean isDeleted);
 

@@ -18,7 +18,7 @@ import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -154,8 +154,8 @@ public class EmploymentService {
 
 
     public PositionWrapper createEmployment(Long id, String type, EmploymentDTO employmentDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
-        Organization organization = organizationService.getOrganizationDetail(employmentDTO.getUnitId(), type);
-        Organization parentOrganization = organization.isParentOrganization() ? organization : organizationService.getParentOfOrganization(organization.getId());
+        Unit unit = organizationService.getOrganizationDetail(employmentDTO.getUnitId(), type);
+        Unit parentUnit = unit.isParentOrganization() ? unit : organizationService.getParentOfOrganization(unit.getId());
 
         Position position = positionGraphRepository.findByStaffId(employmentDTO.getStaffId());
         if (!Optional.ofNullable(position).isPresent()) {
@@ -168,17 +168,17 @@ public class EmploymentService {
         }
 
         if (!saveAsDraft) {
-            List<Employment> oldEmployments = employmentGraphRepository.getStaffEmploymentsByExpertise(organization.getId(), employmentDTO.getStaffId(), employmentDTO.getExpertiseId());
+            List<Employment> oldEmployments = employmentGraphRepository.getStaffEmploymentsByExpertise(unit.getId(), employmentDTO.getStaffId(), employmentDTO.getExpertiseId());
             validateEmploymentWithExpertise(oldEmployments, employmentDTO);
         }
 
 
-        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentOrganization.getId(), employmentDTO.getEmploymentTypeId(), false);
+        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentUnit.getId(), employmentDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST, employmentDTO.getEmploymentTypeId());
         }
         List<FunctionWithAmountQueryResult> functions = findAndValidateFunction(employmentDTO);
-        Employment employment = new Employment(organization, employmentDTO.getStartDate(), employmentDTO.getTimeCareExternalId(), !saveAsDraft, employmentDTO.getTaxDeductionPercentage(), employmentDTO.getAccumulatedTimebankMinutes(), employmentDTO.getAccumulatedTimebankDate());
+        Employment employment = new Employment(unit, employmentDTO.getStartDate(), employmentDTO.getTimeCareExternalId(), !saveAsDraft, employmentDTO.getTaxDeductionPercentage(), employmentDTO.getAccumulatedTimebankMinutes(), employmentDTO.getAccumulatedTimebankDate());
 
         preparePosition(employment, employmentDTO);
         if (EmploymentSubType.MAIN.equals(employmentDTO.getEmploymentSubType()) && positionService.eligibleForMainEmployment(employmentDTO, -1)) {
@@ -186,14 +186,14 @@ public class EmploymentService {
         }
         employmentGraphRepository.save(employment);
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = assignCTAAndWTAToEmployment(employment, employmentDTO);
-        Long reasonCodeId = updateEmploymentEndDate(parentOrganization, employmentDTO, position);
+        Long reasonCodeId = updateEmploymentEndDate(parentUnit, employmentDTO, position);
 
 
         EmploymentLineEmploymentTypeRelationShip relationShip = new EmploymentLineEmploymentTypeRelationShip(employment.getEmploymentLines().get(0), employmentType, employmentDTO.getEmploymentTypeCategory());
         employmentAndEmploymentTypeRelationShipGraphRepository.save(relationShip);
         linkFunctions(functions, employment.getEmploymentLines().get(0), false, employmentDTO.getFunctions());
 
-        EmploymentQueryResult employmentQueryResult = getBasicDetails(employmentType, employmentDTO, employment, relationShip, parentOrganization.getId(), parentOrganization.getName(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0), employment.getEmploymentLines().get(0));
+        EmploymentQueryResult employmentQueryResult = getBasicDetails(employmentType, employmentDTO, employment, relationShip, parentUnit.getId(), parentUnit.getName(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0), employment.getEmploymentLines().get(0));
         employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0));
         employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0));
         setHourlyCost(employmentQueryResult);
@@ -224,8 +224,8 @@ public class EmploymentService {
         return ctawtaAndAccumulatedTimebankWrapper;
     }
 
-    private Long updateEmploymentEndDate(Organization organization, EmploymentDTO employmentDTO, Position position) throws Exception {
-        Position position1 = positionService.updateEmploymentEndDate(organization, employmentDTO.getStaffId(), employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId());
+    private Long updateEmploymentEndDate(Unit unit, EmploymentDTO employmentDTO, Position position) throws Exception {
+        Position position1 = positionService.updateEmploymentEndDate(unit, employmentDTO.getStaffId(), employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId());
         return Optional.ofNullable(position.getReasonCode()).isPresent() ? position1.getReasonCode().getId() : null;
 
     }
@@ -390,7 +390,7 @@ public class EmploymentService {
 
     public PositionWrapper updateEmployment(long employmentId, EmploymentDTO employmentDTO, Long unitId, String type, Boolean saveAsDraft) throws Exception {
 
-        Organization organization = organizationService.getOrganizationDetail(unitId, type);
+        Unit unit = organizationService.getOrganizationDetail(unitId, type);
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(employmentDTO.getStaffId());
         if (clientMinimumDTO.size() > 0) {
             return new PositionWrapper(clientMinimumDTO);
@@ -449,7 +449,7 @@ public class EmploymentService {
                 //}
                 setEndDateToEmployment(oldEmployment, employmentDTO);
                 employmentGraphRepository.save(oldEmployment);
-                employmentQueryResult = getBasicDetails(employmentType, employmentDTO, oldEmployment, employmentLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, currentEmploymentLine);
+                employmentQueryResult = getBasicDetails(employmentType, employmentDTO, oldEmployment, employmentLineEmploymentTypeRelationShip, unit.getId(), unit.getName(), null, currentEmploymentLine);
             } else {
                 EmploymentLine employmentLine = createEmploymentLine(oldEmployment, currentEmploymentLine, employmentDTO);
                 oldEmployment.getEmploymentLines().add(employmentLine);
@@ -459,7 +459,7 @@ public class EmploymentService {
                 // if (changeResultDTO.isFunctionsChanged()) {
                 linkFunctions(changeResultDTO.getFunctions(), employmentLine, false, employmentDTO.getFunctions());
                 //}
-                employmentQueryResult = getBasicDetails(employmentType, employmentDTO, oldEmployment, employmentLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, employmentLine);
+                employmentQueryResult = getBasicDetails(employmentType, employmentDTO, oldEmployment, employmentLineEmploymentTypeRelationShip, unit.getId(), unit.getName(), null, employmentLine);
             }
 
             CTAWTAAndAccumulatedTimebankWrapper newCTAWTAAndAccumulatedTimebankWrapper = null;
@@ -492,7 +492,7 @@ public class EmploymentService {
             setEndDateToEmployment(oldEmployment, employmentDTO);
             oldEmployment.setLastWorkingDate(employmentDTO.getLastWorkingDate());
             employmentGraphRepository.save(oldEmployment);
-            employmentQueryResult = getBasicDetails(employmentType, employmentDTO, oldEmployment, employmentLineEmploymentTypeRelationShip, organization.getId(), organization.getName(), null, currentEmploymentLine);
+            employmentQueryResult = getBasicDetails(employmentType, employmentDTO, oldEmployment, employmentLineEmploymentTypeRelationShip, unit.getId(), unit.getName(), null, currentEmploymentLine);
             employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().get(0));
             employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(0));
         }
@@ -561,7 +561,7 @@ public class EmploymentService {
         employment.setDeleted(true);
         employmentGraphRepository.save(employment);
 
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
         Long staffId = employmentGraphRepository.getStaffIdFromEmployment(positionId);
         Position position = positionService.updateEmploymentEndDate(unit, staffId);
         return new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis());
@@ -585,8 +585,8 @@ public class EmploymentService {
 
         employment.setExpertise(expertiseFuture.get());
         if (Optional.ofNullable(employmentDTO.getUnionId()).isPresent()) {
-            Callable<Organization> organizationCallable = () -> organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(employmentDTO.getUnionId());
-            Future<Organization> organizationFuture = asynchronousService.executeAsynchronously(organizationCallable);
+            Callable<Unit> organizationCallable = () -> organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(employmentDTO.getUnionId());
+            Future<Unit> organizationFuture = asynchronousService.executeAsynchronously(organizationCallable);
             if (!Optional.ofNullable(organizationFuture.get()).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_UNION_NOTEXIST, employmentDTO.getUnionId());
             }
@@ -763,7 +763,7 @@ public class EmploymentService {
 
     }
 
-    public List<com.kairos.dto.activity.shift.StaffEmploymentDetails> getEmploymentDetails(List<Long> employmentIds, Organization organization, Long countryId) {
+    public List<com.kairos.dto.activity.shift.StaffEmploymentDetails> getEmploymentDetails(List<Long> employmentIds, Unit unit, Long countryId) {
         List<EmploymentQueryResult> employments = employmentGraphRepository.getEmploymentByIds(employmentIds);
         List<com.kairos.dto.activity.shift.StaffEmploymentDetails> employmentDetailsList = new ArrayList<>();
         employments.forEach(employment -> {
@@ -772,7 +772,7 @@ public class EmploymentService {
             Map<Long, BigDecimal> hourlyCostMap = employmentLinesQueryResults.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
             employmentDetail.setStaffId(employment.getStaffId());
             employmentDetail.setCountryId(countryId);
-            employmentDetail.setUnitTimeZone(organization.getTimeZone());
+            employmentDetail.setUnitTimeZone(unit.getTimeZone());
             EmploymentLinesQueryResult employmentLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
             BigDecimal hourlyCost = employmentLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
             employmentDetail.setHourlyCost(hourlyCost);
@@ -817,12 +817,12 @@ public class EmploymentService {
     }
 
     private boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareEmploymentDTOs, String unitExternalId, Long expertiseId) throws Exception {
-        Organization organization = organizationGraphRepository.findByExternalId(unitExternalId);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findByExternalId(unitExternalId);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ORGANIZATION_EXTERNALID, unitExternalId);
         }
-        Organization parentOrganization = organizationService.fetchParentOrganization(organization.getId());
-        Long countryId = organizationService.getCountryIdOfOrganization(parentOrganization.getId());
+        Unit parentUnit = organizationService.fetchParentOrganization(unit.getId());
+        Long countryId = organizationService.getCountryIdOfOrganization(parentUnit.getId());
         EmploymentType employmentType = employmentTypeGraphRepository.getOneEmploymentTypeByCountryId(countryId, false);
 
         Expertise expertise;
@@ -836,18 +836,18 @@ public class EmploymentService {
         }
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = workingTimeAgreementRestClient.getWTAByExpertise(expertise.getId());
         if (!CollectionUtils.isNotEmpty(ctawtaAndAccumulatedTimebankWrapper.getCta())) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_CTA_NOTFOUND, organization.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_CTA_NOTFOUND, unit.getId());
         }
         if (!CollectionUtils.isNotEmpty(ctawtaAndAccumulatedTimebankWrapper.getWta())) {
-            exceptionService.dataNotFoundByIdException("message.wta.notFound", organization.getId());
+            exceptionService.dataNotFoundByIdException("message.wta.notFound", unit.getId());
         }
         for (TimeCareEmploymentDTO timeCareEmploymentDTO : timeCareEmploymentDTOs) {
             Staff staff = staffGraphRepository.findByExternalId(timeCareEmploymentDTO.getPersonID());
             if (staff == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EXTERNALID_NOTEXIST, timeCareEmploymentDTO.getPersonID());
             }
-            EmploymentDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId(), ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId(), organization.getId());
-            createEmployment(organization.getId(), "Organization", unitEmploymentPosition, true, true);
+            EmploymentDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId(), ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId(), unit.getId());
+            createEmployment(unit.getId(), "Organization", unitEmploymentPosition, true, true);
         }
         return true;
     }
@@ -915,10 +915,10 @@ public class EmploymentService {
     }
 
     public StaffEmploymentUnitDataWrapper getStaffsEmployment(Long unitId, Long expertiseId, List<Long> staffIds) {
-        Organization organization = organizationService.getOrganizationDetail(unitId, ORGANIZATION);
-        Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(organization.getId()).getId();
+        Unit unit = organizationService.getOrganizationDetail(unitId, ORGANIZATION);
+        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unit.getId()).getId();
         // TODO MIght We dont need these details I(vipul) will verify and remove
-        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(unit.getId(), staffIds, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<com.kairos.dto.activity.shift.StaffEmploymentDetails> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, com.kairos.dto.activity.shift.StaffEmploymentDetails.class);
         List<StaffEmploymentDetails> staffData = employmentGraphRepository.getStaffInfoByUnitIdAndStaffId(unitId, expertiseId, staffIds);
         Map<Long, StaffEmploymentDetails> staffEmploymentDetailsMap = staffData.stream().collect(Collectors.toMap(StaffEmploymentDetails::getStaffId, Function.identity()));
@@ -930,7 +930,7 @@ public class EmploymentService {
         List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
         staffAdditionalInfoDTOS.forEach(currentData -> convertStaffEmploymentObject(employmentDetailsMap.get(currentData.getId()), currentData, expertisePlannedTimes));
         StaffEmploymentUnitDataWrapper staffEmploymentUnitDataWrapper = new StaffEmploymentUnitDataWrapper(staffAdditionalInfoDTOS);
-        staffRetrievalService.setRequiredDataForShiftCreationInWrapper(staffEmploymentUnitDataWrapper, organization, countryId, expertiseId);
+        staffRetrievalService.setRequiredDataForShiftCreationInWrapper(staffEmploymentUnitDataWrapper, unit, countryId, expertiseId);
         return staffEmploymentUnitDataWrapper;
     }
 

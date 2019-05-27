@@ -7,7 +7,7 @@ import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_page.OrgCategoryTabAccessDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.*;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.position.AccessPermissionAccessPageRelation;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
@@ -199,7 +199,7 @@ public class AccessPageService {
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
         Long userId=UserContext.getUserDetails().getId();
         if(accessPageRepository.isHubMember(userId)){
-            Organization parentHub = accessPageRepository.fetchParentHub(userId);
+            Unit parentHub = accessPageRepository.fetchParentHub(userId);
             unitId=parentHub.getId();
         }
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId,userId);

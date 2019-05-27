@@ -26,7 +26,7 @@ import com.kairos.persistence.model.client.relationships.ClientContactPersonRela
 import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.country.default_data.CitizenStatusDTO;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
@@ -182,8 +182,8 @@ public class ClientService {
     }
 
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId, 0);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId);
         }
 
@@ -201,7 +201,7 @@ public class ClientService {
                     exceptionService.duplicateDataException(MESSAGE_CLIENT_CRPNUMBER_DUPLICATE);
                 }
                 logger.debug("Creating Existing Client relationship : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtils.getCurrentDateMillis());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, unit, DateUtils.getCurrentDateMillis());
                 relationService.createRelation(relation);
 
             } else {
@@ -214,7 +214,7 @@ public class ClientService {
                 client.setUser(user);
                 client.setClientType(clientMinimumDTO.getClientType());
                 clientGraphRepository.save(client);
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtils.getCurrentDateMillis());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, unit, DateUtils.getCurrentDateMillis());
                 relationService.createRelation(relation);
             }
         } else {
@@ -225,8 +225,8 @@ public class ClientService {
             client.setUser(user);
             client.setClientType(clientMinimumDTO.getClientType());
             clientGraphRepository.save(client);
-            ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, organization, new DateTime().getMillis());
-            logger.debug("Creating Relation with Organization: " + organization.getName());
+            ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(client, unit, new DateTime().getMillis());
+            logger.debug("Creating Relation with Organization: " + unit.getName());
             relationGraphRepository.save(clientOrganizationRelation);
 
         }
@@ -463,9 +463,9 @@ public class ClientService {
 
     public List<Map<String, Object>> getOrganizationsByClient(Long clientId) {
         logger.debug("Creating:");
-        List<Organization> list = clientGraphRepository.getClientOrganizationIdList(clientId);
+        List<Unit> list = clientGraphRepository.getClientOrganizationIdList(clientId);
         List<Map<String, Object>> mapList = new ArrayList<>();
-        for (Organization org : list) {
+        for (Unit org : list) {
             Map<String, Object> map = new HashMap<>();
             map.put("id", org.getId());
             map.put("name", org.getName());
@@ -605,12 +605,12 @@ public class ClientService {
     }
 
     private void addHouseHoldInOrganization(Client houseHold, long organizationId) {
-        Organization organization = organizationGraphRepository.findOne(organizationId);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = organizationGraphRepository.findOne(organizationId);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, organizationId);
 
         }
-        ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(houseHold, organization, new DateTime().getMillis());
+        ClientOrganizationRelation clientOrganizationRelation = new ClientOrganizationRelation(houseHold, unit, new DateTime().getMillis());
         relationGraphRepository.save(clientOrganizationRelation);
 
     }
@@ -1445,7 +1445,7 @@ public class ClientService {
         String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
 
         mapList.addAll(organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, unitId, imagePath, skip, moduleId));
-        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Unit parent = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(), parent.getId());
         //anil maurya move some business logic in task demand service (task micro service )
         Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), unitId, mapList);
@@ -1468,13 +1468,13 @@ public class ClientService {
 
     public ClientPersonalCalenderPrerequisiteDTO getPrerequisiteForPersonalCalender(Long unitId, Long clientId) {
 
-        Organization organization = organizationGraphRepository.findOne(unitId, 0);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId);
         }
 
         List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));
-        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(organization.getId(), organization.getTimeSlotMode());
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
         List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
         ClientPersonalCalenderPrerequisiteDTO clientPersonalCalenderPrerequisiteDTO = new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS,
                 temporaryAddressList, timeSlotWrappers);

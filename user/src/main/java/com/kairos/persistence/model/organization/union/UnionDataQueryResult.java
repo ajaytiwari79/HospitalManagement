@@ -2,7 +2,7 @@ package com.kairos.persistence.model.organization.union;
 
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -12,7 +12,7 @@ import java.util.List;
 @QueryResult
 public class UnionDataQueryResult {
 
-    private Organization union;
+    private Unit union;
     private List<Sector> sectors;
     private List<Location> locations;
     private ContactAddress address;
@@ -23,11 +23,11 @@ public class UnionDataQueryResult {
 
 
 
-    public Organization getUnion() {
+    public Unit getUnion() {
         return union;
     }
 
-    public void setUnion(Organization union) {
+    public void setUnion(Unit union) {
         this.union = union;
     }
 

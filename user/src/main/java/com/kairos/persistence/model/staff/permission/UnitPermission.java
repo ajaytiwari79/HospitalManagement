@@ -2,7 +2,7 @@ package com.kairos.persistence.model.staff.permission;
 
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -24,7 +24,7 @@ public class UnitPermission extends UserBaseEntity {
     private int weeklyHours;
 
     @Relationship(type = APPLICABLE_IN_UNIT)
-    private Organization organization;
+    private Unit unit;
 
     @Relationship(type = HAS_ACCESS_GROUP)
     private AccessGroup accessGroup;
@@ -61,12 +61,12 @@ public class UnitPermission extends UserBaseEntity {
         this.startDate = startDate;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
     public int getWeeklyHours() {

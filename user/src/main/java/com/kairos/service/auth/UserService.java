@@ -20,7 +20,7 @@ import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.DayType;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -328,7 +328,7 @@ public class UserService {
             return null;
         }
         currentUser = generateTokenToUser(currentUser);
-        Organization org = staffGraphRepository.getStaffOrganization(currentUser.getId());
+        Unit org = staffGraphRepository.getStaffOrganization(currentUser.getId());
         if (org == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
@@ -359,7 +359,7 @@ public class UserService {
                 return null;
             }
             currentUser = generateTokenToUser(currentUser);
-            Organization org = staffGraphRepository.getStaffOrganization(currentUser.getId());
+            Unit org = staffGraphRepository.getStaffOrganization(currentUser.getId());
             if (org == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
@@ -431,7 +431,7 @@ public class UserService {
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
         if (permissionData.isHub()) {
-            Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
+            Unit parentHub = accessPageRepository.fetchParentHub(currentUserId);
             List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
             HashMap<String, Object> unitPermissionMap = new HashMap<>();
             for (AccessPageQueryResult permission : permissions) {
@@ -478,7 +478,7 @@ public class UserService {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (currentUser.getLastSelectedOrganizationId() != organizationId) {
             currentUser.setLastSelectedOrganizationId(organizationId);
-            Organization parent = organizationService.fetchParentOrganization(organizationId);
+            Unit parent = organizationService.fetchParentOrganization(organizationId);
             Long countryId = organizationGraphRepository.getCountryId(parent.getId());
             currentUser.setCountryId(countryId);
             userGraphRepository.save(currentUser);

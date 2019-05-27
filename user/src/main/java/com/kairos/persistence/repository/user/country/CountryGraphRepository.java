@@ -60,7 +60,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (ot:OrganizationType)-[:"+BELONGS_TO+"]->(c:Country) WHERE id(c)= {0} RETURN ot")
     List<OrganizationType> getOrganizationTypes(Long countryId);
 
-    @Query("MATCH (organization:Organization) where id(organization)={0} with organization  " +
+    @Query("MATCH (organization:Unit) where id(organization)={0} with organization  " +
             "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
             "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN id(country)")
     Long getCountryIdByUnitId(long unitId);

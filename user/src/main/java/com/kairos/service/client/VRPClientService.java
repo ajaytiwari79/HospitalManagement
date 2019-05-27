@@ -8,7 +8,7 @@ import com.kairos.dto.planner.vrp.VRPClientDTO;
 import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.persistence.model.client.PreferedTimeWindow;
 import com.kairos.persistence.model.client.VRPClient;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.client.PreferedTimeWindowRepository;
 import com.kairos.persistence.repository.user.client.VRPClientGraphRepository;
@@ -53,10 +53,10 @@ public class VRPClientService {
         return value;
     }
 
-    private Object[] getVrpClientByRows(List<Row> rows,Organization organization){
+    private Object[] getVrpClientByRows(List<Row> rows,Unit unit){
         List<VRPClient> vrpClients = new ArrayList<>();
         List<VRPTaskDTO> vrpTasks = new ArrayList<>();
-        List<Long> clientIntallationNo = vrpClientGraphRepository.getAllClientInstalltionNo(organization.getId());
+        List<Long> clientIntallationNo = vrpClientGraphRepository.getAllClientInstalltionNo(unit.getId());
         for (int i = 2;i<rows.size();i++){
             Row row = rows.get(i);
             VRPClient client = new VRPClient();
@@ -71,7 +71,7 @@ public class VRPClientService {
             client.setHouseNumber((int) row.getCell(8).getNumericCellValue());
             client.setZipCode(new Integer(row.getCell(12).getStringCellValue()));
             client.setStreetName(row.getCell(7).getStringCellValue());
-            client.setOrganization(organization);
+            client.setUnit(unit);
             VRPTaskDTO vrpTaskDTO = new VRPTaskDTO();
             vrpTaskDTO.setAddress(new TaskAddress(client.getZipCode(),client.getCity(),client.getStreetName(),""+client.getHouseNumber(),client.getLongitude().toString(),client.getLatitude().toString(),client.getBlock(),client.getFloorNumber()));
             vrpTaskDTO.setInstallationNumber(client.getInstallationNumber());
@@ -85,7 +85,7 @@ public class VRPClientService {
     }
 
     public List<VRPClientDTO> importClients(Long unitId, MultipartFile multipartFile){
-        Optional<Organization> organization = organizationGraphRepository.findById(unitId,0);
+        Optional<Unit> organization = organizationGraphRepository.findById(unitId,0);
         List<Row> rows = excelService.getRowsByXLSXFile(multipartFile,0);
         Object objects[] = getVrpClientByRows(rows,organization.get());
         List<VRPClient> vrpClients = (List<VRPClient>)objects[0];
@@ -150,7 +150,7 @@ public class VRPClientService {
     }
 
     public List<PreferedTimeWindowDTO> createPreferedTimeWindow(Long unitId){
-        Optional<Organization> organization = organizationGraphRepository.findById(unitId,0);
+        Optional<Unit> organization = organizationGraphRepository.findById(unitId,0);
         List<PreferedTimeWindowDTO> preferedTimeWindowDTOS = null;
         List<PreferedTimeWindow> preferedTimeWindows = preferedTimeWindowRepository.getAllByUnitId(unitId);
         if(preferedTimeWindows.isEmpty() && organization.isPresent()){
@@ -160,9 +160,9 @@ public class VRPClientService {
         }
         return preferedTimeWindowDTOS;
     }
-    public void createDefaultPreferredTimeWindow(Organization organization){
+    public void createDefaultPreferredTimeWindow(Unit unit){
         List<PreferedTimeWindow>
-            preferedTimeWindows = Arrays.asList(new PreferedTimeWindow(LocalTime.of(07,00),LocalTime.of(11,30),organization,"Time window 1"),new PreferedTimeWindow(LocalTime.of(12,00),LocalTime.of(16,00),organization,"Time window 2"));
+            preferedTimeWindows = Arrays.asList(new PreferedTimeWindow(LocalTime.of(07,00),LocalTime.of(11,30), unit,"Time window 1"),new PreferedTimeWindow(LocalTime.of(12,00),LocalTime.of(16,00), unit,"Time window 2"));
             preferedTimeWindowRepository.saveAll(preferedTimeWindows);
     }
     public List<PreferedTimeWindowDTO> getPreferedTimeWindow(Long unitId){

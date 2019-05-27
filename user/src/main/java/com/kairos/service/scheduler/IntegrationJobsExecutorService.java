@@ -5,7 +5,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.enums.scheduler.Result;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.utils.external_plateform_shift.Transstatus;
@@ -60,8 +60,8 @@ public class IntegrationJobsExecutorService {
         //  String endDate = DateFormatUtils.format(controlPanel.getEndDate(), "yyyy-MM-dd");
         Long workplaceId = Long.valueOf(String.valueOf("15"));
         if(job.getUnitId() != null){
-            Organization organization = organizationGraphRepository.findOne(job.getUnitId());
-            if(organization.getExternalId() != null) workplaceId = Long.valueOf(organization.getExternalId());
+            Unit unit = organizationGraphRepository.findOne(job.getUnitId());
+            if(unit.getExternalId() != null) workplaceId = Long.valueOf(unit.getExternalId());
         }
         String importShiftURI = "";
         int weeks = 35;

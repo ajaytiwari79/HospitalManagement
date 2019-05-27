@@ -3,7 +3,7 @@ package com.kairos.service.organization;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
 import com.kairos.persistence.model.organization.OrganizationType;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -188,7 +188,7 @@ public class OrganizationServiceService{
         }
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            Organization unit = organizationGraphRepository.findOne(id);
+            Unit unit = organizationGraphRepository.findOne(id);
             if (unit == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,id);
 
@@ -300,16 +300,16 @@ public class OrganizationServiceService{
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 
-            Organization organization = organizationGraphRepository.findOne(id, 0);
-            if (organization == null) {
+            Unit unit = organizationGraphRepository.findOne(id, 0);
+            if (unit == null) {
                 return null;
             }
-            Organization parent;
-            if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
+            Unit parent;
+            if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
+                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
             } else {
-                parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
+                parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
             }
             if (parent != null) {
                 response = filterSkillData(organizationGraphRepository.getServicesForUnit(parent.getId(), id));
@@ -371,7 +371,7 @@ public class OrganizationServiceService{
     }
 
     public Map<String, Object> organizationImportedServiceData(long id) {
-        Organization unit = organizationGraphRepository.findOne(id);
+        Unit unit = organizationGraphRepository.findOne(id);
         if (unit == null) {
             return null;
         }

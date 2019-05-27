@@ -4,7 +4,7 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
@@ -133,8 +133,8 @@ public class TagService {
         if (type.equalsIgnoreCase("team")) {
             organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
         }
-        Organization organization = organizationGraphRepository.findOne(organizationId, 0);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
         }
@@ -144,12 +144,12 @@ public class TagService {
 
         }
         Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false);
-        if (CollectionUtils.isNotEmpty(organization.getTags())) {
-            organization.getTags().add(tag);
+        if (CollectionUtils.isNotEmpty(unit.getTags())) {
+            unit.getTags().add(tag);
         } else {
-            organization.setTags(Arrays.asList(tag));
+            unit.setTags(Arrays.asList(tag));
         }
-        organizationGraphRepository.save(organization);
+        organizationGraphRepository.save(unit);
         return tag;
     }
 
@@ -157,8 +157,8 @@ public class TagService {
         if (type.equalsIgnoreCase("team")) {
             organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
         }
-        Organization organization = organizationGraphRepository.findOne(organizationId, 0);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
         }
@@ -181,8 +181,8 @@ public class TagService {
         if (type.equalsIgnoreCase("team")) {
             orgId = teamGraphRepository.getOrganizationIdByTeam(orgId);
         }
-        Organization organization = organizationGraphRepository.findOne(orgId, 0);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(orgId, 0);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, orgId);
 
         }
@@ -200,8 +200,8 @@ public class TagService {
         if (type.equalsIgnoreCase("team")) {
             organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
         }
-        Organization organization = organizationGraphRepository.findOne(organizationId, 0);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
         }
@@ -219,13 +219,13 @@ public class TagService {
     }
 
     public Boolean updateShowCountryTagSettingOfOrganization(Long organizationId, boolean showCountryTags) {
-        Organization organization = organizationGraphRepository.findOne(organizationId, 0);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
         }
-        organization.setShowCountryTags(showCountryTags);
-        organizationGraphRepository.save(organization);
+        unit.setShowCountryTags(showCountryTags);
+        organizationGraphRepository.save(unit);
         return showCountryTags;
     }
 
@@ -282,14 +282,14 @@ public class TagService {
     }
 
     public HashMap<String, Object> getListOfMasterDataType(Long orgId) {
-        Organization organization = organizationGraphRepository.findOne(orgId);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(orgId);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, orgId);
 
         }
         HashMap<String, Object> tagCategoryData = new HashMap<>();
         tagCategoryData.put("tagCategories", MasterDataTypeEnum.getListOfMasterDataType());
-        tagCategoryData.put("showCountryTags", organization.isShowCountryTags() != null ? organization.isShowCountryTags() : false);
+        tagCategoryData.put("showCountryTags", unit.isShowCountryTags() != null ? unit.isShowCountryTags() : false);
         return tagCategoryData;
     }
 

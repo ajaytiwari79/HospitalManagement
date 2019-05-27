@@ -7,7 +7,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -128,11 +128,11 @@ public class ClientBatchService {
     }
 
     public List<Map<String, Object>> batchAddClientsToDatabase(MultipartFile multipartFile, long unitId) {
-        Organization currentOrganization = organizationGraphRepository.findOne(unitId);
-        if (currentOrganization == null) {
+        Unit currentUnit = organizationGraphRepository.findOne(unitId);
+        if (currentUnit == null) {
             return null;
         }
-        logger.info("Organization found is : " + currentOrganization.getName());
+        logger.info("Organization found is : " + currentUnit.getName());
         List<Map<String, Object>> clientList = new ArrayList<>();
         List<Map<String, Object>> houseUnverifiedClient = new ArrayList<>();
         InputStream stream;
@@ -336,10 +336,10 @@ public class ClientBatchService {
 
 
                 // Create Client Organization Relation
-                int count = relationService.checkClientOrganizationRelation(client.getId(), currentOrganization.getId());
+                int count = relationService.checkClientOrganizationRelation(client.getId(), currentUnit.getId());
 
                 if (count == 0) {
-                    logger.info("Client not connected to organization: " + currentOrganization.getName());
+                    logger.info("Client not connected to organization: " + currentUnit.getName());
                     connectToOrganization = true;
                     relationCreated++;
                 }
@@ -395,7 +395,7 @@ public class ClientBatchService {
                 if (connectToOrganization) {
                     if (client != null) {
                         logger.info("Creating relationship : " + client.getId());
-                        relation = new ClientOrganizationRelation(client, currentOrganization, DateUtils.getCurrentDate().getTime());
+                        relation = new ClientOrganizationRelation(client, currentUnit, DateUtils.getCurrentDate().getTime());
                         relationService.createRelation(relation);
 
                         Map<String, Object> clientInfo = new HashMap<>();

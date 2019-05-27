@@ -12,7 +12,7 @@ import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.query_result.CtaWtaQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
@@ -119,7 +119,7 @@ public class EmploymentCTAWTAService {
         StaffEmploymentDetails employmentDetails = null;
         if (Optional.ofNullable(employment).isPresent()) {
             Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-            Optional<Organization> organization = organizationGraphRepository.findById(unitId, 0);
+            Optional<Unit> organization = organizationGraphRepository.findById(unitId, 0);
             employmentDetails = convertEmploymentObject(employment);
             employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
             employmentDetails.setCountryId(countryId);

@@ -10,7 +10,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.default_data.PaymentType;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -206,14 +206,14 @@ public class OrganizationAddressService {
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 
-            Organization organization = organizationGraphRepository.findOne(id);
-            if (organization == null) {
+            Unit unit = organizationGraphRepository.findOne(id);
+            if (unit == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, id);
 
 
             }
-            organization.setContactAddress(contactAddress);
-            organizationGraphRepository.save(organization);
+            unit.setContactAddress(contactAddress);
+            organizationGraphRepository.save(unit);
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
@@ -240,8 +240,8 @@ public class OrganizationAddressService {
             billingAddress = new ContactAddress();
         }
 
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
 
         }
@@ -319,8 +319,8 @@ public class OrganizationAddressService {
         }
         billingAddress.setPaymentType(paymentType);
         billingAddress.setCurrency(currency);
-        organization.setBillingAddress(billingAddress);
-        organizationGraphRepository.save(organization);
+        unit.setBillingAddress(billingAddress);
+        organizationGraphRepository.save(unit);
 
         Map<String, Object> response = new HashMap<>();
         response.put("paymentTypeId", paymentType.getId());
@@ -350,8 +350,8 @@ public class OrganizationAddressService {
      * @return
      */
     public ContactAddress addUnitAddress(Long unitId, Map<String, Object> addressMap) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization != null) {
+        Unit unit = organizationGraphRepository.findOne(unitId);
+        if (unit != null) {
             ContactAddress address = organizationGraphRepository.getOrganizationAddressDetails(unitId);
             if (address == null) {
                 logger.info("No address found");
@@ -364,9 +364,9 @@ public class OrganizationAddressService {
             address.setCity((String) addressMap.get("city"));
             address.setLatitude(Float.parseFloat((String) addressMap.get("latitude")));
             address.setLongitude(Float.parseFloat((String) addressMap.get("longitude")));
-            organization.setContactAddress(address);
-            organizationGraphRepository.save(organization);
-            return organization.getContactAddress();
+            unit.setContactAddress(address);
+            organizationGraphRepository.save(unit);
+            return unit.getContactAddress();
         }
         return null;
     }

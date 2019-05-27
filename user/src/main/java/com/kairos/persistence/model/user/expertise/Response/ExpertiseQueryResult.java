@@ -3,7 +3,7 @@ package com.kairos.persistence.model.user.expertise.Response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
@@ -35,7 +35,7 @@ public class ExpertiseQueryResult {
     private Level organizationLevel;
     private List<OrganizationService> organizationService;
     //TODO in current unwinded property cant be set to any nested domain to QueryResult DTO , We will change if in feature this will handle
-    private Organization union;
+    private Unit union;
     private PayTable payTable;
     private List<Map<String, Object>> seniorityLevels;
     private BreakPaymentSetting breakPaymentSetting;
@@ -129,11 +129,11 @@ public class ExpertiseQueryResult {
         this.organizationService = organizationService;
     }
 
-    public Organization getUnion() {
+    public Unit getUnion() {
         return union;
     }
 
-    public void setUnion(Organization union) {
+    public void setUnion(Unit union) {
         this.union = union;
     }
 

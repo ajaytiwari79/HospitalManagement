@@ -12,7 +12,7 @@ import com.kairos.persistence.model.kpermissions.KPermissionField;
 import com.kairos.persistence.model.kpermissions.KPermissionFieldQueryResult;
 import com.kairos.persistence.model.kpermissions.KPermissionModel;
 import com.kairos.persistence.model.kpermissions.KPermissionSubModelFieldQueryResult;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionFieldRelationshipGraphRepository;
 import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionModelRelationshipGraphRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
@@ -145,9 +145,9 @@ public class PermissionService {
     public <E extends Object, T extends UserBaseEntity> E evaluatePermission(@Valid E dtoObject, Class<T> modelClass, List<FieldLevelPermissions> permissions){
         try {
 
-            Organization organization = organizationService.fetchParentOrganization(UserContext.getUnitId());
-            Long staffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
-            StaffAccessGroupQueryResult staffAccessGroupQueryResult =  accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, organization.getId());
+            Unit unit = organizationService.fetchParentOrganization(UserContext.getUnitId());
+            Long staffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), unit.getId());
+            StaffAccessGroupQueryResult staffAccessGroupQueryResult =  accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unit.getId());
             List<Long> accessGroupIds = staffAccessGroupQueryResult.getAccessGroupIds();
             //List<String> permissionFields = permissionFieldRepository.findPermissionFieldsByAccessGroupAndModelClass(modelClass.toString(), accessGroupIds,permissions);
             SimpleFilterProvider filterProvider = new SimpleFilterProvider();
@@ -166,9 +166,9 @@ public class PermissionService {
     public <T extends UserBaseEntity> List<KPermissionModelFieldDTO> fetchPermissionFields(Class<T> modelClass, List<FieldLevelPermissions> permissions){
         List<KPermissionModelFieldDTO> kPermissionModelFieldDTO = new ArrayList<>() ;
         try {
-            Organization organization = organizationService.fetchParentOrganization(UserContext.getUnitId());
-            Long staffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
-            StaffAccessGroupQueryResult staffAccessGroupQueryResult =  accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, organization.getId());
+            Unit unit = organizationService.fetchParentOrganization(UserContext.getUnitId());
+            Long staffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), unit.getId());
+            StaffAccessGroupQueryResult staffAccessGroupQueryResult =  accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, unit.getId());
             List<Long> accessGroupIds = staffAccessGroupQueryResult.getAccessGroupIds();
             List<List<String>> permissionFields = permissionFieldRepository.findPermissionFieldsByAccessGroupAndModelClass(modelClass.toString(), accessGroupIds,permissions);
             List<KPermissionSubModelFieldQueryResult> kPermissionSubModelFieldQueryResults = permissionFieldRepository.findSubModelPermissionFieldsByAccessGroupAndModelClass(modelClass.toString(), accessGroupIds,permissions);

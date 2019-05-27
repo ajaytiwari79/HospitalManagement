@@ -11,7 +11,7 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -88,22 +88,22 @@ public class StaffFilterService {
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Organization organization;
+        Unit unit;
         if (accessPageRepository.isHubMember(userId)) {
-            organization = accessPageRepository.fetchParentHub(userId);
+            unit = accessPageRepository.fetchParentHub(userId);
         } else {
             //TODO please Optimise these DB calls
-            organization = organizationGraphRepository.findOne(unitId);
-            if (!Optional.ofNullable(organization).isPresent()) {
+            unit = organizationGraphRepository.findOne(unitId);
+            if (!Optional.ofNullable(unit).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
             }
-            organization = organization.isParentOrganization() ? organization : organizationService.fetchParentOrganization(unitId);
+            unit = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTEXIST);
         }
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, unit.getId());
 
         return new FiltersAndFavouriteFiltersDTO(
                 getAllFilters(moduleId, countryId, unitId),
@@ -175,7 +175,7 @@ public class StaffFilterService {
 
     public StaffFilterDTO addFavouriteFilter(Long unitId, StaffFilterDTO staffFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
-        Organization parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(unitId);
+        Unit parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
 
         if (!Optional.ofNullable(staffFilterDTO.getName()).isPresent()) {
@@ -204,7 +204,7 @@ public class StaffFilterService {
 
     public StaffFilterDTO updateFavouriteFilter(Long filterId, Long organizationId, StaffFilterDTO favouriteFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
-        Organization parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(organizationId);
+        Unit parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(organizationId);
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
@@ -236,7 +236,7 @@ public class StaffFilterService {
 
     public Boolean deleteFavouriteFilter(Long filterId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Organization parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(unitId);
+        Unit parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(unitId);
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
@@ -267,7 +267,7 @@ public class StaffFilterService {
     }
 
     public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
-        Organization unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
@@ -277,7 +277,7 @@ public class StaffFilterService {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_FILTER_SETTING_NOTFOUND);
 
         }
-        Organization organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
+        Unit organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
@@ -319,7 +319,7 @@ public class StaffFilterService {
     public StaffFilterDTO addStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter();
         Long userId = UserContext.getUserDetails().getId();
-        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Unit parent = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         AccessPage accessPage = accessPageService.findByModuleId(staffFilterDTO.getModuleId());
         staffFavouriteFilter.setName(staffFilterDTO.getName());

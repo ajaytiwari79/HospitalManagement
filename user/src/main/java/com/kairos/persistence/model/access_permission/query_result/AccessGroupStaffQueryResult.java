@@ -1,23 +1,23 @@
 package com.kairos.persistence.model.access_permission.query_result;
 
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 
 @QueryResult
 public class AccessGroupStaffQueryResult {
-    private Organization organization;
+    private Unit unit;
     private Long staffId;
     private List<AccessGroupDayTypesQueryResult> dayTypesByAccessGroup;
 
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public Long getStaffId() {

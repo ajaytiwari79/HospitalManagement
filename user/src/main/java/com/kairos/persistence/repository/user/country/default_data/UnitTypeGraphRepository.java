@@ -28,7 +28,7 @@ public interface UnitTypeGraphRepository extends Neo4jBaseRepository<UnitType, L
             "RETURN unitType")
     List<UnitType> getUnitTypeByIds(Set<Long> unitTypeIds);
 
-    @Query("match(unit:Organization)-[:" + HAS_UNIT_TYPE + "]->(unitType:UnitType{deleted:false}) where id(unit) IN {0} " +
+    @Query("match(unit:Unit)-[:" + HAS_UNIT_TYPE + "]->(unitType:UnitType{deleted:false}) where id(unit) IN {0} " +
             "MATCH(unitType)-[:" + HAS_ACCESS_Of_MODULE + "]-(accessPage:AccessPage{isModule:true}) " +
             "RETURN id(unit) as unitId,collect(id(accessPage)) as accessibleModules")
     List<UnitModuleAccess> getAccessibleModulesByUnits(List<Long> unitIds);

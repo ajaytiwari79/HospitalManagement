@@ -13,26 +13,26 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrganizationHierarchyData {
-    private Organization parent;
-    private List<Organization> childUnits;
+    private Unit parent;
+    private List<Unit> childUnits;
 
     public OrganizationHierarchyData() {
         //Default Constructor
     }
 
-    public Organization getParent() {
+    public Unit getParent() {
         return parent;
     }
 
-    public void setParent(Organization parent) {
+    public void setParent(Unit parent) {
         this.parent = parent;
     }
 
-    public List<Organization> getChildUnits() {
+    public List<Unit> getChildUnits() {
         return childUnits;
     }
 
-    public void setChildUnits(List<Organization> childUnits) {
+    public void setChildUnits(List<Unit> childUnits) {
         this.childUnits = childUnits;
     }
 

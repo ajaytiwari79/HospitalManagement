@@ -5,7 +5,7 @@ package com.kairos.service.resources;
  */
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
@@ -101,16 +101,16 @@ public class ResourceService {
      * @return resource
      */
     public Resource addResourceToOrganization(Long organizationId, Resource resource) {
-        Organization currentOrganization = organizationGraphRepository.findOne(organizationId);
+        Unit currentUnit = organizationGraphRepository.findOne(organizationId);
 
-        if (currentOrganization.getResourceList() == null) {
-            currentOrganization.setResourceList(Arrays.asList(resourceGraphRepository.save(resource)));
-            organizationGraphRepository.save(currentOrganization);
+        if (currentUnit.getResourceList() == null) {
+            currentUnit.setResourceList(Arrays.asList(resourceGraphRepository.save(resource)));
+            organizationGraphRepository.save(currentUnit);
             return resource;
         }
-        List<Resource> resourceList = currentOrganization.getResourceList();
+        List<Resource> resourceList = currentUnit.getResourceList();
         resourceList.add(resource);
-        organizationGraphRepository.save(currentOrganization);
+        organizationGraphRepository.save(currentUnit);
         return resource;
     }
 
@@ -149,8 +149,8 @@ public class ResourceService {
 
 
     public Resource addResource(ResourceDTO resourceDTO, Long unitId) throws ParseException {
-        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
+        if (!Optional.ofNullable(unit).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
 
@@ -176,8 +176,8 @@ public class ResourceService {
                     withHour(0).withMinute(0).withSecond(0).withNano(0);
             resource.setDecommissionDate(decommissionDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         }
-        organization.addResource(resource);
-        organizationGraphRepository.save(organization);
+        unit.addResource(resource);
+        organizationGraphRepository.save(unit);
         return resource;
     }
 
