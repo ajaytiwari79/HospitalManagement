@@ -153,7 +153,8 @@ public class KPISetService {
     }
 
 
-    public KPISetResponseDTO getKPISetCalculationData(Long unitId, Date startDate) {
+    public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, Date startDate) {
+        List<KPISetResponseDTO> kpiSetResponseDTOList = new ArrayList<>();
         List<ApplicableKPI>  applicableKPIS =new ArrayList<>();
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
         List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
@@ -181,15 +182,14 @@ public class KPISetService {
                             }
                         }
                     }
-                    //FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
-//                    FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
- //                   List<KPISetResponseDTO> data = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
- //                   kpiSetResponseDTO.setKpiData(data);
+                    kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
+                    kpiSetResponseDTOList.add(kpiSetResponseDTO);
                 }
             }
-            kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
+
+
         }
-        return kpiSetResponseDTO;
+        return kpiSetResponseDTOList;
     }
 
 
