@@ -28,6 +28,7 @@ public class KPISet extends MongoBaseEntity {
     private ConfLevel confLevel;
 
     public KPISet(BigInteger id,String name,BigInteger phaseId, Long referenceId,ConfLevel confLevel, TimeTypeEnum timeType, Set<BigInteger> kpiIds) {
+        this.id=id;
         this.name = name;
         this.kpiIds = kpiIds;
         this.timeType = timeType;
