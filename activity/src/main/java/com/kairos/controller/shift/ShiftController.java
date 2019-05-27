@@ -71,7 +71,7 @@ public class ShiftController {
     @ApiOperation("update a Shift of a staff")
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam(required=false,value = "shiftAction")ShiftActionType shiftActionType) {
+    public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam(required=false,value = "shiftActionType")ShiftActionType shiftActionType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, type, false,false,shiftActionType));
     }
 
@@ -200,7 +200,7 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> saveDraftShift(@PathVariable Long unitId,
                                                               @RequestParam(value = "employmentId", required = false) Long employmentId,
                                                               @RequestParam(value = "planningPeriodIds", required = false) List<BigInteger> planningPeriodIds,
-                                                              @RequestParam(value = "startDate")
+                                                              @RequestParam(value = "startDate" ,required = false)
                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
                                                               @RequestParam(value = "staffId", required = false) Long staffId,
