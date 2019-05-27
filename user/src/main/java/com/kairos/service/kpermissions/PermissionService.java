@@ -74,40 +74,40 @@ public class PermissionService {
         return modelDTOS;
     }
 
-    private List<KPermissionModel> buildPermissionModelData(List<ModelDTO> modelDTOS, List<KPermissionModel> KPermissionModelList, boolean isSubModel){
+    private List<KPermissionModel> buildPermissionModelData(List<ModelDTO> modelDTOS, List<KPermissionModel> kPermissionModelList, boolean isSubModel){
         List<ModelDTO> newModelDTO = new ArrayList<>();
-        List<KPermissionModel> KPermissionModels = new ArrayList<>();
+        List<KPermissionModel> kPermissionModels = new ArrayList<>();
         modelDTOS.forEach(modelDTO -> {
-            Optional<KPermissionModel>  permissionModelObj = KPermissionModelList.stream().filter(permissionModel ->
+            Optional<KPermissionModel>  permissionModelObj = kPermissionModelList.stream().filter(permissionModel ->
                     modelDTO.getModelName().equalsIgnoreCase(permissionModel.getModelName())
             ).findAny();
             if(permissionModelObj.isPresent()){
-                KPermissionModel KPermissionModel = permissionModelObj.get();
-                List<String> fields = KPermissionModel.getFields().stream().map(KPermissionField::getFieldName).collect(Collectors.toList());
+                KPermissionModel kPermissionModel = permissionModelObj.get();
+                List<String> fields = kPermissionModel.getFields().stream().map(KPermissionField::getFieldName).collect(Collectors.toList());
                 modelDTO.getFields().forEach(fieldDTO -> {
                     if(!fields.contains(fieldDTO.getFieldName())){
-                        KPermissionModel.getFields().add(new KPermissionField(fieldDTO.getFieldName()));
+                        kPermissionModel.getFields().add(new KPermissionField(fieldDTO.getFieldName()));
                     }
                 });
-                KPermissionModel.setPermissionSubModel(isSubModel);
+                kPermissionModel.setPermissionSubModel(isSubModel);
                 if(!modelDTO.getSubModels().isEmpty()){
-                    KPermissionModel.getSubModels().addAll(buildPermissionModelData(modelDTO.getSubModels(), KPermissionModel.getSubModels(), true));
+                    kPermissionModel.getSubModels().addAll(buildPermissionModelData(modelDTO.getSubModels(), kPermissionModel.getSubModels(), true));
                 }
-                    KPermissionModels.add(KPermissionModel);
+                    kPermissionModels.add(kPermissionModel);
             }else{
                 newModelDTO.add(modelDTO);
             }
 
         });
-        KPermissionModelList.addAll(ObjectMapperUtils.copyPropertiesOfListByMapper(newModelDTO, KPermissionModel.class));
-        return KPermissionModelList;
+        kPermissionModelList.addAll(ObjectMapperUtils.copyPropertiesOfListByMapper(newModelDTO, KPermissionModel.class));
+        return kPermissionModelList;
     }
 
     public List<ModelDTO> getPermissionSchema(){
-        List<KPermissionModel> KPermissionModels = new ArrayList();
-        permissionModelRepository.findAll().iterator().forEachRemaining(KPermissionModels::add);
-        KPermissionModels = KPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(KPermissionModels, ModelDTO.class);
+        List<KPermissionModel> kPermissionModels = new ArrayList();
+        permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
+        kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(kPermissionModels, ModelDTO.class);
     }
 
     public List<PermissionDTO> createPermissions(List<PermissionDTO> permissionDTOList){
@@ -121,13 +121,13 @@ public class PermissionService {
 
     public void linkAccessGroupToSubModelAndPermissionFields(List<ModelPermissionDTO> modelPermissionDTOS, List<Long> accessGroupIds){
         modelPermissionDTOS.forEach(modelPermissionDTO -> {
-            KPermissionModel KPermissionModel = null;
+            KPermissionModel kPermissionModel = null;
             for(FieldPermissionDTO fieldPermissionDTO : modelPermissionDTO.getFieldPermissions()){
                 KPermissionFieldQueryResult KPermissionFieldQueryResult = permissionFieldRepository.getPermissionFieldByIdAndPermissionModelId(modelPermissionDTO.getPermissionModelId(), fieldPermissionDTO.getFieldId());
                 if(KPermissionFieldQueryResult == null){
                     exceptionService.dataNotFoundByIdException("message.permission.KPermissionFieldQueryResult");
                 }
-                KPermissionModel = KPermissionFieldQueryResult.getKPermissionModel();
+                kPermissionModel = KPermissionFieldQueryResult.getKPermissionModel();
                 KPermissionField KPermissionField = KPermissionFieldQueryResult.getKPermissionField();
                 if(KPermissionField == null){
                     exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_PERMISSION_FIELD, fieldPermissionDTO.getFieldId());
@@ -135,7 +135,7 @@ public class PermissionService {
                         accessGroupPermissionFieldRelationshipGraphRepository.createAccessGroupPermissionFieldRelationshipType(KPermissionField.getId(),accessGroupIds,FieldLevelPermissions.getByValue(fieldPermissionDTO.getFieldPermission()));
                 }
             }
-                accessGroupPermissionModelRelationshipGraphRepository.createAccessGroupPermissionModelRelationship(KPermissionModel.getId(), accessGroupIds,FieldLevelPermissions.getByValue(modelPermissionDTO.getModelPermission()));
+                accessGroupPermissionModelRelationshipGraphRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds,FieldLevelPermissions.getByValue(modelPermissionDTO.getModelPermission()));
             if(!modelPermissionDTO.getSubModelPermissions().isEmpty()){
                 linkAccessGroupToSubModelAndPermissionFields(modelPermissionDTO.getSubModelPermissions(), accessGroupIds);
             }
