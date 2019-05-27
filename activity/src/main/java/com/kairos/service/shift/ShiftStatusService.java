@@ -26,6 +26,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang.WordUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -253,7 +254,7 @@ public class ShiftStatusService {
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
         String bodyPart1 = "The status of the ";
         String bodyPart2 = activity.getActivityName();
-        String bodyPart3 = " activity which is planned on " + getEmailDateTimeWithFormat(shiftDate) + " has been moved to ";
+        String bodyPart3 = " activity which is planned on " + WordUtils.capitalizeFully(getEmailDateTimeWithFormat(shiftDate)) + " has been moved to ";
         String bodyPart4 = shiftStatus.toString();
         String bodyPart5 = " by " + UserContext.getUserDetails().getFullName() + ".\n";
 
