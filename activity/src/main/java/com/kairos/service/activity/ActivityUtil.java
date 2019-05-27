@@ -78,6 +78,8 @@ public class ActivityUtil {
                 case YEARS:
                     nextEndDate = startDate.plusYears(1).minusDays(1);
                     break;
+                default:
+                    break;
             }
             cutOffIntervals.add(new CutOffInterval(startDate, nextEndDate));
             startDate = nextEndDate.plusDays(1);
@@ -99,6 +101,8 @@ public class ActivityUtil {
                 break;
             case CALCULATED_TIME:
                 calculationType = ENTERED_TIMES;
+                break;
+            default:
                 break;
        /*     case "":
                 break;*/

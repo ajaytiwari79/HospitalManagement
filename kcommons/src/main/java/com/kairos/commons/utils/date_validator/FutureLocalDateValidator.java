@@ -10,7 +10,7 @@ import java.util.Optional;
 public class FutureLocalDateValidator implements ConstraintValidator<FutureLocalDate, LocalDate> {
     @Override
     public void initialize(FutureLocalDate constraintAnnotation) {
-
+        //Not in use
     }
 
     @Override

@@ -22,7 +22,7 @@ public class ActivityWithCTAWTASettingsDTO {
     private BigInteger categoryId;
 
     public ActivityWithCTAWTASettingsDTO(){
-
+        //Not in use
     }
 
     public BigInteger getId() {

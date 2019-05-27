@@ -15,7 +15,7 @@ public class ShiftBreakListener implements VariableListener<Shift> {
 
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, Shift shift) {
-
+        //Not in use
     }
 
     @Override
@@ -25,7 +25,7 @@ public class ShiftBreakListener implements VariableListener<Shift> {
 
     @Override
     public void beforeVariableChanged(ScoreDirector scoreDirector, Shift shift) {
-
+        //Not in use
     }
 
     @Override
@@ -35,12 +35,12 @@ public class ShiftBreakListener implements VariableListener<Shift> {
     }
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, Shift shift) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityRemoved(ScoreDirector scoreDirector, Shift shift) {
-
+        //Not in use
     }
 
     public void updateBreaks(ScoreDirector scoreDirector, Shift shift) {

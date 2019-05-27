@@ -16,6 +16,7 @@ public class GetWorkShiftsFromWorkPlaceByIdResponse {
 
 
     public GetWorkShiftsFromWorkPlaceByIdResponse() {
+        //Not in use
     }
 
     //    public GetWorkShiftsFromWorkPlaceByIdResponse(com.kairos.user.domain.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult[] getWorkShiftsFromWorkPlaceByIdResult) {

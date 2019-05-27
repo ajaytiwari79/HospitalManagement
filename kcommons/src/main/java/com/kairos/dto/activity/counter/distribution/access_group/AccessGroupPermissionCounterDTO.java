@@ -9,7 +9,7 @@ public class AccessGroupPermissionCounterDTO {
     private Long countryId;
     private boolean isCountryAdmin;
     private boolean management;
-    private List<Long> accessGroupIds;
+    private List<Long> accessGroupIds = new ArrayList<>();
 
     public AccessGroupPermissionCounterDTO() {
     }

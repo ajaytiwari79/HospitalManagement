@@ -13,6 +13,7 @@ public class StaffingLevelGraphDTO {
 
 
     public StaffingLevelGraphDTO() {
+        //Not in use
     }
 
     public StaffingLevelSetting getStaffingLevelSetting() {

@@ -11,17 +11,17 @@ import java.time.LocalDateTime;
 public class VrpTaskStartTimeListener implements VariableListener<Task> {
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityAdded(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
     public void beforeVariableChanged(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
@@ -33,12 +33,12 @@ public class VrpTaskStartTimeListener implements VariableListener<Task> {
 
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityRemoved(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
     private void updateStartTime(ScoreDirector scoreDirector, Task task) {
         if(task.getPrevTaskOrShift()==null){

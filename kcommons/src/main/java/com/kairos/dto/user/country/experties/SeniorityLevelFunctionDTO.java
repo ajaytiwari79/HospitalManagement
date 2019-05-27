@@ -17,6 +17,7 @@ public class SeniorityLevelFunctionDTO {
 
 
     public SeniorityLevelFunctionDTO() {
+        //Not in use
     }
 
     public Long getSeniorityLevelId() {

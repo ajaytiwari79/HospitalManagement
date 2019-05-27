@@ -370,6 +370,8 @@ public class CitizenService {
                 case "description":
                     grantObject.put("description", currentElements.getText());
                     break;
+                default:
+                    break;
             }
         }
         grantObject.put("grantName", patientGrant.getName());

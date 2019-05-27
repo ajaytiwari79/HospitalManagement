@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Kairos</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+</head>
+
+<body style="font-family: 'Lato', sans-serif; font-weight: 500; background: #eeeeee;">
+<section style="width: 100%; max-width: 450px; margin: 0 auto; padding: 25px 0;">
+    <div style="height: 100px; background: #ffffff; text-align: center;">
+        <img th:src="@{${kairosLogo}}" alt="Kairos logo"
+             style=" margin-top: 35px; width: 100px;">
+
+    </div>
+    <div style="height: 170px; background: #212e66; color: #ffffff; text-align: center; padding: 15px 7% 0;">
+        <div style="height: 80px; width: 80px; border-radius: 50%; overflow: hidden; padding: 2px; background: white; margin: 0px auto 0 auto;">
+            <img alt="Staff image" th:src="@{${receiverImage}}"
+                 style="width: 100%; height: 100%; border-radius: 50%">
+        </div>
+
+        <h4 style="    margin-top: 10px;
+    font-size: 18px;
+    float: left;
+    width: 100%;
+    color: #1dc1e1;
+    text-align: center;" th:text="${receiverName}"></h4>
+        <div style="height: 40px;
+            background: #fff;
+            margin-top: 50px;
+        "></div>
+    </div>
+    <div style="min-height: 330px; background-image: linear-gradient(rgb(93,167,251) 0%, rgb(33,46,102) 75%); padding: 0 7% 10px; ">
+        <div style="     background: white;
+    min-height: 220px;
+    padding: 0% 4%;
+    text-align: left;
+    padding-right: 30px;
+    padding-left: 30px;
+    box-sizing: border-box;
+    color: #848383;
+    font-size: 18px;">
+            <span th:text="${descriptionPart1}"></span><b th:text="${descriptionPart2}"></b><span th:text="${descriptionPart3}"></span><b th:text="${descriptionPart4}"></b><span th:text="${descriptionPart5}"></span>
+        </div>
+        <div style="    background: #fff;
+            padding: 0 4% 36px;
+            color: #666666;text-align: center;" >
+            <div style="    color: #777e84;
+    font-weight: 600;
+    font-size: 14px;">Cheers, </div>
+            <div style="color: black;font-size: 14px;"> Team Kairos</div>
+        </div>
+        <!-- <div style="background: #fff; text-align: center; padding: 0 20px 8px;">
+            <div style="border-top: 1px solid #9d9d9d; margin-bottom: 10px;" ></div>
+            <img style="width:20px;" src="data:image/svg+xml;base64,
+                        PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHg9IjBweCIgeT0iMHB4IiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDk2LjEyNCA5Ni4xMjMiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDk2LjEyNCA5Ni4xMjM7IiB4bWw6c3BhY2U9InByZXNlcnZlIj48Zz48Zz4KCTxwYXRoIGQ9Ik03Mi4wODksMC4wMkw1OS42MjQsMEM0NS42MiwwLDM2LjU3LDkuMjg1LDM2LjU3LDIzLjY1NnYxMC45MDdIMjQuMDM3Yy0xLjA4MywwLTEuOTYsMC44NzgtMS45NiwxLjk2MXYxNS44MDMgICBjMCwxLjA4MywwLjg3OCwxLjk2LDEuOTYsMS45NmgxMi41MzN2MzkuODc2YzAsMS4wODMsMC44NzcsMS45NiwxLjk2LDEuOTZoMTYuMzUyYzEuMDgzLDAsMS45Ni0wLjg3OCwxLjk2LTEuOTZWNTQuMjg3aDE0LjY1NCAgIGMxLjA4MywwLDEuOTYtMC44NzcsMS45Ni0xLjk2bDAuMDA2LTE1LjgwM2MwLTAuNTItMC4yMDctMS4wMTgtMC41NzQtMS4zODZjLTAuMzY3LTAuMzY4LTAuODY3LTAuNTc1LTEuMzg3LTAuNTc1SDU2Ljg0MnYtOS4yNDYgICBjMC00LjQ0NCwxLjA1OS02LjcsNi44NDgtNi43bDguMzk3LTAuMDAzYzEuMDgyLDAsMS45NTktMC44NzgsMS45NTktMS45NlYxLjk4Qzc0LjA0NiwwLjg5OSw3My4xNywwLjAyMiw3Mi4wODksMC4wMnoiIGRhdGEtb3JpZ2luYWw9IiMwMDAwMDAiIGNsYXNzPSJhY3RpdmUtcGF0aCIgc3R5bGU9ImZpbGw6IzlEOUQ5RCIgZGF0YS1vbGRfY29sb3I9IiM5ZDlkOWQiPjwvcGF0aD4KPC9nPjwvZz4gPC9zdmc+"
+                alt="faceboook logo">
+            <img style="width:20px;" src="data:image/svg+xml;base64,
+                        PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgNjEyIDYxMiIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNjEyIDYxMjsiIHhtbDpzcGFjZT0icHJlc2VydmUiIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBjbGFzcz0iIj48Zz48Zz4KCTxnPgoJCTxwYXRoIHN0eWxlPSJmaWxsOiM5RDlEOUQiIGQ9Ik02MTIsMTE2LjI1OGMtMjIuNTI1LDkuOTgxLTQ2LjY5NCwxNi43NS03Mi4wODgsMTkuNzcyYzI1LjkyOS0xNS41MjcsNDUuNzc3LTQwLjE1NSw1NS4xODQtNjkuNDExICAgIGMtMjQuMzIyLDE0LjM3OS01MS4xNjksMjQuODItNzkuNzc1LDMwLjQ4Yy0yMi45MDctMjQuNDM3LTU1LjQ5LTM5LjY1OC05MS42My0zOS42NThjLTY5LjMzNCwwLTEyNS41NTEsNTYuMjE3LTEyNS41NTEsMTI1LjUxMyAgICBjMCw5LjgyOCwxLjEwOSwxOS40MjcsMy4yNTEsMjguNjA2QzE5Ny4wNjUsMjA2LjMyLDEwNC41NTYsMTU2LjMzNyw0Mi42NDEsODAuMzg2Yy0xMC44MjMsMTguNTEtMTYuOTgsNDAuMDc4LTE2Ljk4LDYzLjEwMSAgICBjMCw0My41NTksMjIuMTgxLDgxLjk5Myw1NS44MzUsMTA0LjQ3OWMtMjAuNTc1LTAuNjg4LTM5LjkyNi02LjM0OC01Ni44NjctMTUuNzU2djEuNTY4YzAsNjAuODA2LDQzLjI5MSwxMTEuNTU0LDEwMC42OTMsMTIzLjEwNCAgICBjLTEwLjUxNywyLjgzLTIxLjYwNyw0LjM5OC0zMy4wOCw0LjM5OGMtOC4xMDcsMC0xNS45NDctMC44MDMtMjMuNjM0LTIuMzMzYzE1Ljk4NSw0OS45MDcsNjIuMzM2LDg2LjE5OSwxMTcuMjUzLDg3LjE5NCAgICBjLTQyLjk0NywzMy42NTQtOTcuMDk5LDUzLjY1NS0xNTUuOTE2LDUzLjY1NWMtMTAuMTM0LDAtMjAuMTE2LTAuNjEyLTI5Ljk0NC0xLjcyMWM1NS41NjcsMzUuNjgxLDEyMS41MzYsNTYuNDg1LDE5Mi40MzgsNTYuNDg1ICAgIGMyMzAuOTQ4LDAsMzU3LjE4OC0xOTEuMjkxLDM1Ny4xODgtMzU3LjE4OGwtMC40MjEtMTYuMjUzQzU3My44NzIsMTYzLjUyNiw1OTUuMjExLDE0MS40MjIsNjEyLDExNi4yNTh6IiBkYXRhLW9yaWdpbmFsPSIjMDEwMDAyIiBjbGFzcz0iYWN0aXZlLXBhdGgiIGRhdGEtb2xkX2NvbG9yPSIjOWQ5ZDlkIj48L3BhdGg+Cgk8L2c+CjwvZz48L2c+IDwvc3ZnPg=="
+                alt="twitter logo">
+            <img style="width:20px;" src="data:image/svg+xml;base64,
+                       PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDMxMC4wNSAzMTAuMDUiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDMxMC4wNSAzMTAuMDU7IiB4bWw6c3BhY2U9InByZXNlcnZlIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGc+PGcgaWQ9IlhNTElEXzc5OF8iPgoJPHBhdGggaWQ9IlhNTElEXzc5OV8iIGQ9Ik0yNDUuMjY1LDMxLjc3MkMyMjMuOTIzLDExLjI4NCwxOTQuMzg4LDAsMTYyLjEwMSwwYy00OS4zMiwwLTc5LjY1NCwyMC4yMTctOTYuNDE2LDM3LjE3NiAgIGMtMjAuNjU4LDIwLjktMzIuNTA0LDQ4LjY1MS0zMi41MDQsNzYuMTM5YzAsMzQuNTEzLDE0LjQzNiw2MS4wMDMsMzguNjExLDcwLjg1OGMxLjYyMywwLjY2NSwzLjI1NiwxLDQuODU3LDEgICBjNS4xLDAsOS4xNDEtMy4zMzcsMTAuNTQxLTguNjljMC44MTYtMy4wNzEsMi43MDctMTAuNjQ3LDMuNTI5LTEzLjkzNmMxLjc2LTYuNDk1LDAuMzM4LTkuNjE5LTMuNS0xNC4xNDIgICBjLTYuOTkyLTguMjczLTEwLjI0OC0xOC4wNTYtMTAuMjQ4LTMwLjc4OGMwLTM3LjgxOCwyOC4xNi03OC4wMTEsODAuMzUyLTc4LjAxMWM0MS40MTIsMCw2Ny4xMzcsMjMuNTM3LDY3LjEzNyw2MS40MjUgICBjMCwyMy45MDktNS4xNSw0Ni4wNTEtMTQuNTA0LDYyLjM1Yy02LjUsMTEuMzI1LTE3LjkzLDI0LjgyNS0zNS40NzcsMjQuODI1Yy03LjU4OCwwLTE0LjQwNC0zLjExNy0xOC43MDUtOC41NTEgICBjLTQuMDYzLTUuMTM3LTUuNDAyLTExLjc3My0zLjc2OC0xOC42ODljMS44NDYtNy44MTQsNC4zNjMtMTUuOTY1LDYuNzk5LTIzLjg0NWM0LjQ0My0xNC4zOTIsOC42NDMtMjcuOTg1LDguNjQzLTM4LjgzICAgYzAtMTguNTUtMTEuNDA0LTMxLjAxNC0yOC4zNzUtMzEuMDE0Yy0yMS41NjgsMC0zOC40NjUsMjEuOTA2LTM4LjQ2NSw0OS44NzFjMCwxMy43MTUsMy42NDUsMjMuOTczLDUuMjk1LDI3LjkxMiAgIGMtMi43MTcsMTEuNTEyLTE4Ljg2NSw3OS45NTMtMjEuOTI4LDkyLjg1OWMtMS43NzEsNy41MzQtMTIuNDQsNjcuMDM5LDUuMjE5LDcxLjc4NGMxOS44NDEsNS4zMzEsMzcuNTc2LTUyLjYyMywzOS4zODEtNTkuMTcyICAgYzEuNDYzLTUuMzI2LDYuNTgyLTI1LjQ2NSw5LjcxOS0zNy44NDVjOS41NzgsOS4yMjYsMjUsMTUuNDYzLDQwLjAwNiwxNS40NjNjMjguMjg5LDAsNTMuNzMtMTIuNzMsNzEuNjM3LTM1Ljg0MyAgIGMxNy4zNjctMjIuNDE4LDI2LjkzMi01My42NjQsMjYuOTMyLTg3Ljk3OEMyNzYuODY5LDc3LjUwMiwyNjUuMzQ5LDUxLjA1NiwyNDUuMjY1LDMxLjc3MnoiIGRhdGEtb3JpZ2luYWw9IiMwMDAwMDAiIGNsYXNzPSJhY3RpdmUtcGF0aCIgc3R5bGU9ImZpbGw6IzlEOUQ5RCIgZGF0YS1vbGRfY29sb3I9IiM5ZDlkOWQiPjwvcGF0aD4KPC9nPjwvZz4gPC9zdmc+"
+                alt="pinterest logo">
+        </div> -->
+        <p style="margin-top: 18px; text-align:center; color: #a8a8a8; font-size: 10px;">Copyright@2019,
+            All rights reserved</p>
+    </div>
+</section>
+</body>
+
+</html>

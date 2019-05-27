@@ -94,6 +94,7 @@ public class GetEmploymentByIdResult {
     private String CostPlace;
 
     public GetEmploymentByIdResult() {
+        //Not in use
     }
 
     public String getAge() {

@@ -26,7 +26,7 @@ public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
 
     @Override
     public void validateRules(BigInteger bigInteger) {
-
+        //Not in use
     }
 
     @Override

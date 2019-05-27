@@ -12,7 +12,7 @@ public class FrequencySettings implements Serializable {
     private DurationType durationType;
 
     public FrequencySettings() {
-
+        //Not in use
     }
 
     public Integer getTimeValue() {
