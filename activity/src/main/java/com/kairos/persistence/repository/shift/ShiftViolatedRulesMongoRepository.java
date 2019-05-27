@@ -19,4 +19,7 @@ public interface ShiftViolatedRulesMongoRepository extends MongoBaseRepository<S
 
     @Query(value = "{shiftId:?0,draft:?1}" )
     ShiftViolatedRules findOneViolatedRulesByShiftId(BigInteger shiftId ,boolean draft);
+
+    @Query(value = "{'shiftId':{'$in':?0},draft:?1}",delete = true)
+    Long deleteAllViolatedRulesByShiftIds(List<BigInteger> shiftIds,boolean draft);
 }

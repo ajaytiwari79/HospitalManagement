@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -59,9 +58,9 @@ public class ShiftDetailsService extends MongoBaseService {
     @Inject
     private ShiftService shiftService;
 
-    public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds) {
+    public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds , boolean showDraft) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByIds(shiftIds);
-        setReasonCodeAndRuleViolationsInShifts(shiftWithActivityDTOS, unitId, shiftIds);
+        setReasonCodeAndRuleViolationsInShifts(shiftWithActivityDTOS, unitId, shiftIds,showDraft);
         return shiftWithActivityDTOS;
     }
 
@@ -70,11 +69,10 @@ public class ShiftDetailsService extends MongoBaseService {
         return true;
     }
 
-    private void setReasonCodeAndRuleViolationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds) {
+    private void setReasonCodeAndRuleViolationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds ,boolean showDraft) {
         ReasonCodeWrapper reasonCodeWrapper = findReasonCodes(shiftWithActivityDTOS, unitId);
-        Map<BigInteger, List<WorkTimeAgreementRuleViolation>> wtaRuleViolationMap = findAllWTAViolatedRules(shiftIds);
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = findAllShiftViolatedRules(shiftIds,showDraft);
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodeWrapper.getReasonCodes().stream().collect(toMap(ReasonCodeDTO::getId, Function.identity()));
-
         for (ShiftWithActivityDTO shift : shiftWithActivityDTOS) {
             for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
                 if (!shiftActivityDTO.isBreakShift()) {
@@ -82,14 +80,29 @@ public class ShiftDetailsService extends MongoBaseService {
                 }
                 shiftActivityDTO.setLocation(reasonCodeWrapper.getContactAddressData());
             }
-            shift.setWtaRuleViolations(wtaRuleViolationMap.get(shift.getId()));
+            if(shiftViolatedRulesMap.containsKey(shift.getId())) {
+                shift.setWtaRuleViolations(shiftViolatedRulesMap.get(shift.getId()).getWorkTimeAgreements());
+            }
         }
     }
 
-    private Map<BigInteger, List<WorkTimeAgreementRuleViolation>> findAllWTAViolatedRules(List<BigInteger> shiftIds) {
-        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds,false);
-        Map<BigInteger, List<WorkTimeAgreementRuleViolation>> wtaRuleViolationMap = shiftViolatedRules.stream().collect(toMap(shiftViolatedRule -> shiftViolatedRule.getShiftId(), v -> v.getWorkTimeAgreements(), (previous, current) -> current));
-        return wtaRuleViolationMap;
+    private Map<BigInteger, ShiftViolatedRules> findAllShiftViolatedRules(List<BigInteger> shiftIds, boolean showDraft) {
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = new HashMap<>();
+        List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
+        Map<BigInteger,ShiftViolatedRules> draftShiftViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isDraft).collect(Collectors.toMap(ShiftViolatedRules::getShiftId,Function.identity()));
+        Map<BigInteger,ShiftViolatedRules> originalShiftViolatedRules = shiftViolatedRules.stream().filter(shiftViolatedRule -> !shiftViolatedRule.isDraft()).collect(Collectors.toMap(ShiftViolatedRules::getShiftId,Function.identity()));
+        if(showDraft){
+            for (BigInteger shiftId : originalShiftViolatedRules.keySet()) {
+                if(draftShiftViolatedRules.containsKey(shiftId)){
+                    shiftViolatedRulesMap.put(shiftId,draftShiftViolatedRules.get(shiftId));
+                }else{
+                    shiftViolatedRulesMap.put(shiftId,originalShiftViolatedRules.get(shiftId));
+                }
+            }
+        }else {
+            shiftViolatedRulesMap = originalShiftViolatedRules;
+        }
+        return shiftViolatedRulesMap;
     }
 
     private ReasonCodeWrapper findReasonCodes(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId) {
@@ -125,7 +138,7 @@ public class ShiftDetailsService extends MongoBaseService {
     private List<PlannedTime> filterPlannedTimes(Date startDate, Date endDate, Map<DateTimeInterval, PlannedTime> plannedTimeMap, BigInteger plannedTimeId) {
         DateTimeInterval activityInterval = new DateTimeInterval(startDate, endDate);
         plannedTimeMap = plannedTimeMap.entrySet().stream().filter(map -> map.getKey().overlaps(activityInterval)).collect(toMap(k -> k.getKey(), k -> k.getValue()));
-        plannedTimeMap = plannedTimeMap.entrySet().stream().sorted(comparing(k -> k.getKey().getStartDate())).collect(toMap(e -> e.getKey(), e -> e.getValue(), (e1, e2) -> e2, LinkedHashMap::new));
+        plannedTimeMap = plannedTimeMap.entrySet().stream().sorted(comparing(k -> k.getKey().getStartDate())).collect(toMap(e -> e.getKey(),v->v.getValue(), (e1, e2) -> e2, LinkedHashMap::new));
         List<PlannedTime> plannedTimes = new ArrayList<>();
         final boolean endDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsStartOrEnd(endDate));
         final boolean startDateInside = plannedTimeMap.entrySet().stream().anyMatch(k -> k.getKey().containsStartOrEnd(startDate));

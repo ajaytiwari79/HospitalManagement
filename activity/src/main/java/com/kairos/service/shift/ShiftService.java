@@ -228,21 +228,13 @@ public class ShiftService extends MongoBaseService {
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false, functionId,phase,null);
-            payOutService.updatePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
-            shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(mainShift, ShiftDTO.class);
+            if(!PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum())) {
+                payOutService.updatePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
+                shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
+            }
+            shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(isNotNull(mainShift.getDraftShift()) ?mainShift.getDraftShift():mainShift , ShiftDTO.class);
             shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
-            ShiftViolatedRules shiftViolatedRules = shiftViolatedRulesMongoRepository.findOneViolatedRulesByShiftId(mainShift.getId() ,false );
-            if (isNull(shiftViolatedRules)) {
-                shiftViolatedRules = new ShiftViolatedRules(mainShift.getId());
-            }
-            if (shiftOverlappedWithNonWorkingType) {
-                shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.SHIFT_OVERLAPPING));
-                shiftViolatedRules.setEscalationResolved(false);
-            }
-            shiftViolatedRules.setActivities(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
-            shiftViolatedRules.setWorkTimeAgreements(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
-            save(shiftViolatedRules);
-            shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
+            validateShiftViolatedRules(mainShift, shiftOverlappedWithNonWorkingType, shiftWithViolatedInfoDTO,PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) ? ShiftActionType.SAVE_AS_DRAFT : null);
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(Arrays.asList(shiftDTO), staffAdditionalInfoDTO.getUserAccessRoleDTO());
         }
         shiftWithViolatedInfoDTO.setShifts(shiftDTOS);
@@ -362,7 +354,7 @@ public class ShiftService extends MongoBaseService {
         shifts.forEach(shift -> updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO));
     }
 
-    public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type, Boolean validatedByStaff, boolean updateShiftState, Long unitId) {
+    public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type, Boolean validatedByStaff, boolean updateShiftState, Long unitId,ShiftActionType shiftActionType) {
         ShiftDTO shiftDTO = shiftWithViolatedInfo.getShifts().get(0);
         Long functionId = shiftDTO.getFunctionId();
         Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
@@ -407,19 +399,13 @@ public class ShiftService extends MongoBaseService {
         if (isIgnoredAllRuletemplate(shiftWithViolatedInfo, updatedShiftWithViolatedInfo)) {
             updateWTACounter(staffAdditionalInfoDTO, updatedShiftWithViolatedInfo, shift);
             shift.setPlanningPeriodId(planningPeriod.getId());
-            shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, false, functionId , phase,null);
-            payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
+            shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, false, functionId , phase,shiftActionType);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
-            shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
-            ShiftViolatedRules shiftViolatedRules = shiftViolatedRulesMongoRepository.findOneViolatedRulesByShiftId(shift.getId(),false);
-            if (isNull(shiftViolatedRules)) {
-                shiftViolatedRules = new ShiftViolatedRules(shift.getId());
+            if (isNull(shiftActionType) || ShiftActionType.SAVE.equals(shiftActionType)) {
+                payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
+                shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
             }
-            shiftViolatedRules.setEscalationReasons(shiftOverLappedWithNonWorkingTime ? newHashSet(ShiftEscalationReason.SHIFT_OVERLAPPING, ShiftEscalationReason.WORK_TIME_AGREEMENT) : newHashSet(ShiftEscalationReason.WORK_TIME_AGREEMENT));
-            shiftViolatedRules.setEscalationResolved(false);
-            shiftViolatedRules.setActivities(updatedShiftWithViolatedInfo.getViolatedRules().getActivities());
-            shiftViolatedRules.setWorkTimeAgreements(updatedShiftWithViolatedInfo.getViolatedRules().getWorkTimeAgreements());
-            save(shiftViolatedRules);
+            validateShiftViolatedRules(shift, shiftOverLappedWithNonWorkingTime, shiftWithViolatedInfo,shiftActionType);
             shiftReminderService.setReminderTrigger(activityWrapperMap, shift);
             if (updateShiftState) {
                 shiftDTO = shiftStateService.updateShiftStateAfterValidatingWtaRule(shiftDTO, shiftDTO.getId(), shiftDTO.getShiftStatePhaseId());
@@ -469,33 +455,46 @@ public class ShiftService extends MongoBaseService {
         return plannedTimeId;
     }
 
-    public Object saveDraftShift(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType,
-                                      ShiftFilterParam shiftFilterParam) {
+    public Object saveDraftShift(Long unitId, Long staffId,List<BigInteger> planningPeriodIds, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType,
+                                      ShiftFilterParam shiftFilterParam,ShiftActionType shiftActionType) {
         List<Shift> saveShifts=new ArrayList<>();
         List<ShiftViolatedRules> saveShiftViolatedRules= new ArrayList<>();
+        List<ShiftViolatedRules> deleteShiftViolatedRules= new ArrayList<>();
         List<Shift> draftShifts;
-        if(isNotNull(staffId) && isNotNull(employmentId)) {
-            draftShifts = shiftMongoRepository.getAllDraftShiftBetweenDuration(employmentId, staffId, asDate(startDate), asDate(endDate), unitId);
+        if(isNotNull(staffId) && isNotNull(employmentId) && isCollectionNotEmpty(planningPeriodIds)) {
+            draftShifts = shiftMongoRepository.getAllDraftShiftBetweenDuration(employmentId, staffId,planningPeriodIds, unitId);
         }else {
             draftShifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse( asDate(startDate), asDate(endDate),unitId);
         }
-        if(isCollectionNotEmpty(draftShifts)) {
+        if(isCollectionEmpty(draftShifts)) {
+            exceptionService.actionNotPermittedException("draft shift not found");
+        }
+        if(ShiftActionType.SAVE.equals(shiftActionType)) {
             for (Shift draftShift : draftShifts) {
-                Shift shift= draftShift.getDraftShift();
+                Shift shift = draftShift.getDraftShift();
                 shift.setDraftShift(null);
-               saveShifts.add(shift);
+                saveShifts.add(shift);
             }
-            shiftMongoRepository.saveEntities(saveShifts);
+
             shiftStateService.updateShiftDailyTimeBankAndPaidOut(saveShifts, saveShifts, unitId);
-            List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(draftShifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()),true);
-            Map<BigInteger,ShiftViolatedRules> draftShiftViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isDraft).collect(Collectors.toMap(ShiftViolatedRules::getShiftId,Function.identity()));
+            List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(draftShifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()), true);
+            Map<BigInteger, ShiftViolatedRules> draftShiftViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isDraft).collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
             for (ShiftViolatedRules shiftViolatedRule : shiftViolatedRules) {
-                if(isNotNull(draftShiftViolatedRules.get(shiftViolatedRule.getShiftId()))){
+                if (isNotNull(draftShiftViolatedRules.get(shiftViolatedRule.getShiftId()))) {
                     saveShiftViolatedRules.add(draftShiftViolatedRules.get(shiftViolatedRule.getShiftId()));
+                    deleteShiftViolatedRules.add(shiftViolatedRule);
                 }
             }
             shiftViolatedRulesMongoRepository.saveEntities(saveShiftViolatedRules);
+            shiftViolatedRulesMongoRepository.deleteAll(deleteShiftViolatedRules);
+        }else {
+            for (Shift draftShift : draftShifts) {
+                draftShift.setDraftShift(null);
+            }
+            saveShifts=draftShifts;
+            shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(draftShifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()), true);
         }
+        shiftMongoRepository.saveEntities(saveShifts);
         return  getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam,null);
     }
 
@@ -609,17 +608,29 @@ public class ShiftService extends MongoBaseService {
 
     private void validateShiftViolatedRules(Shift shift, boolean shiftOverlappedWithNonWorkingType, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO,ShiftActionType actionType) {
         ShiftViolatedRules shiftViolatedRules = shiftViolatedRulesMongoRepository.findOneViolatedRulesByShiftId(shift.getId(),false);
-        if (isNull(shiftViolatedRules) || isNotNull(shift.getDraftShift())) {
-            shiftViolatedRules = new ShiftViolatedRules(shift.getId());
-            shiftViolatedRules.setDraft(isNotNull(shift.getDraftShift()));
-        }
-        if (shiftOverlappedWithNonWorkingType) {
-            shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.SHIFT_OVERLAPPING));
+        if(ShiftActionType.SAVE.equals(actionType) || ShiftActionType.CANCEL.equals(actionType)) {
+            shiftViolatedRules = updateOrDeleteShiftViolatedRule(shift, actionType, shiftViolatedRules);
+        }else {
+            if (isNull(shiftViolatedRules) || isNotNull(shift.getDraftShift())) {
+                shiftViolatedRules = new ShiftViolatedRules(shift.getId());
+                shiftViolatedRules.setDraft(isNotNull(shift.getDraftShift()));
+            }
+            shiftViolatedRules.setEscalationReasons(shiftOverlappedWithNonWorkingType ? newHashSet(ShiftEscalationReason.SHIFT_OVERLAPPING, ShiftEscalationReason.WORK_TIME_AGREEMENT) : newHashSet(ShiftEscalationReason.WORK_TIME_AGREEMENT));
             shiftViolatedRules.setEscalationResolved(false);
+            shiftViolatedRules.setActivities(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
+            shiftViolatedRules.setWorkTimeAgreements(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
         }
-        shiftViolatedRules.setActivities(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
-        shiftViolatedRules.setWorkTimeAgreements(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
         shiftViolatedRulesMongoRepository.save(shiftViolatedRules);
+
+    }
+
+    private ShiftViolatedRules updateOrDeleteShiftViolatedRule(Shift shift, ShiftActionType actionType, ShiftViolatedRules shiftViolatedRules) {
+            ShiftViolatedRules draftShiftViolatedRules = shiftViolatedRulesMongoRepository.findOneViolatedRulesByShiftId(shift.getId(),true);
+            if(ShiftActionType.SAVE.equals(actionType)) {
+                shiftViolatedRules = draftShiftViolatedRules;
+            }
+            shiftViolatedRulesMongoRepository.delete(draftShiftViolatedRules);
+        return shiftViolatedRules;
     }
 
     private Shift updateShiftAfterPublish(Shift shift, UserAccessRoleDTO userAccessRoleDTO, ShiftActionType shiftActionType) {

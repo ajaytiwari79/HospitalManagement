@@ -45,6 +45,7 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     @JsonIgnore
     private List<BigInteger> activitiesPlannedTimeIds = new ArrayList<>();
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
+    private boolean escalationResolved;
 
     public ShiftWithActivityDTO() {
     }
@@ -142,4 +143,11 @@ public class ShiftWithActivityDTO extends ShiftDTO{
         return asLocalDate(this.endDate);
     }
 
+    public boolean isEscalationResolved() {
+        return escalationResolved;
+    }
+
+    public void setEscalationResolved(boolean escalationResolved) {
+        this.escalationResolved = escalationResolved;
+    }
 }

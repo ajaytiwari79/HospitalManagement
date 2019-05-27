@@ -64,6 +64,7 @@ public class Shift extends MongoBaseEntity {
     private int scheduledMinutesOfTimebank;
     private int scheduledMinutesOfPayout;
     private Shift draftShift;
+    private boolean draft;
 
 
     public Shift() {
@@ -406,6 +407,14 @@ public class Shift extends MongoBaseEntity {
 
     public void setDraftShift(Shift draftShift) {
         this.draftShift = draftShift;
+    }
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
     }
 
     @Override

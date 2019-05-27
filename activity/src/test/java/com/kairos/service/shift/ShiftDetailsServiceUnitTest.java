@@ -75,7 +75,7 @@ public class ShiftDetailsServiceUnitTest {
         when(shiftMongoRepository.findAllShiftsByIds(shiftIds)).thenReturn(Arrays.asList(shiftWithActivityDTO));
         List<ShiftViolatedRules> shiftViolatedRules =new ArrayList<>();
         when(shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds,false)).thenReturn(shiftViolatedRules);
-        List<ShiftWithActivityDTO> response=shiftDetailsService.shiftDetailsById(unitId, shiftIds);
+        List<ShiftWithActivityDTO> response=shiftDetailsService.shiftDetailsById(unitId, shiftIds,false);
         Assert.assertEquals(response.get(0).getActivities().get(0).getReasonCode().getId(),reasonCodeDTO.getId());
     }
 }
