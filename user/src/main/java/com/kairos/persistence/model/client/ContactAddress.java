@@ -144,6 +144,21 @@ public class ContactAddress extends UserBaseEntity{
         this.municipality = municipality;
     }
 
+    public ContactAddress(Municipality municipality,@NotNull(message = ERROR_CONTACTADDRESS_LONGITUDE_NOTNULL) float longitude,@NotNull(message = ERROR_CONTACTADDRESS_LATITUDE_NOTNULL) float latitude,String province, String regionName,String city,String country,ZipCode zipCode,String houseNumber,String street, String streetUrl,int floorNumber) {
+        this.municipality = municipality;
+        this.street = street;
+        this.floorNumber = floorNumber;
+        this.city = city;
+        this.regionName = regionName;
+        this.province = province;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.country = country;
+        this.streetUrl = streetUrl;
+        this.zipCode = zipCode;
+
+    }
+
     public String getDescription() {
         return description;
     }
