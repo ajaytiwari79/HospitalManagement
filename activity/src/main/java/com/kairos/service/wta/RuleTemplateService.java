@@ -52,7 +52,6 @@ import static com.kairos.constants.AppConstants.WEEKS;
 @Transactional
 @Service
 public class RuleTemplateService extends MongoBaseService {
-    private static final Logger logger = LoggerFactory.getLogger(RuleTemplateService.class);
     @Inject
     private UserIntegrationService userIntegrationService;
     @Autowired
@@ -85,8 +84,8 @@ public class RuleTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_WTARULETEMPLATE_ALREADYEXISTS);
         }
 
-        String weeks = WEEKS;
-        String TUESDAY = "TUESDAY";
+        final String weeks = WEEKS;
+        final String TUESDAY = "TUESDAY";
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates1 = new ArrayList<>();
         AgeRange range = new AgeRange(0, 0, 0);
 
@@ -103,8 +102,6 @@ public class RuleTemplateService extends MongoBaseService {
         phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("TENTATIVE"), "TENTATIVE", (short) 0, (short) 0, true, false, false,5));
         phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("REALTIME"), "REALTIME", (short) 0, (short) 0, true, false, false,6));
         phaseTemplateValues.add(new PhaseTemplateValue(phaseMap.get("TIME_ATTENDANCE"), "TIME & ATTENDANCE", (short) 0, (short) 0, true, false, false,7));
-
-        //phaseTemplateValues.add(new PhaseTemplateValue(8, "PAYROLL", (short) 0, (short) 0, true, false, false,8));
 
         ShiftLengthWTATemplate shiftLengthWTATemplate = new ShiftLengthWTATemplate("Maximum night shift’s length", "Maximum night shift’s length", 400);
         shiftLengthWTATemplate.setCountryId(countryDTO.getId());
@@ -265,7 +262,6 @@ public class RuleTemplateService extends MongoBaseService {
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID);
         }
-        //List<WTAResponseDTO> wtaResponseDTOS = workingTimeAgreementMongoRepository.getWtaByOrganization(organization.getId());
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(organization.getCountryId());
         List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(organization.getCountryId());
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(templateList, WTABaseRuleTemplateDTO.class);
