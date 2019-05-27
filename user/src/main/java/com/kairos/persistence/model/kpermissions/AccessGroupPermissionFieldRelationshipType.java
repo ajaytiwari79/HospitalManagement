@@ -29,6 +29,6 @@ public class AccessGroupPermissionFieldRelationshipType extends UserBaseEntity {
     private AccessGroup accessGroup;
 
     @Property
-    private FieldLevelPermissions fieldLevelPermissions;
+    private FieldLevelPermissions fieldLevelPermission;
 
 }

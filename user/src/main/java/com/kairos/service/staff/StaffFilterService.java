@@ -302,7 +302,7 @@ public class StaffFilterService {
             AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
             String STAFF_CURRENT_ROLE;
             if (accessGroupQueryResult != null) {
-                STAFF_CURRENT_ROLE = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+                STAFF_CURRENT_ROLE = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
                 if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
                     staffListByRole = staffList;
                 } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {

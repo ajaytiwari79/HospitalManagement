@@ -113,15 +113,7 @@ public class KPISetService {
         List<KPISet> unitKPISets=new ArrayList<>();
         kpiSets.forEach(kpiSet -> {
             if(isCollectionNotEmpty(kpiSet.getKpiIds())) {
-                KPISet unitKPISet = new KPISet();
-                unitKPISet.setId(null);
-                unitKPISet.setName(kpiSet.getName());
-                unitKPISet.setPhaseId(unitPhaseMap.get(kpiSet.getPhaseId()).getId());
-                unitKPISet.setReferenceId(unitId);
-                unitKPISet.setConfLevel(ConfLevel.UNIT);
-                unitKPISet.setTimeType(kpiSet.getTimeType());
-                unitKPISet.setKpiIds(kpiSet.getKpiIds());
-                unitKPISets.add(unitKPISet);
+                unitKPISets.add(new KPISet(null,kpiSet.getName(),unitPhaseMap.get(kpiSet.getPhaseId()).getId(),unitId,ConfLevel.UNIT,kpiSet.getTimeType(),kpiSet.getKpiIds()));
             }
         });
         if(isCollectionNotEmpty(unitKPISets)){
