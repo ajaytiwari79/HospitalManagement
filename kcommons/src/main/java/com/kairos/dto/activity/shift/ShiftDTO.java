@@ -82,7 +82,13 @@ public class ShiftDTO {
         //default Const
     }
 
-   public ShiftDTO(BigInteger id, Date startDate,Date endDate,Long unitId,Long staffId) {
+    public ShiftDTO(Date startDate, Date endDate,List<ShiftActivityDTO> activities) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activities = activities;
+    }
+
+    public ShiftDTO(BigInteger id, Date startDate, Date endDate, Long unitId, Long staffId) {
        this.id = id;
        this.startDate = startDate;
        this.endDate = endDate;

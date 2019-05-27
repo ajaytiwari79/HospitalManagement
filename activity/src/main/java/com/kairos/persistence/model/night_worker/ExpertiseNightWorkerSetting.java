@@ -4,7 +4,11 @@ import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
 
     private TimeSlot timeSlot;
@@ -42,78 +46,6 @@ public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
         this.minShiftsUnitToCheckNightWorker = minShiftsUnitToCheckNightWorker;
         this.unitId = unitId;
         this.expertiseId = expertiseId;
-    }
-
-    public TimeSlot getTimeSlot() {
-        return timeSlot;
-    }
-
-    public void setTimeSlot(TimeSlot timeSlot) {
-        this.timeSlot = timeSlot;
-    }
-
-    public Integer getMinMinutesToCheckNightShift() {
-        return minMinutesToCheckNightShift;
-    }
-
-    public void setMinMinutesToCheckNightShift(Integer minMinutesToCheckNightShift) {
-        this.minMinutesToCheckNightShift = minMinutesToCheckNightShift;
-    }
-
-    public DurationType getIntervalUnitToCheckNightWorker() {
-        return intervalUnitToCheckNightWorker;
-    }
-
-    public void setIntervalUnitToCheckNightWorker(DurationType intervalUnitToCheckNightWorker) {
-        this.intervalUnitToCheckNightWorker = intervalUnitToCheckNightWorker;
-    }
-
-    public Integer getIntervalValueToCheckNightWorker() {
-        return intervalValueToCheckNightWorker;
-    }
-
-    public void setIntervalValueToCheckNightWorker(Integer intervalValueToCheckNightWorker) {
-        this.intervalValueToCheckNightWorker = intervalValueToCheckNightWorker;
-    }
-
-    public Integer getMinShiftsValueToCheckNightWorker() {
-        return minShiftsValueToCheckNightWorker;
-    }
-
-    public void setMinShiftsValueToCheckNightWorker(Integer minShiftsValueToCheckNightWorker) {
-        this.minShiftsValueToCheckNightWorker = minShiftsValueToCheckNightWorker;
-    }
-
-    public CalculationUnit getMinShiftsUnitToCheckNightWorker() {
-        return minShiftsUnitToCheckNightWorker;
-    }
-
-    public void setMinShiftsUnitToCheckNightWorker(CalculationUnit minShiftsUnitToCheckNightWorker) {
-        this.minShiftsUnitToCheckNightWorker = minShiftsUnitToCheckNightWorker;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public Long getExpertiseId() {
-        return expertiseId;
-    }
-
-    public void setExpertiseId(Long expertiseId) {
-        this.expertiseId = expertiseId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
     }
 
     @Override
