@@ -60,17 +60,18 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
     @Query("MATCH (employment:Employment{deleted:false}) where id(employment) IN {0} \n" +
             "MATCH(employment)-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) \n" +
-            "MATCH(employment)-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine) WHERE  date(employmentLine.startDate) <= date() AND (NOT exists(employmentLine.endDate) OR date(employmentLine.endDate) >= date()) \n" +
+            "MATCH(employment)-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine)  \n" +
             "MATCH (employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "MATCH(employmentLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "WITH staff,expertise,employment,employmentLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
             "OPTIONAL MATCH (employment)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
             "WITH employment, Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) as appliedFunctions ,staff,expertise,employmentType,employmentLine\n" +
-            "WITH staff,expertise,employment,employmentLine,employmentType,appliedFunctions\n" +
-            "return expertise as expertise,id(staff) as staffId,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.published as published, employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,\n" +
-            "CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),startDate:employmentLine.startDate, hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
+            "WITH staff,expertise,employment,employmentType,appliedFunctions,\n" +
+            "COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),startDate:employmentLine.startDate, hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
             "fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes , \n" +
-            " avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,employmentType:employmentType}) end as employmentLines,appliedFunctions ")
+            "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,employmentType:employmentType}) as employmentLines  \n" +
+            "return expertise as expertise,id(staff) as staffId,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.published as published, employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,\n" +
+           "employmentLines,appliedFunctions ")
     List<EmploymentQueryResult> getEmploymentByIds(List<Long> employmentIds);
 
 

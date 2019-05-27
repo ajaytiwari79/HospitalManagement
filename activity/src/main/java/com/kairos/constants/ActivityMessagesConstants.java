@@ -156,6 +156,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PERIOD_REQUEST_PHASE_NOTFOUND = "message.period.request.phase.notfound";
     public static final String MESSAGE_PERIODSETTING_NOTFOUND = "message.periodsetting.notFound";
     public static final String MESSAGE_ORGANIZATION_PHASE_NOTFOUND = "message.organization.phase.notfound";
+    public static final String MESSAGE_EMPLOYMENTTYPE_NOTFOUND="message.employmenttype.notfound";
     public static final String MESSAGE_ORGANIZATION_ID = "message.organization.id";
     public static final String MESSAGE_ORGANIZATION_TYPE = "message.organization.type";
     public static final String MESSAGE_ORGANIZATION_TYPE_UPDATE = "message.organization.type.update";
@@ -315,7 +316,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_DAYTYPE = "message.activity.dayType";
     public static final String MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL  = "message.ruleTemplate.counter.value.notNull ";
     public static final String MESSAGE_RULETEMPLATE_COUNTER_EXHAUSTED  = "message.ruleTemplate.counter.exhausted ";
-    public static final String MESSAGE_RULETEMPLATE_HOURS_NOTZERO  = "message.ruleTemplate.hours.notzero ";
+    public static final String MESSAGE_RULETEMPLATE_HOURS_NOTZERO  = "message.ruleTemplate.hours.notzero";
     public static final String MESSAGE_COUNTER_KPI_NOTFOUND = "message.counter.kpi.notfound";
     public static final String MESSAGE_ACCESSGROUP_KPI_NOTFOUND = "message.accessgroup.kpi.notfound";
     public static final String MESSAGE_ORGTYPE_KPI_NOTFOUND = "message.orgtype.kpi.notfound";

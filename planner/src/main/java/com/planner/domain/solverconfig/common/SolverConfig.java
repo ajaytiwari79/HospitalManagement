@@ -25,12 +25,9 @@ public class SolverConfig extends MongoBaseEntity {
     protected TimeTypeEnum typeOfTimeType;
 
 
-    //Constructors
     public SolverConfig() {
-
+        //Not in use
     }
-   /***********************************************/
-    //Setters and Getters
     public String getName() {
         return name;
     }

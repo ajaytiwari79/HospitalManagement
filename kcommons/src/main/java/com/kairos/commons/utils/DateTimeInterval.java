@@ -228,6 +228,12 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
         return ChronoUnit.DAYS.between(getStart(), getEnd());
     }
 
+    public boolean containsStartOrEnd(Date date) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -345,7 +345,7 @@ public class StaffRetrievalService {
      * @return
      * @author mohit
      */
-    public String setStaffAccessRole(AccessGroupStaffQueryResult accessGroupQueryResult) {
+    public String getStaffAccessRole(AccessGroupStaffQueryResult accessGroupQueryResult) {
         ZoneId organizationTimeZoneId = accessGroupQueryResult.getOrganization().getTimeZone();
         LocalDate loginDate = ZonedDateTime.now(organizationTimeZoneId).toLocalDate();
         DayOfWeek loginDay = loginDate.getDayOfWeek();
@@ -675,7 +675,6 @@ public class StaffRetrievalService {
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
         List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds, organization, countryId);
-        Map<Long, StaffEmploymentDetails> employmentDetailsMap = employmentDetails.stream().collect(Collectors.toMap(StaffEmploymentDetails::getStaffId, v -> v));
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
         Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get("dayTypeId") != null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.toList()));
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
@@ -691,12 +690,16 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organization.getNightEndTimeTo());
             staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
             staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organization.getNightStartTimeFrom());
-            if (Optional.ofNullable(employmentDetailsMap.get(staffAdditionalInfoDTO.getId())).isPresent()) {
-                staffAdditionalInfoDTO.setEmployment((employmentDetailsMap.get(staffAdditionalInfoDTO.getId())));
-            }
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         });
-        return staffAdditionalInfoDTOS;
+        Map<Long,StaffAdditionalInfoDTO> staffAdditionalInfoDTOMap = staffAdditionalInfoDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOList = new ArrayList<>();
+        for (StaffEmploymentDetails employmentDetail : employmentDetails) {
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoDTOMap.get(employmentDetail.getStaffId()),StaffAdditionalInfoDTO.class);
+            staffAdditionalInfoDTO.setEmployment(employmentDetail);
+            staffAdditionalInfoDTOList.add(staffAdditionalInfoDTO);
+        }
+        return staffAdditionalInfoDTOList;
     }
 
     public List<SectorAndStaffExpertiseQueryResult> getSectorWiseStaffAndExpertise(List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults) {

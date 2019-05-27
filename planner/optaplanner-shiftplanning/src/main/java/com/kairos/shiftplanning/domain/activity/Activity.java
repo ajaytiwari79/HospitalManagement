@@ -127,6 +127,8 @@ public class Activity {
                 //case 5:return skillsSatisFaction(shift);
                 case 6:return activityConstraints.getMinimumLengthofActivity().checkConstraints(this,shift);
                 case 7:return activityConstraints.getActivityDayType().checkConstraints(shift);
+                default:
+                    break;
 
             }
         return 0;
@@ -160,6 +162,8 @@ public class Activity {
             case 7:
                 activityConstraints.getActivityDayType().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
                 break;
+            default:
+                break;
         }
     }
 
@@ -171,6 +175,8 @@ public class Activity {
             break;
             case 3:scoreHolder.addSoftConstraintMatch(kContext,-1);
             break;
+            default:
+                break;
         }
     }
 

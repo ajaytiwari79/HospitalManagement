@@ -687,6 +687,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setId(shiftId);
         shiftDTO.setStartDate(shift.getStartDate());
         shiftDTO.setEndDate(shift.getEndDate());
+        shiftDTO.setUnitId(shift.getUnitId());
         shiftDTO.setDeleted(true);
         shiftDTO.setActivities(ObjectMapperUtils.copyPropertiesOfListByMapper(shift.getActivities(), ShiftActivityDTO.class));
         shiftValidatorService.escalationCorrectionInShift(shiftDTO, shift.getStartDate(), shift.getEndDate());

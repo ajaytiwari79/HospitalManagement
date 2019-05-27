@@ -153,6 +153,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
 
+
     @RequestMapping(value = "/{staffId}/partial_leave", method = RequestMethod.POST)
     @ApiOperation("update employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

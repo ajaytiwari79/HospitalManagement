@@ -42,7 +42,7 @@ public class KPIDTO {
     private List<FibonacciKPIConfigDTO> fibonacciKPIConfigs;
     private boolean multiDimensional;
     public KPIDTO(){
-
+        //Not in use
     }
 
     public ChartType getChart() {

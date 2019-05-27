@@ -225,7 +225,7 @@ public class StaffService {
             redisService.invalidateAllTokenOfUser(user.getUserName());
             userGraphRepository.save(user);
         } else {
-            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
+            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSCODE_NOTMATCH);
         }
         return true;
     }
@@ -240,7 +240,7 @@ public class StaffService {
             redisService.invalidateAllTokenOfUser(userForStaff.getUserName());
             userGraphRepository.save(userForStaff);
         } else {
-            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
+            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSCODE_NOTMATCH);
         }
         return true;
     }
@@ -318,7 +318,7 @@ public class StaffService {
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
-        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails());
+        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
         return staffPersonalDetail;
     }
 

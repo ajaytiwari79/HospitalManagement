@@ -15,17 +15,17 @@ public class ShiftIntervalListener implements VariableListener<ActivityLineInter
 
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, ActivityLineInterval activityLineInterval) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityAdded(ScoreDirector scoreDirector, ActivityLineInterval activityLineInterval) {
-
+        //Not in use
     }
 
     @Override
     public void beforeVariableChanged(ScoreDirector scoreDirector, ActivityLineInterval activityLineInterval) {
-
+        //Not in use
     }
 
     @Override
@@ -71,12 +71,12 @@ public class ShiftIntervalListener implements VariableListener<ActivityLineInter
 
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, ActivityLineInterval activityLineInterval) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityRemoved(ScoreDirector scoreDirector, ActivityLineInterval activityLineInterval) {
-
+        //Not in use
     }
     @Deprecated
     private void updateShiftTime(ShiftImp shift, ActivityLineInterval activityLineInterval, ScoreDirector scoreDirector) {

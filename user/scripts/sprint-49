@@ -1,0 +1,2 @@
+
+MATCH(f:FunctionalPayment{deleted:false}) set f.oneTimeUpdatedAfterPublish=false;

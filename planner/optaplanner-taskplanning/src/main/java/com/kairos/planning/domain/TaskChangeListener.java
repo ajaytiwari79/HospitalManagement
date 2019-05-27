@@ -13,12 +13,12 @@ public class TaskChangeListener implements VariableListener<Task> {
     public static Map<String,Long> values=new HashMap<String,Long>();
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityAdded(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
@@ -47,12 +47,12 @@ public class TaskChangeListener implements VariableListener<Task> {
 
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityRemoved(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     private void updateRoute(ScoreDirector scoreDirector, Task task) {

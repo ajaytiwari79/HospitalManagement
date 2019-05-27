@@ -18,7 +18,7 @@ public class CountryHolidayCalender {
     private String description;
 
     public CountryHolidayCalender() {
-
+        //Not in use
     }
 
     public String getHolidayTitle() {
