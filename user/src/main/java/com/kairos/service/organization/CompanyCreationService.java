@@ -420,6 +420,10 @@ public class CompanyCreationService {
         if(parentOrganization.getName().equalsIgnoreCase(organizationBasicDTO.getName())) {
             exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
         }
+        Organization organization=organizationGraphRepository.findByOrganizationName("(?i)"+organizationBasicDTO.getName());
+        if(Optional.ofNullable(organization).isPresent()) {
+            exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
+        }
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
         Organization unit = new OrganizationBuilder().setName(WordUtils.capitalize(organizationBasicDTO.getName())).setDescription(organizationBasicDTO.getDescription()).setDesiredUrl(organizationBasicDTO.getDesiredUrl()).setShortCompanyName(organizationBasicDTO.getShortCompanyName()).setCompanyType(organizationBasicDTO.getCompanyType()).setVatId(organizationBasicDTO.getVatId()).setTimeZone(ZoneId.of(TIMEZONE_UTC)).setKairosCompanyId(kairosCompanyId).setWorkcentre(organizationBasicDTO.isWorkcentre()).createOrganization();
         setDefaultDataFromParentOrganization(unit, parentOrganization, organizationBasicDTO);
