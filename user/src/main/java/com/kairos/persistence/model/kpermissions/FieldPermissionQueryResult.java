@@ -1,10 +1,11 @@
-package com.kairos.dto.kpermissions;
+package com.kairos.persistence.model.kpermissions;
 
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotNull;
 
@@ -12,11 +13,10 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FieldPermissionDTO {
+@QueryResult
+public class FieldPermissionQueryResult {
 
-    @NotNull(message = "message.permission.field.id.null")
     private Long fieldId;
 
-    @NotNull(message = "message.permission.id.null")
     private FieldLevelPermission fieldPermission;
 }
