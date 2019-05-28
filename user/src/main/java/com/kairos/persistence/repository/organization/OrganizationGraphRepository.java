@@ -34,7 +34,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     List<Map<String, Object>> findAllOrganizations();
 
     @Query("MATCH (o:Organization) WHERE o.name=~{0} RETURN COUNT(o)>0")
-    boolean findByOrganizationName(String name);
+    boolean existsByName(String name);
 
     Organization findByName(String name);
 

@@ -420,7 +420,7 @@ public class CompanyCreationService {
         if(parentOrganization.getName().equalsIgnoreCase(organizationBasicDTO.getName())) {
             exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
         }
-        if(organizationGraphRepository.findByOrganizationName("(?i)"+organizationBasicDTO.getName())) {
+        if(organizationGraphRepository.existsByName("(?i)"+organizationBasicDTO.getName())) {
             exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
         }
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
