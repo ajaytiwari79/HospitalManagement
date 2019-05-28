@@ -117,7 +117,9 @@ public class QuestionnaireSectionService {
                     question = isOrganization ? new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), null, referenceId)
                             : new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), referenceId, null);
                 }
-                addAttributeNameToQuestion(question, questionDTO.getAttributeName(), templateType);
+                if(templateType != QuestionnaireTemplateType.RISK) {
+                    addAttributeNameToQuestion(question, questionDTO.getAttributeName(), templateType);
+                }
                 questions.add(question);
             });
         }

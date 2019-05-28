@@ -15,8 +15,8 @@ import javax.validation.constraints.NotNull;
 public class FieldPermissionDTO {
 
     @NotNull(message = "message.permission.field.id.null")
-    Long fieldId;
+    private Long fieldId;
 
     @NotBlank(message = "message.permission.id.null")
-    String fieldPermission;
+    private String fieldPermission;
 }

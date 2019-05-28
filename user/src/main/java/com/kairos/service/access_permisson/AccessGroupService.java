@@ -848,7 +848,7 @@ public class AccessGroupService {
             if (accessGroupQueryResult == null) {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
             }
-            String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+            String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
             boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
             boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
@@ -863,7 +863,7 @@ public class AccessGroupService {
         if (accessGroupQueryResult == null) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
         }
-        String staffRole = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+        String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
         boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
         boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
         return new UserAccessRoleDTO(unitId, staff, management, staffId);

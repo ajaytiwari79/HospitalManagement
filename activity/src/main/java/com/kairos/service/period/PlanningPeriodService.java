@@ -539,9 +539,9 @@ public class PlanningPeriodService extends MongoBaseService {
         Map<Long, Map<Long, Set<LocalDate>>> employmentWithShiftDateFunctionIdMap = getEmploymentIdWithFunctionIdShiftDateMap(shifts);
         if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
             if(isCollectionEmpty(employmentTypeIds)){
-                exceptionService.invalidRequestException("id not found");
+                exceptionService.invalidRequestException(MESSAGE_EMPLOYMENTTYPE_NOTFOUND);
             }
-            publishShiftsAfterFlippingPhaseConstructionToDraft(planningPeriod, unitId, new ArrayList<>());
+            publishShiftsAfterFlippingPhaseConstructionToDraft(planningPeriod, unitId, employmentTypeIds);
         }
         createShiftState(shifts, oldPlanningPeriodPhaseId, employmentWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
@@ -791,7 +791,7 @@ public class PlanningPeriodService extends MongoBaseService {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
         List<Long> staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
-        List<Shift> shifts = shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriod.getId(), unitId, staffIds, Arrays.asList(ShiftStatus.PUBLISH, ShiftStatus.PENDING));
+        List<Shift> shifts = shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriod.getId(), unitId, staffIds, Arrays.asList(ShiftStatus.PUBLISH, ShiftStatus.PENDING , ShiftStatus.REQUEST));
         if (isCollectionNotEmpty(shifts)) {
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {

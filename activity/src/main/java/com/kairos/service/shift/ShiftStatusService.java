@@ -27,6 +27,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang.WordUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -44,6 +45,8 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
 import static com.kairos.constants.CommonConstants.EMAIL_GREETING;
 import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
+import static com.kairos.constants.CommonConstants.*;
+
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 @Service
@@ -255,11 +258,19 @@ public class ShiftStatusService {
     public void sendMailToStaffWhenStatusChange(Shift shift, ShiftActivity activity, ShiftStatus shiftStatus) {
         StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
-        String body = "The status of the " + activity.getActivityName() + " activity which is planned on " + getEmailDateTimeWithFormat(shiftDate) + " has been moved to " + shiftStatus + " by " + UserContext.getUserDetails().getFullName() + "\n";
-        //TODO SUBJECT AND MAIL BODY SHOULD IN A SINGLE FILE
+        String bodyPart1 = "The status of the ";
+        String bodyPart2 = activity.getActivityName();
+        String bodyPart3 = " activity which is planned on " + WordUtils.capitalizeFully(getEmailDateTimeWithFormat(shiftDate)) + " has been moved to ";
+        String bodyPart4 = shiftStatus.toString();
+        String bodyPart5 = " by " + UserContext.getUserDetails().getFullName() + ".\n";
+
         Map<String, Object> templateParam = new HashMap<>();
         templateParam.put("receiverName", EMAIL_GREETING + staffDTO.getFullName());
-        templateParam.put("description", body);
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getEmail());
+        templateParam.put("descriptionPart1", bodyPart1);
+        templateParam.put("descriptionPart2", bodyPart2);
+        templateParam.put("descriptionPart3", bodyPart3);
+        templateParam.put("descriptionPart4", bodyPart4);
+        templateParam.put("descriptionPart5", bodyPart5);
+        mailService.sendMailWithSendGrid(SHIFT_NOTIFICATION_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getEmail());
     }
 }

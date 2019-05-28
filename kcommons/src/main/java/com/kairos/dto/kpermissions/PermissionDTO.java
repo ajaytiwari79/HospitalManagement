@@ -16,9 +16,9 @@ import java.util.List;
 public class PermissionDTO {
 
     @NotEmpty(message = "message.accessGroup.id.null")
-    List<Long> accessGroupIds;
+    private List<Long> accessGroupIds;
 
     @Valid
     @NotEmpty(message = "message.model.permissions.null")
-    List<ModelPermissionDTO> modelPermissions;
+    private List<ModelPermissionDTO> modelPermissions;
 }

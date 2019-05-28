@@ -345,7 +345,7 @@ public class StaffRetrievalService {
      * @return
      * @author mohit
      */
-    public String setStaffAccessRole(AccessGroupStaffQueryResult accessGroupQueryResult) {
+    public String getStaffAccessRole(AccessGroupStaffQueryResult accessGroupQueryResult) {
         ZoneId organizationTimeZoneId = accessGroupQueryResult.getOrganization().getTimeZone();
         LocalDate loginDate = ZonedDateTime.now(organizationTimeZoneId).toLocalDate();
         DayOfWeek loginDay = loginDate.getDayOfWeek();
