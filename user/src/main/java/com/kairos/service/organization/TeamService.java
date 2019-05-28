@@ -17,7 +17,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
@@ -54,7 +54,7 @@ public class TeamService {
     @Inject
     private TeamGraphRepository teamGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -78,7 +78,7 @@ public class TeamService {
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
 
-        OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByOrganizationId(unitId);
+        OrganizationContactAddress organizationContactAddress = unitGraphRepository.getOrganizationByOrganizationId(unitId);
         if (organizationContactAddress.getUnit() == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP);
         }
@@ -119,7 +119,7 @@ public class TeamService {
         teamDTO.setId(team.getId());
 
         unit.getTeams().add(team);
-        organizationGraphRepository.save(unit, 2);
+        unitGraphRepository.save(unit, 2);
         teamDTO.setId(team.getId());
         assignTeamLeadersToTeam(teamDTO, team);
         return teamDTO;
@@ -257,7 +257,7 @@ public class TeamService {
 
 
     public List<Map<String, Object>> getTeamSelectedServices(Long teamId) {
-        return organizationGraphRepository.getTeamAllSelectedSubServices(teamId);
+        return unitGraphRepository.getTeamAllSelectedSubServices(teamId);
     }
 
     public List<com.kairos.persistence.model.organization.services.OrganizationService> addTeamSelectedServices(Long teamId, Long[] organizationService) {
@@ -296,12 +296,12 @@ public class TeamService {
     }
 
     public Long getOrganizationIdByTeamId(Long teamId) {
-        Unit unit = organizationGraphRepository.getOrganizationByTeamId(teamId);
+        Unit unit = unitGraphRepository.getOrganizationByTeamId(teamId);
         return unit.getId();
     }
 
     public Unit getOrganizationByTeamId(Long teamId) {
-        return organizationGraphRepository.getOrganizationByTeamId(teamId);
+        return unitGraphRepository.getOrganizationByTeamId(teamId);
     }
 
     public TeamDTO updateTeamGeneralDetails(long teamId, TeamDTO teamDTO) {
@@ -316,7 +316,7 @@ public class TeamService {
     }
 
     public List<Object> getTeamsInUnit(Long unitId) {
-        List<Map<String, Object>> data = organizationGraphRepository.getUnitTeams(unitId);
+        List<Map<String, Object>> data = unitGraphRepository.getUnitTeams(unitId);
         List<Object> response = new ArrayList<>();
         for (Map<String, Object> map :
                 data) {

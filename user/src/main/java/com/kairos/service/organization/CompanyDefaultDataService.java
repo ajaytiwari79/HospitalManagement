@@ -5,7 +5,7 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.integration.ActivityIntegrationService;
@@ -34,7 +34,7 @@ public class CompanyDefaultDataService {
     @Inject
     private VRPClientService vrpClientService;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ReasonCodeService reasonCodeService;
     @Inject
@@ -70,11 +70,11 @@ public class CompanyDefaultDataService {
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
             activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), unit.getId(), orgTypeAndSubTypeDTO);
             vrpClientService.createDefaultPreferredTimeWindow(unit);
-            organizationGraphRepository.linkWithRegionLevelOrganization(unit.getId());
+            unitGraphRepository.linkWithRegionLevelOrganization(unit.getId());
             activityIntegrationService.createDefaultKPISetting(new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(), unit.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), unit.getId());
             timeSlotService.createDefaultTimeSlots(unit, timeSlots);
-            organizationGraphRepository.assignDefaultSkillsToOrg(unit.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
-            organizationGraphRepository.assignDefaultServicesToOrg(unit.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
+            unitGraphRepository.assignDefaultSkillsToOrg(unit.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
+            unitGraphRepository.assignDefaultServicesToOrg(unit.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             reasonCodeService.createDefaultDataForUnit(unit, countryId);
             //gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
     }

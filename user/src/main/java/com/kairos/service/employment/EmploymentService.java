@@ -34,7 +34,7 @@ import com.kairos.persistence.model.user.employment.query_result.StaffEmployment
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
@@ -110,7 +110,7 @@ public class EmploymentService {
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private StaffRetrievalService staffRetrievalService;
     @Inject
@@ -173,7 +173,7 @@ public class EmploymentService {
         }
 
 
-        EmploymentType employmentType = organizationGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentUnit.getId(), employmentDTO.getEmploymentTypeId(), false);
+        EmploymentType employmentType = unitGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentUnit.getId(), employmentDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST, employmentDTO.getEmploymentTypeId());
         }
@@ -561,7 +561,7 @@ public class EmploymentService {
         employment.setDeleted(true);
         employmentGraphRepository.save(employment);
 
-        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = unitGraphRepository.findOne(unitId, 0);
         Long staffId = employmentGraphRepository.getStaffIdFromEmployment(positionId);
         Position position = positionService.updateEmploymentEndDate(unit, staffId);
         return new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis());
@@ -585,7 +585,7 @@ public class EmploymentService {
 
         employment.setExpertise(expertiseFuture.get());
         if (Optional.ofNullable(employmentDTO.getUnionId()).isPresent()) {
-            Callable<Unit> organizationCallable = () -> organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(employmentDTO.getUnionId());
+            Callable<Unit> organizationCallable = () -> unitGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(employmentDTO.getUnionId());
             Future<Unit> organizationFuture = asynchronousService.executeAsynchronously(organizationCallable);
             if (!Optional.ofNullable(organizationFuture.get()).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_UNION_NOTEXIST, employmentDTO.getUnionId());
@@ -817,7 +817,7 @@ public class EmploymentService {
     }
 
     private boolean addEmploymentToUnitByExternalId(List<TimeCareEmploymentDTO> timeCareEmploymentDTOs, String unitExternalId, Long expertiseId) throws Exception {
-        Unit unit = organizationGraphRepository.findByExternalId(unitExternalId);
+        Unit unit = unitGraphRepository.findByExternalId(unitExternalId);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ORGANIZATION_EXTERNALID, unitExternalId);
         }
@@ -916,7 +916,7 @@ public class EmploymentService {
 
     public StaffEmploymentUnitDataWrapper getStaffsEmployment(Long unitId, Long expertiseId, List<Long> staffIds) {
         Unit unit = organizationService.getOrganizationDetail(unitId, ORGANIZATION);
-        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unit.getId()).getId();
+        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : unitGraphRepository.getCountryByParentOrganization(unit.getId()).getId();
         // TODO MIght We dont need these details I(vipul) will verify and remove
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(unit.getId(), staffIds, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<com.kairos.dto.activity.shift.StaffEmploymentDetails> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, com.kairos.dto.activity.shift.StaffEmploymentDetails.class);

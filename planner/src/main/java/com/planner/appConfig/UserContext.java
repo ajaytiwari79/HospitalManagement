@@ -1,5 +1,6 @@
 package com.planner.appConfig;
 
+import com.kairos.dto.CurrentUserDetails;
 import org.springframework.stereotype.Component;
 
 @Component

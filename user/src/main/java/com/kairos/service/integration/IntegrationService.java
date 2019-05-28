@@ -4,7 +4,7 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.integration.TimeCare;
 import com.kairos.persistence.model.user.integration.Twillio;
 import com.kairos.persistence.model.user.integration.Visitour;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.integration.TimeCareGraphRepository;
 import com.kairos.persistence.repository.user.integration.TwillioGraphRepository;
 import com.kairos.persistence.repository.user.integration.VisitourGraphRepository;
@@ -42,7 +42,7 @@ public class IntegrationService {
     private VisitourGraphRepository visitourGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private OrganizationService organizationService;
@@ -64,9 +64,9 @@ public class IntegrationService {
 
             // TODO Need to remove external ID field from organization domain
             // Set organization's time care ID
-            Unit unit = organizationGraphRepository.findOne(unitId);
+            Unit unit = unitGraphRepository.findOne(unitId);
             unit.setExternalId(timeCare.getTimeCareExternalId());
-            organizationGraphRepository.save(unit);
+            unitGraphRepository.save(unit);
 
             return timeCare1;
     }

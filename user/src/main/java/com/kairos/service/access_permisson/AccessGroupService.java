@@ -26,7 +26,7 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
@@ -64,7 +64,7 @@ public class AccessGroupService {
     @Inject
     private AccessGroupRepository accessGroupRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private AccessPageRepository accessPageRepository;
     @Inject
@@ -103,16 +103,16 @@ public class AccessGroupService {
             exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName());
 
         }
-        Unit unit = organizationGraphRepository.findOne(organizationId);
+        Unit unit = unitGraphRepository.findOne(organizationId);
         if (unit == null) {
             return null;
         }
         Unit parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
         List<DayType> dayTypes = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(accessGroupDTO.getDayTypeIds())) {
@@ -123,7 +123,7 @@ public class AccessGroupService {
 
         if (parent == null) {
             unit.getAccessGroups().add(accessGroup);
-            organizationGraphRepository.save(unit, 2);
+            unitGraphRepository.save(unit, 2);
 
             //set default permission of access page while creating access group
             Long countryId = organizationService.getCountryIdOfOrganization(unit.getId());
@@ -191,10 +191,10 @@ public class AccessGroupService {
         Unit parent;
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = new HashMap<>();
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
         Long countryId = organizationService.getCountryIdOfOrganization(unit.getId());
         List<AccessGroup> accessGroupList = null;
@@ -220,7 +220,7 @@ public class AccessGroupService {
             }
             unit.setAccessGroups(accessGroups);
         }
-        organizationGraphRepository.save(unit);
+        unitGraphRepository.save(unit);
         return countryAndOrgAccessGroupIdsMap;
     }
 
@@ -271,14 +271,14 @@ public class AccessGroupService {
         //List<Long> countryAccessGroupIds = newAccessGroupList.stream().map(AccessGroup::getId).collect(Collectors.toList());
         //accessGroupRepository.setAccessPagePermissionForAccessGroup(countryAccessGroupIds, organizationAccessGroupIds);
         unit.setAccessGroups(newAccessGroupList);
-        organizationGraphRepository.save(unit);
+        unitGraphRepository.save(unit);
         return countryAndOrgAccessGroupIdsMap;
     }
 
     public List<AccessGroupQueryResult> getAccessGroupsForUnit(long organizationId) {
-        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (!unit.isParentOrganization()) {
-            unit = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            unit = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
         return accessGroupRepository.getAccessGroupsForUnit(unit.getId());
     }
@@ -346,13 +346,13 @@ public class AccessGroupService {
     }
 
     public List<AccessPageQueryResult> getAccessPageByAccessGroup(long accessGroupId, long unitId, long staffId) {
-        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = unitGraphRepository.findOne(unitId, 0);
 
         Unit parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
 
         List<Map<String, Object>> accessPages;
@@ -494,15 +494,15 @@ public class AccessGroupService {
 
     public void assignPermission(long accessGroupId, AccessPermissionDTO accessPermissionDTO) {
 
-        Unit unit = organizationGraphRepository.findOne(accessPermissionDTO.getUnitId(), 0);
+        Unit unit = unitGraphRepository.findOne(accessPermissionDTO.getUnitId(), 0);
         if (unit == null) {
             exceptionService.internalServerError(ERROR_UNIT_NOTNULL);
         }
         Unit parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
 //        updateReadWritePermissionOfParentTab(accessGroupId, accessPermissionDTO.isRead(), accessPermissionDTO.isWrite(),
 //                accessPermissionDTO.getPageId(), (!Optional.ofNullable(parent).isPresent() ? unit.getId() : parent.getId()), accessPermissionDTO.getUnitId(), accessPermissionDTO.getStaffId());
@@ -751,17 +751,17 @@ public class AccessGroupService {
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
-        Optional<Unit> organization = organizationGraphRepository.findById(organizationId);
+        Optional<Unit> organization = unitGraphRepository.findById(organizationId);
         if (!organization.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
 
         }
         Unit parent;
         if (organization.get().getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.get().getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(organization.get().getId());
 
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(organization.get().getId());
+            parent = unitGraphRepository.getParentOfOrganization(organization.get().getId());
         }
         if (Optional.ofNullable(parent).isPresent()) {
             exceptionService.actionNotPermittedException(MESSAGE_ACCESSGROUP_COPIED);
@@ -780,7 +780,7 @@ public class AccessGroupService {
         AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), currentAccessGroup.getDayTypes(), currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
         accessGroupRepository.save(accessGroup);
         organization.get().getAccessGroups().add(accessGroup);
-        organizationGraphRepository.save(organization.get());
+        unitGraphRepository.save(organization.get());
         accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(), accessGroup.getId());
         accessGroupDTO.setId(accessGroup.getId());
         return accessGroupDTO;
@@ -838,7 +838,6 @@ public class AccessGroupService {
 
     public UserAccessRoleDTO findUserAccessRole(Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        //Todo Yatharth please check and verify our code
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
         UserAccessRoleDTO userAccessRoleDTO;
         if (staffAtHub != null) {

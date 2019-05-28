@@ -6,7 +6,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
@@ -38,7 +38,7 @@ public class TagService {
     private CountryGraphRepository countryGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private SkillGraphRepository skillGraphRepository;
@@ -133,7 +133,7 @@ public class TagService {
         if (type.equalsIgnoreCase("team")) {
             organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
         }
-        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
@@ -149,7 +149,7 @@ public class TagService {
         } else {
             unit.setTags(Arrays.asList(tag));
         }
-        organizationGraphRepository.save(unit);
+        unitGraphRepository.save(unit);
         return tag;
     }
 
@@ -157,7 +157,7 @@ public class TagService {
         if (type.equalsIgnoreCase("team")) {
             organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
         }
-        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
@@ -181,7 +181,7 @@ public class TagService {
         if (type.equalsIgnoreCase("team")) {
             orgId = teamGraphRepository.getOrganizationIdByTeam(orgId);
         }
-        Unit unit = organizationGraphRepository.findOne(orgId, 0);
+        Unit unit = unitGraphRepository.findOne(orgId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, orgId);
 
@@ -200,7 +200,7 @@ public class TagService {
         if (type.equalsIgnoreCase("team")) {
             organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
         }
-        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
@@ -219,13 +219,13 @@ public class TagService {
     }
 
     public Boolean updateShowCountryTagSettingOfOrganization(Long organizationId, boolean showCountryTags) {
-        Unit unit = organizationGraphRepository.findOne(organizationId, 0);
+        Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
         }
         unit.setShowCountryTags(showCountryTags);
-        organizationGraphRepository.save(unit);
+        unitGraphRepository.save(unit);
         return showCountryTags;
     }
 
@@ -282,7 +282,7 @@ public class TagService {
     }
 
     public HashMap<String, Object> getListOfMasterDataType(Long orgId) {
-        Unit unit = organizationGraphRepository.findOne(orgId);
+        Unit unit = unitGraphRepository.findOne(orgId);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, orgId);
 

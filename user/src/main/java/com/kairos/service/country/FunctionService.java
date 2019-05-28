@@ -10,7 +10,7 @@ import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationship;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationshipQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
@@ -39,7 +39,7 @@ public class FunctionService {
     private FunctionGraphRepository functionGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private ExceptionService exceptionService;
@@ -64,7 +64,7 @@ public class FunctionService {
         }
         List<Unit> unions = new ArrayList<>();
         if (!functionDTO.getUnionIds().isEmpty()) {
-            unions = organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
+            unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
         Function function = new Function(functionDTO.getName(), functionDTO.getDescription(), functionDTO.getStartDate(), functionDTO.getEndDate(), unions, levels, country, functionDTO.getIcon());
         functionGraphRepository.save(function);
@@ -106,7 +106,7 @@ public class FunctionService {
         }
         List<Unit> unions = new ArrayList<>();
         if (!functionDTO.getUnionIds().isEmpty()) {
-            unions = organizationGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
+            unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
 
         function.setName(functionDTO.getName());
@@ -196,11 +196,11 @@ public class FunctionService {
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsAtUnit(Long unitId) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
+        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : unitGraphRepository.getCountryByParentOrganization(unitId).getId();
 
         return functionGraphRepository.findFunctionsByCountry(countryId);
     }

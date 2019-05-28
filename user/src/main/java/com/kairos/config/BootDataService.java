@@ -27,7 +27,7 @@ import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
@@ -86,7 +86,7 @@ public class BootDataService {
     @Inject
     CountryGraphRepository countryGraphRepository;
     @Inject
-    OrganizationGraphRepository organizationGraphRepository;
+    UnitGraphRepository unitGraphRepository;
     @Inject
     SkillGraphRepository skillGraphRepository;
     @Inject
@@ -478,7 +478,7 @@ public class BootDataService {
     private void createPosition() {
         positionForAdmin = new Position("working as country admin", adminAsStaff);
         kairosCountryLevel.getPositions().add(positionForAdmin);
-        organizationGraphRepository.save(kairosCountryLevel);
+        unitGraphRepository.save(kairosCountryLevel);
     }
 
     private void createUnitEmploymentForCountryLevel() {
@@ -497,7 +497,7 @@ public class BootDataService {
 //        accessPageService.setPagePermissionToAdmin(accessPermission);
         positionForAdmin.getUnitPermissions().add(unitPermission);
         kairosCountryLevel.getPositions().add(positionForAdmin);
-        organizationGraphRepository.save(kairosCountryLevel);
+        unitGraphRepository.save(kairosCountryLevel);
     }
 
 

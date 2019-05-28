@@ -19,7 +19,7 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentQuery
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
@@ -63,7 +63,7 @@ public class EmploymentCTAWTAService {
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private OrganizationService organizationService;
     @Inject
@@ -119,7 +119,7 @@ public class EmploymentCTAWTAService {
         StaffEmploymentDetails employmentDetails = null;
         if (Optional.ofNullable(employment).isPresent()) {
             Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-            Optional<Unit> organization = organizationGraphRepository.findById(unitId, 0);
+            Optional<Unit> organization = unitGraphRepository.findById(unitId, 0);
             employmentDetails = convertEmploymentObject(employment);
             employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
             employmentDetails.setCountryId(countryId);

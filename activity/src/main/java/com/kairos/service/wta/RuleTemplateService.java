@@ -25,7 +25,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
-import com.kairos.utils.user_context.CurrentUserDetails;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

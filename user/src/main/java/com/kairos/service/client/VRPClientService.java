@@ -9,7 +9,7 @@ import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.persistence.model.client.PreferedTimeWindow;
 import com.kairos.persistence.model.client.VRPClient;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.client.PreferedTimeWindowRepository;
 import com.kairos.persistence.repository.user.client.VRPClientGraphRepository;
 import com.kairos.rest_client.TaskServiceRestClient;
@@ -34,7 +34,7 @@ public class VRPClientService {
 
 
     @Inject private VRPClientGraphRepository vrpClientGraphRepository;
-    @Inject private OrganizationGraphRepository organizationGraphRepository;
+    @Inject private UnitGraphRepository unitGraphRepository;
     @Inject private TomTomRestClient tomTomRestClient;
     @Inject private ExcelService excelService;
     @Inject private TaskServiceRestClient taskServiceRestClient;
@@ -85,7 +85,7 @@ public class VRPClientService {
     }
 
     public List<VRPClientDTO> importClients(Long unitId, MultipartFile multipartFile){
-        Optional<Unit> organization = organizationGraphRepository.findById(unitId,0);
+        Optional<Unit> organization = unitGraphRepository.findById(unitId,0);
         List<Row> rows = excelService.getRowsByXLSXFile(multipartFile,0);
         Object objects[] = getVrpClientByRows(rows,organization.get());
         List<VRPClient> vrpClients = (List<VRPClient>)objects[0];
@@ -150,7 +150,7 @@ public class VRPClientService {
     }
 
     public List<PreferedTimeWindowDTO> createPreferedTimeWindow(Long unitId){
-        Optional<Unit> organization = organizationGraphRepository.findById(unitId,0);
+        Optional<Unit> organization = unitGraphRepository.findById(unitId,0);
         List<PreferedTimeWindowDTO> preferedTimeWindowDTOS = null;
         List<PreferedTimeWindow> preferedTimeWindows = preferedTimeWindowRepository.getAllByUnitId(unitId);
         if(preferedTimeWindows.isEmpty() && organization.isPresent()){

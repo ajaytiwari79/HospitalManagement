@@ -13,7 +13,7 @@ import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactDetailsGraphRepository;
@@ -74,7 +74,7 @@ public class ExternalClientService {
     private MunicipalityGraphRepository municipalityGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
@@ -252,7 +252,7 @@ public class ExternalClientService {
     }
 // TODO FIX the import
     public Client createCitizenFromExternalService(PatientWrapper patientWrapper, Long unitId) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 

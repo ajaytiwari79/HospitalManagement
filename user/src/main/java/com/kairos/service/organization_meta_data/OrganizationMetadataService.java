@@ -10,7 +10,7 @@ import com.kairos.persistence.model.organization.PaymentSettings;
 import com.kairos.persistence.model.organization.PaymentSettingsQueryResult;
 import com.kairos.persistence.model.user.region.LatLng;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.PaymentSettingRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
@@ -39,7 +39,7 @@ public class OrganizationMetadataService {
     OrganizationMetadataRepository organizationMetadataRepository;
 
     @Inject
-    OrganizationGraphRepository organizationGraphRepository;
+    UnitGraphRepository unitGraphRepository;
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -56,7 +56,7 @@ public class OrganizationMetadataService {
         Map<String, Object> localAreaTagData = new HashMap<String, Object>();
         List<Object> clientList = new ArrayList<>();
         List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(unitId, envConfig.getServerHost() + FORWARD_SLASH);
+        List<Map<String, Object>> mapList = unitGraphRepository.getClientsOfOrganization(unitId, envConfig.getServerHost() + FORWARD_SLASH);
         for (Map<String, Object> map : mapList) {
             clientList.add(map.get("Client"));
         }
@@ -71,7 +71,7 @@ public class OrganizationMetadataService {
 
     public LocalAreaTag createNew(LocalAreaTag localAreaTag, long unitId) {
         logger.info("local area tag is" + localAreaTag.toString());
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
 
 
         if (unit != null) {
@@ -85,7 +85,7 @@ public class OrganizationMetadataService {
             localAreaTagList.add(areaTag);
             unit.setLocalAreaTags(localAreaTagList);
             logger.debug("organization.getLocalAreaTags  " + unit.getLocalAreaTags());
-            organizationGraphRepository.save(unit);
+            unitGraphRepository.save(unit);
             return areaTag;
         } else {
             return null;
@@ -193,7 +193,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
     private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Unit unit) {
         PaymentSettings paymentSettings = updatePaymentSettingsWithDates(new PaymentSettings(), paymentSettingsDTO);
         unit.setPaymentSettings(paymentSettings);
-        organizationGraphRepository.save(unit);
+        unitGraphRepository.save(unit);
         return paymentSettings.getId();
 
     }
@@ -206,7 +206,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
     }
 
     public PaymentSettingsDTO updatePaymentsSettings(PaymentSettingsDTO paymentSettingsDTO, Long unitId) {
-        Optional<Unit> organization = organizationGraphRepository.findById(unitId, 1);
+        Optional<Unit> organization = unitGraphRepository.findById(unitId, 1);
         if (!organization.isPresent()) {
             logger.info("Unable to get unit while getting payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get organization by id" + unitId);

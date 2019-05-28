@@ -42,7 +42,7 @@ import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
@@ -136,7 +136,7 @@ public class ClientService {
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
@@ -182,7 +182,7 @@ public class ClientService {
     }
 
     public Client createCitizen(ClientMinimumDTO clientMinimumDTO, Long unitId) {
-        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = unitGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId);
         }
@@ -605,7 +605,7 @@ public class ClientService {
     }
 
     private void addHouseHoldInOrganization(Client houseHold, long organizationId) {
-        Unit unit = organizationGraphRepository.findOne(organizationId);
+        Unit unit = unitGraphRepository.findOne(organizationId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, organizationId);
 
@@ -845,7 +845,7 @@ public class ClientService {
 
         //meta data preparation
         HashMap<String, Object> orgData = new HashMap<>();
-        List<Map<String, Object>> skills = organizationGraphRepository.getSkillsOfOrganization(unitId);
+        List<Map<String, Object>> skills = unitGraphRepository.getSkillsOfOrganization(unitId);
 
         List<Map<String, Object>> filterSkillData = new ArrayList<>();
         for (Map<String, Object> map : skills) {
@@ -937,7 +937,7 @@ public class ClientService {
     public Map<String, Object> getOrganizationClients(Long organizationId) throws InterruptedException, ExecutionException {
 
         Map<String, Object> clientData = new HashMap<String, Object>();
-        List<Map<String, Object>> clientList = organizationGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        List<Map<String, Object>> clientList = unitGraphRepository.getClientsOfOrganization(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
 
         if (clientList.isEmpty()) {
             return null;
@@ -956,7 +956,7 @@ public class ClientService {
 
 
     public HashMap<String, Object> getOrganizationAllClients(long unitId, long staffId) {
-        List<Map<String, Object>> mapList = organizationGraphRepository.getAllClientsOfOrganization(unitId);
+        List<Map<String, Object>> mapList = unitGraphRepository.getAllClientsOfOrganization(unitId);
         List<Object> clientList = new ArrayList<>();
         for (Map<String, Object> map : mapList) {
             clientList.add(map.get("Client"));
@@ -975,7 +975,7 @@ public class ClientService {
      * @auther anil maurya
      */
     public List<Map<String, Object>> getOrganizationClientsExcludeDead(Long organizationId) {
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        List<Map<String, Object>> mapList = unitGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         return mapList;
     }
 
@@ -1220,7 +1220,7 @@ public class ClientService {
     public OrganizationClientWrapper getOrgnizationClients(Long organizationId, OAuth2Authentication auth2Authentication) {
 
         logger.debug("Finding citizen with Id: " + organizationId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        List<Map<String, Object>> mapList = unitGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         logger.debug("CitizenList Size: " + mapList.size());
 
         Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByUserNameIgnoreCase(auth2Authentication.getUserAuthentication().getPrincipal().toString()).getId());
@@ -1241,7 +1241,7 @@ public class ClientService {
     public OrganizationClientWrapper getOrgnizationClients(Long organizationId, List<Long> citizenId) {
 
         logger.info("Finding citizen with Id: " + citizenId);
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsByClintIdList(citizenId);
+        List<Map<String, Object>> mapList = unitGraphRepository.getClientsByClintIdList(citizenId);
         logger.info("CitizenList Size: " + mapList.size());
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
         OrganizationClientWrapper organizationClientWrapper = new OrganizationClientWrapper(mapList, timeSlotData);
@@ -1444,7 +1444,7 @@ public class ClientService {
 
         String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
 
-        mapList.addAll(organizationGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, unitId, imagePath, skip, moduleId));
+        mapList.addAll(unitGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, unitId, imagePath, skip, moduleId));
         Unit parent = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(), parent.getId());
         //anil maurya move some business logic in task demand service (task micro service )
@@ -1468,7 +1468,7 @@ public class ClientService {
 
     public ClientPersonalCalenderPrerequisiteDTO getPrerequisiteForPersonalCalender(Long unitId, Long clientId) {
 
-        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = unitGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ORGANISATION_NOTFOUND, unitId);
         }

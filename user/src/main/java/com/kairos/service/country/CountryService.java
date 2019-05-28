@@ -27,7 +27,7 @@ import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryR
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
@@ -78,7 +78,7 @@ public class CountryService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
@@ -546,7 +546,7 @@ public class CountryService {
 
     // For getting all OrganizationLevel and Unions
     public OrganizationLevelAndUnionWrapper getUnionAndOrganizationLevels(Long countryId) {
-        List<UnionQueryResult> unions = organizationGraphRepository.findAllUnionsByCountryId(countryId);
+        List<UnionQueryResult> unions = unitGraphRepository.findAllUnionsByCountryId(countryId);
         List<Level> organizationLevels = countryGraphRepository.getLevelsByCountry(countryId);
         return new OrganizationLevelAndUnionWrapper(unions, organizationLevels);
     }

@@ -303,7 +303,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     StaffFavouriteFilter getStaffFavouriteFiltersById(Long staffId, Long staffFavouriteFiltersId);
 
 
-    @Query("MATCH (organization:Unit)-[:" + HAS_POSITIONS + "]->(:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE id(organization)={1}" +
+    @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE id(organization)={1}" +
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} RETURN staff")
     Staff getStaffByUserId(Long userId, Long parentOrganizationId);
 
@@ -422,7 +422,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN {id:id(staff),name:user.firstName} AS staff,id(expertise) AS expertiseId")
     List<ExpertiseLocationStaffQueryResult> findAllUnionRepresentativeOfExpertiseInUnit(List<Long> expertiseIds, Long unitId);
 
-    @Query("MATCH (organization:Unit{deleted:false,isEnable:true})<-[:" + HAS_SUB_ORGANIZATION + "*]-(organizationHub:Unit{deleted:false,isEnable:true}) \n" +
+    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})<-[:" + HAS_SUB_ORGANIZATION + "*]-(organizationHub:Unit{deleted:false,isEnable:true}) \n" +
             "-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]->(user:User)\n " +
             "WHERE id(organization)={0} AND organizationHub.isKairosHub=true AND id(user)={1} \n " +
             "RETURN staff")

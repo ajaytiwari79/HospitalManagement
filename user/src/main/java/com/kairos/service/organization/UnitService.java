@@ -7,7 +7,7 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
@@ -37,7 +37,7 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 @Transactional
 public class UnitService {
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private OrganizationService organizationService;
     @Inject
@@ -70,7 +70,6 @@ public class UnitService {
         response.put("orgSubType", parentOrg.getOrganizationSubTypes());
         response.put("accountType", parentOrg.getAccountType());
         response.put("accessGroups",accessGroupService.getOrganizationManagementAccessGroups(parentOrg.getId(), AccessGroupRole.MANAGEMENT));
-        //response.put("accessGroups", accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
         response.put("businessTypes", parentOrg.getBusinessTypes());
         response.put("companyCategory", parentOrg.getCompanyCategory());
         response.put("level", parentOrg.getLevel());
@@ -80,7 +79,7 @@ public class UnitService {
 
     public Map<String, Object> getManageHierarchyData(long organizationId) {
 
-        Unit unit = organizationGraphRepository.findOne(organizationId);
+        Unit unit = unitGraphRepository.findOne(organizationId);
 
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
@@ -127,7 +126,7 @@ public class UnitService {
         } else {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }
-        Country country = organizationGraphRepository.getCountry(parentOrgaziationId);
+        Country country = unitGraphRepository.getCountry(parentOrgaziationId);
         companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(), parentOrgaziationId);
         organizationBasicDTO.setBoardingCompleted(true);
         return organizationBasicDTO;
@@ -135,7 +134,7 @@ public class UnitService {
     }
 
     public Map<String, Object> getEligibleUnitsForCtaAndWtaCreation(Long unitId) {
-        Unit organization = organizationGraphRepository.findOne(unitId, 2);
+        Unit organization = unitGraphRepository.findOne(unitId, 2);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }

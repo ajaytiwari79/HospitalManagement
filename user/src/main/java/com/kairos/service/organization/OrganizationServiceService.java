@@ -37,7 +37,7 @@ public class OrganizationServiceService{
     @Inject
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     //TODO move this dependency in task
@@ -158,7 +158,7 @@ public class OrganizationServiceService{
         if (type.equalsIgnoreCase("team")) {
             return teamGraphRepository.addCustomNameOfServiceForTeam(serviceId, organizationId, customName);
         } else {
-            return organizationGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
+            return unitGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
         }
 
     }
@@ -167,12 +167,12 @@ public class OrganizationServiceService{
         if (type.equalsIgnoreCase("team")) {
             return teamGraphRepository.addCustomNameOfSubServiceForTeam(organizationId, subServiceId, customName);
         } else {
-            return organizationGraphRepository.addCustomNameOfSubServiceForOrganization(subServiceId, organizationId, customName);
+            return unitGraphRepository.addCustomNameOfSubServiceForOrganization(subServiceId, organizationId, customName);
         }
     }
 
     private Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId) {
-        return organizationGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
+        return unitGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
     }
 
     private Boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId) {
@@ -188,22 +188,22 @@ public class OrganizationServiceService{
         }
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            Unit unit = organizationGraphRepository.findOne(id);
+            Unit unit = unitGraphRepository.findOne(id);
             if (unit == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,id);
 
             }
 
             if (isSelected) {
-                logger.info("check if already exist-------> " + organizationGraphRepository.isServiceAlreadyExist(id, organizationService.getId()));
-                if (organizationGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
-                    organizationGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+                logger.info("check if already exist-------> " + unitGraphRepository.isServiceAlreadyExist(id, organizationService.getId()));
+                if (unitGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
+                    unitGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
                 } else {
-                    organizationGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
+                    unitGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
                 }
                 addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
             } else {
-                organizationGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
+                unitGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
             }
 //                        getServiceOfSubService
         } else if (TEAM.equalsIgnoreCase(type)) {
@@ -300,21 +300,21 @@ public class OrganizationServiceService{
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 
-            Unit unit = organizationGraphRepository.findOne(id, 0);
+            Unit unit = unitGraphRepository.findOne(id, 0);
             if (unit == null) {
                 return null;
             }
             Unit parent;
             if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+                parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
             } else {
-                parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+                parent = unitGraphRepository.getParentOfOrganization(unit.getId());
             }
             if (parent != null) {
-                response = filterSkillData(organizationGraphRepository.getServicesForUnit(parent.getId(), id));
+                response = filterSkillData(unitGraphRepository.getServicesForUnit(parent.getId(), id));
             } else {
-                response = filterSkillData(organizationGraphRepository.getServicesForParent(id));
+                response = filterSkillData(unitGraphRepository.getServicesForParent(id));
             }
 
         } else if (TEAM.equalsIgnoreCase(type)) {
@@ -371,11 +371,11 @@ public class OrganizationServiceService{
     }
 
     public Map<String, Object> organizationImportedServiceData(long id) {
-        Unit unit = organizationGraphRepository.findOne(id);
+        Unit unit = unitGraphRepository.findOne(id);
         if (unit == null) {
             return null;
         }
-        return filterSkillData(organizationGraphRepository.getImportedServicesForUnit(unit.getId()));
+        return filterSkillData(unitGraphRepository.getImportedServicesForUnit(unit.getId()));
 
     }
 

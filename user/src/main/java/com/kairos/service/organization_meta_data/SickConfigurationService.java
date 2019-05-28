@@ -3,7 +3,7 @@ package com.kairos.service.organization_meta_data;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.default_data.SickConfiguration;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.default_data.SickConfigurationRepository;
 import com.kairos.service.country.TimeTypeRestClient;
 import com.kairos.utils.user_context.UserContext;
@@ -30,12 +30,12 @@ public class SickConfigurationService {
     @Inject
     private TimeTypeRestClient timeTypeRestClient;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     public boolean saveSickSettingsOfUnit(Long unitId, Set<BigInteger> allowedTimeTypes) {
         SickConfiguration sickConfiguration = sickConfigurationRepository.findSickConfigurationOfUnit(unitId);
         if (!Optional.ofNullable(sickConfiguration).isPresent()) {
-            Unit unit = organizationGraphRepository.findOne(unitId, 0);
+            Unit unit = unitGraphRepository.findOne(unitId, 0);
             sickConfiguration = new SickConfiguration(allowedTimeTypes, unit);
 
         } else {

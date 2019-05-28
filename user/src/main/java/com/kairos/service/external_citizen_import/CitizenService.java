@@ -22,7 +22,7 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBuilder;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -91,7 +91,7 @@ public class CitizenService {
     private TimeSlotGraphRepository timeSlotGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private OrganizationService organizationService;
@@ -126,7 +126,7 @@ public class CitizenService {
      */
     public String getCitizensFromKMD(Long unitId) {
         try {
-            Unit unit = organizationGraphRepository.findOne(unitId);
+            Unit unit = unitGraphRepository.findOne(unitId);
             RestTemplate loginTemplate = new RestTemplate();
             HttpMessageConverter formHttpMessageConverter = new FormHttpMessageConverter();
             HttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
@@ -383,7 +383,7 @@ public class CitizenService {
         String pattern = (String) grantObject.get("grantPattern");
         if (grantTypes.contains(grantObject.get("grantTypeNameSection")) && (shiftRepetition.getShifts().size() > 0)) {
             CitizenSupplier citizenSupplier = (CitizenSupplier) grantObject.get("supplier");
-            Unit supplier = organizationGraphRepository.findByKmdExternalId(citizenSupplier.getId());
+            Unit supplier = unitGraphRepository.findByKmdExternalId(citizenSupplier.getId());
             Optional supplierOptional = Optional.ofNullable(supplier);
             if (!supplierOptional.isPresent()) {
                 supplier = new OrganizationBuilder().setName(citizenSupplier.getName()).createOrganization();
@@ -463,7 +463,7 @@ public class CitizenService {
                 for (RelativeContacts relativeContacts : availableContacts.getRelativeContacts()) {
                     String relativeContactUrl = relativeContacts.get_links().getSelf().getHref();
                     ResponseEntity<String> relativeContactResponse = loginTemplate.exchange(relativeContactUrl, HttpMethod.GET, headersElements, String.class);
-                    Unit unit = organizationGraphRepository.findByName(AppConstants.KMD_NEXUS_ORGANIZATION);
+                    Unit unit = unitGraphRepository.findByName(AppConstants.KMD_NEXUS_ORGANIZATION);
                     PatientRelative patientRelative = jsonStringToObject(relativeContactResponse.getBody(), PatientRelative.class);
                     clientService.addClientRelativeDetailsFromExternalService(patientRelative, client, unit.getId());
                 }
@@ -515,7 +515,7 @@ public class CitizenService {
     public Staff createStaffFromKMD(long unitId, StaffDTO payload) {
         Staff staff = staffGraphRepository.findByKmdExternalId(payload.getId());
         if(staff == null) staff = new Staff();
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (unit == null)
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,unitId);
 
@@ -547,10 +547,10 @@ public class CitizenService {
 
         Unit parent = null;
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
         } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
 
         if (parent == null) {
@@ -588,7 +588,7 @@ public class CitizenService {
         JSONArray jsonArray = new JSONArray(responseEntity.getBody());
         jsonObject.put("kmdTimeSlotDTOList", jsonArray);
         ImportTimeSlotListDTO importTimeSlotListDTO = jsonStringToObject(jsonObject.toString(), ImportTimeSlotListDTO.class);
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         importTimeSlotListDTO.getImportTimeSlotDTOList().forEach(kmdTimeSlotDTO -> {
             //timeSlotService.importTimeSlotsFromKMD( unit,  kmdTimeSlotDTO);
         });

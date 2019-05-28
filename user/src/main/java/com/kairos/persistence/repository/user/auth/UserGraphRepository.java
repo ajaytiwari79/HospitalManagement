@@ -107,6 +107,6 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     User findUserByUserName(String userName);
 
     @Query("MATCH (user:User) WHERE user.userName=~{0} " +
-            "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Unit{isEnable:true,boardingCompleted: true,deleted:false}) RETURN user")
+            "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) RETURN user")
     User findUserByUserNameInAnyOrganization(String userName);
 }

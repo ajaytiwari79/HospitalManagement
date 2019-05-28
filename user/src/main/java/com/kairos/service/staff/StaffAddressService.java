@@ -7,7 +7,7 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
@@ -56,7 +56,7 @@ public class StaffAddressService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ExceptionService exceptionService;
 
@@ -144,7 +144,7 @@ public class StaffAddressService {
 
         ContactAddress staffAddress = staff.getContactAddress();
 
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (unit == null) {
             return null;
         }

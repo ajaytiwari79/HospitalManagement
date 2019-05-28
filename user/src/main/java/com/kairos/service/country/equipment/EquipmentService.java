@@ -8,7 +8,7 @@ import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.country.equipment.EquipmentQueryResult;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentGraphRepository;
@@ -48,7 +48,7 @@ public class EquipmentService{
     private ResourceGraphRepository resourceGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private OrganizationService organizationService;
@@ -169,7 +169,7 @@ public class EquipmentService{
     }
 
     public HashMap<String,List<EquipmentQueryResult>> getEquipmentsForResource(Long organizationId, Long resourceId){
-        Unit unit = organizationGraphRepository.findOne(organizationId,1);
+        Unit unit = unitGraphRepository.findOne(organizationId,1);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,organizationId);
 
@@ -186,7 +186,7 @@ public class EquipmentService{
             exceptionService.dataNotFoundByIdException(MESSAGE_EQUIPMENT_RESOURCE_ID_NOTFOUND,resourceId);
 
         }
-        Unit unit = organizationGraphRepository.findOne(organizationId,1);
+        Unit unit = unitGraphRepository.findOne(organizationId,1);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,organizationId);
 

@@ -26,6 +26,7 @@ public abstract class RelationshipConstants {
     public static final  String ORGANISATION_HAS_SKILL = "ORGANISATION_HAS_SKILL";
     public static final  String ORGANIZATION_TIME_SLOT = "ORGANIZATION_TIME_SLOT";
     public static final  String HAS_SUB_ORGANIZATION = "HAS_SUB_ORGANIZATION";
+    public static final  String HAS_UNIT = "HAS_UNIT";
     public static final  String PROVIDE_SERVICE = "PROVIDE_SERVICE";
     public static final  String ORGANIZATION_TYPE_HAS_SERVICES = "ORGANIZATION_TYPE_HAS_SERVICES";
     public static final  String HAS_PUBLIC_PHONE_NUMBER = "HAS_PUBLIC_PHONE_NUMBER";

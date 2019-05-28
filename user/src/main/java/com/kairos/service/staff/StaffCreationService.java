@@ -25,7 +25,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -70,7 +70,7 @@ public class StaffCreationService {
     @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private AccessGroupRepository accessGroupRepository;
     @Inject
@@ -153,12 +153,12 @@ public class StaffCreationService {
 
     public Map createUnitManager(long unitId, UnitManagerDTO unitManagerDTO) {
         User user = userGraphRepository.findByEmail(unitManagerDTO.getEmail());
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         Unit parent;
         if(unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
         final String password = unitManagerDTO.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH;
         ObjectMapper mapper = new ObjectMapper();
@@ -207,9 +207,9 @@ public class StaffCreationService {
         staff = staffGraphRepository.save(staff);
         Unit parent = null;
         if(!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
         } else if(!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
         if(parent == null) {
             if(positionGraphRepository.findPosition(unit.getId(), staff.getId()) == null) {
@@ -255,7 +255,7 @@ public class StaffCreationService {
         adminAsStaff.setEmail(admin.getEmail());
         staffGraphRepository.save(adminAsStaff);
 
-        List<Unit> units = organizationGraphRepository.findByOrganizationLevel(OrganizationLevel.COUNTRY);
+        List<Unit> units = unitGraphRepository.findByOrganizationLevel(OrganizationLevel.COUNTRY);
         Unit unit = null;
         if (!units.isEmpty()) {
             unit = units.get(0);
@@ -263,7 +263,7 @@ public class StaffCreationService {
         if (unit != null) {
             Position position = new Position("working as country admin", adminAsStaff);
             unit.getPositions().add(position);
-            organizationGraphRepository.save(unit);
+            unitGraphRepository.save(unit);
 
             AccessGroup accessGroup = accessGroupRepository.findAccessGroupByName(unit.getId(), AppConstants.COUNTRY_ADMIN);
             UnitPermission unitPermission = new UnitPermission();
@@ -275,7 +275,7 @@ public class StaffCreationService {
             accessPageService.setPagePermissionToAdmin(accessPermission);
             position.getUnitPermissions().add(unitPermission);
             unit.getPositions().add(position);
-            organizationGraphRepository.save(unit);
+            unitGraphRepository.save(unit);
         } else {
             return null;
         }
@@ -314,16 +314,16 @@ public class StaffCreationService {
         if (payload.getCprNumber().length() != 10) {
             exceptionService.invalidSize(MESSAGE_CPRNUMBER_SIZE);
         }
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         Unit parent = null;
         if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
         } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
         if (staffGraphRepository.findStaffByEmailInOrganization(payload.getPrivateEmail(), unitId) != null) {
             exceptionService.duplicateDataException(MESSAGE_EMAIL_ALREADYEXIST, "Staff", payload.getPrivateEmail());
@@ -381,7 +381,7 @@ public class StaffCreationService {
     }
 
     public boolean importStaffFromTimeCare(List<TimeCareStaffDTO> timeCareStaffDTOS, String externalId) {
-        Unit unit = organizationGraphRepository.findByExternalId(externalId);
+        Unit unit = unitGraphRepository.findByExternalId(externalId);
         if(unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXTERNALID_NOTFOUND);
         }

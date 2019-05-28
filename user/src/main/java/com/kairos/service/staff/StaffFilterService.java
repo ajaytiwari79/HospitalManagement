@@ -11,12 +11,14 @@ import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.StaffFilterDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
@@ -71,7 +73,9 @@ public class StaffFilterService {
     StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
     @Inject
     private
-    OrganizationGraphRepository organizationGraphRepository;
+    UnitGraphRepository unitGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -87,26 +91,30 @@ public class StaffFilterService {
     private AccessPageRepository accessPageRepository;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
+
+        return getAllAndFavouriteFiltersFromParent(moduleId, organizationService.fetchParentOrganization(unitId).getId());
+
+    }
+
+    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFiltersFromParent(String moduleId, Long organizationId) {
         Long userId = UserContext.getUserDetails().getId();
-        Unit unit;
+        Organization organization;
         if (accessPageRepository.isHubMember(userId)) {
-            unit = accessPageRepository.fetchParentHub(userId);
+            organization = accessPageRepository.fetchParentHub(userId);
         } else {
-            //TODO please Optimise these DB calls
-            unit = organizationGraphRepository.findOne(unitId);
-            if (!Optional.ofNullable(unit).isPresent()) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
+            organization = organizationGraphRepository.findOne(organizationId);
+            if (!Optional.ofNullable(organization).isPresent()) {
+                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
             }
-            unit = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTEXIST);
         }
-        Staff staff = staffGraphRepository.getStaffByUserId(userId, unit.getId());
+        Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
 
         return new FiltersAndFavouriteFiltersDTO(
-                getAllFilters(moduleId, countryId, unitId),
+                getAllFilters(moduleId, countryId, organizationId),
                 getFavouriteFilters(moduleId, staff.getId()));
     }
 
@@ -175,7 +183,7 @@ public class StaffFilterService {
 
     public StaffFilterDTO addFavouriteFilter(Long unitId, StaffFilterDTO staffFilterDTO) {
         Long userId = UserContext.getUserDetails().getId();
-        Unit parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(unitId);
+        Organization parent = accessPageRepository.isHubMember(userId) ? accessPageRepository.fetchParentHub(userId) : organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
 
         if (!Optional.ofNullable(staffFilterDTO.getName()).isPresent()) {
@@ -267,7 +275,7 @@ public class StaffFilterService {
     }
 
     public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
@@ -281,7 +289,7 @@ public class StaffFilterService {
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
-        staffEmploymentTypeWrapper.setStaffList(organizationGraphRepository.getStaffWithFilters(unitId, organization.getId(), moduleId,
+        staffEmploymentTypeWrapper.setStaffList(unitGraphRepository.getStaffWithFilters(unitId, organization.getId(), moduleId,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);

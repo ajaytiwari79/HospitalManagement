@@ -1,2 +1,11 @@
 
 MATCH(f:FunctionalPayment{deleted:false}) set f.oneTimeUpdatedAfterPublish=false;
+
+MATCH (org:Organization{isParentOrganization:false})
+REMOVE org:Organization
+SET org:Unit
+
+
+MATCH(unit:Unit)-[r:HAS_SUB_ORGANIZATION]-(org:Organization)
+delete r
+CREATE UNIQUE(org)-[r1:HAS_UNIT]->(unit)

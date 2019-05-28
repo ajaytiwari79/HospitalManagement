@@ -38,7 +38,7 @@ import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -94,7 +94,7 @@ public class ExpertiseService {
     StaffGraphRepository staffGraphRepository;
     @Inject
     private
-    OrganizationGraphRepository organizationGraphRepository;
+    UnitGraphRepository unitGraphRepository;
     @Inject
     private
     OrganizationServiceRepository organizationServiceRepository;
@@ -149,7 +149,7 @@ public class ExpertiseService {
                 exceptionService.duplicateDataException(MESSAGE_DUPLICATE, EXPERTISE, expertiseDTO.getName());
             }
             Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
-                if (expertiseDTO.isPublished() && (!Optional.ofNullable(unionIDNameDTO.getId()).isPresent() || !organizationGraphRepository.isPublishedUnion(unionIDNameDTO.getId()))) {
+                if (expertiseDTO.isPublished() && (!Optional.ofNullable(unionIDNameDTO.getId()).isPresent() || !unitGraphRepository.isPublishedUnion(unionIDNameDTO.getId()))) {
                     exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
                 }
             });
@@ -169,7 +169,7 @@ public class ExpertiseService {
             }
             Optional.ofNullable(expertise.getUnion()).ifPresent(union -> {
                 expertiseResponseDTO.getUnion().setId(expertise.getUnion().getId());
-                organizationGraphRepository.linkUnionSector(expertise.getUnion().getId(), expertise.getSector().getId());
+                unitGraphRepository.linkUnionSector(expertise.getUnion().getId(), expertise.getSector().getId());
             });
             TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
             ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
@@ -379,7 +379,7 @@ public class ExpertiseService {
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
             seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
             copiedExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(), expertiseDTO.getUnion().getName(), country));
-            organizationGraphRepository.linkUnionSector(copiedExpertise.getUnion().getId(), copiedExpertise.getSector().getId());
+            unitGraphRepository.linkUnionSector(copiedExpertise.getUnion().getId(), copiedExpertise.getSector().getId());
             // NOW WE need to add the other seniority level which exists in expertise
             // since we have already
             seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, currentExpertise.getSeniorityLevel(), seniorityLevelToUpdate.get().getId()));
@@ -416,7 +416,7 @@ public class ExpertiseService {
                 expertiseResponseDTO.getUnion().setId(currentExpertise.getUnion().getId());
             }
             if (currentExpertise.getUnion() != null && currentExpertise.getSector() != null) {
-                organizationGraphRepository.linkUnionSector(currentExpertise.getUnion().getId(), currentExpertise.getSector().getId());
+                unitGraphRepository.linkUnionSector(currentExpertise.getUnion().getId(), currentExpertise.getSector().getId());
             }
 
 
@@ -592,7 +592,7 @@ public class ExpertiseService {
         }
         UnionServiceWrapper unionServiceWrapper = new UnionServiceWrapper();
         unionServiceWrapper.setServices(organizationServiceService.getAllOrganizationService(countryId));
-        unionServiceWrapper.setUnions(organizationGraphRepository.findAllUnionsByCountryId(countryId));
+        unionServiceWrapper.setUnions(unitGraphRepository.findAllUnionsByCountryId(countryId));
         unionServiceWrapper.setOrganizationLevels(countryGraphRepository.getLevelsByCountry(countryId));
         unionServiceWrapper.setSectors(ObjectMapperUtils.copyPropertiesOfListByMapper(sectorGraphRepository.findAllSectorsByCountryAndDeletedFalse(countryId), SectorDTO.class));
         return unionServiceWrapper;
@@ -609,7 +609,7 @@ public class ExpertiseService {
 
         }
         validateExpertiseBeforePublishing(expertise);
-        if (!Optional.ofNullable(expertise.getUnion().getId()).isPresent() || !organizationGraphRepository.isPublishedUnion(expertise.getUnion().getId())) {
+        if (!Optional.ofNullable(expertise.getUnion().getId()).isPresent() || !unitGraphRepository.isPublishedUnion(expertise.getUnion().getId())) {
             exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
         }
         List<Long> seniorityLevelId = new ArrayList<>();
@@ -898,7 +898,7 @@ public class ExpertiseService {
     private Unit getUnion(Long unionId, String unionName, Country country) {
         Unit union;
         if (Optional.ofNullable(unionId).isPresent()) {
-            union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
+            union = unitGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
             if (!Optional.ofNullable(union).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, UNION, unionId);
             }
@@ -922,7 +922,7 @@ public class ExpertiseService {
     }
 
     public Map<String, Object> getPlannedTimeAndEmploymentTypeForUnit(Long unitId) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }

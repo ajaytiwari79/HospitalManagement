@@ -14,7 +14,7 @@ import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
@@ -56,7 +56,7 @@ public class ClientExtendedService{
     @Inject
     private ClientGraphRepository clientGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ClientService clientService;
     @Inject

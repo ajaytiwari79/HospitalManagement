@@ -6,7 +6,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -35,7 +35,7 @@ public class ReasonCodeService {
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -58,7 +58,7 @@ public class ReasonCodeService {
     }
 
     public ReasonCodeDTO createReasonCodeForUnit(long unitId, ReasonCodeDTO reasonCodeDTO) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }

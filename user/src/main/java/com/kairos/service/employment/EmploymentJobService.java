@@ -15,7 +15,7 @@ import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentLine;
 import com.kairos.persistence.model.user.employment.EmploymentLineEmploymentTypeRelationShip;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentSeniorityLevelQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentAndEmploymentTypeRelationShipGraphRepository;
@@ -51,7 +51,7 @@ public class EmploymentJobService {
     @Inject
     private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private PositionGraphRepository positionGraphRepository;
     @Inject

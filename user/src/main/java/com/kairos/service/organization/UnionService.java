@@ -23,7 +23,7 @@ import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.LocationGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -59,7 +59,7 @@ import static com.kairos.constants.UserMessagesConstants.*;
 public class UnionService {
     private final Logger LOGGER = LoggerFactory.getLogger(UnionService.class);
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
@@ -146,7 +146,7 @@ public class UnionService {
         if (locationGraphRepository.existsByName("(?i)" + locationDTO.getName(), unionId, -1l)) {
             exceptionService.duplicateDataException(MESSAGE_LOCATION_NAME_ALREADYEXISTS, locationDTO.getName());
         }
-        Unit union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
+        Unit union = unitGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
         if (!Optional.ofNullable(union).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_UNIONID_NOTFOUND, unionId);
         }
@@ -157,7 +157,7 @@ public class UnionService {
         }
         Location location = new Location(locationDTO.getName(), address);
         union.getLocations().add(location);
-        organizationGraphRepository.save(union);
+        unitGraphRepository.save(union);
         locationGraphRepository.save(location);
         locationDTO.setId(location.getId());
 
@@ -222,7 +222,7 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
 
-        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), -1l)) {
+        if (unitGraphRepository.existsByName("(?i)" + unionData.getName(), -1l)) {
             exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
 
         }
@@ -254,7 +254,7 @@ public class UnionService {
             union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
 
-        organizationGraphRepository.save(union);
+        unitGraphRepository.save(union);
         unionData.setSectors(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
         unionData.setId(union.getId());
         return unionData;
@@ -302,10 +302,10 @@ public class UnionService {
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
-        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), unionId)) {
+        if (unitGraphRepository.existsByName("(?i)" + unionData.getName(), unionId)) {
             exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
         }
-        List<UnionDataQueryResult> unionDataQueryResults = organizationGraphRepository.getUnionCompleteById(unionId, unionData.getName());
+        List<UnionDataQueryResult> unionDataQueryResults = unitGraphRepository.getUnionCompleteById(unionId, unionData.getName());
 
         if (CollectionUtils.isEmpty(unionDataQueryResults) || (unionDataQueryResults.size() == 1 && !unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
             exceptionService.dataNotFoundByIdException("message.union.not.found", unionId);
@@ -323,12 +323,12 @@ public class UnionService {
         sectorIDsToBeCreated.removeAll(sectorIdsDb);
         sectorIdsDb.removeAll(sectorIds);
         if (!sectorIdsDb.isEmpty() && !union.isBoardingCompleted()) {
-            organizationGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
+            unitGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
         } else if (!sectorIdsDb.isEmpty() && union.isBoardingCompleted()) {
             exceptionService.unsupportedOperationException(MESSAGE_SECTOR_UNLINKED);
         }
         if (!sectorIDsToBeCreated.isEmpty()) {
-            organizationGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
+            unitGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
         }
         if (!sectorDTOS.isEmpty()) {
             List<Sector> sectors = createSectors(countryId, sectorDTOS);
@@ -365,7 +365,7 @@ public class UnionService {
         if (isCollectionEmpty(union.getLocations()) && publish) {
             union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
-        organizationGraphRepository.save(union);
+        unitGraphRepository.save(union);
         unionData.setId(union.getId());
         return unionData;
     }
@@ -426,7 +426,7 @@ public class UnionService {
 
     public UnionGlobalDataDTO getUnionData(Long countryId) {
 
-        List<UnionDataQueryResult> unionDataObjects = organizationGraphRepository.getUnionData(countryId);
+        List<UnionDataQueryResult> unionDataObjects = unitGraphRepository.getUnionData(countryId);
         List<Long> locationIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getLocations().stream().map(location -> location.getId())).collect(
                 Collectors.toList());
         Set<Long> municipalityIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getMunicipalities().stream().map(
@@ -534,12 +534,12 @@ public class UnionService {
 
         }
         List<Long> organizationSubTypeIds = unit.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
-        List<UnionResponseDTO> unions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
+        List<UnionResponseDTO> unions = unitGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
         List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
         if (unit.isParentOrganization()) {
-            organizationHierarchy = organizationGraphRepository.getOrganizationHierarchy(unit.getId());
+            organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(unit.getId());
         } else {
-            OrganizationHierarchyData data = organizationGraphRepository.getChildHierarchyByChildUnit(unit.getId());
+            OrganizationHierarchyData data = unitGraphRepository.getChildHierarchyByChildUnit(unit.getId());
             Iterator itr = data.getChildUnits().listIterator();
             while (itr.hasNext()) {
                 Unit thisUnit = (Unit) itr.next();

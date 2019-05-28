@@ -10,7 +10,7 @@ import com.kairos.persistence.model.client.relationships.ClientOrganizationRelat
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
@@ -55,7 +55,7 @@ public class ClientBatchService {
     @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ClientService clientService;
     @Inject
@@ -128,7 +128,7 @@ public class ClientBatchService {
     }
 
     public List<Map<String, Object>> batchAddClientsToDatabase(MultipartFile multipartFile, long unitId) {
-        Unit currentUnit = organizationGraphRepository.findOne(unitId);
+        Unit currentUnit = unitGraphRepository.findOne(unitId);
         if (currentUnit == null) {
             return null;
         }

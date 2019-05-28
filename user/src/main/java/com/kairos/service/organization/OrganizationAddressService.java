@@ -15,7 +15,7 @@ import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -53,7 +53,7 @@ public class OrganizationAddressService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -88,7 +88,7 @@ public class OrganizationAddressService {
         HashMap<String, Object> response = new HashMap<>(2);
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             Long countryId = countryGraphRepository.getCountryIdByUnitId(id);
-            OrganizationContactAddress contactAddressData = organizationGraphRepository.getContactAddressOfOrg(id);
+            OrganizationContactAddress contactAddressData = unitGraphRepository.getContactAddressOfOrg(id);
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> map = objectMapper.convertValue(contactAddressData.getContactAddress(), Map.class);
             map.put("zipCodeId", contactAddressData.getZipCode().getId());
@@ -96,7 +96,7 @@ public class OrganizationAddressService {
             response.put("contactAddress", map);
             response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
             response.put("municipalities", FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(contactAddressData.getZipCode().getId())));
-            Map<String, Object> billingAddress = organizationGraphRepository.getBillingAddress(id);
+            Map<String, Object> billingAddress = unitGraphRepository.getBillingAddress(id);
             response.put("billingAddress", billingAddress);
             response.put("billingMunicipalities", (billingAddress.get("zipCodeId") == null) ? Collections.emptyList() :
                     FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) billingAddress.get("zipCodeId"))));
@@ -206,14 +206,14 @@ public class OrganizationAddressService {
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
 
-            Unit unit = organizationGraphRepository.findOne(id);
+            Unit unit = unitGraphRepository.findOne(id);
             if (unit == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, id);
 
 
             }
             unit.setContactAddress(contactAddress);
-            organizationGraphRepository.save(unit);
+            unitGraphRepository.save(unit);
         } else if (TEAM.equalsIgnoreCase(type)) {
             Team team = teamGraphRepository.findOne(id);
             if (team == null) {
@@ -240,7 +240,7 @@ public class OrganizationAddressService {
             billingAddress = new ContactAddress();
         }
 
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
 
@@ -320,7 +320,7 @@ public class OrganizationAddressService {
         billingAddress.setPaymentType(paymentType);
         billingAddress.setCurrency(currency);
         unit.setBillingAddress(billingAddress);
-        organizationGraphRepository.save(unit);
+        unitGraphRepository.save(unit);
 
         Map<String, Object> response = new HashMap<>();
         response.put("paymentTypeId", paymentType.getId());
@@ -350,9 +350,9 @@ public class OrganizationAddressService {
      * @return
      */
     public ContactAddress addUnitAddress(Long unitId, Map<String, Object> addressMap) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (unit != null) {
-            ContactAddress address = organizationGraphRepository.getOrganizationAddressDetails(unitId);
+            ContactAddress address = unitGraphRepository.getOrganizationAddressDetails(unitId);
             if (address == null) {
                 logger.info("No address found");
                 address = new ContactAddress();
@@ -365,14 +365,14 @@ public class OrganizationAddressService {
             address.setLatitude(Float.parseFloat((String) addressMap.get("latitude")));
             address.setLongitude(Float.parseFloat((String) addressMap.get("longitude")));
             unit.setContactAddress(address);
-            organizationGraphRepository.save(unit);
+            unitGraphRepository.save(unit);
             return unit.getContactAddress();
         }
         return null;
     }
 
     public ReasonCodeWrapper getAddressAndReasonCodeOfOrganization(Set<Long> absenceReasonCodeIds, Long unitId) {
-        Map<String, Object> contactAddressData = organizationGraphRepository.getContactAddressOfParentOrganization(unitId);
+        Map<String, Object> contactAddressData = unitGraphRepository.getContactAddressOfParentOrganization(unitId);
         List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findByIds(absenceReasonCodeIds);
         List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodes, ReasonCodeDTO.class);
         return new ReasonCodeWrapper(reasonCodeDTOS,contactAddressData);

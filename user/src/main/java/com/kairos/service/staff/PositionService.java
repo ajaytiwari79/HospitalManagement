@@ -29,7 +29,7 @@ import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermiss
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.*;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
@@ -76,7 +76,7 @@ import static com.kairos.constants.UserMessagesConstants.*;
 public class PositionService {
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
@@ -172,13 +172,13 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND, unitId);
 
         }
 
-        Unit parentUnit = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Unit parentUnit = (unit.isParentOrganization()) ? unit : unitGraphRepository.getParentOfOrganization(unit.getId());
         if (!Optional.ofNullable(parentUnit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
@@ -245,9 +245,9 @@ public class PositionService {
         Unit unit = null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.findOne(unitId);
+            unit = unitGraphRepository.findOne(unitId);
         } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
+            unit = unitGraphRepository.getOrganizationByTeamId(unitId);
         } else {
             exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
 
@@ -255,10 +255,10 @@ public class PositionService {
 
         Unit parent;
         if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
         } else {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
 
         List<Map<String, Object>> list = new ArrayList<>();
@@ -299,10 +299,10 @@ public class PositionService {
         position.getUnitPermissions().add(unitPermission);
         if (parent == null) {
             unit.getPositions().add(position);
-            organizationGraphRepository.save(unit);
+            unitGraphRepository.save(unit);
         } else {
             parent.getPositions().add(position);
-            organizationGraphRepository.save(parent);
+            unitGraphRepository.save(parent);
         }
 
     }
@@ -315,9 +315,9 @@ public class PositionService {
         }
         Unit unit = null;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.findOne(unitId);
+            unit = unitGraphRepository.findOne(unitId);
         } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
+            unit = unitGraphRepository.getOrganizationByTeamId(unitId);
 
         } else {
             exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
@@ -330,9 +330,9 @@ public class PositionService {
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
 
-        Unit parentOrganization = unit.isParentOrganization() ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Unit parentOrganization = unit.isParentOrganization() ? unit : unitGraphRepository.getParentOfOrganization(unit.getId());
         accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
-        units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
+        units = unitGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
         List<Map<String, Object>> employments;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization
@@ -438,9 +438,9 @@ public class PositionService {
         Unit unit = null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.findOne(id);
+            unit = unitGraphRepository.findOne(id);
         } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.getOrganizationByTeamId(id);
+            unit = unitGraphRepository.getOrganizationByTeamId(id);
         } else {
             exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
 
@@ -459,9 +459,9 @@ public class PositionService {
 
             Unit parent;
             if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+                parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
             } else {
-                parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+                parent = unitGraphRepository.getParentOfOrganization(unit.getId());
             }
 
             UnitPermission unitPermission;
@@ -507,9 +507,9 @@ public class PositionService {
         Unit unit = null;
 
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.findOne(id);
+            unit = unitGraphRepository.findOne(id);
         } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.getOrganizationByTeamId(id);
+            unit = unitGraphRepository.getOrganizationByTeamId(id);
         } else {
             exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
 
@@ -616,7 +616,7 @@ public class PositionService {
 
     private Position saveEmploymentEndDate(Unit unit, Long employmentEndDate, Long staffId, Long reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
 
-        Unit parentUnit = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Unit parentUnit = (unit.isParentOrganization()) ? unit : unitGraphRepository.getParentOfOrganization(unit.getId());
         ReasonCode reasonCode = null;
         if (!Optional.ofNullable(parentUnit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PARENTORGANIZATION_NOTFOUND, unit.getId());
@@ -711,22 +711,22 @@ public class PositionService {
         if(Optional.ofNullable(organization).isPresent()) {
             if(Optional.ofNullable(organization.getPositions()).isPresent()) {
                 organization.getPositions().add(position);
-                organizationGraphRepository.save(organization);
+                unitGraphRepository.save(organization);
             } else {
                 List<Position> positions = new ArrayList<>();
                 positions.add(position);
                 organization.setPositions(positions);
-                organizationGraphRepository.save(organization);
+                unitGraphRepository.save(organization);
             }
         } else {
             if(Optional.ofNullable(unit.getPositions()).isPresent()) {
                 unit.getPositions().add(position);
-                organizationGraphRepository.save(unit);
+                unitGraphRepository.save(unit);
             } else {
                 List<Position> positions = new ArrayList<>();
                 positions.add(position);
                 unit.setPositions(positions);
-                organizationGraphRepository.save(unit);
+                unitGraphRepository.save(unit);
             }
 
         }

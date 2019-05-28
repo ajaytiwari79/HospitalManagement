@@ -23,7 +23,7 @@ import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -71,7 +71,7 @@ public class EmploymentTypeService {
     @Inject
     private RegionService regionService;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
@@ -158,17 +158,17 @@ public class EmploymentTypeService {
     }
 
     public List<Map<String, Object>> getEmploymentTypeOfOrganization(Long unitId, boolean isDeleted) {
-        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
+        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(unit).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
         }
         Unit parent = organizationService.fetchParentOrganization(unitId);
-        return organizationGraphRepository.getEmploymentTypeByOrganization(parent.getId(), isDeleted);
+        return unitGraphRepository.getEmploymentTypeByOrganization(parent.getId(), isDeleted);
     }
 
     public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long unitId, Long employmentTypeId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
-        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
+        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(unit).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
@@ -195,7 +195,7 @@ public class EmploymentTypeService {
     }
 
     public List<EmploymentTypeDTO> getEmploymentTypeSettingsOfOrganization(Long unitId) {
-        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId, 0) : null;
+        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId, 0) : null;
         if (!Optional.ofNullable(unit).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
@@ -279,13 +279,13 @@ public class EmploymentTypeService {
     }
 
     public List<StaffKpiFilterDTO> getStaffByKpiFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        Unit unit =organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
+        Unit unit = unitGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         return ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), unit.isParentOrganization()), StaffKpiFilterDTO.class);
     }
 
 
     public DefaultKpiDataDTO getKpiDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        Unit unit = organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
+        Unit unit = unitGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), unit.isParentOrganization()), StaffKpiFilterDTO.class);
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
@@ -304,7 +304,7 @@ public class EmploymentTypeService {
 
 
     public DefaultKpiDataDTO getKpiDefaultDate(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
-        Unit unit = organizationGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
+        Unit unit = unitGraphRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), unit.isParentOrganization()), StaffKpiFilterDTO.class);
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
@@ -323,7 +323,7 @@ public class EmploymentTypeService {
     public DefaultKpiDataDTO getKpiFilterDefaultData(Long unitId) {
         Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
         Long staffId =staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
-        List<OrganizationCommonDTO>  organizationCommonDTO=ObjectMapperUtils.copyPropertiesOfListByMapper(organizationGraphRepository.getAllOrganizaionByStaffid(staffId),OrganizationCommonDTO.class);
+        List<OrganizationCommonDTO>  organizationCommonDTO=ObjectMapperUtils.copyPropertiesOfListByMapper(unitGraphRepository.getAllOrganizaionByStaffid(staffId),OrganizationCommonDTO.class);
         List<Long> unitIds=organizationCommonDTO.stream().map(organizationCommonDto -> organizationCommonDto.getId()).collect(Collectors.toList());
         List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
         List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);

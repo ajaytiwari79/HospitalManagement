@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -208,8 +209,8 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (position:Position)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} WITH position\n" +
-            "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Unit{isKairosHub:true}) RETURN org ORDER BY id(org) LIMIT 1 \n" )
-    Unit fetchParentHub(Long userId);
+            "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization{isKairosHub:true}) RETURN org ORDER BY id(org) LIMIT 1 \n" )
+    Organization fetchParentHub(Long userId);
 
 
 

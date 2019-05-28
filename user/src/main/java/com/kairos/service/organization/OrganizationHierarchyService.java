@@ -11,7 +11,7 @@ import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResul
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -35,7 +35,7 @@ import static java.util.stream.Collectors.toList;
 public class OrganizationHierarchyService {
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private TreeStructureService treeStructureService;
     @Inject
@@ -48,7 +48,7 @@ public class OrganizationHierarchyService {
     public List<QueryResult> generateHierarchy() {
         List<QueryResult> resultQueryResults = new ArrayList<>();
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
-        List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList()));
+        List<Map<String, Object>> units = unitGraphRepository.getOrganizationHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList()));
         ObjectMapper objectMapper = new ObjectMapper();
 
         List<QueryResult> list = new ArrayList<>();
@@ -106,9 +106,9 @@ public class OrganizationHierarchyService {
      * @return
      */
     public QueryResult generateOrganizationHierarchyByFilter(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
-        List<Map<String, Object>> units = organizationGraphRepository.getOrganizationHierarchyByFilters(parentOrganizationId, organizationHierarchyFilterDTO);
+        List<Map<String, Object>> units = unitGraphRepository.getOrganizationHierarchyByFilters(parentOrganizationId, organizationHierarchyFilterDTO);
         if (units.isEmpty()) {
-            Unit unit = organizationGraphRepository.findOne(parentOrganizationId);
+            Unit unit = unitGraphRepository.findOne(parentOrganizationId);
             if (unit == null) {
                 return null;
             }
@@ -168,7 +168,7 @@ public class OrganizationHierarchyService {
     public FilterAndFavouriteFilterDTO getOrganizationHierarchyFilters(long unitId) {
         Unit parent = organizationService.fetchParentOrganization(unitId);
         FilterAndFavouriteFilterDTO filterAndFavouriteFilter = new FilterAndFavouriteFilterDTO();
-        Map<String, Object> filterTypeDataMap = organizationGraphRepository.getFiltersByParentOrganizationId(parent.getId());
+        Map<String, Object> filterTypeDataMap = unitGraphRepository.getFiltersByParentOrganizationId(parent.getId());
         List<FilterResponseDTO> filterResponseDTOList = new ArrayList<>();
         for (String filterType : filterTypeDataMap.keySet()) {
             FilterResponseDTO filterResponseDTO = new FilterResponseDTO();

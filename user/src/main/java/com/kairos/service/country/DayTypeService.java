@@ -6,7 +6,7 @@ import com.kairos.enums.Day;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
@@ -46,7 +46,7 @@ public class DayTypeService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private OrganizationService organizationService;
 

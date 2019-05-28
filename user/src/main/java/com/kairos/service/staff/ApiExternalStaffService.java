@@ -4,7 +4,7 @@ import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -33,7 +33,7 @@ public class ApiExternalStaffService {
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private PositionGraphRepository positionGraphRepository;
     @Inject
@@ -66,7 +66,7 @@ public class ApiExternalStaffService {
             staffList.add(staff.getId());
             logger.info("Creating Staff using organizationId " + orgnaizationId);
 
-            Unit unit =organizationGraphRepository.findOne(orgnaizationId,0);
+            Unit unit = unitGraphRepository.findOne(orgnaizationId,0);
 
             if(unit == null){
                 exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND,orgnaizationId);
@@ -75,10 +75,10 @@ public class ApiExternalStaffService {
 
             Unit parent = null;
             if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
+                parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
 
             } else if(!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-                parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
+                parent = unitGraphRepository.getParentOfOrganization(unit.getId());
             }
 
             if(parent == null){

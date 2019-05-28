@@ -5,7 +5,7 @@ import com.kairos.persistence.model.organization.OpeningHours;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationSetting;
 import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class OpenningHourService {
     @Inject
     private OpeningHourGraphRepository openingHourGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -65,7 +65,7 @@ public class OpenningHourService {
     public Map<String, Object> getOpeningHoursAndHolidayDetails(Long organizationId) {
         Map<String, Object> objectMap = new HashMap<>();
         objectMap.put("holidayList", getOrganizationHolidays(organizationId));
-        objectMap.put("openingHours", organizationGraphRepository.getOpeningHours(organizationId));
+        objectMap.put("openingHours", unitGraphRepository.getOpeningHours(organizationId));
         return objectMap;
 
     }
@@ -87,7 +87,7 @@ public class OpenningHourService {
 
 
     public boolean setDefaultOpeningHours(long unitId) {
-        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
+        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId) : null;
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
 
@@ -95,7 +95,7 @@ public class OpenningHourService {
         OrganizationSetting organizationSetting = getDefaultSettings();
         unit.setOrganizationSetting(organizationSetting);
 
-        organizationGraphRepository.save(unit);
+        unitGraphRepository.save(unit);
         return true;
     }
 

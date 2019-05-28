@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.UserDetailsDTO;
@@ -20,10 +21,11 @@ import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.DayType;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -81,7 +83,7 @@ public class UserService {
     @Inject
     private SmsService smsService;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private AccessPageRepository accessPageRepository;
     @Inject
@@ -477,9 +479,17 @@ public class UserService {
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (currentUser.getLastSelectedOrganizationId() != organizationId) {
+            Object entity=unitGraphRepository.findOneById(organizationId);
+            Long countryId=null;
+            if(entity instanceof Unit) {
+                countryId = ((Unit) entity).getCountryId();
+                currentUser.setConfLevel(ConfLevel.UNIT);
+            }
+            else if(entity instanceof Organization) {
+                countryId = ((Organization) entity).getCountry().getId();
+                currentUser.setConfLevel(ConfLevel.UNIT);
+            }
             currentUser.setLastSelectedOrganizationId(organizationId);
-            Unit parent = organizationService.fetchParentOrganization(organizationId);
-            Long countryId = organizationGraphRepository.getCountryId(parent.getId());
             currentUser.setCountryId(countryId);
             userGraphRepository.save(currentUser);
         }

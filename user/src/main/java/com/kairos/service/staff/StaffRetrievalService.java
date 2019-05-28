@@ -49,7 +49,7 @@ import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
@@ -100,7 +100,7 @@ public class StaffRetrievalService {
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -153,8 +153,8 @@ public class StaffRetrievalService {
 
         StaffPositionDTO staffPositionDTO = null;
         Staff staff = null;
-        Unit unit = organizationGraphRepository.findOne(unitId);
-        Unit parentUnit = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Unit unit = unitGraphRepository.findOne(unitId);
+        Unit parentUnit = (unit.isParentOrganization()) ? unit : unitGraphRepository.getParentOfOrganization(unit.getId());
         if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getTeamStaff(unitId, staffId);
             staffPositionDTO = new StaffPositionDTO(staff, null);
@@ -426,7 +426,7 @@ public class StaffRetrievalService {
             engineerTypes = engineerTypeGraphRepository.findEngineerTypeByCountry(countryId);
         } else if (TEAM.equalsIgnoreCase(type)) {
             staff = staffGraphRepository.getStaffByTeamId(id, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-            Unit unit = organizationGraphRepository.getOrganizationByTeamId(id);
+            Unit unit = unitGraphRepository.getOrganizationByTeamId(id);
             roles = accessGroupService.getAccessGroups(unit.getId());
             countryId = countryGraphRepository.getCountryIdByUnitId(unit.getId());
         }
@@ -444,7 +444,7 @@ public class StaffRetrievalService {
 
     // TODO NEED TO FIX map
     public List<StaffPersonalDetailDTO> getStaffWithBasicInfo(long unitId) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
@@ -452,14 +452,14 @@ public class StaffRetrievalService {
     }
 
     public List<StaffPersonalDetailDTO> getStaffWithBasicInfo(long unitId, Boolean allStaffRequired) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
         }
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
         if (allStaffRequired) {
-            Unit parentUnit = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+            Unit parentUnit = (unit.isParentOrganization()) ? unit : unitGraphRepository.getParentOfOrganization(unit.getId());
             staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentUnit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         } else {
             staffPersonalDetailDTOS = staffGraphRepository.getAllStaffHavingEmploymentByUnitId(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
@@ -468,7 +468,7 @@ public class StaffRetrievalService {
     }
 
     public List<StaffAdditionalInfoQueryResult> getStaffWithAdditionalInfo(long unitId) {
-        Unit unit = organizationGraphRepository.findOne(unitId, 0);
+        Unit unit = unitGraphRepository.findOne(unitId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND, unitId);
         }
@@ -587,7 +587,7 @@ public class StaffRetrievalService {
      */
     private StaffAdditionalInfoDTO getStaffEmploymentData(LocalDate shiftDate, StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult, Long employmentId, long organizationId, String type, Set<Long> reasonCodeIds) {
         Unit unit = organizationService.getOrganizationDetail(organizationId, type);
-        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(organizationId).getId();
+        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : unitGraphRepository.getCountryByParentOrganization(organizationId).getId();
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
         StaffEmploymentDetails employment = employmentService.getEmploymentDetails(employmentId);
         if (Optional.ofNullable(employment).isPresent()) {
@@ -670,7 +670,7 @@ public class StaffRetrievalService {
 
     public List<StaffAdditionalInfoDTO> getStaffsEmploymentData(List<Long> staffIds, List<Long> employmentIds, long id, String type) {
         Unit unit = organizationService.getOrganizationDetail(id, type);
-        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(unit.getId()).getId();
+        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : unitGraphRepository.getCountryByParentOrganization(unit.getId()).getId();
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(Arrays.asList(unit.getId()), TimeSlotType.SHIFT_PLANNING);
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(unit.getId(), staffIds,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);

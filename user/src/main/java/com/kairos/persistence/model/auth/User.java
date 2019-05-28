@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -43,6 +44,7 @@ public class User extends UserBaseEntity {
     protected Gender gender;
     private boolean pregnant;
     private String email;
+    private ConfLevel confLevel;
     private Long lastSelectedOrganizationId;
     private LocalDate dateOfBirth;
     @NotNull(message = ERROR_USER_PASSCODE_NOTNULL)
@@ -54,6 +56,7 @@ public class User extends UserBaseEntity {
     private List<String> roles;
     private ContactDetail contactDetail;
     private ContactAddress homeAddress;
+
 
     @Relationship(type = ADMINS_COUNTRY)
     private List<Country> countryList;
@@ -416,6 +419,14 @@ public class User extends UserBaseEntity {
 
     public void setUserNameUpdated(boolean isUserNameUpdated) {
         this.userNameUpdated = isUserNameUpdated;
+    }
+
+    public ConfLevel getConfLevel() {
+        return confLevel;
+    }
+
+    public void setConfLevel(ConfLevel confLevel) {
+        this.confLevel = confLevel;
     }
 
     @Override

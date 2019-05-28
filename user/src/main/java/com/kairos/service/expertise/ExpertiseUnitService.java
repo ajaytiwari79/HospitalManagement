@@ -7,7 +7,7 @@ import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.expertise.OrganizationPersonalizeLocationRelationShipGraphRepository;
@@ -33,7 +33,7 @@ public class ExpertiseUnitService {
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
@@ -46,11 +46,11 @@ public class ExpertiseUnitService {
     private OrganizationPersonalizeLocationRelationShipGraphRepository organizationLocationRelationShipGraphRepository;
 
     public List<ExpertiseQueryResult> findAllExpertise(Long unitId) {
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        Long countryId= unit.isParentOrganization()? unit.getCountry().getId():organizationGraphRepository.getCountryByParentOrganization(unitId).getId();
+        Long countryId= unit.isParentOrganization()? unit.getCountry().getId(): unitGraphRepository.getCountryByParentOrganization(unitId).getId();
         OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
         List<ExpertiseQueryResult> expertises = new ArrayList<>();
         if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
@@ -77,12 +77,12 @@ public class ExpertiseUnitService {
 
     public Map<String, Object> getStaffListOfExpertise(Long expertiseId, Long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Unit unit = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         if (!unit.isParentOrganization()) {
-            unit = organizationGraphRepository.getParentOfOrganization(unitId);
+            unit = unitGraphRepository.getParentOfOrganization(unitId);
         }
         List<StaffPersonalDetailDTO> staffs = staffGraphRepository.getAllStaffByUnitIdAndExpertiseId(unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), expertiseId);
         List<Location> locations = expertiseGraphRepository.findAllLocationsOfUnionInExpertise(expertiseId);
