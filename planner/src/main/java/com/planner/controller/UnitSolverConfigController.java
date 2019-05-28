@@ -23,8 +23,7 @@ public class UnitSolverConfigController {
     @PostMapping
     @ApiOperation("Create UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@PathVariable Long unitId,@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
-        unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO,unitId);
-        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO,unitId));
     }
 
     @PostMapping(value = "/copy")
@@ -47,7 +46,7 @@ public class UnitSolverConfigController {
      * @param unitSolverConfigDTO
      * @return
      */
-    @PatchMapping
+    @PutMapping(value = "/{unitSolverConfigId}")
     @ApiOperation("Update UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> updateUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
         unitSolverConfigService.updateUnitSolverConfig(unitSolverConfigDTO);

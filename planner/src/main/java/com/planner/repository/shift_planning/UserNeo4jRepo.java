@@ -86,4 +86,10 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
             "case when unit is null then \"unitNotExists\" else \"valid\" end " +
             "as result")
     String validateUnit(Long unitId);
+
+    @Query("MATCH  (unit:Organization)-[:SUB_TYPE_OF]-(o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(unit) = {0} \n" +
+            "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) \n" +
+            "WITH case when os  is NULL then [] else collect({id:id(ss),name:ss.name}) END as organizationSubServices,os\n" +
+            "RETURN  id(os) as id ,os.name as name,organizationSubServices as organizationSubServices")
+    List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId);
 }

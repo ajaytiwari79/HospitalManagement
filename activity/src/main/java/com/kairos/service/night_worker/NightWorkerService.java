@@ -10,14 +10,21 @@ import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.persistence.model.night_worker.*;
 import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.persistence.model.wta.WorkingTimeAgreement;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.model.wta.templates.template_types.DaysOffAfterASeriesWTATemplate;
 import com.kairos.persistence.repository.night_worker.*;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
+import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
+import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.rule_validator.night_worker.StaffNonPregnancySpecification;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +62,8 @@ public class NightWorkerService{
     private UnitAgeSettingMongoRepository unitAgeSettingMongoRepository;
     @Inject private ExpertiseNightWorkerSettingRepository expertiseNightWorkerSettingRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
+    @Inject private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
 
     public List<QuestionnaireAnswerResponseDTO> getNightWorkerQuestionnaire(Long staffId){
         return nightWorkerMongoRepository.getNightWorkerQuestionnaireDetails(staffId);
@@ -210,7 +219,6 @@ public class NightWorkerService{
         nightWorkerUnitSettings.stream().forEach(nightWorkerUnitSetting -> nightWorkerUnitSettingsMap.put(nightWorkerUnitSetting.getUnitId(), nightWorkerUnitSetting));
         Map<Long, List<Long>> staffEligibleForNightWorker = new HashMap<>();
         Map<Long, List<Long>> staffNotEligibleForNightWorker = new HashMap<>();
-
         unitStaffResponseDTOs.stream().forEach(unitStaffResponseDTO -> checkIfStaffAreEligibleForNightWorker(nightWorkerUnitSettingsMap.get(unitStaffResponseDTO.getUnitId()), unitStaffResponseDTO.getStaffList(), staffEligibleForNightWorker,
                     staffNotEligibleForNightWorker)
         );
@@ -231,7 +239,19 @@ public class NightWorkerService{
                 employmentAndNightWorkerMap.put(employmentAndExpertiseIdEntry.getKey(), nightWorker);
             }
         }
+        updateWTARuleTemplateForNightWorker(employmentAndNightWorkerMap);
         return employmentAndNightWorkerMap;
+    }
+
+    private void updateWTARuleTemplateForNightWorker(Map<Long,Boolean> employmentAndNightWorkerMap){
+        List<WTAQueryResultDTO> workingTimeAgreements = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(employmentAndNightWorkerMap.keySet());
+        for (WTAQueryResultDTO workingTimeAgreement : workingTimeAgreements) {
+            for (WTABaseRuleTemplate ruleTemplate : workingTimeAgreement.getRuleTemplates()) {
+                if(ruleTemplate instanceof DaysOffAfterASeriesWTATemplate){
+                    ruleTemplate.setDisabled(!employmentAndNightWorkerMap.get(workingTimeAgreement.getEmploymentId()).booleanValue());
+                }
+            }
+        }
     }
 
     private int getNightMinutesOrCount(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, List<ShiftDTO> shiftDTOS) {

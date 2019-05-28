@@ -16,6 +16,7 @@ import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.service.night_worker.NightWorkerService.getNightInterval;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
@@ -90,10 +91,21 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
             List<ShiftWithActivityDTO> shiftWithActivityDTOS = infoWrapper.getShifts();
             shiftWithActivityDTOS.add(infoWrapper.getShift());
             List<ShiftWithActivityDTO> nightShifts = getNightMinutesOrCount(infoWrapper.getExpertiseNightWorkerSetting(),shiftWithActivityDTOS,dateTimeInterval);
-            List<LocalDate> shiftDates = getSortedAndUniqueDates(nightShifts);
-            int consecutiveNightDays = getConsecutiveDaysInDate(shiftDates);
+            Set<LocalDate> shiftDates = getSortedAndUniqueDates(nightShifts);
+            int consecutiveNightDays = getConsecutiveDaysInDate(new ArrayList<>(shiftDates));
+            int daysOffCount = 0;
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
-            boolean isValid = isValid(MinMaxSetting.MAXIMUM, limitAndCounter[0], consecutiveNightDays);
+            if(consecutiveNightDays>=nightShiftSequence){
+                LocalDate shiftDate = asLocalDate(infoWrapper.getShift().getActivities().get(0).getStartDate());
+                LocalDate daysOffDate = shiftDate.minusDays(limitAndCounter[0]);
+                while (daysOffDate.isBefore(shiftDate) || daysOffDate.equals(shiftDate)){
+                    if(!shiftDates.contains(daysOffDate)){
+                        daysOffCount++;
+                    }
+                    daysOffDate = daysOffDate.plusDays(1);
+                }
+            }
+            boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], daysOffCount);
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                     limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
         }
@@ -116,7 +128,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
                 DateTimeInterval nightInterval = getNightInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate(), expertiseNightWorkerSetting.getTimeSlot());
                 if (nightInterval.overlaps(shiftWithActivityDTO.getInterval())) {
                     int overlapMinutes = (int) nightInterval.overlap(shiftWithActivityDTO.getInterval()).getMinutes();
-                    if (overlapMinutes >= expertiseNightWorkerSetting.getMinShiftsValueToCheckNightWorker()) {
+                    if (overlapMinutes >= expertiseNightWorkerSetting.getMinMinutesToCheckNightShift()) {
                         nightShifts.add(shiftWithActivityDTO);
                     }
                 }

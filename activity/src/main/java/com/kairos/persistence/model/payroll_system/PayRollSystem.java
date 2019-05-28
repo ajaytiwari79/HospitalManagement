@@ -10,15 +10,16 @@ public class PayRollSystem extends MongoBaseEntity {
     protected int code;
     protected PayRollType payRollType;
     protected String description;
-    //===================================================
-    public PayRollSystem(){}
+
+    public PayRollSystem(){
+        //Not in Use
+    }
 
     public PayRollSystem(int code, PayRollType payRollType, String description) {
         this.code = code;
         this.payRollType = payRollType;
         this.description = description;
     }
-    //====================================================
 
     public int getCode() {
         return code;

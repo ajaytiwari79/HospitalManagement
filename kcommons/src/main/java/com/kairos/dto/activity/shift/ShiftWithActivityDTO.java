@@ -49,6 +49,12 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     public ShiftWithActivityDTO() {
     }
 
+    public ShiftWithActivityDTO(Date startDate, Date endDate,List<ShiftActivityDTO> activities) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activities = activities;
+    }
+
     public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivityDTO> activities, Long staffId, Long employmentId, Long unitId) {
         this.id = id;
         this.name = name;

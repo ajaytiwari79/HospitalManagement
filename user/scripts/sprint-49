@@ -1,2 +1,12 @@
 
 MATCH(f:FunctionalPayment{deleted:false}) set f.oneTimeUpdatedAfterPublish=false;
+
+Match(ap:AccessPage) where ap.moduleId="module_3" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Optaplanner Configurations",isModule:false,moduleId:"tab_426",active:true});
+
+Match(ap:AccessPage) where ap.moduleId="tab_426" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Shift Planning",isModule:false,moduleId:"tab_427",active:true});
+
+Match(ap:AccessPage) where ap.moduleId="tab_427" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Shift Planning",isModule:false,moduleId:"tab_428",active:true});
+
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+Match (ap:AccessPage)
+CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);

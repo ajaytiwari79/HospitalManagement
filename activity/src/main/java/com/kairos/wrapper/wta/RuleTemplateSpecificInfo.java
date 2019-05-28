@@ -67,4 +67,13 @@ public class RuleTemplateSpecificInfo {
         this.expertiseNightWorkerSetting = expertiseNightWorkerSetting;
     }
 
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, boolean nightWorker, ExpertiseNightWorkerSetting expertiseNightWorkerSetting,BigInteger phaseId,ShiftWithActivityDTO shift,UserAccessRoleDTO user,ViolatedRulesDTO violatedRules) {
+        this.shifts = shifts;
+        this.nightWorker = nightWorker;
+        this.expertiseNightWorkerSetting = expertiseNightWorkerSetting;
+        this.phaseId = phaseId;
+        this.shift = shift;
+        this.user = user;
+        this.violatedRules = violatedRules;
+    }
 }

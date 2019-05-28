@@ -143,7 +143,6 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         return entity;
     }
 
-    //==========================saveEntity List of objects=======================
     public <T extends MongoBaseEntity> List<T> saveList(List<T> objects){
         Assert.notEmpty(objects,"List Can't be empty or null");
         //Get class name for sequence class

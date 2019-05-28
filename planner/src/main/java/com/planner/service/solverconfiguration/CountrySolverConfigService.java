@@ -48,11 +48,6 @@ public class CountrySolverConfigService {
     @Inject private PlanningProblemRepository planningProblemRepository;
     @Inject private ConstraintsRepository constraintsRepository;
 
-    //================================================================
-
-    /**
-     * @param countrySolverConfigDTO
-     */
     public CountrySolverConfigDTO createCountrySolverConfig(Long countryId,CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigDTO.setCountryId(countryId);
         if (preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
@@ -102,9 +97,6 @@ public class CountrySolverConfigService {
         copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
     }
 
-
-    //===========================================================================
-
     /**
      * copy(create) countrySolverConfig at country Level itself
      * Here TypeCasting is not required because coming DTO might get changed,so we require only
@@ -133,15 +125,12 @@ public class CountrySolverConfigService {
         return countrySolverConfigDTO;
     }
 
-    //=============================================================================
     public List<CountrySolverConfigDTO> getAllCountrySolverConfigByCountryId(Long countryId) {
         List<SolverConfigDTO> solverConfigDTOS = solverConfigRepository.getAllSolverConfigWithConstraints(true,countryId);
         return solverConfigDTOS.stream().map(solverConfigDTO -> (CountrySolverConfigDTO)solverConfigDTO).collect(Collectors.toList());
     }
 
 
-    //=============================================================================
-    //Only update if present
     public CountrySolverConfigDTO updateCountrySolverConfig(Long countryId,CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigDTO.setCountryId(countryId);
         SolverConfig solverConfig = solverConfigRepository.findByIdNotDeleted(countrySolverConfigDTO.getId());
@@ -171,8 +160,6 @@ public class CountrySolverConfigService {
         return countrySolverConfigDTO;
     }
 
-    //============================================================================
-    //Soft Delete
     public boolean deleteCountrySolverConfig(BigInteger solverConfigId) {
         boolean success = solverConfigRepository.safeDeleteById(solverConfigId);
         if (!success) {
@@ -181,7 +168,6 @@ public class CountrySolverConfigService {
         return success;
     }
 
-    /*=================================Country Default Data===============================================*/
     public DefaultDataDTO getDefaultData(Long countryId) {
         List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
@@ -222,10 +208,6 @@ public class CountrySolverConfigService {
         return constraintTypeSetMap;
     }
 
-    /**
-     * @param countryId
-     * @return
-     */
     private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
         List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
         List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
@@ -233,23 +215,11 @@ public class CountrySolverConfigService {
         return organizationServiceDTOS;
     }
 
-    /**
-     * @param countryId
-     * @return
-     */
     private List<PhaseDTO> getAllPhases(Long countryId) {
         List<PhaseDTO> phaseDTOS = activityMongoRepository.getAllPhasesByCountryId(countryId);
         return phaseDTOS;
     }
 
-    //=====================common validation==============================================
-
-    /**
-     * Validation sequence should follow this ordering
-     *
-     * @param countrySolverConfigDTO
-     * @return
-     */
     private boolean preValidateCountrySolverConfigDTO(CountrySolverConfigDTO countrySolverConfigDTO) {
         //TODO pradeep please update this method
         /*String result = userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countrySolverConfigDTO.getCountryId(), countrySolverConfigDTO.getOrganizationSubServiceIds());

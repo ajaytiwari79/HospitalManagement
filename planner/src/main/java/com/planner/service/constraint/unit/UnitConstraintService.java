@@ -30,7 +30,6 @@ public class UnitConstraintService {
     @Inject
     private ExceptionService exceptionService;
 
-    //======================================================
     public UnitConstraintDTO createUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
         if (preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
             UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
@@ -40,8 +39,6 @@ public class UnitConstraintService {
         return unitConstraintDTO;
     }
 
-
-    //====================================================
     public UnitConstraintDTO copyUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(unitConstraintDTO.getId());
         if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, true)) {
@@ -54,7 +51,6 @@ public class UnitConstraintService {
         return unitConstraintDTO;
     }
 
-    //====================================================
     public List<UnitConstraint> getUnitConstraintsByUnitId(Long unitId) {
 
         Long countryId=userNeo4jRepo.getCountryIdByUnitId(unitId);
@@ -62,7 +58,6 @@ public class UnitConstraintService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(constraintList, UnitConstraint.class);
     }
 
-    //====================================================
     public void updateUnitConstraint(UnitConstraintDTO unitConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(unitConstraintDTO.getId());
         if (constraint != null && preValidateUnitConstraintDTO(unitConstraintDTO, false)) {
@@ -71,7 +66,6 @@ public class UnitConstraintService {
         }
     }
 
-    //====================================================
     public void deleteUnitConstraint(BigInteger unitConstraintId) {
         boolean result = false;
         if (unitConstraintId != null)
@@ -80,8 +74,6 @@ public class UnitConstraintService {
         }
 
     }
-
-    //===================common=======================================
 
     /**
      * Validation sequence should follow this ordering
