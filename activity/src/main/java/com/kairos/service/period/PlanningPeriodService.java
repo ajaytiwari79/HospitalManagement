@@ -547,7 +547,7 @@ public class PlanningPeriodService extends MongoBaseService {
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
         save(planningPeriod);
         schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-       }, null, null);
+        }, null, null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
