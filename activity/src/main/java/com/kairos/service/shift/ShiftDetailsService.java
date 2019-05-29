@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.isEqualOrBefore;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toMap;
@@ -59,7 +60,17 @@ public class ShiftDetailsService extends MongoBaseService {
     private ShiftService shiftService;
 
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds , boolean showDraft) {
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByIds(shiftIds);
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS;
+        if(showDraft){
+            shiftWithActivityDTOS  = shiftMongoRepository.findAllDraftShiftsByIds(shiftIds,showDraft);
+            List<BigInteger> draftShiftIds=shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList());
+            shiftIds.removeAll(draftShiftIds);
+            if(isCollectionNotEmpty(shiftIds)){
+                shiftWithActivityDTOS.addAll(shiftMongoRepository.findAllShiftsByIds(shiftIds));
+            }
+        }else{
+            shiftWithActivityDTOS  = shiftMongoRepository.findAllShiftsByIds(shiftIds);
+        }
         setReasonCodeAndRuleViolationsInShifts(shiftWithActivityDTOS, unitId, shiftIds,showDraft);
         return shiftWithActivityDTOS;
     }

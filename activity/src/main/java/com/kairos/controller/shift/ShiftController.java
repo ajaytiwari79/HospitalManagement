@@ -9,7 +9,6 @@ import com.kairos.enums.shift.ViewType;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.*;
 import com.kairos.utils.response.ResponseHandler;
-import com.netflix.infix.lang.infix.antlr.EventFilterParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -208,6 +207,6 @@ public class ShiftController {
                                                               @RequestParam(value = "staffId", required = false) Long staffId,
                                                               @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam,
                                                               @RequestParam(value = "shiftActionType") ShiftActionType shiftActionType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveDraftShift(unitId, staffId, planningPeriodIds, startDate, endDate, employmentId, viewType, shiftFilterParam, shiftActionType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveAndCancelDraftShift(unitId, staffId, planningPeriodIds, startDate, endDate, employmentId, viewType, shiftFilterParam, shiftActionType));
     }
 }

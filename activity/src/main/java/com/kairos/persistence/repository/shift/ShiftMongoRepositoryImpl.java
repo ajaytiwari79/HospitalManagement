@@ -237,9 +237,24 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
 
     @Override
-    public List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds) {
+    public List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds ) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(where("deleted").is(false).and("id").in(shiftIds)),
+                match(Criteria.where("deleted").is(false).and("id").in(shiftIds)),
+                unwind("activities", true),
+                lookup("activities", "activities.activityId", "_id", "activityObject"),
+                new CustomAggregationOperation(shiftWithActivityAndDescriptionProjection()),
+                new CustomAggregationOperation(shiftWithActivityGroup())
+        );
+        AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<ShiftWithActivityDTO> findAllDraftShiftsByIds(List<BigInteger> shiftIds,boolean draftShift ) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("id").in(shiftIds)),
+                match(Criteria.where("draftShift").exists(draftShift)),
+                replaceRoot("draftShift"),
                 unwind("activities", true),
                 lookup("activities", "activities.activityId", "_id", "activityObject"),
                 new CustomAggregationOperation(shiftWithActivityAndDescriptionProjection()),
@@ -289,6 +304,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    'scheduledMinutes' : 1,\n" +
                 "    'durationMinutes' : 1,\n" +
                 "    'employmentId' : 1,\n" +
+                "    'draftShift' : 1,\n" +
+                "    'draft' : 1,\n" +
                 "    'status':1,\n" +
                 "        'activities.timeBankCtaBonusMinutes' : 1,\n" +
                 "        'activities._id' : 1,\n" +
@@ -320,6 +337,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    '_id': {\n" +
                 "    '_id' : '$_id',\n" +
                 "    'name' : '$name',\n" +
+                "    'draft' : '$draft',\n" +
+                "    'draftShift' : '$draftShift',\n" +
                 "    'startDate' : '$startDate',\n" +
                 "    'endDate' : '$endDate',\n" +
                 "    'disabled' : '$disabled',\n" +
