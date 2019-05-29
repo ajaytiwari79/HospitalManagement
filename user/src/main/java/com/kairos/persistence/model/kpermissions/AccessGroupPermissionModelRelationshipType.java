@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.kpermissions;
 
-import com.kairos.enums.kpermissions.FieldLevelPermissions;
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import lombok.AllArgsConstructor;
@@ -23,12 +23,12 @@ public class AccessGroupPermissionModelRelationshipType extends UserBaseEntity {
 
 
     @StartNode
-    private KPermissionModel KPermissionModel;
+    private KPermissionModel kPermissionModel;
 
     @EndNode
     private AccessGroup accessGroup;
 
     @Property
-    private FieldLevelPermissions fieldLevelPermission;
+    private FieldLevelPermission fieldLevelPermission;
 
 }
