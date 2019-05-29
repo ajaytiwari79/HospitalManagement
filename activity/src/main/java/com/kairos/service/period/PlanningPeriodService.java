@@ -788,9 +788,9 @@ public class PlanningPeriodService extends MongoBaseService {
     public void publishShiftsAfterFlippingPhaseConstructionToDraft(PlanningPeriod planningPeriod, Long unitId, List<Long> employmentTypeIds) {
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(employmentTypeIds, unitId, planningPeriod.getStartDate().toString(), planningPeriod.getEndDate().toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        List<Long> staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
+        List<Long> employmentIds=staffKpiFilterDTOS.stream().flatMap(k->k.getEmployment().stream().map(v->v.getId())).collect(Collectors.toList());
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
-        List<Shift> shifts = shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriod.getId(), unitId, staffIds, Arrays.asList(ShiftStatus.PUBLISH, ShiftStatus.PENDING , ShiftStatus.REQUEST));
+        List<Shift> shifts = shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriod.getId(), unitId, employmentIds, Arrays.asList(ShiftStatus.PUBLISH, ShiftStatus.PENDING , ShiftStatus.REQUEST));
         if (isCollectionNotEmpty(shifts)) {
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
