@@ -21,6 +21,7 @@ import com.kairos.persistence.repository.user.country.HousingTypeGraphRepository
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
@@ -73,6 +74,8 @@ public class ClientAddressService{
     private EnvConfig envConfig;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private CountryService countryService;
 
 
     public Map<String, Object> getAddressDetails(Long clientId, Long unitId) {
@@ -129,8 +132,7 @@ public class ClientAddressService{
         response.put("partnerAddress", partnerAddressInfo);
         response.put("temporaryAddress", temporaryAddressList);
 
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        logger.info("country id----------> " + countryId);
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
         if (countryId != null) {
             response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         } else {

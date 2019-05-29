@@ -4,6 +4,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.*;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
@@ -64,7 +65,7 @@ public class UnitService {
     private final Logger logger = LoggerFactory.getLogger(UnitService.class);
 
 
-    private Map<String, Object> parentOrgDefaultDetails(Unit parentOrg) {
+    private Map<String, Object> parentOrgDefaultDetails(Organization parentOrg) {
         Map<String, Object> response = new HashMap<>(5);
         response.put("orgType", parentOrg.getOrganizationType());
         response.put("orgSubType", parentOrg.getOrganizationSubTypes());
@@ -85,14 +86,14 @@ public class UnitService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
         }
 
-        Unit parentUnit = unit.isParentOrganization()? unit : organizationService.fetchParentOrganization(organizationId);
+        Organization organization = organizationService.fetchParentOrganization(organizationId);
         Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
         }
 
         Map<String, Object> response = new HashMap<>(2);
-        response.put("parentInfo", parentOrgDefaultDetails(parentUnit));
+        response.put("parentInfo", parentOrgDefaultDetails(organization));
         List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(organizationId);
         response.put("units", units.size() != 0 ? units : Collections.emptyList());
 

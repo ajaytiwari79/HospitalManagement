@@ -433,7 +433,7 @@ public class UserService {
         UnitWiseStaffPermissionsDTO permissionData = new UnitWiseStaffPermissionsDTO();
         permissionData.setHub(accessPageRepository.isHubMember(currentUserId));
         if (permissionData.isHub()) {
-            Unit parentHub = accessPageRepository.fetchParentHub(currentUserId);
+            Organization parentHub = accessPageRepository.fetchParentHub(currentUserId);
             List<AccessPageQueryResult> permissions = accessPageRepository.fetchHubUserPermissions(currentUserId, parentHub.getId());
             HashMap<String, Object> unitPermissionMap = new HashMap<>();
             for (AccessPageQueryResult permission : permissions) {

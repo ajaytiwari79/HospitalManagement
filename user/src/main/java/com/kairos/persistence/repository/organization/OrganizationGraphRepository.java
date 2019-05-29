@@ -4,10 +4,14 @@ package com.kairos.persistence.repository.organization;/*
  */
 
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organization,Long> {
 
+    Organization findByExternalId(String externalId);
+
+    Organization findByKmdExternalId(String kmdExternalId);
 }

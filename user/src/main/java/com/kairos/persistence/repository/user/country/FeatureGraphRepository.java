@@ -52,11 +52,11 @@ public interface FeatureGraphRepository extends Neo4jBaseRepository<Feature,Long
             "WHERE id(country)={0} AND feature.name = {1} AND feature.deleted= {2} return feature")
     Feature getFeatureByName(long countryId, String name, boolean deleted);
 
-    @Query("MATCH (o:Unit)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(res:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle)-[r:"+VEHICLE_HAS_FEATURE+"]->(feature:Feature{deleted:{2}}) where id(o)={0} AND id(res)={1}\n" +
+    @Query("MATCH (o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(res:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle)-[r:"+VEHICLE_HAS_FEATURE+"]->(feature:Feature{deleted:{2}}) where id(o)={0} AND id(res)={1}\n" +
             "return id(feature) as id, feature.name as name, feature.description as description")
     List<FeatureQueryResult> getResourcesAvailableFeatures(Long organizationId, Long resourceId, boolean deleted);
 
-    @Query("MATCH (o:Unit)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(res:Resource{deleted:false})-[:"+RESOURCE_HAS_FEATURE+"]->(feature:Feature{deleted:{2}}) where id(o)={0} AND id(res)={1}\n" +
+    @Query("MATCH (o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(res:Resource{deleted:false})-[:"+RESOURCE_HAS_FEATURE+"]->(feature:Feature{deleted:{2}}) where id(o)={0} AND id(res)={1}\n" +
             "return id(feature) as id, feature.name as name, feature.description as description")
     List<FeatureQueryResult> getResourcesSelectedFeatures(Long organizationId, Long resourceId, boolean deleted);
 

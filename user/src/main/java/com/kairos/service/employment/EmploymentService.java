@@ -18,6 +18,7 @@ import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
@@ -821,8 +822,8 @@ public class EmploymentService {
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ORGANIZATION_EXTERNALID, unitExternalId);
         }
-        Unit parentUnit = organizationService.fetchParentOrganization(unit.getId());
-        Long countryId = organizationService.getCountryIdOfOrganization(parentUnit.getId());
+        Organization parentUnit = organizationService.fetchParentOrganization(unit.getId());
+        Long countryId = unit.getCountryId();
         EmploymentType employmentType = employmentTypeGraphRepository.getOneEmploymentTypeByCountryId(countryId, false);
 
         Expertise expertise;

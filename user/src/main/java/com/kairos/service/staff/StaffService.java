@@ -23,6 +23,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.*;
@@ -42,6 +43,7 @@ import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
@@ -128,6 +130,8 @@ public class StaffService {
     private UnitGraphRepository unitGraphRepository;
     @Inject
     private PositionGraphRepository positionGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
@@ -247,7 +251,7 @@ public class StaffService {
 
     public StaffPersonalDetail savePersonalDetail(long staffId, StaffPersonalDetail staffPersonalDetail, long unitId) throws ParseException {
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
-        Unit parentUnit = organizationService.fetchParentOrganization(unitId);
+        Organization parentUnit = organizationService.fetchParentOrganization(unitId);
 
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
         if (staffToUpdate == null) {
@@ -402,17 +406,10 @@ public class StaffService {
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
         staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
         staffUploadBySheetQueryResult.setStaffList(staffList);
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if (unit == null) {
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        if (organization == null) {
             LOGGER.info("Organization is null");
             return null;
-        }
-        Unit parent = null;
-        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
         }
         try (InputStream stream = multipartFile.getInputStream()) {
             //Get the workbook instance for XLS file
@@ -506,7 +503,7 @@ public class StaffService {
                         continue;
                     }
                     // Check if Staff exists in organization with CPR Number
-                    if (staffGraphRepository.isStaffExistsByCPRNumber(cprAsLong.toString(), Optional.ofNullable(parent).isPresent() ? parent.getId() : unitId)) {
+                    if (staffGraphRepository.isStaffExistsByCPRNumber(cprAsLong.toString(), organization.getId())) {
                         StaffDTO staffDTO = new StaffDTO(firstName, lastName, privateEmail, "Staff already exist with CPR Number " + cprAsLong);
                         staffDTO.setCprNumber(BigInteger.valueOf(cprAsLong));
                         staffErrorList.add(staffDTO);
@@ -561,8 +558,8 @@ public class StaffService {
                     staffDTO.setGender(user.getGender());
                     staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
                     staffList.add(staffDTO);
-                    if (!staffGraphRepository.staffAlreadyInUnit(externalId, unit.getId())) {
-                        positionService.createPosition(parent, unit, staff, accessGroupId, DateUtils.getCurrentDateMillis(), isEmploymentExist);
+                    if (!staffGraphRepository.staffAlreadyInUnit(externalId, organization.getId())) {
+                        positionService.createPosition(organization,staff, accessGroupId, DateUtils.getCurrentDateMillis(), isEmploymentExist);
                     }
                 }
             }
@@ -707,9 +704,9 @@ public class StaffService {
         }
         // if the organization is not parent organization then adding position in parent organization.
         if (!parentOrganization) {
-            Unit mainUnit = unitGraphRepository.getParentOfOrganization(unit.getId());
+            Organization mainUnit = organizationService.fetchParentOrganization(unit.getId());
             mainUnit.getPositions().add(position);
-            unitGraphRepository.save(mainUnit);
+            organizationGraphRepository.save(mainUnit);
             user.setCountryId(mainUnit.getCountry().getId());
         } else {
             unit.getPositions().add(position);
@@ -1039,7 +1036,7 @@ public class StaffService {
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
-        Unit organization = unit.isParentOrganization() ? unit : organizationService.fetchParentOrganization(unitId);
+        Organization organization = organizationService.fetchParentOrganization(unitId);
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);

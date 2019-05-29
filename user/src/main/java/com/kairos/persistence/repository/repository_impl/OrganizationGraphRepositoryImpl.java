@@ -75,8 +75,6 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         }
 
-        //matchRelationshipQueryForStaff += " WITH employments,staff, user, " ;
-
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
             matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
                     "WHERE id(expertise) IN {expertiseIds} ";

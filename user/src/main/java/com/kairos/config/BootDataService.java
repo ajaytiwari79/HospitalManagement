@@ -27,10 +27,7 @@ import com.kairos.persistence.model.user.region.Region;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
-import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
+import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.UserBaseRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -81,6 +78,8 @@ public class BootDataService {
     StaffGraphRepository staffGraphRepository;
     @Inject
     AccessGroupRepository accessGroupRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     OrganizationServiceRepository organizationServiceRepository;
     @Inject
@@ -136,8 +135,8 @@ public class BootDataService {
 
     private Country denmark = null;
 
-    private Unit kairosCountryLevel = null;
-    private Unit kairosRegionLevel = null;
+    private Organization kairosCountryLevel = null;
+    private Organization kairosRegionLevel = null;
 
     private Team nestingTeam;
 
@@ -370,10 +369,7 @@ public class BootDataService {
         kairosCountryLevel.setEanNumber("501234567890");
         kairosCountryLevel.setEmail(KAIROS_DENMARK_EMAIL);
         kairosCountryLevel.setContactDetail(new ContactDetail("info@kairos.com", KAIROS_DENMARK_EMAIL, "431311", "653322"));
-//        kairosCountryLevel.setContactAddress(new ContactAddress("Thorsgade", 2, 5000, "Odense", 4345, "Commercial"));
-//        kairosCountryLevel.setOrganizationType(privateOrganization);
         kairosCountryLevel.setCostCenterCode("OD12");
-        kairosCountryLevel.setOrganizationLevel(OrganizationLevel.COUNTRY);
         kairosCountryLevel.setCountry(denmark);
         kairosCountryLevel.setParentOrganization(true);
         ContactAddress contactAddress = new ContactAddress();
@@ -392,9 +388,7 @@ public class BootDataService {
         kairosCountryLevel.setOrganizationSetting(organizationSetting);
 
         organizationService.createOrganization(kairosCountryLevel, null, true);
-        //organizationGraphRepository.addSkillInOrganization(kairosCountryLevel.getId(),skillList,DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
 
-        // Create AccessGroup for Ulrik as AG_COUNTRY_ADMIN
         createSuperAdminAccessGroup();
         createPosition();
         createTeam();
@@ -478,14 +472,14 @@ public class BootDataService {
     private void createPosition() {
         positionForAdmin = new Position("working as country admin", adminAsStaff);
         kairosCountryLevel.getPositions().add(positionForAdmin);
-        unitGraphRepository.save(kairosCountryLevel);
+        organizationGraphRepository.save(kairosCountryLevel);
     }
 
     private void createUnitEmploymentForCountryLevel() {
 
 //        accessGroup = accessGroupRepository.getAccessGroupOfOrganizationByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
         UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setUnit(kairosCountryLevel);
+        unitPermission.setOrganization(kairosCountryLevel);
         unitPermission.setAccessGroup(accessGroup);
 //        accessGroup = accessGroupRepository.findAccessGroupByName(kairosCountryLevel.getId(), AppConstants.AG_COUNTRY_ADMIN);
 
@@ -497,7 +491,7 @@ public class BootDataService {
 //        accessPageService.setPagePermissionToAdmin(accessPermission);
         positionForAdmin.getUnitPermissions().add(unitPermission);
         kairosCountryLevel.getPositions().add(positionForAdmin);
-        unitGraphRepository.save(kairosCountryLevel);
+        organizationGraphRepository.save(kairosCountryLevel);
     }
 
 
@@ -510,9 +504,7 @@ public class BootDataService {
         kairosRegionLevel.setEanNumber("501234567890");
         kairosRegionLevel.setEmail("kairos_zealand@kairos.com");
         kairosRegionLevel.setContactDetail(new ContactDetail("info@kairos.com", KAIROS_DENMARK_EMAIL, "431311", "653322"));
-        //    kairosRegionLevel.setOrganizationType(privateOrganization);
         kairosRegionLevel.setCostCenterCode("OD12");
-        kairosRegionLevel.setOrganizationLevel(OrganizationLevel.REGION);
         kairosRegionLevel.setCountry(denmark);
         kairosRegionLevel.setKairosHub(false);
         kairosRegionLevel.setBoardingCompleted(true);

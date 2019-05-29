@@ -1,18 +1,20 @@
 package com.kairos.service.expertise;
 
 import com.kairos.config.env.EnvConfig;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.expertise.OrganizationPersonalizeLocationRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.organization.OrganizationService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,8 @@ public class ExpertiseUnitService {
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -77,14 +81,8 @@ public class ExpertiseUnitService {
 
     public Map<String, Object> getStaffListOfExpertise(Long expertiseId, Long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-        }
-        if (!unit.isParentOrganization()) {
-            unit = unitGraphRepository.getParentOfOrganization(unitId);
-        }
-        List<StaffPersonalDetailDTO> staffs = staffGraphRepository.getAllStaffByUnitIdAndExpertiseId(unit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), expertiseId);
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        List<StaffPersonalDetailDTO> staffs = staffGraphRepository.getAllStaffByUnitIdAndExpertiseId(organization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), expertiseId);
         List<Location> locations = expertiseGraphRepository.findAllLocationsOfUnionInExpertise(expertiseId);
 
         response.put("staffs", staffs);

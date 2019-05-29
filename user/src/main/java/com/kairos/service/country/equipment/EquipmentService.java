@@ -13,7 +13,9 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.google_calender.CountryCalenderService;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -40,6 +43,8 @@ public class EquipmentService{
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private CountryService countryService;
 
     @Inject
     private EquipmentGraphRepository equipmentGraphRepository;
@@ -136,8 +141,8 @@ public class EquipmentService{
         return equipmentsData;
     }
 
-    public HashMap<String,Object> getListOfEquipmentsByUnitId(Long unitId, String filterText){
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+    public Map<String,Object> getListOfEquipmentsByUnitId(Long unitId, String filterText){
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
@@ -154,21 +159,13 @@ public class EquipmentService{
         return equipmentsData;
     }
 
-    public EquipmentCategory getEquipmentCategoryByName(String name){
-        return equipmentCategoryGraphRepository.getEquipmentCategoryByName(name);
-    }
-
-    public Equipment getEquipmentByName(long countryId, String name){
-        return equipmentGraphRepository.getEquipmentByName(countryId, name, false);
-    }
-
 
 
     public List<EquipmentQueryResult> fetchSelectedEquipmentsOfResources(Long organizationId, Long resourceId){
         return equipmentGraphRepository.getResourcesSelectedEquipments(organizationId, resourceId, false);
     }
 
-    public HashMap<String,List<EquipmentQueryResult>> getEquipmentsForResource(Long organizationId, Long resourceId){
+    public Map<String,List<EquipmentQueryResult>> getEquipmentsForResource(Long organizationId, Long resourceId){
         Unit unit = unitGraphRepository.findOne(organizationId,1);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,organizationId);

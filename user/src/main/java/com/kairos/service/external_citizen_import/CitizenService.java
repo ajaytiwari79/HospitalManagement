@@ -18,10 +18,12 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBuilder;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
@@ -103,6 +105,8 @@ public class CitizenService {
 
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
@@ -383,7 +387,7 @@ public class CitizenService {
         String pattern = (String) grantObject.get("grantPattern");
         if (grantTypes.contains(grantObject.get("grantTypeNameSection")) && (shiftRepetition.getShifts().size() > 0)) {
             CitizenSupplier citizenSupplier = (CitizenSupplier) grantObject.get("supplier");
-            Unit supplier = unitGraphRepository.findByKmdExternalId(citizenSupplier.getId());
+            Organization supplier = organizationGraphRepository.findByKmdExternalId(citizenSupplier.getId());
             Optional supplierOptional = Optional.ofNullable(supplier);
             if (!supplierOptional.isPresent()) {
                 supplier = new OrganizationBuilder().setName(citizenSupplier.getName()).createOrganization();
@@ -515,8 +519,8 @@ public class CitizenService {
     public Staff createStaffFromKMD(long unitId, StaffDTO payload) {
         Staff staff = staffGraphRepository.findByKmdExternalId(payload.getId());
         if(staff == null) staff = new Staff();
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if (unit == null)
+        Organization organization = organizationGraphRepository.findOne(unitId);
+        if (organization == null)
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,unitId);
 
         staff.setFirstName(payload.getFirstName());
@@ -542,25 +546,19 @@ public class CitizenService {
             if (alreadyExistStaff != null)
                 exceptionService.dataNotFoundByIdException(MESSAGE_CITIZEN_STAFF_ALREADYEXIST);
 
-            staff = staffCreationService.createStaffObject(user, staff, Long.valueOf("1162"), unit);
+            staff = staffCreationService.createStaffObject(user, staff, Long.valueOf("1162"), organization);
         }
 
-        Unit parent = null;
-        if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-        } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
-        }
+        Organization parent=organizationService.fetchParentOrganization(unitId);
 
         if (parent == null) {
-            if((staff.getId() == null) || (positionGraphRepository.findPosition(unit.getId(), staff.getId()) == null)){
-                positionGraphRepository.createPositions(unit.getId(), Arrays.asList(staff.getId()), unit.getId());
+            if((staff.getId() == null) || (positionGraphRepository.findPosition(organization.getId(), staff.getId()) == null)){
+                positionGraphRepository.createPositions(organization.getId(), Arrays.asList(staff.getId()), organization.getId());
             }
 
         } else {
             if((staff.getId() == null) || (positionGraphRepository.findPosition(parent.getId(), staff.getId()) == null)) {
-                positionGraphRepository.createPositions(parent.getId(), Arrays.asList(staff.getId()), unit.getId());
+                positionGraphRepository.createPositions(parent.getId(), Arrays.asList(staff.getId()), organization.getId());
             }
         }
 

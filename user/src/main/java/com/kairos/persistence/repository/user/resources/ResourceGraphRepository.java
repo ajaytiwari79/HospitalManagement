@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION_HAS_RESOURCE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.UNIT_HAS_RESOURCE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.UNAVAILABLE_ON;
 
 
@@ -30,7 +30,7 @@ public interface ResourceGraphRepository extends Neo4jBaseRepository<Resource,Lo
     @Query("MATCH (r:Resource) where s.isEnabled= true return s")
     List<Resource> findAll();
 
-    @Query(" MATCH (o:Unit)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource{deleted:false}) WHERE  id(o)={0} AND r.deleted=false WITH r as res " +
+    @Query(" MATCH (o:Unit)-[:UNIT_HAS_RESOURCE]->(r:Resource{deleted:false}) WHERE  id(o)={0} AND r.deleted=false WITH r as res " +
             "OPTIONAL MATCH (res)-[:RESOURCE_NOT_AVAILABLE_ON]->(ra:ResourceUnAvailability)  RETURN " +
             "{ name:res.name, " +
             " id:id(res), " +
@@ -51,18 +51,18 @@ public interface ResourceGraphRepository extends Neo4jBaseRepository<Resource,Lo
     *  @Param unitID, resource type(need only these types of resource) and resourceId(already assigned resource)
     *  Return the available resources to assigned beacons
     * */
-    @Query("MATCH(o:Unit)-[:ORGANIZATION_HAS_RESOURCE]->(r:Resource)  where id(o)={0} AND (r.name IN {1}) AND NOT (id(r) IN {2})  return r")
+    @Query("MATCH(o:Unit)-[:UNIT_HAS_RESOURCE]->(r:Resource)  where id(o)={0} AND (r.name IN {1}) AND NOT (id(r) IN {2})  return r")
     List<Resource> getUnassignedResourceWithBeacon(Long unit, String[] resourceTypes, long[] resourceIds);
 
-    @Query("MATCH(o:Unit)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource)  where id(o)={0} AND r.deleted=false  return r")
+    @Query("MATCH(o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(r:Resource)  where id(o)={0} AND r.deleted=false  return r")
     List<Resource> getByUnitId(Long organizationId);
 
-    @Query("MATCH (o:Unit)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
+    @Query("MATCH (o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
             "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType," +
             "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate,case when r.decommissionDate is null then false else true end as isDecommision")
     List<ResourceWrapper> getResources(Long organizationId);
 
-    @Query("MATCH (o:Unit)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
+    @Query("MATCH (o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
             "Optional Match (r)-[:"+UNAVAILABLE_ON+"{month:{1},year:{2}}]->(ru:ResourceUnAvailability)\n" +
             "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType," +
             "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate,case when r.decommissionDate is null then false else true end as isDecommision,collect(ru) as resourceUnAvailabilities")
@@ -79,10 +79,10 @@ public interface ResourceGraphRepository extends Neo4jBaseRepository<Resource,Lo
             "return resourceUnAvailability")
     ResourceUnAvailability getResourceUnavailabilityById(Long resourceId, Long unavailabilityId);
 
-    @Query("MATCH(o:Unit)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})  where id(o)={0} AND r.registrationNumber={1} return r")
+    @Query("MATCH(o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(r:Resource{deleted:false})  where id(o)={0} AND r.registrationNumber={1} return r")
     Resource getResourceByRegistrationNumberAndUnit(Long organizationId,String registrationNumber);
 
-    @Query("MATCH(o:Unit)-[:"+ORGANIZATION_HAS_RESOURCE+"]->(r:Resource{deleted:false})  where id(o)={0} AND id(r)={1} return r")
+    @Query("MATCH(o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(r:Resource{deleted:false})  where id(o)={0} AND id(r)={1} return r")
     Resource getResourceOfOrganizationById(Long organizationId,Long resourceId, boolean deleted);
 
 

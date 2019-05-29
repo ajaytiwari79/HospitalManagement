@@ -52,6 +52,7 @@ import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGr
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
@@ -89,6 +90,8 @@ public class ExpertiseService {
     @Inject
     private
     ExpertiseGraphRepository expertiseGraphRepository;
+    @Inject
+    private CountryService countryService;
     @Inject
     private
     StaffGraphRepository staffGraphRepository;
@@ -793,7 +796,7 @@ public class ExpertiseService {
     }
 
     public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
         return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
     }
 

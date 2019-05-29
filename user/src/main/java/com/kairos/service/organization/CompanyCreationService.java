@@ -29,6 +29,7 @@ import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDT
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
@@ -59,6 +60,7 @@ import com.kairos.utils.FormatUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -91,6 +93,8 @@ public class CompanyCreationService {
     private ExceptionService exceptionService;
     @Inject
     private UnitGraphRepository unitGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private AccountTypeGraphRepository accountTypeGraphRepository;
     @Inject
@@ -149,43 +153,43 @@ public class CompanyCreationService {
             exceptionService.actionNotPermittedException(ERROR_ORGANIZATION_NAME_INSUFFIENT);
         }
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(orgDetails);
-        Unit unit = new OrganizationBuilder().setIsParentOrganization(true).setCountry(country).setName(orgDetails.getName()).setCompanyType(orgDetails.getCompanyType()).setKairosCompanyId(kairosCompanyId).setVatId(orgDetails.getVatId()).setTimeZone(ZoneId.of(TIMEZONE_UTC)).setShortCompanyName(orgDetails.getShortCompanyName()).setDesiredUrl(orgDetails.getDesiredUrl()).setDescription(orgDetails.getDescription()).createOrganization();
+        Organization organization = new OrganizationBuilder().setIsParentOrganization(true).setCountry(country).setName(orgDetails.getName()).setCompanyType(orgDetails.getCompanyType()).setKairosCompanyId(kairosCompanyId).setVatId(orgDetails.getVatId()).setTimeZone(ZoneId.of(TIMEZONE_UTC)).setShortCompanyName(orgDetails.getShortCompanyName()).setDesiredUrl(orgDetails.getDesiredUrl()).setDescription(orgDetails.getDescription()).createOrganization();
         if(CompanyType.COMPANY.equals(orgDetails.getCompanyType()) && Optional.ofNullable(orgDetails.getAccountTypeId()).isPresent()) {
             AccountType accountType = accountTypeGraphRepository.findOne(orgDetails.getAccountTypeId(), 0);
             if(!Optional.ofNullable(accountType).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ACCOUNTTYPE_NOTFOUND);
             }
-            unit.setAccountType(accountType);
-            accessGroupService.createDefaultAccessGroups(unit, Collections.emptyList());
+            organization.setAccountType(accountType);
+            accessGroupService.createDefaultAccessGroups(organization, Collections.emptyList());
         }
-        unit.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
-        unit.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
-        unit.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
+        organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
+        organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
+        organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
         Unit hubToBeLinked = unitGraphRepository.findOne(orgDetails.getHubId(), 0);
         if(hubToBeLinked == null) {
             exceptionService.dataNotFoundByIdException("message.hub.notFound", orgDetails.getHubId());
         }
-        unitGraphRepository.save(unit);
+        organizationGraphRepository.save(organization);
         //Linking organization to the selected hub
-        unitGraphRepository.linkOrganizationToHub(unit.getId(), hubToBeLinked.getId());
-        orgDetails.setId(unit.getId());
+        unitGraphRepository.linkOrganizationToHub(organization.getId(), hubToBeLinked.getId());
+        orgDetails.setId(organization.getId());
         orgDetails.setKairosCompanyId(kairosCompanyId);
         return orgDetails;
     }
 
     public OrganizationBasicDTO updateParentOrganization(OrganizationBasicDTO orgDetails, long organizationId) {
-        Unit unit = unitGraphRepository.findOne(organizationId, 1);
-        if(!Optional.ofNullable(unit).isPresent()) {
+        Organization organization=organizationGraphRepository.findOne(organizationId);
+        if(!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
 
         }
-        updateOrganizationDetails(unit, orgDetails, true);
-        unitGraphRepository.save(unit);
-        orgDetails.setId(unit.getId());
+        updateOrganizationDetails(null,organization,orgDetails, true);
+        organizationGraphRepository.save(organization);
+        orgDetails.setId(organization.getId());
         return orgDetails;
     }
 
-    private void updateOrganizationDetails(Unit unit, OrganizationBasicDTO orgDetails, boolean parent) {
+    private <T extends OrganizationBaseEntity> void updateOrganizationDetails(T unit, OrganizationBasicDTO orgDetails, boolean parent) {
         if(orgDetails.getDesiredUrl() != null && !orgDetails.getDesiredUrl().trim().equalsIgnoreCase(unit.getDesiredUrl())) {
             Boolean orgExistWithUrl = unitGraphRepository.checkOrgExistWithUrl(orgDetails.getDesiredUrl());
             if(orgExistWithUrl) {
@@ -204,7 +208,8 @@ public class CompanyCreationService {
         unit.setShortCompanyName(orgDetails.getShortCompanyName());
         unit.setDesiredUrl(orgDetails.getDesiredUrl());
         unit.setDescription(orgDetails.getDescription());
-        unit.setWorkcentre(orgDetails.isWorkcentre());
+        if(unit instanceof Unit)
+            ((Unit) unit).setWorkcentre(orgDetails.isWorkcentre());
         if(parent && CompanyType.COMPANY.equals(orgDetails.getCompanyType())) {
             if(!Optional.ofNullable(orgDetails.getAccountTypeId()).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ACCOUNTTYPE_SELECT);
@@ -217,19 +222,23 @@ public class CompanyCreationService {
             if(unit.getAccountType() == null || !unit.getAccountType().getId().equals(orgDetails.getAccountTypeId())) {
                 unit.setAccountType(accountType);
                 List<Long> organizationIds = new ArrayList<>();
-                organizationIds.addAll(unit.getChildren().stream().map(Unit::getId).collect(Collectors.toList()));
+                if(unit instanceof Organization) {
+                    organizationIds.addAll(((Organization) unit).getChildren().stream().map(Organization::getId).collect(Collectors.toList()));
+                    if(!((Organization)unit).getChildren().isEmpty()) {
+                        unitGraphRepository.updateAccountTypeOfChildOrganization(unit.getId(), accountType.getId());
+                    }
+                }
                 organizationIds.add(unit.getId());
                 accessGroupService.removeDefaultCopiedAccessGroup(organizationIds);
-                if(!unit.getChildren().isEmpty()) {
-                    unitGraphRepository.updateAccountTypeOfChildOrganization(unit.getId(), accountType.getId());
-                }
-                accessGroupService.createDefaultAccessGroups(unit, unit.getChildren());
+
+                if(unit instanceof Organization)
+                accessGroupService.createDefaultAccessGroups(((Organization) unit), ((Organization) unit).getUnits());
             }
         }
         setCompanyData(unit, orgDetails);
     }
 
-    private void setCompanyData(Unit unit, OrganizationBasicDTO orgDetails) {
+    private <T extends OrganizationBaseEntity> void setCompanyData(T unit, OrganizationBasicDTO orgDetails) {
         unit.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         unit.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
         unit.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
@@ -434,7 +443,6 @@ public class CompanyCreationService {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
         reasonCodeService.createDefaultDataForSubUnit(unit, parentUnit.getId());
-        //accessGroupService.createDefaultAccessGroups(unit, Collections.EMPTY_LIST);
         unitGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if(doesUnitManagerInfoAvailable(organizationBasicDTO)) {
@@ -467,7 +475,7 @@ public class CompanyCreationService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         unit.setUnitType(getUnitType(organizationBasicDTO.getUnitTypeId()));
-        updateOrganizationDetails(unit, organizationBasicDTO, false);
+        updateOrganizationDetails(unit,null, organizationBasicDTO,false);
         setAddressInCompany(unitId, organizationBasicDTO.getContactAddress());
         setOrganizationTypeAndSubTypeInOrganization(unit, organizationBasicDTO, null);
         if(doesUnitManagerInfoAvailable(organizationBasicDTO)) {

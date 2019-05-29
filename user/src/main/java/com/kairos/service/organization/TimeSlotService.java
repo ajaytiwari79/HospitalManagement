@@ -5,6 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.enums.TimeSlotType;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
@@ -259,9 +260,9 @@ public class TimeSlotService {
         return response;
     }
 
-    public void createDefaultTimeSlots(Unit unit, TimeSlotType timeSlotType) {
+    public void createDefaultTimeSlots(Organization organization, TimeSlotType timeSlotType) {
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
-        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), unit.getTimeSlotMode());
+        TimeSlotSet timeSlotSet = new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode());
         timeSlotSet.setDefaultSet(true);
         timeSlotSet.setTimeSlotType(timeSlotType);
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
@@ -283,10 +284,10 @@ public class TimeSlotService {
             timeSlotSetTimeSlotRelationships.add(timeSlotSetTimeSlotRelationship);
         }
         timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
-        List<TimeSlotSet> timeSlotSets = unit.getTimeSlotSets();
+        List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
         timeSlotSets.add(timeSlotSet);
-        unit.setTimeSlotSets(timeSlotSets);
-        unitGraphRepository.save(unit);
+        organization.setTimeSlotSets(timeSlotSets);
+        unitGraphRepository.save(organization);
     }
 
 

@@ -33,9 +33,6 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
     OrganizationType findByName(OrganizationType.OrganizationTypeEnum name);
 
-    @Query("MATCH (o:OrganizationType) return {id:id(o) , name:o.name} as typeList")
-    List<Map<String, Object>> findAllTypes();
-
     @Query("Match (o:OrganizationType)-[rel:ORGANIZATION_TYPE_HAS_SERVICES]->(os:OrganizationService) where id(o)={0}  AND  id(os)={1} return SIGN(COUNT(rel))")
     int checkIfServiceExistsWithOrganizationType(long orgTypeId, long serviceId);
 
@@ -118,25 +115,6 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "RETURN organizationType as result")
     List<Map<String, Object>> getAllOrganizationTypeWithSubTypeByCountryId(Long countryId);
 
-    @Query("match(country:Country) where id(country)={0} \n" +
-            "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) return orgType")
-    List<OrganizationType> findOrganizationTypeByCountry(Long countryId);
-
-    @Query("match(country:Country) where id(country)={0} \n" +
-            "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) WHERE id(orgType)={1} return orgType")
-    OrganizationType getOrganizationTypeById(Long countryId, Long orgTypeId);
-
-
-    @Query("match(country:Country) where id(country)={0} \n" +
-            "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) return orgType LIMIT 1")
-    OrganizationType getOneDefaultOrganizationTypeById(Long countryId);
-
-
-    @Query("MATCH (pot:OrganizationType {isEnable:true})-[:HAS_SUB_TYPE]-(ot:OrganizationType{isEnable:true}) WHERE id(pot)={0} return ot")
-    List<OrganizationType> getOrganizationSubTypesByTypeId(Long organizationTypeId);
-
-    @Query("Match (n:Unit{isEnable:true,isKairosHub:{1}})-[:SUB_TYPE_OF]->(organizationType:OrganizationType) where id(organizationType)={0} return n")
-    List<Unit> getOrganizationsByOrganizationTypeAndIsKairosHub(long orgTypeId, boolean isKairosHub);
 
     @Query("match(country:Country) where id(country)={0} \n" +
             "match(country)<-[:" + BELONGS_TO + "]-(orgType:OrganizationType{isEnable:true}) WHERE LOWER(orgType.name)=LOWER({1}) return orgType")

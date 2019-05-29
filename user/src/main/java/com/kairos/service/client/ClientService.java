@@ -26,6 +26,7 @@ import com.kairos.persistence.model.client.relationships.ClientContactPersonRela
 import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.country.default_data.CitizenStatusDTO;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
@@ -1445,9 +1446,8 @@ public class ClientService {
         String imagePath = envConfig.getServerHost() + FORWARD_SLASH;
 
         mapList.addAll(unitGraphRepository.getClientsWithFilterParameters(clientFilterDTO, citizenIds, unitId, imagePath, skip, moduleId));
-        Unit parent = organizationService.fetchParentOrganization(unitId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(UserContext.getUserDetails().getId(), parent.getId());
-        //anil maurya move some business logic in task demand service (task micro service )
         Map<String, Object> responseFromTask = taskDemandRestClient.getOrganizationClientsWithPlanning(staff.getId(), unitId, mapList);
         response.putAll(responseFromTask);
         return response;

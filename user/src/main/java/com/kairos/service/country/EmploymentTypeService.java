@@ -21,6 +21,7 @@ import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.OrganizationMappingDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -78,6 +79,8 @@ public class EmploymentTypeService {
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
     private OrganizationService organizationService;
+    @Inject
+    private CountryService countryService;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -158,13 +161,8 @@ public class EmploymentTypeService {
     }
 
     public List<Map<String, Object>> getEmploymentTypeOfOrganization(Long unitId, boolean isDeleted) {
-        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId, 0) : null;
-        if (!Optional.ofNullable(unit).isPresent()) {
-            logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
-        }
-        Unit parent = organizationService.fetchParentOrganization(unitId);
-        return unitGraphRepository.getEmploymentTypeByOrganization(parent.getId(), isDeleted);
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        return unitGraphRepository.getEmploymentTypeByOrganization(organization.getId(), isDeleted);
     }
 
     public OrganizationEmploymentTypeDTO setEmploymentTypeSettingsOfOrganization(Long unitId, Long employmentTypeId, OrganizationEmploymentTypeDTO organizationEmploymentTypeDTO) {
@@ -195,15 +193,8 @@ public class EmploymentTypeService {
     }
 
     public List<EmploymentTypeDTO> getEmploymentTypeSettingsOfOrganization(Long unitId) {
-        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId, 0) : null;
-        if (!Optional.ofNullable(unit).isPresent()) {
-            logger.error("Incorrect unit id " + unitId);
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
-
-        }
-        Unit parent = organizationService.fetchParentOrganization(unitId);
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
-
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        Long countryId=countryService.getCountryIdByUnitId(unitId);
         // Fetch all mapped settings with employment Type
         List<EmploymentTypeDTO> employmentSettingForOrganization = employmentTypeGraphRepository.getCustomizedEmploymentTypeSettingsForOrganization(countryId, unitId, false);
         List<Long> listOfConfiguredEmploymentTypeIds = new ArrayList<>();
@@ -212,7 +203,7 @@ public class EmploymentTypeService {
         }
 
         // Fetch employment type setting which are not customized yet
-        List<EmploymentTypeDTO> employmentSettingForParentOrganization = employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(countryId, parent.getId(), false, listOfConfiguredEmploymentTypeIds);
+        List<EmploymentTypeDTO> employmentSettingForParentOrganization = employmentTypeGraphRepository.getEmploymentTypeSettingsForOrganization(countryId, organization.getId(), false, listOfConfiguredEmploymentTypeIds);
         employmentSettingForOrganization.addAll(employmentSettingForParentOrganization);
 
         return employmentSettingForOrganization;

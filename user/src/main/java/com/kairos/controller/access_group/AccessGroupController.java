@@ -36,13 +36,13 @@ public class AccessGroupController {
     AccessGroupService accessGroupService;
 
 
-    @RequestMapping(value = UNIT_URL+"/access_group", method = RequestMethod.POST)
+    @PostMapping(value = UNIT_URL+"/access_group")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createAccessGroup(@PathVariable long unitId,@Valid @RequestBody AccessGroupDTO accessGroupDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createAccessGroup(unitId, accessGroupDTO));
     }
 
-    @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}", method = RequestMethod.PUT)
+    @PutMapping(value = UNIT_URL+"/access_group/{accessGroupId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateAccessGroup(@PathVariable long unitId, @PathVariable long accessGroupId, @Valid @RequestBody AccessGroupDTO accessGroupDTO) {
         AccessGroupDTO updatedObject = accessGroupService.updateAccessGroup(accessGroupId, unitId, accessGroupDTO);
@@ -52,18 +52,18 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, updatedObject);
     }
 
-    @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = UNIT_URL+"/access_group/{accessGroupId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteAccessGroup(@PathVariable long accessGroupId) {
         boolean isObjectDeleted = accessGroupService.deleteAccessGroup(accessGroupId);
         if (isObjectDeleted) {
-            return ResponseHandler.generateResponse(HttpStatus.CREATED, true, isObjectDeleted);
+            return ResponseHandler.generateResponse(HttpStatus.CREATED, true, true);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
     }
 
 
-    @RequestMapping(value = UNIT_URL+"/access_group", method = RequestMethod.GET)
+    @GetMapping(value = UNIT_URL+"/access_group")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessGroups(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroupsForUnit(unitId));

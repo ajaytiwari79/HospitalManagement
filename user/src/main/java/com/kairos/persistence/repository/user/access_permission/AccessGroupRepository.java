@@ -46,11 +46,11 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "Match (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') return accessGroup")
     List<AccessGroup> getAccessGroups(long unitId);
 
-    @Query("MATCH (organization:Unit) WHERE id(organization)={0}\n" +
+    @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
             "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false}) " +
             "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]-(dayType:DayType) WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') " +
             "RETURN id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, collect(id(dayType)) AS dayTypeIds,accessGroup.allowedDayTypes AS allowedDayTypes ORDER BY accessGroup.name")
-    List<AccessGroupQueryResult> getAccessGroupsForUnit(long unitId);
+    List<AccessGroupQueryResult> getAccessGroupsForUnit(Long refId);
 
 
     @Query("MATCH (accessGroup:AccessGroup) WHERE id(accessGroup)={1} WITH accessGroup\n" +

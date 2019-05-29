@@ -27,6 +27,7 @@ import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository
 import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
@@ -60,6 +61,8 @@ public class EmploymentCTAWTAService {
     private EmploymentService employmentService;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
+    @Inject
+    private CountryService countryService;
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
@@ -118,7 +121,7 @@ public class EmploymentCTAWTAService {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentById(employmentId);
         StaffEmploymentDetails employmentDetails = null;
         if (Optional.ofNullable(employment).isPresent()) {
-            Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+            Long countryId = countryService.getCountryIdByUnitId(unitId);
             Optional<Unit> organization = unitGraphRepository.findById(unitId, 0);
             employmentDetails = convertEmploymentObject(employment);
             employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));

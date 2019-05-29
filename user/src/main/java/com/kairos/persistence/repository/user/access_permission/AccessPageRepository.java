@@ -55,7 +55,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (accessPage:AccessPage) WHERE id(accessPage)={3} WITH accessPage\n" +
-            "MATCH (n:Unit),(staff:Staff) WHERE id(n)={0} AND id(staff)={1} WITH n,staff,accessPage\n" +
+            "MATCH (n:Organization),(staff:Staff) WHERE id(n)={0} AND id(staff)={1} WITH n,staff,accessPage\n" +
             "MATCH (n)-[:"+ HAS_POSITIONS +"]->(position:Position)-[:"+BELONGS_TO+"]->(staff)-[:"+BELONGS_TO+"]->(user:User) WITH user,position,accessPage\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit:Unit) WHERE id(unit)={2} WITH unitPermission,accessPage\n" +
             "MATCH (unitPermission)-[r:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE r.accessGroupId={4}\n" +
@@ -64,7 +64,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
 
-    @Query("MATCH (n:Unit)-[:"+ HAS_POSITIONS +"]->(position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(n)={0} AND  id(staff)={2}\n" +
+    @Query("MATCH (n:Organization)-[:"+ HAS_POSITIONS +"]->(position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(n)={0} AND  id(staff)={2}\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit:Unit) WHERE id(unit)={1}\n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(g:AccessGroup) WHERE id(g)={3} WITH g,unitPermission\n" +
             "MATCH (g)-[:"+HAS_ACCESS_OF_TABS+"]->(accessPage:AccessPage{isModule:true}) WITH accessPage,g,unitPermission\n" +
@@ -82,7 +82,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "children:collect( DISTINCT {name:ps.c.name,id:id(ps.c),sequence:ps.c.sequence,moduleId:ps.c.moduleId,\n" +
             "read:CASE WHEN childCustomRel IS NULL THEN r2.read ELSE childCustomRel.read END,\n" +
             "write:CASE WHEN childCustomRel IS NULL THEN r2.write ELSE childCustomRel.write END})} as data\n"+
-            " UNION\n" +
+            " UNION \n" +
             "MATCH (n:Unit)-[:"+ HAS_POSITIONS +"]->(position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(n)={0} AND  id(staff)={2}\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit:Unit) WHERE id(unit)={1}\n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(g:AccessGroup) WHERE id(g)={3} WITH g,unitPermission\n" +

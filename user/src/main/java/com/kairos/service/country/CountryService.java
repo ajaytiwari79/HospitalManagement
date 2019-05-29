@@ -17,13 +17,11 @@ import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDe
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
 import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
@@ -493,7 +491,7 @@ public class CountryService {
         List<ActivityTypeDTO> activityTypeDTOS;
         List<PhaseResponseDTO> phases;
         if (Optional.ofNullable(unitId).isPresent()) {
-            countryId = organizationService.getCountryIdOfOrganization(unitId);
+            countryId = getCountryIdByUnitId(unitId);
             activityTypeDTOS = activityTypesRestClient.getActivitiesForUnit(unitId);
             phases = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, API_ALL_PHASES_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PhaseResponseDTO>>>() {
             });
@@ -592,8 +590,11 @@ public class CountryService {
         return true;
     }
 
-    public Long getCountryIdByUnitId(long unitId) {
-        Unit parent = organizationService.fetchParentOrganization(unitId);
-        return countryGraphRepository.getCountryIdByUnitId(parent.getId());
+    public Long getCountryIdByUnitId(Long unitId) {
+        Object entity=unitGraphRepository.findOneById(unitId);
+        if(entity instanceof Unit){
+            return ((Unit) entity).getCountryId();
+        }
+        return ((Organization) entity).getCountry().getId();
     }
 }
