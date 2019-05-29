@@ -76,6 +76,9 @@ public class ShiftDTO {
     private Set<BigInteger> escalationFreeShiftIds;
     private boolean escalationResolved;
     private boolean deleted;
+    private ShiftDTO draftShift;
+    private boolean draft;
+
 
 
     public ShiftDTO() {
@@ -112,6 +115,21 @@ public class ShiftDTO {
         this.endDate = endDate;
     }
 
+    public ShiftDTO getDraftShift() {
+        return draftShift;
+    }
+
+    public void setDraftShift(ShiftDTO draftShift) {
+        this.draftShift = draftShift;
+    }
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
+    }
 
     public boolean isDeleted() {
         return deleted;
