@@ -40,6 +40,7 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
                 employmentJobService.updateSeniorityLevelOnJobTrigger(job.getId(),job.getUnitId());
                 break;
             case NIGHT_WORKER:employmentJobService.updateNightWorkers();
+                break;
             default:
                 logger.error("No exceution route found for jobsubtype");
                 break;
