@@ -65,11 +65,11 @@ public class NightWorkerServiceTest {
     public void updateNightWorkers(){
         when(expertiseNightWorkerSettingRepository.findAllByExpertiseIds(anyCollection())).thenReturn(expertiseNightWorkerSettings);
         when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
-        Map<Long,Boolean> employmentAndNightWorkerMap = nightWorkerService.updateNightWorkers(employmentAndExpertiseIdMap);
+        Map<Long,Boolean> employmentAndNightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap);
         Assert.assertEquals(employmentAndNightWorkerMap.get(145l).booleanValue(),true);
         expertiseNightWorkerSettings.get(0).setMinShiftsUnitToCheckNightWorker(CalculationUnit.PERCENTAGE);
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(50);
-        employmentAndNightWorkerMap = nightWorkerService.updateNightWorkers(employmentAndExpertiseIdMap);
+        employmentAndNightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap);
         Assert.assertEquals(employmentAndNightWorkerMap.get(145l).booleanValue(),true);
     }
 
@@ -79,11 +79,11 @@ public class NightWorkerServiceTest {
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(3000);
         when(expertiseNightWorkerSettingRepository.findAllByExpertiseIds(anyCollection())).thenReturn(expertiseNightWorkerSettings);
         when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
-        Map<Long,Boolean> employmentAndNightWorkerMap = nightWorkerService.updateNightWorkers(employmentAndExpertiseIdMap);
+        Map<Long,Boolean> employmentAndNightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap);
         Assert.assertEquals(employmentAndNightWorkerMap.get(145l).booleanValue(),false);
         expertiseNightWorkerSettings.get(0).setMinShiftsUnitToCheckNightWorker(CalculationUnit.PERCENTAGE);
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(70);
-        employmentAndNightWorkerMap = nightWorkerService.updateNightWorkers(employmentAndExpertiseIdMap);
+        employmentAndNightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap);
         Assert.assertEquals(employmentAndNightWorkerMap.get(145l).booleanValue(),false);
     }
 

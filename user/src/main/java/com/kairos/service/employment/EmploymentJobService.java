@@ -180,9 +180,8 @@ public class EmploymentJobService {
     }
 
     public void updateNightWorkers(){
-        List<Employment> employments = employmentGraphRepository.findAllDeletedFalse();
-        Map<Long,Long> employmentAndExpertiseIdMap = employments.stream().collect(Collectors.toMap(k->k.getId(),v->v.getExpertise().getId()));
-        activityIntegrationService.updateNightWorkers(employmentAndExpertiseIdMap);
+        List<Map> employments = employmentGraphRepository.findStaffsWithEmploymentIds();
+        activityIntegrationService.updateNightWorkers(employments);
 
     }
 

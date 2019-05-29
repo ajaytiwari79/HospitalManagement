@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
@@ -61,11 +62,11 @@ public class NightWorkerController {
     public ResponseEntity<Map<String, Object>> updateNightWorkerEligibilityOfStaff() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerEligibilityOfStaff());
     }
-
     @ApiOperation(value = "update night workers")
     @PutMapping(value = "/updateNightWorkers")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateNightWorkers(@RequestBody Map<Long,Long> employmentAndExpertiseIdMap) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkers(employmentAndExpertiseIdMap));
+    public ResponseEntity<Map<String, Object>> updateNightWorkers(@RequestBody List<Map> employments) {
+        nightWorkerService.updateNightWorkers(employments);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 }

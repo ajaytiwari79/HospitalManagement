@@ -7,6 +7,7 @@ import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.dto.planner.solverconfig.DefaultDataDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import com.kairos.dto.planner.solverconfig.country.CountrySolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
 import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.planner.component.exception.ExceptionService;
@@ -48,6 +49,8 @@ public class UnitSolverConfigService {
         unitSolverConfigDTO.setUnitId(unitId);
         if (preValidateUnitSolverConfigDTO(unitSolverConfigDTO)) {
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
+            List<BigInteger> countraintids = getConstraintsIds(unitSolverConfigDTO, null);
+            unitSolverConfig.setConstraintIds(countraintids);
             solverConfigRepository.saveEntity(unitSolverConfig);
             unitSolverConfigDTO.setId(unitSolverConfig.getId());
         }
@@ -60,6 +63,8 @@ public class UnitSolverConfigService {
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
             unitSolverConfig.setParentSolverConfigId(unitSolverConfigDTO.getId());
             unitSolverConfig.setId(null);//Unset Id
+            List<BigInteger> countraintids = getConstraintsIds(unitSolverConfigDTO, null);
+            unitSolverConfig.setConstraintIds(countraintids);
             solverConfigRepository.saveEntity(unitSolverConfig);
             unitSolverConfigDTO.setId(unitSolverConfig.getId());
         }
@@ -68,37 +73,45 @@ public class UnitSolverConfigService {
 
 
     public List<UnitSolverConfigDTO> getAllUnitSolverConfigByUnitId(Long unitId) {
-        List<SolverConfig> solverConfigList = solverConfigRepository.findAllObjectsNotDeletedById(false, unitId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(solverConfigList, UnitSolverConfig.class);
+        List<SolverConfigDTO> solverConfigList = solverConfigRepository.getAllSolverConfigWithConstraints(false, unitId);
+        return solverConfigList.stream().map(solverConfigDTO -> (UnitSolverConfigDTO)solverConfigDTO).collect(Collectors.toList());
     }
 
-    public UnitSolverConfigDTO updateUnitSolverConfig(UnitSolverConfigDTO unitSolverConfigDTO) {
+    public UnitSolverConfigDTO updateUnitSolverConfig(Long unitId,UnitSolverConfigDTO unitSolverConfigDTO) {
+        unitSolverConfigDTO.setUnitId(unitId);
         SolverConfig solverConfig = solverConfigRepository.findByIdNotDeleted(unitSolverConfigDTO.getId());
         boolean nameExists = solverConfigRepository.isNameExistsById(unitSolverConfigDTO.getName(), unitSolverConfigDTO.getId(), false, unitSolverConfigDTO.getUnitId());
         if (isNotNull(solverConfig) && !nameExists) {
-            List<UnitConstraint> solverConfigConstraints = constraintsRepository.findAllUnitConstraintByIds(solverConfig.getConstraintIds());
-            Map<BigInteger, UnitConstraint> countryConstraintDTOMap = solverConfigConstraints.stream().collect(Collectors.toMap(k->k.getId(), v->v));
-            List<UnitConstraint> unitConstraints = new ArrayList<>();
-            for (ConstraintDTO constraintDTO : unitSolverConfigDTO.getConstraints()) {
-                if(countryConstraintDTOMap.containsKey(constraintDTO.getId())) {
-                    UnitConstraint unitConstraint = countryConstraintDTOMap.get(constraintDTO.getId());
-                    unitConstraint.setConstraintLevel(constraintDTO.getConstraintLevel());
-                    unitConstraint.setPenalty(constraintDTO.getPenalty());
-                    unitConstraints.add(unitConstraint);
-                }
-                else {
-                    unitConstraints.add(new UnitConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
-                }
-            }
-            if(isCollectionNotEmpty(unitConstraints)) {
-                constraintsRepository.saveList(unitConstraints);
-            }
             UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(unitSolverConfigDTO, UnitSolverConfig.class);
-            List<BigInteger> countraintids = unitConstraints.stream().map(countryConstraint -> countryConstraint.getId()).collect(Collectors.toList());
+            List<BigInteger> countraintids = getConstraintsIds(unitSolverConfigDTO, solverConfig);
             unitSolverConfig.setConstraintIds(countraintids);
             solverConfigRepository.saveEntity(unitSolverConfig);
         }
         return unitSolverConfigDTO;
+    }
+
+    private List<BigInteger> getConstraintsIds(UnitSolverConfigDTO unitSolverConfigDTO, SolverConfig solverConfig) {
+        Map<BigInteger, UnitConstraint> countryConstraintDTOMap = new HashMap<>();
+        if(isNotNull(solverConfig)){
+            List<UnitConstraint> solverConfigConstraints = constraintsRepository.findAllUnitConstraintByIds(solverConfig.getConstraintIds());
+            countryConstraintDTOMap = solverConfigConstraints.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        }
+        List<UnitConstraint> unitConstraints = new ArrayList<>();
+        for (ConstraintDTO constraintDTO : unitSolverConfigDTO.getConstraints()) {
+            if(countryConstraintDTOMap.containsKey(constraintDTO.getId())) {
+                UnitConstraint unitConstraint = countryConstraintDTOMap.get(constraintDTO.getId());
+                unitConstraint.setConstraintLevel(constraintDTO.getConstraintLevel());
+                unitConstraint.setPenalty(constraintDTO.getPenalty());
+                unitConstraints.add(unitConstraint);
+            }
+            else {
+                unitConstraints.add(new UnitConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
+            }
+        }
+        if(isCollectionNotEmpty(unitConstraints)) {
+            constraintsRepository.saveList(unitConstraints);
+        }
+        return unitConstraints.stream().map(countryConstraint -> countryConstraint.getId()).collect(Collectors.toList());
     }
 
     public boolean deleteUnitSolverConfig(BigInteger solverConfigId) {

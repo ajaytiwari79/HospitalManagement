@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class UnitSolverConfigController {
 
     @PostMapping
     @ApiOperation("Create UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@PathVariable Long unitId,@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
+    public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@PathVariable Long unitId,@RequestBody @Valid UnitSolverConfigDTO unitSolverConfigDTO) {
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO,unitId));
     }
 
@@ -48,9 +49,9 @@ public class UnitSolverConfigController {
      */
     @PutMapping(value = "/{unitSolverConfigId}")
     @ApiOperation("Update UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> updateUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
-        unitSolverConfigService.updateUnitSolverConfig(unitSolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
+    public ResponseEntity<Map<String, Object>> updateUnitSolverConfig(@PathVariable Long unitId,@RequestBody @Valid UnitSolverConfigDTO unitSolverConfigDTO) {
+        ;
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,unitSolverConfigService.updateUnitSolverConfig(unitId,unitSolverConfigDTO));
     }
 
     @DeleteMapping(value = "/{unitSolverConfigId}")

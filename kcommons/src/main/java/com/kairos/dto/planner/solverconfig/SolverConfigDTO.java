@@ -40,6 +40,7 @@ public class SolverConfigDTO {
     protected TimeTypeEnum typeOfTimeType;
 
     public SolverConfigDTO() {
+        this.constraints = new ArrayList<>();
     }
 
     public SolverConfigDTO(List<ConstraintDTO> constraints) {
