@@ -190,9 +190,11 @@ public class PlannedHoursCalculationService implements CounterService {
 
     public   Map<Object, Double>  getStaffWithPlannedHour(Map<FilterType, List> filterBasedCriteria, Long organizationId,ApplicableKPI applicableKPI) {
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
-        List<Long> staffIds = (List<Long>)filterCriteria[0];
+      //  List<Long> staffIds = (List<Long>)filterCriteria[0];
+        List<Long> staffIds = new ArrayList<>();
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
         Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
+        staffIds=(List<Long>)kpiData[2];
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffIds, newArrayList(organizationId), newArrayList(), newHashSet(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         Map<Object, Double> plannedHoursMap = getStaffPlannedHoursByRepresentPerStaff(staffIds, shifts);
