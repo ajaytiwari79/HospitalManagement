@@ -243,6 +243,7 @@ public class NightWorkerService {
         Map<Long, Long> employmentAndExpertiseIdMap = staffAndEmploymentAndExpertiseIdArray[0];
         Map<Long, Long> employmentIdAndStaffIdMap = staffAndEmploymentAndExpertiseIdArray[1];
         Map<Long, Boolean> staffIdAndnightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
+        updateWTARuleTemplateForNightWorker(staffIdAndnightWorkerDetailsMap);
         List<NightWorker> nightWorkers = nightWorkerMongoRepository.findByStaffIds(employmentIdAndStaffIdMap.values());
         Map<Long,NightWorker> nightWorkerMap = nightWorkers.stream().collect(Collectors.toMap(NightWorker::getStaffId,v->v));
         List<NightWorker> updateNightWorkers = new ArrayList<>();
@@ -294,7 +295,6 @@ public class NightWorkerService {
                 staffIdAndNightWorkerMap.put(staffId, nightWorker);
             }
         }
-        updateWTARuleTemplateForNightWorker(staffIdAndNightWorkerMap);
         return staffIdAndNightWorkerMap;
     }
 
