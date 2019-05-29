@@ -40,7 +40,7 @@ public class PermissionController {
     }
 
     @RequestMapping(value = "/access_group_permissions",method = RequestMethod.GET)
-    public ResponseEntity getFLPSchema(@RequestParam Long accessGroupId )  {
+    public ResponseEntity getAccessGroupPermissions(@RequestParam Long accessGroupId )  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(accessGroupId));
 
