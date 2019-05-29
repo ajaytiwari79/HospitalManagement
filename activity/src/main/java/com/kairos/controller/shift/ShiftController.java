@@ -56,9 +56,9 @@ public class ShiftController {
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createShift(@RequestParam("type") String type, @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO) {
+    public ResponseEntity<Map<String, Object>> createShift(@RequestParam("type") String type, @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type ,shiftActionType));
     }
 
 
@@ -146,7 +146,7 @@ public class ShiftController {
     @ApiOperation("get a Shift detail by id")
     @PostMapping(value = "/shift/details")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> shiftDetailsById(@PathVariable Long unitId, @RequestBody List<BigInteger> shiftIds, @RequestParam(required = false, value = "showOriginal") boolean showDraft) {
+    public ResponseEntity<Map<String, Object>> shiftDetailsById(@PathVariable Long unitId, @RequestBody List<BigInteger> shiftIds, @RequestParam(required = false, value = "showDraft") boolean showDraft) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.shiftDetailsById(unitId, shiftIds, showDraft));
 
     }
