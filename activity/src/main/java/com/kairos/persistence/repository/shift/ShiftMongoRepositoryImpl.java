@@ -567,9 +567,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
 
     @Override
-    public List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId, Long unitId, List<Long> staffIds, List<ShiftStatus> shiftStatus) {
+    public List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId, Long unitId, List<Long> employmentIds, List<ShiftStatus> shiftStatus) {
         Query query = new Query(where("deleted").is(false).and("planningPeriodId").is(planningPeriodId).and("unitId").is(unitId)
-                .and("staffId").in(staffIds)
+                .and("employmentId").in(employmentIds)
                 .and("activities").elemMatch(where("status").nin(shiftStatus)));
         return mongoTemplate.find(query, Shift.class);
 
