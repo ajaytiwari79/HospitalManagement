@@ -98,7 +98,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
             if(consecutiveNightDays>=nightShiftSequence){
                 LocalDate shiftDate = asLocalDate(infoWrapper.getShift().getActivities().get(0).getStartDate());
                 LocalDate daysOffDate = shiftDate.minusDays(limitAndCounter[0]);
-                while (daysOffDate.isBefore(shiftDate) || daysOffDate.equals(shiftDate)){
+                while (!daysOffDate.isAfter(shiftDate)){
                     if(!shiftDates.contains(daysOffDate)){
                         daysOffCount++;
                     }

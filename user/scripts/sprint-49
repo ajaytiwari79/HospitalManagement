@@ -5,7 +5,7 @@ Match(ap:AccessPage) where ap.moduleId="module_3" merge (ap)-[:SUB_PAGE]-(access
 
 Match(ap:AccessPage) where ap.moduleId="tab_426" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Shift Planning",isModule:false,moduleId:"tab_427",active:true});
 
-Match(ap:AccessPage) where ap.moduleId="tab_427" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Shift Planning",isModule:false,moduleId:"tab_428",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_427" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Solver Configuration Settings",isModule:false,moduleId:"tab_428",active:true});
 
 Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
 Match (ap:AccessPage)
