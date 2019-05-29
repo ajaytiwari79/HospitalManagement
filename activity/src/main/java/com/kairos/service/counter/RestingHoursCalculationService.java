@@ -122,8 +122,8 @@ public class RestingHoursCalculationService implements CounterService {
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList,  new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
-    @Override
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,ApplicableKPI applicableKPI) {
+
+    public  Map<Long, Integer> getStaffAndWithRestingHour(Map<FilterType, List> filterBasedCriteria, Long organizationId,ApplicableKPI applicableKPI) {
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = (List<Long>)filterCriteria[0];
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
@@ -132,6 +132,13 @@ public class RestingHoursCalculationService implements CounterService {
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
         Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(staffIds, null, dateTimeIntervals, applicableKPI, shifts);
         Map<Long, Integer> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
+        return staffAndRestingHoursMap;
+    }
+
+
+    @Override
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,ApplicableKPI applicableKPI) {
+        Map<Long, Integer> staffAndRestingHoursMap =  getStaffAndWithRestingHour(filterBasedCriteria, organizationId, applicableKPI);
         return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
     }
 
@@ -195,14 +202,15 @@ public class RestingHoursCalculationService implements CounterService {
 
     public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
         KPIResponseDTO kpiResponseDTO = new KPIResponseDTO();
-        Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
+       /* Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = new ArrayList<>();
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
         Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
         staffIds = (List<Long>) kpiData[2];
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdsAndDate(staffIds, DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate())), DateUtils.getLocalDateTimeFromLocalDate(DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())));
-        Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(staffIds, null, dateTimeIntervals, applicableKPI, shifts);
+        Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(staffIds, null, dateTimeIntervals, applicableKPI, shifts);*/
+        Map<Long, Integer> restingHoursMap =  getStaffAndWithRestingHour(filterBasedCriteria, organizationId, applicableKPI);
         Map<Long, Double> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v-> DateUtils.getHoursFromTotalMilliSeconds(v.getValue().longValue())));
         kpiResponseDTO.setKpiName(kpi.getTitle());
         kpiResponseDTO.setKpiId(kpi.getId());

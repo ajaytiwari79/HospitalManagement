@@ -210,10 +210,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     }
 
     public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
-        Map<Object,Object> objectMap = new HashedMap();
-        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
-        return kpiSetResponseDTO;
-
+        return new KPISetResponseDTO();
     }
 
 }

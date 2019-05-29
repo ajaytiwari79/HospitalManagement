@@ -1,10 +1,14 @@
 package com.kairos.dto.activity.kpi;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.Map;
 
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class KPIResponseDTO {
 
@@ -12,29 +16,6 @@ public class KPIResponseDTO {
 
     private String kpiName;
 
-    private Map<Long ,Double> staffKPIValue;
+    private Map<Long, Double> staffKPIValue;
 
-    public BigInteger getKpiId() {
-        return kpiId;
-    }
-
-    public void setKpiId(BigInteger kpiId) {
-        this.kpiId = kpiId;
-    }
-
-    public String getKpiName() {
-        return kpiName;
-    }
-
-    public void setKpiName(String kpiName) {
-        this.kpiName = kpiName;
-    }
-
-    public Map<Long, Double> getStaffKPIValue() {
-        return staffKPIValue;
-    }
-
-    public void setStaffKPIValue(Map<Long, Double> staffKPIValue) {
-        this.staffKPIValue = staffKPIValue;
-    }
 }

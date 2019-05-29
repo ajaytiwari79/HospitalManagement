@@ -74,9 +74,7 @@ public class KPISetController {
 
 
     @GetMapping(UNIT_URL+"/kpi_set_calculation")
-    public ResponseEntity<Map<String, Object>> createKPISetCalculation(@PathVariable Long unitId,
-                                                                     @RequestParam  @DateTimeFormat(pattern = "yyyy" +
-                                                                               "-MM-dd") Date startDate) {
+    public ResponseEntity<Map<String, Object>> createKPISetCalculation(@PathVariable Long unitId, @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getKPISetCalculationData(unitId,startDate));
     }
 

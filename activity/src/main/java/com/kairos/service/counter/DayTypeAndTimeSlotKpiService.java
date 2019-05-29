@@ -272,28 +272,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     }
 
     public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
-        Map<BigInteger, BigInteger> objectMap = new HashedMap();
-        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
-        List< Map<String ,Number>> mapList = new ArrayList<>();
-        Map<String ,Number> stringNumberMap = new HashMap<>();
-        List<CommonKpiDataUnit> dataList = getDayTypeAndTimeSlotHours(organizationId, filterBasedCriteria ,applicableKPI);
-        new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
-
-        dataList.forEach(c->{
-             stringNumberMap.put(c.getLabel(),c.getRefId());
-            LOGGER.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%+" +c.getLabel()+"%%%%%%%%"+c.getRefId() +"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-        });
-
-
-         /*Map<String ,Number>  bigIntegerBigIntegerMap = dataList.stream()
-                 .collect(Collectors.toMap(CommonKpiDataUnit::getLabel, CommonKpiDataUnit::getRefId));*/
-       //  mapList.add(bigIntegerBigIntegerMap);
-        mapList.add(stringNumberMap);
-         kpiSetResponseDTO.setKpiId(kpi.getId());
-         kpiSetResponseDTO.setKpiSetName(kpi.getTitle());
-       //  kpiSetResponseDTO.setData(mapList);
-        return kpiSetResponseDTO;
-
+         return  new KPISetResponseDTO();
     }
 
     @Override

@@ -164,26 +164,20 @@ public class KPISetService {
                         applicableKPIS = counterRepository.getKPIByKPIIds(kpiSet.getKpiIds().stream().collect(Collectors.toList()), unitId, ConfLevel.UNIT);
                         for (ApplicableKPI applicableKPI : applicableKPIS) {
                             applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
-
-                         //   FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),new ArrayList<>(kpiSetDTOList.get(0).getKpiIds()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPIS.get(0).getApplicableFilter().getCriteriaList(),applicableKPIS.get(0).getInterval(),applicableKPIS.get(0).getFrequencyType(),applicableKPIS.get(0).getValue(),unitId);
-                        FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),Arrays.asList(applicableKPI.getActiveKpiId()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPI.getApplicableFilter().getCriteriaList(),applicableKPI.getInterval(),applicableKPI.getFrequencyType(),applicableKPI.getValue(),unitId);
+                            FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),Arrays.asList(applicableKPI.getActiveKpiId()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPI.getApplicableFilter().getCriteriaList(),applicableKPI.getInterval(),applicableKPI.getFrequencyType(),applicableKPI.getValue(),unitId);
                             KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
-                            //kpiSetResponseDTO.setKpiData(data);
                             if(isNotNull(kpiResponseDTO)) {
                                 kpiResponseDTOList.add(kpiResponseDTO);
                             }
                         }
                     }
-                    kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
+                    if(isCollectionNotEmpty(kpiResponseDTOList)) {
+                        kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
+                    }
                     kpiSetResponseDTOList.add(kpiSetResponseDTO);
                 }
             }
-
-
         }
         return kpiSetResponseDTOList;
     }
-
-
-
 }

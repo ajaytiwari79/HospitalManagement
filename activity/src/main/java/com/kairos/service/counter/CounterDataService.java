@@ -5,6 +5,7 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
+import com.google.api.client.util.ArrayMap;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -61,6 +62,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.enums.FilterType.STAFF_IDS;
 import static java.util.stream.Collectors.toList;
 
 
@@ -143,7 +145,7 @@ public class CounterDataService extends MongoBaseService {
             if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
                 staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
                 if(KPIRepresentation.INDIVIDUAL_STAFF.equals(staffApplicableKPI.getKpiRepresentation())){
-                    staffFilterBasedCriteria.put(FilterType.STAFF_IDS, Arrays.asList(isNotNull(filters.getStaffId()) ?filters.getStaffId().intValue() : staffId.intValue()));
+                    staffFilterBasedCriteria.put(STAFF_IDS, Arrays.asList(isNotNull(filters.getStaffId()) ?filters.getStaffId().intValue() : staffId.intValue()));
                    // staffApplicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                 }
                 if(isNotNull(filters.getFrequencyType())){
@@ -209,7 +211,7 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(FilterType.UNIT_IDS) && ConfLevel.UNIT.equals(level)) {
             getUnitIdsDefaultData(criteriaList, defaultKpiDataDTO);
         }
-        if (kpi.getFilterTypes().contains(FilterType.STAFF_IDS) && ConfLevel.UNIT.equals(level)) {
+        if (kpi.getFilterTypes().contains(STAFF_IDS) && ConfLevel.UNIT.equals(level)) {
             getStaffDefaultData(criteriaList, defaultKpiDataDTO);
         }
         if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_STATUS)) {
@@ -271,7 +273,7 @@ public class CounterDataService extends MongoBaseService {
     private void getStaffDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         defaultKpiDataDTO.getStaffKpiFilterDTOs().forEach(staffKpiFilterDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(staffKpiFilterDTO.getId(), staffKpiFilterDTO.getFullName(), staffKpiFilterDTO.getUnitIds())));
-        criteriaList.add(new FilterCriteria(FilterType.STAFF_IDS.value, FilterType.STAFF_IDS, (List) kpiFilterDefaultDataDTOS));
+        criteriaList.add(new FilterCriteria(STAFF_IDS.value, STAFF_IDS, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getUnitIdsDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
@@ -433,7 +435,6 @@ public class CounterDataService extends MongoBaseService {
             }
         } else {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
-
         }
         for (BigInteger kpiId : filters.getKpiIds()) {
             if(!counterRepository.getKPIByid(kpiId).isMultiDimensional() && isNotNull(kpiIdAndApplicableKPIMap.get(kpiId))) {
@@ -443,18 +444,8 @@ public class CounterDataService extends MongoBaseService {
                 kpiResults.add(responseData);
             }
         }
-
-       /* List<KPIResponseDTO> kpisData = new ArrayList();
-        for (Future<KPIResponseDTO> data : kpiResults) {
-            try {
-                kpisData.add(data.get());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        }*/
         KPIResponseDTO kpiResponseDTO = new KPISetResponseDTO();
         for (Future<KPIResponseDTO> data : kpiResults) {
-
             try {
                 if(isNotNull(data)) {
                     kpiResponseDTO.setKpiId(data.get().getKpiId());
@@ -466,12 +457,7 @@ public class CounterDataService extends MongoBaseService {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-
-
-
         }
-
-
         return kpiResponseDTO;
     }
 }
