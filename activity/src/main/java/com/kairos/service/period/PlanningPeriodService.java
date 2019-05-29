@@ -709,7 +709,6 @@ public class PlanningPeriodService extends MongoBaseService {
             staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
     }
-    //=================================================================================
 
     /**
      * @param shiftStates

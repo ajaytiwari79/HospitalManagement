@@ -5,7 +5,7 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
 
 public interface ExpertiseNightWorkerSettingRepository extends MongoBaseRepository<ExpertiseNightWorkerSetting, BigInteger> {
 
@@ -20,4 +20,10 @@ public interface ExpertiseNightWorkerSettingRepository extends MongoBaseReposito
 
     @Query(value = "{ expertiseId:?0, countryId:{$exists:true} ,deleted:false}")
     ExpertiseNightWorkerSetting findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(Long expertiseId);
+
+    @Query(value = "{ expertiseId:{$in:?0},deleted:false}")
+    List<ExpertiseNightWorkerSetting> findAllByExpertiseIds(Collection<Long> expertiseIds);
+
+    @Query(value = "{ expertiseId:?0,deleted:false}")
+    ExpertiseNightWorkerSetting findOneByExpertiseId(Long expertiseId);
 }
