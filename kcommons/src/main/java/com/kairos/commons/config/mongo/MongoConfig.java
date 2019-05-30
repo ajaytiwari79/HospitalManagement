@@ -1,27 +1,11 @@
 package com.kairos.commons.config.mongo;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoDatabase;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by pradeep on 09/04/19.
  */
-@Configuration
-@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
-public class MongoConfig extends AbstractMongoConfiguration{
+//@Configuration
+//@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+public class MongoConfig{/* extends AbstractMongoConfiguration{
 
     Environment environment;
 
@@ -57,7 +41,7 @@ public class MongoConfig extends AbstractMongoConfiguration{
         converterList.add(new LocalDateTimeReadConverter());
         return new MongoCustomConversions(converterList);
     }
-
+*/
 
  /*   @Override
     public void setEnvironment(Environment environment) {
