@@ -4,10 +4,14 @@ import com.kairos.commons.utils.*;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.night_worker.*;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.enums.CalculationUnit;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.night_worker.*;
 import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
@@ -19,19 +23,19 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.rest_client.*;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.rule_validator.night_worker.StaffNonPregnancySpecification;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,6 +68,8 @@ public class NightWorkerService {
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
+    @Inject
+    private SchedulerServiceRestClient schedulerRestClient;
 
     public String prepareNameOfQuestionnaireSet() {
         return AppConstants.QUESTIONNAIE_NAME_PREFIX + " " + DateUtils.getDateString(DateUtils.getDate(), "dd_MMM_yyyy");
@@ -366,6 +372,13 @@ public class NightWorkerService {
                     break;
             }
         return interval;
+    }
+
+    public void registerJobForNightWorker(){
+        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 1), JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING, ZoneId.systemDefault().toString());
+        // create job for auto clock out and create realtime/draft shiftstate
+        List<SchedulerPanelDTO> schedulerPanelDTOS = schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+        });
     }
 
 }

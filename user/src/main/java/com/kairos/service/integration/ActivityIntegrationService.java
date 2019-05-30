@@ -147,7 +147,7 @@ public class ActivityIntegrationService {
     }
 
     public void updateNightWorkers(List<Map> employments) {
-        genericRestClient.publishRequest(employments, null, false, IntegrationOperation.UPDATE, "/updateNightWorkers", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        genericRestClient.publishRequest(employments, null, false, IntegrationOperation.UPDATE, "/update_night_workers", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 

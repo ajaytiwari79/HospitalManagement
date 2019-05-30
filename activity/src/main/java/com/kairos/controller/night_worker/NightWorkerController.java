@@ -63,10 +63,18 @@ public class NightWorkerController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, nightWorkerService.updateNightWorkerEligibilityOfStaff());
     }
     @ApiOperation(value = "update night workers")
-    @PutMapping(value = "/updateNightWorkers")
+    @PutMapping(value = "/update_night_workers")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateNightWorkers(@RequestBody List<Map> employments) {
         nightWorkerService.updateNightWorkers(employments);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
+
+    @ApiOperation(value = "Register job for night worker")
+    @PostMapping(value = "/register_job_for_night_worker")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> registerJobForNightWorker() {
+        nightWorkerService.registerJobForNightWorker();
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 }
