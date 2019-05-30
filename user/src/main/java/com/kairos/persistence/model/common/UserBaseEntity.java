@@ -2,9 +2,6 @@ package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.audit_logging.LoggingType;
-import lombok.Getter;
-import lombok.Setter;
 import org.neo4j.ogm.annotation.GraphId;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,9 +16,8 @@ import java.time.LocalDateTime;
  *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@Setter
-public abstract class UserBaseEntity implements Serializable{
+
+public abstract class UserBaseEntity implements Serializable {
 
     //@GeneratedValue
     @GraphId protected Long id;
@@ -40,20 +36,13 @@ public abstract class UserBaseEntity implements Serializable{
     @LastModifiedBy
     protected Long lastModifiedBy;
 
-    public Long getId() {
-        return id;
-    }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public Long getId() {
+        return id;
     }
 
     public LocalDateTime getCreationDate() {
@@ -70,6 +59,14 @@ public abstract class UserBaseEntity implements Serializable{
 
     public void setLastModificationDate(LocalDateTime lastModificationDate) {
         this.lastModificationDate = lastModificationDate;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Long getCreatedBy() {
