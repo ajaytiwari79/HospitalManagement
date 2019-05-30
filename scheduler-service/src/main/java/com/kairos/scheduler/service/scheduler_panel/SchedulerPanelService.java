@@ -106,7 +106,7 @@ public class SchedulerPanelService extends MongoBaseService {
      * @author yatharth
      * @lastmodifiedby
      */
-    public List<SchedulerPanelDTO> createSchedulerPanel(long unitId, List<SchedulerPanelDTO> schedulerPanelDTOs) {
+    public List<SchedulerPanelDTO> createSchedulerPanel(Long unitId, List<SchedulerPanelDTO> schedulerPanelDTOs) {
 
         //logger.info("integrationConfigurationId-----> "+integrationConfigurationId);
         String timezone = null;
@@ -156,7 +156,7 @@ public class SchedulerPanelService extends MongoBaseService {
         }
         save(schedulerPanels);
 
-        if (!Optional.ofNullable(timezone).isPresent())
+        if (!Optional.ofNullable(timezone).isPresent() && isNotNull(unitId))
             timezone = userIntegrationService.getTimeZoneOfUnit(unitId);
 //        String defaultTimezone=timezone;
 //        schedulerPanels.stream().map(schedulerPanel-> dynamicCronScheduler.setCronScheduling(schedulerPanel,defaultTimezone));
