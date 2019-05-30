@@ -6,17 +6,11 @@ import com.kairos.enums.audit_logging.LoggingType;
 import de.danielbechler.diff.ObjectDifferBuilder;
 import de.danielbechler.diff.node.DiffNode;
 import de.danielbechler.diff.node.Visit;
-import org.neo4j.ogm.annotation.NodeEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
@@ -29,7 +23,7 @@ import static de.danielbechler.diff.node.DiffNode.State.CHANGED;
  * 8/5/19
  */
 
-@Component
+//@Component
 public class AuditLogging {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogging.class);
@@ -37,10 +31,10 @@ public class AuditLogging {
 
     private static MongoTemplate mongoTemplate;
 
-    @Autowired
+    /*@Autowired
     public void setMongoTemplate(@Qualifier("AuditLoggingMongoTemplate") MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
-    }
+    }*/
 
     // @Test
     // @AfterReturning(value = "execution(* org.springframework.data.repository.*.*(..))",returning = "entity")
@@ -92,7 +86,7 @@ public class AuditLogging {
 
     private static void updateMap(DiffNode arg0, Object oldValue, Object newValue, String properteyName, Map<String, Object> result, Class parentNodeClass) {
         if(isArgumentValid(arg0, properteyName) && isPropertyValid(arg0, properteyName) && parentNodeClass.equals(arg0.getParentNode().getValueType())) {
-            if(!primitives.contains(arg0.getValueType().getSimpleName()) && arg0.getValueType().isAnnotationPresent(NodeEntity.class)) {
+            if(!primitives.contains(arg0.getValueType().getSimpleName())){// && arg0.getValueType().isAnnotationPresent(NodeEntity.class)) {
                 result.put(properteyName, checkDifferences(oldValue, newValue));
             } else {
                 result.put(properteyName, newValue);
