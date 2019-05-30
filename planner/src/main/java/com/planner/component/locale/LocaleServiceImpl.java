@@ -13,7 +13,6 @@ public class LocaleServiceImpl implements LocaleService{
     private MessageSource messageSource;
 
 
-    //=========================Non-Static===========================
     @Override
     public String getMessage(String code) {
         Locale locale = LocaleContextHolder.getLocale();

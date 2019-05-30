@@ -41,7 +41,6 @@ public class CountryConstraintService {
     @Inject
     private PlanningProblemRepository planningProblemRepository;
 
-    //======================================================
     public CountryConstraintDTO createCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         if (preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
             CountryConstraint countryConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraintDTO, CountryConstraint.class);
@@ -66,8 +65,7 @@ public class CountryConstraintService {
         List<UnitConstraint> unitConstraintList = new ArrayList<>();
         if (!applicableUnitIdForConstraint.isEmpty()) {
             for (Long unitId : applicableUnitIdForConstraint) {
-                UnitConstraint unitConstraint = new UnitConstraint();
-                unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraint, UnitConstraint.class);
+                UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraint, UnitConstraint.class);
                 unitConstraint.setId(null);//Unset Id
                 unitConstraint.setUnitId(unitId);
                 unitConstraint.setParentCountryConstraintId(countryConstraint.getId());
@@ -80,7 +78,6 @@ public class CountryConstraintService {
         }
     }
 
-    //====================================================
     public CountryConstraintDTO copyCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(countryConstraintDTO.getId());
         if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, true)) {
@@ -95,13 +92,11 @@ public class CountryConstraintService {
         return countryConstraintDTO;
     }
 
-    //====================================================
     public List<CountryConstraint> getAllCountryConstraintByCountryId(Long countryId) {
         List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(true, countryId);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(constraintList, CountryConstraint.class);
     }
 
-    //====================================================
     public void updateCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
         Constraint constraint = constraintsRepository.findByIdNotDeleted(countryConstraintDTO.getId());
         if (constraint != null && preValidateCountryConstraintDTO(countryConstraintDTO, false)) {
@@ -110,7 +105,6 @@ public class CountryConstraintService {
         }
     }
 
-    //====================================================
     public void deleteCountryConstraint(BigInteger countryConstraintId) {
         boolean result = false;
         if (countryConstraintId != null)
@@ -119,8 +113,6 @@ public class CountryConstraintService {
         }
 
     }
-
-    //===================common=======================================
 
     /**
      * Validation sequence should follow this ordering
@@ -144,7 +136,6 @@ public class CountryConstraintService {
         return true;
     }
 
-    //============================Create Default constraints==================================
     public List<CountryConstraint> createDefaultCountryConstraints(Long countryId) {
         PlanningProblem planningProblem=planningProblemRepository.findPlanningProblemByType("shiftPlanning");
         BigInteger planningProblemId=null;

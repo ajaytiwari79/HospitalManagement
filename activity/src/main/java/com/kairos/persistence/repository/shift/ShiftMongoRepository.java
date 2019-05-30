@@ -21,13 +21,17 @@ import java.util.Set;
 @Repository
 public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInteger>, CustomShiftMongoRepository {
 
-    @Query(value = "{employmentId:?0,deleted:false,disabled:false,startDate:{$gte:?1,$lte:?2}}", fields = "{ 'startDate' : 1, 'endDate' : 1,'employmentId':1}")
+    @Query(value = "{employmentId:?0,deleted:false,disabled:false,startDate:{$gte:?1,$lte:?2}}", fields = "{ 'startDate' : 1, 'endDate' : 1,'employmentId':1,'activities':1}")
     List<ShiftDTO> findAllShiftBetweenDuration(Long employmentId, Date startDate, Date endDate);
 
     @Query(value = "{employmentId:?0,staffId:?1,unitId:?4,deleted:false,disabled:false,startDate:{$gte:?2,$lte:?3}}")
     List<ShiftDTO> getAllShiftBetweenDuration(Long employmentId,Long staffId, Date startDate, Date endDate,Long unitId);
 
+    @Query(value = "{'planningPeriodId':{'$in':?2},employmentId:?0,staffId:?1,unitId:?3,deleted:false,disabled:false,draftShift:{$exists:true}}")
+    List<Shift> getAllDraftShiftBetweenDuration(Long employmentId,Long staffId,List<BigInteger> planningPeriodIds,Long unitId);
+
     List<Shift> findByExternalIdIn(List<String> externalIds);
+
 
     @Query(value = "{employmentId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);
@@ -35,8 +39,12 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationByStaffId(Long staffId, Date startDate, Date endDate);
 
-    @Query("{'deleted':false,'unitId':?2, 'disabled':false, 'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
+    @Query("{'deleted':false,'unitId':?2, 'disabled':false, startDate: {$lte: ?1},endDate:{$gte:?0},draftShift:{$exists:true}}")
+    List<Shift> findDraftShiftBetweenDurationAndUnitIdAndDeletedFalse(Date startDate, Date endDate, Long unitId);
+
+    @Query("{'deleted':false,'unitId':?2, 'disabled':false, startDate: {$lte: ?1},endDate:{$gte:?0}}")
     List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(Date startDate, Date endDate, Long unitId);
+
 
     @Query("{'deleted':false,'unitId':?2, 'disabled':false, '_id':{'$ne':?3},'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
     List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(Date startDate, Date endDate, Long unitId,BigInteger shiftId);
@@ -80,4 +88,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query(value = "{employmentId:?0,deleted:false,'_id':{'$ne':?3}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}",exists=true)
     boolean shiftOverLapped(Long employmentId, Date startDate, Date endDate,BigInteger shiftId);
+
+    @Query(value = "{disabled:false,deleted:false,unitId:0,planningPeriodId:?1,draftState:{$exists:true}}")
+    List<Shift> findAllDraftShift(Long unitId,BigInteger planningPeriodid);
 }

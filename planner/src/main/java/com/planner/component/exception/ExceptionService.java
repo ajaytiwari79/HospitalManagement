@@ -29,8 +29,6 @@ public class ExceptionService {
         return localeService.getMessage(message, params);
     }
 
-    //============================Used throughout this planner module=================================
-
     public void dataNotFoundByIdException(String message, Object... params) {
         throw new DataNotFoundByIdException(convertMessage(message, params));
     }

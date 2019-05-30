@@ -146,5 +146,10 @@ public class ActivityIntegrationService {
       return genericRestClient.publishRequest(null,countryId,false,IntegrationOperation.GET,"/timeType/{timeTypeId}/verify/",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},timeTypeId);
     }
 
+    public void updateNightWorkers(List<Map> employments) {
+        genericRestClient.publishRequest(employments, null, false, IntegrationOperation.UPDATE, "/updateNightWorkers", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
+    }
+
 }
 

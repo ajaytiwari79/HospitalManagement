@@ -587,6 +587,11 @@ public  class DateUtils {
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    public static Date getEndOfDayDateFromLocalDate(LocalDate localDate) {
+
+        return Date.from(localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
+    }
+
     public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes, int seconds) {
         return LocalDateTime.of(localDate, LocalTime.of(hours, minutes, seconds));
     }

@@ -46,7 +46,7 @@ public class KPIUtils {
         switch (interval) {
             case LAST:
                 for (int i = 0; i < value; i++) {
-                    currentDate = getLastDateTimeIntervalByDate(currentDate,frequencyType, dateTimeIntervals);
+                    currentDate = getLastDateTimeIntervalByDate(currentDate.minusDays(1),frequencyType, dateTimeIntervals);
                 }
                 break;
             case CURRENT:
@@ -54,7 +54,7 @@ public class KPIUtils {
                 break;
             case NEXT:
                 for (int i = 0; i < value; i++) {
-                    currentDate = getNextDateTimeIntervalByDate(currentDate, frequencyType, dateTimeIntervals);
+                    currentDate = getNextDateTimeIntervalByDate(currentDate.plusDays(1), frequencyType, dateTimeIntervals);
                 }
                 break;
             default:

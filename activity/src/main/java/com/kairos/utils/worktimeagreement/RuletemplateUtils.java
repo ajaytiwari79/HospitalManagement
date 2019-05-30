@@ -274,7 +274,7 @@ public class RuletemplateUtils {
             if (localDates.get(l - 1).equals(localDates.get(l).minusDays(1))) {
                 count++;
             } else {
-                count = 0;
+                count = 1;
             }
             if (count > max) {
                 max = count;
@@ -308,10 +308,9 @@ public class RuletemplateUtils {
         return minMaxSetting.equals(MinMaxSetting.MINIMUM) ? limitValue <= calculatedValue : limitValue >= calculatedValue;
     }
 
-    public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
-        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
-        dates.sort(Comparator.naturalOrder());
-        return dates;
+    public static Set<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
+        Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
+        return new TreeSet<>(dates);
     }
 
 

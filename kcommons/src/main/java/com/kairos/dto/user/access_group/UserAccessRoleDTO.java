@@ -11,6 +11,11 @@ public class UserAccessRoleDTO {
         // default constructor
     }
 
+    public UserAccessRoleDTO(Boolean staff,Boolean management) {
+        this.staff = staff;
+        this.management = management;
+    }
+
     public UserAccessRoleDTO(Long userId, Long unitId, Boolean staff, Boolean management){
         this.userId = userId;
         this.unitId = unitId;

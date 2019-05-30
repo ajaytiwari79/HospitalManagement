@@ -625,4 +625,11 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePasswordByManagement(staffId,passwordUpdateDTO));
     }
 
+    @GetMapping(value = "/updateNightWorkers")
+    @ApiOperation("update password")
+    public ResponseEntity<Map<String, Object>> updateNightWorkers() {
+        employmentJobService.updateNightWorkers();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
+
 }

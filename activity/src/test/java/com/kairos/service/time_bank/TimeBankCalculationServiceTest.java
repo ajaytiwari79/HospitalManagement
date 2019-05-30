@@ -51,10 +51,7 @@ public class TimeBankCalculationServiceTest {
     @InjectMocks
     private TimeBankCalculationService timeBankCalculationService;
     @Mock
-    private TimeBankCalculationService timeBankCalculationServiceMock;
-    @Mock
     private TimeBankRepository timeBankRepository;
-    @Mock private PlanningPeriodMongoRepository planningPeriodMongoRepository;
 
 
     private StaffAdditionalInfoDTO staffAdditionalInfoDTO;
