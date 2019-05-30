@@ -25,9 +25,11 @@ import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.counter.ApplicableFilter;
@@ -155,6 +157,7 @@ public class CounterDataService extends MongoBaseService {
                 }
                 if(isNotNull(filters.getStartDate()) && isNotNull( filters.getEndDate())) {
                     staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
+                    staffApplicableKPI.setFrequencyType(DurationType.MONTHS);
                 }
                 staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
             }

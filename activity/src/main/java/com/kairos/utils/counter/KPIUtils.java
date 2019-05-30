@@ -88,11 +88,13 @@ public class KPIUtils {
     }
 
     public static void sortKpiDataByDateTimeInterval(List<CommonKpiDataUnit> kpiDataUnits) {
-        String label = kpiDataUnits.get(0).getLabel();
-        if (label.matches("\\d{2}-\\d{2}-\\d{4}")) {
-            kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel(), DateTimeFormatter.ofPattern("dd-MM-yyyy")).compareTo(LocalDate.parse(o2.getLabel(), DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
-        } else if (label.matches("\\d{2}-\\d{2}-\\d{4} - \\d{2}-\\d{2}-\\d{4}")) {
-            kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern("dd-MM-yyyy")).compareTo(LocalDate.parse(o2.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+        if(isCollectionNotEmpty(kpiDataUnits)) {
+            String label = kpiDataUnits.get(0).getLabel();
+            if (label.matches("\\d{2}-\\d{2}-\\d{4}")) {
+                kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel(), DateTimeFormatter.ofPattern("dd-MM-yyyy")).compareTo(LocalDate.parse(o2.getLabel(), DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+            } else if (label.matches("\\d{2}-\\d{2}-\\d{4} - \\d{2}-\\d{2}-\\d{4}")) {
+                kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern("dd-MM-yyyy")).compareTo(LocalDate.parse(o2.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+            }
         }
     }
 
@@ -101,6 +103,6 @@ public class KPIUtils {
     }
 
     public static boolean verifyKPIResponseData(Map<Object, Double> objectListMap){
-        return  objectListMap.values().stream().anyMatch(value -> new Double(0.0).equals(value));
+        return  objectListMap.values().stream().anyMatch(value -> !new Double(0.0).equals(value));
     }
 }
