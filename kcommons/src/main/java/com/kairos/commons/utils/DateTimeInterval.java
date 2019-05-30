@@ -18,7 +18,7 @@ import static javax.management.timer.Timer.ONE_MINUTE;
  */
 
 @IgnoreLogging
-public class DateTimeInterval implements Comparable<DateTimeInterval>{
+public class DateTimeInterval {
 
     private Long start;
     private Long end;
@@ -266,8 +266,5 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
                 '}';
     }
 
-    @Override
-    public int compareTo(DateTimeInterval dateTimeInterval) {
-        return this.start.compareTo(dateTimeInterval.start);
-    }
+
 }
