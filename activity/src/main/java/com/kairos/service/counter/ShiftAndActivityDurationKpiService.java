@@ -42,6 +42,7 @@ import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.AppConstants.BLANK_STRING;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseListData;
 
 @Service
 public class ShiftAndActivityDurationKpiService implements CounterService {
@@ -109,8 +110,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
                     kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue()));
                     break;
                 default:
-                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(),
-                             entry.getValue()));
+                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue()));
                     break;
 
             }
@@ -119,7 +119,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
 
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals,  ApplicableKPI applicableKPI, List<ShiftWithActivityDTO> shifts) {
-        Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap = new HashedMap();
+        Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap;
         Map<String, Integer> activityNameAndTotalDurationMinutesMap = new HashMap<>();
         Integer shiftDurationMinutes = 0;
         Map<String, String> activityNameAndColorCodeMap = new HashMap<>();
@@ -134,7 +134,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
                 staffIdAndShiftAndActivityDurationMap = getShiftAndActivityByRepresentPerInterval(dateTimeIntervalListMap, dateTimeIntervals, activityNameAndColorCodeMap , applicableKPI.getFrequencyType());
                 break;
         }
-        return staffIdAndShiftAndActivityDurationMap;
+        return verifyKPIResponseListData(staffIdAndShiftAndActivityDurationMap) ? staffIdAndShiftAndActivityDurationMap : new HashMap<>();
     }
 
 

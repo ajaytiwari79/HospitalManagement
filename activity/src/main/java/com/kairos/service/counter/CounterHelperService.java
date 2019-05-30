@@ -51,4 +51,5 @@ public class CounterHelperService {
         Set<DayOfWeek> daysOfWeeks = filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAYS_OF_WEEK)) ? KPIUtils.getDaysOfWeeksfromString(filterBasedCriteria.get(FilterType.DAYS_OF_WEEK)) : newHashSet(DayOfWeek.values());
         return new Object[]{staffIds,filterDates,unitIds,employmentTypeIds,daysOfWeeks};
     }
+
 }
