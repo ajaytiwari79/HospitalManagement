@@ -1,0 +1,8 @@
+
+## to set KPIset to multidimensional
+
+db.counter.updateMany({},{"$set":{"multiDimensional":true}})
+
+db.counter.updateMany({ type: { $in: ["RESTING_HOURS_PER_PRESENCE_DAY", "PLANNED_HOURS","TIMEBANK"] } },{"$set":{"multiDimensional":false}})
+
+
