@@ -306,9 +306,7 @@ public class CompanyCreationService {
                 userGraphRepository.save(user);
             } else {
                 if(unitManagerDTO.getCprNumber() != null) {
-                    StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(),
-                            unitManagerDTO.getLastName(), unitManagerDTO.getCprNumber(), null,
-                            unitManagerDTO.getEmail(), null, unitManagerDTO.getUserName(), null, unitManagerDTO.getAccessGroupId());
+                    StaffCreationDTO unitManagerData = new StaffCreationDTO(unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getCprNumber(), null, unitManagerDTO.getEmail(), null, unitManagerDTO.getUserName(), null, unitManagerDTO.getAccessGroupId());
                     staffCreationService.createUnitManagerForNewOrganization(organization, unitManagerData);
                 }
 
@@ -324,7 +322,6 @@ public class CompanyCreationService {
                 if(anotherUserExistBySameEmailOrCPR != 0) {
                     exceptionService.duplicateDataException(MESSAGE_CPRNUMBEREMAIL_NOTNULL);
                 }
-
                 user.setEmail(unitManagerDTO.getEmail());
                 user.setUserName(unitManagerDTO.getUserName());
                 user.setCprNumber(unitManagerDTO.getCprNumber());
@@ -347,12 +344,9 @@ public class CompanyCreationService {
                         userGraphRepository.save(user);
                         setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
                     } else {
-                        user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(),
-                                unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getUserName()
-                                ,true);
+                        user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getUserName(), true);
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
                     }
-
                     userGraphRepository.save(user);
                     staffService.setUserAndPosition(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
 
