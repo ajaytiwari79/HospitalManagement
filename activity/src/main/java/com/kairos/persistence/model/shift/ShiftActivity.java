@@ -50,9 +50,7 @@ public class ShiftActivity {
     private int plannedMinutesOfPayout;
     private int scheduledMinutesOfTimebank;
     private int scheduledMinutesOfPayout;
-
-    private Set<ShiftStatus> status = new HashSet<>(Arrays.asList(ShiftStatus.REQUEST));
-
+    private Set<ShiftStatus> status = new HashSet<>();
     private List<PlannedTime> plannedTimes;
 
 
@@ -61,8 +59,6 @@ public class ShiftActivity {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
     }
 
-
-    private Set<ShiftStatus> status = new HashSet<>();
 
 
     public ShiftActivity() {
