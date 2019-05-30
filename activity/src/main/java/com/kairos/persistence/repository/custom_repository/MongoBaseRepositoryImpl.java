@@ -3,6 +3,9 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.common.MongoSequence;
+import com.kairos.persistence.model.counter.Counter;
+import com.kairos.persistence.model.counter.FibonacciKPI;
+import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.utils.user_context.UserContext;
 import com.mongodb.BasicDBObject;
@@ -35,7 +38,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	/**
 	 *  Sequence collection name prefix
 	 * */
-	private static final String SEQUENCE_POST_FIX = "Sequence";
+	public static final String SEQUENCE_POST_FIX = "Sequence";
 
 	public MongoBaseRepositoryImpl(MongoEntityInformation<T, ID>  entityInformation,
 							  MongoOperations mongoOperations) {
@@ -134,6 +137,9 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 			if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
 				//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
 				className = entity.getClass().getSuperclass().getSimpleName();
+			}
+			if(entity.getClass().equals(FibonacciKPI.class)){
+				className = KPI.class.getSimpleName();
 			}
 			entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 			entity.setCreatedAt(DateUtils.getDate());

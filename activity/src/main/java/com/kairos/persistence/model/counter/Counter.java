@@ -17,18 +17,19 @@ import java.util.Set;
  */
 public class Counter extends MongoBaseEntity {
 
-    private CounterType type;
-    private String title;
-    private boolean counter;
-    private BigInteger primaryCounter; //to directly identify the base counters child
-    private BigInteger parentCounter;  //to identify parent counter
-    private BigInteger categoryId;
-    private List<FilterType> filterTypes;
-    private List<FilterCriteria> criteriaList;
-    private Set<ModuleType> supportedModuleTypes;
+    protected CounterType type;
+    protected String title;
+    protected boolean counter;
+    protected BigInteger primaryCounter; //to directly identify the base counters child
+    protected BigInteger parentCounter;  //to identify parent counter
+    protected BigInteger categoryId;
+    protected List<FilterType> filterTypes;
+    protected List<FilterCriteria> criteriaList;
+    protected Set<ModuleType> supportedModuleTypes;
     //calculation formula of per KPI
-    private String calculationFormula;
-    private ConfLevel applicableFor;
+    protected String calculationFormula;
+    protected ConfLevel applicableFor;
+    protected boolean multiDimensional;
 
     public Counter() {
     }
@@ -135,5 +136,13 @@ public class Counter extends MongoBaseEntity {
 
     public void setApplicableFor(ConfLevel applicableFor) {
         this.applicableFor = applicableFor;
+    }
+
+    public boolean isMultiDimensional() {
+        return multiDimensional;
+    }
+
+    public void setMultiDimensional(boolean multiDimensional) {
+        this.multiDimensional = multiDimensional;
     }
 }

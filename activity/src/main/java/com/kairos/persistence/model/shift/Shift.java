@@ -2,6 +2,7 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -63,14 +64,9 @@ public class Shift extends MongoBaseEntity {
     private int plannedMinutesOfPayout;
     private int scheduledMinutesOfTimebank;
     private int scheduledMinutesOfPayout;
+    private Shift draftShift;
+    private boolean draft;
 
-    public Long getStaffUserId() {
-        return staffUserId;
-    }
-
-    public void setStaffUserId(Long staffUserId) {
-        this.staffUserId = staffUserId;
-    }
 
     public Shift() {
         //Default Constructor
@@ -135,6 +131,13 @@ public class Shift extends MongoBaseEntity {
         this.shiftType=shiftType;
     }
 
+    public Long getStaffUserId() {
+        return staffUserId;
+    }
+
+    public void setStaffUserId(Long staffUserId) {
+        this.staffUserId = staffUserId;
+    }
 
     public ShiftType getShiftType() {
         return shiftType;
@@ -243,10 +246,6 @@ public class Shift extends MongoBaseEntity {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
-    public int getMinutes() {
-        return (int)getInterval().getMinutes();
-    }
-
     public String getRemarks() {
         return remarks;
     }
@@ -346,7 +345,11 @@ public class Shift extends MongoBaseEntity {
         this.functionId = functionId;
     }
 
+    @IgnoreLogging
     public DateTimeInterval getInterval() {
+        if(this.getActivities()==null){
+            return null;
+        }
         return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
     }
 
@@ -397,6 +400,22 @@ public class Shift extends MongoBaseEntity {
 
     public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
         this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
+    }
+
+    public Shift getDraftShift() {
+        return draftShift;
+    }
+
+    public void setDraftShift(Shift draftShift) {
+        this.draftShift = draftShift;
+    }
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
     }
 
     @Override
