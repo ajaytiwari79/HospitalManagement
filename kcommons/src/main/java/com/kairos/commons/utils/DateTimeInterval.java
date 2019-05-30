@@ -1,6 +1,7 @@
 package com.kairos.commons.utils;
 
 
+import com.kairos.commons.IgnoreLogging;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -16,7 +17,8 @@ import static javax.management.timer.Timer.ONE_MINUTE;
  * @date - 14/5/18
  */
 
-public class DateTimeInterval implements Comparable<DateTimeInterval>{
+@IgnoreLogging
+public class DateTimeInterval {
 
     private Long start;
     private Long end;
@@ -264,8 +266,5 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
                 '}';
     }
 
-    @Override
-    public int compareTo(DateTimeInterval o) {
-        return this.start.compareTo(o.start);
-    }
+
 }

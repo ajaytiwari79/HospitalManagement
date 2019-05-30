@@ -209,7 +209,7 @@ public class TimeBankKpiCalculationService implements CounterService {
             }
             subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(unitName, null, DateUtils.getHoursByMinutes(totalTimeBankOfUnit)));
         }
-        staffIdAndTimeBankMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())),subClusteredBarValue );
+        staffIdAndTimeBankMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())),subClusteredBarValue );
         return staffIdAndTimeBankMap;
     }
 

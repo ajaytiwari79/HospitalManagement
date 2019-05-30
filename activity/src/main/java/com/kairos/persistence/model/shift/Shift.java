@@ -2,6 +2,7 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -245,10 +246,6 @@ public class Shift extends MongoBaseEntity {
         this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
     }
 
-    public int getMinutes() {
-        return (int)getInterval().getMinutes();
-    }
-
     public String getRemarks() {
         return remarks;
     }
@@ -348,7 +345,11 @@ public class Shift extends MongoBaseEntity {
         this.functionId = functionId;
     }
 
+    @IgnoreLogging
     public DateTimeInterval getInterval() {
+        if(this.getActivities()==null){
+            return null;
+        }
         return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
     }
 
