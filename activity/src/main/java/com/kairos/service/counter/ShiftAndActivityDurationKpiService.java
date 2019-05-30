@@ -110,7 +110,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
                     break;
                 default:
                     kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(),
-                            (Long)entry.getKey(), entry.getValue()));
+                             entry.getValue()));
                     break;
 
             }
