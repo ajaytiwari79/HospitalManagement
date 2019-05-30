@@ -785,14 +785,16 @@ public class PlanningPeriodService extends MongoBaseService {
     public void publishShiftsAfterFlippingPhaseConstructionToDraft(BigInteger planningPeriodId, Long unitId){
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
         List<Shift> shifts=shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriodId,unitId,ShiftStatus.PUBLISH);
-        for (Shift shift : shifts) {
-            for (ShiftActivity shiftActivity : shift.getActivities()) {
-                if(!shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))
-                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+        if(isCollectionNotEmpty(shifts)) {
+            for (Shift shift : shifts) {
+                for (ShiftActivity shiftActivity : shift.getActivities()) {
+                    if (!shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))
+                        shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                }
             }
+            save(shifts);
+            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
+            LOGGER.info("successfully p-ublish shift after flipping planning period contruction to draft phase");
         }
-        save(shifts);
-        timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
-        LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
     }
 }
