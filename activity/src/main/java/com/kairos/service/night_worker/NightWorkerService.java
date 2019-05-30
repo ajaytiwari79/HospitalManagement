@@ -381,4 +381,15 @@ public class NightWorkerService {
         });
     }
 
+    public Map<Long,Boolean> getStaffNightWorkerDetails(List<Long> staffIds){
+        List<NightWorker> nightWorker = nightWorkerMongoRepository.findByStaffIds(staffIds);
+        Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorker.stream().collect(Collectors.toMap(NightWorker::getStaffId,NightWorker::isNightWorker));
+        for (Long staffId : staffIds) {
+            if(!staffIdAndNightWorkerMap.containsKey(staffId)) {
+                staffIdAndNightWorkerMap.put(staffId, false);
+            }
+        }
+        return staffIdAndNightWorkerMap;
+    }
+
 }
