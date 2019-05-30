@@ -223,14 +223,6 @@ public class PlannedHoursCalculationService implements CounterService {
 
     public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();;
-       /* Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
-        List<Long> staffIds = new ArrayList<>();
-        List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
-        staffIds = (List<Long>) kpiData[2];
-        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
-        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffIds, newArrayList(organizationId), newArrayList(), newHashSet(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-        Map<Object, Double> restingHoursMap = getStaffPlannedHoursByRepresentPerStaff(staffIds, shifts);*/
         Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria,organizationId,applicableKPI);
         Map<Long, Double> staffAndPlanningHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().doubleValue()));
         kpiSetResponseDTO.setKpiId(kpi.getId());
