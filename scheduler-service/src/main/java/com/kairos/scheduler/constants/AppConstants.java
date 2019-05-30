@@ -22,7 +22,7 @@ public class AppConstants {
     public static final String ACTIVITY_TO_SCHEDULER_LOGS_QUEUE_TOPIC="activityToSchedulerLogQueue";
 
     public static final String JOB_TO_CHECK_SICK_USER = "JOB_TO_CHECK_SICK_USER";
-    public final static Set<JobSubType> userSubTypes = Stream.of(INTEGRATION, EMPLOYMENT_END, QUESTIONAIRE_NIGHTWORKER, SENIORITY_LEVEL).collect(Collectors.toSet());
+    public final static Set<JobSubType> userSubTypes = Stream.of(INTEGRATION, EMPLOYMENT_END, QUESTIONAIRE_NIGHTWORKER, SENIORITY_LEVEL,NIGHT_WORKER).collect(Collectors.toSet());
     public final static Set<JobSubType> activitySubTypes = Stream.of(PRIORITYGROUP_FILTER, FLIP_PHASE, SHIFT_REMINDER, UPDATE_USER_ABSENCE,ATTENDANCE_SETTING, ADD_PAYROLL_PERIOD,ADD_PLANNING_PERIOD,UNASSIGN_EXPERTISE_FROM_ACTIVITY).collect(Collectors.toSet());
 
     //Mail constansts
