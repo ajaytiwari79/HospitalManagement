@@ -2,13 +2,12 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.counter.data.FilterCriteria;
-import com.kairos.utils.counter.KPIUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
@@ -26,19 +25,18 @@ import com.kairos.enums.Day;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import org.apache.commons.collections.map.HashedMap;
+import com.kairos.utils.counter.KPIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,10 +45,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
+import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
+import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseListData;
 
 
 @Service
@@ -252,7 +251,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
                 objectListMap = getTotalHoursOfTimeSlotByInterval(timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals,dateTimeIntervalListMap,applicableKPI.getFrequencyType());
                 break;
         }
-        return objectListMap;
+        return verifyKPIResponseListData(objectListMap) ? objectListMap : new HashMap<>();
 
     }
 

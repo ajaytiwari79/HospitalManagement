@@ -44,6 +44,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
 
 @Service
 public class ContractualAndPlannedHoursCalculationService implements CounterService {
@@ -190,7 +191,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
                 staffContratualHours = calculateContractualHoursPerInterval(planningPeriodIntervel,staffKpiFilterDTOS,dateTimeIntervals, applicableKPI.getFrequencyType());
                 break;
         }
-        return staffContratualHours;
+        return verifyKPIResponseData(staffContratualHours) ? staffContratualHours : new HashMap<>();
     }
 
 

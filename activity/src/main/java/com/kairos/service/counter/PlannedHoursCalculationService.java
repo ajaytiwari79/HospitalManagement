@@ -41,6 +41,7 @@ import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
 
 @Service
 public class PlannedHoursCalculationService implements CounterService {
@@ -146,7 +147,7 @@ public class PlannedHoursCalculationService implements CounterService {
                 staffplannedHours = getStaffPlannedHoursByRepresentPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI.getFrequencyType());
                 break;
         }
-        return staffplannedHours;
+        return verifyKPIResponseData(staffplannedHours) ? staffplannedHours : new HashMap<>();
     }
 
     private Map<Object, Double> getStaffPlannedHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType) {
