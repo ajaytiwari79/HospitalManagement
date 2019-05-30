@@ -24,8 +24,8 @@ import static com.kairos.scheduler.constants.ApiConstants.API_SCHEDULER_URL;
 import static com.kairos.scheduler.constants.ApiConstants.API_UNIT_SCHEDULER_URL;
 
 @RestController
-@RequestMapping(API_UNIT_SCHEDULER_URL)
-@Api(API_UNIT_SCHEDULER_URL)
+@RequestMapping
+@Api
 public class SchedulerPanelController {
 
     @Inject
@@ -131,7 +131,7 @@ public class SchedulerPanelController {
         }
 
     @PostMapping(API_SCHEDULER_URL)
-    @ApiOperation("Create Scheduler Panel ")
+    @ApiOperation("Create System Scheduler Panel ")
     public ResponseEntity<Map<String, Object>> addSystemSchedulerPanel(@RequestBody List<SchedulerPanelDTO> schedulerPanelDTOs) throws IOException {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(null, schedulerPanelDTOs));
     }
