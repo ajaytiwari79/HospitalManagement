@@ -38,7 +38,6 @@ public class KPIUtils {
 
     public static List<DateTimeInterval> getDateTimeIntervals(Interval interval,int value,DurationType frequencyType, List<LocalDate> filterDates) {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
-        //Set<DateTimeInterval> dateTimeIntervals = new TreeSet<>(Comparator.comparing(DateTimeInterval::getStartMillis));
         if(isCollectionNotEmpty(filterDates)){
             dateTimeIntervals.add(new DateTimeInterval(filterDates.get(0),filterDates.get(1)));
             return dateTimeIntervals;
@@ -46,16 +45,18 @@ public class KPIUtils {
         LocalDate currentDate = DateUtils.getCurrentLocalDate();
         switch (interval) {
             case LAST:
+                currentDate.minusDays(1);
                 for (int i = 0; i < value; i++) {
-                    currentDate = getLastDateTimeIntervalByDate(currentDate.minusDays(1),frequencyType, dateTimeIntervals);
+                    currentDate = getLastDateTimeIntervalByDate(currentDate,frequencyType, dateTimeIntervals);
                 }
                 break;
             case CURRENT:
                 getCurrentDateTimeIntervalByDate(currentDate, frequencyType, dateTimeIntervals);
                 break;
             case NEXT:
+                currentDate=currentDate.plusDays(1);
                 for (int i = 0; i < value; i++) {
-                    currentDate = getNextDateTimeIntervalByDate(currentDate.plusDays(1), frequencyType, dateTimeIntervals);
+                    currentDate = getNextDateTimeIntervalByDate(currentDate, frequencyType, dateTimeIntervals);
                 }
                 break;
             default:
