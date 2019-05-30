@@ -189,7 +189,55 @@ public class TimeBankCalculationServiceTest {
         Map<LocalDate, TimeBankByDateDTO> localDateTimeBankByDateDTOMap = timeBankCalculationService.getAccumulatedTimebankDTO(planningPeriodIntervals, dailyTimeBankEntries, unitPositionWithCtaDetailsDTO, startDate, endDate);*/
     }
 
+    //  @Test
+    public void diffChecker(){
 
+        DailyTimeBankEntry dailyTimeBankEntry = new DailyTimeBankEntry(153l,179l,LocalDate.now());
+        DailyTimeBankEntry dailyTimeBankEntry2 = new DailyTimeBankEntry(253l,179l,LocalDate.of(2019,12,15));
+
+        //DiffNode diff = ObjectDifferBuilder.buildDefault().compare(dailyTimeBankEntry, dailyTimeBankEntry2);
+
+        ObjectDifferBuilder builder = ObjectDifferBuilder.startBuilding();
+        //builder.inclusion().exclude().propertyNameOfType(User.class, "authorities");
+        DiffNode diff = builder.build().compare(dailyTimeBankEntry, dailyTimeBankEntry2);
+        final Map<String , Object> result = new  HashMap<String, Object>();
+        diff.visit(new DiffNode.Visitor()
+        {
+            @Override
+            public void node(DiffNode arg0, Visit arg1) {
+                String path = arg0.getPath().getLastElementSelector().toHumanReadableString().toString();
+                final Object oldValue = arg0.canonicalGet(dailyTimeBankEntry2);
+                final Object newValue = arg0.canonicalGet(dailyTimeBankEntry);
+                String properteyName = arg0.getPropertyName();
+                if(isNotNull(properteyName) && isValid(arg0) || isValidPa(arg0)) {
+                    if(arg0.isChanged() && !path.toUpperCase().contains("UPDATEDATE") && !path.equals("/")) {
+                        result.put("new_" + path, newValue);
+                        result.put("old_" + path, oldValue);
+                    }
+                    if((oldValue == null || newValue == null)) {
+                        result.put("new" + path, newValue);
+                        result.put("old" + path, oldValue);
+                    }
+                    if(arg0.isChanged() && !path.toUpperCase().contains("UPDATEDATE") && !path.equals("/") && !arg0.hasChildren()) {
+                        result.put("new" + path, newValue);
+                        result.put("old" + path, oldValue);
+                    }
+                }
+            }
+
+        });
+        LOGGER.info("test {}",result);
+    }
+
+    boolean isValid(DiffNode arg0){
+        Set<String> strings = newHashSet("int","long");
+        return strings.contains(arg0.getValueType().getName()) && isNotNull(arg0.getParentNode()) && !arg0.getParentNode().getValueType().getPackage().getName().contains("java.time");
+    }
+
+    boolean isValidPa(DiffNode arg0){
+        LOGGER.debug("property {}",arg0.getPropertyName());
+        return isNotNull(arg0.getValueType().getPackage()) && isNotNull(arg0.getParentNode().getValueType().getPackage()) && !arg0.getParentNode().getValueType().getPackage().getName().contains("java.time");
+    }
 
     //@Test
     public void updateMessageProperties() {
