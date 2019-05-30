@@ -139,7 +139,6 @@ public class StaffFilterService {
             case EMPLOYMENT: {
                 return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
             }
-
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
