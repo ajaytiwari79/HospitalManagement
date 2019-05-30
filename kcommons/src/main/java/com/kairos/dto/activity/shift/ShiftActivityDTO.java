@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.IgnoreLogging;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
@@ -135,12 +137,20 @@ public class ShiftActivityDTO {
     }
 
     @JsonIgnore
+    @IgnoreLogging
     public LocalDate getStartLocalDate(){
+        if(isNull(this.startDate)){
+            return null;
+        }
         return asLocalDate(this.startDate);
     }
 
     @JsonIgnore
+    @IgnoreLogging
     public LocalDate getEndLocalDate(){
+        if(isNull(this.endDate)){
+            return null;
+        }
         return asLocalDate(this.endDate);
     }
 
