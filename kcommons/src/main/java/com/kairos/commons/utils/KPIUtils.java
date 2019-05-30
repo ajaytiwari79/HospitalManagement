@@ -38,7 +38,6 @@ public class KPIUtils {
 
     public static List<DateTimeInterval> getDateTimeIntervals(Interval interval,int value,DurationType frequencyType, List<LocalDate> filterDates) {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
-        //Set<DateTimeInterval> dateTimeIntervals = new TreeSet<>(Comparator.comparing(DateTimeInterval::getStartMillis));
         if(isCollectionNotEmpty(filterDates)){
             dateTimeIntervals.add(new DateTimeInterval(filterDates.get(0),filterDates.get(1)));
             return dateTimeIntervals;
