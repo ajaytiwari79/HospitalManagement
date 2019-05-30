@@ -25,7 +25,6 @@ public class SchedulerToUserQueueService implements JobQueueExecutor {
     private static Logger logger = LoggerFactory.getLogger(SchedulerToUserQueueService.class);
 
     public void execute(KairosSchedulerExecutorDTO job) {
-
         switch(job.getJobSubType()) {
             case INTEGRATION:
                 integrationJobService.runJob(job);
