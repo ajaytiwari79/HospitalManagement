@@ -42,7 +42,7 @@ public class UserIntegrationService {
 
 
     public void exceuteScheduleJob(KairosSchedulerExecutorDTO job){
-        userRestClient.publishRequest(job,null,false, IntegrationOperation.CREATE,SCHEDULER_EXECUTE_JOB,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        userRestClient.publishRequest(job,null,false, IntegrationOperation.CREATE,"scheduler_execute_job",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         },true);
     }
 
