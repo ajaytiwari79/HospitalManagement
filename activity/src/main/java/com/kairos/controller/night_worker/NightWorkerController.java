@@ -70,6 +70,15 @@ public class NightWorkerController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
+    @ApiOperation(value = "get night worker details")
+    @PostMapping(value = UNIT_URL+"/get_night_worker_details")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@RequestBody List<Long> staffIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,nightWorkerService.getStaffNightWorkerDetails(staffIds));
+    }
+
+
+
     @ApiOperation(value = "Register job for night worker")
     @PostMapping(value = "/register_job_for_night_worker")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

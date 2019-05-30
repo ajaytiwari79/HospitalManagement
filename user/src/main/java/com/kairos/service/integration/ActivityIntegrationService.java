@@ -151,5 +151,10 @@ public class ActivityIntegrationService {
         });
     }
 
+    public Map<Long,Boolean> getNightWorkerDetails(List<Long> staffIds,Long unitId) {
+        return genericRestClient.publishRequest(staffIds, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
+        });
+    }
+
 }
 
