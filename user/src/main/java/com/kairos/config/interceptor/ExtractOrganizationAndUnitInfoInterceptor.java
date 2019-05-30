@@ -28,6 +28,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             HttpServletResponse response,
             Object handler) throws Exception {
 
+        if(request.getRequestURL().toString().contains("/scheduler_execute_job")) return true;
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);

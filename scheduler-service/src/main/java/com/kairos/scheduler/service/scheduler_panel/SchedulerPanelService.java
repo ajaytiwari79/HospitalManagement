@@ -82,7 +82,11 @@ public class SchedulerPanelService extends MongoBaseService {
                 if (!(schedulerPanel.isOneTimeTrigger() && schedulerPanel.getOneTimeTriggerDate().isBefore(LocalDateTime.now()))) {
                     logger.info("Inside initSchedulerPanels" + schedulerPanel.getUnitId() + " unitId = " + unitIdTimeZoneMap.containsKey(schedulerPanel.getUnitId()));
                     //if there is no timezone of unit/organization then we set "UTC" timezone of that unit
-                    dynamicCronScheduler.setCronScheduling(schedulerPanel, unitIdTimeZoneMap.getOrDefault(schedulerPanel.getUnitId(), AppConstants.TIMEZONE_UTC));
+                    String timeZone = AppConstants.TIMEZONE_UTC;
+                    if(isNotNull(schedulerPanel.getUnitId())){
+                        timeZone = unitIdTimeZoneMap.getOrDefault(schedulerPanel.getUnitId(), AppConstants.TIMEZONE_UTC);
+                    }
+                    dynamicCronScheduler.setCronScheduling(schedulerPanel, timeZone);
                 }
             }
         }
