@@ -147,7 +147,7 @@ public class KPISetService {
 
     public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, Date startDate) {
         List<KPISetResponseDTO> kpiSetResponseDTOList = new ArrayList<>();
-        List<ApplicableKPI>  applicableKPIS =new ArrayList<>();
+        List<ApplicableKPI>  applicableKPIS ;
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
         List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
@@ -161,7 +161,7 @@ public class KPISetService {
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
                         kpiSetResponseDTO.setKpiSetName(kpiSet.getName());
                         kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
-                        applicableKPIS = counterRepository.getKPIByKPIIds(kpiSet.getKpiIds().stream().collect(Collectors.toList()), unitId, ConfLevel.UNIT);
+                        applicableKPIS = counterRepository.getKPIByKPIIds(kpiSet.getKpiIds().stream().collect(Collectors.toList()), accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF);
                         for (ApplicableKPI applicableKPI : applicableKPIS) {
                             applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                             FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),Arrays.asList(applicableKPI.getActiveKpiId()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPI.getApplicableFilter().getCriteriaList(),applicableKPI.getInterval(),applicableKPI.getFrequencyType(),applicableKPI.getValue(),unitId);

@@ -18,4 +18,13 @@ public class KPIResponseDTO {
 
     private Map<Long, Double> staffKPIValue;
 
+    public KPIResponseDTO() {
+        //DC
+    }
+
+    public KPIResponseDTO(BigInteger kpiId, String kpiName, Map<Long, Double> staffKPIValue) {
+        this.kpiId = kpiId;
+        this.kpiName = kpiName;
+        this.staffKPIValue = staffKPIValue;
+    }
 }

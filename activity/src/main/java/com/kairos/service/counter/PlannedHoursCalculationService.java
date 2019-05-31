@@ -209,12 +209,6 @@ public class PlannedHoursCalculationService implements CounterService {
 
     @Override
     public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,ApplicableKPI applicableKPI) {
-       /* Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
-        List<Long> staffIds = (List<Long>)filterCriteria[0];
-        List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
-        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
-        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffIds, newArrayList(organizationId), newArrayList(), newHashSet(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());*/
         Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria,organizationId,applicableKPI);
         Map<Long, Integer> staffAndRestingHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
         return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
