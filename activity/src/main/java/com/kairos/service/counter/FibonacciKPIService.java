@@ -1,32 +1,24 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.utils.counter.KPIUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.constants.AppConstants;
 import com.kairos.counter.CounterServiceMapping;
-import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
-import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
-import com.kairos.dto.activity.counter.data.KPIAxisData;
-import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.DisplayUnit;
-import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
-import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.kpi.*;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
+import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.counter.KPIUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,16 +28,11 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
-import static com.kairos.commons.utils.DateUtils.getHoursByMinutes;
-import static com.kairos.utils.counter.KPIUtils.getLongValue;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.dto.activity.counter.enums.ConfLevel.UNIT;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.dto.activity.counter.enums.ConfLevel.UNIT;
+import static com.kairos.utils.counter.KPIUtils.getLongValue;
 
 @Service
 public class FibonacciKPIService implements CounterService{
@@ -156,6 +143,11 @@ public class FibonacciKPIService implements CounterService{
             }});
         }*/
         return null;//new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, new ArrayList<>(staffAndfibonacciKpiDataMap.values()), new KPIAxisData(AppConstants.DATE,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
+    }
+
+    @Override
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
+        return null;
     }
 
     @Override

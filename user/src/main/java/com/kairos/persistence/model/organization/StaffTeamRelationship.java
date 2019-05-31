@@ -1,5 +1,8 @@
 package com.kairos.persistence.model.organization;
 
+import com.kairos.annotations.KPermissionRelatedModel;
+import com.kairos.annotations.KPermissionRelationshipFrom;
+import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -13,13 +16,15 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 /**
  * Created by oodles on 6/10/16.
  */
-
+@KPermissionRelatedModel
 @RelationshipEntity(type = TEAM_HAS_MEMBER)
 public class StaffTeamRelationship extends UserBaseEntity {
 
+    @KPermissionRelationshipTo
     @StartNode
     private Team team;
 
+    @KPermissionRelationshipFrom
     @EndNode
     private Staff staff;
 

@@ -26,7 +26,7 @@ public class ShiftViolatedRules extends MongoBaseEntity {
     private List<ActivityRuleViolation> activities;
     private Set<ShiftEscalationReason> escalationReasons;
     private boolean escalationResolved;
-
+    private boolean draft;
     public ShiftViolatedRules() {
     }
 
@@ -76,5 +76,13 @@ public class ShiftViolatedRules extends MongoBaseEntity {
 
     public void setEscalationResolved(boolean escalationResolved) {
         this.escalationResolved = escalationResolved;
+    }
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
     }
 }

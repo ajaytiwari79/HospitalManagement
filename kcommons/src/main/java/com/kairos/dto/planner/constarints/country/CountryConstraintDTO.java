@@ -11,8 +11,6 @@ public class CountryConstraintDTO extends ConstraintDTO {
     //@NotBlank
     private Long organizationSubServiceId;
 
-    //======================================================
-
     public Long getCountryId() {
         return countryId;
     }

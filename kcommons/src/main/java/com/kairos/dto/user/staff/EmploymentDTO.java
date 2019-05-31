@@ -24,6 +24,7 @@ public class EmploymentDTO {
     private Long timeCareExternalId;
 
     public EmploymentDTO() {
+        //Not in use
     }
 
 

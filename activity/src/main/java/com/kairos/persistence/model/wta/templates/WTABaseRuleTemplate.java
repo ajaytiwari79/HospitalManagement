@@ -30,7 +30,7 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected Integer managementCanIgnoreCounter;
 
     public WTABaseRuleTemplate(){
-        //Not in Use
+        //Not in use
     }
 
     public WTABaseRuleTemplate(String name,String description) {

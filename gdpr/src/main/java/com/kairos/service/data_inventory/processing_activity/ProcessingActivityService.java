@@ -177,7 +177,7 @@ public class ProcessingActivityService {
         processingActivity.setJointControllerContactInfo(processingActivityDTO.getJointControllerContactInfo());
         processingActivity.setMaxDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
         processingActivity.setMinDataSubjectVolume(processingActivityDTO.getMinDataSubjectVolume());
-        processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getId(), processingActivityDTO.getManagingDepartment().getName()));
+        processingActivity.setManagingDepartment(new ManagingOrganization(processingActivityDTO.getManagingDepartment().getManagingOrgId(), processingActivityDTO.getManagingDepartment().getManagingOrgName()));
         processingActivity.setProcessOwner(new Staff(processingActivityDTO.getProcessOwner().getStaffId(), processingActivityDTO.getProcessOwner().getFirstName(), processingActivityDTO.getProcessOwner().getLastName()));
         Optional.ofNullable(processingActivityDTO.getResponsibilityType()).ifPresent(responsibilityTypeId -> processingActivity.setResponsibilityType(responsibilityTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(responsibilityTypeId, unitId)));
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getTransferMethods()))

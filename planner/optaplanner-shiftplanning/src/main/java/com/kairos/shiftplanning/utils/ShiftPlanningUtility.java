@@ -638,6 +638,8 @@ public class ShiftPlanningUtility {
                 return new Interval(shift.getStart().plusMinutes(SECOND_BREAK_START_MINUTES), shift.getStart().plusMinutes(SECOND_BREAK_END_MINUTES));
             case 3:
                 return new Interval(shift.getStart().plusMinutes(THIRD_BREAK_START_MINUTES), shift.getStart().plusMinutes(THIRD_BREAK_END_MINUTES));
+            default:
+                break;
         }
         return null;
     }

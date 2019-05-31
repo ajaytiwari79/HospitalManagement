@@ -29,6 +29,7 @@ public class Counter extends MongoBaseEntity {
     //calculation formula of per KPI
     protected String calculationFormula;
     protected ConfLevel applicableFor;
+    protected boolean multiDimensional;
 
     public Counter() {
     }
@@ -135,5 +136,13 @@ public class Counter extends MongoBaseEntity {
 
     public void setApplicableFor(ConfLevel applicableFor) {
         this.applicableFor = applicableFor;
+    }
+
+    public boolean isMultiDimensional() {
+        return multiDimensional;
+    }
+
+    public void setMultiDimensional(boolean multiDimensional) {
+        this.multiDimensional = multiDimensional;
     }
 }

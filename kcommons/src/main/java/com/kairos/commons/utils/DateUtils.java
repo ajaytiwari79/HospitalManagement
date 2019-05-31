@@ -1,5 +1,6 @@
 package com.kairos.commons.utils;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.DurationType;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -343,6 +344,7 @@ public  class DateUtils {
             case HOURS: {
                 return (60 * Period.between(startDate, endDate).getDays());
             }
+            default:break;
         }
         return Period.between(startDate, endDate).getDays();
 
@@ -434,6 +436,7 @@ public  class DateUtils {
             case MINUTES: {
                 return localDateTime.plusMinutes(duration * recurringNumber);
             }
+            default:break;
 
 
         }
@@ -450,8 +453,7 @@ public  class DateUtils {
             case MINUTES: {
                 return localDateTime.minusMinutes(duration );
             }
-
-
+            default:break;
         }
         return localDateTime;
     }
@@ -470,6 +472,7 @@ public  class DateUtils {
             case YEAR: {
                 return localDate.plusYears(duration * recurringNumber);
             }
+            default:break;
         }
         return localDate;
     }
@@ -583,6 +586,11 @@ public  class DateUtils {
     public static LocalDateTime getEndOfDayFromLocalDate(LocalDate localDate) {
 
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static Date getEndOfDayDateFromLocalDate(LocalDate localDate) {
+
+        return Date.from(localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes, int seconds) {

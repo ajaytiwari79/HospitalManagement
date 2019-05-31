@@ -10,6 +10,8 @@ import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.enums.DurationType;
@@ -27,6 +29,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
 
 @Service
 public class ContractualAndPlannedHoursCalculationService implements CounterService {
@@ -142,7 +146,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
             for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
                 contractualMinutes = getaContratualMinutes(unitIdAndPlanningPeriodIntervalMap, interval, staffKpiFilterDTO, contractualMinutes);
                 }
-            dateTimeIntervalAndContractualHourMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), DateUtils.getHoursByMinutes(contractualMinutes.doubleValue()));
+            dateTimeIntervalAndContractualHourMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), DateUtils.getHoursByMinutes(contractualMinutes.doubleValue()));
 
         return dateTimeIntervalAndContractualHourMap;
     }
@@ -187,7 +191,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
                 staffContratualHours = calculateContractualHoursPerInterval(planningPeriodIntervel,staffKpiFilterDTOS,dateTimeIntervals, applicableKPI.getFrequencyType());
                 break;
         }
-        return staffContratualHours;
+        return verifyKPIResponseData(staffContratualHours) ? staffContratualHours : new HashMap<>();
     }
 
 
@@ -205,4 +209,9 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         }
         return kpiDataUnits;
     }
+
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+        return new KPISetResponseDTO();
+    }
+
 }

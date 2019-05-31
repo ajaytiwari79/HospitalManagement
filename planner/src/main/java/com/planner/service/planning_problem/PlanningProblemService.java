@@ -55,8 +55,6 @@ public class PlanningProblemService {
         }
     }
 
-
-    //=================================================================================
     public PlanningProblemDTO createDefaultPlanningProblem() {
         PlanningProblem defaultPlanningProblem = new PlanningProblem();
         defaultPlanningProblem.setName("ShiftPlanning");

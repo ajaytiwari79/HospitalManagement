@@ -87,6 +87,8 @@ public class WorkTimeAgreementBalancesCalculationService {
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
                     interval = interval.addInterval(getIntervalByWTACareDaysRuleTemplate(startDate, wtaForCareDays, activityWrapperMap, planningPeriodEndDate));
                     break;
+                default:
+                    break;
             }
         }
         return interval;
@@ -112,6 +114,8 @@ public class WorkTimeAgreementBalancesCalculationService {
                 case WTA_FOR_CARE_DAYS:
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
                     activityIds.addAll(wtaForCareDays.getCareDayCounts().stream().map(activityCareDayCount -> activityCareDayCount.getActivityId()).collect(Collectors.toSet()));
+                    break;
+                default:
                     break;
             }
         }
@@ -394,6 +398,8 @@ public class WorkTimeAgreementBalancesCalculationService {
                     break;
                 case YEARS:
                     nextEndDate = startDate.plusYears(1);
+                    break;
+                default:
                     break;
             }
 

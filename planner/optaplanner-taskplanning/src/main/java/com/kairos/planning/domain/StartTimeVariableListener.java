@@ -18,7 +18,7 @@ public class StartTimeVariableListener implements VariableListener<Task> {
 
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
@@ -28,7 +28,7 @@ public class StartTimeVariableListener implements VariableListener<Task> {
 
     @Override
     public void beforeVariableChanged(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
@@ -40,12 +40,12 @@ public class StartTimeVariableListener implements VariableListener<Task> {
 
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityRemoved(ScoreDirector scoreDirector, Task task) {
-
+        //Not in use
     }
     private void updateStartTime(ScoreDirector scoreDirector, Task task) {
         AvailabilityRequest shift=task.getEmployee()==null?null: TaskPlanningUtility.getEmployeeAvailabilityForDay(task.getEmployee(), scoreDirector);

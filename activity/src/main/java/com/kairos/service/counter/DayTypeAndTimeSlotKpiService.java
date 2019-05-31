@@ -2,17 +2,18 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.utils.counter.KPIUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -24,12 +25,15 @@ import com.kairos.enums.Day;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.utils.counter.KPIUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -41,10 +45,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
+import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
+import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseListData;
 
 
 @Service
@@ -56,7 +61,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
     @Inject
     private CounterHelperService counterHelperService;
 
-
+    private static Logger LOGGER = LoggerFactory.getLogger(DayTypeAndTimeSlotKpiService.class);
     // use for calculate hours of given days of daytype
     private Double getTotalHoursOfDayType(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Day> days) {
         Long totalMilliSeconds = 0L;
@@ -157,6 +162,11 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
 
 
     @Override
+    public Map<FilterType, List> getApplicableFilters(List<FilterCriteria> availableFilters, Map<FilterType, List> providedFiltersMap) {
+        return null;
+    }
+
+    @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getDayTypeAndTimeSlotHours(organizationId, filterBasedCriteria,null);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
@@ -168,7 +178,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
-    @Override
+
     public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
         List<Long> staffIds = staffKpiFilterDTOS.stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toList());
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, newArrayList(organizationId), new ArrayList<>(), new ArrayList<>(), DateUtils.asDate(filterDates.get(0)), DateUtils.asDate(DateUtils.getEndOfDayFromLocalDate(filterDates.get(1))));
@@ -212,7 +222,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTotalHoursOfTimeSlotByTotalData(List<ShiftWithActivityDTO> shiftWithActivityDTOS, TimeSlotDTO timeSlotDTO, List<Long> dayTypeIds, Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap, List<DateTimeInterval> dateTimeIntervals) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> intervalAndTotalHours = new HashMap<>();
-        String dateTimeInterval=getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate()));
+        String dateTimeInterval=getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate()));
         intervalAndTotalHours.putIfAbsent(dateTimeInterval, new ArrayList<>());
             Map<LocalDate, List<ShiftWithActivityDTO>> localDateShiftMap = shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(k -> asLocalDate(k.getStartDate()), Collectors.toList()));
             for (Long dayTypeId : dayTypeIds) {
@@ -241,7 +251,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
                 objectListMap = getTotalHoursOfTimeSlotByInterval(timeSlotDTO,dayTypeIds,daysTypeIdAndDayTypeMap,dateTimeIntervals,dateTimeIntervalListMap,applicableKPI.getFrequencyType());
                 break;
         }
-        return objectListMap;
+        return verifyKPIResponseListData(objectListMap) ? objectListMap : new HashMap<>();
 
     }
 
@@ -259,4 +269,14 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
             }
         }
     }
+
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+         return  new KPISetResponseDTO();
+    }
+
+    @Override
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, ApplicableKPI applicableKPI) {
+        return null;
+    }
+
 }

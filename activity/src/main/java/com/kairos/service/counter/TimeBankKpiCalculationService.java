@@ -2,6 +2,8 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.utils.counter.KPIUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
@@ -11,6 +13,7 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
@@ -43,9 +46,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.utils.counter.KPIUtils.*;
 
 @Service
 public class TimeBankKpiCalculationService implements CounterService {
@@ -122,6 +124,9 @@ public class TimeBankKpiCalculationService implements CounterService {
         Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
+        if (CollectionUtils.isEmpty(unitIds)) {
+            unitIds.add(organizationId);
+        }
         staffIds = (List<Long>) kpiData[2];
         Map<Object, List<ClusteredBarChartKpiDataUnit>> objectDoubleMap = calculateDataByKpiRepresentation(staffIds, dateTimeIntervals, applicableKPI,unitIds,staffKpiFilterDTOS,daysOfWeeks,phaseIds);
         getKpiDataUnits(objectDoubleMap, kpiDataUnits, applicableKPI, staffKpiFilterDTOS);
@@ -129,6 +134,11 @@ public class TimeBankKpiCalculationService implements CounterService {
         return kpiDataUnits;
     }
 
+
+    @Override
+    public Map<FilterType, List> getApplicableFilters(List<FilterCriteria> availableFilters, Map<FilterType, List> providedFiltersMap) {
+        return null;
+    }
 
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
@@ -142,7 +152,7 @@ public class TimeBankKpiCalculationService implements CounterService {
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
-    @Override
+
     public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,List<LocalDate> filterDates) {
         return new TreeSet<>();//getTimeBankForUnitKpiData(organizationId, filterBasedCriteria, true);
     }
@@ -198,8 +208,8 @@ public class TimeBankKpiCalculationService implements CounterService {
             }
             subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(unitName, null, DateUtils.getHoursByMinutes(totalTimeBankOfUnit)));
         }
-        staffIdAndTimeBankMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())),subClusteredBarValue );
-        return staffIdAndTimeBankMap;
+        staffIdAndTimeBankMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())),subClusteredBarValue );
+        return verifyKPIResponseListData(staffIdAndTimeBankMap) ? staffIdAndTimeBankMap : new HashMap<>();
     }
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTimeBankByInterval(List<DateTimeInterval> dateTimeIntervals, List<Long> unitIds, List<ClusteredBarChartKpiDataUnit> subClusteredBarValue, Map<Long, List<StaffKpiFilterDTO>> unitAndStaffKpiFilterMap, Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, List<DailyTimeBankEntry> employmentAndDailyTimeBank, DurationType frequencyType) {
@@ -247,6 +257,70 @@ public class TimeBankKpiCalculationService implements CounterService {
 
             }
         }
+    }
+
+
+
+    private Map<Long,Double> getTimebankCalculationPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<StaffKpiFilterDTO> staffKpiFilterDTOS, Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, List<DailyTimeBankEntry> employmentAndDailyTimeBank) {
+        Map<Long, Double> staffIdAndTimeBankMap = new HashedMap();
+        Map<Long, List<DailyTimeBankEntry>> staffAndDailyTimeBankMap;
+        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
+        Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v->v));
+        Map<Long,List<DailyTimeBankEntry>> staffIdAndDailyTimeBankMap = getDailyTimeBankEntryByStaffId(staffIds,employmentAndDailyTimeBank);
+        for (Long staffId :staffIds) {
+            staffAndDailyTimeBankMap =staffIdAndDailyTimeBankMap.getOrDefault(staffId,new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
+            Long totalTimeBankOfUnit = 0l;
+            StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
+            DateTimeInterval dateTimeInterval=new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate()));
+            totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, staffAndDailyTimeBankMap, dateTimeInterval, staffKpiFilterDTO.getUnitId(), totalTimeBankOfUnit, staffKpiFilterDTO);
+            staffIdAndTimeBankMap.put(staffId, totalTimeBankOfUnit.doubleValue());
+        }
+        return staffIdAndTimeBankMap;
+
+    }
+
+
+
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
+        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+        Map<Long, Double> kpiAndStaffIdMap = new HashMap<>();
+        List<BigInteger> phaseIds = filterBasedCriteria.containsKey(FilterType.PHASE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.PHASE)) : new ArrayList<>();
+        Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
+        List<Long> staffIds = new ArrayList<>();
+        List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
+        List<Long> unitIds = (List<Long>) filterCriteria[2];
+        List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
+        Set<DayOfWeek> daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
+        if (CollectionUtils.isEmpty(unitIds)) {
+            unitIds.add(organizationId);
+        }
+        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
+        staffIds = (List<Long>) kpiData[2];
+        Map<Long, Set<DateTimeInterval>> planningPeriodIntervel = getPlanningPeriodIntervals(unitIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), phaseIds);
+        List<DailyTimeBankEntry> employmentAndDailyTimeBank = getDailyTimeBankEntryByDate(staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getEmployment().stream().map(EmploymentWithCtaDetailsDTO::getId)).collect(Collectors.toList()), dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate(), daysOfWeeks);
+        Map<Long, List<DailyTimeBankEntry>> staffAndDailyTimeBankMap;
+        Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v -> v));
+        Map<Long, List<DailyTimeBankEntry>> staffIdAndDailyTimeBankMap = getDailyTimeBankEntryByStaffId(staffIds, employmentAndDailyTimeBank);
+
+        for (Long staffId : staffIds) {
+            staffAndDailyTimeBankMap = staffIdAndDailyTimeBankMap.getOrDefault(staffId, new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
+            Long totalTimeBankOfUnit = 0l;
+            StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
+            DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate()));
+            totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, staffAndDailyTimeBankMap, dateTimeInterval, staffKpiFilterDTO.getUnitId(), totalTimeBankOfUnit, staffKpiFilterDTO);
+            kpiAndStaffIdMap.put(staffId,totalTimeBankOfUnit.doubleValue());
+        }
+        kpiSetResponseDTO.setKpiName(kpi.getTitle());
+        kpiSetResponseDTO.setKpiId(kpi.getId());
+        kpiSetResponseDTO.setStaffKPIValue(kpiAndStaffIdMap);
+        return kpiSetResponseDTO;
+    }
+
+    @Override
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, ApplicableKPI applicableKPI) {
+        return null;
     }
 
 }

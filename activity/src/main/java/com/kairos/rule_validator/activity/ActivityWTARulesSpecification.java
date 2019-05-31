@@ -45,7 +45,7 @@ public class ActivityWTARulesSpecification extends AbstractActivitySpecification
 
     @Override
     public void validateRules(Activity activity) {
-
+        //Not in use
     }
 
     @Override

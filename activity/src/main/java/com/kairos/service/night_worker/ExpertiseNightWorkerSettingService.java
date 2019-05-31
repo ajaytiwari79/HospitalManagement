@@ -5,6 +5,10 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.enums.CalculationUnit;
+import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -18,10 +22,11 @@ import javax.inject.Inject;
 import java.util.*;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_NIGHTWORKER_SETTING_NOTFOUND;
+import static com.kairos.constants.AppConstants.NIGHT;
 
 @Service
 @Transactional
-public class ExpertiseNightWorkerSettingService extends MongoBaseService {
+public class ExpertiseNightWorkerSettingService{
 
     @Inject
     private ExpertiseNightWorkerSettingRepository expertiseNightWorkerSettingRepository;
@@ -37,36 +42,40 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
 
     public ExpertiseNightWorkerSettingDTO createExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = ObjectMapperUtils.copyPropertiesByMapper(nightWorkerSettingDTO, ExpertiseNightWorkerSetting.class);
-        save(expertiseNightWorkerSetting);
+        expertiseNightWorkerSettingRepository.save(expertiseNightWorkerSetting);
         nightWorkerSettingDTO.setId(expertiseNightWorkerSetting.getId());
         return nightWorkerSettingDTO;
     }
 
     public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettings(Long countryId, Long expertiseId) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
+        TimeSlotDTO timeSlot = userIntegrationService.getDefaultTimeSlot(countryId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_NIGHTWORKER_SETTING_NOTFOUND, expertiseId);
+            expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, CalculationUnit.HOURS,countryId,expertiseId);
         }
+        expertiseNightWorkerSetting.setTimeSlot(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()));
         return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
 
     public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettings(Long countryId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
+        TimeSlotDTO timeSlot = userIntegrationService.getDefaultTimeSlot(countryId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_NIGHTWORKER_SETTING_NOTFOUND, expertiseId);
+            expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, CalculationUnit.HOURS,countryId,expertiseId);
         }
-        expertiseNightWorkerSetting.setTimeSlot(nightWorkerSettingDTO.getTimeSlot());
+        expertiseNightWorkerSetting.setTimeSlot(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()));
         expertiseNightWorkerSetting.setMinMinutesToCheckNightShift(nightWorkerSettingDTO.getMinMinutesToCheckNightShift());
         expertiseNightWorkerSetting.setIntervalUnitToCheckNightWorker(nightWorkerSettingDTO.getIntervalUnitToCheckNightWorker());
         expertiseNightWorkerSetting.setIntervalValueToCheckNightWorker(nightWorkerSettingDTO.getIntervalValueToCheckNightWorker());
         expertiseNightWorkerSetting.setMinShiftsValueToCheckNightWorker(nightWorkerSettingDTO.getMinShiftsValueToCheckNightWorker());
         expertiseNightWorkerSetting.setMinShiftsUnitToCheckNightWorker(nightWorkerSettingDTO.getMinShiftsUnitToCheckNightWorker());
-        save(expertiseNightWorkerSetting);
+        expertiseNightWorkerSettingRepository.save(expertiseNightWorkerSetting);
         return nightWorkerSettingDTO;
     }
 
     public ExpertiseNightWorkerSettingDTO updateExpertiseNightWorkerSettingsInUnit(Long unitId, Long expertiseId, ExpertiseNightWorkerSettingDTO nightWorkerSettingDTO) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findOne(nightWorkerSettingDTO.getId());
+        TimeSlotDTO timeSlot = userIntegrationService.getUnitTimeSlot(unitId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();;
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_NIGHTWORKER_SETTING_NOTFOUND, nightWorkerSettingDTO.getId());
         }
@@ -76,7 +85,7 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
                     nightWorkerSettingDTO.getMinShiftsUnitToCheckNightWorker());
         } else {
             expertiseNightWorkerSetting.setExpertiseId(expertiseId);
-            expertiseNightWorkerSetting.setTimeSlot(nightWorkerSettingDTO.getTimeSlot());
+            expertiseNightWorkerSetting.setTimeSlot(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()));
             expertiseNightWorkerSetting.setMinMinutesToCheckNightShift(nightWorkerSettingDTO.getMinMinutesToCheckNightShift());
             expertiseNightWorkerSetting.setIntervalUnitToCheckNightWorker(nightWorkerSettingDTO.getIntervalUnitToCheckNightWorker());
             expertiseNightWorkerSetting.setIntervalValueToCheckNightWorker(nightWorkerSettingDTO.getIntervalValueToCheckNightWorker());
@@ -133,11 +142,12 @@ public class ExpertiseNightWorkerSettingService extends MongoBaseService {
 
     public ExpertiseNightWorkerSettingDTO getExpertiseNightWorkerSettingsForUnit(Long unitId, Long expertiseId) {
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndUnitId( expertiseId,unitId);
+        TimeSlotDTO timeSlot = userIntegrationService.getUnitTimeSlot(unitId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();;
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
             // find country level settings
             expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(expertiseId);
-
         }
+        expertiseNightWorkerSetting.setTimeSlot(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()));
         return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
     }
 }

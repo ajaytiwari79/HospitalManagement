@@ -356,6 +356,8 @@ public class RandomDateGeneratorService extends MongoBaseService {
                 weekOfMonthInt = 4;
                 break;
             }
+            default:
+                break;
         }
         return weekOfMonthInt;
     }

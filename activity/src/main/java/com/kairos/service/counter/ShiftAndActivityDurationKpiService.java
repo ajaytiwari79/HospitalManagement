@@ -10,6 +10,7 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -41,6 +42,7 @@ import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.AppConstants.BLANK_STRING;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseListData;
 
 @Service
 public class ShiftAndActivityDurationKpiService implements CounterService {
@@ -117,7 +119,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
 
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals,  ApplicableKPI applicableKPI, List<ShiftWithActivityDTO> shifts) {
-        Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap = new HashedMap();
+        Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap;
         Map<String, Integer> activityNameAndTotalDurationMinutesMap = new HashMap<>();
         Integer shiftDurationMinutes = 0;
         Map<String, String> activityNameAndColorCodeMap = new HashMap<>();
@@ -132,7 +134,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
                 staffIdAndShiftAndActivityDurationMap = getShiftAndActivityByRepresentPerInterval(dateTimeIntervalListMap, dateTimeIntervals, activityNameAndColorCodeMap , applicableKPI.getFrequencyType());
                 break;
         }
-        return staffIdAndShiftAndActivityDurationMap;
+        return verifyKPIResponseListData(staffIdAndShiftAndActivityDurationMap) ? staffIdAndShiftAndActivityDurationMap : new HashMap<>();
     }
 
 
@@ -157,7 +159,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentTotalData(List<DateTimeInterval> dateTimeIntervals, List<ShiftWithActivityDTO> shifts, Map<String, Integer> activityNameAndTotalDurationMinutesMap, Integer shiftDurationMinutes, Map<String, String> activityNameAndColorCodeMap) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap = new HashedMap();
-        staffIdAndShiftAndActivityDurationMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes,shifts));
+        staffIdAndShiftAndActivityDurationMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes,shifts));
         return staffIdAndShiftAndActivityDurationMap;
     }
 
@@ -199,6 +201,11 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
             staffAndShiftDurationMap.put(staffIdAndShiftsEntry.getKey(),shiftDuration);
         }
         return staffAndShiftDurationMap;
+    }
+
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+        return  new KPISetResponseDTO();
+
     }
 
 }

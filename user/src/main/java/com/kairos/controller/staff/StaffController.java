@@ -153,6 +153,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
 
+
     @RequestMapping(value = "/{staffId}/partial_leave", method = RequestMethod.POST)
     @ApiOperation("update employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -622,6 +623,13 @@ public class StaffController {
     @ApiOperation("update password")
     public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable Long staffId,@Valid @RequestBody PasswordUpdateByAdminDTO passwordUpdateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePasswordByManagement(staffId,passwordUpdateDTO));
+    }
+
+    @GetMapping(value = "/updateNightWorkers")
+    @ApiOperation("update password")
+    public ResponseEntity<Map<String, Object>> updateNightWorkers() {
+        employmentJobService.updateNightWorkers();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 }

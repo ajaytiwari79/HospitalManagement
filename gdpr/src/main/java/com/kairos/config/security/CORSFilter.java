@@ -31,9 +31,11 @@ class CORSFilter implements Filter {
 
     @Override
     public void destroy() {
+        //Not in use
     }
 
     @Override
     public void init(FilterConfig config) {
+        //Not in use
     }
 }

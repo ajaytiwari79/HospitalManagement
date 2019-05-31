@@ -40,8 +40,9 @@ public class KPIDTO {
     private BigInteger categoryId;
     private ConfLevel confLevel;
     private List<FibonacciKPIConfigDTO> fibonacciKPIConfigs;
+    private boolean multiDimensional;
     public KPIDTO(){
-
+        //Not in use
     }
 
     public ChartType getChart() {
@@ -211,5 +212,13 @@ public class KPIDTO {
 
     public void setCategoryId(BigInteger categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public boolean isMultiDimensional() {
+        return multiDimensional;
+    }
+
+    public void setMultiDimensional(boolean multiDimensional) {
+        this.multiDimensional = multiDimensional;
     }
 }

@@ -159,4 +159,17 @@ public class FilterCriteriaDTO {
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
+
+
+    public FilterCriteriaDTO(boolean isCountryAdmin, Long staffId, List<BigInteger> kpiIds, KPIRepresentation kpiRepresentation, List<FilterCriteria> filters, IntervalUnit interval, DurationType frequencyType, int value,Long unitId) {
+        this.isCountryAdmin = isCountryAdmin;
+        this.staffId = staffId;
+        this.kpiIds = kpiIds;
+        this.kpiRepresentation = kpiRepresentation;
+        this.filters = filters;
+        this.interval = interval;
+        this.frequencyType = frequencyType;
+        this.value = value;
+        this.unitId = unitId;
+    }
 }

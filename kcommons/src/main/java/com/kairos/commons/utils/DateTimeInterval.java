@@ -265,7 +265,7 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
     }
 
     @Override
-    public int compareTo(DateTimeInterval o) {
-        return this.start.compareTo(o.start);
+    public int compareTo(DateTimeInterval dateTimeInterval) {
+        return this.start.compareTo(dateTimeInterval.start);
     }
 }

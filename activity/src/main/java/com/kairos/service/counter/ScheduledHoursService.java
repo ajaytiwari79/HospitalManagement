@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
@@ -12,6 +13,7 @@ import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.counter.CounterRepository;
+import org.apache.commons.collections.map.HashedMap;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +64,17 @@ public class ScheduledHoursService implements CounterService {
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, List<LocalDate> filterDates) {
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, ApplicableKPI applicableKPI){
         return new TreeSet<>();
     }
+
+    @Override
+    public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+        Map<Object,Object> objectMap = new HashedMap();
+        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+        return kpiSetResponseDTO;
+
+    }
+
+
 }
