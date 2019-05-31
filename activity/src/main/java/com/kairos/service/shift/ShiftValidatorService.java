@@ -454,8 +454,11 @@ public class ShiftValidatorService {
         String staffingLevelStatus = null;
         if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
             for (StaffingLevel staffingLevel : staffingLevels) {
-                List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
-                        activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
+
+                List<StaffingLevelInterval> staffingLevelIntervals = TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
+
+                /*List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
+                        activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();*/
                 for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
                     int shiftsCount = 0;
                     Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(activity.getId())).findFirst();
@@ -927,7 +930,7 @@ public class ShiftValidatorService {
     }
 
 
-    private TimeTypeEnum getTimeTypeByActivity(ActivityWrapper activityWrapper) {
+    /*private TimeTypeEnum getTimeTypeByActivity(ActivityWrapper activityWrapper) {
         if(TimeTypeEnum.ABSENCE.equals(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType())){
             return TimeTypeEnum.ABSENCE;
         }else if(TimeTypeEnum.PRESENCE.equals(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType())){
@@ -935,6 +938,6 @@ public class ShiftValidatorService {
         }else {
             return activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType();
         }
-    }
+    }*/
 
 }
