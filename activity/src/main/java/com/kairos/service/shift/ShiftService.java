@@ -1018,7 +1018,7 @@ public class ShiftService extends MongoBaseService {
     private ActivityWrapper getAbsenceTypeOfActivityIfPresent(List<ShiftActivityDTO> shiftActivityDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         ActivityWrapper activityWrapper = null;
         for (ShiftActivityDTO shiftActivityDTO : shiftActivityDTOS) {
-          if(TimeTypeEnum.ABSENCE.equals(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType())){
+          if(TimeTypeEnum.ABSENCE.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getBalanceSettingsActivityTab().getTimeType())){
             //  if (FULL_WEEK.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
                 activityWrapper = activityWrapperMap.get(shiftActivityDTO.getActivityId());
             }
