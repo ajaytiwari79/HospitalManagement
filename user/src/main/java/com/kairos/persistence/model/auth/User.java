@@ -28,7 +28,6 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOT
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_SIZE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
-
 /**
  * User Domain & it's properties
  */
@@ -90,6 +89,44 @@ public class User extends UserBaseEntity {
 
     private Long countryId;
 
+    /**
+     * For Jackson parsing
+     */
+    public User() {
+    }
+
+    public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
+        this.cprNumber = cprNumber;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public User(String cprNumber, String firstName, String lastName, String email, String userName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.cprNumber = cprNumber;
+        this.userName = userName;
+    }
+
+    public User(String cprNumber, String firstName, String lastName, String email, String userName, boolean isUserNameUpdated) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.cprNumber = cprNumber;
+        this.userName = userName;
+        this.userNameUpdated = isUserNameUpdated;
+    }
+
+    public User(String userName, String firstName, String lastName, String email, ContactDetail contactDetail, String password) {
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.contactDetail = contactDetail;
+        this.password = password;
+    }
 
     public int getOtp() {
         return otp;
@@ -220,16 +257,14 @@ public class User extends UserBaseEntity {
     }
 
     public String getUserName() {
-        if (userName != null) {
+        if(userName != null) {
             userName.toLowerCase();
         }
         return userName;
-
     }
 
     public void setUserName(String userName) {
-        if (userName != null)
-            this.userName = userName.toLowerCase();
+        if(userName != null) this.userName = userName.toLowerCase();
     }
 
     public String getEmail() {
@@ -252,7 +287,6 @@ public class User extends UserBaseEntity {
         this.age = age;
     }
 
-
     public UserPersonalizedSettings getUserPersonalizedSettings() {
         return userPersonalizedSettings;
     }
@@ -261,38 +295,6 @@ public class User extends UserBaseEntity {
         this.userPersonalizedSettings = userPersonalizedSettings;
     }
 
-    /**
-     * For Jackson parsing
-     */
-    public User() {
-    }
-
-    public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
-        this.cprNumber = cprNumber;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public User(String cprNumber, String firstName, String lastName, String email, String userName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.cprNumber = cprNumber;
-        this.userName = userName;
-    }
-
-
-    public User(String cprNumber, String firstName, String lastName, String email, String userName,boolean isUserNameUpdated) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.cprNumber = cprNumber;
-        this.userName = userName;
-        this.userNameUpdated = isUserNameUpdated;
-    }
-
-
     public boolean isPasswordUpdated() {
         return isPasswordUpdated;
     }
@@ -300,7 +302,6 @@ public class User extends UserBaseEntity {
     public void setPasswordUpdated(boolean passwordUpdated) {
         isPasswordUpdated = passwordUpdated;
     }
-
 
     public Boolean getHubMember() {
         return hubMember;
@@ -343,7 +344,6 @@ public class User extends UserBaseEntity {
         this.setGender((ageVariable % 2 == 0) ? Gender.FEMALE : Gender.MALE);
     }
 
-
     public UserType getUserType() {
         return userType;
     }
@@ -352,8 +352,8 @@ public class User extends UserBaseEntity {
         this.userType = userType;
     }
 
-    public String getFullName(){
-        return StringUtils.capitalize(this.firstName)+" "+StringUtils.capitalize(this.lastName);
+    public String getFullName() {
+        return StringUtils.capitalize(this.firstName) + " " + StringUtils.capitalize(this.lastName);
     }
 
     public Long getCountryId() {
@@ -366,50 +366,49 @@ public class User extends UserBaseEntity {
 
     public int getAge() {
         int age = 0;
-        if (cprNumber == null) {
+        if(cprNumber == null) {
             return this.age;
 
         }
-        if (cprNumber.length() == 9) {
+        if(cprNumber.length() == 9) {
             cprNumber = "0" + cprNumber;
         }
-            Integer year = Integer.valueOf(cprNumber.substring(4, 6));
-            Integer month = Integer.valueOf(cprNumber.substring(2, 4));
-            Integer day = Integer.valueOf(cprNumber.substring(0, 2));
-            Integer century = Integer.parseInt(cprNumber.substring(6, 7));
-
-            if (century >= 0 && century <= 3) {
+        Integer year = Integer.valueOf(cprNumber.substring(4, 6));
+        Integer month = Integer.valueOf(cprNumber.substring(2, 4));
+        Integer day = Integer.valueOf(cprNumber.substring(0, 2));
+        Integer century = Integer.parseInt(cprNumber.substring(6, 7));
+        if(century >= 0 && century <= 3) {
+            century = 1900;
+        }
+        if(century == 4) {
+            if(year <= 36) {
+                century = 2000;
+            } else {
                 century = 1900;
             }
-            if (century == 4) {
-                if (year <= 36) {
-                    century = 2000;
-                } else {
-                    century = 1900;
-                }
+        }
+        if(century >= 5 && century <= 8) {
+            if(year <= 57) {
+                century = 2000;
             }
-            if (century >= 5 && century <= 8) {
-                if (year <= 57) {
-                    century = 2000;
-                }
-                if (year >= 58 && year <= 99) {
-                    century = 1800;
-                }
+            if(year >= 58 && year <= 99) {
+                century = 1800;
             }
-            if (century == 9) {
-                if (year <= 36) {
-                    century = 2000;
-                } else {
-                    century = 1900;
-                }
+        }
+        if(century == 9) {
+            if(year <= 36) {
+                century = 2000;
+            } else {
+                century = 1900;
             }
-            year = century + year;
-            LocalDate today = LocalDate.now();
-            LocalDate birthday = LocalDate.of(year, month, day);
-            // Calculating age in yeas from DOB
-            Period period = Period.between(birthday, today);
-            age = period.getYears();
-            this.age = age;
+        }
+        year = century + year;
+        LocalDate today = LocalDate.now();
+        LocalDate birthday = LocalDate.of(year, month, day);
+        // Calculating age in yeas from DOB
+        Period period = Period.between(birthday, today);
+        age = period.getYears();
+        this.age = age;
         return this.age;
     }
 
@@ -431,19 +430,6 @@ public class User extends UserBaseEntity {
 
     @Override
     public String toString() {
-        return "{User={" +
-                "cprNumber='" + cprNumber + '\'' +
-                ", userName='" + userName + '\'' +
-                ", nickName='" + nickName + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender=" + gender +
-                ", email='" + email + '\'' +
-                ", age=" + age +
-                ", accessToken='" + accessToken + '\'' +
-                ", otp=" + otp +
-                ", isPasswordUpdated=" + isPasswordUpdated +
-                '}' +
-                '}';
+        return "{User={" + "cprNumber='" + cprNumber + '\'' + ", userName='" + userName + '\'' + ", nickName='" + nickName + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", gender=" + gender + ", email='" + email + '\'' + ", age=" + age + ", accessToken='" + accessToken + '\'' + ", otp=" + otp + ", isPasswordUpdated=" + isPasswordUpdated + '}' + '}';
     }
 }

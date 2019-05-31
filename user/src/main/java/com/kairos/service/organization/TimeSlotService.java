@@ -397,10 +397,18 @@ public class TimeSlotService {
         Unit unit = unitGraphRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
-
         }
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
         return timeSlotWrappers;
+    }
+
+    public List<TimeSlotDTO> getUnitTimeSlot(Long unitId){
+        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        if (!Optional.ofNullable(unit).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
+        }
+        List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getUnitTimeSlotsByType(unit.getId(), unit.getTimeSlotMode(),TimeSlotType.SHIFT_PLANNING);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers,TimeSlotDTO.class);
     }
 
     public Map<String, Object> getTimeSlotByUnitIdAndTimeSlotExternalId(Long unitId, Long kmdExternalId) {

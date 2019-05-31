@@ -8,6 +8,8 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import lombok.Getter;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -24,6 +26,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
+@Getter
+@Setter
 public class Employment extends UserBaseEntity {
 
     @Relationship(type = HAS_EXPERTISE_IN)
@@ -54,6 +58,7 @@ public class Employment extends UserBaseEntity {
     //This is the Intial value of accumulatedTimebank
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
+    private boolean nightWorker;
 
     public Employment() {
 
@@ -74,124 +79,9 @@ public class Employment extends UserBaseEntity {
         this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
 
-    public Expertise getExpertise() {
-        return expertise;
-    }
-
-    public void setExpertise(Expertise expertise) {
-        this.expertise = expertise;
-    }
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Staff staff) {
-        this.staff = staff;
-    }
-
-
-    public Organization getUnion() {
-        return union;
-    }
-
-
-    public void setUnion(Organization union) {
-        this.union = union;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public LocalDate getLastWorkingDate() {
-        return lastWorkingDate;
-    }
-
-    public void setLastWorkingDate(LocalDate lastWorkingDate) {
-        this.lastWorkingDate = lastWorkingDate;
-    }
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public void setUnit(Unit unit) {
-        this.unit = unit;
-    }
-
-    public Long getTimeCareExternalId() {
-        return timeCareExternalId;
-    }
-
-    public void setTimeCareExternalId(Long timeCareExternalId) {
-        this.timeCareExternalId = timeCareExternalId;
-    }
-
-    public ReasonCode getReasonCode() {
-        return reasonCode;
-    }
-
-    public void setReasonCode(ReasonCode reasonCode) {
-        this.reasonCode = reasonCode;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
     public List<EmploymentLine> getEmploymentLines() {
         return Optional.ofNullable(employmentLines).orElse(new ArrayList<>());
     }
-
-    public void setEmploymentLines(List<EmploymentLine> employmentLines) {
-        this.employmentLines = employmentLines;
-    }
-
-    public EmploymentSubType getEmploymentSubType() { return employmentSubType; }
-
-    public void setEmploymentSubType(EmploymentSubType employmentSubType) { this.employmentSubType = employmentSubType; }
-
-    public float getTaxDeductionPercentage() {
-        return taxDeductionPercentage;
-    }
-
-    public void setTaxDeductionPercentage(float taxDeductionPercentage) {
-        this.taxDeductionPercentage = taxDeductionPercentage;
-    }
-
-    public long getAccumulatedTimebankMinutes() {
-        return accumulatedTimebankMinutes;
-    }
-
-    public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
-        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
-    }
-
-    public LocalDate getAccumulatedTimebankDate() {
-        return accumulatedTimebankDate;
-    }
-
-    public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
-        this.accumulatedTimebankDate = accumulatedTimebankDate;
-    }
-
 
 
     @Override

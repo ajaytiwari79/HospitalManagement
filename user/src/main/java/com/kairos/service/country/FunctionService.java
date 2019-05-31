@@ -141,7 +141,6 @@ public class FunctionService {
 
     }
 
-    //====================================================================================
     public Map<Long, Map<Long, Set<LocalDate>>> getEmploymentIdWithFunctionIdShiftDateMap(Set<Long> employmentIds) {
         Map<Long, Map<Long, Set<LocalDate>>> employmentWithFunctionIdAndLocalDateMap = new HashMap<>();
         if (!employmentIds.isEmpty()) {
@@ -159,8 +158,6 @@ public class FunctionService {
         }
         return null;
     }
-
-    //=================================================================================
 
     /**
      * Assuming one function per Date per employment

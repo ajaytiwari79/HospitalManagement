@@ -3,13 +3,9 @@ package com.kairos.dto.planner.constarints.unit;
 import com.kairos.dto.planner.constarints.ConstraintDTO;
 
 public class UnitConstraintDTO extends ConstraintDTO {
-    //~
+
     private Long unitId;
     private Long parentCountryConstraintId;
-   
-
-    //======================================================
-
 
     public Long getUnitId() {
         return unitId;

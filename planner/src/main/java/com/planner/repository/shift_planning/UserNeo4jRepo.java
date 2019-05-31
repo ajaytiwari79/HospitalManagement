@@ -18,6 +18,10 @@ import static com.planner.constants.AppConstants.*;
  * i.e this interface must contain methods annotated with {@Query}
  */
 public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
+    @Query("MATCH (organization:Organization) where id(organization)={0} with organization  " +
+            "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
+            "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN id(country)")
+    Long getCountryIdByUnitId(long unitId);
 
     @Query("Match(unit:Unit) where id(unit)={0} " +
             "Match(staff:Staff)  where id(staff) in {1} with staff,unit " +
@@ -70,4 +74,10 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
             "case when unit is null then \"unitNotExists\" else \"valid\" end " +
             "as result")
     String validateUnit(Long unitId);
+
+    @Query("MATCH  (unit:Organization)-[:SUB_TYPE_OF]-(o:OrganizationType)-[:ORGANIZATION_TYPE_HAS_SERVICES]->(ss:OrganizationService{isEnabled:true}) where id(unit) = {0} \n" +
+            "MATCH (ss)<-[:ORGANIZATION_SUB_SERVICE]-(os:OrganizationService {isEnabled:true} ) \n" +
+            "WITH case when os  is NULL then [] else collect({id:id(ss),name:ss.name}) END as organizationSubServices,os\n" +
+            "RETURN  id(os) as id ,os.name as name,organizationSubServices as organizationSubServices")
+    List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId);
 }

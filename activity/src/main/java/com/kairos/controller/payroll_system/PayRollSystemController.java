@@ -22,7 +22,6 @@ public class PayRollSystemController {
     private PayRollSystemService payRollSystemService;
     
 
-    //====================Default Available PayRolls at system level==========================
     @GetMapping("/default_payrolls")
     @ApiOperation("This Api will get all available Payroll Type List")
     public ResponseEntity<Map<String, Object>> getDefaultAvailablePayRolls() {

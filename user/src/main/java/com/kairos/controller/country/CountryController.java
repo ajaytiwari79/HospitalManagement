@@ -422,5 +422,12 @@ public class CountryController {
 
     }
 
+    @ApiOperation(value = "get Default TimeSlot of Country")
+    @GetMapping(value = COUNTRY_URL + "/get_default_timeSlot")
+    public ResponseEntity<Map<String, Object>> mappingPayRollListToCountry(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getDefaultTimeSlot());
+
+    }
+
 }
 

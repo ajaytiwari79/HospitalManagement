@@ -9,7 +9,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * @author mohit
@@ -37,6 +40,7 @@ public class SolverConfigDTO {
     protected TimeTypeEnum typeOfTimeType;
 
     public SolverConfigDTO() {
+        this.constraints = new ArrayList<>();
     }
 
     public SolverConfigDTO(List<ConstraintDTO> constraints) {
@@ -48,7 +52,7 @@ public class SolverConfigDTO {
     }
 
     public void setConstraints(List<ConstraintDTO> constraints) {
-        this.constraints = constraints;
+        this.constraints = isNullOrElse(constraints,new ArrayList<>());
     }
 
 

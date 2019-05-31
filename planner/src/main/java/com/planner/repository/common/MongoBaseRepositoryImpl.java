@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 
     private final MongoOperations mongoOperations;
@@ -56,16 +58,19 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
     /**
      *
      * @param name must not null
-     * @param objectIdNotApplicableForCheck
+     * @param solverConfigId
      * @param checkForCountry  must not null
      * @param countryOrUnitId  must not null
      * @return
      */
     @Override
-    public boolean isNameExistsById(String name, BigInteger objectIdNotApplicableForCheck, boolean checkForCountry,Long countryOrUnitId) {
+    public boolean isNameExistsById(String name, BigInteger solverConfigId, boolean checkForCountry,Long countryOrUnitId) {
         String applicableIdField = checkForCountry ? "countryId" : "unitId";
-        Criteria criteria=Criteria.where("name").is(name).regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(applicableIdField).is(countryOrUnitId);
-        if (objectIdNotApplicableForCheck != null) criteria=criteria.and("_id").ne(objectIdNotApplicableForCheck);
+        Criteria criteria = Criteria.where(applicableIdField).is(countryOrUnitId).and("deleted").is(false);
+        if (isNotNull(solverConfigId)){
+            criteria=criteria.and("_id").ne(solverConfigId.toString());
+        }
+        criteria.and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
         return mongoOperations.exists(new Query(criteria),entityInformation.getJavaType());
     }
 
@@ -143,7 +148,6 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
         return entity;
     }
 
-    //==========================saveEntity List of objects=======================
     public <T extends MongoBaseEntity> List<T> saveList(List<T> objects){
         Assert.notEmpty(objects,"List Can't be empty or null");
         //Get class name for sequence class

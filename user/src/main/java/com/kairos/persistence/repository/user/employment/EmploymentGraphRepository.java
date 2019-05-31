@@ -319,5 +319,9 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "WHERE id(employment) IN {0} AND ( employmentLines.endDate IS NULL OR DATE(employmentLines.endDate) > DATE({1})) WITH employmentLines SET employmentLines.endDate = {1} RETURN  COUNT(employmentLines)>0")
     boolean updateEmploymentLineEndDateByEmploymentIds(Set<Long> employmentIds,String endDate);
 
+    @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]-(e:Expertise{deleted:false}) \n" +
+            "RETURN id(staff) as staffId,COLLECT({id:id(employment),expId:id(e)}) as employmentDetails")
+    List<Map> findStaffsWithEmploymentIds();
+
 
 }

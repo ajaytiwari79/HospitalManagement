@@ -5,13 +5,10 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.kpermissions.*;
-import com.kairos.enums.kpermissions.FieldLevelPermissions;
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.kpermissions.KPermissionField;
-import com.kairos.persistence.model.kpermissions.KPermissionFieldQueryResult;
-import com.kairos.persistence.model.kpermissions.KPermissionModel;
-import com.kairos.persistence.model.kpermissions.KPermissionSubModelFieldQueryResult;
+import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionFieldRelationshipGraphRepository;
@@ -29,11 +26,11 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATANOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_PERMISSION_FIELD;
 
@@ -105,10 +102,23 @@ public class PermissionService {
     }
 
     public List<ModelDTO> getPermissionSchema(){
+        Map<String, Object> permissionSchemaMap = new HashMap<>();
         List<KPermissionModel> kPermissionModels = new ArrayList();
         permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
         kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kPermissionModels, ModelDTO.class);
+    }
+
+    public Map<String, Object> getPermissionSchema(Long accessGroupId){
+        Map<String, Object> permissionSchemaMap = new HashMap<>();
+        List<KPermissionModel> kPermissionModels = new ArrayList();
+        permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
+        kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = permissionModelRepository.getModelPermissionsByAccessGroupId(accessGroupId);
+        permissionSchemaMap.put(PERMISSIONS_SCHEMA,ObjectMapperUtils.copyPropertiesOfListByMapper(kPermissionModels, ModelDTO.class));
+        permissionSchemaMap.put(PERMISSIONS, Stream.of(FieldLevelPermission.values()).map(FieldLevelPermission::getValue).collect(Collectors.toList()));
+        permissionSchemaMap.put(PERMISSION_DATA, modelPermissionQueryResults);
+            return permissionSchemaMap;
     }
 
     public List<PermissionDTO> createPermissions(List<PermissionDTO> permissionDTOList){
@@ -133,17 +143,17 @@ public class PermissionService {
                 if(KPermissionField == null){
                     exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_PERMISSION_FIELD, fieldPermissionDTO.getFieldId());
                 }else{
-                        accessGroupPermissionFieldRelationshipGraphRepository.createAccessGroupPermissionFieldRelationshipType(KPermissionField.getId(),accessGroupIds,FieldLevelPermissions.getByValue(fieldPermissionDTO.getFieldPermission()));
+                        accessGroupPermissionFieldRelationshipGraphRepository.createAccessGroupPermissionFieldRelationshipType(KPermissionField.getId(),accessGroupIds,fieldPermissionDTO.getFieldPermission());
                 }
             }
-                accessGroupPermissionModelRelationshipGraphRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds,FieldLevelPermissions.getByValue(modelPermissionDTO.getModelPermission()));
+                accessGroupPermissionModelRelationshipGraphRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds,modelPermissionDTO.getModelPermission());
             if(!modelPermissionDTO.getSubModelPermissions().isEmpty()){
                 linkAccessGroupToSubModelAndPermissionFields(modelPermissionDTO.getSubModelPermissions(), accessGroupIds);
             }
         });
     }
 
-    public <E extends Object, T extends UserBaseEntity> E evaluatePermission(@Valid E dtoObject, Class<T> modelClass, List<FieldLevelPermissions> permissions){
+    public <E extends Object, T extends UserBaseEntity> E evaluatePermission(@Valid E dtoObject, Class<T> modelClass, List<FieldLevelPermission> permissions){
         try {
 
             Organization organization = organizationService.fetchParentOrganization(UserContext.getUnitId());
@@ -164,7 +174,7 @@ public class PermissionService {
         return null;
     }
 
-    public <T extends UserBaseEntity> List<KPermissionModelFieldDTO> fetchPermissionFields(Class<T> modelClass, List<FieldLevelPermissions> permissions){
+    public <T extends UserBaseEntity> List<KPermissionModelFieldDTO> fetchPermissionFields(Class<T> modelClass, List<FieldLevelPermission> permissions){
         List<KPermissionModelFieldDTO> kPermissionModelFieldDTO = new ArrayList<>() ;
         try {
             Organization organization = organizationService.fetchParentOrganization(UserContext.getUnitId());
