@@ -18,7 +18,8 @@ import static com.kairos.constants.ApiConstants.SCHEDULER_EXECUTE_JOB;
  * @author pradeep
  * @date - 23/12/18
  */
-@RestController(API_V1+ SCHEDULER_EXECUTE_JOB)
+@RestController
+@RequestMapping(API_V1+ SCHEDULER_EXECUTE_JOB)
 public class SchedulerJobController {
 
     @Inject
