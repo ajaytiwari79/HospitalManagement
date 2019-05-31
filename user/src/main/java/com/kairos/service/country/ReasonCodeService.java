@@ -5,6 +5,7 @@ import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -138,12 +139,7 @@ public class ReasonCodeService {
         return reasonCodeGraphRepository.save(reasonCode);
     }
 
-    public void createDefaultDataForUnit(Unit unit, long countryId) {
-        List<ReasonCodeResponseDTO> reasonCodeResponseDTO = reasonCodeGraphRepository.findReasonCodeByCountryId(countryId);
-        createDefaultData(reasonCodeResponseDTO, unit);
-    }
-
-    public void createDefaultDataForSubUnit(Unit unit, long parentId) {
+    public void createReasonCodeForUnit(Unit unit, long parentId) {
         List<ReasonCodeResponseDTO> reasonCodeResponseDTO = reasonCodeGraphRepository.findReasonCodeByUnitId(parentId);
         createDefaultData(reasonCodeResponseDTO, unit);
     }

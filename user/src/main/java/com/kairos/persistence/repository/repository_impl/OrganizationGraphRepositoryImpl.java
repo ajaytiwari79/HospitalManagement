@@ -5,6 +5,7 @@ import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.enums.Employment;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,17 +59,17 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             matchRelationshipQueryForStaff += "MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)  " +
                     "MATCH (employmentLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  " +
-                    "OPTIONAL MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise) WITH staff,organization,employment,user,exp,employmentType,employmentLine \n" +
-                    "OPTIONAL MATCH(employmentLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +
+                    "OPTIONAL MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]-(exp:Expertise) WITH staff,organization,employment,user,exp,employmentType,employmentLine \n" +
+                    "OPTIONAL MATCH(employmentLine)-[:" + APPLICABLE_FUNCTION + "]-(function:Function) " +
                     "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,employmentLine,exp,employmentType\n" +
                     "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions}) as employmentLines,exp,employmentType\n" +
                     "with staff,user,CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList, \n" +
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         } else {
             matchRelationshipQueryForStaff += "OPTIONAL MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)  " +
-                    "OPTIONAL MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]-(exp:Expertise)\n" +
+                    "OPTIONAL MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]-(exp:Expertise)\n" +
                     "OPTIONAL MATCH (employmentLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  " +
-                    "OPTIONAL MATCH(employmentLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +
+                    "OPTIONAL MATCH(employmentLine)-[:" + APPLICABLE_FUNCTION + "]-(function:Function) " +
                     "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,employmentLine,exp,employmentType\n" +
                     "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions}) as employmentLines,exp,employmentType\n" +
                     "with staff,user,CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList, \n" +
@@ -84,8 +85,8 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
         matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, " +
                 "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList " +
-        " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
-        " with engineerType,employments, staff, user, employmentList, expertiseList";
+                " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
+                " with engineerType,employments, staff, user, employmentList, expertiseList";
         return matchRelationshipQueryForStaff;
     }
 
@@ -132,7 +133,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         } else if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT)).isPresent() && filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (organization:Unit)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff) where id(organization)={parentOrganizationId} " +
                     " MATCH(unit:Unit) WHERE id(unit)={unitId}" +
-                    " MATCH (staff) WHERE NOT (staff)-[:" + BELONGS_TO_STAFF + "]->(:Employment)-[:" + IN_UNIT + "]-(unit)"+
+                    " MATCH (staff) WHERE NOT (staff)-[:" + BELONGS_TO_STAFF + "]->(:Employment)-[:" + IN_UNIT + "]-(unit)" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User)  " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) +
                     " OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment)" +
                     " WITH user, staff, employment,organization ";
@@ -217,10 +218,10 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
     }
 
     @Override
-    public List<Map<String, Object>> getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
+    public OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
         String filterQuery = "";
         final String SUB_ORGANIZATIONS = "subOrganizations";
-        Map<String, Object> queryParameters = new HashMap();
+        Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put("parentOrganizationId", parentOrganizationId);
 
         if (organizationHierarchyFilterDTO != null) {
@@ -233,9 +234,6 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                 filterQuery = filterQuery + " Match(organizationSubType:OrganizationType)-[:" + SUB_TYPE_OF + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(organizationSubType) IN {organizationSubTypeIds} ";
                 queryParameters.put("organizationSubTypeIds", organizationHierarchyFilterDTO.getOrganizationSubTypeIds());
             }
-            /*if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationTypeIds()) && CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubTypeIds())) {
-                filterQuery = filterQuery + " Match(organizationType)-[:" + HAS_SUB_TYPE + "]-(organizationSubType) ";
-            }*/
             //organizationService Filter
             if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationServiceIds())) {
                 filterQuery = filterQuery + " Match(organizationService:OrganizationService)-[:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(organizationService) IN {organizationServiceIds} ";
@@ -245,13 +243,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                 filterQuery = filterQuery + " Match(organizationSubService:OrganizationService)-[:" + PROVIDE_SERVICE + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(organizationSubService) IN {organizationSubServiceIds} ";
                 queryParameters.put("organizationSubServiceIds", organizationHierarchyFilterDTO.getOrganizationSubServiceIds());
             }
-            //Might Require
-            /*if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationServiceIds()) && CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubServiceIds())) {
-                filterQuery = filterQuery + " Match(organizationService)-[:" + ORGANIZATION_SUB_SERVICE + "]-(organizationSubService) ";
-            }*/
-            /*if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubServiceIds()) && CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationSubTypeIds())) {
-                filterQuery = filterQuery + " Match(organizationSubService)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]-(organizationSubType)  ";
-            }*/
+
             //accountType Filter
             if (CollectionUtils.isNotEmpty(organizationHierarchyFilterDTO.getOrganizationAccountTypeIds())) {
                 filterQuery = filterQuery + " Match(accountType:AccountType)-[:" + HAS_ACCOUNT_TYPE + "]-(" + SUB_ORGANIZATIONS + ") WHERE id(accountType) IN {accountTypeIds} ";
@@ -259,20 +251,12 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             }
         }
 
-        String query = "MATCH (org:Unit{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Unit{isEnable:true,boardingCompleted: true})-[:HAS_TEAMS]->(team:Team)" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data\n" +
-                "UNION\n" +
-                "MATCH (org:Unit{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Unit{isEnable:true,boardingCompleted: true})" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data\n" +
-                "UNION\n" +
-                "MATCH (org:Unit{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_SUB_ORGANIZATION*]->(" + SUB_ORGANIZATIONS + ":Unit{isEnable:true,boardingCompleted: true})" + filterQuery + " WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data \n" +
-                "UNION\n" +
-                "MATCH (org:Unit{isEnable:true,boardingCompleted: true}) WHERE id(org)={parentOrganizationId} WITH org MATCH path=(org)-[:HAS_TEAMS]->(team:Team) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data";
+        String query = "MATCH(o{isEnable:true,boardingCompleted: true}) where id(o)={parentOrganizationId}\n" + filterQuery +
+                "OPTIONAL MATCH(o)-[orgRel:HAS_SUB_ORGANIZATION*]->(org:Organization{isEnable:true,boardingCompleted: true})\n" + filterQuery +
+                "OPTIONAL MATCH(o)-[unitRel:HAS_UNIT]->(u:Unit{isEnable:true,boardingCompleted: true})\n" + filterQuery +
+                "OPTIONAL MATCH(org)-[orgUnitRel:HAS_UNIT]->(un:Unit{isEnable:true,boardingCompleted: true})\n" +
+                "RETURN o,org,orgRel,unitRel,u,orgUnitRel,un";
 
-        Iterator<Map> mapIterator = session.query(Map.class, query, queryParameters).iterator();
-        List<Map<String, Object>> mapList = new ArrayList<>();
-        while (mapIterator.hasNext()) {
-            mapList.add(mapIterator.next());
-        }
-        return mapList;
-
+        return session.queryForObject(OrganizationBaseEntity.class, query, queryParameters);
     }
 }

@@ -37,6 +37,8 @@ public class FunctionService {
 
     @Inject
     private FunctionGraphRepository functionGraphRepository;
+    @Inject
+    private CountryService countryService;
 
     @Inject
     private UnitGraphRepository unitGraphRepository;
@@ -200,7 +202,7 @@ public class FunctionService {
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : unitGraphRepository.getCountryByParentOrganization(unitId).getId();
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
 
         return functionGraphRepository.findFunctionsByCountry(countryId);
     }

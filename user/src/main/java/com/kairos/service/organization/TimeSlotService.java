@@ -6,11 +6,13 @@ import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSetTimeSlotRelationship;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotRelationshipGraphRepository;
@@ -47,6 +49,8 @@ public class TimeSlotService {
     private ExceptionService exceptionService;
     @Inject
     private TimeSlotRelationshipGraphRepository timeSlotRelationshipGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     private static final Logger logger = LoggerFactory.getLogger(TimeSlotService.class);
 
     public Map<String, Object> getTimeSlots(long unitId) {
@@ -287,7 +291,7 @@ public class TimeSlotService {
         List<TimeSlotSet> timeSlotSets = organization.getTimeSlotSets();
         timeSlotSets.add(timeSlotSet);
         organization.setTimeSlotSets(timeSlotSets);
-        unitGraphRepository.save(organization);
+        organizationGraphRepository.save(organization);
     }
 
 
@@ -314,20 +318,23 @@ public class TimeSlotService {
         return timeSlotSetTimeSlotRelationships;
     }
 
-    public void createDefaultTimeSlots(Unit unit, List<TimeSlot> timeSlots) {
-        logger.info("Creating default time slot for organization "+ unit.getName());
+    public <T extends OrganizationBaseEntity> void createDefaultTimeSlots(T organization, List<TimeSlot> timeSlots) {
+        logger.info("Creating default time slot for organization "+ organization.getName());
         if (timeSlots.isEmpty()){
              timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         }
         List<TimeSlotSet> timeSlotSets = new ArrayList<>();
-        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), unit.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING));
-        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), unit.getTimeSlotMode(), TimeSlotType.TASK_PLANNING));
+        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING));
+        timeSlotSets.add(new TimeSlotSet(TIME_SLOT_SET_NAME, LocalDate.now(), organization.getTimeSlotMode(), TimeSlotType.TASK_PLANNING));
         List<TimeSlotSetTimeSlotRelationship> timeSlotSetTimeSlotRelationships = new ArrayList<>();
         timeSlotSetTimeSlotRelationships.addAll(setTimeSlotSet(timeSlots, timeSlotSets.get(0)));
         timeSlotSetTimeSlotRelationships.addAll(setTimeSlotSet(timeSlots, timeSlotSets.get(1)));
         timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
-        unit.setTimeSlotSets(timeSlotSets);
-        unitGraphRepository.save(unit);
+        organization.setTimeSlotSets(timeSlotSets);
+        if(organization instanceof Organization)
+        organizationGraphRepository.save((Organization)organization);
+        else
+            unitGraphRepository.save((Unit) organization);
     }
 
     /*private void validateTimeSlot(long unitId,OrganizationTimeSlotRelationship objToCreate,TimeSlot.TimeSlotMode timeSlotMode){

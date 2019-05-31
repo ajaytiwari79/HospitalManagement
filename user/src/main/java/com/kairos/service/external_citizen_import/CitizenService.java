@@ -391,14 +391,14 @@ public class CitizenService {
             Optional supplierOptional = Optional.ofNullable(supplier);
             if (!supplierOptional.isPresent()) {
                 supplier = new OrganizationBuilder().setName(citizenSupplier.getName()).createOrganization();
-                supplier.setCountry(unit.getCountry());
+                supplier.setCountry(countryGraphRepository.findOne(unit.getCountryId()));
                 supplier.setKmdExternalId(citizenSupplier.getId());
             }
             if (citizenSupplier.getType().equals("external")) {
                  //organizationService.createOrganization(supplier, null);
             } else if (citizenSupplier.getType().equals("organization")) {
                 if (organizationService.checkDuplicationOrganizationRelation(unit.getId(), supplier.getId()) == 0)
-                   supplier = organizationService.createOrganization(supplier, unit.getId(), false);
+                   supplier = organizationService.createOrganization(supplier,  false);
             }
 
             if (supplierOptional.isPresent()) grantObject.put("supplierId",supplier.getId());

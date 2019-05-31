@@ -176,7 +176,7 @@ public class TimeBankCalculationService {
         DateTimeInterval shiftInterval = dateTimeInterval.overlap(new DateTimeInterval(shiftActivity.getStartDate(), shiftActivity.getEndDate()));
         int ctaBonusAndScheduledMinutes = 0;
         ctaBonusAndScheduledMinutes = calculateBonusAndUpdateShiftActivity(dateTimeInterval, ctaTimeBankMinMap, ruleTemplate, shiftActivity, shiftInterval);
-        if(asLocalDate(shiftActivity.getStartDate()).isBefore(asLocalDate(shiftActivity.getEndDate()))) {
+        if(!asLocalDate(shiftActivity.getStartDate()).equals(asLocalDate(shiftActivity.getEndDate()))) {
             DateTimeInterval nextDayInterval = new DateTimeInterval(getStartOfDay(shiftActivity.getEndDate()), getEndOfDay(shiftActivity.getEndDate()));
             shiftInterval = nextDayInterval.overlap(new DateTimeInterval(getStartOfDay(shiftActivity.getEndDate()), shiftActivity.getEndDate()));
             ctaBonusAndScheduledMinutes += calculateBonusAndUpdateShiftActivity(nextDayInterval, ctaTimeBankMinMap, ruleTemplate, shiftActivity, shiftInterval);

@@ -10,6 +10,7 @@ import com.kairos.persistence.model.system_setting.SystemLanguageQueryResult;
 import com.kairos.persistence.repository.system_setting.CountryLanguageSettingRelationshipRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
@@ -35,6 +36,8 @@ public class SystemLanguageService {
     private ExceptionService exceptionService;
     @Inject
     private SystemLanguageGraphRepository systemLanguageGraphRepository;
+    @Inject
+    private CountryService countryService;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
@@ -198,7 +201,7 @@ public class SystemLanguageService {
     }
 
     public SystemLanguage getDefaultSystemLanguageForUnit(Long unitId) {
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
         SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         if (!Optional.ofNullable(systemLanguage).isPresent()) {
             systemLanguage = systemLanguageGraphRepository.getDefaultSystemLangugae();

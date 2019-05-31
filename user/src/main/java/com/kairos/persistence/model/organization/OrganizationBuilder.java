@@ -276,4 +276,10 @@ public class OrganizationBuilder {
                 parentOrganization, country,accountType,boardingCompleted,children);
     }
 
+    public Unit createUnit(){
+        return new Unit(id,name,description,country.getId(),desiredUrl,shortCompanyName,kairosCompanyId,companyType,
+                vatId,businessTypes,organizationType,organizationSubTypes,companyUnitType,
+                companyCategory,timeZone,accountType,boardingCompleted);
+    }
+
 }

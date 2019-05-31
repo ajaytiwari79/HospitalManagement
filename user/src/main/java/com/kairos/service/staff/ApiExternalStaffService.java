@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.enums.OrganizationLevel;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -66,26 +67,10 @@ public class ApiExternalStaffService {
             staffList.add(staff.getId());
             logger.info("Creating Staff using organizationId " + orgnaizationId);
 
-            Unit unit = unitGraphRepository.findOne(orgnaizationId,0);
+            Organization parent = organizationService.fetchParentOrganization(orgnaizationId);
 
-            if(unit == null){
-                exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND,orgnaizationId);
-                //throw new InternalError("unit can't be null");
-            }
+            positionGraphRepository.createPositions(parent.getId(), staffList, orgnaizationId);
 
-            Unit parent = null;
-            if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-                parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-            } else if(!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-                parent = unitGraphRepository.getParentOfOrganization(unit.getId());
-            }
-
-            if(parent == null){
-                positionGraphRepository.createPositions(unit.getId(),staffList,unit.getId());
-            } else {
-                positionGraphRepository.createPositions(parent.getId(),staffList,unit.getId());
-            }
 
             AddressDTO address = new AddressDTO();
             address.setCity("Odense");
@@ -102,23 +87,23 @@ public class ApiExternalStaffService {
         return null;
     }
 
-    public void updateExternalId(long staffId,long externalId){
+    public void updateExternalId(long staffId, long externalId) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
-        if(staff == null){
+        if (staff == null) {
             return;
         }
         staff.setExternalId(externalId);
         staffGraphRepository.save(staff);
     }
 
-    public String getStaffFromTimeCare(GetEmploymentByIdResponse personsResponse){
+    public String getStaffFromTimeCare(GetEmploymentByIdResponse personsResponse) {
         try {
             logger.info(" Staffs---> " + personsResponse.getGetEmploymentByIdResult().size());
             for (GetEmploymentByIdResult person : personsResponse.getGetEmploymentByIdResult()) {
                 Staff staff = staffService.getByExternalId(person.getId());
                 Unit unit = organizationService.getOrganizationByExternalId(person.getParentWorkPlaceId().toString());
-                if(staff == null) {
+                if (staff == null) {
                     Map<String, Object> engineerMetaData = new HashMap<>();
                     engineerMetaData.put("firstName", person.getFirstName());
                     engineerMetaData.put("lastName", person.getLastName());

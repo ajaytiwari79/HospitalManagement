@@ -26,6 +26,7 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
@@ -50,6 +51,7 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
+import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.*;
@@ -112,6 +114,8 @@ public class OrganizationService {
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
+    private OrganizationService organizationService;
+    @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
@@ -143,6 +147,8 @@ public class OrganizationService {
     private UnitGraphRepository unitGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -207,17 +213,8 @@ public class OrganizationService {
     }
 
 
-    public Organization createOrganization(Organization organization, Long id, boolean baseOrganization) {
-        Organization parent = (id == null) ? null : getOrganizationById(id);
-        if(parent != null) {
-            organizationGraphRepository.save(organization);
-            Unit o = unitGraphRepository.createChildOrganization(parent.getId(), organization.getId());
-        } else {
-            organization = organizationGraphRepository.save(organization);
-            if(!baseOrganization && !organization.getOrganizationLevel().equals(OrganizationLevel.COUNTRY)) {
-                unitGraphRepository.linkWithRegionLevelOrganization(organization.getId());
-            }
-        }
+    public Organization createOrganization(Organization organization, boolean baseOrganization) {
+        organizationGraphRepository.save(organization);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.SHIFT_PLANNING);
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         if(!baseOrganization) {
@@ -228,17 +225,18 @@ public class OrganizationService {
     }
 
     public boolean deleteOrganization(long organizationId) {
-        Unit unit = unitGraphRepository.findOne(organizationId);
+        Organization organization = organizationGraphRepository.findOne(organizationId);
         boolean success;
-        if(unit != null && unit.isBoardingCompleted()) {
-            unit.setEnable(false);
-            unit.setDeleted(true);
-            unitGraphRepository.save(unit);
+        if(organization != null && organization.isBoardingCompleted()) {
+            organization.setEnable(false);
+            organization.setDeleted(true);
+            organizationGraphRepository.save(organization);
             success = true;
         } else {
             List<Long> organizationIdsToDelete = new ArrayList<>();
-            organizationIdsToDelete.add(unit.getId());
-            organizationIdsToDelete.addAll(unit.getChildren().stream().map(child -> child.getId()).collect(Collectors.toList()));
+            organizationIdsToDelete.add(organization.getId());
+            organizationIdsToDelete.addAll(organization.getChildren().stream().map(child -> child.getId()).collect(Collectors.toList()));
+            organizationIdsToDelete.addAll(organization.getUnits().stream().map(child -> child.getId()).collect(Collectors.toList()));
             unitGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
             success = true;
         }
@@ -283,15 +281,14 @@ public class OrganizationService {
         return response;
     }
 
-    public boolean updateOrganizationGeneralDetails(OrganizationGeneral organizationGeneral, long unitId) throws ParseException {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if(unit == null) {
+    public  boolean updateOrganizationGeneralDetails(OrganizationGeneral organizationGeneral, long unitId) {
+        OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(unitId);
+        if(organizationBaseEntity == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }
         OwnershipType ownershipType = null;
         ContractType contractType = null;
         IndustryType industryType = null;
-        EmployeeLimit employeeLimit = null;
         KairosStatus kairosStatus = null;
         VatType vatType = null;
         if(organizationGeneral.getOwnershipTypeId() != null)
@@ -301,13 +298,11 @@ public class OrganizationService {
             contractType = contractTypeGraphRepository.findOne(organizationGeneral.getContractTypeId());
         if(organizationGeneral.getIndustryTypeId() != null)
             industryType = industryTypeGraphRepository.findOne(organizationGeneral.getIndustryTypeId());
-        if(organizationGeneral.getEmployeeLimitId() != null)
-            employeeLimit = employeeLimitGraphRepository.findOne(organizationGeneral.getEmployeeLimitId());
         if(organizationGeneral.getVatTypeId() != null)
             vatType = vatTypeGraphRepository.findOne(organizationGeneral.getVatTypeId());
         if(organizationGeneral.getKairosStatusId() != null)
             kairosStatus = kairosStatusGraphRepository.findOne(organizationGeneral.getKairosStatusId());
-        ContactAddress contactAddress = unit.getContactAddress();
+        ContactAddress contactAddress = organizationBaseEntity.getContactAddress();
         if(contactAddress != null) {
             Municipality municipality = municipalityGraphRepository.findOne(organizationGeneral.getMunicipalityId());
             if(municipality == null) {
@@ -317,33 +312,38 @@ public class OrganizationService {
         }
         Optional<OrganizationType> organizationTypes = organizationTypeGraphRepository.findById(organizationGeneral.getOrganizationTypeId());
         List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationGeneral.getOrganizationSubTypeId());
-        unit.setContactAddress(contactAddress);
-        unit.setName(organizationGeneral.getName());
-        unit.setShortName(organizationGeneral.getShortName());
-        unit.setCvrNumber(organizationGeneral.getCvrNumber());
-        unit.setPNumber(organizationGeneral.getpNumber());
-        unit.setWebSiteUrl(organizationGeneral.getWebsiteUrl());
-        unit.setEmployeeLimit(employeeLimit);
-        unit.setDescription(organizationGeneral.getDescription());
-        unit.setOrganizationType(organizationTypes.get());
-        unit.setOrganizationSubTypes(organizationSubTypes);
-        unit.setVatType(vatType);
-        unit.setEanNumber(organizationGeneral.getEanNumber());
-        unit.setCostCenterCode(organizationGeneral.getCostCenterCode());
-        unit.setCostCenterName(organizationGeneral.getCostCenterName());
-        unit.setOwnershipType(ownershipType);
-        unit.setBusinessTypes(businessTypes);
-        unit.setIndustryType(industryType);
-        unit.setContractType(contractType);
-        unit.setClientSince(parseDate(organizationGeneral.getClientSince()).getTime());
-        unit.setKairosHub(organizationGeneral.isKairosHub());
-        unit.setKairosStatus(kairosStatus);
-        unit.setExternalId(organizationGeneral.getExternalId());
-        unit.setEndTimeDeduction(organizationGeneral.getPercentageWorkDeduction());
-        unit.setKmdExternalId(organizationGeneral.getKmdExternalId());
-        unit.setDayShiftTimeDeduction(organizationGeneral.getDayShiftTimeDeduction());
-        unit.setNightShiftTimeDeduction(organizationGeneral.getNightShiftTimeDeduction());
-        unitGraphRepository.save(unit);
+        organizationBaseEntity.setContactAddress(contactAddress);
+        organizationBaseEntity.setName(organizationGeneral.getName());
+        organizationBaseEntity.setShortName(organizationGeneral.getShortName());
+        organizationBaseEntity.setCvrNumber(organizationGeneral.getCvrNumber());
+        organizationBaseEntity.setPNumber(organizationGeneral.getpNumber());
+        organizationBaseEntity.setWebSiteUrl(organizationGeneral.getWebsiteUrl());
+        organizationBaseEntity.setDescription(organizationGeneral.getDescription());
+        organizationBaseEntity.setOrganizationType(organizationTypes.get());
+        organizationBaseEntity.setOrganizationSubTypes(organizationSubTypes);
+        organizationBaseEntity.setVatType(vatType);
+        organizationBaseEntity.setEanNumber(organizationGeneral.getEanNumber());
+        organizationBaseEntity.setCostCenterCode(organizationGeneral.getCostCenterCode());
+        organizationBaseEntity.setCostCenterName(organizationGeneral.getCostCenterName());
+        organizationBaseEntity.setOwnershipType(ownershipType);
+        organizationBaseEntity.setBusinessTypes(businessTypes);
+        organizationBaseEntity.setIndustryType(industryType);
+        organizationBaseEntity.setContractType(contractType);
+        organizationBaseEntity.setClientSince(parseDate(organizationGeneral.getClientSince()).getTime());
+        organizationBaseEntity.setKairosStatus(kairosStatus);
+        organizationBaseEntity.setExternalId(organizationGeneral.getExternalId());
+        organizationBaseEntity.setEndTimeDeduction(organizationGeneral.getPercentageWorkDeduction());
+        organizationBaseEntity.setKmdExternalId(organizationGeneral.getKmdExternalId());
+        organizationBaseEntity.setDayShiftTimeDeduction(organizationGeneral.getDayShiftTimeDeduction());
+        organizationBaseEntity.setNightShiftTimeDeduction(organizationGeneral.getNightShiftTimeDeduction());
+        if(organizationBaseEntity instanceof Organization){
+            ((Organization)organizationBaseEntity).setKairosHub(organizationGeneral.isKairosHub());
+            organizationGraphRepository.save(((Organization)organizationBaseEntity));
+        }
+        else {
+            unitGraphRepository.save(((Unit)organizationBaseEntity));
+        }
+
         return true;
 
     }
@@ -435,15 +435,6 @@ public class OrganizationService {
         return returnData;
     }
 
-    public Boolean createLinkParentWithChildOrganization(Long parentId, Long childId) {
-        Unit parent = unitGraphRepository.findOne(parentId);
-        Unit child = unitGraphRepository.findOne(childId);
-        unitGraphRepository.createChildOrganization(parent.getId(), child.getId());
-        accessGroupService.createDefaultAccessGroups(child);
-        timeSlotService.createDefaultTimeSlots(child, TimeSlotType.SHIFT_PLANNING);
-        timeSlotService.createDefaultTimeSlots(child, TimeSlotType.TASK_PLANNING);
-        return true;
-    }
 
     public Long getOrganizationIdByTeamIdOrGroupIdOrOrganizationId(String type, Long id) {
         if(ORGANIZATION.equalsIgnoreCase(type)) {
@@ -500,27 +491,6 @@ public class OrganizationService {
         return organizationResult;
     }
 
-    public boolean updateOneTimeSyncsettings(long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if(unit == null) {
-            LOGGER.debug("Searching organization by id " + unitId);
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-        }
-        unit.setOneTimeSyncPerformed(true);
-        unitGraphRepository.save(unit);
-        return true;
-    }
-
-    public boolean updateAutoGenerateTaskSettings(long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if(unit == null) {
-            LOGGER.debug("Searching organization by id " + unitId);
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-        }
-        unit.setAutoGeneratedPerformed(true);
-        unitGraphRepository.save(unit);
-        return true;
-    }
 
     public Map<String, Object> getTaskDemandSupplierInfo(Long unitId) {
         Map<String, Object> supplierInfo = new HashMap();
@@ -534,8 +504,8 @@ public class OrganizationService {
         return unitGraphRepository.getParentOrganizationOfCityLevel(unitId);
     }
 
-    public Unit getParentOfOrganization(Long unitId) {
-        return unitGraphRepository.getParentOfOrganization(unitId);
+    public Organization getParentOfOrganization(Long unitId) {
+        return fetchParentOrganization(unitId);
     }
 
     public Unit getOrganizationByTeamId(Long teamId) {
@@ -574,20 +544,20 @@ public class OrganizationService {
     }
 
     public OrganizationTypeAndSubTypeDTO getOrganizationTypeAndSubTypes(Long id, String type) {
-        Unit unit = getOrganizationDetail(id, type);
+        OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(id);
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = new OrganizationTypeAndSubTypeDTO();
-        if(!unit.isParentOrganization()) {
-            Unit parentUnit = unitGraphRepository.getParentOfOrganization(unit.getId());
-            organizationTypeAndSubTypeDTO.setParentOrganizationId(parentUnit.getId());
+        if(!organizationBaseEntity.isParentOrganization()) {
+            Organization organization=organizationService.fetchParentOrganization(id);
+            organizationTypeAndSubTypeDTO.setParentOrganizationId(organization.getId());
             organizationTypeAndSubTypeDTO.setParent(false);
         } else {
             organizationTypeAndSubTypeDTO.setParent(true);
         }
-        List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(unit.getId());
-        List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(unit.getId());
+        List<Long> orgTypeIds = organizationTypeGraphRepository.getOrganizationTypeIdsByUnitId(organizationBaseEntity.getId());
+        List<Long> orgSubTypeIds = organizationTypeGraphRepository.getOrganizationSubTypeIdsByUnitId(organizationBaseEntity.getId());
         organizationTypeAndSubTypeDTO.setOrganizationTypes(Optional.ofNullable(orgTypeIds).orElse(Collections.EMPTY_LIST));
         organizationTypeAndSubTypeDTO.setOrganizationSubTypes(Optional.ofNullable(orgSubTypeIds).orElse(Collections.EMPTY_LIST));
-        organizationTypeAndSubTypeDTO.setUnitId(unit.getId());
+        organizationTypeAndSubTypeDTO.setUnitId(organizationBaseEntity.getId());
         return organizationTypeAndSubTypeDTO;
     }
 
@@ -638,10 +608,6 @@ public class OrganizationService {
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
 
-    public Long getOrganization(Long id, String type) {
-        Unit unit = getOrganizationDetail(id, type);
-        return unit.getId();
-    }
 
     public Unit getOrganizationDetail(Long id, String type) {
         Unit unit = null;
@@ -836,7 +802,7 @@ public class OrganizationService {
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId) {
         Unit unit = unitGraphRepository.findOne(unitId);
-        Long countryId = unit.isParentOrganization() ? unit.getCountry().getId() : unitGraphRepository.getCountryByParentOrganization(unit.getId()).getId();
+        Long countryId = unit.getCountryId();
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
@@ -945,25 +911,15 @@ public class OrganizationService {
         return organizationBasicResponses.stream().collect(Collectors.toMap(OrganizationBasicResponse::getId, OrganizationBasicResponse::getTimezone));
     }
 
-    public boolean mappingPayRollToUnit(long unitId, BigInteger payRollTypeId) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if(unit != null && !unit.isDeleted()) {
-            unit.setPayRollTypeId(payRollTypeId);
-            unitGraphRepository.save(unit);
-        } else {
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "Organization", unitId);
-        }
-        return true;
-    }
 
     public List<Long> getOrganizationIds(Long unitId) {
         List<Long> organizationIds = null;
         if(isNull(unitId)) {
             organizationIds = unitGraphRepository.findAllOrganizationIds();
         } else {
-            Optional<Unit> optionalOrganization = unitGraphRepository.findById(unitId);
+            Optional<Organization> optionalOrganization = organizationGraphRepository.findById(unitId);
             if(optionalOrganization.isPresent()) {
-                organizationIds = optionalOrganization.get().getChildren().stream().map(unit -> unit.getId()).collect(Collectors.toList());
+                organizationIds = optionalOrganization.get().getUnits().stream().map(unit -> unit.getId()).collect(Collectors.toList());
             }
         }
         return organizationIds;

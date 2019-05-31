@@ -10,6 +10,7 @@ import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
@@ -30,6 +31,7 @@ import com.kairos.rest_client.TaskDemandRestClient;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
 import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
@@ -62,6 +64,8 @@ public class SkillService {
     @Inject
     private UnitGraphRepository unitGraphRepository;
     @Inject
+    private OrganizationService organizationService;
+    @Inject
     private CountryGraphRepository countryGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
@@ -91,7 +95,8 @@ public class SkillService {
     private TagGraphRepository tagGraphRepository;
     @Inject
     private ExceptionService exceptionService;
-    @Inject private StaffRetrievalService staffRetrievalService;
+    @Inject
+    private StaffRetrievalService staffRetrievalService;
 
     public Map<String, Object> createSkill(SkillDTO skillDTO, long skillCategoryId) {
         SkillCategory skillCategory = skillCategoryGraphRepository.findOne(skillCategoryId);
@@ -112,7 +117,7 @@ public class SkillService {
             return response;
         }
         exceptionService.duplicateDataException(MESSAGE_SKILL_NAME_DUPLICATE);
-            return  null;
+        return null;
 
     }
 
@@ -173,53 +178,26 @@ public class SkillService {
     public HashMap<String, Object> getAllAvailableSkills(long id, String type) {
 
         HashMap<String, Object> response = new HashMap<>();
-
-
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-
-            Unit unit = unitGraphRepository.findOne(id, 0);
-            Unit parent = null;
-
-            if (!unit.isParentOrganization() && OrganizationLevel.CITY.equals(unit.getOrganizationLevel())) {
-                parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-            } else if (!unit.isParentOrganization() && OrganizationLevel.COUNTRY.equals(unit.getOrganizationLevel())) {
-                parent = unitGraphRepository.getParentOfOrganization(unit.getId());
-            }
-
-            List<Map<String, Object>> organizationSkills;
-            if (parent == null) {
-                organizationSkills = unitGraphRepository.getSkillsOfParentOrganizationWithActualName(id);
-            } else {
-                organizationSkills = unitGraphRepository.getSkillsOfChildOrganizationWithActualName(parent.getId(), id);
-            }
-
-            List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
-            for (Map<String, Object> map : organizationSkills) {
-                orgSkillRel.add((Map<String, Object>) map.get("data"));
-            }
-
-            response.put("orgData", orgSkillRel);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-
-            List<Map<String, Object>> teamSkills = teamGraphRepository.getSkillsOfTeam(id);
-
-            List<Map<String, Object>> teamSkillRel = new ArrayList<>(teamSkills.size());
-            for (Map<String, Object> map : teamSkills) {
-                teamSkillRel.add((Map<String, Object>) map.get("data"));
-            }
-            response.put("orgData", teamSkillRel);
+        Organization parent = organizationService.fetchParentOrganization(id);
+        List<Map<String, Object>> organizationSkills;
+        if (parent == null) {
+            organizationSkills = unitGraphRepository.getSkillsOfParentOrganizationWithActualName(id);
+        } else {
+            organizationSkills = unitGraphRepository.getSkillsOfChildOrganizationWithActualName(parent.getId(), id);
         }
-       /* List<Long> serviceIds = organizationServiceRepository.getServiceIdsByOrgId(id);
-        Map<String, Object> taskTypeList = skillServiceTemplateClient.getTaskTypeList(serviceIds, id);
-        response.putAll(taskTypeList);*/
+
+        List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
+        for (Map<String, Object> map : organizationSkills) {
+            orgSkillRel.add((Map<String, Object>) map.get("data"));
+        }
+
+        response.put("orgData", orgSkillRel);
         response.put("skillLevels", Skill.SkillLevel.values());
         response.put("teamList", teamService.getAllTeamsInOrganization(id));
 
         return response;
 
     }
-
 
 
     /**
@@ -251,7 +229,7 @@ public class SkillService {
         } else if (TEAM.equalsIgnoreCase(type)) {
             long createdDate = DateUtils.getCurrentDate().getTime();
             if (isSelected) {
-                teamGraphRepository.addSkillInTeam(id, skillId,  createdDate, createdDate, true);
+                teamGraphRepository.addSkillInTeam(id, skillId, createdDate, createdDate, true);
             } else {
                 teamGraphRepository.addSkillInTeam(id, skillId, createdDate, createdDate, false);
             }
@@ -320,7 +298,7 @@ public class SkillService {
         skill.setEnabled(false);
         skill.setSkillStatus(Skill.SkillStatus.PENDING);
         skillGraphRepository.save(skill);
-        mailService.sendMailWithSendGrid(null,null, "Request for create new skill", "Skill creation request",ADMIN_EMAIL);
+        mailService.sendMailWithSendGrid(null, null, "Request for create new skill", "Skill creation request", ADMIN_EMAIL);
         return true;
     }
 
@@ -330,7 +308,7 @@ public class SkillService {
             return null;
         }
 
-        long unitId=0;
+        long unitId = 0;
         if (ORGANIZATION.equalsIgnoreCase(type)) {
             unitId = id;
         } else if (TEAM.equalsIgnoreCase(type)) {
@@ -443,7 +421,7 @@ public class SkillService {
     public Map<String, Object> getStaffSkills(long id, String type) {
 
 
-        List<Map<String, Object>> skills=null;
+        List<Map<String, Object>> skills = null;
         List<Map<String, Object>> response = new ArrayList<>();
         List<StaffPersonalDetailDTO> staffList = new ArrayList<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
@@ -463,7 +441,7 @@ public class SkillService {
             skills = teamGraphRepository.getAssignedSkillsOfStaffByTeam(id, staffIds);
         } else {
             exceptionService.dataNotFoundByIdException(MESSAGE_TYPE_NOTVALID);
-           // throw new InternalError("Type is not valid");
+            // throw new InternalError("Type is not valid");
         }
         List<Map<String, Object>> skillsResponse = new ArrayList<>();
         for (Map<String, Object> map : skills) {
@@ -489,7 +467,7 @@ public class SkillService {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
 
@@ -500,7 +478,7 @@ public class SkillService {
         List<Skill> skillsByExternalIds = (externalIds.isEmpty()) ? new ArrayList<>() :
                 skillGraphRepository.findByExternalIdInAndIsEnabledTrue(externalIds);
 
-        SkillCategory skillCategory = skillCategoryGraphRepository.findByNameIgnoreCaseAndIsEnabledTrue(countryId,"(?i)"+SKILL_CATEGORY_FOR_TIME_CARE);
+        SkillCategory skillCategory = skillCategoryGraphRepository.findByNameIgnoreCaseAndIsEnabledTrue(countryId, "(?i)" + SKILL_CATEGORY_FOR_TIME_CARE);
         if (!Optional.ofNullable(skillCategory).isPresent()) {
             skillCategory = new SkillCategory(SKILL_CATEGORY_FOR_TIME_CARE);
         }

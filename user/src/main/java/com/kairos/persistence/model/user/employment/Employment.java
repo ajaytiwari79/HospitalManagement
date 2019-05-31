@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
@@ -32,7 +33,7 @@ public class Employment extends UserBaseEntity {
     private Staff staff;
 
     @Relationship(type = SUPPORTED_BY_UNION)
-    private Unit union;
+    private Organization union;
 
     @Relationship(type = IN_UNIT)
     private Unit unit;
@@ -90,12 +91,12 @@ public class Employment extends UserBaseEntity {
     }
 
 
-    public Unit getUnion() {
+    public Organization getUnion() {
         return union;
     }
 
 
-    public void setUnion(Unit union) {
+    public void setUnion(Organization union) {
         this.union = union;
     }
 

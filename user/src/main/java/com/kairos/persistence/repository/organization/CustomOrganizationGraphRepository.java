@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.organization;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -17,5 +18,5 @@ public interface CustomOrganizationGraphRepository {
     List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,String moduleId,
                                   Map<FilterType, List<String>> filters, String searchText, String imagePath);
 
-    List<Map<String, Object>> getOrganizationHierarchyByFilters(long parentOrganizationId,OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
+    OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
 }

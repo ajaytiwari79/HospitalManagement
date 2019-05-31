@@ -24,6 +24,7 @@ import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.*;
@@ -520,7 +521,7 @@ public class StaffService {
                     }
                     ContactAddress contactAddress = extractContactAddressFromRow(row);
                     if (!Optional.ofNullable(contactAddress).isPresent()) {
-                        contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(unit);
+                        contactAddress = staffAddressService.getStaffContactAddressByOrganizationAddress(organization);
                     }
                     ContactDetail contactDetail = extractContactDetailFromRow(row);
                     staff.setContactDetail(contactDetail);
@@ -559,7 +560,7 @@ public class StaffService {
                     staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
                     staffList.add(staffDTO);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, organization.getId())) {
-                        positionService.createPosition(organization,staff, accessGroupId, DateUtils.getCurrentDateMillis(), isEmploymentExist);
+                        positionService.createPosition(organization,staff, accessGroupId, DateUtils.getCurrentDateMillis());
                     }
                 }
             }
@@ -688,8 +689,9 @@ public class StaffService {
         accessPageRepository.setDefaultPermission(accessPermission.getId(), accessGroup.getId());
     }
 
-    public void setUserAndPosition(Unit unit, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
-        Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(unit.getId(), user.getId());
+    public void setUserAndPosition(OrganizationBaseEntity organizationBaseEntity, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
+        Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organizationBaseEntity.getId(), user.getId());
+        Organization organization=organizationService.fetchParentOrganization(organizationBaseEntity.getId());
         if (isNull(position)) {
 
             Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
@@ -699,24 +701,22 @@ public class StaffService {
             staff.setUser(user);
             position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
             position.setStaff(staff);
-            staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(unit));
+            staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
             position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
         }
         // if the organization is not parent organization then adding position in parent organization.
-        if (!parentOrganization) {
-            Organization mainUnit = organizationService.fetchParentOrganization(unit.getId());
-            mainUnit.getPositions().add(position);
-            organizationGraphRepository.save(mainUnit);
-            user.setCountryId(mainUnit.getCountry().getId());
-        } else {
-            unit.getPositions().add(position);
-            user.setCountryId(unit.getCountry().getId());
-        }
-        unitGraphRepository.save(unit);
+            organization.getPositions().add(position);
+            organizationGraphRepository.save(organization);
+            user.setCountryId(organization.getCountry().getId());
+
         UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setUnit(unit);
+        if(organizationBaseEntity instanceof Organization){
+            unitPermission.setOrganization((Organization) organizationBaseEntity);
+        } else {
+            unitPermission.setUnit((Unit) organizationBaseEntity);
+        }
         if (accessGroupId != null) {
-            AccessGroup accessGroup = (union || parentOrganization) ? accessGroupRepository.getAccessGroupByParentAccessGroupId(unit.getId(), accessGroupId) : accessGroupRepository.getAccessGroupByParentId(unit.getId(), accessGroupId);
+            AccessGroup accessGroup = (union || parentOrganization) ? accessGroupRepository.getAccessGroupByParentAccessGroupId(organization.getId(), accessGroupId) : accessGroupRepository.getAccessGroupByParentId(organization.getId(), accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
                 linkAccessOfModules(accessGroup, unitPermission);
@@ -726,7 +726,7 @@ public class StaffService {
         positionGraphRepository.save(position,2);
     }
 
-    public void setUnitManagerAndPosition(Unit unit, User user, Long accessGroupId) {
+    public void setUnitManagerAndPosition(Organization organization, User user, Long accessGroupId) {
         Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
         Position position = new Position();
         position.setStaff(staff);
@@ -734,20 +734,20 @@ public class StaffService {
         position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         position.setStaff(staff);
         position.setStartDateMillis(DateUtils.getCurrentDateMillis());
-        unit.getPositions().add(position);
-        unitGraphRepository.save(unit);
+        organization.getPositions().add(position);
+        organizationGraphRepository.save(organization);
         if (accessGroupId != null) {
             UnitPermission unitPermission = new UnitPermission();
-            unitPermission.setUnit(unit);
+            unitPermission.setOrganization(organization);
             AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
             if (Optional.ofNullable(accessGroup).isPresent()) {
                 unitPermission.setAccessGroup(accessGroup);
             }
             position.getUnitPermissions().add(unitPermission);
         }
-        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(unit));
+        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
         positionGraphRepository.save(position);
-        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(position.getStaff().getId())), unit.getId());
+        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(position.getStaff().getId())), organization.getId());
 
     }
 
@@ -796,17 +796,9 @@ public class StaffService {
     }
 
     public Map<String, Object> getUnitManager(long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        Unit parent;
-        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-        } else {
-            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
-        }
+        Organization organization=organizationService.fetchParentOrganization(unitId);
         List<Map<String, Object>> unitManagers;
-        if (parent == null) unitManagers = staffGraphRepository.getUnitManagers(unitId, unitId);
-        else unitManagers = staffGraphRepository.getUnitManagers(parent.getId(), unitId);
+         unitManagers = staffGraphRepository.getUnitManagers(organization.getId(), unitId);
         List<Map<String, Object>> unitManagerList = new ArrayList<>();
         for (Map<String, Object> unitManager : unitManagers) {
             unitManagerList.add((Map<String, Object>) unitManager.get("data"));
@@ -850,8 +842,7 @@ public class StaffService {
     }
 
     public List<StaffTaskDTO> getAssignedTasksOfStaff(long unitId, long staffId, String date) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        Unit parentUnit = (unit.isParentOrganization()) ? unit : unitGraphRepository.getParentOfOrganization(unit.getId());
+        Organization parentUnit = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUnitId(parentUnit.getId(), staffId);
         if (staff == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_ID_NOTFOUND);
@@ -891,28 +882,14 @@ public class StaffService {
     }
 
     public List<Long> getUnitManagerIds(long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        Unit parent;
-        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = unitGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-        } else {
-            parent = unitGraphRepository.getParentOfOrganization(unit.getId());
-        }
-        List<Long> unitManagers;
-        if (parent == null) unitManagers = staffGraphRepository.getUnitManagersIds(unitId, unitId);
-        else unitManagers = staffGraphRepository.getUnitManagersIds(parent.getId(), unitId);
-        return unitManagers;
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        return staffGraphRepository.getUnitManagersIds(organization.getId(), unitId);
     }
 
     public List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, Boolean allStaffRequired) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
-
-        }
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
         if (allStaffRequired) {
-            Unit parentUnit = (unit.isParentOrganization()) ? unit : unitGraphRepository.getParentOfOrganization(unit.getId());
+            Organization parentUnit = organizationService.fetchParentOrganization(unitId);
             // unit is parent so fetching all staff from itself
             staffPersonalDetailDTOS = staffGraphRepository.getAllStaffByUnitId(parentUnit.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         } else {
@@ -943,7 +920,7 @@ public class StaffService {
 
     public StaffFilterDTO updateStaffFavouriteFilters(StaffFilterDTO staffFilterDTO, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Unit parent = organizationService.fetchParentOrganization(unitId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFilterDTO.getId());
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
@@ -956,7 +933,7 @@ public class StaffService {
 
     public boolean removeStaffFavouriteFilters(Long staffFavouriteFilterId, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Unit parent = organizationService.fetchParentOrganization(unitId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersById(staff.getId(), staffFavouriteFilterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
@@ -968,7 +945,7 @@ public class StaffService {
 
     public List<FavoriteFilterQueryResult> getStaffFavouriteFilters(String moduleId, long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Unit parent = organizationService.fetchParentOrganization(unitId);
+        Organization parent = organizationService.fetchParentOrganization(unitId);
         Staff staff = staffGraphRepository.getStaffByUserId(userId, parent.getId());
         return staffGraphRepository.getStaffFavouriteFiltersByStaffAndView(staff.getId(), moduleId);
     }

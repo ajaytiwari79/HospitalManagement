@@ -299,7 +299,6 @@ public class PositionService {
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         position.getUnitPermissions().add(unitPermission);
         if (parent == null) {
-            unit.getPositions().add(position);
             unitGraphRepository.save(unit);
         } else {
             parent.getPositions().add(position);
@@ -531,9 +530,9 @@ public class PositionService {
         return map;
     }
 
-    public Position updateEmploymentEndDate(Unit unit, Long staffId) throws Exception {
+    public Position updatePositionEndDate(Organization organization, Long staffId) throws Exception {
         Long employmentEndDate = getMaxEmploymentEndDate(staffId);
-        return saveEmploymentEndDate(unit, employmentEndDate, staffId, null, null, null);
+        return saveEmploymentEndDate(organization, employmentEndDate, staffId, null, null, null);
     }
 
 
@@ -575,14 +574,14 @@ public class PositionService {
         return true;
     }
 
-    public Position updateEmploymentEndDate(Unit unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) throws Exception {
+    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) throws Exception {
         Long employmentEndDate = null;
         if (Optional.ofNullable(endDateMillis).isPresent()) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
         }
 
 
-        return saveEmploymentEndDate(unit, employmentEndDate, staffId, reasonCodeId, endDateMillis, accessGroupId);
+        return saveEmploymentEndDate(organization, employmentEndDate, staffId, reasonCodeId, endDateMillis, accessGroupId);
     }
 
     private Long getMaxEmploymentEndDate(Long staffId) {
@@ -609,12 +608,12 @@ public class PositionService {
 
     }
 
-    private Position saveEmploymentEndDate(Unit unit, Long employmentEndDate, Long staffId, Long reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
+    private Position saveEmploymentEndDate(Organization organization, Long employmentEndDate, Long staffId, Long reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
 
-        Organization parentUnit = organizationService.fetchParentOrganization(unit.getId());
+        Organization parentUnit = organizationService.fetchParentOrganization(organization.getId());
         ReasonCode reasonCode = null;
         if (!Optional.ofNullable(parentUnit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_PARENTORGANIZATION_NOTFOUND, unit.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_PARENTORGANIZATION_NOTFOUND, organization.getId());
         }
 
         Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);

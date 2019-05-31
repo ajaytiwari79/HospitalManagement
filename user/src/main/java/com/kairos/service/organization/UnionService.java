@@ -15,6 +15,7 @@ import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.OrganizationHierarchyData;
@@ -23,6 +24,7 @@ import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.LocationGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
@@ -60,6 +62,8 @@ public class UnionService {
     private final Logger LOGGER = LoggerFactory.getLogger(UnionService.class);
     @Inject
     private UnitGraphRepository unitGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private ZipCodeGraphRepository zipCodeGraphRepository;
     @Inject
@@ -146,7 +150,7 @@ public class UnionService {
         if (locationGraphRepository.existsByName("(?i)" + locationDTO.getName(), unionId, -1l)) {
             exceptionService.duplicateDataException(MESSAGE_LOCATION_NAME_ALREADYEXISTS, locationDTO.getName());
         }
-        Unit union = unitGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
+        Organization union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
         if (!Optional.ofNullable(union).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_UNIONID_NOTFOUND, unionId);
         }
@@ -157,7 +161,7 @@ public class UnionService {
         }
         Location location = new Location(locationDTO.getName(), address);
         union.getLocations().add(location);
-        unitGraphRepository.save(union);
+        organizationGraphRepository.save(union);
         locationGraphRepository.save(location);
         locationDTO.setId(location.getId());
 
@@ -222,7 +226,7 @@ public class UnionService {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
 
-        if (unitGraphRepository.existsByName("(?i)" + unionData.getName(), -1l)) {
+        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), -1l)) {
             exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
 
         }
@@ -249,12 +253,12 @@ public class UnionService {
             sectors.addAll(sectorGraphRepository.findSectorsById(sectorIds));
         }
         sectors.addAll(createSectors(countryId, sectorDTOS));
-        Unit union = new Unit(unionData.getName(), sectors, address, boardingCompleted, country, true);
+        Organization union = new Organization(unionData.getName(), sectors, address, boardingCompleted, country, true);
         if (isCollectionEmpty(union.getLocations()) && publish) {
             union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
 
-        unitGraphRepository.save(union);
+        organizationGraphRepository.save(union);
         unionData.setSectors(sectors.stream().map(sector -> new SectorDTO(sector.getId(), sector.getName())).collect(Collectors.toList()));
         unionData.setId(union.getId());
         return unionData;
@@ -302,15 +306,15 @@ public class UnionService {
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
-        if (unitGraphRepository.existsByName("(?i)" + unionData.getName(), unionId)) {
+        if (organizationGraphRepository.existsByName("(?i)" + unionData.getName(), unionId)) {
             exceptionService.duplicateDataException(MESSAGE_UNION_NAME_EXISTS, unionData.getName());
         }
-        List<UnionDataQueryResult> unionDataQueryResults = unitGraphRepository.getUnionCompleteById(unionId, unionData.getName());
+        List<UnionDataQueryResult> unionDataQueryResults = organizationGraphRepository.getUnionCompleteById(unionId, unionData.getName());
 
         if (CollectionUtils.isEmpty(unionDataQueryResults) || (unionDataQueryResults.size() == 1 && !unionDataQueryResults.get(0).getUnion().getId().equals(unionId))) {
             exceptionService.dataNotFoundByIdException("message.union.not.found", unionId);
         }
-        Unit union = unionDataQueryResults.get(0).getUnion();
+        Organization union = unionDataQueryResults.get(0).getUnion();
         union.setLocations(unionDataQueryResults.get(0).getLocations());
         if (!publish && union.isBoardingCompleted()) {
             exceptionService.invalidRequestException(MESSAGE_PUBLISH_UNION_UNPUBLISH);
@@ -365,7 +369,7 @@ public class UnionService {
         if (isCollectionEmpty(union.getLocations()) && publish) {
             union.getLocations().add(new Location(AppConstants.MAIN_LOCATION, true, address));
         }
-        unitGraphRepository.save(union);
+        organizationGraphRepository.save(union);
         unionData.setId(union.getId());
         return unionData;
     }

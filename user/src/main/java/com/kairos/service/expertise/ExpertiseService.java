@@ -24,6 +24,7 @@ import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryResult;
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
@@ -38,6 +39,7 @@ import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
@@ -119,6 +121,8 @@ public class ExpertiseService {
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
     @Inject
@@ -898,15 +902,15 @@ public class ExpertiseService {
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
     }
 
-    private Unit getUnion(Long unionId, String unionName, Country country) {
-        Unit union;
+    private Organization getUnion(Long unionId, String unionName, Country country) {
+        Organization union;
         if (Optional.ofNullable(unionId).isPresent()) {
-            union = unitGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
+            union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
             if (!Optional.ofNullable(union).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, UNION, unionId);
             }
         } else {
-            union = new Unit(unionName, true, country);
+            union = new Organization(unionName, true, country);
         }
         return union;
     }
@@ -929,7 +933,7 @@ public class ExpertiseService {
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        return getPlannedTimeAndEmploymentType(unit.getCountry().getId());
+        return getPlannedTimeAndEmploymentType(unit.getCountryId());
     }
 
     //register a job for unassign expertise from activity and this method call when set enddate of publish expertise

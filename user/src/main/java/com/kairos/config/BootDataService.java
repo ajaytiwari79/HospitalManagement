@@ -384,10 +384,8 @@ public class BootDataService {
         contactAddress.setRegionName(frederiksberg.getProvince().getRegion().getName());
         contactAddress.setProvince(frederiksberg.getProvince().getName());
         kairosCountryLevel.setContactAddress(contactAddress);
-        OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
-        kairosCountryLevel.setOrganizationSetting(organizationSetting);
 
-        organizationService.createOrganization(kairosCountryLevel, null, true);
+        organizationService.createOrganization(kairosCountryLevel,  true);
 
         createSuperAdminAccessGroup();
         createPosition();
@@ -521,8 +519,7 @@ public class BootDataService {
         contactAddress.setProvince(frederiksberg.getProvince().getName());
         kairosRegionLevel.setContactAddress(contactAddress);
         OrganizationSetting organizationSetting = openningHourService.getDefaultSettings();
-        kairosRegionLevel.setOrganizationSetting(organizationSetting);
-        organizationService.createOrganization(kairosRegionLevel, kairosCountryLevel.getId(), true);
+        organizationService.createOrganization(kairosRegionLevel,  true);
 
         //organizationGraphRepository.addOrganizationServiceInUnit(kairosRegionLevel.getId(),Arrays.asList(privateOrganization.getOrganizationServiceList().get(0).getId()),DateUtil.getCurrentDate().getTime(),DateUtil.getCurrentDate().getTime());
     }

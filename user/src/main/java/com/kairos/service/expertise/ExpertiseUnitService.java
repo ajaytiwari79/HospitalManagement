@@ -13,6 +13,7 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.expertise.OrganizationPersonalizeLocationRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.apache.commons.collections.CollectionUtils;
@@ -47,14 +48,12 @@ public class ExpertiseUnitService {
     @Inject
     private ExceptionService exceptionService;
     @Inject
+    private CountryService countryService;
+    @Inject
     private OrganizationPersonalizeLocationRelationShipGraphRepository organizationLocationRelationShipGraphRepository;
 
     public List<ExpertiseQueryResult> findAllExpertise(Long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-        }
-        Long countryId= unit.isParentOrganization()? unit.getCountry().getId(): unitGraphRepository.getCountryByParentOrganization(unitId).getId();
+        Long countryId= countryService.getCountryIdByUnitId(unitId);
         OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
         List<ExpertiseQueryResult> expertises = new ArrayList<>();
         if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {

@@ -61,7 +61,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]-(position:Position) WHERE id(position)={0} RETURN staff")
     Staff findStaffByPositionId(Long positionId);
 
-    @Query("MATCH (organization:Unit),(user:User) WHERE id(organization)={0} AND id(user)={1}\n" +
+    @Query("MATCH (organization),(user:User) WHERE id(organization)={0} AND id(user)={1}\n" +
             "Match (organization)<-[:" + HAS_SUB_ORGANIZATION+"*]-(org:Unit{isParentOrganization:true,isKairosHub:false})" +
             "MATCH (user)-[:"+ BELONGS_TO +"]-(staff:Staff)" +
             "MATCH (org)-[:"+ HAS_POSITIONS +"]->(position:Position{deleted:false})-[" + BELONGS_TO + "]->(staff) RETURN position")

@@ -77,7 +77,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
 
     @Query("MATCH(s:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(o:Unit) where id(o)={0} AND id(s)={1} \n" +
-            "MATCH(employment)-[:HAS_EXPERTISE_IN]-(e:Expertise) where id(e)={2}\n" +
+            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]-(e:Expertise) where id(e)={2}\n" +
             "return employment ORDER BY employment.startDate")
     List<Employment> getStaffEmploymentsByExpertise(Long unitId, Long staffId, Long expertiseId);
 

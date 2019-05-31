@@ -7,9 +7,13 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.DateLong;
@@ -28,6 +32,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Expertise extends UserBaseEntity {
     @NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL)
     private String name;
@@ -52,7 +59,7 @@ public class Expertise extends UserBaseEntity {
     private Set<OrganizationService> organizationServices;
 
     @Relationship(type = SUPPORTED_BY_UNION)
-    private Unit union;
+    private Organization union;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
     private BreakPaymentSetting breakPaymentSetting;
@@ -73,150 +80,26 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
-    }
-
     public Expertise(String name, Country country) {
         this.name = name;
         this.country = country;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-
-    public Date getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Date startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public Date getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(Date endDateMillis) {
-        this.endDateMillis = endDateMillis;
-    }
-
-    public Level getOrganizationLevel() {
-        return organizationLevel;
-    }
-
-    public void setOrganizationLevel(Level organizationLevel) {
-        this.organizationLevel = organizationLevel;
-    }
-
-    public Set<OrganizationService> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(Set<OrganizationService> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public Unit getUnion() {
-        return union;
-    }
-
-    public void setUnion(Unit union) {
-        this.union = union;
-    }
-
-    public int getFullTimeWeeklyMinutes() {
-        return fullTimeWeeklyMinutes;
-    }
-
-    public void setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
-    public Integer getNumberOfWorkingDaysInWeek() {
-        return numberOfWorkingDaysInWeek;
-    }
-
-    public void setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-    }
 
     public List<SeniorityLevel> getSeniorityLevel() {
         return seniorityLevel = Optional.ofNullable(seniorityLevel).orElse(new ArrayList<>());
     }
 
-    public void setSeniorityLevel(List<SeniorityLevel> seniorityLevel) {
-        this.seniorityLevel = seniorityLevel;
-    }
 
     public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
         this.seniorityLevel = Optional.ofNullable(this.seniorityLevel).orElse(new ArrayList<>());
         this.seniorityLevel.add(seniorityLevel);
     }
 
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public boolean isHasDraftCopy() {
-        return hasDraftCopy;
-    }
-
-    public void setHasDraftCopy(boolean hasDraftCopy) {
-        this.hasDraftCopy = hasDraftCopy;
-    }
-
-    public Expertise getParentExpertise() {
-        return parentExpertise;
-    }
-
-    public void setParentExpertise(Expertise parentExpertise) {
-        this.parentExpertise = parentExpertise;
-    }
-
-    public boolean isHistory() {
-        return history;
-    }
-
-    public void setHistory(boolean history) {
-        this.history = history;
-    }
-
     public List<CareDays> getSeniorDays() {
         return seniorDays = Optional.ofNullable(seniorDays).orElse(new ArrayList<>());
     }
 
-    public void setSeniorDays(List<CareDays> seniorDays) {
-        this.seniorDays = seniorDays;
-    }
 
     public void addSeniorDay(CareDays seniorDays) {
         this.seniorDays = Optional.ofNullable(this.seniorDays).orElse(new ArrayList<>());
@@ -232,13 +115,6 @@ public class Expertise extends UserBaseEntity {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
     }
 
-    public void setChildCareDays(List<CareDays> childCareDays) {
-        this.childCareDays = childCareDays;
-    }
-
-    public Expertise() {
-        //Default Constructor
-    }
 
 
     public String getName() {
@@ -283,22 +159,6 @@ public class Expertise extends UserBaseEntity {
     public Expertise retrieveBasicDetails() {
         return new Expertise(this.id, this.name, this.description, this.startDateMillis, this.endDateMillis, this.fullTimeWeeklyMinutes, this.numberOfWorkingDaysInWeek, this.published);
 
-    }
-
-    public BreakPaymentSetting getBreakPaymentSetting() {
-        return breakPaymentSetting;
-    }
-
-    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
-        this.breakPaymentSetting = breakPaymentSetting;
-    }
-
-    public Sector getSector() {
-        return sector;
-    }
-
-    public void setSector(Sector sector) {
-        this.sector = sector;
     }
 
     public Map<String, Object> retrieveDetails() {

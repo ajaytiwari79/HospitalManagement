@@ -172,7 +172,7 @@ public class EquipmentService{
 
         }
         HashMap<String, List<EquipmentQueryResult>> featuresData = new HashMap<>();
-        featuresData.put("availableEquipments",equipmentGraphRepository.getListOfEquipment(unit.getCountry().getId(), false, ""));
+        featuresData.put("availableEquipments",equipmentGraphRepository.getListOfEquipment(unit.getCountryId(), false, ""));
         featuresData.put("selectedEquipments",fetchSelectedEquipmentsOfResources(organizationId,resourceId));
         return featuresData;
     }
@@ -188,7 +188,7 @@ public class EquipmentService{
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,organizationId);
 
         }
-        List<Equipment> equipments = equipmentGraphRepository.getListOfEquipmentByIds(unit.getCountry().getId(), false, vehicleEquipmentDTO.getEquipments());
+        List<Equipment> equipments = equipmentGraphRepository.getListOfEquipmentByIds(unit.getCountryId(), false, vehicleEquipmentDTO.getEquipments());
         equipmentGraphRepository.detachResourceEquipments(resourceId);
         resource.setEquipments(equipments);
         resourceGraphRepository.save(resource);

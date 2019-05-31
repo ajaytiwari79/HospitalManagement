@@ -140,7 +140,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH (position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission{isUnitManagerEmployment:true})-[:" + APPLICABLE_IN_UNIT + "]->(unit) WITH unitPermission WITH count(unitPermission) AS count RETURN count")
     int countOfUnitEmployment(long organizationId, long unitId, String email);
 
-    @Query("MATCH (organization:Unit),(unit:Unit) WHERE id(organization)={0} AND id(unit)={1} WITH organization,unit\n" +
+    @Query("MATCH (organization),(unit) WHERE id(organization)={0} AND id(unit)={1} WITH organization,unit\n" +
             "MATCH (organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission{isUnitManagerEmployment:true})-[:" + APPLICABLE_IN_UNIT + "]->(unit) WITH position,unitPermission\n" +
             "MATCH (position)-[:" + BELONGS_TO + "]->(staff:Staff) WITH staff,unitPermission\n" +
             "MATCH (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "]->(accessPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup) WITH accessGroup,staff\n" +
@@ -214,7 +214,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN id(staff)")
     List<Long> getCountryAdminIds(long organizationId);
 
-    @Query("MATCH (organization:Unit),(unit:Unit) WHERE id(organization)={0} AND id(unit)={1} WITH organization,unit\n" +
+    @Query("MATCH (organization),(unit) WHERE id(organization)={0} AND id(unit)={1} WITH organization,unit\n" +
             "MATCH (organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission{isUnitManagerEmployment:true})-[:" + APPLICABLE_IN_UNIT + "]->(unit) WITH position,unitPermission\n" +
             "MATCH (position)-[:" + BELONGS_TO + "]->(staff:Staff) WITH staff,unitPermission\n" +
             "MATCH (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "]->(accessPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup) WITH accessGroup,staff\n" +

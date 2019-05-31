@@ -15,6 +15,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.StaffQueryResult;
@@ -26,6 +27,7 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
@@ -38,6 +40,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionAndAccessPermissionGraphRepository;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
@@ -69,6 +72,8 @@ public class StaffCreationService {
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
+    @Inject
     private StaffAddressService staffAddressService;
     @Inject
     private UserGraphRepository userGraphRepository;
@@ -92,6 +97,8 @@ public class StaffCreationService {
     private StaffService staffService;
     @Inject
     private SystemLanguageService systemLanguageService;
+    @Inject
+    private CountryService countryService;
     @Inject
     private EngineerTypeGraphRepository engineerTypeGraphRepository;
     @Inject
@@ -247,27 +254,23 @@ public class StaffCreationService {
         adminAsStaff.setEmail(admin.getEmail());
         staffGraphRepository.save(adminAsStaff);
 
-        List<Unit> units = unitGraphRepository.findByOrganizationLevel(OrganizationLevel.COUNTRY);
-        Unit unit = null;
-        if (!units.isEmpty()) {
-            unit = units.get(0);
-        }
-        if (unit != null) {
+        Organization organization = organizationGraphRepository.findHub();
+        if (organization != null) {
             Position position = new Position("working as country admin", adminAsStaff);
-            unit.getPositions().add(position);
-            unitGraphRepository.save(unit);
+            organization.getPositions().add(position);
+            organizationGraphRepository.save(organization);
 
-            AccessGroup accessGroup = accessGroupRepository.findAccessGroupByName(unit.getId(), AppConstants.COUNTRY_ADMIN);
+            AccessGroup accessGroup = accessGroupRepository.findAccessGroupByName(organization.getId(), AppConstants.COUNTRY_ADMIN);
             UnitPermission unitPermission = new UnitPermission();
-            unitPermission.setUnit(unit);
+            unitPermission.setOrganization(organization);
             AccessPermission accessPermission = new AccessPermission(accessGroup);
             UnitPermissionAccessPermissionRelationship unitPermissionAccessPermissionRelationship = new UnitPermissionAccessPermissionRelationship(unitPermission, accessPermission);
             unitPermissionAccessPermissionRelationship.setEnabled(true);
             unitPermissionAndAccessPermissionGraphRepository.save(unitPermissionAccessPermissionRelationship);
             accessPageService.setPagePermissionToAdmin(accessPermission);
             position.getUnitPermissions().add(unitPermission);
-            unit.getPositions().add(position);
-            unitGraphRepository.save(unit);
+            organization.getPositions().add(position);
+            organizationGraphRepository.save(organization);
         } else {
             return null;
         }
@@ -350,17 +353,17 @@ public class StaffCreationService {
         ));
     }
 
-    public User createUnitManagerForNewOrganization(Unit unit, StaffCreationDTO staffCreationData) {
+    public User createUnitManagerForNewOrganization(Organization organization, StaffCreationDTO staffCreationData) {
         User user = userGraphRepository.findByEmail(staffCreationData.getPrivateEmail().trim());
         if (!Optional.ofNullable(user).isPresent()) {
-            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(unit.getId());
+            SystemLanguage systemLanguage = systemLanguageService.getDefaultSystemLanguageForUnit(organization.getId());
             user = new User();
             user.setUserLanguage(systemLanguage);
             setBasicDetailsOfUser(user, staffCreationData);
-            user.setCountryId(unit.getCountry().getId());
+            user.setCountryId(countryService.getCountryIdByUnitId(organization.getId()));
             userGraphRepository.save(user);
         }
-        staffService.setUnitManagerAndPosition(unit, user, staffCreationData.getAccessGroupId());
+        staffService.setUnitManagerAndPosition(organization, user, staffCreationData.getAccessGroupId());
         return user;
     }
 
