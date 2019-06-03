@@ -244,7 +244,7 @@ public class ShiftStatusService {
     public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, UserAccessRoleDTO userAccessRoleDTO) {
         Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
-            if (isNull(mainShift.getId()) && validPhaseForPublishingShift.contains(phase.getPhaseEnum())) {
+            if (validPhaseForPublishingShift.contains(phase.getPhaseEnum())) {
                 shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
