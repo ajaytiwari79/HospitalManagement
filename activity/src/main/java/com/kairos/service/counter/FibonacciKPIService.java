@@ -8,7 +8,7 @@ import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.persistence.model.counter.ApplicableFilter;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPI;
-import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
+import com.kairos.persistence.repository.counter.*;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
@@ -30,6 +30,7 @@ public class FibonacciKPIService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private ExceptionService exceptionService;
     @Inject private CounterServiceMapping counterServiceMapping;
+    @Inject private ApplicableKPIRepository applicableKPIRepository;
 
     public FibonacciKPIDTO createFibonacciKPI(Long referenceId, FibonacciKPIDTO fibonacciKPIDTO, ConfLevel confLevel) {
         boolean existByName = fibonacciKPIRepository.existByName(null,fibonacciKPIDTO.getTitle(),confLevel,referenceId);
@@ -53,7 +54,7 @@ public class FibonacciKPIService {
         } else if (ConfLevel.UNIT.equals(confLevel)) {
             applicableKPIs.add(new ApplicableKPI(fibonacciKPI.getId(), fibonacciKPI.getId(), null, referenceId, null, confLevel, new ApplicableFilter(new ArrayList<>(), false), fibonacciKPI.getTitle(), false));
         }
-        fibonacciKPIRepository.saveEntities(applicableKPIs);
+        applicableKPIRepository.saveEntities(applicableKPIs);
         return fibonacciKPIDTO;
     }
 

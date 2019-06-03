@@ -18,8 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.PACKAGE_NAME;
 import static de.danielbechler.diff.node.DiffNode.State.ADDED;
 import static de.danielbechler.diff.node.DiffNode.State.CHANGED;
@@ -29,7 +28,7 @@ import static de.danielbechler.diff.node.DiffNode.State.CHANGED;
  * 8/5/19
  */
 
-@Component
+//@Component
 public class AuditLogging {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogging.class);
@@ -93,6 +92,13 @@ public class AuditLogging {
     private static void updateMap(DiffNode arg0, Object oldValue, Object newValue, String properteyName, Map<String, Object> result, Class parentNodeClass) {
         if(isArgumentValid(arg0, properteyName) && isPropertyValid(arg0, properteyName) && parentNodeClass.equals(arg0.getParentNode().getValueType())) {
             if(!primitives.contains(arg0.getValueType().getSimpleName()) && arg0.getValueType().isAnnotationPresent(NodeEntity.class)) {
+                if(isNull(oldValue)){
+                    try {
+                        oldValue = newValue.getClass().newInstance();
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
                 result.put(properteyName, checkDifferences(oldValue, newValue));
             } else {
                 result.put(properteyName, newValue);
@@ -121,18 +127,10 @@ public class AuditLogging {
     private static LoggingType getLoggingType(Map<String, Object> oldEntity, Map<String, Object> newEntity) {
         if(!oldEntity.containsKey("id")) {
             return LoggingType.CREATED;
-        } else if((Boolean) newEntity.get("deleted")) {
+        } else if(newEntity.containsKey("deleted") && (Boolean) newEntity.get("deleted")) {
             return LoggingType.DELETED;
         } else {
             return LoggingType.UPDATED;
         }
     }
-
-    /*ActivityDTO oldActivityDTO = new ActivityDTO(new BigInteger("12"),"test",new BigInteger("123"));
-        ActivityDTO newActivityDTO = new ActivityDTO(new BigInteger("125"),"test",new BigInteger("124"));
-        ShiftActivityDTO newShiftActivity = new ShiftActivityDTO("dsada",asDate(LocalDate.now()),asDate(LocalDate.now().plusDays(1)),new BigInteger("12"),154l);
-        ShiftActivityDTO oldShiftActivity = new ShiftActivityDTO("sadasdsasdas",asDate(LocalDate.of(2019,12,15)),asDate(LocalDate.of(2019,12,16)),new BigInteger("125"),152l);
-        newShiftActivity.setActivity(newActivityDTO);
-        oldShiftActivity.setActivity(oldActivityDTO);
-        */
 }
