@@ -52,7 +52,6 @@ public class PlannedHoursCalculationService implements CounterService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
 
-    private static Logger LOGGER = LoggerFactory.getLogger(PlannedHoursCalculationService.class);
 
     private double getPlannedHoursOfStaff(List<Shift> shifts) {
         long plannedHours = 0l;
@@ -217,7 +216,7 @@ public class PlannedHoursCalculationService implements CounterService {
 
 
     public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
-        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();;
+        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
         Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria,organizationId,applicableKPI);
         Map<Long, Double> staffAndPlanningHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().doubleValue()));
         kpiSetResponseDTO.setKpiId(kpi.getId());

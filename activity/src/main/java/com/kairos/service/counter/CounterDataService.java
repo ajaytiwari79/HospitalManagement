@@ -159,7 +159,9 @@ public class CounterDataService extends MongoBaseService {
                     staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
                     staffApplicableKPI.setFrequencyType(DurationType.MONTHS);
                 }
-
+                if(isCollectionNotEmpty(staffApplicableKPI.getFibonacciKPIConfigs())){
+                    staffFilterBasedCriteria.put(FilterType.FIBONACCI,staffApplicableKPI.getFibonacciKPIConfigs());
+                }
                 staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
             }
             kpiIdAndApplicableKPIMap.put(staffApplicableKPI.getActiveKpiId(),staffApplicableKPI);
@@ -451,7 +453,7 @@ public class CounterDataService extends MongoBaseService {
         KPIResponseDTO kpiResponseDTO = new KPISetResponseDTO();
         for (Future<KPIResponseDTO> data : kpiResults) {
             try {
-                if(isNotNull(data)) {
+                if(isNotNull(data.get())) {
                     kpiResponseDTO.setKpiId(data.get().getKpiId());
                     kpiResponseDTO.setKpiName(data.get().getKpiName());
                     kpiResponseDTO.setStaffKPIValue(data.get().getStaffKPIValue());
