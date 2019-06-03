@@ -48,7 +48,6 @@ public class ShiftActivityDTO {
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
-    private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
