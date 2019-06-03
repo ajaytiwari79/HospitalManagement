@@ -492,6 +492,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.status' : 1,\n" +
                 "        'activities.timeType' : 1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.plannedTimes':1,\n" +
                 "'activities.activity':{  \n" +
                 "            '$arrayElemAt':[  \n" +
                 "               '$activities.activity',\n" +
@@ -568,20 +569,22 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public boolean existShiftsBetweenDurationByEmploymentIdAndTimeType(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, TimeTypes timeType, boolean allowedConflicts) {
+    public List<ShiftWithActivityDTO> findOverlappedShiftsByEmploymentId(BigInteger shiftId, Long employmentId, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("employmentId").is(employmentId).and("startDate").lt(endDate).and("endDate").gt(startDate);
         if (isNotNull(shiftId)) {
             criteria.and("_id").ne(shiftId);
         }
-        Aggregation aggregation = Aggregation.newAggregation(
+
+        Aggregation aggregation = getShiftWithActivityAggregation(criteria);
+        /*Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("activities", "activities.activityId", "_id", "activity"),
                 unwind("activity"),
                 lookup("time_Type", "activity.balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                match(where("timeType.timeTypes").is(timeType).and("timeType.allowedConflicts").is(allowedConflicts))
-        );
+                match(where("timeType.timeTypes").is(timeType))
+        );*/
 
-        return !mongoTemplate.aggregate(aggregation, Shift.class, ShiftDTO.class).getMappedResults().isEmpty();
+        return mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class).getMappedResults();
     }
 
 

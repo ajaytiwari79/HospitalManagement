@@ -213,7 +213,6 @@ public class ShiftService extends MongoBaseService {
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
 
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap, staffAdditionalInfoDTO, phase);
         List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
         mainShift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         mainShift.setPlanningPeriodId(planningPeriod.getId());
@@ -224,6 +223,8 @@ public class ShiftService extends MongoBaseService {
             mainShift.setActivities(breakActivities);
         }
         shiftDetailsService.addPlannedTimeInShift(mainShift,activityWrapperMap.get(activityWrapperMap.keySet().iterator().next()),staffAdditionalInfoDTO);
+        shiftDTO =ObjectMapperUtils.copyPropertiesByMapper(mainShift,ShiftDTO.class);
+        ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap, staffAdditionalInfoDTO, phase);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
@@ -268,7 +269,6 @@ public class ShiftService extends MongoBaseService {
             }
             shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
             shiftActivity.setActivityName(activityWrapper.getActivity().getName());
-            shiftActivity.setPlannedTimeId(addPlannedTimeInShift(shift.getUnitId(), shift.getPhaseId(), activityWrapper.getActivity(), staffAdditionalInfoDTO));
         }
         shiftStatusService.updateStatusOfShiftIfPhaseValid(phase, shift,activityWrapperMap ,staffAdditionalInfoDTO.getUserAccessRoleDTO());
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
@@ -344,7 +344,6 @@ public class ShiftService extends MongoBaseService {
                 }
                 shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
                 shiftActivity.setActivityName(activityWrapper.getActivity().getName());
-                shiftActivity.setPlannedTimeId(addPlannedTimeInShift(staffAdditionalInfoDTO.getUnitId(), phaseListByDate.get(shiftActivity.getStartDate()).getId(), activityWrapperMap.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO));
             }
             shift.setPhaseId(phaseListByDate.get(shift.getActivities().get(0).getStartDate()).getId());
             shift.setScheduledMinutes(scheduledMinutes);
@@ -958,7 +957,6 @@ public class ShiftService extends MongoBaseService {
                 shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
         );
         shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
-            shiftActivityDTO.setPlannedTimeId(addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), staffAdditionalInfoDTO));
             shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
         });
         shiftWithActivityDTO.setStartDate(shiftDTO.getActivities().get(0).getStartDate());

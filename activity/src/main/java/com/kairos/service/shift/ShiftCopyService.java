@@ -285,7 +285,6 @@ public class ShiftCopyService extends MongoBaseService {
             shiftActivity.setBackgroundColor(currentActivityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
             shiftActivity.setActivityName(currentActivityWrapper.getActivity().getName());
             shiftActivity.setTimeType(currentActivityWrapper.getTimeType());
-            shiftActivity.setPlannedTimeId(addPlannedTimeInShift(planningPeriod.getCurrentPhaseId(), currentActivityWrapper.getActivity(), staffEmployment, dataWrapper, activityConfigurations));
         }
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
