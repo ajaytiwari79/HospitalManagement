@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
 import lombok.Getter;
@@ -102,7 +103,7 @@ public class ShiftWithActivityDTO extends ShiftDTO{
 
     public List<BigInteger> getActivitiesPlannedTimeIds(){
         if(activitiesPlannedTimeIds.isEmpty()) {
-            activitiesPlannedTimeIds = activities.stream().map(shiftActivityDTO -> shiftActivityDTO.getPlannedTimeId()).collect(Collectors.toList());
+            activitiesPlannedTimeIds = activities.stream().flatMap(k -> k.getPlannedTimes().stream().map(plannedTime->plannedTime.getPlannedTimeId())).collect(Collectors.toList());
         }
         return activitiesPlannedTimeIds;
     }
