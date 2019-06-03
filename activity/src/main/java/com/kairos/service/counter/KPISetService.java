@@ -148,8 +148,6 @@ public class KPISetService {
     public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, Date startDate) {
         List<KPISetResponseDTO> kpiSetResponseDTOList = new ArrayList<>();
         List<ApplicableKPI>  applicableKPIS =new ArrayList<>();
-        KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
-        List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, startDate,
                 asDate(asLocalDate(startDate).atTime(LocalTime.MAX)));
@@ -158,9 +156,12 @@ public class KPISetService {
                     unitId,ConfLevel.UNIT);
             if (isCollectionNotEmpty(kpiSetDTOList)) {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
+                    KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+                    List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
                         kpiSetResponseDTO.setKpiSetName(kpiSet.getName());
                         kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
+
                         applicableKPIS = counterRepository.getKPIByKPIIds(kpiSet.getKpiIds().stream().collect(Collectors.toList()), unitId, ConfLevel.UNIT);
                         for (ApplicableKPI applicableKPI : applicableKPIS) {
                             applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
