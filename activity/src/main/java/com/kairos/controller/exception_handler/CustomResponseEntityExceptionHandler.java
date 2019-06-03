@@ -509,18 +509,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     }
 
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(value = InvalidRequestException.class)
-    @ResponseBody
-    public ResponseEnvelope invalidRequestExceptionHandler(InvalidRequestException ex, HttpServletRequest request) {
-        logger.error("error in user service ", ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
-    }
 
 
 }
