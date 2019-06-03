@@ -467,12 +467,11 @@ public class ShiftService extends MongoBaseService {
     public Map<String,Object> saveAndCancelDraftShift(Long unitId, Long staffId, List<BigInteger> planningPeriodIds, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType,
                                           ShiftFilterParam shiftFilterParam, ShiftActionType shiftActionType) {
 
-        List<PlanningPeriod> planningPeriods=new ArrayList<>();
-        if(isNotNull(planningPeriodIds)) {
-            planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndIds(unitId, planningPeriodIds);
-            planningPeriods.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
+        if(isCollectionEmpty(planningPeriodIds)) {
+           exceptionService.actionNotPermittedException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
         }
-
+        List<PlanningPeriod>  planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndIds(unitId, planningPeriodIds);
+        planningPeriods.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
         List<Shift> draftShifts = getDraftShifts(unitId, staffId, planningPeriodIds, startDate, endDate, employmentId);
         List<Shift> saveShifts;
         List<BigInteger> deletedShiftIds = new ArrayList<>();
