@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -44,10 +45,13 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     List<Activity> findActivitiesByCategoryId(BigInteger activityCategoryId);
 
     @Query("{_id:{$in:?0}, deleted:false}")
-    List<Activity> findAllActivitiesByIds(Set<BigInteger> activityIds);
+    List<Activity> findAllActivitiesByIds(Collection<BigInteger> activityIds);
 
     @Query(value = "{childActivityIds:?0, deleted:false}",fields ="{'_id':1}")
     Activity findByChildActivityId(BigInteger childActivityId);
+
+    @Query(value = "{childActivityIds:{$in:?0}, deleted:false}",fields ="{'_id':1,'childActivityIds':1}")
+    List<Activity> findByChildActivityIds(Collection<BigInteger> childActivityIds);
 
     @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'phaseSettingsActivityTab':1 ,'rulesActivityTab':1}")
     List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);

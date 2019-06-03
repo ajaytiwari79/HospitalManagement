@@ -58,8 +58,6 @@ public class PlanningProblemController {
         return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
-    //=====================================================================
-
     @PostMapping("/create_default_planningProblem")
     @ApiOperation("Create Default PlanningProblem")
     public ResponseEntity<Map<String, Object>> createDefaultPlanningProblem() {

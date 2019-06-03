@@ -4,12 +4,14 @@ import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.country.CountrySolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
 import com.planner.domain.solverconfig.common.SolverConfig;
+import com.planner.domain.solverconfig.unit.UnitSolverConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.inject.Inject;
@@ -48,6 +50,16 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         Class className = checkForCountry ? CountrySolverConfigDTO.class : UnitSolverConfigDTO.class;
         AggregationResults<SolverConfigDTO> result = mongoTemplate.aggregate(aggregation, SolverConfig.class, className);
         return result.getMappedResults();
+    }
+
+    public SolverConfig getSolverConfigById(BigInteger solverConfigId,boolean checkForCountry){
+        Class className = checkForCountry ? CountrySolverConfigDTO.class : UnitSolverConfigDTO.class;
+        return (SolverConfig) mongoTemplate.findOne(new Query(Criteria.where("_id").is(solverConfigId)), className,"solverConfig");
+    }
+
+
+    public List<UnitSolverConfig> getAllSolverConfigByParentId(BigInteger solverConfigId){
+        return mongoTemplate.find(new Query(Criteria.where("parentCountrySolverConfigId").is(solverConfigId).and("deleted").is(false)), UnitSolverConfig.class,"solverConfig");
     }
 
 

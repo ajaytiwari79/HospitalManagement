@@ -1,6 +1,5 @@
 package com.kairos.commons.audit_logging;
 
-import com.kairos.commons.IgnoreLogging;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.enums.audit_logging.LoggingType;
 import de.danielbechler.diff.ObjectDifferBuilder;
@@ -12,11 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.PACKAGE_NAME;

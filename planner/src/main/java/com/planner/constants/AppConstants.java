@@ -45,4 +45,9 @@ public class AppConstants {
     public static final String HAS_ORGANIZATION_SERVICES="HAS_ORGANIZATION_SERVICES";
     public static final String ORGANIZATION_SUB_SERVICE="ORGANIZATION_SUB_SERVICE";
     public static final String PROVIDE_SERVICE="PROVIDE_SERVICE";
+    public static final  String CONTACT_ADDRESS = "CONTACT_ADDRESS";
+    public static final  String MUNICIPALITY = "MUNICIPALITY";
+    public static final  String PROVINCE = "PROVINCE";
+    public static final  String REGION = "REGION";
+    public static final String BELONGS_TO = "BELONGS_TO";
 }

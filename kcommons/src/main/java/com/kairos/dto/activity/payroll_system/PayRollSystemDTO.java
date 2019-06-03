@@ -9,9 +9,6 @@ public class PayRollSystemDTO {
     protected int code;
     protected String description;
 
-
-    //====================================================
-
     public BigInteger getId() {
         return id;
     }

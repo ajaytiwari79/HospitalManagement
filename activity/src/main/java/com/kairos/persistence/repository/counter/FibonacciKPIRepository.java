@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.counter;
 
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
 import com.kairos.persistence.model.counter.FibonacciKPI;
@@ -19,4 +20,5 @@ public interface FibonacciKPIRepository extends MongoBaseRepository<FibonacciKPI
     List<FibonacciKPIDTO> findAllFibonacciKPIByCountryId(Long referenceId, ConfLevel confLevel);
 
     boolean existsByIdIn(Set<BigInteger> kpiIds);
+    List<KPIDTO> findAllFibonacciKPIByReferenceId(Long referenceId, ConfLevel confLevel);
 }

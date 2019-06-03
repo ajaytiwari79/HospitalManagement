@@ -63,7 +63,7 @@ public class AuditLogMongoConfig extends AbstractMongoConfiguration implements E
     }
     @Bean("AuditLoggingMongoDataBase")
     public MongoDatabase getDb(){
-      return mongoClient().getDatabase(getDatabaseName());
+        return mongoClient().getDatabase(getDatabaseName());
     }
 
     @Override

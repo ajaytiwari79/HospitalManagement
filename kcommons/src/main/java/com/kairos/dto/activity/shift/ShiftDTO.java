@@ -76,13 +76,22 @@ public class ShiftDTO {
     private Set<BigInteger> escalationFreeShiftIds;
     private boolean escalationResolved;
     private boolean deleted;
+    private ShiftDTO draftShift;
+    private boolean draft;
+
 
 
     public ShiftDTO() {
         //default Const
     }
 
-   public ShiftDTO(BigInteger id, Date startDate,Date endDate,Long unitId,Long staffId) {
+    public ShiftDTO(Date startDate, Date endDate,List<ShiftActivityDTO> activities) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.activities = activities;
+    }
+
+    public ShiftDTO(BigInteger id, Date startDate, Date endDate, Long unitId, Long staffId) {
        this.id = id;
        this.startDate = startDate;
        this.endDate = endDate;
@@ -106,6 +115,21 @@ public class ShiftDTO {
         this.endDate = endDate;
     }
 
+    public ShiftDTO getDraftShift() {
+        return draftShift;
+    }
+
+    public void setDraftShift(ShiftDTO draftShift) {
+        this.draftShift = draftShift;
+    }
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
+    }
 
     public boolean isDeleted() {
         return deleted;

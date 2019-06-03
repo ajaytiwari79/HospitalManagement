@@ -142,7 +142,7 @@ public class AssetService {
         asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());
         asset.setSuggested(assetDTO.isSuggested());
-        asset.setManagingDepartment(new ManagingOrganization(assetDTO.getManagingDepartment().getId(), assetDTO.getManagingDepartment().getName()));
+        asset.setManagingDepartment(new ManagingOrganization(assetDTO.getManagingDepartment().getManagingOrgId(), assetDTO.getManagingDepartment().getManagingOrgName()));
         asset.setAssetOwner(new Staff(assetDTO.getAssetOwner().getStaffId(), assetDTO.getAssetOwner().getFirstName(), assetDTO.getAssetOwner().getLastName()));
         asset.setHostingLocation(assetDTO.getHostingLocation());
         asset.setAssetAssessor(assetDTO.getAssetAssessor());

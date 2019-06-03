@@ -21,7 +21,6 @@ public class CountryConstraintController {
     
     @Inject
     private CountryConstraintService countryConstraintService;
-//=============================================================
     @PostMapping
     @ApiOperation("Create CountryConstraint")
     public ResponseEntity<Map<String, Object>> createCountryConstraint(@RequestBody @Valid CountryConstraintDTO countryConstraintDTO) {
@@ -57,7 +56,6 @@ public class CountryConstraintController {
         return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
-    //=================================================================
     @PostMapping("/default_country_constraint")
     @ApiOperation("Create Default CountryConstraint")
     public ResponseEntity<Map<String, Object>> createDefaultCountryConstraints(@PathVariable Long countryId) {

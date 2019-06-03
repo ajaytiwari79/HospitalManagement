@@ -1,7 +1,6 @@
 package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kairos.commons.IgnoreLogging;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
@@ -50,7 +48,6 @@ public class ShiftActivityDTO {
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
-    private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
@@ -72,7 +69,12 @@ public class ShiftActivityDTO {
     private BigInteger fourthLevelTimeTypeId;
     private List<PlannedTime> plannedTimes;
 
-    public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId,Long absenceReasonCodeId) {
+    public ShiftActivityDTO(Date startDate, Date endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, Long absenceReasonCodeId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -132,20 +134,12 @@ public class ShiftActivityDTO {
     }
 
     @JsonIgnore
-    @IgnoreLogging
     public LocalDate getStartLocalDate(){
-        if(isNull(this.startDate)){
-            return null;
-        }
         return asLocalDate(this.startDate);
     }
 
     @JsonIgnore
-    @IgnoreLogging
     public LocalDate getEndLocalDate(){
-        if(isNull(this.endDate)){
-            return null;
-        }
         return asLocalDate(this.endDate);
     }
 

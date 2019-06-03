@@ -12,6 +12,7 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -26,6 +27,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang.WordUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -37,12 +39,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
+import static com.kairos.constants.CommonConstants.EMAIL_GREETING;
+import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
 import static com.kairos.constants.CommonConstants.*;
+
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 @Service
@@ -139,7 +143,7 @@ public class ShiftStatusService {
     }
 
     private boolean validateShiftActivityStatus(ShiftStatus shiftStatus, ShiftActivity shiftActivity, Activity activity) {
-        boolean valid ;
+        boolean valid;
         if (isCollectionEmpty(activity.getRulesActivityTab().getApprovalAllowedPhaseIds()) && (shiftStatus.equals(ShiftStatus.FIX) || shiftStatus.equals(ShiftStatus.UNFIX) || shiftStatus.equals(ShiftStatus.PUBLISH))) {
             valid = true;
         } else {
@@ -152,15 +156,15 @@ public class ShiftStatusService {
         return getValidShiftStatus(shiftActivity.getStatus()).contains(shiftStatus);
     }
 
-    private Set<ShiftStatus> getValidShiftStatus(Set<ShiftStatus> shiftStatusSet){
+    private Set<ShiftStatus> getValidShiftStatus(Set<ShiftStatus> shiftStatusSet) {
         Set<ShiftStatus> shiftStatuses;
-        if (shiftStatusSet.contains(ShiftStatus.REQUEST)){
-            shiftStatuses = newHashSet(ShiftStatus.PENDING,APPROVE,DISAPPROVE);
-        }else if(shiftStatusSet.contains(ShiftStatus.PENDING)){
-            shiftStatuses = newHashSet(APPROVE,DISAPPROVE);
-        }else if(shiftStatusSet.contains(ShiftStatus.APPROVE) || shiftStatusSet.contains(ShiftStatus.FIX)) {
+        if (shiftStatusSet.contains(ShiftStatus.REQUEST)) {
+            shiftStatuses = newHashSet(ShiftStatus.PENDING, APPROVE, DISAPPROVE);
+        } else if (shiftStatusSet.contains(ShiftStatus.PENDING)) {
+            shiftStatuses = newHashSet(APPROVE, DISAPPROVE);
+        } else if (shiftStatusSet.contains(ShiftStatus.APPROVE) || shiftStatusSet.contains(ShiftStatus.FIX)) {
             shiftStatuses = newHashSet(FIX, UNFIX, PUBLISH);
-        }else {
+        } else {
             shiftStatuses = newHashSet(FIX, PUBLISH);
         }
         return shiftStatuses;
@@ -238,8 +242,11 @@ public class ShiftStatusService {
     }
 
     public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, UserAccessRoleDTO userAccessRoleDTO) {
+        Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
-            if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
+            if (validPhaseForPublishingShift.contains(phase.getPhaseEnum())) {
+                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+            } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
                     shiftActivity.getStatus().add(userAccessRoleDTO.getManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
                 }
@@ -253,7 +260,7 @@ public class ShiftStatusService {
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
         String bodyPart1 = "The status of the ";
         String bodyPart2 = activity.getActivityName();
-        String bodyPart3 = " activity which is planned on " + getEmailDateTimeWithFormat(shiftDate) + " has been moved to ";
+        String bodyPart3 = " activity which is planned on " + WordUtils.capitalizeFully(getEmailDateTimeWithFormat(shiftDate)) + " has been moved to ";
         String bodyPart4 = shiftStatus.toString();
         String bodyPart5 = " by " + UserContext.getUserDetails().getFullName() + ".\n";
 

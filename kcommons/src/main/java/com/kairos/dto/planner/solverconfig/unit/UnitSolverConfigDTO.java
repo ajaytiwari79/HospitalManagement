@@ -1,25 +1,24 @@
 package com.kairos.dto.planner.solverconfig.unit;
 
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+
+@Getter
+@Setter
 public class UnitSolverConfigDTO extends SolverConfigDTO {
     private Long unitId;
     private Long parentCountrySolverConfigId;
+    private List<Long> organizationSubServiceIds;
 
-    //~ Getter/Setter
-    public Long getUnitId() {
-        return unitId;
-    }
+    public List<Long> getOrganizationSubServiceIds() {
 
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Long getParentCountrySolverConfigId() {
-        return parentCountrySolverConfigId;
-    }
-
-    public void setParentCountrySolverConfigId(Long parentCountrySolverConfigId) {
-        this.parentCountrySolverConfigId = parentCountrySolverConfigId;
+        return isNullOrElse(organizationSubServiceIds,new ArrayList<>());
     }
 }

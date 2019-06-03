@@ -2,6 +2,7 @@ package com.kairos.persistence.model.payroll_setting;
 
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+@Document
 public class UnitPayrollSetting extends MongoBaseEntity {
     private boolean published;
     private Long unitId;

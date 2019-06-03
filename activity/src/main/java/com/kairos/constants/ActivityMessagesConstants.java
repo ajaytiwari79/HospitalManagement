@@ -140,6 +140,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_CHILD_ACTIVITIES_NOT_SUPPORT_STAFFING_LEVEL = "message.child_activities.not_support.staffing_level";
     public static final String MESSAGE_UNIT_ID = "message.unit.id";
     public static final String MESSAGE_EMPLOYMENT_ABSENT = "message.employment.absent";
+    //public static final String MESSAGE_EMPLOYMENT_ABSENT = "message.employment.absent";
     public static final String MESSAGE_UNIT_AGESETTING_NOTFOUND = "message.unit.ageSetting.notFound";
     public static final String MESSAGE_UNIT_SETTING_NOTFOUND = "message.unit.setting.notFound";
     public static final String OPENSHIFT_ALREADY_EXIST = "openShift.already.exist";
@@ -216,6 +217,8 @@ public class ActivityMessagesConstants {
     public static final String SHIFT_CAN_NOT_MOVE = "shift.can.not.move";
     public static final String ERROR_FUNCTION_CAN_NOT_APPLY_WITH_ABSENCE_ACTIVITY = "error.function.can.not.apply.with.absence.activity";
     public static final String MESSAGE_STAFF_UNIT = "message.staff.unit";
+    public static final String MESSAGE_SHIFT_DRAFT_NOTFOUND = "message.draft.shift.notfound";
+    public static final String MESSAGE_PLANNING_PERIOD_NOTFOUND = "message.shift.planning.period.notfound";
     public static final String MESSAGE_STAFF_BELONGS = "message.staff.belongs";
     public static final String MESSAGE_STAFFLEVEL_CURRENTDATE = "message.stafflevel.currentdate";
     public static final String MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE = "message.stafflevel.currentdate.update";

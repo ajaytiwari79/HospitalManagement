@@ -1,11 +1,11 @@
 package com.kairos.dto.kpermissions;
 
+import com.kairos.enums.kpermissions.FieldLevelPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -15,8 +15,8 @@ import javax.validation.constraints.NotNull;
 public class FieldPermissionDTO {
 
     @NotNull(message = "message.permission.field.id.null")
-    Long fieldId;
+    private Long fieldId;
 
-    @NotBlank(message = "message.permission.id.null")
-    String fieldPermission;
+    @NotNull(message = "message.permission.id.null")
+    private FieldLevelPermission fieldPermission;
 }

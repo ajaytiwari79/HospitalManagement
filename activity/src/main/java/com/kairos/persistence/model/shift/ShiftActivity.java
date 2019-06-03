@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.shift;
 
-import com.kairos.commons.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.enums.shift.ShiftStatus;
@@ -17,6 +16,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
  * @date - 10/9/18
  */
 public class ShiftActivity {
+
 
     private BigInteger activityId;
     private Date startDate;
@@ -36,7 +36,6 @@ public class ShiftActivity {
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
-    private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
@@ -50,21 +49,20 @@ public class ShiftActivity {
     private int plannedMinutesOfPayout;
     private int scheduledMinutesOfTimebank;
     private int scheduledMinutesOfPayout;
-
-    private Set<ShiftStatus> status = new HashSet<>();
-
     private List<PlannedTime> plannedTimes;
 
-
-    @IgnoreLogging
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
     }
 
+    private Set<ShiftStatus> status = new HashSet<>();
+
     public ShiftActivity() {
     }
 
-    public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId) {
+
+
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -76,43 +74,44 @@ public class ShiftActivity {
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
-        this.breakShift = breakShift;
+        this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
-        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
-        this.startLocation = startLocation;
-        this.endLocation = endLocation;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
 
-    public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute, String remarks, String startLocation, String endLocation) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,
+                          Long allowedBreakDurationInMinute,String remarks,String startLocation,String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
-        this.breakShift = breakShift;
+        this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
-        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
         this.remarks = remarks;
-        this.startLocation = startLocation;
-        this.endLocation = endLocation;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
-
-    public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute, boolean breakReplaced, String startLocation, String endLocation) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,
+                          Long allowedBreakDurationInMinute,boolean breakReplaced,String startLocation,String endLocation) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
-        this.breakShift = breakShift;
+        this.breakShift=breakShift;
         this.absenceReasonCodeId = absenceReasonCodeId;
-        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
-        this.breakReplaced = breakReplaced;
-        this.startLocation = startLocation;
-        this.endLocation = endLocation;
+        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
+        this.breakReplaced=breakReplaced;
+        this.startLocation=startLocation;
+        this.endLocation=endLocation;
     }
-
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;
     }
+
 
     public int getTimeBankCtaBonusMinutes() {
         return timeBankCtaBonusMinutes;
@@ -130,14 +129,6 @@ public class ShiftActivity {
         this.reasonCodeId = reasonCodeId;
     }
 
-    public BigInteger getPlannedTimeId() {
-        return plannedTimeId;
-    }
-
-    public void setPlannedTimeId(BigInteger plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
-    }
-
     public Set<ShiftStatus> getStatus() {
         return status;
     }
@@ -145,7 +136,6 @@ public class ShiftActivity {
     public void setStatus(Set<ShiftStatus> status) {
         this.status = status;
     }
-
     public boolean isHaltBreak() {
         return haltBreak;
     }
@@ -169,6 +159,7 @@ public class ShiftActivity {
     public void setTimeType(String timeType) {
         this.timeType = timeType;
     }
+
 
     public long getBid() {
         return bid;
@@ -319,7 +310,7 @@ public class ShiftActivity {
     }
 
     public void setPayoutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions) {
-        this.payoutPerShiftCTADistributions = isNullOrElse(payoutPerShiftCTADistributions, new ArrayList<>());
+        this.payoutPerShiftCTADistributions = isNullOrElse(payoutPerShiftCTADistributions,new ArrayList<>());
     }
 
     public int getPayoutCtaBonusMinutes() {

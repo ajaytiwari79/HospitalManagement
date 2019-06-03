@@ -34,30 +34,6 @@ public class SchedulerServiceRestClient {
     RestTemplate restTemplate;
     @Inject private ExceptionService exceptionService;
 
-    public <T extends Object, V> V publish(T t, Long id, boolean isUnit, IntegrationOperation integrationOperation, String uri, Map<String,Object> queryParams, Object... pathParams) {
-        final String baseUrl = getBaseUrl(isUnit,id);
-
-        try {
-            ParameterizedTypeReference<RestTemplateResponseEnvelope<V>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<V>>() {
-            };
-            ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange =
-                    restTemplate.exchange(
-                            baseUrl +  getURI(t,uri,queryParams),
-                            getHttpMethod(integrationOperation),
-                            t==null?null:new HttpEntity<>(t), typeReference,pathParams);
-            RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException(response.getMessage());
-            }
-            return response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
-        }
-
-    }
-
     public static HttpMethod getHttpMethod(IntegrationOperation integrationOperation) {
         switch (integrationOperation) {
             case CREATE:

@@ -12,6 +12,7 @@ import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 import com.planner.component.exception.ExceptionService;
 import com.planner.domain.constraint.country.CountryConstraint;
+import com.planner.domain.constraint.unit.UnitConstraint;
 import com.planner.domain.query_results.organization_service.OrganizationServiceQueryResult;
 import com.planner.domain.solverconfig.common.SolverConfig;
 import com.planner.domain.solverconfig.country.CountrySolverConfig;
@@ -48,15 +49,12 @@ public class CountrySolverConfigService {
     @Inject private PlanningProblemRepository planningProblemRepository;
     @Inject private ConstraintsRepository constraintsRepository;
 
-    //================================================================
-
-    /**
-     * @param countrySolverConfigDTO
-     */
     public CountrySolverConfigDTO createCountrySolverConfig(Long countryId,CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigDTO.setCountryId(countryId);
         if (preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
+            List<BigInteger> countraintIds = getContraintIds(countrySolverConfigDTO, null);
+            countrySolverConfig.setConstraintIds(countraintIds);
             solverConfigRepository.saveEntity(countrySolverConfig);
             //Now copy same countrySolverConfig at {unit/s} associated with {organizationSubServiceId}
             copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
@@ -77,13 +75,33 @@ public class CountrySolverConfigService {
     private void copyUnitSolverConfigByOrganizationServiceAndSubService(CountrySolverConfig countrySolverConfig) {
         List<Long> applicableUnitIdForSolverConfig = userNeo4jRepo.getUnitIdsByOrganizationSubServiceIds(countrySolverConfig.getOrganizationSubServiceIds());
         List<UnitSolverConfig> unitSolverConfigList = new ArrayList<>();
+        PhaseDTO phaseDTO = activityMongoRepository.getOnePhaseById(new BigInteger(countrySolverConfig.getPhaseId().toString()));
+        List<PhaseDTO> phaseDTOS = activityMongoRepository.getPhaseByUnitIdAndPhaseEnum(applicableUnitIdForSolverConfig,phaseDTO.getPhaseEnum());
+        Map<Long,PhaseDTO> phaseDTOMap = phaseDTOS.stream().collect(Collectors.toMap(k->k.getOrganizationId(),v->v));
+        List<UnitSolverConfig> unitSolverConfigs = solverConfigRepository.getAllSolverConfigByParentId(countrySolverConfig.getId());
+        Map<Long,UnitSolverConfig> unitSolverConfigMap = unitSolverConfigs.stream().collect(Collectors.toMap(UnitSolverConfig::getUnitId,v->v));
+        List<CountryConstraint> solverConfigConstraints = constraintsRepository.findAllCountryConstraintByIds(countrySolverConfig.getConstraintIds());
         if (!applicableUnitIdForSolverConfig.isEmpty()) {
             for (Long unitId : applicableUnitIdForSolverConfig) {
-                UnitSolverConfig unitSolverConfig;
-                unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
-                unitSolverConfig.setId(null);//Unset Id
-                unitSolverConfig.setUnitId(unitId);
-                unitSolverConfig.setParentCountrySolverConfigId(countrySolverConfig.getId());
+                if (!unitSolverConfigMap.containsKey(unitId) && phaseDTOMap.containsKey(unitId)) {
+                    UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
+                    unitSolverConfig.setId(null);//Unset Id
+                    unitSolverConfig.setUnitId(unitId);
+                    List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfListByMapper(solverConfigConstraints,UnitConstraint.class);
+                    if(isCollectionNotEmpty(unitConstraints)) {
+                        constraintsRepository.saveList(unitConstraints);
+                    }
+                    List<BigInteger> unitContraintIds = unitConstraints.stream().map(unitConstraint -> unitConstraint.getId()).collect(Collectors.toList());
+                    unitSolverConfig.setConstraintIds(unitContraintIds);
+                    unitSolverConfig.setParentCountrySolverConfigId(countrySolverConfig.getId());
+                    unitSolverConfig.setPhaseId(phaseDTOMap.get(unitId).getId().longValue());
+                    unitSolverConfigList.add(unitSolverConfig);
+                }else {
+                    unitSolverConfigMap.remove(unitId);
+                }
+            }
+            for (UnitSolverConfig unitSolverConfig : unitSolverConfigMap.values()) {
+                unitSolverConfig.setDeleted(true);
                 unitSolverConfigList.add(unitSolverConfig);
             }
             if (isCollectionNotEmpty(unitSolverConfigList)) {
@@ -92,8 +110,11 @@ public class CountrySolverConfigService {
         }
     }
 
-
-    //===========================================================================
+    public void mapSolverConfigToOrganization(BigInteger solverConfigId,List<Long> organizationSubServiceIds){
+        CountrySolverConfig countrySolverConfig = (CountrySolverConfig)solverConfigRepository.getSolverConfigById(solverConfigId,true);
+        countrySolverConfig.setOrganizationSubServiceIds(organizationSubServiceIds);
+        copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
+    }
 
     /**
      * copy(create) countrySolverConfig at country Level itself
@@ -123,46 +144,50 @@ public class CountrySolverConfigService {
         return countrySolverConfigDTO;
     }
 
-    //=============================================================================
     public List<CountrySolverConfigDTO> getAllCountrySolverConfigByCountryId(Long countryId) {
         List<SolverConfigDTO> solverConfigDTOS = solverConfigRepository.getAllSolverConfigWithConstraints(true,countryId);
         return solverConfigDTOS.stream().map(solverConfigDTO -> (CountrySolverConfigDTO)solverConfigDTO).collect(Collectors.toList());
     }
 
 
-    //=============================================================================
-    //Only update if present
     public CountrySolverConfigDTO updateCountrySolverConfig(Long countryId,CountrySolverConfigDTO countrySolverConfigDTO) {
         countrySolverConfigDTO.setCountryId(countryId);
         SolverConfig solverConfig = solverConfigRepository.findByIdNotDeleted(countrySolverConfigDTO.getId());
         if (solverConfig != null && preValidateCountrySolverConfigDTO(countrySolverConfigDTO)) {
-            List<CountryConstraint> solverConfigConstraints = constraintsRepository.findAllCountryConstraintByIds(solverConfig.getConstraintIds());
-            Map<BigInteger, CountryConstraint> countryConstraintDTOMap = solverConfigConstraints.stream().collect(Collectors.toMap(k->k.getId(), v->v));
-            List<CountryConstraint> countryConstraints = new ArrayList<>();
-            for (ConstraintDTO constraintDTO : countrySolverConfigDTO.getConstraints()) {
-                if(countryConstraintDTOMap.containsKey(constraintDTO.getId())) {
-                    CountryConstraint countryConstraint = countryConstraintDTOMap.get(constraintDTO.getId());
-                    countryConstraint.setConstraintLevel(constraintDTO.getConstraintLevel());
-                    countryConstraint.setPenalty(constraintDTO.getPenalty());
-                    countryConstraints.add(countryConstraint);
-                }
-                else {
-                    countryConstraints.add(new CountryConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
-                }
-            }
-            if(isCollectionNotEmpty(countryConstraints)) {
-                constraintsRepository.saveList(countryConstraints);
-            }
             CountrySolverConfig countrySolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfigDTO, CountrySolverConfig.class);
-            List<BigInteger> countraintids = countryConstraints.stream().map(countryConstraint -> countryConstraint.getId()).collect(Collectors.toList());
+            List<BigInteger> countraintids = getContraintIds(countrySolverConfigDTO, solverConfig);
             countrySolverConfig.setConstraintIds(countraintids);
             solverConfigRepository.saveEntity(countrySolverConfig);
+            copyUnitSolverConfigByOrganizationServiceAndSubService(countrySolverConfig);
         }
         return countrySolverConfigDTO;
     }
 
-    //============================================================================
-    //Soft Delete
+    private List<BigInteger> getContraintIds(CountrySolverConfigDTO countrySolverConfigDTO, SolverConfig solverConfig) {
+        Map<BigInteger, CountryConstraint> countryConstraintDTOMap = new HashMap<>();
+        if(isNotNull(solverConfig)){
+            List<CountryConstraint> solverConfigConstraints = constraintsRepository.findAllCountryConstraintByIds(solverConfig.getConstraintIds());
+            countryConstraintDTOMap = solverConfigConstraints.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        }
+        List<CountryConstraint> countryConstraints = new ArrayList<>();
+        for (ConstraintDTO constraintDTO : countrySolverConfigDTO.getConstraints()) {
+            if(countryConstraintDTOMap.containsKey(constraintDTO.getId())) {
+                CountryConstraint countryConstraint = countryConstraintDTOMap.get(constraintDTO.getId());
+                countryConstraint.setConstraintLevel(constraintDTO.getConstraintLevel());
+                countryConstraint.setPenalty(constraintDTO.getPenalty());
+                countryConstraints.add(countryConstraint);
+            }
+            else {
+                countryConstraints.add(new CountryConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
+            }
+        }
+        if(isCollectionNotEmpty(countryConstraints)) {
+            constraintsRepository.saveList(countryConstraints);
+        }
+
+        return countryConstraints.stream().map(countryConstraint -> countryConstraint.getId()).collect(Collectors.toList());
+    }
+
     public boolean deleteCountrySolverConfig(BigInteger solverConfigId) {
         boolean success = solverConfigRepository.safeDeleteById(solverConfigId);
         if (!success) {
@@ -171,7 +196,6 @@ public class CountrySolverConfigService {
         return success;
     }
 
-    /*=================================Country Default Data===============================================*/
     public DefaultDataDTO getDefaultData(Long countryId) {
         List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
@@ -212,10 +236,6 @@ public class CountrySolverConfigService {
         return constraintTypeSetMap;
     }
 
-    /**
-     * @param countryId
-     * @return
-     */
     private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
         List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
         List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
@@ -223,23 +243,11 @@ public class CountrySolverConfigService {
         return organizationServiceDTOS;
     }
 
-    /**
-     * @param countryId
-     * @return
-     */
     private List<PhaseDTO> getAllPhases(Long countryId) {
         List<PhaseDTO> phaseDTOS = activityMongoRepository.getAllPhasesByCountryId(countryId);
         return phaseDTOS;
     }
 
-    //=====================common validation==============================================
-
-    /**
-     * Validation sequence should follow this ordering
-     *
-     * @param countrySolverConfigDTO
-     * @return
-     */
     private boolean preValidateCountrySolverConfigDTO(CountrySolverConfigDTO countrySolverConfigDTO) {
         //TODO pradeep please update this method
         /*String result = userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countrySolverConfigDTO.getCountryId(), countrySolverConfigDTO.getOrganizationSubServiceIds());
