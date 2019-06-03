@@ -50,6 +50,7 @@ public class WorkPlace {
     private String CostPlace;
 
     public WorkPlace() {
+        //Not in use
     }
 
     public String getExternalNodeId() {

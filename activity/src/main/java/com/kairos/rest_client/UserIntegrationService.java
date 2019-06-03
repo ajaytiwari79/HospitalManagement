@@ -29,6 +29,7 @@ import com.kairos.dto.user.client.ClientTemporaryAddress;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
@@ -486,6 +487,11 @@ public class UserIntegrationService {
         });
     }
 
+    public List<TimeSlotDTO> getDefaultTimeSlot(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/get_default_timeSlot", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {
+        });
+    }
+
     // ~ ========ClientRestClient===================publishRequestWithoutAuth=====
     public Client getClient(Long clientId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CLIENT_ID_URL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Client>>() {
@@ -789,6 +795,12 @@ public class UserIntegrationService {
                 new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
                 },activityId);
     }
+
+    public List<TimeSlotDTO> getUnitTimeSlot(long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/get_time_slots",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {});
+    }
+
+
 }
 
 

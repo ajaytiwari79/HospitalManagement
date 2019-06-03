@@ -12,7 +12,7 @@ public class ShiftCostListener implements VariableListener<ShiftImp> {
 
     @Override
     public void beforeEntityAdded(ScoreDirector scoreDirector, ShiftImp shift) {
-
+        //Not in use
     }
 
     @Override
@@ -22,7 +22,7 @@ public class ShiftCostListener implements VariableListener<ShiftImp> {
 
     @Override
     public void beforeVariableChanged(ScoreDirector scoreDirector, ShiftImp shift) {
-
+        //Not in use
     }
 
     @Override
@@ -33,12 +33,12 @@ public class ShiftCostListener implements VariableListener<ShiftImp> {
 
     @Override
     public void beforeEntityRemoved(ScoreDirector scoreDirector, ShiftImp shift) {
-
+        //Not in use
     }
 
     @Override
     public void afterEntityRemoved(ScoreDirector scoreDirector, ShiftImp shift) {
-
+        //Not in use
     }
 
     public void updateCost(ScoreDirector scoreDirector, ShiftImp shift){

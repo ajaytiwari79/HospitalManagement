@@ -539,15 +539,15 @@ public class PlanningPeriodService extends MongoBaseService {
         Map<Long, Map<Long, Set<LocalDate>>> employmentWithShiftDateFunctionIdMap = getEmploymentIdWithFunctionIdShiftDateMap(shifts);
         if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
             if(isCollectionEmpty(employmentTypeIds)){
-                exceptionService.invalidRequestException("id not found");
+                exceptionService.invalidRequestException(MESSAGE_EMPLOYMENTTYPE_NOTFOUND);
             }
-            publishShiftsAfterFlippingPhaseConstructionToDraft(planningPeriod, unitId, new ArrayList<>());
+            publishShiftsAfterFlippingPhaseConstructionToDraft(planningPeriod, unitId, employmentTypeIds);
         }
         createShiftState(shifts, oldPlanningPeriodPhaseId, employmentWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
         save(planningPeriod);
-        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, null, null);
+//        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+//        }, null, null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
@@ -709,7 +709,6 @@ public class PlanningPeriodService extends MongoBaseService {
             staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
     }
-    //=================================================================================
 
     /**
      * @param shiftStates
@@ -789,9 +788,9 @@ public class PlanningPeriodService extends MongoBaseService {
     public void publishShiftsAfterFlippingPhaseConstructionToDraft(PlanningPeriod planningPeriod, Long unitId, List<Long> employmentTypeIds) {
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(employmentTypeIds, unitId, planningPeriod.getStartDate().toString(), planningPeriod.getEndDate().toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        List<Long> staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
+        List<Long> employmentIds=staffKpiFilterDTOS.stream().flatMap(k->k.getEmployment().stream().map(v->v.getId())).collect(Collectors.toList());
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
-        List<Shift> shifts = shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriod.getId(), unitId, staffIds, Arrays.asList(ShiftStatus.PUBLISH, ShiftStatus.PENDING));
+        List<Shift> shifts = shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriod.getId(), unitId, employmentIds, Arrays.asList(ShiftStatus.PUBLISH, ShiftStatus.PENDING , ShiftStatus.REQUEST));
         if (isCollectionNotEmpty(shifts)) {
             for (Shift shift : shifts) {
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -802,6 +801,7 @@ public class PlanningPeriodService extends MongoBaseService {
             planningPeriodMongoRepository.saveEntities(shifts);
             timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
             LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
+
         }
     }
 }

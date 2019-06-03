@@ -14,6 +14,7 @@ public class GetEmploymentByIdResponse {
     private List<GetEmploymentByIdResult> GetEmploymentByIdResult;
 
     public GetEmploymentByIdResponse() {
+        //Not in use
     }
 
     public List<GetEmploymentByIdResult> getGetEmploymentByIdResult() {

@@ -14,7 +14,7 @@ public class DateRangeValidator implements ConstraintValidator<DateRange, PayGro
 
     @Override
     public void initialize(DateRange constraintAnnotation) {
-
+        //Not in use
     }
 
     @Override

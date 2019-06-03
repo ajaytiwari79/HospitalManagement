@@ -1,0 +1,2 @@
+// to update allowedConflicts in existing time types
+db.time_Type.updateMany({},{$set:{"allowedConflicts":false}});

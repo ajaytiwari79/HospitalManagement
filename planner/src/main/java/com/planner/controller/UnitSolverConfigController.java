@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -22,9 +23,8 @@ public class UnitSolverConfigController {
 
     @PostMapping
     @ApiOperation("Create UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
-        unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
+    public ResponseEntity<Map<String, Object>> createUnitSolverConfig(@PathVariable Long unitId,@RequestBody @Valid UnitSolverConfigDTO unitSolverConfigDTO) {
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,unitSolverConfigService.createUnitSolverConfig(unitSolverConfigDTO,unitId));
     }
 
     @PostMapping(value = "/copy")
@@ -34,7 +34,7 @@ public class UnitSolverConfigController {
         return ResponseHandler.generateResponse("Success", HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{unitSolverConfigId}")
+    @GetMapping
     @ApiOperation("Get UnitSolverConfigration")
     public ResponseEntity<Map<String, Object>> getAllUnitSolverConfigByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK, unitSolverConfigService.getAllUnitSolverConfigByUnitId(unitId));
@@ -47,11 +47,11 @@ public class UnitSolverConfigController {
      * @param unitSolverConfigDTO
      * @return
      */
-    @PatchMapping
+    @PutMapping(value = "/{unitSolverConfigId}")
     @ApiOperation("Update UnitSolverConfigration")
-    public ResponseEntity<Map<String, Object>> updateUnitSolverConfig(@RequestBody UnitSolverConfigDTO unitSolverConfigDTO) {
-        unitSolverConfigService.updateUnitSolverConfig(unitSolverConfigDTO);
-        return ResponseHandler.generateResponse("Success", HttpStatus.OK);
+    public ResponseEntity<Map<String, Object>> updateUnitSolverConfig(@PathVariable Long unitId,@RequestBody @Valid UnitSolverConfigDTO unitSolverConfigDTO) {
+        ;
+        return ResponseHandler.generateResponseWithData("Success", HttpStatus.OK,unitSolverConfigService.updateUnitSolverConfig(unitId,unitSolverConfigDTO));
     }
 
     @DeleteMapping(value = "/{unitSolverConfigId}")

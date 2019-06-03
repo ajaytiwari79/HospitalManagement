@@ -28,7 +28,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
-public class Staff extends UserBaseEntity {
+public class Staff extends UserBaseEntity implements Cloneable {
     @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
@@ -461,5 +461,8 @@ public class Staff extends UserBaseEntity {
         this.user_id = user_id;
     }
 
+    public Staff clone()throws CloneNotSupportedException{
+        return (Staff)super.clone();
+    }
 
 }

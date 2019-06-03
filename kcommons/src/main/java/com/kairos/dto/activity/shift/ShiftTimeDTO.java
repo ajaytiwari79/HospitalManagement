@@ -11,6 +11,7 @@ public class ShiftTimeDTO {
     private Long staffId;
 
     public ShiftTimeDTO() {
+        //Not in use
     }
 
     public BigInteger getId() {

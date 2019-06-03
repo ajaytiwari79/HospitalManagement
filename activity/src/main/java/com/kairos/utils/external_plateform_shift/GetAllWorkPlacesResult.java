@@ -50,6 +50,7 @@ public class GetAllWorkPlacesResult {
     private String CostPlace;
 
     public GetAllWorkPlacesResult() {
+        //Not in use
     }
 
     public String getExternalNodeId() {

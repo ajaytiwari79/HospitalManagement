@@ -226,6 +226,8 @@ public class TaskDemandService extends MongoBaseService {
                     case FOUR_WEEK:
                         weekDayFrequency = 4;
                         break;
+                    default:
+                        break;
                 }
                 for (TaskDemandVisit taskDemandVisit : taskDemand.getWeekdayVisits()) {
                     hours += taskDemandVisit.getVisitCount() * taskDemandVisit.getVisitDuration();
@@ -243,6 +245,8 @@ public class TaskDemandService extends MongoBaseService {
                     case THREE_WEEK: weekEndFrequency = 3;
                         break;
                     case FOUR_WEEK: weekEndFrequency = 4;
+                        break;
+                    default:
                         break;
                 }
                 for(TaskDemandVisit  taskDemandVisit : taskDemand.getWeekendVisits()){
@@ -563,6 +567,8 @@ public class TaskDemandService extends MongoBaseService {
                         case 4:
                             taskDemand.setWeekdayFrequency(TaskDemand.WeekFrequency.FOUR_WEEK);
                             break;
+                        default:
+                            break;
                     }
 
                 }
@@ -581,6 +587,8 @@ public class TaskDemandService extends MongoBaseService {
                         case 4:
                             taskDemand.setWeekendFrequency(TaskDemand.WeekFrequency.FOUR_WEEK);
                             break;
+                        default:
+                            break;
                     }
 
                 }
@@ -598,6 +606,8 @@ public class TaskDemandService extends MongoBaseService {
                 monthlyFrequency.setWeekdayCount(weekDayCount);
                 taskDemand.setMonthlyFrequency(monthlyFrequency);
                 taskDemand.setRecurrencePattern(TaskDemand.RecurrencePattern.MONTHLY);
+                break;
+            default:
                 break;
         }
 

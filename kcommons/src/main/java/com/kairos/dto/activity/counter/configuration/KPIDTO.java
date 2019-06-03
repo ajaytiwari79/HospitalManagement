@@ -5,10 +5,11 @@ import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.kpi.Interval;
 import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.enums.wta.IntervalUnit;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -32,10 +33,16 @@ public class KPIDTO {
     private DurationType frequencyType;
     // frequency value
     private int value;
-    private Interval interval;
+    private IntervalUnit interval;
 
+    private String description;
+    private Long referenceId;
+    private BigInteger categoryId;
+    private ConfLevel confLevel;
+    private List<FibonacciKPIConfigDTO> fibonacciKPIConfigs;
+    private boolean multiDimensional;
     public KPIDTO(){
-
+        //Not in use
     }
 
     public ChartType getChart() {
@@ -150,11 +157,11 @@ public class KPIDTO {
         this.value = value;
     }
 
-    public Interval getInterval() {
+    public IntervalUnit getInterval() {
         return interval;
     }
 
-    public void setInterval(Interval interval) {
+    public void setInterval(IntervalUnit interval) {
         this.interval = interval;
     }
 
@@ -165,5 +172,53 @@ public class KPIDTO {
 
     public void setKpiRepresentation(KPIRepresentation kpiRepresentation) {
         this.kpiRepresentation = kpiRepresentation;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    public ConfLevel getConfLevel() {
+        return confLevel;
+    }
+
+    public void setConfLevel(ConfLevel confLevel) {
+        this.confLevel = confLevel;
+    }
+
+    public List<FibonacciKPIConfigDTO> getFibonacciKPIConfigs() {
+        return fibonacciKPIConfigs;
+    }
+
+    public void setFibonacciKPIConfigs(List<FibonacciKPIConfigDTO> fibonacciKPIConfigs) {
+        this.fibonacciKPIConfigs = fibonacciKPIConfigs;
+    }
+
+    public BigInteger getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(BigInteger categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public boolean isMultiDimensional() {
+        return multiDimensional;
+    }
+
+    public void setMultiDimensional(boolean multiDimensional) {
+        this.multiDimensional = multiDimensional;
     }
 }

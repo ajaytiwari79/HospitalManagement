@@ -8,6 +8,7 @@ public class CTARuleTemplateDayTypeDTO {
     private Long dayType;
     private List<Long> countryHolidayCalenders =new ArrayList<>();
     public CTARuleTemplateDayTypeDTO() {
+        //Not in use
     }
     public Long getId() {
         return id;
