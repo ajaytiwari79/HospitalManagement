@@ -88,7 +88,9 @@ public class CountrySolverConfigService {
                     unitSolverConfig.setId(null);//Unset Id
                     unitSolverConfig.setUnitId(unitId);
                     List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfListByMapper(solverConfigConstraints,UnitConstraint.class);
-                    constraintsRepository.saveList(unitConstraints);
+                    if(isCollectionNotEmpty(unitConstraints)) {
+                        constraintsRepository.saveList(unitConstraints);
+                    }
                     List<BigInteger> unitContraintIds = unitConstraints.stream().map(unitConstraint -> unitConstraint.getId()).collect(Collectors.toList());
                     unitSolverConfig.setConstraintIds(unitContraintIds);
                     unitSolverConfig.setParentCountrySolverConfigId(countrySolverConfig.getId());
