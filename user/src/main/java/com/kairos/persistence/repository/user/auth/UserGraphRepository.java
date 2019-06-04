@@ -36,7 +36,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     @Query("MATCH(u:User) WHERE u.forgotPasswordToken={0} RETURN u")
     User findByForgotPasswordToken(String forgotPasswordToken);
 
-    @Query("MATCH (organization:Unit{isEnable:true})-[:"+ HAS_POSITIONS +"]->(:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(user)={0} WITH organization\n" +
+    @Query("MATCH (organization:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]->(:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(user)={0} WITH organization\n" +
             "RETURN id(organization) AS id,organization.name AS name,organization.isKairosHub AS isKairosHub")
     List<OrganizationWrapper> getOrganizations(long userId);
 

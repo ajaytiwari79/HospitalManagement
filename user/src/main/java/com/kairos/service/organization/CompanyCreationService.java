@@ -95,8 +95,6 @@ public class CompanyCreationService {
     @Inject
     private UnitGraphRepository unitGraphRepository;
     @Inject
-    private Neo4jBaseRepository neo4jBaseRepository;
-    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private AccountTypeGraphRepository accountTypeGraphRepository;
@@ -429,7 +427,7 @@ public class CompanyCreationService {
         if(parentUnit.getName().equalsIgnoreCase(organizationBasicDTO.getName())) {
             exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
         }
-        if(organizationGraphRepository.existsByName("(?i)"+organizationBasicDTO.getName())) {
+        if(unitGraphRepository.existsByName("(?i)"+organizationBasicDTO.getName())) {
             exceptionService.duplicateDataException(ERROR_ORGANIZATION_NAME_DUPLICATE, organizationBasicDTO.getName());
         }
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
@@ -554,7 +552,7 @@ public class CompanyCreationService {
     }
 
     public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrgaziationId) {
-        Optional<Object> organization=neo4jBaseRepository.findById(organizationId,2);
+        Optional<OrganizationBaseEntity> organization=organizationBaseRepository.findById(organizationId,2);
         if(!organization.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
         }

@@ -30,7 +30,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     Organization findHub();
 
 
-    @Query("MATCH(o{isEnable:true,boardingCompleted: true}) where id(o)={parentOrganizationId} "+
+    @Query("MATCH(o{isEnable:true,boardingCompleted: true}) where id(o) IN {0} "+
             "OPTIONAL MATCH(o)-[orgRel:"+HAS_SUB_ORGANIZATION+"*]->(org:Organization{isEnable:true,boardingCompleted: true}) " +
             "OPTIONAL MATCH(o)-[unitRel:"+HAS_UNIT+"]->(u:Unit{isEnable:true,boardingCompleted: true}) " +
             "OPTIONAL MATCH(org)-[orgUnitRel:"+HAS_UNIT+"]->(un:Unit{isEnable:true,boardingCompleted: true}) " +

@@ -12,11 +12,11 @@ import java.util.Map;
  * Created by oodles on 26/10/17.
  */
 public interface CustomOrganizationGraphRepository {
-    List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,
+    /*List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,
                                              Long organizationId, String imagePath, String skip,String moduleId);
 
-    List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,String moduleId,
-                                  Map<FilterType, List<String>> filters, String searchText, String imagePath);
+    *//*List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId,String moduleId,
+                                  Map<FilterType, List<String>> filters, String searchText, String imagePath);*//*
 
-    OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
+    OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);*/
 }

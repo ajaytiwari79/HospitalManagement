@@ -217,7 +217,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
 
     }
 
-    @Override
+    //@Override
     public OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
         String filterQuery = "";
         final String SUB_ORGANIZATIONS = "subOrganizations";

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
@@ -51,6 +52,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableTransactionManagement(proxyTargetClass=true)
 @EnableCircuitBreaker
 @EnableKafka
+@EnableAuditLogging
 public class UserServiceApplication implements WebMvcConfigurer {
 
 	public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
