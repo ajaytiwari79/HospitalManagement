@@ -17,7 +17,7 @@ import java.util.Optional;
 /**
  * Created by pawanmandhan on 23/8/17.
  */
-public class RulesActivityTab implements Serializable{
+public class RulesActivityTab{
 
 
     private boolean eligibleForFinalSchedule;

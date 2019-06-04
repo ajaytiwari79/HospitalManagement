@@ -359,7 +359,7 @@ public class StaffingLevelService extends MongoBaseService {
 
         int i = 0;
         int seq = 0;
-        DateFormat sourceFormat = new SimpleDateFormat("dd-MM-yyyy");
+        DateFormat sourceFormat = new SimpleDateFormat(COMMON_DATE_FORMAT);
         Map<String, String> firstData = processedData.get(0);
         duration = new Duration(LocalTime.MIN, LocalTime.MAX);
         staffingLevelSetting = new StaffingLevelSetting(15, duration);

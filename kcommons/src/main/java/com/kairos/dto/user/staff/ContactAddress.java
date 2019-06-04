@@ -77,7 +77,7 @@ public class ContactAddress{
     }
 
     public ContactAddress() {
-        //Not in use
+        //Not in Use
     }
 
    /* public ContactAddressDTO(String street1, int floorNumber, String houseNumber, ZipCode zipCode) {

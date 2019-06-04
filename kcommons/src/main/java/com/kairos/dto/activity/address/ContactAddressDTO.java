@@ -82,6 +82,7 @@ public class ContactAddressDTO {
     }
 
     public ContactAddressDTO() {
+        //Not in Use
     }
 
 
