@@ -1,16 +1,18 @@
-package com.kairos.commons.repository.audit_logging;
+package com.kairos.persistence.repository.custom_repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by pradeep
  * Created at 4/6/19
  **/
-
+@Repository
 public class AuditLoggingRepository {
 
     @Autowired
