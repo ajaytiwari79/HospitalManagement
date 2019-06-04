@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
+
 @Service
 @Transactional
 public class PriorityGroupService extends MongoBaseService {
@@ -55,7 +57,7 @@ public class PriorityGroupService extends MongoBaseService {
     public boolean createPriorityGroupForCountry(long countryId,List<PriorityGroupDTO> priorityGroupDTO) {
         boolean isPriorityGroupsAlreadyExists=priorityGroupRepository.existsByCountryId(countryId);
         if(isPriorityGroupsAlreadyExists){
-            exceptionService.actionNotPermittedException("priorityGroup.already.exists",countryId);
+            exceptionService.actionNotPermittedException(PRIORITYGROUP_ALREADY_EXISTS,countryId);
         }
         List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTO, PriorityGroup.class);
         save(priorityGroups);
@@ -73,7 +75,7 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroupDTO updatePriorityGroup(long countryId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,PRIORITY_GROUP,priorityGroupId);
         }
         if (priorityGroup.isDeActivated()!=priorityGroupDTO.isDeActivated()){
             priorityGroup.setDeActivated(priorityGroupDTO.isDeActivated());
@@ -93,7 +95,7 @@ public class PriorityGroupService extends MongoBaseService {
     public boolean deletePriorityGroup(long countryId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndCountryIdAndDeletedFalse(priorityGroupId, countryId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,PRIORITY_GROUP,priorityGroupId);
         }
         priorityGroup.setDeleted(true);
         save(priorityGroup);
@@ -128,7 +130,7 @@ public class PriorityGroupService extends MongoBaseService {
     public PriorityGroupDTO updatePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId, PriorityGroupDTO priorityGroupDTO) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId, unitId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,PRIORITY_GROUP,priorityGroupId);
         }
         if (priorityGroup.isDeActivated()!=priorityGroupDTO.isDeActivated()){
             priorityGroup.setDeActivated(priorityGroupDTO.isDeActivated());
@@ -148,7 +150,7 @@ public class PriorityGroupService extends MongoBaseService {
     public boolean deletePriorityGroupOfUnit(long unitId, BigInteger priorityGroupId) {
         PriorityGroup priorityGroup = priorityGroupRepository.findByIdAndUnitIdAndDeletedFalse(priorityGroupId, unitId);
         if (!Optional.ofNullable(priorityGroup).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound","priority-group",priorityGroupId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,PRIORITY_GROUP,priorityGroupId);
         }
         priorityGroup.setDeleted(true);
         save(priorityGroup);

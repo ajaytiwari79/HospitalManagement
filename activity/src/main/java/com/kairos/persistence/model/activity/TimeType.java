@@ -27,6 +27,7 @@ public class TimeType extends MongoBaseEntity{
     private Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy;
     private boolean partOfTeam;
     private boolean allowChildActivities;
+    private boolean allowedConflicts;
 
     public TimeType() {}
 
@@ -136,5 +137,13 @@ public class TimeType extends MongoBaseEntity{
 
     public void setAllowChildActivities(boolean allowChildActivities) {
         this.allowChildActivities = allowChildActivities;
+    }
+
+    public boolean isAllowedConflicts() {
+        return allowedConflicts;
+    }
+
+    public void setAllowedConflicts(boolean allowedConflicts) {
+        this.allowedConflicts = allowedConflicts;
     }
 }

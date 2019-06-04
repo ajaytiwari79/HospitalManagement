@@ -39,6 +39,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_DATANOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.OPENSHIFT;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION;
 import static com.kairos.constants.AppConstants.SHIFT_NOTIFICATION_MESSAGE;
 import static com.kairos.dto.activity.open_shift.ShiftAssignmentCriteria.*;
@@ -143,7 +145,7 @@ public class OpenShiftService extends MongoBaseService {
         OpenShiftAction openShiftAction = null;
         OpenShift openShift = openShiftMongoRepository.findByIdAndUnitIdAndDeletedFalse(openShiftId, unitId);
         if (!Optional.ofNullable(openShift).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShift", openShiftId);
+            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND,OPENSHIFT, openShiftId);
         }
         Optional<Order> order = orderMongoRepository.findById(openShift.getOrderId());
 
@@ -222,7 +224,7 @@ public class OpenShiftService extends MongoBaseService {
     public boolean notifyStaff(Long unitId, BigInteger openShiftId, List<Long> staffIds, String action) {
         OpenShift openShift = openShiftMongoRepository.findOpenShiftByIdAndEnabled(openShiftId);
         if (!Optional.ofNullable(openShift).isPresent()) {
-            exceptionService.dataNotFoundByIdException("exception.dataNotFound", "openShift", openShiftId);
+            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, OPENSHIFT, openShiftId);
         }
         if (OpenShiftAction.ASSIGN.name().equals(action)) {
             Optional<Order> order = orderMongoRepository.findById(openShift.getOrderId());

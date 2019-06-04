@@ -44,6 +44,9 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.END_DATE_FROM_END_DATE;
+import static com.kairos.constants.ActivityMessagesConstants.START_DATE_FROM_END_DATE;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
@@ -111,7 +114,7 @@ public class CostTimeAgreementService extends MongoBaseService {
      */
     public CTARuleTemplateDTO createCTARuleTemplate(Long countryId, CTARuleTemplateDTO ctaRuleTemplateDTO) {
         if (ctaRuleTemplateRepository.isCTARuleTemplateExistWithSameName(countryId, ctaRuleTemplateDTO.getName())) {
-            exceptionService.dataNotFoundByIdException("message.cta.ruleTemplate.alreadyExist", ctaRuleTemplateDTO.getName());
+            exceptionService.dataNotFoundByIdException(MESSAGE_CTA_RULETEMPLATE_ALREADYEXIST, ctaRuleTemplateDTO.getName());
         }
         CountryDTO countryDTO = userIntegrationService.getCountryById(countryId);
         ctaRuleTemplateDTO.setId(null);
@@ -238,10 +241,10 @@ public class CostTimeAgreementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && ctaDTO.getEndDate() != null && ctaDTO.getEndDate().isBefore(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException("end_date.from.end_date", ctaDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+            exceptionService.actionNotPermittedException(END_DATE_FROM_END_DATE, ctaDTO.getEndDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         if (staffAdditionalInfoDTO.getEmployment().getEndDate() != null && ctaDTO.getStartDate().isAfter(staffAdditionalInfoDTO.getEmployment().getEndDate())) {
-            exceptionService.actionNotPermittedException("start_date.from.end_date", ctaDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
+            exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE, ctaDTO.getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate());
         }
         CostTimeAgreement oldCTA = costTimeAgreementRepository.findOne(ctaId);
         CTAResponseDTO responseCTA;
@@ -391,7 +394,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     public Boolean deleteCostTimeAgreement(Long countryId, BigInteger ctaId) {
         CostTimeAgreement costTimeAgreement = costTimeAgreementRepository.findCTAByCountryAndIdAndDeleted(countryId, ctaId, false);
         if (costTimeAgreement == null) {
-            exceptionService.dataNotFoundByIdException("message.cta.id.notFound", ctaId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_CTA_ID_NOTFOUND, ctaId);
         }
         costTimeAgreement.setDeleted(true);
         this.save(costTimeAgreement);
@@ -484,7 +487,7 @@ public class CostTimeAgreementService extends MongoBaseService {
     public CollectiveTimeAgreementDTO createCopyOfUnitCTA(Long unitId, CollectiveTimeAgreementDTO collectiveTimeAgreementDTO) {
         logger.info("saving CostTimeAgreement unit {}", unitId);
         if (costTimeAgreementRepository.isCTAExistWithSameNameInUnit(unitId, collectiveTimeAgreementDTO.getName().trim(), new BigInteger("1"))) {
-            exceptionService.duplicateDataException("message.cta.name.alreadyExist", collectiveTimeAgreementDTO.getName());
+            exceptionService.duplicateDataException(MESSAGE_CTA_NAME_ALREADYEXIST, collectiveTimeAgreementDTO.getName());
 
         }
         OrganizationDTO organization = userIntegrationService.getOrganization();
@@ -523,7 +526,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         } else {
             CostTimeAgreement cta = costTimeAgreementRepository.getCTAByIdAndOrganizationSubTypeAndCountryId(organizationSubTypeId, countryId, ctaId);
             if (!Optional.ofNullable(cta).isPresent())
-                exceptionService.dataNotFoundByIdException("message.cta.id.notFound", ctaId);
+                exceptionService.dataNotFoundByIdException(MESSAGE_CTA_ID_NOTFOUND, ctaId);
             cta.setDeleted(true);
             save(cta);
         }

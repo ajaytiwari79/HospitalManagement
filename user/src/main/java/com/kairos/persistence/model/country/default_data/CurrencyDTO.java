@@ -4,14 +4,17 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.NotBlank;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_CURRENCY_CURRENCYCODE_NOTEMPTY;
+import static com.kairos.constants.UserMessagesConstants.ERROR_CURRENCY_NAME_NOTEMPTY;
+
 @QueryResult
 public class CurrencyDTO {
 
     private Long id;
-    @NotBlank(message = "error.Currency.name.notEmpty")
+    @NotBlank(message = ERROR_CURRENCY_NAME_NOTEMPTY)
     private String name;
     private String description;
-    @NotBlank(message = "error.Currency.currencyCode.notEmpty")
+    @NotBlank(message = ERROR_CURRENCY_CURRENCYCODE_NOTEMPTY)
     private String currencyCode;
 
     public CurrencyDTO() {

@@ -44,6 +44,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static java.lang.Math.toIntExact;
 import static java.time.ZoneId.systemDefault;
@@ -241,29 +242,29 @@ public class VisitatorService{
 
         if (clientStaffInfoDTO.getClientId() == null) {
             logger.info("No Citizen Found with Id " + clientId);
-            exceptionService.taskDemandException("message.citizen.id",clientId);
+            exceptionService.taskDemandException(MESSAGE_CITIZEN_ID,clientId);
         } else if (  !DateUtils.isSameDay(taskDemandDTO.getStartDate(), DateUtils.getDate()) && taskDemandDTO.getStartDate().before(DateUtils.getDate())) {
             logger.info("Task Demand's cannot start on past date");
-            exceptionService.taskDemandException("message.taskdemand.startdate");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_STARTDATE);
         } else if (!taskDemandDTO.getDayName().toUpperCase().equals("MONDAY")) {
             logger.info("Task Demand can only start on Monday.");
-            exceptionService.taskDemandException("message.taskdemand.startday");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_STARTDAY);
         } else if (taskDemandDTO.getEndDate()!=null && (taskDemandDTO.getRecurrencePattern().equals(TaskDemand.RecurrencePattern.WEEKLY)||taskDemandDTO.getRecurrencePattern().equals(TaskDemand.RecurrencePattern.DAILY)) &&
                 //ChronoUnit.WEEKS.between(taskDemandDTO.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()), DateUtil.dateToLocalDateTime(taskDemandDTO.getEndDate()))<1) {
                 DAYS.between(taskDemandDTO.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), taskDemandDTO.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())<6){
             logger.info("Task Demand should be of atleast one week");
-            exceptionService.taskDemandException("message.taskdemand.week");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_WEEK);
         } else if (taskDemandDTO.getEndDate()!=null &&  taskDemandDTO.getNextVisit()!=null &&  taskDemandDTO.getNextVisit().before(taskDemandDTO.getEndDate())) {
             logger.info("Task Demand's next visit date should be greater then end date");
-            exceptionService.taskDemandException("message.taskdemand.visitdate");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_VISITDATE);
         } else if (taskDemandDTO.getEndDate()!=null && taskDemandDTO.getRecurrencePattern().equals(TaskDemand.RecurrencePattern.MONTHLY) &&
                 ChronoUnit.MONTHS.between(DateUtils.dateToLocalDateTime(taskDemandDTO.getStartDate()), DateUtils.dateToLocalDateTime(taskDemandDTO.getEndDate()))<1) {
             logger.info("Task Demand should be of atleast one month");
-            exceptionService.taskDemandException("message.taskdemand.month");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_MONTH);
         } else if ( !taskDemandDTO.getRecurrencePattern().equals(TaskDemand.RecurrencePattern.WEEKLY) &&
                 (taskDemandDTO.getEndDate()==null && taskDemandDTO.getEndAfterOccurrence()==0)) {
             logger.info("Please enter either Task Demand end date or number of occurences");
-            exceptionService.taskDemandException("message.taskdemandend-date.numberofoccurence");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMANDEND_DATE_NUMBEROFOCCURENCE);
                     } else {
             ObjectMapper mapper = new ObjectMapper();
             TaskDemand taskDemand = mapper.convertValue(taskDemandDTO, TaskDemand.class);
@@ -302,15 +303,15 @@ public class VisitatorService{
 
         if (taskDemandDTO.getDayName() == null || !taskDemandDTO.getDayName().toUpperCase().equals("MONDAY")) {
             logger.info("Task Demand can only start on Monday.");
-            exceptionService.taskDemandException("message.taskdemand.startday");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_STARTDAY);
         } else if (taskDemandDTO.getRecurrencePattern().equals(TaskDemand.RecurrencePattern.WEEKLY) &&
                 DAYS.between(taskDemandDTO.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), taskDemandDTO.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())<6) {
             logger.info("Task Demand should be of atleast one week");
-            exceptionService.taskDemandException("message.taskdemand.week");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_WEEK);
         } else if ( !taskDemandDTO.getRecurrencePattern().equals(TaskDemand.RecurrencePattern.WEEKLY) &&
                 (taskDemandDTO.getEndDate()==null && taskDemandDTO.getEndAfterOccurrence()==0)) {
             logger.info("Please enter either Task Demand end date or number of occurences");
-            exceptionService.taskDemandException("message.taskdemandend-date.numberofoccurence");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMANDEND_DATE_NUMBEROFOCCURENCE);
         } else {
 
             TaskDemand existingTaskDemand = taskDemandMongoRepository.findByTaskDemandIdAndUnitIdAndIsDeleted(taskDemandId,unitId,false);
@@ -347,10 +348,10 @@ public class VisitatorService{
 
                 if (existingTaskDemand.getEndDate().equals(updatedTaskDemand.getEndDate())) {
                     logger.info("Only Task Demand EndDate can be changed, when demand status is " + existingTaskDemand.getStatus());
-                    exceptionService.taskDemandException("message.taskdemand.demandstatus.update");
+                    exceptionService.taskDemandException(MESSAGE_TASKDEMAND_DEMANDSTATUS_UPDATE);
                     } else if (existingTaskDemand.getEndDate().before(updatedTaskDemand.getEndDate())) {
                     logger.info("Task Demand EndDate should be less than previous selected EndDate");
-                    exceptionService.taskDemandException("message.taskdemand.end-date");
+                    exceptionService.taskDemandException(MESSAGE_TASKDEMAND_END_DATE);
                 } else {
                     logger.info("Task Demand EndDate updated, so delete tasks from kairos and visitour after this date");
                     List<Task> tasksToDelete = taskMongoRepository.getTasksByDemandIdAndDateTo(existingTaskDemand.getId().toString(), updatedTaskDemand.getEndDate());
@@ -360,7 +361,7 @@ public class VisitatorService{
                 }
             } else {
                 logger.info("Sorry, Cannot update task demand with status " + existingTaskDemand.getStatus());
-                exceptionService.taskDemandException("message.taskdemand.status");
+                exceptionService.taskDemandException(MESSAGE_TASKDEMAND_STATUS);
             }
 
             //Staff staff = staffGraphRepository.getByUser(userGraphRepository.findByAccessToken(authToken).getId());
@@ -422,7 +423,7 @@ public class VisitatorService{
             isSuccess = true;
         } else {
             logger.error("Task Demand not found with ID " + taskDemandId);
-            exceptionService.taskDemandException("message.taskdemand.id");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_ID);
         }
         return isSuccess;
 
@@ -437,7 +438,7 @@ public class VisitatorService{
         List<TaskDemand> taskDemandList = Collections.EMPTY_LIST;
         if (startDate == null && endDate == null) {
             logger.error("Start Date and End Date are null");
-            exceptionService.taskDemandException("message.taskdemand.startdate.enddate");
+            exceptionService.taskDemandException(MESSAGE_TASKDEMAND_STARTDATE_ENDDATE);
         } else if (startDate != null && endDate != null) {
             taskDemandList = taskDemandMongoRepository.findAllBetweenDates(unitId, citizenId, startDate, endDate);
         } else if (startDate != null && endDate == null) {
@@ -646,7 +647,7 @@ public class VisitatorService{
 
         } else {
             logger.error("Task Package not found with ID " + taskPackageId);
-            exceptionService.internalError("message.taskpackage.id");
+            exceptionService.internalError(MESSAGE_TASKPACKAGE_ID);
         }
         return null;
     }

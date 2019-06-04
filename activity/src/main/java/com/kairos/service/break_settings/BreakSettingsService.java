@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.PAID_BREAK;
 import static com.kairos.constants.AppConstants.UNPAID_BREAK;
 import static com.kairos.enums.shift.BreakPaymentSetting.PAID;
@@ -45,7 +46,7 @@ public class BreakSettingsService extends MongoBaseService {
     public BreakSettingsDTO createBreakSettings(Long countryId, Long expertiseId, BreakSettingsDTO breakSettingsDTO) {
         BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndShiftDurationInMinuteEquals(countryId, expertiseId, breakSettingsDTO.getShiftDurationInMinute());
         if (Optional.ofNullable(breakSettings).isPresent()) {
-            exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
+            exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
         }
         breakSettings = new BreakSettings(countryId, breakSettingsDTO.getShiftDurationInMinute(), breakSettingsDTO.getBreakDurationInMinute(), expertiseId, breakSettingsDTO.getActivityId());
         save(breakSettings);
@@ -56,7 +57,7 @@ public class BreakSettingsService extends MongoBaseService {
     public BreakSettingAndActivitiesWrapper getBreakSettings(Long countryId, Long expertiseId) {
         Expertise expertise = userIntegrationService.getExpertise(countryId, expertiseId);
         if (!Optional.ofNullable(expertise).isPresent()) {
-            exceptionService.duplicateDataException("error.expertise.notfound");
+            exceptionService.duplicateDataException(ERROR_EXPERTISE_NOTFOUND);
         }
         String secondLevelTimeType=expertise.getBreakPaymentSetting().equals(PAID)?PAID_BREAK:UNPAID_BREAK;
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByDeletedFalseAndCountryIdAndTimeType(countryId,secondLevelTimeType );
@@ -75,12 +76,12 @@ public class BreakSettingsService extends MongoBaseService {
     public BreakSettingsDTO updateBreakSettings(Long countryId, Long expertiseId, BigInteger breakSettingsId, BreakSettingsDTO breakSettingsDTO) {
         BreakSettings breakSettings = breakSettingMongoRepository.findByIdAndDeletedFalse(breakSettingsId);
         if (!Optional.ofNullable(breakSettings).isPresent()) {
-            exceptionService.dataNotFoundByIdException("error.breakSettings.notFound", breakSettingsId);
+            exceptionService.dataNotFoundByIdException(ERROR_BREAKSETTINGS_NOTFOUND, breakSettingsId);
         }
         if (!breakSettingsDTO.getShiftDurationInMinute().equals(breakSettings.getShiftDurationInMinute())) {
             BreakSettings breakSettingsFromDB = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndShiftDurationInMinuteEquals(countryId, expertiseId, breakSettingsDTO.getShiftDurationInMinute());
             if (Optional.ofNullable(breakSettingsFromDB).isPresent()) {
-                exceptionService.duplicateDataException("error.breakSettings.duplicate", breakSettingsDTO.getShiftDurationInMinute());
+                exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
             }
 
         }

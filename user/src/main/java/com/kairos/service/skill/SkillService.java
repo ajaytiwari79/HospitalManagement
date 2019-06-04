@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
  * Created by oodles on 15/9/16.
@@ -110,7 +111,7 @@ public class SkillService {
             Map<String, Object> response = skill.retrieveDetails();
             return response;
         }
-        exceptionService.duplicateDataException("message.skill.name.duplicate");
+        exceptionService.duplicateDataException(MESSAGE_SKILL_NAME_DUPLICATE);
             return  null;
 
     }
@@ -256,7 +257,7 @@ public class SkillService {
             }
             return getAllAvailableSkills(id, type);
         } else {
-            exceptionService.dataNotFoundByIdException("message.type.notvalid");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TYPE_NOTVALID);
 
         }
         return null;
@@ -305,7 +306,7 @@ public class SkillService {
             }
             return skillUpdated;
         } else {
-            exceptionService.dataNotFoundByIdException("message.type.notvalid");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TYPE_NOTVALID);
         }
         return false;
     }
@@ -336,7 +337,7 @@ public class SkillService {
             Organization unit = organizationGraphRepository.getOrganizationByTeamId(id);
             unitId = unit.getId();
         } else {
-            exceptionService.dataNotFoundByIdException("message.type.notvalid");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TYPE_NOTVALID);
             //throw new InternalError("Type incorrect");
         }
 
@@ -426,7 +427,7 @@ public class SkillService {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
-            exceptionService.dataNotFoundByIdException("message.staff.id.notFound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_ID_NOTFOUND);
 
         }
 
@@ -461,7 +462,7 @@ public class SkillService {
             });
             skills = teamGraphRepository.getAssignedSkillsOfStaffByTeam(id, staffIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.type.notvalid");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TYPE_NOTVALID);
            // throw new InternalError("Type is not valid");
         }
         List<Map<String, Object>> skillsResponse = new ArrayList<>();
@@ -488,7 +489,7 @@ public class SkillService {
 
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound",countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
 
         }
 

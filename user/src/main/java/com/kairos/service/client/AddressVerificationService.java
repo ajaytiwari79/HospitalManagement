@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.constants.UserMessagesConstants.COUNTRY;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -95,7 +97,7 @@ public class AddressVerificationService {
         if(contactAddress.getMunicipalityId() != null){
             Municipality municipality = municipalityGraphRepository.findOne(contactAddress.getMunicipalityId());
             if(municipality == null){
-                exceptionService.dataNotFoundByIdException("message.municipality.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
             }
             municipalityName = municipality.getName();
@@ -104,7 +106,7 @@ public class AddressVerificationService {
         }
 
         if (zipCode == null) {
-            exceptionService.zipCodeNotFoundException("message.zipCode.notFound");
+            exceptionService.zipCodeNotFoundException(MESSAGE_ZIPCODE_NOTFOUND);
 
         }
         logger.info("Verifying with Information \n house: " +
@@ -174,7 +176,7 @@ public class AddressVerificationService {
                 client.setTemporaryAddress(clientTemporaryAddressList);
                 break;
             default:
-                exceptionService.dataNotFoundByIdException("message.client.addressType.notFound");
+                exceptionService.dataNotFoundByIdException(MESSAGE_CLIENT_ADDRESSTYPE_NOTFOUND);
 
         }
         clientGraphRepository.save(client);

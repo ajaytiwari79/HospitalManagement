@@ -22,6 +22,8 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 /**
  * Created by oodles on 18/10/16.
  */
@@ -44,12 +46,12 @@ public class OrganizationTypeService{
     public OrganizationType createOrganizationTypeForCountry(Long countryId, OrganizationTypeDTO organizationTypeDTO) {
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.country.id.notFound", countryId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
 
         }
         OrganizationType isAlreadyExist = organizationTypeGraphRepository.findByName(countryId, organizationTypeDTO.getName().trim());
         if (Optional.ofNullable(isAlreadyExist).isPresent()) {
-            exceptionService.duplicateDataException("message.organizationtype.name.duplicate");
+            exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONTYPE_NAME_DUPLICATE);
 
         }
         List<Level> levels = countryGraphRepository.getLevelsByIdsIn(countryId, organizationTypeDTO.getLevels());
@@ -92,7 +94,7 @@ public class OrganizationTypeService{
     public OrganizationType updateOrganizationType(UpdateOrganizationTypeDTO updateOrganizationTypeDTO) {
         OrganizationType orgTypeToUpdate = organizationTypeGraphRepository.findOne(updateOrganizationTypeDTO.getId());
         if (!Optional.ofNullable(orgTypeToUpdate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.organizationtype.id.notfound", updateOrganizationTypeDTO.getId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONTYPE_ID_NOTFOUND, updateOrganizationTypeDTO.getId());
 
         }
         if (!updateOrganizationTypeDTO.getLevelsToDelete().isEmpty()) {

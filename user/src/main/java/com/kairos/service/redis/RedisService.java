@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,12 +20,13 @@ import static com.kairos.constants.CommonConstants.LOCAL_PROFILE;
 @Service
 public class RedisService extends CommonsExceptionUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisService.class);
 
-    private static Logger LOGGER = LoggerFactory.getLogger(RedisService.class);
+    @Inject
+    private EnvConfigCommon envConfigCommon;
 
     @Inject
     private RedisTemplate<String, Map<String, String>> valueOperations;
-    @Inject private EnvConfigCommon envConfigCommon;
 
     public void saveTokenInRedis(String userName, String accessToken) {
         if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {
@@ -39,9 +41,7 @@ public class RedisService extends CommonsExceptionUtil {
             valueOperations.opsForValue().set(userName, userTokensFromDifferentMachine);
             LOGGER.info("saved user token into redis");
         }
-
     }
-
 
     public void invalidateAllTokenOfUser(String userName) {
         if(!LOCAL_PROFILE.equals(envConfigCommon.getCurrentProfile())) {

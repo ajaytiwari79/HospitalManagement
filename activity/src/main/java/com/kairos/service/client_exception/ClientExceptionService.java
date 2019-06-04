@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.commons.utils.DateUtils.ONLY_DATE;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.persistence.model.constants.ClientExceptionConstant.*;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
 
@@ -94,11 +95,11 @@ public class ClientExceptionService extends MongoBaseService {
         // Client client = clientGraphRepository.findById(clientId, 0);
         Client client = userIntegrationService.getClient(clientId);
         if (client == null) {
-            exceptionService.internalError("error.client.notfound");
+            exceptionService.internalError(ERROR_CLIENT_NOTFOUND);
         }
         Optional<ClientExceptionType> clientExceptionTypeOptional = clientExceptionTypeMongoRepository.findById(new BigInteger(clientExceptionDto.getExceptionTypeId()));
         if (!clientExceptionTypeOptional.isPresent()) {
-            exceptionService.internalError("error.exception.type.null");
+            exceptionService.internalError(ERROR_EXCEPTION_TYPE_NULL);
         }
         ClientExceptionType clientExceptionType = clientExceptionTypeOptional.get();
         ClientException clientException;
@@ -118,7 +119,7 @@ public class ClientExceptionService extends MongoBaseService {
                 sickExceptions = new ArrayList<>();
                 Optional<String> date = clientExceptionDto.getSelectedDates().stream().findFirst();
                 if (!date.isPresent()) {
-                    exceptionService.internalError("error.exception.date.notfound");
+                    exceptionService.internalError(ERROR_EXCEPTION_DATE_NOTFOUND);
                 }
                 DateTime initialDate = new DateTime(date.get());
                 validateSickException(initialDate, clientExceptionDto.getDaysToReview(), clientId);
@@ -198,7 +199,7 @@ public class ClientExceptionService extends MongoBaseService {
                 break;
             }
             default:
-                exceptionService.internalError("error.exception.type.notexist");
+                exceptionService.internalError(ERROR_EXCEPTION_TYPE_NOTEXIST);
         }
         ClientAggregator clientAggregator = taskExceptionService.updateTaskCountInAggregator(allUnhandledTasks, unitId, clientId, false);
         PerformCalculation performCalculation = (n) -> n + 1;
@@ -385,7 +386,7 @@ public class ClientExceptionService extends MongoBaseService {
     private void updatePriorityAndDuration(ClientExceptionDTO clientExceptionDTO, Task actualTask) {
         if (clientExceptionDTO.isUpdateTaskDuration()) {
             if (clientExceptionDTO.getNewTaskDuration() < 1) {
-                exceptionService.internalError("error.task.duration");
+                exceptionService.internalError(ERROR_TASK_DURATION);
             }
             Date timeTo = org.apache.commons.lang.time.DateUtils.addMinutes(actualTask.getTimeFrom(), clientExceptionDTO.getNewTaskDuration());
             actualTask.setTimeTo(timeTo);
@@ -463,7 +464,7 @@ public class ClientExceptionService extends MongoBaseService {
     public List<TaskGanttDTO> deleteClientException(BigInteger exceptionId, long unitId) {
         Optional<ClientException> clientExceptionOptional = clientExceptionMongoRepository.findById(exceptionId);
         if (!clientExceptionOptional.isPresent()) {
-            exceptionService.internalError("error.exception.notfound");
+            exceptionService.internalError(ERROR_EXCEPTION_NOTFOUND);
         }
         ClientException clientException = clientExceptionOptional.get();
         List<Task> tasksToHandle = taskMongoRepository.getTaskByException(clientException.getClientId(), unitId, exceptionId);
@@ -554,7 +555,7 @@ public class ClientExceptionService extends MongoBaseService {
     public Object getClientExceptionById(BigInteger taskExceptionId) {
         Optional<ClientException> clientExceptionOptional = clientExceptionMongoRepository.findById(taskExceptionId);
         if (!clientExceptionOptional.isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.exception.task.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXCEPTION_TASK_NOTFOUND);
         }
         logger.info("Preparing response");
         ClientException clientException = clientExceptionOptional.get();
@@ -582,12 +583,12 @@ public class ClientExceptionService extends MongoBaseService {
     public Map<String, Object> updateClientExceptionById(BigInteger clientExceptionId, ClientExceptionDTO clientExceptionDto, long unitId) throws ParseException {
         Optional<ClientException> clientExceptionOptional = clientExceptionMongoRepository.findById(clientExceptionId);
         if (!clientExceptionOptional.isPresent()) {
-            exceptionService.internalError("error.exception.notfound");
+            exceptionService.internalError(ERROR_EXCEPTION_NOTFOUND);
         }
         ClientException clientException = clientExceptionOptional.get();
         Optional<ClientExceptionType> clientExceptionTypeOptional = clientExceptionTypeMongoRepository.findById(new BigInteger(clientExceptionDto.getExceptionTypeId()));
         if (!clientExceptionTypeOptional.isPresent()) {
-            exceptionService.internalError("error.exception.type");
+            exceptionService.internalError(ERROR_EXCEPTION_TYPE);
         }
         ClientExceptionType clientExceptionType = clientExceptionTypeOptional.get();
         List<Task> tasksToReturn;
@@ -658,7 +659,7 @@ public class ClientExceptionService extends MongoBaseService {
                 break;
             }
             default:
-                exceptionService.internalError("error.exception.type");
+                exceptionService.internalError(ERROR_EXCEPTION_TYPE);
 
         }
         ClientAggregator clientAggregator = taskExceptionService.updateTaskCountInAggregator(allUnhandledTasks, unitId, clientException.getClientId(), false);
@@ -864,7 +865,7 @@ public class ClientExceptionService extends MongoBaseService {
 
     private void validateClientException(List<Long> clientId, Date dateFrom, Date dateTo, BigInteger exceptionTypeId) {
         if (clientExceptionMongoRepository.isExceptionTypeExistBetweenDate(clientId, dateFrom, dateTo, exceptionTypeId)) {
-            exceptionService.invalidClientException("message.exception.timeslot.create");
+            exceptionService.invalidClientException(MESSAGE_EXCEPTION_TIMESLOT_CREATE);
         }
     }
 
@@ -878,13 +879,13 @@ public class ClientExceptionService extends MongoBaseService {
         newDateTO.setHours(toTime.getHour());
         newDateTO.setMinutes(toTime.getMinute());
         if (clientExceptionMongoRepository.isExceptionExistBetweenDate(clientException.getClientId(), newDateFrom, newDateTO, clientException.getId())) {
-            exceptionService.invalidClientException("message.exception.timeslot.create");
+            exceptionService.invalidClientException(MESSAGE_EXCEPTION_TIMESLOT_CREATE);
         }
     }
 
     private void validateClientException(Date dateFrom, Date dateTo, List<BigInteger> exceptionIds, List<Long> clientIds) throws ParseException {
         if (clientExceptionMongoRepository.isExceptionExistBetweenDate(clientIds, dateFrom, dateTo, exceptionIds)) {
-            exceptionService.invalidClientException("message.exception.timeslot.create");
+            exceptionService.invalidClientException(MESSAGE_EXCEPTION_TIMESLOT_CREATE);
         }
     }
 
@@ -893,7 +894,7 @@ public class ClientExceptionService extends MongoBaseService {
         ;
         long count = clientExceptionMongoRepository.countSickExceptionsAfterDate(citizenId, startDate.toDate());
         if (daysToReview <= count) {
-            exceptionService.invalidClientException("message.exception.timeslot.create");
+            exceptionService.invalidClientException(MESSAGE_EXCEPTION_TIMESLOT_CREATE);
         }
     }
 

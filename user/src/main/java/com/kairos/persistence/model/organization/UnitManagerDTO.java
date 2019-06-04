@@ -8,6 +8,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import static com.kairos.constants.UserMessagesConstants.*;
+
 /**
  * Created by prabjot on 10/2/17.
  */
@@ -15,13 +17,13 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UnitManagerDTO {
 
-    @NotBlank(message = "error.firstname.notnull")
+    @NotBlank(message = ERROR_FIRSTNAME_NOTNULL)
     String firstName;
-    @NotBlank(message = "error.lastname.notnull")
+    @NotBlank(message = ERROR_LASTNAME_NOTNULL)
     String lastName;
     @Email
     String email;
-    @NotNull(message = "error.Organization.unitmanager.accessgroupid.notnull")
+    @NotNull(message = ERROR_ORGANIZATION_UNITMANAGER_ACCESSGROUPID_NOTNULL)
     Long accessGroupId;
     ContactDetail contactDetail;
     Long staffId;

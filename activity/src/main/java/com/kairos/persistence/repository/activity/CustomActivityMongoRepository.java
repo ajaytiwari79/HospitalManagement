@@ -4,8 +4,10 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
@@ -14,6 +16,7 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface CustomActivityMongoRepository {
@@ -45,6 +48,8 @@ public interface CustomActivityMongoRepository {
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds);
 
     List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId);
+
+    List<PhaseSettingsActivityTab> findActivityIdAndStatusByUnitAndAccessGroupIds(Long unitId, List<Long> accessGroupIds);
 
     List<ActivityDTO> findAllActivityByUnitId(Long unitId, boolean deleted);
 
@@ -94,4 +99,6 @@ public interface CustomActivityMongoRepository {
     List<Activity> findByActivityIdInChildActivities(BigInteger activityId, List<BigInteger> allowedActivityIds);
 
     ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId);
+
+    List<ActivityTagDTO> findAllActivityByUnitIdAndNotPartOfTeam(Long unitId);
 }

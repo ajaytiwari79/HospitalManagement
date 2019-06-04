@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
 public class UnitPayrollSettingService extends MongoBaseService {
@@ -91,7 +92,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
     public UnitPayrollSettingDTO deleteDraftPayrollPeriod(BigInteger payrollPeriodId, Long unitId) {
         UnitPayrollSetting unitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodByUnitIdPayrollPeriodId(unitId, payrollPeriodId);
         if (isNull(unitPayrollSetting)) {
-            exceptionService.actionNotPermittedException("message.payroll.period.not.found");
+            exceptionService.actionNotPermittedException(MESSAGE_PAYROLL_PERIOD_NOT_FOUND);
         }
         // use when draft table deleted and return previous data of parent table
         UnitPayrollSetting parentUnitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodByUnitIdPayrollPeriodId(unitId, unitPayrollSetting.getParentPayrollId());
@@ -103,7 +104,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
         List<UnitPayrollSetting> unitPayrollSettings = new ArrayList<>();
         UnitPayrollSetting unitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodByUnitIdPayrollPeriodId(unitId, unitPayrollSettingDTO.getId());
         if (isNull(unitPayrollSetting)) {
-            exceptionService.actionNotPermittedException("message.payroll.period.not.found");
+            exceptionService.actionNotPermittedException(MESSAGE_PAYROLL_PERIOD_NOT_FOUND);
         }
         unitPayrollSetting.setAccessGroupsPriority(ObjectMapperUtils.copyPropertiesOfListByMapper(unitPayrollSettingDTO.getAccessGroupsPriority(), PayrollAccessGroups.class));
         unitPayrollSetting.setPublished(unitPayrollSettingDTO.isPublished());
@@ -202,9 +203,9 @@ public class UnitPayrollSettingService extends MongoBaseService {
     public List<UnitPayrollSettingDTO> breakPayrollPeriodOfUnit(Long unitId, UnitPayrollSettingDTO unitPayrollSettingDTO) {
         UnitPayrollSetting unitPayrollSetting = unitPayrollSettingMongoRepository.findPayrollPeriodByIdAndPayrollFrequency(unitId, unitPayrollSettingDTO.getParentPayrollId(), unitPayrollSettingDTO.getPayrollFrequency());
         if (isNull(unitPayrollSetting)) {
-            exceptionService.actionNotPermittedException("message.payroll.period.not.found");
+            exceptionService.actionNotPermittedException(MESSAGE_PAYROLL_PERIOD_NOT_FOUND);
         } else if (unitPayrollSettingDTO.getStartDate().isBefore(DateUtils.getLocalDate()) || !validateStartDateForPayrollPeriodCreation(unitPayrollSettingDTO.getStartDate(), unitPayrollSettingDTO.getPayrollFrequency())) {
-            exceptionService.actionNotPermittedException("error.payroll.period.start.date.invalid");
+            exceptionService.actionNotPermittedException(ERROR_PAYROLL_PERIOD_START_DATE_INVALID);
         }
         UnitPayrollSetting draftUnitPayrollSetting = unitPayrollSettingMongoRepository.findDraftPayrollPeriodByUnitIdAndPayrollFrequencyAndEndDate(unitId, unitPayrollSetting.getPayrollFrequency(), getlastDayOfYear(unitPayrollSettingDTO.getEndDate().getYear()));
         Map<LocalDate, PayrollPeriod> startDateAndPayrollPeriodMap = unitPayrollSetting.getPayrollPeriods().stream().collect(Collectors.toMap(PayrollPeriod::getStartDate, Function.identity()));
@@ -272,7 +273,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
         for (PayrollPeriodDTO payrollPeriodDTO : payrollPeriodDTOS) {
             if (startDateAndPayrollPeriodMap.containsKey(payrollPeriodDTO.getStartDate())) {
                 if (isNull(payrollPeriodDTO.getDeadlineDate()) || DateUtils.getLocalDateFromLocalDateTime(payrollPeriodDTO.getDeadlineDate()).isBefore(payrollPeriodDTO.getStartDate())) {
-                    exceptionService.actionNotPermittedException("message.payroll.deadline.date.not.invalid", payrollPeriodDTO.getStartDate(), payrollPeriodDTO.getEndDate());
+                    exceptionService.actionNotPermittedException(MESSAGE_PAYROLL_DEADLINE_DATE_NOT_INVALID, payrollPeriodDTO.getStartDate(), payrollPeriodDTO.getEndDate());
                 }
                 startDateAndPayrollPeriodMap.get(payrollPeriodDTO.getStartDate()).setDeadlineDate(payrollPeriodDTO.getDeadlineDate());
                 int daysTillDeadlineDate = (int) ChronoUnit.DAYS.between(payrollPeriodDTO.getEndDate(), payrollPeriodDTO.getDeadlineDate());
@@ -288,7 +289,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
         boolean result = isCollectionNotEmpty(payrollAccessGroupsDTOS);
         int sumOfGracePeriod = result ? payrollAccessGroupsDTOS.stream().mapToInt(payrollAccessGroupsDTOs -> payrollAccessGroupsDTOs.getGracePeriod()).sum() : 0;
         if (sumOfGracePeriod == 0 || sumOfGracePeriod > daysTillDeadlineDate || !result) {
-            exceptionService.actionNotPermittedException("message.payroll.grace.period.not.invalid", daysTillDeadlineDate, startDate, endDate);
+            exceptionService.actionNotPermittedException(MESSAGE_PAYROLL_GRACE_PERIOD_NOT_INVALID, daysTillDeadlineDate, startDate, endDate);
         }
         return true;
     }
@@ -318,7 +319,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
 
     private boolean validatePayrollPeriod(UnitPayrollSettingDTO unitPayrollSettingDTO, Long unitId) {
         if (unitPayrollSettingDTO.getStartDate().isBefore(DateUtils.getLocalDate()) || !validateStartDateForPayrollPeriodCreation(unitPayrollSettingDTO.getStartDate(), unitPayrollSettingDTO.getPayrollFrequency())) {
-            exceptionService.actionNotPermittedException("error.payroll.period.start.date.invalid");
+            exceptionService.actionNotPermittedException(ERROR_PAYROLL_PERIOD_START_DATE_INVALID);
         }
         boolean existsPayrollPeriod = unitPayrollSettingMongoRepository.findPayrollPeriodByUnitIdStartDate(unitId, unitPayrollSettingDTO.getStartDate());
         if (existsPayrollPeriod) {

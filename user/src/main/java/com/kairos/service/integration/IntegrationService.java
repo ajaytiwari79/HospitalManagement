@@ -23,6 +23,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.kairos.constants.UserMessagesConstants.ERROR_INTEGRATIONSERVICE_DATA_ISEMPTY;
+
 /**
  * Created by oodles on 21/2/17.
  */
@@ -95,7 +97,7 @@ public class IntegrationService {
         if( ! Optional.ofNullable(visitour.getUsername()).isPresent() ||
                 ! Optional.ofNullable(visitour.getServerName()).isPresent() ||
                 ! Optional.ofNullable(visitour.getPassword()).isPresent()){
-            exceptionService.internalServerError("error.integrationService.data.isEmpty");
+            exceptionService.internalServerError(ERROR_INTEGRATIONSERVICE_DATA_ISEMPTY);
             
         }
 

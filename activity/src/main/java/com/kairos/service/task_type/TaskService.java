@@ -94,6 +94,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.CITIZEN_ID;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.persistence.model.constants.TaskConstants.*;
@@ -409,20 +410,20 @@ public class TaskService extends MongoBaseService {
                         getWorkShiftsFromWorkPlaceByIdResult.getEmploymentId()).findFirst();
 
         if (!workPlaceId.isPresent() || !personExternalId.isPresent() || !personExternalEmploymentId.isPresent()) {
-            exceptionService.internalError("error.timecare.workplaceid.personid.person-external-position-id");
+            exceptionService.internalError(ERROR_TIMECARE_WORKPLACEID_PERSONID_PERSON_EXTERNAL_POSITION_ID);
         }
         OrganizationStaffWrapper organizationStaffWrapper = userIntegrationService.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
         StaffDTO staffDTO = organizationStaffWrapper.getStaff();
         OrganizationDTO organizationDTO = organizationStaffWrapper.getOrganization();
 
         if (organizationDTO == null) {
-            exceptionService.dataNotFoundByIdException("message.organization.externalid",workPlaceId.get());
+            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_EXTERNALID,workPlaceId.get());
         }
         if (!Optional.ofNullable(staffDTO).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.organization.external-staffid",personExternalId.get());
         }
         if (!Optional.ofNullable(organizationStaffWrapper.getEmployment()).isPresent()) {
-            exceptionService.internalError("error.kairos.employment",personExternalId.get());
+            exceptionService.internalError(ERROR_KAIROS_EMPLOYMENT,personExternalId.get());
         }
         List<GetWorkShiftsFromWorkPlaceByIdResult> shiftsFromTimeCare = timeCareShifts.getGetWorkShiftsFromWorkPlaceByIdResult();
         int sizeOfTimeCareShifts = shiftsFromTimeCare.size();
@@ -694,7 +695,7 @@ public class TaskService extends MongoBaseService {
         LOGGER.info("percentage of duration :: " + minutes + "   bulkUpdateTaskDTO.isReduced()  " + reduction);
         if (reduction) {
             if (task.getDuration() - minutes <= 0) {
-                exceptionService.internalError("error.task.duration");
+                exceptionService.internalError(ERROR_TASK_DURATION);
             }
             timeTo = timeTo.minusMinutes(minutes);
             task.setTimeTo(Date.from(timeTo.atZone(ZoneId.systemDefault()).toInstant()));
@@ -945,7 +946,7 @@ public class TaskService extends MongoBaseService {
         List<VRPTaskDTO> newTasks = new ArrayList<>();
         for (VRPTaskDTO task : taskDTOS) {
             if(!taskTypeIds.containsKey(task.getSkill())){
-                exceptionService.dataNotFoundException("message.taskType.notExists",task.getSkill());
+                exceptionService.dataNotFoundException(MESSAGE_TASKTYPE_NOTEXISTS,task.getSkill());
             }
             if(!installationNoAndTaskTypeId.containsKey(new Long(task.getInstallationNumber()+""+taskTypeIds.get(task.getSkill())))) {
                 task.setUnitId(unitId);
