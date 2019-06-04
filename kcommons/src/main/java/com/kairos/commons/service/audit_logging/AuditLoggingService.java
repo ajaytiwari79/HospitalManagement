@@ -1,8 +1,7 @@
-package com.kairos.service.audit_logging;
+package com.kairos.commons.service.audit_logging;
 
-import com.kairos.persistence.repository.custom_repository.AuditLoggingRepository;
+import com.kairos.commons.repository.audit_logging.AuditLoggingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import java.util.Map;
  * Created by pradeep
  * Created at 4/6/19
  **/
-@Service
 public class AuditLoggingService {
 
     @Autowired
