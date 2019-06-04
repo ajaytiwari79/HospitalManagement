@@ -161,8 +161,8 @@ public class CounterDistController {
 
     //staff will send list of KPITabMappings
     @PostMapping(COUNTER_STAFF_UNIT_DIST_URL + TAB + "/create_dist_entry")
-    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId, @RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.addTabKPIEntriesOfStaff(tabKPIMappingDTOS, unitId, ConfLevel.STAFF));
+    public ResponseEntity<Map<String, Object>> addTabKPIsEntryForStaff(@PathVariable Long unitId, @RequestBody List<TabKPIMappingDTO> tabKPIMappingDTOS,@RequestParam(required = false) Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.addTabKPIEntriesOfStaff(tabKPIMappingDTOS, unitId, ConfLevel.STAFF,staffId));
     }
 
     @PutMapping(COUNTER_STAFF_UNIT_DIST_URL + TAB + "/{tabId}/update_dist_entry")

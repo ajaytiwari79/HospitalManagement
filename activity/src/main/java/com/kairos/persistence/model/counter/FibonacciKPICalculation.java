@@ -25,11 +25,19 @@ public class FibonacciKPICalculation implements Comparable{
     private BigInteger fibonacciKpiCount;
     private int impactWeight;
     private Direction sortingOrder;
+    private int orderValueByFiboncci;
 
     public FibonacciKPICalculation(Long staffId, int value) {
         this.staffId = staffId;
         this.value = value;
     }
+
+    public FibonacciKPICalculation(int orderValueByFiboncci,Long staffId) {
+        this.staffId = staffId;
+        this.orderValueByFiboncci = orderValueByFiboncci;
+        this.fibonacciKpiCount = new BigInteger("0");
+    }
+
 
     public Integer getValue() {
         return value;

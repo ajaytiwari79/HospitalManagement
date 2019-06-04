@@ -2,6 +2,7 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
@@ -246,7 +249,8 @@ public class Shift extends MongoBaseEntity {
     }
 
     public int getMinutes() {
-        return (int)getInterval().getMinutes();
+        DateTimeInterval interval = getInterval();
+        return isNotNull(interval) ? (int)interval.getMinutes() : 0;
     }
 
     public String getRemarks() {
@@ -348,8 +352,12 @@ public class Shift extends MongoBaseEntity {
         this.functionId = functionId;
     }
 
+    @IgnoreLogging
     public DateTimeInterval getInterval() {
-        return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
+        if(isCollectionNotEmpty(this.activities)) {
+            return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size() - 1).getEndDate().getTime());
+        }
+        return null;
     }
 
 

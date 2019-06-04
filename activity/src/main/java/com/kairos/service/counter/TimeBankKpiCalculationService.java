@@ -47,6 +47,7 @@ import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.*;
 
 @Service
@@ -260,27 +261,6 @@ public class TimeBankKpiCalculationService implements CounterService {
     }
 
 
-
-    private Map<Long,Double> getTimebankCalculationPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<StaffKpiFilterDTO> staffKpiFilterDTOS, Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, List<DailyTimeBankEntry> employmentAndDailyTimeBank) {
-        Map<Long, Double> staffIdAndTimeBankMap = new HashedMap();
-        Map<Long, List<DailyTimeBankEntry>> staffAndDailyTimeBankMap;
-        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
-        Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v->v));
-        Map<Long,List<DailyTimeBankEntry>> staffIdAndDailyTimeBankMap = getDailyTimeBankEntryByStaffId(staffIds,employmentAndDailyTimeBank);
-        for (Long staffId :staffIds) {
-            staffAndDailyTimeBankMap =staffIdAndDailyTimeBankMap.getOrDefault(staffId,new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
-            Long totalTimeBankOfUnit = 0l;
-            StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
-            DateTimeInterval dateTimeInterval=new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate()));
-            totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, staffAndDailyTimeBankMap, dateTimeInterval, staffKpiFilterDTO.getUnitId(), totalTimeBankOfUnit, staffKpiFilterDTO);
-            staffIdAndTimeBankMap.put(staffId, totalTimeBankOfUnit.doubleValue());
-        }
-        return staffIdAndTimeBankMap;
-
-    }
-
-
-
     public KPISetResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
         Map<Long, Double> kpiAndStaffIdMap = new HashMap<>();
@@ -320,7 +300,9 @@ public class TimeBankKpiCalculationService implements CounterService {
 
     @Override
     public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, ApplicableKPI applicableKPI) {
-        return null;
+        KPISetResponseDTO  kpiSetResponseDTO=getCalculatedDataOfKPI(filterBasedCriteria, organizationId,new KPI(),applicableKPI);
+        Map<Long, Double> kpiAndStaffIdMap = kpiSetResponseDTO.getStaffKPIValue();
+        return getFibonacciCalculation(kpiAndStaffIdMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue())),sortingOrder);
     }
 
 }

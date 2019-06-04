@@ -28,6 +28,10 @@ public class CurrentAddress {
 
     private String addressLine1;
 
+    public CurrentAddress() {
+        //Not in Use
+    }
+
     public Long getPostalCode() {
         return postalCode;
     }
@@ -106,9 +110,6 @@ public class CurrentAddress {
         this.postalDistrict = postalDistrict;
     }
 
-
-    public CurrentAddress() {
-    }
 
     public GeoCoordinates getGeoCoordinates ()
     {
