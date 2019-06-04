@@ -136,18 +136,7 @@ public class FibonacciKPIService implements CounterService{
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
-        /*Map[] calculateFibonacciKPImaps = calculateFibonacciKPI(filterBasedCriteria,organizationId,applicableKPI);
-        Map<Long,List<ClusteredBarChartKpiDataUnit>> kpiAndstaffDataMap = (Map<Long,List<ClusteredBarChartKpiDataUnit>>)calculateFibonacciKPImaps[0];
-        Map<Long,CommonKpiDataUnit> staffAndfibonacciKpiDataMap = (Map<Long,CommonKpiDataUnit>)calculateFibonacciKPImaps[1];
-        for (Map.Entry<Long, CommonKpiDataUnit> staffAndFibonacciEntry : staffAndfibonacciKpiDataMap.entrySet()) {
-            ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = (ClusteredBarChartKpiDataUnit)staffAndFibonacciEntry.getValue();
-            clusteredBarChartKpiDataUnit.setSubValues(new ArrayList(kpiAndstaffDataMap.get(staffAndFibonacciEntry.getKey())){{
-                ClusteredBarChartKpiDataUnit subValue = ObjectMapperUtils.copyPropertiesByMapper(clusteredBarChartKpiDataUnit,ClusteredBarChartKpiDataUnit.class);
-                //subValue.setValue(getHoursByMinutes(subValue.getValue()));
-                add(subValue);
-            }});
-        }*/
-        return null;//new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, new ArrayList<>(staffAndfibonacciKpiDataMap.values()), new KPIAxisData(AppConstants.DATE,AppConstants.LABEL),new KPIAxisData(AppConstants.HOURS,AppConstants.VALUE_FIELD));
+        return new CommonRepresentationData();
     }
 
     @Override
@@ -179,7 +168,7 @@ public class FibonacciKPIService implements CounterService{
             }
         }
         Map<Long,Double> staffIdAndOrderMap = new HashMap<>();
-        double order = 0;
+        double order = 1;
         for (FibonacciKPICalculation fibonacciKPICalculation : kpiAndFibonacciDataMap.values().stream().sorted().collect(Collectors.toList())) {
             staffIdAndOrderMap.put(fibonacciKPICalculation.getStaffId(),order++);
         }
