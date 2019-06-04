@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
@@ -42,6 +43,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableCircuitBreaker
 @EnableMongoRepositories(basePackages ={"com.kairos.persistence.repository"},
 repositoryBaseClass = MongoBaseRepositoryImpl.class)
+@EnableAuditLogging
 public class KairosActivityApplication implements WebMvcConfigurer {
 	@Autowired
 	private Environment environment;

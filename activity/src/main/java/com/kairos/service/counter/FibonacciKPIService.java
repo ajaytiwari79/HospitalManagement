@@ -1,6 +1,8 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.persistence.repository.counter.*;
+import com.kairos.utils.counter.KPIUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
@@ -15,8 +17,6 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.*;
-import com.kairos.persistence.repository.counter.CounterRepository;
-import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.counter.KPIUtils;
@@ -47,7 +47,9 @@ public class FibonacciKPIService implements CounterService{
     @Inject private ExceptionService exceptionService;
     @Inject private CounterServiceMapping counterServiceMapping;
     @Inject private CounterRepository counterRepository;
+
     @Inject private CounterHelperService counterHelperService;
+    @Inject private ApplicableKPIRepository applicableKPIRepository;
 
     public FibonacciKPIDTO createFibonacciKPI(Long referenceId, FibonacciKPIDTO fibonacciKPIDTO, ConfLevel confLevel) {
         boolean existByName = fibonacciKPIRepository.existByName(null,fibonacciKPIDTO.getTitle(),confLevel,referenceId);
@@ -71,7 +73,7 @@ public class FibonacciKPIService implements CounterService{
         } else if (UNIT.equals(confLevel)) {
             applicableKPIs.add(new ApplicableKPI(fibonacciKPI.getId(), fibonacciKPI.getId(), null, referenceId, null, confLevel, new ApplicableFilter(new ArrayList<>(), false), fibonacciKPI.getTitle(), false,ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIDTO.getFibonacciKPIConfigs(),FibonacciKPIConfig.class),KPIRepresentation.INDIVIDUAL_STAFF));
         }
-        fibonacciKPIRepository.saveEntities(applicableKPIs);
+        applicableKPIRepository.saveEntities(applicableKPIs);
         return fibonacciKPIDTO;
     }
 

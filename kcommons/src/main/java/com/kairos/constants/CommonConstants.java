@@ -27,6 +27,8 @@ public class CommonConstants {
 
     public static final String PACKAGE_NAME  = "com.kairos";
 
+    public static final String API_V1 = "/api/v1";
+
 
 
 
