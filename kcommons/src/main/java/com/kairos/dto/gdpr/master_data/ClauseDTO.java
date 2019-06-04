@@ -33,6 +33,7 @@ public class ClauseDTO {
     private List<Long> templateTypes;
 
     public ClauseDTO() {
+        //Not in use
     }
 
   }

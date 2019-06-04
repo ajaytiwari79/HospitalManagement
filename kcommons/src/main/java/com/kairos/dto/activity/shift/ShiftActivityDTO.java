@@ -48,7 +48,6 @@ public class ShiftActivityDTO {
     private String timeType;
     private String backgroundColor;
     private boolean haltBreak;
-    private BigInteger plannedTimeId;
     private boolean breakShift;
     private boolean breakReplaced;
     private ReasonCodeDTO reasonCode;
@@ -70,7 +69,12 @@ public class ShiftActivityDTO {
     private BigInteger fourthLevelTimeTypeId;
     private List<PlannedTime> plannedTimes;
 
-    public ShiftActivityDTO(String activityName, Date startDate, Date endDate,BigInteger activityId,Long absenceReasonCodeId) {
+    public ShiftActivityDTO(Date startDate, Date endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, Long absenceReasonCodeId) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;

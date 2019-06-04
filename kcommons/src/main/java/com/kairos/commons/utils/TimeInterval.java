@@ -45,8 +45,8 @@ public class TimeInterval {
 
     public boolean contains(int minutes){
         boolean contains;
-        if(endTo<startFrom){
-            contains =  endTo > minutes || startFrom<=minutes;
+        if(endTo<=startFrom){
+            contains =  endTo >= minutes || startFrom<=minutes;
         }else {
             contains = startFrom<=minutes && minutes<endTo;
         }

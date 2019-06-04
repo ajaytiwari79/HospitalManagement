@@ -70,7 +70,7 @@ public class DynamicCronScheduler implements DisposableBean {
             future = threadPoolTaskScheduler.schedule(runnable, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
         }
 
-        logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
+        logger.info("Name of cron job is --> {} scheduler {}",schedulerPanel.getId(),TimeZone.getDefault());
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
         logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
 

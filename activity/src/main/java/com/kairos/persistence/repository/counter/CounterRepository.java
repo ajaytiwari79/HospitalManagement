@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.counter;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
@@ -16,18 +18,33 @@ import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.common.MongoBaseEntity;
+import com.kairos.persistence.model.common.MongoSequence;
 import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
+import com.kairos.utils.user_context.UserContext;
+import com.mongodb.BasicDBObject;
+import com.mongodb.BulkWriteOperation;
 import com.mongodb.client.result.DeleteResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
+import org.springframework.data.mongodb.core.query.BasicQuery;
+import org.springframework.data.mongodb.core.query.BasicUpdate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.Assert;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +58,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.DELETED;
 import static com.kairos.dto.activity.counter.enums.ConfLevel.COUNTRY;
 import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
+import static com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl.SEQUENCE_POST_FIX;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /*
@@ -49,12 +67,15 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  */
 
 @Repository
-public class CounterRepository {
+public class CounterRepository{
 
     @Inject
     private MongoTemplate mongoTemplate;
 
-    private String getRefQueryField(ConfLevel level) {
+    private final static Logger LOGGER = LoggerFactory.getLogger(MongoBaseRepositoryImpl.class);
+
+
+    public static String getRefQueryField(ConfLevel level) {
         switch (level) {
             case UNIT:
                 return "unitId";
@@ -132,8 +153,28 @@ public class CounterRepository {
                 lookup("counter", "activeKpiId", "_id", "kpi"),
                 project("title","kpiRepresentation").and("kpi").arrayElementAt(0).as("kpi"),
                 project().and("title").as("title").and("kpi._id").as("_id").and("kpi.type").as("type")
-                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
+                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").and("kpi.multiDimensional").as("multiDimensional").
                         and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpiRepresentation").as("kpiRepresentation")
+        );
+        AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
+        return results.getMappedResults();
+    }
+
+    public List<KPIDTO> getFibonacciKpiForReferenceId(Long refId, ConfLevel level, boolean copy) {
+        String refQueryField = getRefQueryField(level);
+        Criteria criteria = Criteria.where("deleted").is(false).and(refQueryField).is(refId).and("level").is(level);
+        if (copy) {
+            criteria.and("copy").is(copy);
+        }
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("counter", "activeKpiId", "_id", "kpi"),
+                project("title","fibonacciKPIConfigs").and("kpi").arrayElementAt(0).as("kpi"),
+                match(Criteria.where("kpi.fibonacciKPI").is(true)),
+                project("title","fibonacciKPIConfigs").and("kpi._id").as("_id").and("kpi.type").as("type")
+                        .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
+                        and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.description").as("kpi.description")
+                        .and("kpi.referenceId").as("referenceId")
         );
         AggregationResults<KPIDTO> results = mongoTemplate.aggregate(aggregation, ApplicableKPI.class, KPIDTO.class);
         return results.getMappedResults();
@@ -357,11 +398,18 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         mongoTemplate.remove(query, KPIDashboard.class);
     }
 
-    public List<ApplicableKPI> getKPIByKPIId(List<BigInteger> kpiIds, Long refId, ConfLevel level) {
+    public List<ApplicableKPI> getKPIByKPIIds(List<BigInteger> kpiIds, Long refId, ConfLevel level) {
         String refQueryField = getRefQueryField(level);
         Query query = new Query(Criteria.where("deleted").is(false).and(refQueryField).is(refId).and("activeKpiId").in(kpiIds).and("level").is(level));
         return mongoTemplate.find(query, ApplicableKPI.class);
     }
+
+    public ApplicableKPI getKPIByKPIId(BigInteger kpiId, Long refId, ConfLevel level) {
+        String refQueryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("deleted").is(false).and(refQueryField).is(refId).and("activeKpiId").is(kpiId).and("level").is(level));
+        return mongoTemplate.findOne(query, ApplicableKPI.class);
+    }
+
 
     public OrgTypeKPIEntry getOrgTypeKPIEntry(OrgTypeMappingDTO entry, Long countryId) {
         Query query = new Query(Criteria.where("deleted").is(false).and("orgTypeId").is(entry.getOrgTypeId()).and("kpiId").is(entry.getKpiId()).and("countryId").is(countryId));
@@ -576,6 +624,162 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         Criteria matchCriteria = Criteria.where("activeKpiId").in(kpiIds).and("kpiRepresentation").is(INDIVIDUAL_STAFF).and(DELETED).is(false).and(queryField).is(referenceId).and("level").is(confLevel);
         Query query = new Query(matchCriteria);
         return mongoTemplate.find(query, ApplicableKPI.class).size() == kpiIds.size();
+    }
+
+    public <S extends MongoBaseEntity> S save(@Valid S entity) {
+        Assert.notNull(entity, "Entity must not be null!");
+        /**
+         *  Get class name for sequence class
+         * */
+        String className = entity.getClass().getSimpleName();
+
+        /**
+         *  Set Id if entity don't have Id
+         * */
+        if(entity.getId() == null){
+            if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
+                //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
+                className = entity.getClass().getSuperclass().getSimpleName();
+            }
+            if(entity.getClass().equals(FibonacciKPI.class)){
+                className = KPI.class.getSimpleName();
+            }
+            entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+            entity.setCreatedAt(DateUtils.getDate());
+            entity.setId(nextSequence(className));
+        }else {
+            entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+        }
+        /**
+         *  Set updatedAt time as current time
+         * */
+        entity.setUpdatedAt(DateUtils.getDate());
+        mongoTemplate.save(entity);
+        return entity;
+    }
+
+    public <T extends MongoBaseEntity> List<T> saveEntities(@Valid List<T> entities){
+        Assert.notNull(entities, "Entity must not be null!");
+        Assert.notEmpty(entities, "Entity must not be Empty!");
+
+        String collectionName = mongoTemplate.getCollectionName(entities.get(0).getClass());
+
+        /**
+         *  Creating BulkWriteOperation object
+         * */
+
+        BulkWriteOperation bulkWriteOperation= mongoTemplate.getMongoDbFactory().getLegacyDb().getCollection(collectionName).initializeUnorderedBulkOperation();
+
+        /**
+         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
+         * */
+        MongoConverter converter = mongoTemplate.getConverter();
+
+        BasicDBObject dbObject;
+
+        /**
+         *  Handling bulk write exceptions
+         * */
+        try{
+
+            for (T entity: entities) {
+                /**
+                 *  Get class name for sequence class
+                 * */
+                String className = entity.getClass().getSimpleName();
+                /**
+                 *  Set updatedAt time as current time
+                 * */
+                entity.setUpdatedAt(DateUtils.getDate());
+
+
+                if(entity.getId() == null){
+                    entity.setCreatedAt(DateUtils.getDate());
+                    /**
+                     *  Set Id if entity don't have Id
+                     * */
+                    if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
+                        //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
+                        className = entity.getClass().getSuperclass().getSimpleName();
+                    }
+                    entity.setId(nextSequence(className));
+                    entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+                    dbObject = new BasicDBObject();
+
+                    /*
+                     *  Converting entity object to BasicDBObject
+                     * */
+                    converter.write(entity, dbObject);
+
+                    /*
+                     *  Adding entity (BasicDBObject)
+                     * */
+                    bulkWriteOperation.insert(dbObject);
+                }else {
+                    entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+                    dbObject = new BasicDBObject();
+
+                    /*
+                     *  Converting entity object to BasicDBObject
+                     * */
+                    converter.write(entity, dbObject);
+
+                    /**
+                     *  Creating BasicDbObject for find query
+                     * */
+                    BasicDBObject query = new BasicDBObject();
+
+                    /**
+                     *  Adding query (find by ID)
+                     * */
+                    query.put("_id", dbObject.get("_id"));
+
+                    /**
+                     *  Replacing whole Object
+                     * */
+                    bulkWriteOperation.find(query).replaceOne(dbObject);
+                }
+            }
+
+            /**
+             * Executing the Operation
+             * */
+            bulkWriteOperation.execute();
+            return entities;
+
+        } catch(Exception ex){
+            LOGGER.error("BulkWriteOperation Exception ::  ", ex);
+            return null;
+        }
+    }
+
+    public BigInteger nextSequence(String sequenceName){
+        /**
+         * adding sequence postfix into class name
+         * */
+        sequenceName = sequenceName + SEQUENCE_POST_FIX;
+
+        /**
+         *  Find query
+         * */
+        String findQuery = "{'sequenceName':'"+sequenceName+"'}";
+        /**
+         *  Update query
+         * */
+        String updateQuery = "{'$inc':{'sequenceNumber':1}}";
+        FindAndModifyOptions findAndModifyOptions = new FindAndModifyOptions();
+
+        /**
+         *  return updated value
+         * */
+        findAndModifyOptions.returnNew(true);
+
+        /**
+         *  create new if not exists
+         * */
+        findAndModifyOptions.upsert(true);
+        MongoSequence mongoSequence = mongoTemplate.findAndModify(new BasicQuery(findQuery), new BasicUpdate(updateQuery), findAndModifyOptions, MongoSequence.class);
+        return new BigInteger(mongoSequence.getSequenceNumber()+"");
     }
 
 

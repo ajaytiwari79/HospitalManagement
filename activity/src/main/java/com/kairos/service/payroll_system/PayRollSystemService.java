@@ -28,8 +28,6 @@ public class PayRollSystemService {
     @Inject
     private ExceptionService exceptionService;
 
-    //=====================================================================
-
     /**
      * called only at the time of application bootstrap
      */
@@ -46,7 +44,6 @@ public class PayRollSystemService {
         }
     }
 
-    //============================================================
     public List<PayRollSystemDTO> getDefaultAvailablePayRolls() {
         List<PayRollSystem> payRollSystemList = payRollSystemRepository.findAll();
         if (payRollSystemList.isEmpty()) {

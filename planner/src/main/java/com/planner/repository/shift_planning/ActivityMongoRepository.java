@@ -5,6 +5,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.planner.activity.ShiftPlanningStaffingLevelDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
@@ -122,12 +124,20 @@ public class ActivityMongoRepository {
         AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "phases", PhaseDTO.class);
         return aggregationResults.getMappedResults();
     }
+
+    public PhaseDTO getOnePhaseById(BigInteger phaseId) {
+        return mongoTemplate.findOne(new Query(Criteria.where("_id").is(phaseId)),PhaseDTO.class,"phases");
+    }
    //For Unit(Unit)
     public List<PhaseDTO> getAllPhasesByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("organizationId").is(unitId)));
         AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "phases", PhaseDTO.class);
         return aggregationResults.getMappedResults();
+    }
+
+    public List<PhaseDTO> getPhaseByUnitIdAndPhaseEnum(List<Long> unitIds, PhaseDefaultName phaseEnum) {
+        return mongoTemplate.find(new Query(Criteria.where("phaseEnum").is(phaseEnum).and("organizationId").in(unitIds)), PhaseDTO.class,"phases" );
     }
 
     //For Unit(Unit

@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -157,7 +158,7 @@ public class StaffingLevelController {
     @GetMapping(value = "/")
     @ApiOperation("getting  staffing_level between date unit wise ")
     public ResponseEntity<Map<String, Object>> getStaffingLevels(@PathVariable Long unitId
-            , @RequestParam("startDate")@DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd")Date endDate) {
+            , @RequestParam("startDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate, @RequestParam("endDate")@DateTimeFormat(pattern="yyyy-MM-dd")LocalDate endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 staffingLevelService.getStaffingLevel(unitId,startDate,endDate));
     }

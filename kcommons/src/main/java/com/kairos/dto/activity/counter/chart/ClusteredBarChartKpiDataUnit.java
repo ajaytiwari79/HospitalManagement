@@ -29,7 +29,12 @@ public class ClusteredBarChartKpiDataUnit extends CommonKpiDataUnit {
         this.subValues = subValues;
     }
 
-    public ClusteredBarChartKpiDataUnit(String label, List<ClusteredBarChartKpiDataUnit> subValues) {
+    public ClusteredBarChartKpiDataUnit(String label ,Number refId , List<ClusteredBarChartKpiDataUnit> subValues) {
+        super(label,refId);
+        this.subValues = subValues;
+    }
+
+    public ClusteredBarChartKpiDataUnit(String label , List<ClusteredBarChartKpiDataUnit> subValues) {
         super(label);
         this.subValues = subValues;
     }

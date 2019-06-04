@@ -20,6 +20,6 @@ public enum ShiftStatus {
 
     }
     public static List<ShiftStatus> getAllStatusExceptRequestAndPending() {
-        return Stream.of(ShiftStatus.values()).filter(current->(!(current.equals(REQUEST)|| current.equals(MOVED) || current.equals(REJECT)))).collect(Collectors.toList());
+        return Stream.of(ShiftStatus.values()).filter(current->(!(current.equals(REQUEST)|| current.equals(UNPUBLISH) || current.equals(MOVED) || current.equals(REJECT)))).collect(Collectors.toList());
     }
 }

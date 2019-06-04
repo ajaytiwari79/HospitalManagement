@@ -21,7 +21,6 @@ public class UnitConstraintController {
     @Inject
     private UnitConstraintService unitConstraintService;
 
-    //=============================================================
     @PostMapping
     @ApiOperation("Create UnitConstraint")
     public ResponseEntity<Map<String, Object>> createUnitConstraint(@RequestBody UnitConstraintDTO unitConstraintDTO) {

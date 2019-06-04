@@ -10,14 +10,13 @@ import com.planner.domain.constraint.common.Constraint;
 import java.math.BigInteger;
 
 public class CountryConstraint extends Constraint {
-   //~
     private Long countryId;
     private Long organizationServiceId;
     private Long organizationSubServiceId;
 
-    //======================================================
-    //~ Constructors
-    public CountryConstraint(){}
+    public CountryConstraint(){
+        //Not in Use
+    }
 
     public CountryConstraint(ConstraintLevel constraintLevel, int penalty,String name) {
         this.name = name;
@@ -31,7 +30,6 @@ public class CountryConstraint extends Constraint {
         this.organizationServiceId = organizationServiceId;
         this.organizationSubServiceId = organizationSubServiceId;
     }
-    //=======================================================
 
     public Long getCountryId() {
         return countryId;

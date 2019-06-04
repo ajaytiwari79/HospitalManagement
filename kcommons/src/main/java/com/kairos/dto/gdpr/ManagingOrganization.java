@@ -19,23 +19,23 @@ public class ManagingOrganization {
 
 
     @NotNull(message = "error.message.id.notnull")
-    private Long id;
+    private Long managingOrgId;
 
     @NotBlank(message = "error.message.managingDepartment.notNull")
-    private String name;
+    private String managingOrgName;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ManagingOrganization that = (ManagingOrganization) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(name, that.name);
+        return Objects.equals(managingOrgId, that.managingOrgId) &&
+                Objects.equals(managingOrgName, that.managingOrgName);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, name);
+        return Objects.hash(managingOrgId, managingOrgName);
     }
 }

@@ -13,6 +13,7 @@ public enum CounterType {
     SHIFT_AND_ACTIVITY_DURATION("Duration Of Shift And Activity"),
     CONTRACTUAL_AND_PLANNED_HOURS("Contractual And Planned Hours Of Staff"),
     TIMEBANK("TimeBank For Units"),
+    FIBONACCI("Fibonacci"),
     //VRP COUNTER
     TOTAL_KM_DRIVEN_PER_DAY("Total KM Driven Per Day"),
     TASK_UNPLANNED("Total Tasks Unplanned"),
@@ -26,8 +27,7 @@ public enum CounterType {
     FLEXI_TIME_TASK_PERCENT("Flex Time Task time"),
     TOTAL_KM_DRIVEN_PER_STAFF("Total Distance Driven Per Staff"),
     TASK_EFFICIENCY("Task Efficiency"),
-    WORKING_HOUR_PER_SHIFT("Working Time"),
-    FIBONACCI("Fibonacci")
+    WORKING_HOUR_PER_SHIFT("Working Time")
     //COMPLETED
 
     ;

@@ -162,6 +162,8 @@ public class PlannerService extends MongoBaseService {
                 weekFrequency = 4;
                 break;
             }
+            default:
+                break;
         }
         return weekFrequency;
     }

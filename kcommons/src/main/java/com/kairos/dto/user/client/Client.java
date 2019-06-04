@@ -122,6 +122,7 @@ public class Client {
 
     // Constructors
     public Client() {
+        //Not in use
     }
 
     public Long getId() {

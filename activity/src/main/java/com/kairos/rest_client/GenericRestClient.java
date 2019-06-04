@@ -41,8 +41,6 @@ public class GenericRestClient {
     @Qualifier("restTemplateWithoutAuth")
     private RestTemplate schedulerRestTemplate;
 
-//=================================Usable Code==========================================
-
     /**
      * @param t
      * @param id

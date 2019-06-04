@@ -6,7 +6,7 @@ db.applicableKPI.update({}, {$set: {
     "frequencyType" : "DAYS",
     "value" : 2,
     "interval" : "LAST"
-}}, {multi:true})
+}}, {multi:true});
 
 
 
@@ -15,7 +15,7 @@ db.counter.update(
     { },
     { $pull: { filterTypes: { $in: [ "TIME_INTERVAL" ] }} },
     { multi: true }
-)
+);
 
 
 db.applicableKPI.update(
@@ -44,3 +44,19 @@ db.payOutTransaction.updateMany( {}, { $rename: { 'unitPositionId': 'employmentI
 db.shiftState.updateMany( {}, { $rename: { 'unitPositionId': 'employmentId'} } )
 
 db.dailyTimeBankEntries.createIndex({ employmentId:1,date:1,deleted:1}, { unique: true });
+
+
+
+## Query to update timeType in balanceSettingActivityTab
+
+db.activities.find({}).forEach( function (activity) {
+var timeTypeId = activity.balanceSettingsActivityTab.timeTypeId
+if(timeTypeId){
+print("_id "+timeTypeId);
+var timeType = db.time_Type.findOne({"_id":timeTypeId});
+activity.balanceSettingsActivityTab.timeType = timeType.secondLevelType;
+db.activities.save(activity);
+print("printing the results"+timeType.secondLevelType);
+}
+
+});

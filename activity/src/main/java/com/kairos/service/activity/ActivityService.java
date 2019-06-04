@@ -98,7 +98,7 @@ import static com.kairos.service.activity.ActivityUtil.*;
  * Created by pawanmandhan on 17/8/17.
  */
 @Service
-public class ActivityService extends MongoBaseService {
+public class ActivityService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
@@ -155,7 +155,7 @@ public class ActivityService extends MongoBaseService {
         }
         activity = buildActivity(activityDTO);
         initializeActivityTabs(activity, countryId, activityDTO);
-        save(activity);
+        activityMongoRepository.save(activity);
         // Fetch tags detail
         List<TagDTO> tags = tagMongoRepository.getTagsById(activityDTO.getTags());
         ActivityTagDTO activityTagDTO = new ActivityTagDTO();
@@ -174,7 +174,7 @@ public class ActivityService extends MongoBaseService {
             generalActivityTab.setCategoryId(activityCategory.getId());
         } else {
             ActivityCategory category = new ActivityCategory("NONE", "", countryId, null);
-            save(category);
+            activityCategoryRepository.save(category);
             generalActivityTab.setCategoryId(category.getId());
         }
         activity.setGeneralActivityTab(generalActivityTab);
@@ -253,7 +253,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE);
         }
         activity.setDeleted(true);
-        save(activity);
+        activityMongoRepository.save(activity);
         return true;
     }
 
@@ -298,7 +298,7 @@ public class ActivityService extends MongoBaseService {
         }
         updateBalanceSettingTab(generalDTO, activity);
         updateNotesTabOfActivity(generalDTO, activity);
-        save(activity);
+        activityMongoRepository.save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
         generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
@@ -370,7 +370,7 @@ public class ActivityService extends MongoBaseService {
         ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(countryId, activity.getBalanceSettingsActivityTab().getTimeTypeId());
         if (category == null) {
             category = new ActivityCategory(timeType.getLabel(), "", countryId, timeType.getId());
-            save(category);
+            activityCategoryRepository.save(category);
         }
         activity.getGeneralActivityTab().setCategoryId(category.getId());
     }
@@ -388,7 +388,7 @@ public class ActivityService extends MongoBaseService {
             if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(FULL_WEEK)) {
                 timeCalculationActivityTab.setDayTypes(activity.getRulesActivityTab().getDayTypes());
             }
-            save(activity);
+            activityMongoRepository.save(activity);
         }
         return timeCalculationActivityDTO;
     }
@@ -419,7 +419,7 @@ public class ActivityService extends MongoBaseService {
         Set<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toSet());
         activity.setCompositeActivities(compositeActivities);
         updateCompositeActivity(activityList, activity, compositeActivities);
-        save(activity);
+        activityMongoRepository.save(activity);
         return compositeShiftActivityDTOs;
     }
 
@@ -435,7 +435,7 @@ public class ActivityService extends MongoBaseService {
             }
         }
         if (isCollectionNotEmpty(activityList)) {
-            save(activityList);
+            activityMongoRepository.saveEntities(activityList);
         }
     }
 
@@ -451,7 +451,7 @@ public class ActivityService extends MongoBaseService {
         organizationActivityService.verifyChildActivity(activityMatched, activity);
         activity.setChildActivityIds(childActivitiesIds);
         updateCompositeActivities(childActivitiesIds,activity);
-        save(activity);
+        activityMongoRepository.save(activity);
         return childActivitiesIds;
     }
 
@@ -502,7 +502,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, individualPointsDTO.getActivityId());
         }
         activity.setIndividualPointsActivityTab(individualPointsActivityTab);
-        save(activity);
+        activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(individualPointsActivityTab);
     }
 
@@ -530,7 +530,7 @@ public class ActivityService extends MongoBaseService {
         if (!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
             activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
         }
-        save(activity);
+        activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(rulesActivityTab);
     }
 
@@ -553,7 +553,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, phaseSettingsActivityTab.getActivityId());
         }
         activity.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
-        save(activity);
+        activityMongoRepository.save(activity);
         return phaseSettingsActivityTab;
     }
 
@@ -591,7 +591,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, communicationActivityDTO.getActivityId());
         }
         activity.setCommunicationActivityTab(communicationActivityTab);
-        save(activity);
+        activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(communicationActivityTab);
     }
 
@@ -611,7 +611,7 @@ public class ActivityService extends MongoBaseService {
         }
         BonusActivityTab bonusActivityTab = new BonusActivityTab(bonusActivityDTO.getBonusHoursType(), bonusActivityDTO.isOverRuleCtaWta());
         activity.setBonusActivityTab(bonusActivityTab);
-        save(activity);
+        activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(bonusActivityTab);
     }
 
@@ -630,7 +630,7 @@ public class ActivityService extends MongoBaseService {
         }
         SkillActivityTab skillActivityTab = new SkillActivityTab(skillActivityDTO.getActivitySkills());
         activity.setSkillActivityTab(skillActivityTab);
-        save(activity);
+        activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(skillActivityTab);
     }
 
@@ -654,7 +654,7 @@ public class ActivityService extends MongoBaseService {
         activity.setOrganizationTypes(organizationMappingActivityDTO.getOrganizationTypes());
         activity.setLevels(organizationMappingActivityDTO.getLevel());
         activity.setEmploymentTypes(organizationMappingActivityDTO.getEmploymentTypes());
-        save(activity);
+        activityMongoRepository.save(activity);
         if (activity.getUnitId() != null) {
             plannerSyncService.publishActivity(activity.getUnitId(), activity, IntegrationOperation.UPDATE);
         }
@@ -703,7 +703,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
         }
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
-        save(activity);
+        activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(optaPlannerSettingActivityTab);
     }
 
@@ -724,7 +724,7 @@ public class ActivityService extends MongoBaseService {
         }
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(ctaAndWtaSettingsActivityTabDTO.isEligibleForCostCalculation());
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
-        save(activity);
+        activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(ctaAndWtaSettingsActivityTab);
     }
 
@@ -772,7 +772,7 @@ public class ActivityService extends MongoBaseService {
             }
         }
         List<ActivityWithCompositeDTO> activities = activityMongoRepository.findAllActivityByUnitIdWithCompositeActivities(unitId);
-        List<PhaseSettingsActivityTab> phaseSettingsActivityTab = activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId,accessGroupPermissionCounterDTO.getAccessGroupIds());
+        List<PhaseSettingsActivityTab> phaseSettingsActivityTab=activityMongoRepository.findActivityIdAndStatusByUnitAndAccessGroupIds(unitId,accessGroupPermissionCounterDTO.getAccessGroupIds());
         List<ShiftTemplateDTO> shiftTemplates = shiftTemplateService.getAllShiftTemplates(unitId);
         PlanningPeriodDTO planningPeriodDTO = planningPeriodService.getStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
         if (isNull(planningPeriodDTO)) {
@@ -796,7 +796,7 @@ public class ActivityService extends MongoBaseService {
         Files.write(path, bytes);
         activity.getGeneralActivityTab().setOriginalIconName(file.getOriginalFilename());
         activity.getGeneralActivityTab().setModifiedIconName(modifiedFileName);
-        save(activity);
+        activityMongoRepository.save(activity);
         return activity.getGeneralActivityTab();
     }
 
@@ -809,7 +809,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException(EXCEPTION_ALREADYINUSE, ACTIVITY);
         }
         activity.setDeleted(true);
-        save(activity);
+        activityMongoRepository.save(activity);
         return true;
     }
 
@@ -830,7 +830,7 @@ public class ActivityService extends MongoBaseService {
         ActivityCategory activityCategory = activityCategoryRepository.getCategoryByNameAndCountryAndDeleted("NONE", countryId, false);
         if (activityCategory == null) {
             activityCategory = new ActivityCategory("NONE", "", countryId, null);
-            save(activityCategory);
+            activityCategoryRepository.save(activityCategory);
         }
         Long orgType = organizationDTO.getOrganizationType().getId();
         List<Long> orgSubTypes = organizationDTO.getOrganizationSubTypes().stream().map(organizationTypeDTO -> organizationTypeDTO.getId()).collect(Collectors.toList());
@@ -846,7 +846,7 @@ public class ActivityService extends MongoBaseService {
                     glideTimeSettingsDTO, phases, activitiesByExternalIds, activityCategory, skills, presenceTimeTypeId, absenceTimeTypeId);
             activities.add(activity);
         }
-        save(activities);
+        activityMongoRepository.saveEntities(activities);
         return activities;
     }
 
@@ -872,7 +872,7 @@ public class ActivityService extends MongoBaseService {
             }
         }
         if (!organizationActivities.isEmpty()) {
-            save(organizationActivities);
+            activityMongoRepository.saveEntities(organizationActivities);
         }
     }
 
@@ -887,7 +887,7 @@ public class ActivityService extends MongoBaseService {
         Files.write(path, bytes);
         activity.getNotesActivityTab().setOriginalDocumentName(file.getOriginalFilename());
         activity.getNotesActivityTab().setModifiedDocumentName(modifiedFileName);
-        save(activity);
+        activityMongoRepository.save(activity);
         return activity.getNotesActivityTab();
     }
 
@@ -903,7 +903,7 @@ public class ActivityService extends MongoBaseService {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_ABSENT, activity.getName());
         }
         activity.setState(ActivityStateEnum.PUBLISHED);
-        save(activity);
+        activityMongoRepository.save(activity);
         return true;
     }
 
@@ -947,7 +947,7 @@ public class ActivityService extends MongoBaseService {
         }
         LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getGlideTimeForCheckIn(), locationActivityTabDTO.getGlideTimeForCheckOut());
         activity.setLocationActivityTab(locationActivityTab);
-        save(activity);
+        activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(locationActivityTab);
     }
 
@@ -987,7 +987,7 @@ public class ActivityService extends MongoBaseService {
                     }
                 }
                 if (currentSettings.getId() == null) {
-                    currentSettings.setId(mongoSequenceRepository.nextSequence(ActivityReminderSettings.class.getSimpleName()));
+                    currentSettings.setId(activityMongoRepository.nextSequence(ActivityReminderSettings.class.getSimpleName()));
                 }
                 counter++;
             }
@@ -1033,7 +1033,7 @@ public class ActivityService extends MongoBaseService {
             activity.getGeneralActivityTab().setOriginalIconName(null);
             activity.getGeneralActivityTab().setModifiedIconName(null);
         }
-        save(activity);
+        activityMongoRepository.save(activity);
         return true;
     }
 

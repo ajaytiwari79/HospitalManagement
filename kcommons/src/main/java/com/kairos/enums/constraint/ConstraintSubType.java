@@ -30,21 +30,4 @@ public enum ConstraintSubType {
     NO_OF_SEQUENCE_SHIFT,
     EMPLOYEES_WITH_INCREASE_RISK,
     WTA_FOR_CARE_DAYS
-
-
-
-
-    //===========================Variables==========================
-    /*private String constraintSubTypeValue;
-    private ConstraintType constraintType;
-
-    //=======================Constructor============================
-    ConstraintSubType( ConstraintType constraintType) {
-        this.constraintType = constraintType;
-    }
-
-    //===========================Getters============================
-    public String getConstraintSubType() {
-        return constraintSubTypeValue;
-    }*/
 }

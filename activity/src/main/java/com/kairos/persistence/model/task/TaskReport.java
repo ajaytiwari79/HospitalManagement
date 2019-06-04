@@ -171,5 +171,6 @@ public class TaskReport extends MongoBaseEntity {
 
 
     public TaskReport() {
+        //Not in use
     }
 }

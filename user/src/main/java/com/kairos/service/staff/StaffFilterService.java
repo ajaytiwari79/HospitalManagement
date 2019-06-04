@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -27,9 +28,11 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -85,6 +88,7 @@ public class StaffFilterService {
     private AccessGroupRepository accessGroupRepository;
     @Inject
     private AccessPageRepository accessPageRepository;
+    @Inject private ActivityIntegrationService activityIntegrationService;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
@@ -135,7 +139,6 @@ public class StaffFilterService {
             case EMPLOYMENT: {
                 return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
             }
-
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
@@ -288,6 +291,15 @@ public class StaffFilterService {
         List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId);
         staffs = staffs.stream().filter(distinctByKey(a -> a.get("id"))).collect(Collectors.toList());
         staffEmploymentTypeWrapper.setStaffList(staffs);
+        List<Long> staffIds = (List<Long>) staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
+        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffIds,unitId);
+        List<Map> staffList = new ArrayList<>();
+        for (Map staffUndModifiable : staffs) {
+            Map<String,Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffUndModifiable, HashedMap.class);
+            staff.put("nightWorker",staffIdAndNightWorkerDetailsMap.get(((Integer)((Map)staff).get("id")).longValue()));
+            staffList.add(staff);
+        }
+        staffEmploymentTypeWrapper.setStaffList(staffList);
         return staffEmploymentTypeWrapper;
 
     }
@@ -299,10 +311,10 @@ public class StaffFilterService {
         if (staffAtHub != null) {
             staffListByRole = staffList;
         } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndStaffId(unitId, userId);
+            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
             String STAFF_CURRENT_ROLE;
             if (accessGroupQueryResult != null) {
-                STAFF_CURRENT_ROLE = staffRetrievalService.setStaffAccessRole(accessGroupQueryResult);
+                STAFF_CURRENT_ROLE = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
                 if (AccessGroupRole.MANAGEMENT.name().equals(STAFF_CURRENT_ROLE)) {
                     staffListByRole = staffList;
                 } else if (AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {

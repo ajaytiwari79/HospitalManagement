@@ -16,7 +16,7 @@ import static javax.management.timer.Timer.ONE_MINUTE;
  * @date - 14/5/18
  */
 
-public class DateTimeInterval  {
+public class DateTimeInterval implements Comparable<DateTimeInterval>{
 
     private Long start;
     private Long end;
@@ -228,6 +228,12 @@ public class DateTimeInterval  {
         return ChronoUnit.DAYS.between(getStart(), getEnd());
     }
 
+    public boolean containsStartOrEnd(Date date) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -258,5 +264,8 @@ public class DateTimeInterval  {
                 '}';
     }
 
-
+    @Override
+    public int compareTo(DateTimeInterval dateTimeInterval) {
+        return this.start.compareTo(dateTimeInterval.start);
+    }
 }

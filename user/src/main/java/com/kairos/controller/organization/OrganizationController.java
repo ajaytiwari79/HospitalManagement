@@ -997,4 +997,10 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getCountryIdByUnitId(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getCountryIdByUnitId(unitId));
     }
+
+    @ApiOperation(value = "Get time slots of organization")
+    @GetMapping(UNIT_URL + "/get_time_slots")
+    public ResponseEntity<Map<String, Object>> getTimeSlotOfUnit(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlot(unitId));
+    }
 }

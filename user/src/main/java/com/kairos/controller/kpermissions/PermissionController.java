@@ -9,10 +9,7 @@ import io.swagger.annotations.Api;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -39,6 +36,13 @@ public class PermissionController {
     public ResponseEntity getFLPSchema()  {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema());
+
+    }
+
+    @RequestMapping(value = "/access_group_permissions",method = RequestMethod.GET)
+    public ResponseEntity getAccessGroupPermissions(@RequestParam Long accessGroupId )  {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(accessGroupId));
 
     }
 
