@@ -801,6 +801,9 @@ public class ShiftValidatorService {
             }
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
         boolean shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(byTandAPhase ? shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), WORKING_TYPE,false);
+        if (shiftExists) {
+            exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftDTO.getStartDate(), shiftDTO.getEndDate());
+        }
         if (!shiftExists) {
             shiftExists = shiftMongoRepository.existShiftsBetweenDurationByEmploymentIdAndTimeType(shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), shiftDTO.getStartDate(), shiftDTO.getEndDate(), TimeTypes.NON_WORKING_TYPE,true);
             if (shiftExists && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
@@ -808,9 +811,7 @@ public class ShiftValidatorService {
                 shiftOverlappedWithNonWorkingType = true;
             }
         }
-        if (shiftExists) {
-            exceptionService.invalidRequestException(MESSAGE_SHIFT_DATE_STARTANDEND, shiftDTO.getStartDate(), shiftDTO.getEndDate());
-        }
+
         return shiftOverlappedWithNonWorkingType;
     }
 
