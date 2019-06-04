@@ -798,7 +798,7 @@ public class PlanningPeriodService extends MongoBaseService {
                         shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
                 }
             }
-            planningPeriodMongoRepository.saveEntities(shifts);
+            shiftMongoRepository.saveEntities(shifts);
             timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
             LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
 
