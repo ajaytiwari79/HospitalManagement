@@ -1,6 +1,6 @@
-package com.kairos.controller.audit_logging;
+package com.kairos.commons.controller.audit_logging;
 
-import com.kairos.service.audit_logging.AuditLoggingService;
+import com.kairos.commons.service.audit_logging.AuditLoggingService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
