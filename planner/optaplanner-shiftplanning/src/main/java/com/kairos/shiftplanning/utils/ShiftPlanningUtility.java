@@ -222,78 +222,8 @@ public class ShiftPlanningUtility {
     }
 
 
-    public static Interval getBreakIntervalFromShift(Interval shiftInterval, Integer startMinutes, Integer duration) {
-        return new Interval(shiftInterval.getStart().plusMinutes(startMinutes), shiftInterval.getStart().plusMinutes(startMinutes + duration));
-    }
-
-    public static void registerFactHandle(DefaultFactHandle factHandle, Shift shift) {
-
-    }
-
-    public static int getWorkingHoursOfWeek(List<Shift> shifts, Shift shift) {
-        int workingHoursOfWeek = shift.getMinutes();
-        for (Shift shift1 : shifts) {
-            if (shift1.getStart() != null && shift.getEmployee().getId().equals(shift1.getEmployee().getId()) && shift1.getStart().toLocalDate().isAfter(shift.getStart().toLocalDate())) {
-                workingHoursOfWeek = workingHoursOfWeek + shift.getMinutes();
-            }
-        }
-        return workingHoursOfWeek;
-    }
-
-    public static int getTimeBetweenTwoShiftsInSameDay(List<Shift> shifts, Shift shift) {
-        int timeBetweenTwoShiftsInSameDay = 0;
-        getSortedShiftsInAsc(shifts);
-        for (Shift shift1 : shifts) {
-            if (shift1.getEnd() != null && shift.getStart() != null && shift.getStart().toLocalDate().equals(shift1.getEnd().toLocalDate()) && shift.getEmployee().getId().equals(shift1.getEmployee().getId())) {
-                timeBetweenTwoShiftsInSameDay = new Period(shift.getStart(), shift1.getEnd()).getMinutes();
-                if (timeBetweenTwoShiftsInSameDay < 0) timeBetweenTwoShiftsInSameDay = 0;
-                break;
-            }
-        }
-        return timeBetweenTwoShiftsInSameDay;
-    }
-
-    public static int getConsecutiveDays(List<Shift> shifts, Shift shift) {
-        //List<Shift> sortedShifts = getSortedShiftsInAsc(shifts);
-        Set<LocalDate> dateList = shifts.stream().filter(e -> e.getStart() != null && shift.getStart() != null && e.getEmployee().getId().equals(shift.getEmployee().getId())).map(s -> s.getStart().toLocalDate()).collect(Collectors.toSet());
-        int count = 0;
-        if (shift.getStart() != null) {
-            LocalDate currentShift = shift.getStart().toLocalDate();
-            int i = 1;
-            while (true) {
-                LocalDate prevDay = currentShift.minusDays(i);
-                if (dateList.contains(prevDay)) {
-                    count++;
-                    i++;
-                } else {
-                    break;
-                }
-            }
-        }
-        return count;
-    }
-
-    public static int getSameDayShiftCount(List<Shift> shifts, Shift shift) {
-        int count = 0;
-        List<LocalDate> dateList = shifts.stream().filter(e -> e.getStart() != null && shift.getStart() != null && e.getEmployee().getId().equals(shift.getEmployee().getId())).map(e -> e.getStart().toLocalDate()).collect(Collectors.toList());
-        if (shift.getStart() != null) {
-            LocalDate currentShift = shift.getStart().toLocalDate();
-            for (LocalDate localDate : dateList) {
-                if (currentShift.equals(localDate)) {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
     public static List<Shift> getSortedShiftsInAsc(List<Shift> shifts) {
         Collections.sort(shifts, getShiftStartTimeComparator());
-        return shifts;
-    }
-
-    public static List<Shift> getSortedShiftsInAscByEmp(List<Shift> shifts, Shift shift) {
-        Collections.sort(shifts, getShiftStartTimeComparatorByEmp(shift));
         return shifts;
     }
 

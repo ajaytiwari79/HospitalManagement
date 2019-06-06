@@ -46,6 +46,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 
 public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepository {
+    public static final String ACTIVITY_RULES_ACTIVITY_TAB = "activity.rulesActivityTab";
+    public static final String ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB = "activity.individualPointsActivityTab";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -403,7 +405,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("state").as("activity.state").and("unitId").as("activity.unitId")
                         .and("parentId").as("activity.parentId").and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
                         .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
-                        .and("rulesActivityTab").as("activity.rulesActivityTab").and("individualPointsActivityTab").as("activity.individualPointsActivityTab")
+                        .and("rulesActivityTab").as(ACTIVITY_RULES_ACTIVITY_TAB).and("individualPointsActivityTab").as(ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB)
                         .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab")
                         .and("compositeActivities").as("activity.compositeActivities")
                         .and("notesActivityTab").as("activity.notesActivityTab")
@@ -435,7 +437,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("state").as("activity.state").and("unitId").as("activity.unitId")
                         .and("parentId").as("activity.parentId").and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
                         .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
-                        .and("rulesActivityTab").as("activity.rulesActivityTab").and("individualPointsActivityTab").as("activity.individualPointsActivityTab")
+                        .and("rulesActivityTab").as(ACTIVITY_RULES_ACTIVITY_TAB).and("individualPointsActivityTab").as(ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB)
                         .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab").
                         and("compositeActivities").as("activity.compositeActivities")
                         .and("notesActivityTab").as("activity.notesActivityTab")
@@ -544,7 +546,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("state").as("activity.state").and("unitId").as("activity.unitId")
                         .and("isParentActivity").as("activity.isParentActivity").and("generalActivityTab").as("activity.generalActivityTab")
                         .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
-                        .and("rulesActivityTab").as("activity.rulesActivityTab").and("individualPointsActivityTab").as("activity.individualPointsActivityTab")
+                        .and("rulesActivityTab").as(ACTIVITY_RULES_ACTIVITY_TAB).and("individualPointsActivityTab").as(ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB)
                         .and("timeCalculationActivityTab").as("activity.timeCalculationActivityTab")
                         .and("compositeActivities").as("activity.compositeActivities")
                         .and("notesActivityTab").as("activity.notesActivityTab")
@@ -590,7 +592,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         "timeType"),
                 project().and("id").as("activity._id").and("name").as("activity.name")
                         .and("balanceSettingsActivityTab").as("activity.balanceSettingsActivityTab")
-                        .and("rulesActivityTab").as("activity.rulesActivityTab")
+                        .and("rulesActivityTab").as(ACTIVITY_RULES_ACTIVITY_TAB)
                         .and("compositeActivities").as("activity.compositeActivities")
                         .and("timeType").arrayElementAt(0).as("timeTypeInfo")
         );
