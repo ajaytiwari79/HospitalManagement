@@ -277,7 +277,7 @@ public class ShiftService extends MongoBaseService {
         Activity activity = activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity();
         //if ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
         TimeTypeEnum timeType = activity.getBalanceSettingsActivityTab().getTimeType();
-        if(timeType.equals(TimeTypeEnum.ABSENCE)){
+        if(TimeTypeEnum.ABSENCE.equals(timeType)){
             shift.setShiftType(ShiftType.ABSENCE);
         } else {
             shift.setShiftType(ShiftType.PRESENCE);
