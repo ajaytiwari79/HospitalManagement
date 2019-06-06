@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 	private final MongoOperations mongoOperations;
@@ -139,12 +140,9 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 		S oldEntity = null;
 		if(isNotNull(entity.getId())){
 			oldEntity = (S)this.findOne((ID)entity.getId());
+			oldEntity = isNull(oldEntity) ? createEntity(entity) : oldEntity;
 		}else {
-			try {
-				oldEntity = (S)entity.getClass().newInstance();
-			} catch (InstantiationException | IllegalAccessException e) {
-				e.printStackTrace();
-			}
+			oldEntity = createEntity(entity);
 		}
 		if(entity.getId() == null){
 			if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
@@ -167,6 +165,16 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 		mongoOperations.save(entity);
 		AuditLogging.checkDifferences(oldEntity,entity);
 		return entity;
+	}
+
+	private <S> S createEntity(S entity){
+		S oldEntity = null;
+		try {
+			oldEntity = (S)entity.getClass().newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return oldEntity;
 	}
 
 	public <S extends T> Iterable<S> saveEntities(Iterable<S> entities) {

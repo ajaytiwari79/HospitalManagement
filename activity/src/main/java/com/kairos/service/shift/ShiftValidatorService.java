@@ -814,6 +814,7 @@ public class ShiftValidatorService {
         Date startDate = asDate(shiftDTO.getShiftDate());
         Date endDate = null;
         if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
+
             endDate = asDate(shiftDTO.getShiftDate().plusDays(6).atTime(LocalTime.MAX));
             shiftInterval = new DateTimeInterval(startDate, endDate);
         } else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
