@@ -8,6 +8,7 @@ import com.kairos.dto.gdpr.filter.FilterResponseDTO;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
+import com.kairos.persistence.model.common.OrganizationBaseEntityQueryResult;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
@@ -50,10 +51,13 @@ public class OrganizationHierarchyService {
     @Inject
     private OrganizationService organizationService;
 
-    public OrganizationBaseEntity generateHierarchy() {
-        //List<QueryResult> resultQueryResults = new ArrayList<>();
+    public List<QueryResult> generateHierarchy() {
+        List<QueryResult> resultQueryResults = new ArrayList<>();
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
-       return organizationGraphRepository.generateHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList()));
+
+       OrganizationBaseEntity hierarchy= organizationGraphRepository.generateHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList())).get(0);
+       setUnitPermission(hierarchy, accessPageService.isHubMember(UserContext.getUserDetails().getId()),resultQueryResults);
+
 //        return unitGraphRepository.getOrganizationHierarchyByFilters(, organizationHierarchyFilterDTO);
 //        List<Map<String, Object>> units = unitGraphRepository.getOrganizationHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList()));
 //        ObjectMapper objectMapper = new ObjectMapper();
@@ -103,7 +107,7 @@ public class OrganizationHierarchyService {
 //            }
 //            setUnitPermission(resultQueryResults, false);
 //        }
-//        return resultQueryResults;
+       return resultQueryResults;
     }
 
 
@@ -213,28 +217,46 @@ public class OrganizationHierarchyService {
         return filterAndFavouriteFilter;
     }
 
-    private void setUnitPermission(List<QueryResult> organizationHierarchy,boolean countryAdmin) {
-        if (!countryAdmin) {
-            Set<Long> organizationIds=new HashSet<>();
-            List<StaffAccessGroupQueryResult> staffAccessGroupQueryResults = accessPageService.getAccessPermission(UserContext.getUserDetails().getId(), getAllUnitIds(organizationHierarchy,organizationIds));
-            Map<Long, Boolean> unitPermissionMap = staffAccessGroupQueryResults.stream().collect(Collectors.toMap(StaffAccessGroupQueryResult::getUnitId, StaffAccessGroupQueryResult::isHasPermission));
-            setPermissionInChildren(organizationHierarchy, unitPermissionMap, false);
-        } else {
-            setPermissionInChildren(organizationHierarchy, null, true);
-        }
+    private void setUnitPermission(OrganizationBaseEntity organizationHierarchy,boolean countryAdmin,List<QueryResult> resultQueryResults) {
+        Set<Long> organizationIds=new HashSet<>();
+        List<StaffAccessGroupQueryResult> staffAccessGroupQueryResults = accessPageService.getAccessPermission(UserContext.getUserDetails().getId(), getAllUnitIds(organizationHierarchy,organizationIds));
+        Map<Long, Boolean> unitPermissionMap = staffAccessGroupQueryResults.stream().collect(Collectors.toMap(StaffAccessGroupQueryResult::getUnitId, StaffAccessGroupQueryResult::isHasPermission));
+        resultQueryResults.add(new QueryResult(organizationHierarchy.getName(),organizationHierarchy.getId(),new ArrayList<>(),new ArrayList<>(),true,
+                (organizationHierarchy instanceof Organization)?((Organization) organizationHierarchy).isKairosHub():false,organizationHierarchy.isEnable(),false,organizationHierarchy.getTimeZone().toString(),false,18743l,countryAdmin?true:unitPermissionMap.get(organizationHierarchy.getId())));
+        setPermissionInChildren(organizationHierarchy, unitPermissionMap, countryAdmin,resultQueryResults);
     }
 
-    private void setPermissionInChildren(List<QueryResult> organizationHierarchy, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin) {
-        organizationHierarchy.forEach(unit -> {
-            unit.setHasPermission(countryAdmin ? true : unitPermissionMap.get(unit.getId()));
-            setPermissionInChildren(unit.getChildren(), unitPermissionMap, countryAdmin);
-        });
+    private void setPermissionInChildren(OrganizationBaseEntity organizationHierarchy, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin,List<QueryResult> resultQueryResults) {
+        if(organizationHierarchy instanceof Organization){
+            ((Organization) organizationHierarchy).getChildren().forEach(organization->{
+                List<QueryResult> children=ObjectMapperUtils.copyPropertiesOfListByMapper(((Organization) organizationHierarchy).getChildren(),QueryResult.class);
+                List<QueryResult> units=ObjectMapperUtils.copyPropertiesOfListByMapper(((Organization) organizationHierarchy).getUnits(),QueryResult.class);
+                resultQueryResults.get(0).getChildren().add(new QueryResult(organization.getName(),organization.getId(),children,units,true,
+                        organization.isKairosHub(),organization.isEnable(),organization.isParentOrganization(),organization.getTimeZone().toString(),organization.isUnion(),18743l,countryAdmin?true:unitPermissionMap.get(organization.getId())));
+                organization.getUnits().forEach(unit->{
+                    resultQueryResults.get(0).getUnits().add(new QueryResult(unit.getName(),unit.getId(),null,null,true,
+                            false,unit.isEnable(),false,organization.getTimeZone().toString(),false,18743l,countryAdmin?true:unitPermissionMap.get(organization.getId())));
+                });
+                setPermissionInChildren(organization,unitPermissionMap,countryAdmin,resultQueryResults);
+            });
+
+        }
+
+
     }
-    private Set<Long> getAllUnitIds(List<QueryResult> organizationHierarchy,Set<Long> organizationIds){
-        organizationHierarchy.forEach(unit->{
-            organizationIds.add(unit.getId());
-            getAllUnitIds(unit.getChildren(),organizationIds);
-        });
+    private Set<Long> getAllUnitIds(OrganizationBaseEntity organizationHierarchy,Set<Long> organizationIds){
+        if(organizationHierarchy instanceof Organization){
+            ((Organization) organizationHierarchy).getChildren().forEach(organization->{
+                organizationIds.add(organization.getId());
+                getAllUnitIds(organization,organizationIds);
+            });
+
+            ((Organization) organizationHierarchy).getUnits().forEach(unit->{
+                organizationIds.add(unit.getId());
+                getAllUnitIds(unit,organizationIds);
+            });
+        }
+        organizationIds.add(organizationHierarchy.getId());
         return organizationIds;
     }
 

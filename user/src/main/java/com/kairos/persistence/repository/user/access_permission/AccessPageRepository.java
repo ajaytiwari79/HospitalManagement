@@ -154,7 +154,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     Boolean updateAccessStatusOfCountryByCategory(Long tabId, String organizationCategory, Boolean accessStatus);
 
     @Query("MATCH (position:Position)-[:" + BELONGS_TO + "]->(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} WITH position\n" +
-            "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Unit) WITH collect(org.isKairosHub) as hubList\n" +
+            "MATCH (position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization) WITH collect(org.isKairosHub) as hubList\n" +
             "RETURN true in hubList")
     Boolean isHubMember(Long userId);
 
@@ -308,7 +308,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             )
     List<AccessGroup> fetchAccessGroupsOfStaffPermission(Long userId);
 
-    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)<-[:"+ HAS_POSITIONS +"]-(parentOrg:Unit)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup),(unit:Unit) " +
+    @Query("MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)<-[:"+ HAS_POSITIONS +"]-(parentOrg:Organization)-[:"+ORGANIZATION_HAS_ACCESS_GROUPS+"]->(accessGroup:AccessGroup),(unit) " +
             "WHERE  id(user) = {0} AND id(unit) IN {1} \n" +
             "OPTIONAL MATCH(position)-[:"+HAS_UNIT_PERMISSIONS+"]->(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit)\n" +
             "OPTIONAL MATCH(up)-[r:"+HAS_ACCESS_GROUP+"]->(accessGroup) " +

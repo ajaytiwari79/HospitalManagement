@@ -1069,15 +1069,10 @@ public class TimeBankCalculationService {
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate)) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
                 totalTimeBankMinutes = dailyTimeBankEntry.getDeltaTimeBankMinutes();
-                //accumulatedTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
                 publishedBalancesMinutes = dailyTimeBankEntry.getPublishedBalances().values().stream().mapToLong(value -> value).sum();
             } else {
                 totalTimeBankMinutes = -getContractualMinutesByDate(dateTimeIntervals, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines());
             }
-            /*if(employmentStartDate.equals(employmentWithCtaDetailsDTO.getAccumulatedTimebankDate())) {
-                accumulatedTimebank = employmentWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
-            }
-            timeBankByDateDTO.setAccumulatedTimebankMinutes(accumulatedTimebank);*/
             timeBankByDateDTO.setTimeBankChangeMinutes(totalTimeBankMinutes);
             if(employmentStartDate.isAfter(startDate) || startDate.equals(employmentStartDate)) {
                 localDateTimeBankByDateDTOMap.put(employmentStartDate, new TimeBankByDateDTO(totalTimeBankMinutes,accumulatedTimebank,actualTimebankMinutes+ totalTimeBankMinutes,publishedBalancesMinutes));

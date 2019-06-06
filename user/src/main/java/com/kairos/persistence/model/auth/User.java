@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.annotation.EnableStringTrimer;
+import com.kairos.commons.annotation.IgnoreStringTrimer;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
@@ -33,9 +35,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@EnableStringTrimer
 public class User extends UserBaseEntity {
     protected String cprNumber;
 
+    @IgnoreStringTrimer
     private String userName;
     protected String nickName;
     protected String firstName;
