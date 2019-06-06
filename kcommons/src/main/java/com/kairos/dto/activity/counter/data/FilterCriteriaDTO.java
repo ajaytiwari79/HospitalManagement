@@ -38,8 +38,9 @@ public class FilterCriteriaDTO {
         this.interval=interval;
     }
 
-    public FilterCriteriaDTO(Long unitId, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {
+    public FilterCriteriaDTO(Long unitId,Long staffId,List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {
         this.countryId=countryId;
+        this.staffId=staffId;
         this.isCountryAdmin=isCountryAdmin;
         this.unitId = unitId;
         this.kpiIds = kpiIds;

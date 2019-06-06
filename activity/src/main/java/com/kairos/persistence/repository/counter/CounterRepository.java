@@ -521,7 +521,7 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
                 project("kpi._id")
         );
         AggregationResults<Map> results = mongoTemplate.aggregate(aggregation, AccessGroupKPIEntry.class, Map.class);
-        return results.getMappedResults().stream().map(s -> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
+        return results.getMappedResults().stream().filter(s-> isNotNull(s.get("_id"))).map(s -> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
     }
 
     public List<AccessGroupMappingDTO> getAccessGroupAndKpiId(Set<Long> accessGroupIds, ConfLevel level, Long refId) {
