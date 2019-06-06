@@ -7,3 +7,19 @@ db.counter.updateMany({ type: { $in: ["RESTING_HOURS_PER_PRESENCE_DAY", "PLANNED
 
 
 {ServerURL}/kairos/activity/api/v1/register_job_for_night_worker
+
+
+## query to update the shift
+
+db.shifts.find({}).forEach(function(e){
+    if(e.activities){
+ e.activities.forEach(function (activity) {
+
+ if(activity && activity.activityId == "858"){
+ var id = "3694";
+ activity.activityId = id
+ }
+ db.shifts.save(e);
+});
+}
+ });

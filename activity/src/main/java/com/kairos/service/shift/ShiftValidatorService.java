@@ -823,6 +823,8 @@ public class ShiftValidatorService {
             shiftInterval = new DateTimeInterval(shiftDTO.getStartDate(), shiftDTO.getEndDate());
             startDate = getStartOfDay(shiftDTO.getStartDate());
             endDate = getEndOfDay(shiftDTO.getEndDate());
+
+
         }
         //As discussed with Arvind we remove the Check of cross organization overlapping functionality
         List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ?
@@ -925,7 +927,7 @@ public class ShiftValidatorService {
 
     private List<ShiftWithActivityDTO> updateFullDayAndFullWeekActivityShift(List<ShiftWithActivityDTO> shifts) {
         for (ShiftWithActivityDTO shift : shifts) {
-            if (isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())) {
+            if (isNotNull(shift) && isNotNull(shift.getActivities().get(0).getActivity()) && isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())) {
                 Date startDate = getStartOfDay(shift.getStartDate());
                 Date endDate = getMidNightOfDay(shift.getEndDate());
                 // Date endDate = getMidNightOfDay(shift.getStartDate());
@@ -939,8 +941,7 @@ public class ShiftValidatorService {
     }
 
     private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
-        // return (FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
-        return true;
+         return (FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
     }
 
 
