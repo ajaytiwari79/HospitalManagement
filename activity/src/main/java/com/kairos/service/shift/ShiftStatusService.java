@@ -12,6 +12,7 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
@@ -218,8 +219,10 @@ public class ShiftStatusService {
     }
 
     public int activityChangeStatus(Activity activityOld, Activity activityCurrent) {
-        boolean isShiftOldForPresence = !(activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
-        boolean isShiftCurrentForAbsence = (activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
+        boolean isShiftOldForPresence = TimeTypeEnum.PRESENCE.equals(activityOld.getBalanceSettingsActivityTab().getTimeType());
+        boolean isShiftCurrentForAbsence = TimeTypeEnum.ABSENCE.equals(activityCurrent.getBalanceSettingsActivityTab().getTimeType());
+      //  boolean isShiftOldForPresence = !(activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
+      //  boolean isShiftCurrentForAbsence = (activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
         int activityChangeStatus = 0;
         if (isShiftOldForPresence && isShiftCurrentForAbsence) {
             activityChangeStatus = 1;
