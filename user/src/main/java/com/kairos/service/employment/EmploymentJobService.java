@@ -23,6 +23,7 @@ import com.kairos.persistence.repository.user.employment.EmploymentGraphReposito
 import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -64,6 +65,7 @@ public class EmploymentJobService {
     private UserGraphRepository userGraphRepository;
     @Inject
     private EmploymentService employmentService;
+    @Inject private ActivityIntegrationService activityIntegrationService;
 
     public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId, Long unitId) {
 
@@ -174,6 +176,12 @@ public class EmploymentJobService {
         User user = userGraphRepository.getUserByStaffId(staffId);
         PositionQueryResult positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), position.getReasonCode().getId(), position.getAccessGroupIdOnPositionEnd());
         return employmentService.getEmploymentsOfStaff(unitId,staffId,true);
+
+    }
+
+    public void updateNightWorkers(){
+        List<Map> employments = employmentGraphRepository.findStaffsWithEmploymentIds();
+        activityIntegrationService.updateNightWorkers(employments);
 
     }
 

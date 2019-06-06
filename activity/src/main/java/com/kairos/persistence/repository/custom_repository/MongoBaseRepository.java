@@ -14,11 +14,12 @@ public interface MongoBaseRepository<T, ID extends Serializable> extends MongoRe
 	 T findOne(ID id);
 	 void safeDeleteById(ID id);
 	<T extends MongoBaseEntity> void safeDelete(T object);
-	<T extends MongoBaseEntity> List<T> saveEntities(List<T> entities);
+	<S extends T> Iterable<S> saveEntities(Iterable<S> entities);
 	//<T extends MongoBaseEntity> T save(T entity);
 	boolean existsByName(String name);
 	boolean existsByNameAndNotEqualToId(String name,BigInteger id);
 	<T extends MongoBaseEntity> T findLastOrFirstByField(Sort sort);
+	BigInteger nextSequence(String sequenceName);
 
 
 }

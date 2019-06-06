@@ -24,6 +24,7 @@ public class EmploymentWtaDTO {
     private Long staffId;
 
     public EmploymentWtaDTO() {
+        //Not in Use
     }
 
     public Long getId() {

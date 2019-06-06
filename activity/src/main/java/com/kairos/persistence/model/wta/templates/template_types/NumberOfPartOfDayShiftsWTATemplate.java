@@ -170,6 +170,8 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
                 interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
                 interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusYears(intervalValue).truncatedTo(ChronoUnit.DAYS));
                 break;
+            default:
+                break;
         }
         return interval;
     }

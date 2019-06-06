@@ -94,6 +94,7 @@ public class Person {
     private String CostPlace;
 
     public Person() {
+        //Not in use
     }
 
     public String getAge() {

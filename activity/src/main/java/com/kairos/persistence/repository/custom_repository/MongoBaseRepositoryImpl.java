@@ -1,8 +1,12 @@
 package com.kairos.persistence.repository.custom_repository;
+import com.kairos.commons.audit_logging.AuditLogging;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.common.MongoSequence;
+import com.kairos.persistence.model.counter.Counter;
+import com.kairos.persistence.model.counter.FibonacciKPI;
+import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.utils.user_context.UserContext;
 import com.mongodb.BasicDBObject;
@@ -26,6 +30,9 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 	private final MongoOperations mongoOperations;
 	private final MongoEntityInformation<T, ID> entityInformation;
@@ -35,7 +42,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	/**
 	 *  Sequence collection name prefix
 	 * */
-	private static final String SEQUENCE_POST_FIX = "Sequence";
+	public static final String SEQUENCE_POST_FIX = "Sequence";
 
 	public MongoBaseRepositoryImpl(MongoEntityInformation<T, ID>  entityInformation,
 							  MongoOperations mongoOperations) {
@@ -130,10 +137,20 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 		/**
 		 *  Set Id if entity don't have Id
 		 * */
+		S oldEntity = null;
+		if(isNotNull(entity.getId())){
+			oldEntity = (S)this.findOne((ID)entity.getId());
+			oldEntity = isNull(oldEntity) ? createEntity(entity) : oldEntity;
+		}else {
+			oldEntity = createEntity(entity);
+		}
 		if(entity.getId() == null){
 			if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
 				//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
 				className = entity.getClass().getSuperclass().getSimpleName();
+			}
+			if(entity.getClass().equals(FibonacciKPI.class)){
+				className = KPI.class.getSimpleName();
 			}
 			entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 			entity.setCreatedAt(DateUtils.getDate());
@@ -146,51 +163,69 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 		 * */
 		entity.setUpdatedAt(DateUtils.getDate());
 		mongoOperations.save(entity);
+		AuditLogging.checkDifferences(oldEntity,entity);
 		return entity;
+	}
+
+	private <S> S createEntity(S entity){
+		S oldEntity = null;
+		try {
+			oldEntity = (S)entity.getClass().newInstance();
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return oldEntity;
+	}
+
+	public <S extends T> Iterable<S> saveEntities(Iterable<S> entities) {
+		for (S entity : entities) {
+			save(entity);
+		}
+		return entities;
 	}
 
 
 
-	public <T extends MongoBaseEntity> List<T> saveEntities(@Valid List<T> entities){
+	/*public <T extends MongoBaseEntity> List<T> saveEntities(@Valid List<T> entities){
 		Assert.notNull(entities, "Entity must not be null!");
 		Assert.notEmpty(entities, "Entity must not be Empty!");
 
 		String collectionName = mongoOperations.getCollectionName(entities.get(0).getClass());
 
-		/**
+		*//**
 		 *  Creating BulkWriteOperation object
-		 * */
+		 * *//*
 
 		BulkWriteOperation bulkWriteOperation= ((MongoTemplate) mongoOperations).getMongoDbFactory().getLegacyDb().getCollection(collectionName).initializeUnorderedBulkOperation();
 
-		/**
+		*//**
 		 *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
-		 * */
+		 * *//*
 		MongoConverter converter = mongoOperations.getConverter();
 
 		BasicDBObject dbObject;
 
-		/**
+		*//**
 		 *  Handling bulk write exceptions
-		 * */
+		 * *//*
 		try{
 
 			for (T entity: entities) {
-				/**
+				*//**
 				 *  Get class name for sequence class
-				 * */
+				 * *//*
 				String className = entity.getClass().getSimpleName();
-				/**
+				*//**
 				 *  Set updatedAt time as current time
-				 * */
+				 * *//*
 				entity.setUpdatedAt(DateUtils.getDate());
 
 
 				if(entity.getId() == null){
 					entity.setCreatedAt(DateUtils.getDate());
-					/**
+					*//**
 					 *  Set Id if entity don't have Id
-					 * */
+					 * *//*
 					if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
 						//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
 						className = entity.getClass().getSuperclass().getSimpleName();
@@ -199,44 +234,44 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 					entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 					dbObject = new BasicDBObject();
 
-                    /*
+                    *//*
                     *  Converting entity object to BasicDBObject
-                    * */
+                    * *//*
 					converter.write(entity, dbObject);
 
-                    /*
+                    *//*
                     *  Adding entity (BasicDBObject)
-                    * */
+                    * *//*
 					bulkWriteOperation.insert(dbObject);
 				}else {
 					entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
 					dbObject = new BasicDBObject();
 
-                    /*
+                    *//*
                     *  Converting entity object to BasicDBObject
-                    * */
+                    * *//*
 					converter.write(entity, dbObject);
 
-					/**
+					*//**
 					 *  Creating BasicDbObject for find query
-					 * */
+					 * *//*
 					BasicDBObject query = new BasicDBObject();
 
-					/**
+					*//**
 					 *  Adding query (find by ID)
-					 * */
+					 * *//*
 					query.put("_id", dbObject.get("_id"));
 
-					/**
+					*//**
 					 *  Replacing whole Object
-					 * */
+					 * *//*
 					bulkWriteOperation.find(query).replaceOne(dbObject);
 				}
 			}
 
-			/**
+			*//**
 			 * Executing the Operation
-			 * */
+			 * *//*
 			bulkWriteOperation.execute();
 			return entities;
 
@@ -244,6 +279,6 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 			logger.error("BulkWriteOperation Exception ::  ", ex);
 			return null;
 		}
-	}
+	}*/
 
 }

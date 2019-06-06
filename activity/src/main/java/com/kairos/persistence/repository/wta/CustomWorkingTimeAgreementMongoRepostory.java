@@ -6,9 +6,7 @@ import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -60,5 +58,7 @@ public interface CustomWorkingTimeAgreementMongoRepostory {
     List<WTAQueryResultDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate);
 
     List<WTAQueryResultDTO> getWTAByEmploymentIdAndDatesWithRuleTemplateType(Long employmentId, Date startDate, Date endDate, WTATemplateType templateType);
+
+    List<WTAQueryResultDTO> getAllWTAByEmploymentIds(Collection<Long> employmentIds);
 
 }

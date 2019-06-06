@@ -140,6 +140,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_CHILD_ACTIVITIES_NOT_SUPPORT_STAFFING_LEVEL = "message.child_activities.not_support.staffing_level";
     public static final String MESSAGE_UNIT_ID = "message.unit.id";
     public static final String MESSAGE_EMPLOYMENT_ABSENT = "message.employment.absent";
+    //public static final String MESSAGE_EMPLOYMENT_ABSENT = "message.employment.absent";
     public static final String MESSAGE_UNIT_AGESETTING_NOTFOUND = "message.unit.ageSetting.notFound";
     public static final String MESSAGE_UNIT_SETTING_NOTFOUND = "message.unit.setting.notFound";
     public static final String OPENSHIFT_ALREADY_EXIST = "openShift.already.exist";
@@ -156,6 +157,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PERIOD_REQUEST_PHASE_NOTFOUND = "message.period.request.phase.notfound";
     public static final String MESSAGE_PERIODSETTING_NOTFOUND = "message.periodsetting.notFound";
     public static final String MESSAGE_ORGANIZATION_PHASE_NOTFOUND = "message.organization.phase.notfound";
+    public static final String MESSAGE_EMPLOYMENTTYPE_NOTFOUND="message.employmenttype.notfound";
     public static final String MESSAGE_ORGANIZATION_ID = "message.organization.id";
     public static final String MESSAGE_ORGANIZATION_TYPE = "message.organization.type";
     public static final String MESSAGE_ORGANIZATION_TYPE_UPDATE = "message.organization.type.update";
@@ -215,6 +217,8 @@ public class ActivityMessagesConstants {
     public static final String SHIFT_CAN_NOT_MOVE = "shift.can.not.move";
     public static final String ERROR_FUNCTION_CAN_NOT_APPLY_WITH_ABSENCE_ACTIVITY = "error.function.can.not.apply.with.absence.activity";
     public static final String MESSAGE_STAFF_UNIT = "message.staff.unit";
+    public static final String MESSAGE_SHIFT_DRAFT_NOTFOUND = "message.draft.shift.notfound";
+    public static final String MESSAGE_PLANNING_PERIOD_NOTFOUND = "message.shift.planning.period.notfound";
     public static final String MESSAGE_STAFF_BELONGS = "message.staff.belongs";
     public static final String MESSAGE_STAFFLEVEL_CURRENTDATE = "message.stafflevel.currentdate";
     public static final String MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE = "message.stafflevel.currentdate.update";
@@ -315,7 +319,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_DAYTYPE = "message.activity.dayType";
     public static final String MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL  = "message.ruleTemplate.counter.value.notNull ";
     public static final String MESSAGE_RULETEMPLATE_COUNTER_EXHAUSTED  = "message.ruleTemplate.counter.exhausted ";
-    public static final String MESSAGE_RULETEMPLATE_HOURS_NOTZERO  = "message.ruleTemplate.hours.notzero ";
+    public static final String MESSAGE_RULETEMPLATE_HOURS_NOTZERO  = "message.ruleTemplate.hours.notzero";
     public static final String MESSAGE_COUNTER_KPI_NOTFOUND = "message.counter.kpi.notfound";
     public static final String MESSAGE_ACCESSGROUP_KPI_NOTFOUND = "message.accessgroup.kpi.notfound";
     public static final String MESSAGE_ORGTYPE_KPI_NOTFOUND = "message.orgtype.kpi.notfound";

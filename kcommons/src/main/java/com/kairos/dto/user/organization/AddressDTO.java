@@ -41,6 +41,7 @@ public class AddressDTO {
     private boolean primary;
 
     public AddressDTO() {
+        //Not in use
     }
 
     public AddressDTO(Long id, String street, String houseNumber, String city, String municipalityName, Long zipCodeId, String regionName, String province, Long municipalityId) {

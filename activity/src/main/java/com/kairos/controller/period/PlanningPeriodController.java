@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
@@ -70,8 +71,8 @@ public class PlanningPeriodController {
     @ApiOperation(value = "update period's phase to next phase")
     @PutMapping(value = "/period/{periodId}/next_phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToNext(unitId, periodId));
+    public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId , @RequestBody(required=false) List<Long> employmentTypeIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToNext(unitId, periodId ,employmentTypeIds));
     }
 //test api
 //    @ApiOperation(value = "update period's flipping Date")

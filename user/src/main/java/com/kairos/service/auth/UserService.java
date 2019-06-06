@@ -536,7 +536,7 @@ public class UserService {
 
     public boolean resetPassword(String token, PasswordUpdateDTO passwordUpdateDTO) {
         if (!passwordUpdateDTO.isValid()) {
-            exceptionService.actionNotPermittedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_USER_PASSCODE_NOTMATCH);
         }
         User user = findByForgotPasswordToken(token);
         if (!Optional.ofNullable(user).isPresent()) {

@@ -267,6 +267,7 @@ public class UserMessagesConstants {
     public static final String ERROR_TEAMSERVICE_STAFFORTEAM_NOTEMPTY = "error.teamservice.stafforteam.notEmpty";
     public static final String MESSAGE_TEAMSERVICE_SOMETHINGWRONG = "message.teamservice.somethingwrong";
     public static final String MESSAGE_TEAMSERVICE_TEAM_NOTFOUND = "message.teamservice.team.notFound";
+    public static final String STAFF_CAN_NOT_BE_TEAM_LEADER="message.staff.team.leader";
     public static final String MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT = "message.teamservice.team.alreadyexists.in.unit";
     public static final String MESSAGE_TIMESLOT_ID_NOTFOUND = "message.timeslot.id.notfound";
     public static final String TIMESLOT_NOT_FOUND  = "timeslot.not.found ";
@@ -339,7 +340,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_STAFF_UNIT_PERMISSION_NOTFOUND = "message.staff.unit.permission.notfound";
     public static final String MESSAGE_STAFF_NOTFOUND = "message.staff.notfound";
     public static final String MESSAGE_STAFF_USER_ID_NOTFOUND = "message.staff.user.id.notfound";
-    public static final String MESSAGE_STAFF_USER_PASSWORD_NOTMATCH = "message.staff.user.password.notmatch";
+    public static final String MESSAGE_STAFF_USER_PASSCODE_NOTMATCH = "message.staff.user.password.notmatch";
     public static final String MESSAGE_EMPLOY_NOTCONVERT_FICTIVE = "message.employ.notconvert.Fictive";
     public static final String MESSAGE_STAFF_IDANDUNITID_NOTFOUND = "message.staff.idandunitid.notfound";
     public static final String ERROR_STAFF_ACCESSGROUP_NOTFOUND = "error.staff.accessgroup.notfound";
@@ -436,4 +437,5 @@ public class UserMessagesConstants {
     public static final String MESSAGE_MODEL_PERMISSION_ID_NULL = "message.model.permission.id.null";
     public static final String MESSAGE_ACCESSGROUP_ID_NULL = "message.accessGroup.id.null";
     public static final String MESSAGE_MODEL_PERMISSIONS_NULL = "message.model.permissions.null";
+    public static final String MESSAGE_DRAFT_COPY_CREATED = "message.draft.copy.exists";
 }

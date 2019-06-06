@@ -274,7 +274,9 @@ public class PayOutCalculationService {
                 return StringUtils.capitalize(AppConstants.YEAR) + " " + interval.getStart().getYear();
             case QUATERLY:
                 return StringUtils.capitalize(AppConstants.QUARTER) + " " + (interval.getStart().dayOfMonth().withMinimumValue().equals(interval.getStart()) ? interval.getStart().getMonthOfYear() / 3 : (interval.getStart().getMonthOfYear() / 3) + 1);
-            //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
+            default:
+                break;
+                //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
         }
         return "";
     }

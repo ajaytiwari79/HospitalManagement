@@ -146,5 +146,15 @@ public class ActivityIntegrationService {
       return genericRestClient.publishRequest(null,countryId,false,IntegrationOperation.GET,"/timeType/{timeTypeId}/verify/",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {},timeTypeId);
     }
 
+    public void updateNightWorkers(List<Map> employments) {
+        genericRestClient.publishRequest(employments, null, false, IntegrationOperation.UPDATE, "/update_night_workers", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        });
+    }
+
+    public Map<Long,Boolean> getNightWorkerDetails(List<Long> staffIds,Long unitId) {
+        return genericRestClient.publishRequest(staffIds, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
+        });
+    }
+
 }
 

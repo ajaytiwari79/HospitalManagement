@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.ERROR_DAYTYPE_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static org.apache.commons.lang.StringUtils.isEmpty;
@@ -64,7 +64,7 @@ public class RuletemplateUtils {
 
     public static DateTimeInterval getIntervalByNumberOfWeeks(Date startDate, int numberOfWeeks, LocalDate validationStartDate, LocalDate planningPeriodEndDate) {
         if (numberOfWeeks == 0 || validationStartDate == null) {
-            throwException("message.ruleTemplate.weeks.notNull");
+            throwException(MESSAGE_RULETEMPLATE_WEEKS_NOTNULL);
         }
         DateTimeInterval dateTimeInterval = null;
         while (validationStartDate.isBefore(planningPeriodEndDate) || validationStartDate.equals(planningPeriodEndDate)) {
@@ -141,7 +141,7 @@ public class RuletemplateUtils {
     public static DateTimeInterval getIntervalByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue) {
         DateTimeInterval interval = null;
         if (intervalValue == 0 || StringUtils.isEmpty(intervalUnit)) {
-            throwException("message.ruleTemplate.interval.notNull");
+            throwException(MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL);
         }
         switch (intervalUnit) {
             case DAYS:
@@ -155,6 +155,8 @@ public class RuletemplateUtils {
                 break;
             case YEARS:
                 interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            default:
                 break;
         }
         return interval;
@@ -249,12 +251,12 @@ public class RuletemplateUtils {
         if (infoWrapper.getUser().getStaff() && phaseTemplateValue.isStaffCanIgnore()) {
             totalCounterValue = ruleTemplate.getStaffCanIgnoreCounter();
             if (totalCounterValue == null) {
-                throwException("message.ruleTemplate.counter.value.notNull", ruleTemplate.getName());
+                throwException(MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL, ruleTemplate.getName());
             }
         } else if (infoWrapper.getUser().getManagement() && phaseTemplateValue.isManagementCanIgnore()) {
             totalCounterValue = ruleTemplate.getManagementCanIgnoreCounter();
             if (totalCounterValue == null) {
-                throwException("message.ruleTemplate.counter.value.notNull", ruleTemplate.getName());
+                throwException(MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL, ruleTemplate.getName());
             }
         }
         Integer availableCounter = totalCounterValue != null ? infoWrapper.getCounterMap().getOrDefault(ruleTemplate.getId(), totalCounterValue) : null;
@@ -272,7 +274,7 @@ public class RuletemplateUtils {
             if (localDates.get(l - 1).equals(localDates.get(l).minusDays(1))) {
                 count++;
             } else {
-                count = 0;
+                count = 1;
             }
             if (count > max) {
                 max = count;
@@ -306,10 +308,9 @@ public class RuletemplateUtils {
         return minMaxSetting.equals(MinMaxSetting.MINIMUM) ? limitValue <= calculatedValue : limitValue >= calculatedValue;
     }
 
-    public static List<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
-        List<LocalDate> dates = new ArrayList<>(shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet()));
-        dates.sort(Comparator.naturalOrder());
-        return dates;
+    public static Set<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
+        Set<LocalDate> dates = shifts.stream().map(s -> DateUtils.asLocalDate(s.getStartDate())).collect(Collectors.toSet());
+        return new TreeSet<>(dates);
     }
 
 
@@ -329,13 +330,13 @@ public class RuletemplateUtils {
 
     public static void validateRuleTemplate(int numberOfWeeks, LocalDate validationStartDate) {
         if (numberOfWeeks == 0 || validationStartDate == null) {
-            throwException("message.ruleTemplate.weeks.notNull");
+            throwException(MESSAGE_RULETEMPLATE_WEEKS_NOTNULL);
         }
     }
 
     public static void validateRuleTemplate(long intervalLength, String intervalUnit) {
         if (intervalLength == 0 || isEmpty(intervalUnit)) {
-            throwException("message.ruleTemplate.interval.notNull");
+            throwException(MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL);
         }
     }
 
@@ -404,6 +405,8 @@ public class RuletemplateUtils {
                 case DURATION_BETWEEN_SHIFTS:
                     interval = interval.addInterval(new DateTimeInterval(minusMonths(shift.getStartDate(),1),plusMonths(shift.getStartDate(),1)));
                 break;
+                default:
+                    break;
             }
         }
         return interval;
@@ -502,9 +505,9 @@ public class RuletemplateUtils {
         return limitAndCounter;
     }
 
-    public static String getHoursByMinutes(Integer hour){
+    public static String getHoursByMinutes(Integer hour,String name){
         if(isNull(hour) || hour==0){
-            throwException("message.ruleTemplate.hours.notzero");
+            throwException(MESSAGE_RULETEMPLATE_HOURS_NOTZERO,name);
         }
         int hours = hour / 60; //since both are ints, you get an int
         int minutes = hour % 60;

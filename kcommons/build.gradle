@@ -23,7 +23,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.7'
     // https://mvnrepository.com/artifact/org.springframework/spring-beans
     compile group: 'org.springframework', name: 'spring-context', version: '5.0.9.RELEASE'
-    compile group: 'de.danielbechler', name: 'java-object-diff', version: '0.10.1'
+    compile group: 'de.danielbechler', name: 'java-object-diff', version: '0.95'
     compile group: 'org.springframework', name: 'spring-beans', version: '5.0.9.RELEASE'
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
@@ -32,6 +32,9 @@ dependencies {
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.6'
     compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.0.8.RELEASE'
     compile "org.projectlombok:lombok:1.18.6"
+    compile group: 'org.springframework.data', name: 'spring-data-mongodb', version: '2.0.0.RELEASE'
+    compile group: 'org.springframework.data', name: 'spring-data-commons', version: '2.1.6.RELEASE'
+    compile group: 'org.neo4j', name: 'neo4j-ogm-core', version: '3.1.10'
     // compile group: 'org.springframework.data', name: 'spring-data-neo4j', version: '5.0.2.RELEASE'//As there are DTOs with neo4j annotations which needs to be fixed TODO
     //compile 'org.neo4j:neo4j:3.3.4'
 

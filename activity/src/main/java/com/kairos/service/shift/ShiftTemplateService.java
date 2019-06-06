@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
 import com.kairos.persistence.model.shift.ShiftTemplate;
@@ -50,7 +51,11 @@ public class ShiftTemplateService extends MongoBaseService {
         Set<BigInteger> activityIds = shiftTemplateDTO.getShiftList().stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());
         List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
         activities.forEach(activity -> {
-            if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
+            /*if (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) {
+                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ABSENCETYPE, activity.getId());
+            }*/
+
+            if (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())){
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_ABSENCETYPE, activity.getId());
             }
         });
@@ -190,7 +195,7 @@ public class ShiftTemplateService extends MongoBaseService {
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);
-            ShiftWithViolatedInfoDTO result = shiftService.createShift(unitId, newShiftDTO, "Organization");
+            ShiftWithViolatedInfoDTO result = shiftService.createShift(unitId, newShiftDTO, "Organization",null);
             shiftWithViolatedInfoDTO.setShifts(result.getShifts());
 
             if (CollectionUtils.isNotEmpty(result.getViolatedRules().getActivities())) {

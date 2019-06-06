@@ -1,4 +1,7 @@
 package com.kairos.persistence.model.client;
+import com.kairos.annotations.KPermissionRelatedModel;
+import com.kairos.annotations.KPermissionRelationshipFrom;
+import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.neo4j.ogm.annotation.EndNode;
@@ -11,16 +14,18 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SERVE
 /**
  * Created by oodles on 3/10/16.
  */
-
+@KPermissionRelatedModel
 @RelationshipEntity(type = SERVED_BY_STAFF)
 public class ClientStaffRelation extends UserBaseEntity {
     public enum StaffType{
         PREFERRED,FORBIDDEN,NONE
     }
 
+    @KPermissionRelationshipTo
     @StartNode
     private Client client;
 
+    @KPermissionRelationshipFrom
     @EndNode
     private Staff staff;
 

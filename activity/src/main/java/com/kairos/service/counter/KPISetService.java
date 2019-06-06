@@ -4,9 +4,18 @@ package com.kairos.service.counter;
  *
  */
 
+
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
+import com.kairos.dto.activity.kpi.KPIResponseDTO;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
+import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPISet;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -14,18 +23,24 @@ import com.kairos.persistence.repository.counter.KPISetRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
+import com.kairos.utils.user_context.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalTime;
+import java.util.*;
+
+
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -42,6 +57,13 @@ public class KPISetService {
     private CounterRepository counterRepository;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
+    @Inject
+    private PhaseService phaseService;
+    @Inject
+    private CounterDataService counterDataService;
+
+
+    private static final Logger logger = LoggerFactory.getLogger(KPISetService.class);
 
     public KPISetDTO createKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
@@ -77,6 +99,7 @@ public class KPISetService {
         return true;
     }
 
+
     public List<KPISetDTO> getAllKPISetByReferenceId(Long referenceId) {
         return kpiSetRepository.findAllByReferenceIdAndDeletedFalse(referenceId);
     }
@@ -108,24 +131,53 @@ public class KPISetService {
 
     public void copyKPISets(Long unitId, List<Long> orgSubTypeIds, Long countryId) {
         List<KPISet> kpiSets = kpiSetRepository.findAllByCountryIdAndDeletedFalse(orgSubTypeIds, countryId);
-        List<Phase> unitPhaseList=phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        Map<BigInteger,Phase> unitPhaseMap=unitPhaseList.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId,Function.identity()));
-        List<KPISet> unitKPISets=new ArrayList<>();
+        List<Phase> unitPhaseList = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        Map<BigInteger, Phase> unitPhaseMap = unitPhaseList.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId, Function.identity()));
+        List<KPISet> unitKPISets = new ArrayList<>();
         kpiSets.forEach(kpiSet -> {
             if(isCollectionNotEmpty(kpiSet.getKpiIds())) {
-                KPISet unitKPISet = new KPISet();
-                unitKPISet.setId(null);
-                unitKPISet.setName(kpiSet.getName());
-                unitKPISet.setPhaseId(unitPhaseMap.get(kpiSet.getPhaseId()).getId());
-                unitKPISet.setReferenceId(unitId);
-                unitKPISet.setConfLevel(ConfLevel.UNIT);
-                unitKPISet.setTimeType(kpiSet.getTimeType());
-                unitKPISet.setKpiIds(kpiSet.getKpiIds());
-                unitKPISets.add(unitKPISet);
+                unitKPISets.add(new KPISet(null,kpiSet.getName(),unitPhaseMap.get(kpiSet.getPhaseId()).getId(),unitId,ConfLevel.UNIT,kpiSet.getTimeType(),kpiSet.getKpiIds()));
             }
         });
-        if(isCollectionNotEmpty(unitKPISets)){
+        if (isCollectionNotEmpty(unitKPISets)) {
             kpiSetRepository.saveEntities(unitKPISets);
         }
+    }
+
+
+    public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, Date startDate) {
+        List<KPISetResponseDTO> kpiSetResponseDTOList = new ArrayList<>();
+        List<ApplicableKPI>  applicableKPIS =new ArrayList<>();
+        AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, startDate,
+                asDate(asLocalDate(startDate).atTime(LocalTime.MAX)));
+        if (isNotNull(phase)) {
+            List<KPISetDTO> kpiSetDTOList = kpiSetRepository.findByPhaseIdAndReferenceIdAndConfLevel(phase.getId(),
+                    unitId,ConfLevel.UNIT);
+            if (isCollectionNotEmpty(kpiSetDTOList)) {
+                for (KPISetDTO kpiSet : kpiSetDTOList) {
+                    KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+                    List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
+                    if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
+                        kpiSetResponseDTO.setKpiSetName(kpiSet.getName());
+                        kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
+                        applicableKPIS = counterRepository.getKPIByKPIIds(kpiSet.getKpiIds().stream().collect(Collectors.toList()), accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF);
+                        for (ApplicableKPI applicableKPI : applicableKPIS) {
+                            applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
+                            FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),Arrays.asList(applicableKPI.getActiveKpiId()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPI.getApplicableFilter().getCriteriaList(),applicableKPI.getInterval(),applicableKPI.getFrequencyType(),applicableKPI.getValue(),unitId);
+                            KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                            if(isNotNull(kpiResponseDTO)) {
+                                kpiResponseDTOList.add(kpiResponseDTO);
+                            }
+                        }
+                    }
+                    if(isCollectionNotEmpty(kpiResponseDTOList)) {
+                        kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
+                    }
+                    kpiSetResponseDTOList.add(kpiSetResponseDTO);
+                }
+            }
+        }
+        return kpiSetResponseDTOList;
     }
 }

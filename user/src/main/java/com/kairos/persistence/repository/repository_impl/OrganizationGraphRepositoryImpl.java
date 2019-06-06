@@ -62,7 +62,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "OPTIONAL MATCH(employmentLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +
                     "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,employmentLine,exp,employmentType\n" +
                     "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions}) as employmentLines,exp,employmentType\n" +
-                    "with staff,user,employmentType, \n" +
+                    "with staff,user,CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList, \n" +
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         } else {
             matchRelationshipQueryForStaff += "OPTIONAL MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)  " +
@@ -71,12 +71,11 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "OPTIONAL MATCH(employmentLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) " +
                     "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,employmentLine,exp,employmentType\n" +
                     "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions}) as employmentLines,exp,employmentType\n" +
-                    "with staff,user,employmentType, \n" +
+                    "with staff,user,CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList, \n" +
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         }
 
-        matchRelationshipQueryForStaff += " WITH employments,staff, user, " +
-                "CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList ";
+        //matchRelationshipQueryForStaff += " WITH employments,staff, user, " ;
 
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
             matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +

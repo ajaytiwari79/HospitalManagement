@@ -12,6 +12,7 @@ public class CommonConstants {
 
     public static final String MAIL_REQUEST_ENDPOINT = "mail/send";
     public static final String DEFAULT_EMAIL_TEMPLATE = "kairos-email-template.html";
+    public static final String SHIFT_NOTIFICATION_EMAIL_TEMPLATE = "kairos-shift-notification-email-template.html";
     public static final String EMAIL_GREETING = "Hi, ";
 
     public static final String FORWARD_SLASH = "/";
@@ -25,6 +26,8 @@ public class CommonConstants {
     public static final String LOCAL_PROFILE = "local";
 
     public static final String PACKAGE_NAME  = "com.kairos";
+
+    public static final String API_V1 = "/api/v1";
 
 
 

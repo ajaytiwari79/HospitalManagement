@@ -13,7 +13,7 @@ public class FutureDateValidator implements ConstraintValidator<FutureDate,Date>
 
     @Override
     public void initialize(FutureDate constraintAnnotation) {
-
+        //Not in use
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.kairos.dto.activity.counter.data;
 
 import com.kairos.enums.DurationType;
-import com.kairos.enums.kpi.Interval;
 import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.enums.wta.IntervalUnit;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -21,13 +21,13 @@ public class FilterCriteriaDTO {
     // frequency value
     private int value;
     private KPIRepresentation kpiRepresentation;
-    private Interval interval;
+    private IntervalUnit interval;
     private LocalDate startDate;
     private LocalDate endDate;
     public FilterCriteriaDTO() {
     }
 
-    public FilterCriteriaDTO(List<FilterCriteria> filters, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin,KPIRepresentation kpiRepresentation,Interval interval,int value,DurationType frequencyType) {
+    public FilterCriteriaDTO(List<FilterCriteria> filters, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin,KPIRepresentation kpiRepresentation,IntervalUnit interval,int value,DurationType frequencyType) {
         this.filters = filters;
         this.kpiIds = kpiIds;
         this.countryId=countryId;
@@ -38,8 +38,9 @@ public class FilterCriteriaDTO {
         this.interval=interval;
     }
 
-    public FilterCriteriaDTO(Long unitId, List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {
+    public FilterCriteriaDTO(Long unitId,Long staffId,List<BigInteger> kpiIds,Long countryId,boolean isCountryAdmin) {
         this.countryId=countryId;
+        this.staffId=staffId;
         this.isCountryAdmin=isCountryAdmin;
         this.unitId = unitId;
         this.kpiIds = kpiIds;
@@ -127,11 +128,11 @@ public class FilterCriteriaDTO {
         this.value = value;
     }
 
-    public Interval getInterval() {
+    public IntervalUnit getInterval() {
         return interval;
     }
 
-    public void setInterval(Interval interval) {
+    public void setInterval(IntervalUnit interval) {
         this.interval = interval;
     }
 
@@ -158,5 +159,18 @@ public class FilterCriteriaDTO {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+
+    public FilterCriteriaDTO(boolean isCountryAdmin, Long staffId, List<BigInteger> kpiIds, KPIRepresentation kpiRepresentation, List<FilterCriteria> filters, IntervalUnit interval, DurationType frequencyType, int value,Long unitId) {
+        this.isCountryAdmin = isCountryAdmin;
+        this.staffId = staffId;
+        this.kpiIds = kpiIds;
+        this.kpiRepresentation = kpiRepresentation;
+        this.filters = filters;
+        this.interval = interval;
+        this.frequencyType = frequencyType;
+        this.value = value;
+        this.unitId = unitId;
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
@@ -42,6 +43,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableCircuitBreaker
 @EnableMongoRepositories(basePackages ={"com.kairos.persistence.repository"},
 repositoryBaseClass = MongoBaseRepositoryImpl.class)
+@EnableAuditLogging
 public class KairosActivityApplication implements WebMvcConfigurer {
 	@Autowired
 	private Environment environment;
@@ -148,29 +150,4 @@ public class KairosActivityApplication implements WebMvcConfigurer {
                 .build();
         return template;
     }
-
-
-/*
-	private static final String ALLOWED_HEADERS = "X-Requested-With,access-control-allow-origin,Authorization,authorization,Origin,Content-Type,Version";
-	private static final String ALLOWED_METHODS = "GET,PUT,POST,DELETE,OPTIONS";
-	private static final String ALLOWED_ORIGIN = "*";
-	private static final String MAX_AGE = "3600";
-	@Bean
-	public WebFilter corsFilter() {
-		return (ServerWebExchange ctx, WebFilterChain chain) -> {
-			ServerHttpRequest request = ctx.getRequest();
-			ServerHttpResponse response = ctx.getResponse();
-			HttpHeaders headers = response.getHeaders();
-			headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
-			headers.set("Access-Control-Allow-Credentials", "true");
-			headers.set("Access-Control-Allow-Methods", ALLOWED_METHODS);
-			headers.set("Access-Control-Max-Age", MAX_AGE);
-			headers.set("Access-Control-Allow-Headers",ALLOWED_HEADERS);
-			if (request.getMethod() == HttpMethod.OPTIONS) {
-				response.setStatusCode(HttpStatus.OK);
-				return  Mono.empty();
-			}
-			return chain.filter(ctx);
-		};
-	}*/
 }
