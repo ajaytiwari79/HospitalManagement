@@ -453,7 +453,7 @@ public class ShiftValidatorService {
                                 || (rankOfExisting.getRank() > rankOfReplaced.getRank() && BALANCED.equals(staffingLevelForReplacedActivity))
                                 || (BALANCED.equals(staffingLevelForReplacedActivity) && BALANCED.equals(staffingLevelForExistingActivity))
                                 || (staffingLevelForReplacedActivity == null && rankOfExisting.getRank() > rankOfReplaced.getRank())
-                                ) {
+                        ) {
                             logger.info("shift can be replaced");
                         } else {
                             exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelForReplacedActivity);
@@ -943,6 +943,7 @@ public class ShiftValidatorService {
 
     private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
          return (FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
+        //return true;
     }
 
 

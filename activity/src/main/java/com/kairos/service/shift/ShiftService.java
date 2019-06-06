@@ -168,7 +168,9 @@ public class ShiftService extends MongoBaseService {
         shiftValidatorService.checkAbsenceTypeShift(shiftDTO);
         staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
-        if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
+      //  if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
+        TimeTypeEnum timeType = activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType();
+        if(TimeTypeEnum.ABSENCE.equals(timeType)){
             shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate()));
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
             shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType,shiftActionType);
@@ -273,7 +275,9 @@ public class ShiftService extends MongoBaseService {
         shiftStatusService.updateStatusOfShiftIfPhaseValid(phase, shift,activityWrapperMap ,staffAdditionalInfoDTO.getUserAccessRoleDTO());
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
         Activity activity = activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity();
-        if ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
+        //if ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
+        TimeTypeEnum timeType = activity.getBalanceSettingsActivityTab().getTimeType();
+        if(timeType.equals(TimeTypeEnum.ABSENCE)){
             shift.setShiftType(ShiftType.ABSENCE);
         } else {
             shift.setShiftType(ShiftType.PRESENCE);
@@ -437,9 +441,13 @@ public class ShiftService extends MongoBaseService {
          **/
         Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
 
-        return (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
+         /* return (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
                 || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK))
                 ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
+                : phaseService.getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);*/
+
+
+        return (activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.ABSENCE)) ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
                 : phaseService.getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
     }
 

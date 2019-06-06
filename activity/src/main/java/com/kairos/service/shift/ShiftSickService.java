@@ -7,6 +7,7 @@ import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -219,7 +220,8 @@ public class ShiftSickService extends MongoBaseService {
             ShiftActivity shiftActivity = calculateShiftStartAndEndTime(shiftNeedsToAddForDays, activity.getTimeCalculationActivityTab(), staffEmploymentDetails, duration);
             shiftActivity.setActivityId(activity.getId());
             shiftActivity.setActivityName(activity.getName());
-            ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
+             ShiftType shiftType = TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
+            // ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
             Shift currentShift = new Shift(shiftActivity.getStartDate(), shiftActivity.getEndDate(), staffId, Arrays.asList(shiftActivity), staffEmploymentDetails.getId(), unitId, planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
             currentShift.setShiftType(shiftType);
             shifts.add(currentShift);
