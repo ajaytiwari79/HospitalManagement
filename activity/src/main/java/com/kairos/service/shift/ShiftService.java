@@ -447,7 +447,7 @@ public class ShiftService extends MongoBaseService {
                 : phaseService.getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);*/
 
 
-        return (activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.ABSENCE)) ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
+        return (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())) ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
                 : phaseService.getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
     }
 

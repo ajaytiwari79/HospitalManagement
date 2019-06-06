@@ -225,7 +225,7 @@ public class ShiftCopyService extends MongoBaseService {
                     , planningPeriod.getCurrentPhaseId(), planningPeriod.getId(), staffEmployment.getUserId(), sourceShift.getShiftType());
             Activity activity = activityMap.get(sourceShift.getActivities().get(0).getActivityId()).getActivity();
 
-              ShiftType shiftType = activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.ABSENCE) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
+              ShiftType shiftType = TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
 
             //  ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
             shiftActivities = shiftBreakService.addBreakInShiftsWhileCopy(activityMap, copiedShift, null, dataWrapper.getTimeSlotWrappers(), breakSettings);
@@ -306,7 +306,7 @@ public class ShiftCopyService extends MongoBaseService {
                 : getPresencePlannedTime(phaseId, managementPerson, staffAdditionalInfoDTO, activityConfigurations);*/
 
 
-        return (activity.getBalanceSettingsActivityTab().getTimeType().equals(TimeTypeEnum.ABSENCE)
+        return (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())
                 ? getAbsencePlannedTime(phaseId, staffAdditionalInfoDTO, activityConfigurations)
                 : getPresencePlannedTime(phaseId, managementPerson, staffAdditionalInfoDTO, activityConfigurations));
     }
