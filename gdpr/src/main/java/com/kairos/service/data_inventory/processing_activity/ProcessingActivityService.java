@@ -106,7 +106,7 @@ public class ProcessingActivityService {
             processingActivity.setSubProcessingActivities(createSubProcessingActivity(unitId, processingActivityDTO.getSubProcessingActivities(), processingActivity));
         }
         if (!processingActivityDTO.getDataSubjectList().isEmpty()) {
-            processingActivity.setDataSubjects(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectList()));
+            processingActivity.setDataSubjectList(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectList()));
         }
         processingActivityRepository.save(processingActivity);
         processingActivityDTO.setId(processingActivity.getId());
@@ -291,7 +291,7 @@ public class ProcessingActivityService {
         if (CollectionUtils.isNotEmpty(processingActivity.getAssets())) {
             processingActivityResponseDTO.setAssets(processingActivity.getAssets().stream().map(asset -> new AssetBasicResponseDTO(asset.getId(), asset.getName(), asset.getDescription(), asset.getHostingLocation(), asset.getManagingDepartment(), asset.isActive())).collect(Collectors.toList()));
         }
-        processingActivityResponseDTO.setDataSubjectList(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class));
+        processingActivityResponseDTO.setDataSubjectList(ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjectList(), RelatedDataSubjectDTO.class));
         if (CollectionUtils.isNotEmpty(processingActivity.getSubProcessingActivities())) {
             processingActivity.getSubProcessingActivities().forEach(subProcessingActivity -> processingActivityResponseDTO.getSubProcessingActivities().add(prepareProcessingActivityResponseData(subProcessingActivity)));
         }
@@ -354,7 +354,7 @@ public class ProcessingActivityService {
         if (!Optional.ofNullable(processingActivity).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.ProcessingActivity", processingActivityId);
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjects(), RelatedDataSubjectDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivity.getDataSubjectList(), RelatedDataSubjectDTO.class);
     }
 
     /*
