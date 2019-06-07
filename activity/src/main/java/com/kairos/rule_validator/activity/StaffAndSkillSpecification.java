@@ -48,7 +48,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             ActivityRuleViolation activityRuleViolation;
             if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
-                    (CollectionUtils.isEmpty(staffSkills) || !CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills))) {
+                    CollectionUtils.isEmpty(staffSkills) || !CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills)) {
                 errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
                  activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
                 if(activityRuleViolation==null){
