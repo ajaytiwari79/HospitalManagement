@@ -421,7 +421,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN {id:id(staff),name:user.firstName} AS staff,id(expertise) AS expertiseId")
     List<ExpertiseLocationStaffQueryResult> findAllUnionRepresentativeOfExpertiseInUnit(List<Long> expertiseIds, Long unitId);
 
-    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})<-[:" + HAS_SUB_ORGANIZATION + "*]-(organizationHub:Unit{deleted:false,isEnable:true}) \n" +
+    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})<-[:" + HAS_SUB_ORGANIZATION + "*]-(organizationHub:Organization{deleted:false,isEnable:true}) \n" +
             "-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]->(user:User)\n " +
             "WHERE id(organization)={0} AND organizationHub.isKairosHub=true AND id(user)={1} \n " +
             "RETURN staff")

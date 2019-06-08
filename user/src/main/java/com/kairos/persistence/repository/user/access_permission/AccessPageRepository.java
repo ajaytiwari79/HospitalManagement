@@ -217,7 +217,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     // fetch Permission of Hub Users
 
     @Query("MATCH (position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(user)={0} WITH position \n" +
-            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org:Unit{isEnable:true}) WHERE id(org)={1}  WITH unitPermission,org \n" +
+            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org{isEnable:true}) WHERE id(org)={1}  WITH unitPermission,org \n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date()) WITH accessGroup,org,unitPermission \n" +
             "MATCH (module:AccessPage)<-[modulePermission:"+HAS_ACCESS_OF_TABS+"{isEnabled:true}]-(accessGroup) WITH module,modulePermission,unitPermission,accessGroup\n" +
             "OPTIONAL MATCH (unitPermission)-[moduleCustomRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(module) WHERE moduleCustomRel.accessGroupId=id(accessGroup) \n" +
@@ -226,10 +226,10 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     List<AccessPageQueryResult> fetchHubUserPermissions(Long userId, Long organizationId);
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
-            "MATCH (org:Unit{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
-            "OPTIONAL MATCH (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Unit{isEnable:true,boardingCompleted:true}) WITH position,org+[unit] as coll\n" +
+            "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
+            "OPTIONAL MATCH (org)-[:"+HAS_UNIT+"*]->(unit:Unit{isEnable:true,boardingCompleted:true}) WITH position,org+[unit] as coll\n" +
             "unwind coll as units WITH  DISTINCT units,position \n" +
-            "OPTIONAL MATCH  (o:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
+            "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]-(units) \n" +
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) " +
@@ -246,10 +246,10 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
-            "MATCH (org:Unit{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
-            "OPTIONAL MATCH (org)-[:"+HAS_SUB_ORGANIZATION+"*]->(unit:Unit{isEnable:true,boardingCompleted:true}) WITH position,org+[unit] as coll\n" +
+            "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
+            "OPTIONAL MATCH (org)-[:"+HAS_UNIT+"*]->(unit:Unit{isEnable:true,boardingCompleted:true}) WITH position,org+[unit] as coll\n" +
             "unwind coll as units WITH  DISTINCT units,position \n" +
-            "OPTIONAL MATCH  (o:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
+            "OPTIONAL MATCH  (o:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]-(units) \n" +
             "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())  WITH org,accessGroup,unitPermission\n" +
@@ -298,11 +298,11 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     List<AccessPageDTO> getMainActiveTabs(Long countryId);
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
-            "MATCH (org:Unit{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
-            "OPTIONAL MATCH (org)-[:HAS_SUB_ORGANIZATION*]->(unit:Unit{isEnable:true}) WITH position,org+[unit] as coll\n" +
-            "unwind coll as units WITH  DISTINCT units,position \n" +
-            "OPTIONAL MATCH  (o:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:HAS_SUB_ORGANIZATION*1..]->(units) \n" +
-            "WITH o,position, [o]+units as units  unwind units as org  WITH DISTINCT org,o,position\n" +
+            "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
+            "OPTIONAL MATCH (org)-[:"+HAS_SUB_ORGANIZATION+"*]->(subOrg:Organization{isEnable:true}) WITH position,org+[subOrg] as coll\n" +
+            "unwind coll as orgList WITH  DISTINCT orgList,position \n" +
+            "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:"+HAS_SUB_ORGANIZATION+"*1..]->(orgList) \n" +
+            "WITH o,position, [o]+orgList as units  unwind units as org  WITH DISTINCT org,o,position\n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission \n" +
             "MATCH (unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup{deleted:false,enabled:true})  RETURN accessGroup"
             )
@@ -315,5 +315,3 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "RETURN id(unit) as unitId, CASE WHEN COUNT(r)>0 THEN TRUE ELSE FALSE END AS hasPermission")
     List<StaffAccessGroupQueryResult> getAccessPermission(Long userId, Set<Long> organizationIds);
 }
-
-

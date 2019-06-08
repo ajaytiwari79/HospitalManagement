@@ -300,7 +300,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     List<AccessPageQueryResult> findAllAccessGroupWithParentIds(Long organizationId, Set<Long> parentAccessGroupsIds);
 
 
-    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(organization:Unit)\n" +
+    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(organization)\n" +
             "WHERE id(organization)={0} AND id(user)={1}\n" +
             "MATCH (unitPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(organization)\n" +
             "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]->(dayType:DayType)\n" +

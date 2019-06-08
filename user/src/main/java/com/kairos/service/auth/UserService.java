@@ -22,9 +22,11 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
@@ -76,6 +78,8 @@ public class UserService {
 
     @Inject
     private UserGraphRepository userGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private UserDetailService userDetailsService;
     @Inject
@@ -479,14 +483,14 @@ public class UserService {
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (currentUser.getLastSelectedOrganizationId() != organizationId) {
-            Object entity=unitGraphRepository.findOneById(organizationId);
+            OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(organizationId);
             Long countryId=null;
-            if(entity instanceof Unit) {
-                countryId = ((Unit) entity).getCountryId();
+            if(organizationBaseEntity instanceof Unit) {
+                countryId = ((Unit) organizationBaseEntity).getCountryId();
                 currentUser.setConfLevel(ConfLevel.UNIT);
             }
-            else if(entity instanceof Organization) {
-                countryId = ((Organization) entity).getCountry().getId();
+            else if(organizationBaseEntity instanceof Organization) {
+                countryId = ((Organization) organizationBaseEntity).getCountry().getId();
                 currentUser.setConfLevel(ConfLevel.UNIT);
             }
             currentUser.setLastSelectedOrganizationId(organizationId);

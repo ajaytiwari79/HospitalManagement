@@ -791,7 +791,8 @@ public class AccessGroupService {
 
     public UserAccessRoleDTO findUserAccessRole(Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
+        Organization parent=organizationService.fetchParentOrganization(unitId);
+        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), userId);
         UserAccessRoleDTO userAccessRoleDTO;
         if (staffAtHub != null) {
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);

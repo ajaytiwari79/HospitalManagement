@@ -677,7 +677,11 @@ public class OrganizationService {
     }
 
     public Organization fetchParentOrganization(Long unitId) {
-        return UserContext.getUserDetails().getConfLevel().equals(ConfLevel.ORGANIZATION)?organizationGraphRepository.findByIdAndDeletedFalse(unitId):unitGraphRepository.getParentOfOrganization(unitId);
+        OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(unitId);
+        if(organizationBaseEntity instanceof Organization)
+            return (Organization) organizationBaseEntity;
+        else
+            return unitGraphRepository.getParentOfOrganization(unitId);
     }
 
     public OrganizationMappingDTO getEmploymentTypeWithExpertise(Long unitId) {
