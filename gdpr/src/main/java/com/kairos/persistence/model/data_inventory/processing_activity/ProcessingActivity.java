@@ -60,7 +60,7 @@ public class ProcessingActivity extends BaseEntity {
     private Integer dataRetentionPeriod;
     private boolean isSubProcessingActivity;
     @OneToMany(cascade = CascadeType.PERSIST)
-    private List<RelatedDataSubject> dataSubjects = new ArrayList<>();
+    private List<RelatedDataSubject> dataSubjectList = new ArrayList<>();
     private Long organizationId;
     private boolean active = true;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

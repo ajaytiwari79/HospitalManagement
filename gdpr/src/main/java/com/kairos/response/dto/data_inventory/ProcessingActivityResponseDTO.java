@@ -40,7 +40,7 @@ public class ProcessingActivityResponseDTO {
     private Boolean active;
     private Boolean suggested;
     private List<ProcessingActivityResponseDTO> subProcessingActivities=new ArrayList<>();
-    private List<RelatedDataSubjectDTO> dataSubjects = new ArrayList<>();
+    private List<RelatedDataSubjectDTO> dataSubjectList = new ArrayList<>();
     private List<AssetBasicResponseDTO> assets=new ArrayList<>();
 
 }

@@ -163,11 +163,13 @@ public class KPISetService {
                         kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
                         applicableKPIS = counterRepository.getKPIByKPIIds(kpiSet.getKpiIds().stream().collect(Collectors.toList()), accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF);
                         for (ApplicableKPI applicableKPI : applicableKPIS) {
-                            applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
-                            FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(),accessGroupPermissionCounterDTO.getStaffId(),Arrays.asList(applicableKPI.getActiveKpiId()),KPIRepresentation.REPRESENT_PER_STAFF,applicableKPI.getApplicableFilter().getCriteriaList(),applicableKPI.getInterval(),applicableKPI.getFrequencyType(),applicableKPI.getValue(),unitId);
-                            KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
-                            if(isNotNull(kpiResponseDTO)) {
-                                kpiResponseDTOList.add(kpiResponseDTO);
+                            if(isNotNull(applicableKPI)) {
+                                applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
+                                FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
+                                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                                if (isNotNull(kpiResponseDTO)) {
+                                    kpiResponseDTOList.add(kpiResponseDTO);
+                                }
                             }
                         }
                     }
