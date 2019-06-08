@@ -292,7 +292,7 @@ public class TimeBankService extends MongoBaseService {
             dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, interval.getStart().toDate(), interval.getEnd().toDate());
         }
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, employmentWithCtaDetailsDTO);
-        Long actualTimebankMinutes = getAccumulatedTimebankAndDeltaDTO(employmentId,unitId,asLocalDate(interval.getStart()),asLocalDate(interval.getEnd()),true);
+        Long actualTimebankMinutes = getAccumulatedTimebankAndDeltaDTO(employmentId,unitId,true);
         timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
         return timeBankDTO;
     }
@@ -577,13 +577,13 @@ public class TimeBankService extends MongoBaseService {
         return ctaResponse;
     }
 
-    public <T> T getAccumulatedTimebankAndDeltaDTO(Long employmentId, Long unitId, LocalDate startDate, LocalDate endDate,Boolean includeActualTimebank) {
+    public <T> T getAccumulatedTimebankAndDeltaDTO(Long employmentId, Long unitId,Boolean includeActualTimebank) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>());
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO, unitId);
         T object;
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
-        endDate = planningPeriod.getEndDate();
-        startDate = employmentWithCtaDetailsDTO.getStartDate();
+        LocalDate endDate = planningPeriod.getEndDate();
+        LocalDate startDate = employmentWithCtaDetailsDTO.getStartDate();
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, asDate(endDate));
         Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId, asDate(startDate), asDate(endDate));
         object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodIntervals,dailyTimeBankEntries,employmentWithCtaDetailsDTO,endDate,startDate);
