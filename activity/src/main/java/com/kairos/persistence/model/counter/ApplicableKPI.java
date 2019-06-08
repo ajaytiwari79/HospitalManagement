@@ -67,7 +67,7 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.frequencyType=frequencyType;
     }
 
-    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy,List<FibonacciKPIConfig> fibonacciKPIConfigs) {
+    public ApplicableKPI(BigInteger activeKpiId, BigInteger baseKpiId, Long countryId, Long unitId, Long staffId, ConfLevel level, ApplicableFilter applicableFilter,String title,boolean copy,List<FibonacciKPIConfig> fibonacciKPIConfigs,KPIRepresentation kpiRepresentation) {
         this.activeKpiId = activeKpiId;
         this.baseKpiId = baseKpiId;
         this.countryId = countryId;
@@ -78,6 +78,7 @@ public class ApplicableKPI extends MongoBaseEntity {
         this.copy=copy;
         this.title=title;
         this.fibonacciKPIConfigs = fibonacciKPIConfigs;
+        this.kpiRepresentation=kpiRepresentation;
     }
 
     public BigInteger getActiveKpiId() {
