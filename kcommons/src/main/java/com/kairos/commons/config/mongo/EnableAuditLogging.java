@@ -16,7 +16,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Documented
-@Import({AuditLogMongoConfig.class, AuditLogging.class, AuditLoggingService.class, AuditLoggingRepository.class, AuditLogController.class})
+@Import({AuditLogMongoConfig.class, AuditLogging.class, AuditLoggingService.class, AuditLoggingRepository.class})
 @Configuration
 public @interface EnableAuditLogging {
 }
