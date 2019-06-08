@@ -168,9 +168,9 @@ public class ShiftService extends MongoBaseService {
         shiftValidatorService.checkAbsenceTypeShift(shiftDTO);
         staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
-      //  if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
-        TimeTypeEnum timeType = activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType();
-        if(TimeTypeEnum.ABSENCE.equals(timeType)){
+        if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
+       // TimeTypeEnum timeType = activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType();
+      //  if(TimeTypeEnum.ABSENCE.equals(timeType)){
             shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate()));
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
             shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType,shiftActionType);
