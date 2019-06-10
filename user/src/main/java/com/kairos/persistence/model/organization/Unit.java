@@ -1,0 +1,119 @@
+package com.kairos.persistence.model.organization;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import com.kairos.dto.user.organization.CompanyType;
+import com.kairos.dto.user.organization.CompanyUnitType;
+import com.kairos.enums.UnionState;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.team.Team;
+import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
+import com.kairos.persistence.model.organization.union.Location;
+import com.kairos.persistence.model.organization.union.Sector;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
+import com.kairos.persistence.model.user.region.LocalAreaTag;
+import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.utils.ZoneIdStringConverter;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.typeconversion.Convert;
+import org.neo4j.ogm.annotation.typeconversion.DateString;
+
+import javax.validation.constraints.NotNull;
+import java.math.BigInteger;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_CONTACTADDRESS_NOTNULL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+
+
+/**
+ * Organization Domain & it's properties
+ */
+//@JsonSerialize(using = OrganizationSerializer.class)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
+@NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
+public class Unit extends OrganizationBaseEntity {
+
+    private boolean showPersonNames;
+    private Long countryId;
+
+    // Relationships
+    @Relationship(type = HAS_TEAMS)
+    private List<Team> teams = new ArrayList<>();
+
+    @Relationship(type = HAS_SETTING)
+    private OrganizationSetting organizationSetting;
+
+
+    @Relationship(type = UNIT_HAS_ACCESS_GROUPS)
+    private List<AccessGroup> accessGroups = new ArrayList<>();
+
+    @Relationship(type = UNIT_HAS_RESOURCE)
+    private List<Resource> resourceList;
+
+    @Relationship(type = HAS_PAYMENT_SETTINGS)
+    private PaymentSettings paymentSettings;
+
+    private boolean workcentre;
+    private boolean gdprUnit;
+
+    public List<Resource> getResourceList() {
+        return java.util.Optional.ofNullable(resourceList).orElse(new ArrayList<>());
+    }
+
+    public void addResource(Resource resource) {
+        List<Resource> resourceList = this.getResourceList();
+        resourceList.add(resource);
+        this.resourceList = resourceList;
+    }
+
+    public Unit(Long id, String name, String description, Long  countryId, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
+                        String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
+                        CompanyCategory companyCategory, ZoneId timeZone,  AccountType accountType, boolean boardingCompleted) {
+        this.name = name;
+        this.description = description;
+        this.countryId=countryId;
+        this.desiredUrl = desiredUrl;
+        this.shortCompanyName = shortCompanyName;
+        this.kairosCompanyId = kairosCompanyId;
+        this.vatId = vatId;
+        this.businessTypes = businessTypes;
+        this.organizationSubTypes = organizationSubTypes;
+        this.organizationType = organizationType;
+        this.companyType = companyType;
+        this.companyCategory = companyCategory;
+        this.companyUnitType = companyUnitType;
+        this.timeZone = timeZone;
+        this.id = id;
+        this.accountType = accountType;
+        this.boardingCompleted = boardingCompleted;
+
+    }
+
+
+
+}

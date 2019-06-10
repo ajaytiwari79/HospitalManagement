@@ -1,0 +1,44 @@
+package com.kairos.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CurrentUserDetails {
+    private Long id;
+    private String userName;
+    protected String nickName;
+    protected String firstName;
+    protected String lastName;
+    private String email;
+    private boolean passwordUpdated;
+    private  int age;
+    private Long countryId;
+    private boolean hubMember;
+    private Long languageId;
+    private Long lastSelectedOrganizationId;
+    private ConfLevel confLevel;
+
+
+    public CurrentUserDetails(Long id, String userName, String nickName,
+                              String firstName, String lastName, String email,boolean passwordUpdated) {
+        this.id = id;
+        this.userName = userName;
+        this.nickName = nickName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.passwordUpdated=passwordUpdated;
+    }
+
+    public String getFullName(){
+        return this.firstName+" "+this.lastName;
+    }
+
+}
