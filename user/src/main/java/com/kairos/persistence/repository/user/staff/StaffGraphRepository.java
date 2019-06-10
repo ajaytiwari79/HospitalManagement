@@ -366,7 +366,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH(staff:Staff) WHERE id(staff) in {0} RETURN staff.email")
     List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds);
 
-    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:" + HAS_POSITIONS + "]-(organization:Unit) WHERE id(user)={0} AND id(organization)={1}  RETURN id(staff)")
+    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:" + HAS_POSITIONS + "]-(organization:Organization) WHERE id(user)={0} AND id(organization)={1}  RETURN id(staff)")
     Long findStaffIdByUserId(Long userId, Long unitId);
 
     @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:" + HAS_POSITIONS + "]-(organization:Unit{isKairosHub:true})-[:" + HAS_SUB_ORGANIZATION + "]-(org:Unit) WHERE id(user)={0} AND id(org)={1}  RETURN id(staff)")

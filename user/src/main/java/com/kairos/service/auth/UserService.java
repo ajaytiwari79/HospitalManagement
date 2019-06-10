@@ -483,7 +483,7 @@ public class UserService {
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (currentUser.getLastSelectedOrganizationId() != organizationId) {
-            OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(organizationId);
+            OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOneById(organizationId);
             Long countryId=null;
             if(organizationBaseEntity instanceof Unit) {
                 countryId = ((Unit) organizationBaseEntity).getCountryId();
