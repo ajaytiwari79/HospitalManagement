@@ -619,6 +619,12 @@ Criteria.where("level").is(ConfLevel.COUNTRY.toString()),Criteria.where("level")
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboardDTO.class);
     }
 
+    public List<KPIDashboard> getKPIDashboardsOfStaffAndUnits(List<Long> unitIds, ConfLevel level, List<Long> staffIds) {
+        Criteria matchCriteria = Criteria.where("deleted").is(false).and("unitId").in(unitIds).and("staffId").in(staffIds).and("level").is(level);
+        Query query = new Query(matchCriteria);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboard.class);
+    }
+
     public boolean allKPIsBelongsToIndividualType(Set<BigInteger> kpiIds, ConfLevel confLevel, Long referenceId) {
         String queryField = getRefQueryField(confLevel);
         Criteria matchCriteria = Criteria.where("activeKpiId").in(kpiIds).and("kpiRepresentation").is(INDIVIDUAL_STAFF).and(DELETED).is(false).and(queryField).is(referenceId).and("level").is(confLevel);
