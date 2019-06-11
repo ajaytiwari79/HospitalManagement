@@ -109,6 +109,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_RESTRICTIONFREQUENCY_ID = "message.restrictionfrequency.id";
     public static final String ERROR_ACTIVITY_FULLWEEK_START  = "error.activity.fullweek.start ";
     public static final String MESSAGE_ACTIVITY_ID = "message.activity.id";
+    public static final String ACTIVITY_USED_AT_UNIT="activity.used.unit";
     public static final String MESSAGE_ACTIVITY_NAME_NOTEMPTY = "message.activity.name.notEmpty";
     public static final String MESSAGE_ACTIVITY_NAME = "message.activity.name";
     public static final String MESSAGE_ACTIVITY_TIMECARE_ID = "message.activity.timecare.id";
