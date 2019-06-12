@@ -66,7 +66,7 @@ public class NightWorkerServiceTest {
 
     @Test
     public void updateNightWorkers(){
-        when(expertiseNightWorkerSettingRepository.findAllByExpertiseIds(anyCollection())).thenReturn(expertiseNightWorkerSettings);
+        when(expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(anyCollection())).thenReturn(expertiseNightWorkerSettings);
         when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
         Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),true);
@@ -80,7 +80,7 @@ public class NightWorkerServiceTest {
     @Test
     public void updateNightWorkersWithNegativeDetails(){
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(3000);
-        when(expertiseNightWorkerSettingRepository.findAllByExpertiseIds(anyCollection())).thenReturn(expertiseNightWorkerSettings);
+        when(expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(anyCollection())).thenReturn(expertiseNightWorkerSettings);
         when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
         Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
