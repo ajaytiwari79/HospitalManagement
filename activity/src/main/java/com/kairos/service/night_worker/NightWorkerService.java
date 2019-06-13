@@ -246,8 +246,10 @@ public class NightWorkerService {
         Map[] staffAndEmploymentAndExpertiseIdArray = getEmploymentAndExpertiseIdMap(staffAndEmploymentIdMap);
         Map<Long, Long> employmentAndExpertiseIdMap = staffAndEmploymentAndExpertiseIdArray[0];
         Map<Long, Long> employmentIdAndStaffIdMap = staffAndEmploymentAndExpertiseIdArray[1];
-        Map<Long, Boolean> staffIdAndnightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
-        updateWTARuleTemplateForNightWorker(staffIdAndnightWorkerDetailsMap);
+        Map[] nightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
+        Map<Long,Boolean> staffIdAndnightWorkerDetailsMap = nightWorkerDetailsMap[0];
+        Map<Long,Boolean> employementIdAndNightWorkerMap = nightWorkerDetailsMap[1];
+        updateWTARuleTemplateForNightWorker(employementIdAndNightWorkerMap);
         List<NightWorker> nightWorkers = nightWorkerMongoRepository.findByStaffIds(employmentIdAndStaffIdMap.values());
         Map<Long,NightWorker> nightWorkerMap = nightWorkers.stream().collect(Collectors.toMap(NightWorker::getStaffId,v->v));
         List<NightWorker> updateNightWorkers = new ArrayList<>();
@@ -277,10 +279,11 @@ public class NightWorkerService {
         return new Map[]{employmentAndExpertiseIdMap,employmentIdAndStaffIdMap};
     }
 
-    public Map<Long, Boolean> getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
+    public Map[] getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
         List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(employmentAndExpertiseIdMap.values());
         Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = expertiseNightWorkerSettings.stream().collect(Collectors.toMap(ExpertiseNightWorkerSetting::getExpertiseId, v -> v));
         Map<Long, Boolean> staffIdAndNightWorkerMap = new HashMap<>();
+        Map<Long, Boolean> employementIdAndNightWorkerMap = new HashMap<>();
         for (Map.Entry<Long, Long> employmentAndExpertiseIdEntry : employmentAndExpertiseIdMap.entrySet()) {
             boolean nightWorker = false;
             if (expertiseNightWorkerSettingMap.containsKey(employmentAndExpertiseIdEntry.getValue())) {
@@ -297,9 +300,10 @@ public class NightWorkerService {
             Long staffId = employmentIdAndStaffIdMap.get(employmentAndExpertiseIdEntry.getKey());
             if(!staffIdAndNightWorkerMap.containsKey(staffId) || !staffIdAndNightWorkerMap.get(staffId)) {
                 staffIdAndNightWorkerMap.put(staffId, nightWorker);
+                employementIdAndNightWorkerMap.put(employmentAndExpertiseIdEntry.getKey(),nightWorker);
             }
         }
-        return staffIdAndNightWorkerMap;
+        return new Map[]{staffIdAndNightWorkerMap,employementIdAndNightWorkerMap};
     }
 
     private void updateWTARuleTemplateForNightWorker(Map<Long, Boolean> employmentAndNightWorkerMap) {
