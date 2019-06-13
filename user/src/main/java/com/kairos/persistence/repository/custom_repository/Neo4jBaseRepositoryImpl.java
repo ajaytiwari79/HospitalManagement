@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.custom_repository;
 
 import com.kairos.commons.audit_logging.AuditLogging;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.session.Session;
 import org.springframework.data.neo4j.repository.support.SimpleNeo4jRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,17 +64,22 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 	@Override
 	public <S extends T> S save(S entity) {
 		S oldEntity = null;
-		if(isNotNull(entity.getId())){
+		boolean validClass = !entity.getClass().isAnnotationPresent(RelationshipEntity.class);
+		if(validClass && isNotNull(entity.getId())){
 			oldEntity = (S)this.findById((ID)entity.getId()).orElse(null);
 		}else {
-			try {
-				oldEntity = (S)entity.getClass().newInstance();
-			} catch (InstantiationException | IllegalAccessException e) {
-				e.printStackTrace();
+			if(validClass) {
+				try {
+					oldEntity = (S) entity.getClass().newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		session.save(entity);
-		AuditLogging.checkDifferences(oldEntity,entity);
+		if(validClass) {
+			AuditLogging.checkDifferences(oldEntity, entity);
+		}
 		return entity;
 	}
 
