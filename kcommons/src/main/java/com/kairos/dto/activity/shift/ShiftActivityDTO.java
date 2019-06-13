@@ -142,6 +142,4 @@ public class ShiftActivityDTO {
     public LocalDate getEndLocalDate(){
         return asLocalDate(this.endDate);
     }
-
-
 }

@@ -168,9 +168,9 @@ public class ShiftService extends MongoBaseService {
         shiftValidatorService.checkAbsenceTypeShift(shiftDTO);
         staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
-      //  if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
-        TimeTypeEnum timeType = activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType();
-        if(TimeTypeEnum.ABSENCE.equals(timeType)){
+        if ((FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
+       // TimeTypeEnum timeType = activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType();
+      //  if(TimeTypeEnum.ABSENCE.equals(timeType)){
             shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate()));
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
             shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType,shiftActionType);
@@ -231,7 +231,7 @@ public class ShiftService extends MongoBaseService {
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false, functionId,phase,shiftActionType);
-            if(ShiftActionType.SAVE.equals(shiftActionType)) {
+            if(ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
                 payOutService.updatePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
                 shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
             }
@@ -277,7 +277,7 @@ public class ShiftService extends MongoBaseService {
         Activity activity = activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity();
         //if ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
         TimeTypeEnum timeType = activity.getBalanceSettingsActivityTab().getTimeType();
-        if(timeType.equals(TimeTypeEnum.ABSENCE)){
+        if(TimeTypeEnum.ABSENCE.equals(timeType)){
             shift.setShiftType(ShiftType.ABSENCE);
         } else {
             shift.setShiftType(ShiftType.PRESENCE);
@@ -475,11 +475,12 @@ public class ShiftService extends MongoBaseService {
     public Map<String,Object> saveAndCancelDraftShift(Long unitId, Long staffId, List<BigInteger> planningPeriodIds, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType,
                                           ShiftFilterParam shiftFilterParam, ShiftActionType shiftActionType) {
 
-        if(isCollectionEmpty(planningPeriodIds)) {
-           exceptionService.actionNotPermittedException(MESSAGE_PLANNING_PERIOD_NOTFOUND);
+        List<PlanningPeriod> planningPeriods=new ArrayList<>();
+        if(isNotNull(planningPeriodIds)) {
+            planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndIds(unitId, planningPeriodIds);
+            planningPeriods.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
         }
-        List<PlanningPeriod>  planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndIds(unitId, planningPeriodIds);
-        planningPeriods.sort((o1, o2) -> o1.getStartDate().compareTo(o2.getStartDate()));
+
         List<Shift> draftShifts = getDraftShifts(unitId, staffId, planningPeriodIds, startDate, endDate, employmentId);
         List<Shift> saveShifts;
         List<BigInteger> deletedShiftIds = new ArrayList<>();
@@ -494,7 +495,7 @@ public class ShiftService extends MongoBaseService {
             shiftMongoRepository.saveEntities(saveShifts);
         }
         Map<String,Object> response = new HashMap<>();
-        response.put("shiftDetails",getAllShiftAndStates(unitId, staffId, isNull(startDate) ? planningPeriods.get(0).getStartDate() : startDate, isNull(endDate) ? planningPeriods.get(planningPeriodIds.size()-1).getEndDate() : endDate, employmentId, viewType, shiftFilterParam,null));
+        response.put("shiftDetails",getAllShiftAndStates(unitId, staffId, isNull(startDate) ? planningPeriods.get(0).getStartDate() : startDate, isNull(endDate) ? planningPeriods.get(0).getEndDate() : endDate, employmentId, viewType, shiftFilterParam,null));
         response.put("deletedShiftIds",deletedShiftIds);
         return response;
     }

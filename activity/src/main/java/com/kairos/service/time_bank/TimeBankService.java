@@ -159,6 +159,9 @@ public class TimeBankService extends MongoBaseService {
                 }
                 DateTimeInterval dateTimeInterval = new DateTimeInterval(startDateTime.getTime(), plusDays(startDateTime, 1).getTime());
                 List<Shift> shiftList = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftWithActivityDTOS, Shift.class);
+                List<BigInteger> activityIdsList = shiftList.stream().flatMap(s -> s.getActivities().stream().map(ShiftActivity::getActivityId)).distinct().collect(Collectors.toList());
+                List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
+                activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
                 for (Shift shift : shiftList) {
                     PayOutPerShift payOutPerShift = shiftAndPayOutMap.getOrDefault(shift.getId(), new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), dateTimeInterval.getStartLocalDate(), shift.getUnitId()));
                     payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(dateTimeInterval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
@@ -292,7 +295,7 @@ public class TimeBankService extends MongoBaseService {
             dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, interval.getStart().toDate(), interval.getEnd().toDate());
         }
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, employmentWithCtaDetailsDTO);
-        Long actualTimebankMinutes = getAccumulatedTimebankAndDeltaDTO(employmentId,unitId,asLocalDate(interval.getStart()),asLocalDate(interval.getEnd()),true);
+        Long actualTimebankMinutes = getAccumulatedTimebankAndDeltaDTO(employmentId,unitId,true);
         timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
         return timeBankDTO;
     }
@@ -577,13 +580,13 @@ public class TimeBankService extends MongoBaseService {
         return ctaResponse;
     }
 
-    public <T> T getAccumulatedTimebankAndDeltaDTO(Long employmentId, Long unitId, LocalDate startDate, LocalDate endDate,Boolean includeActualTimebank) {
+    public <T> T getAccumulatedTimebankAndDeltaDTO(Long employmentId, Long unitId,Boolean includeActualTimebank) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>());
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO, unitId);
         T object;
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
-        endDate = planningPeriod.getEndDate();
-        startDate = employmentWithCtaDetailsDTO.getStartDate();
+        LocalDate endDate = planningPeriod.getEndDate();
+        LocalDate startDate = employmentWithCtaDetailsDTO.getStartDate();
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, asDate(endDate));
         Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId, asDate(startDate), asDate(endDate));
         object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodIntervals,dailyTimeBankEntries,employmentWithCtaDetailsDTO,endDate,startDate);

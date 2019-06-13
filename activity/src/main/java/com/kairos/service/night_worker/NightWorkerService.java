@@ -15,7 +15,6 @@ import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.night_worker.*;
 import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
-import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.DaysOffAfterASeriesWTATemplate;
 import com.kairos.persistence.repository.night_worker.*;
@@ -28,7 +27,6 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.rule_validator.night_worker.StaffNonPregnancySpecification;
 import com.kairos.service.exception.ExceptionService;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -280,7 +278,7 @@ public class NightWorkerService {
     }
 
     public Map<Long, Boolean> getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
-        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIds(employmentAndExpertiseIdMap.values());
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(employmentAndExpertiseIdMap.values());
         Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = expertiseNightWorkerSettings.stream().collect(Collectors.toMap(ExpertiseNightWorkerSetting::getExpertiseId, v -> v));
         Map<Long, Boolean> staffIdAndNightWorkerMap = new HashMap<>();
         for (Map.Entry<Long, Long> employmentAndExpertiseIdEntry : employmentAndExpertiseIdMap.entrySet()) {

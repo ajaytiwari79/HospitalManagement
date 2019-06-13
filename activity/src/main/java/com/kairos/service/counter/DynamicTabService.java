@@ -1,8 +1,10 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
+import com.kairos.dto.activity.counter.distribution.dashboard.DashboardKPIDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.staff.staff.StaffDTO;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -77,6 +80,26 @@ public class DynamicTabService extends MongoBaseService {
         List<StaffDTO> staffDTOS = userIntegrationService.getStaffListByUnit();
         if(ConfLevel.UNIT.equals(level)){
             createTabsForStaff(unitId,kpiDashboards,staffDTOS.stream().map(StaffDTO::getId).collect(Collectors.toList()));
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
+    }
+    public List<KPIDashboardDTO> addDashboardDefaultTabToRef(KPIDashboardDTO kpiDashboardDTO, ConfLevel level) {
+        List<KPIDashboard> dashboardKPIDTOS=counterRepository.getKPIDashboardsOfStaffAndUnits(kpiDashboardDTO.getUnitIds(),ConfLevel.STAFF, Arrays.asList(kpiDashboardDTO.getStaffId()));
+        Map<Long,List<KPIDashboard>> kpiDashboardMap=dashboardKPIDTOS.stream().collect(Collectors.groupingBy(k->k.getUnitId(),Collectors.toList()));
+        List<KPIDashboard> kpiDashboards = new ArrayList<>();
+        kpiDashboardDTO.getUnitIds().forEach(unit->{
+            if(!kpiDashboardMap.get(unit).stream().anyMatch(k->k.getName().equalsIgnoreCase(kpiDashboardDTO.getName()))){
+                kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(), kpiDashboardDTO.getModuleId(), kpiDashboardDTO.getName(), kpiDashboardDTO.getCountryId(), unit, kpiDashboardDTO.getStaffId(), level,kpiDashboardDTO.isDefaultTab()));
+            }
+
+        });
+
+        if (!kpiDashboards.isEmpty()){
+            save(kpiDashboards);
+            kpiDashboards.stream().forEach(kpiDashboard -> {
+                kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId()));
+            });
+            save(kpiDashboards);
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
