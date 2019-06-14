@@ -29,7 +29,7 @@ public class CommonsExceptionUtil {
         throw new DataNotFoundByIdException(convertMessage(message, params));
     }
 
-    public void actionNotPermittedException(String message, Object... params) {
+   public void actionNotPermittedException(String message, Object... params) {
         throw new ActionNotPermittedException(convertMessage(message, params));
     }
 

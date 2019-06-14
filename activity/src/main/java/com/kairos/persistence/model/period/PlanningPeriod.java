@@ -131,7 +131,7 @@ public class PlanningPeriod extends MongoBaseEntity {
         this.active = active;
     }
 
-    public DateTimeInterval takeInterval(){
+     public DateTimeInterval takeInterval(){
         return new DateTimeInterval(asDate(startDate),asDate(endDate));
     }
 
