@@ -800,6 +800,10 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/get_time_slots",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {});
     }
 
+    public Boolean isUnit(long unitId){
+        return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/is_unit",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+    }
+
 
 }
 
