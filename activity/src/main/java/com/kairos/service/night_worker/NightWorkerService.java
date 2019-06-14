@@ -49,7 +49,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAI
 public class NightWorkerService {
 
     @Inject
-    NightWorkerMongoRepository nightWorkerMongoRepository;
+    private NightWorkerMongoRepository nightWorkerMongoRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject

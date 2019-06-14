@@ -235,9 +235,9 @@ public class ActivityUtil {
     }
 
     public static void updateCompositeActivities(Set<BigInteger> activityIds,Activity activity){
-        Set<CompositeActivity> compositeActivities=new HashSet<>();
+        /*Set<CompositeActivity> compositeActivities=new HashSet<>();
         activityIds.forEach(activityId-> compositeActivities.add(new CompositeActivity(activityId,false,false)));
-        activity.getCompositeActivities().addAll(compositeActivities);
+        activity.getCompositeActivities().addAll(compositeActivities);*/
 
     }
 

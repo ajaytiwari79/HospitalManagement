@@ -406,7 +406,7 @@ public class ActivityService {
     }
 
     public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
-        Activity activity = activityMongoRepository.findById(activityId).orElse(null);
+        /*Activity activity = activityMongoRepository.findById(activityId).orElse(null);
         if (activity == null) {
             exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
         }
@@ -419,12 +419,12 @@ public class ActivityService {
         Set<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toSet());
         activity.setCompositeActivities(compositeActivities);
         updateCompositeActivity(activityList, activity, compositeActivities);
-        activityMongoRepository.save(activity);
+        activityMongoRepository.save(activity);*/
         return compositeShiftActivityDTOs;
     }
 
     private void updateCompositeActivity(List<Activity> activityList, Activity activity, Set<CompositeActivity> compositeActivities) {
-        Map<BigInteger, Activity> activityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+       /* Map<BigInteger, Activity> activityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         for (CompositeActivity compositeActivity : compositeActivities) {
             Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
             Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
@@ -436,7 +436,7 @@ public class ActivityService {
         }
         if (isCollectionNotEmpty(activityList)) {
             activityMongoRepository.saveEntities(activityList);
-        }
+        }*/
     }
 
     public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds) {

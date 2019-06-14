@@ -52,6 +52,7 @@ public class ShiftController {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private ShiftStatusService shiftStatusService;
+    @Inject private RequestAbsenceService requestAbsenceService;
 
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
@@ -208,5 +209,12 @@ public class ShiftController {
                                                               @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam,
                                                               @RequestParam(value = "shiftActionType") ShiftActionType shiftActionType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveAndCancelDraftShift(unitId, staffId, planningPeriodIds, startDate, endDate, employmentId, viewType, shiftFilterParam, shiftActionType));
+    }
+
+    @ApiOperation("create request absence")
+    @DeleteMapping(value = "/request_absence")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createRequestAbsence(@RequestBody @Valid RequestAbsenceDTO requestAbsenceDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, requestAbsenceService.createRequestAbsence(requestAbsenceDTO));
     }
 }

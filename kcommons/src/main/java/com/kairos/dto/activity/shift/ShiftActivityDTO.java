@@ -68,6 +68,7 @@ public class ShiftActivityDTO {
     private BigInteger thirdLevelTimeTypeId;
     private BigInteger fourthLevelTimeTypeId;
     private List<PlannedTime> plannedTimes;
+    private List<ShiftActivityDTO> childActivities = new ArrayList<>();
 
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = startDate;

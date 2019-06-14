@@ -155,7 +155,7 @@ public class ShiftServiceUnitTest {
         activity.setScheduledMinutes(360);
         activity.setScheduledMinutes(360);
         activity.setActivityName("12 Bronze");
-        activity.setpId(0);
+        activity.setPId(0);
         activity.setBid(0);
         activity.setRemarks("");
         activity.setTimeType("WORKING_TYPE");

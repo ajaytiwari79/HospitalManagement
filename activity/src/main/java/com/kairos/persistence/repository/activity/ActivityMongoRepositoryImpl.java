@@ -423,7 +423,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(List<BigInteger> activityIds) {
+    public List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("id").in(activityIds).and("deleted").is(false)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",

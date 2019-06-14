@@ -15,9 +15,7 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface CustomActivityMongoRepository {
 
@@ -79,7 +77,7 @@ public interface CustomActivityMongoRepository {
 
     List<ActivityDTO> findAllByTimeTypeIdAndUnitId(Set<BigInteger> timeTypeIds,Long unitId) ;
 
-    List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(List<BigInteger> activityIds);
+    List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds);
     List<ActivityWrapper> findActivitiesAndTimeTypeByParentIdsAndUnitId(List<BigInteger> activityIds,Long unitId);
     List<ActivityDTO> findAllActivitiesByCountryIdAndTimeTypes(Long countryId,List<BigInteger> timeTypeIds);
 

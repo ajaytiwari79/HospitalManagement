@@ -377,5 +377,6 @@ public class ActivityMessagesConstants {
     public static final String STAFF_ID_END_DATE_NULL = "staff_id.end_date.null";
     public static final String PLEASE_SELECT_VALID_CRITERIA = "please.select.valid.criteria";
     public static final String MESSAGE_SELFROSTERING_METADATA_NULL = "message.selfRostering.metaData.null";
+    public static final String REQUEST_ABSENCE_APPROVED = "request.absence.approved";
 
 }

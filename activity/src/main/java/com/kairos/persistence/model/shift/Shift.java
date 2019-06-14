@@ -6,6 +6,8 @@ import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,6 +25,8 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 /**
  * Created by vipul on 30/8/17.
  */
+@Getter
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "shifts")
 public class Shift extends MongoBaseEntity {
@@ -68,6 +72,7 @@ public class Shift extends MongoBaseEntity {
     private int scheduledMinutesOfPayout;
     private Shift draftShift;
     private boolean draft;
+    private RequestAbsence requestAbsence;
 
 
     public Shift() {

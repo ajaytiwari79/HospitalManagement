@@ -516,7 +516,7 @@ public class OrganizationActivityService extends MongoBaseService {
      * @date 5-10-2018
      */
     private void updateCompositeActivitiesIds(List<Activity> activities) {
-        Map<BigInteger, BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k -> k.getParentId(), v -> v.getId()));
+       /* Map<BigInteger, BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k -> k.getParentId(), v -> v.getId()));
         for (Activity activity : activities) {
             Iterator<CompositeActivity> compositeActivityIterator = activity.getCompositeActivities().iterator();
             while (compositeActivityIterator.hasNext()) {
@@ -535,7 +535,7 @@ public class OrganizationActivityService extends MongoBaseService {
                 activity.getChildActivityIds().remove(childActivityId);
             }
         }
-        save(activities);
+        save(activities);*/
     }
 
 

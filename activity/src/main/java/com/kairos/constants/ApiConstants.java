@@ -163,5 +163,7 @@ public final class ApiConstants {
     public static final String IS_ACTIVITY_ASSIGNED = "/team/is_activity_assigned";
     public static final String KPI_SET="/kpi_set";
 
+    public static final String REQUEST_ABSENCE = API_V1+"/request_absence";
+
 
 }
