@@ -1,0 +1,5 @@
+<root>
+    <item name='org.springframework.web.client.HttpServerErrorException'>
+        <annotation name='java.lang.Deprecated'/>
+    </item>
+</root>
