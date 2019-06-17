@@ -996,4 +996,8 @@ public class OrganizationService {
         List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
         return new SelfRosteringMetaData(ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
     }
+
+    public boolean isUnit(Long unitId){
+        return !organizationGraphRepository.findOne(unitId).isParentOrganization();
+    }
 }
