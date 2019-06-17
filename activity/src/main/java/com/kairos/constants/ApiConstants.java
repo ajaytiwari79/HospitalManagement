@@ -139,7 +139,7 @@ public final class ApiConstants {
     public static final String GET_FUNCTIONS_OF_EMPLOYMENT = STAFF_WITH_STAFF_ID + "/employment/{employmentId}/functions";
     public static final String FUNCTIONS_OF_EMPLOYMENT = "/employment/functions";
     public static final String UNIT_TIMEZONE = "/time_zone";
-    public static final String UNITS_TIMEZONE = "units_time_zone";
+    public static final String UNITS_TIMEZONE = "/units_time_zone";
     public static final String GET_ORGANIZATION_IDS = "/get_organization_ids";
     public static final String GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE = "/holiday_day_type_reason_code";
 

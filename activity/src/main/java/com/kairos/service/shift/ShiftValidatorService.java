@@ -689,16 +689,9 @@ public class ShiftValidatorService {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_VALIDATION_ACCESS);
         }
         Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
-        ShiftState shiftState = null;
-        //StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()),shiftDTO.getStaffId(), type, shiftDTO.getEmploymentId(),Collections.emptySet());
-        if (!validatedByStaff) {
-            shiftState = shiftStateMongoRepository.findShiftStateByShiftIdAndActualPhaseAndRole(shiftDTO.getShiftId(), shiftDTO.getShiftStatePhaseId(), AccessGroupRole.STAFF);
-        }
-        //    shiftValidatorService.validateGracePeriod(shiftDTO, validatedByStaff, unitId, staffShiftDTO);
-        BigInteger shiftStateId = shiftDTO.getId();
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.updateShift(shiftDTO, type, true, !validatedByStaff, null);
         if (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) {
-            shiftDTO = validateShiftStateAfterValidatingWtaRule(shiftDTO, shiftState, validatedByStaff, actualPhases, shiftStateId);
+            shiftDTO = validateShiftStateAfterValidatingWtaRule(shiftDTO, validatedByStaff, actualPhases);
             shiftDTO.setEscalationReasons(shiftWithViolatedInfoDTO.getShifts().get(0).getEscalationReasons());
             shiftDTO.setRestingMinutes(shiftWithViolatedInfoDTO.getShifts().get(0).getRestingMinutes());
             shiftWithViolatedInfoDTO.setShifts(newArrayList(shiftDTO));
@@ -706,9 +699,10 @@ public class ShiftValidatorService {
         return shiftWithViolatedInfoDTO;
     }
 
-    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, ShiftState shiftState, Boolean
-            validatedByStaff, Phase actualPhases, BigInteger shiftStateId) {
-        shiftState = shiftStateMongoRepository.findOne(shiftStateId);
+    public ShiftDTO validateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO,  Boolean
+            validatedByStaff, Phase actualPhases) {
+        BigInteger shiftStateId = shiftDTO.getId();
+        ShiftState shiftState = shiftStateMongoRepository.findOne(shiftStateId);
         if (shiftState == null) {
             Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
             if (shift != null) {
@@ -882,7 +876,7 @@ public class ShiftValidatorService {
     }
 
     public ShiftDTO escalationCorrectionInShift(ShiftDTO shiftDTO, Date oldShiftStartDate, Date oldShiftEndDate) {
-        Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
+        Shift shift = shiftMongoRepository.findOne(shiftDTO.getShiftId());
         ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId());
         boolean workingTypeShift = WORKING_TYPE.toString().equals(activityWrapper.getTimeType());
         List<Shift> overLappedShifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentId(shift.getEmploymentId(), workingTypeShift ? shiftDTO.getActivities().get(0).getStartDate() : oldShiftStartDate, workingTypeShift ? shiftDTO.getActivities().get(0).getEndDate() : oldShiftEndDate);

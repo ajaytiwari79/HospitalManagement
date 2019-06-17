@@ -76,4 +76,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'deleted' : false, 'countryId' :?0,'activityPriorityId':?1 }",exists = true)
     boolean existsActivitiesByActivityPriorityIdAndCountryId(Long countryId,BigInteger activityPriorityId);
 
+    @Query(value = "{deleted: false, parentId :?0,unitId:{$in:?1 }}",exists = true)
+    boolean existsByParentIdAndDeletedFalse( BigInteger activityId,List<Long> unitIds);
+
 }

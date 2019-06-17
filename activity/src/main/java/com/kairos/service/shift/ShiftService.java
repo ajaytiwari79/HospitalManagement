@@ -408,9 +408,8 @@ public class ShiftService extends MongoBaseService {
             if (updateShiftState) {
                 shiftDTO = shiftStateService.updateShiftStateAfterValidatingWtaRule(shiftDTO, shiftDTO.getId(), shiftDTO.getShiftStatePhaseId());
             } else if (isNotNull(validatedByStaff)) {
-                ShiftState shiftState = null;
                 Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
-                shiftDTO = shiftValidatorService.validateShiftStateAfterValidatingWtaRule(shiftDTO, shiftState, validatedByStaff, actualPhases, shiftDTO.getId());
+                shiftDTO = shiftValidatorService.validateShiftStateAfterValidatingWtaRule(shiftDTO, validatedByStaff, actualPhases);
             }
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(newArrayList(shiftDTO), staffAdditionalInfoDTO.getUserAccessRoleDTO());
         } else {
@@ -978,7 +977,7 @@ public class ShiftService extends MongoBaseService {
                 openShift.getInterestedStaff().remove(staffId);
                 openShift.getAssignedStaff().remove(staffId);
             }
-            save(openShifts);
+            openShiftMongoRepository.saveEntities(openShifts);
         }
 
     }
