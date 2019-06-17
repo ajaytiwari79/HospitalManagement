@@ -465,7 +465,7 @@ public class ActivityService {
     }
 
 
-    public ActivityWithCompositeDTO getCompositeAndChildActivityOfCountryActivity(BigInteger activityId,Long countryId){
+    /*public ActivityWithCompositeDTO getCompositeAndChildActivityOfCountryActivity(BigInteger activityId,Long countryId){
         ActivityWithCompositeDTO  activity=getCompositeShiftTabOfActivity(activityId);
         List<ActivityTagDTO> activityTagDTO=activityMongoRepository.findAllowChildActivityByCountryId(countryId);
         activity.setAvailableChildActivityIds(checkActivityAllowForChildActivities(activityTagDTO,activity));
@@ -492,7 +492,7 @@ public class ActivityService {
             activity.setCompositeActivities(compositeActivities);
         }
         return activity;
-    }
+    }*/
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
         IndividualPointsActivityTab individualPointsActivityTab = new IndividualPointsActivityTab();

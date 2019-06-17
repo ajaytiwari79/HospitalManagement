@@ -215,6 +215,6 @@ public class ShiftController {
     @DeleteMapping(value = "/request_absence")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createRequestAbsence(@RequestBody @Valid RequestAbsenceDTO requestAbsenceDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, requestAbsenceService.createRequestAbsence(requestAbsenceDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, requestAbsenceService.createOrUpdateRequestAbsence(requestAbsenceDTO));
     }
 }

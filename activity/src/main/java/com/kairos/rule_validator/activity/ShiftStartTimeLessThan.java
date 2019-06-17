@@ -28,12 +28,17 @@ public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftW
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
         shift.getActivities().forEach(shiftActivityDTO -> {
-            Duration duration = Duration.between(DateUtils.getLocalDateTime(), DateUtils.asLocalDateTime(shiftActivityDTO.getStartDate()));
-            int calculatedValue = DurationType.DAYS.equals(shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getType()) ? (int)duration.toDays() : (int)duration.toHours();
-            if (shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()!=null && calculatedValue < shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()) {
-                ShiftValidatorService.throwException(MESSAGE_SHIFT_PLANNEDTIME_LESS);
-            }
+            shiftActivityDTO.getChildActivities().forEach(childActivity->validateShiftActivityStartTime(childActivity));
+            validateShiftActivityStartTime(shiftActivityDTO);
         });
+    }
+
+    private void validateShiftActivityStartTime(ShiftActivityDTO shiftActivityDTO) {
+        Duration duration = Duration.between(DateUtils.getLocalDateTime(), DateUtils.asLocalDateTime(shiftActivityDTO.getStartDate()));
+        int calculatedValue = DurationType.DAYS.equals(shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getType()) ? (int)duration.toDays() : (int)duration.toHours();
+        if (shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()!=null && calculatedValue < shiftActivityDTO.getActivity().getRulesActivityTab().getPqlSettings().getApprovalTimeInAdvance().getValue()) {
+            ShiftValidatorService.throwException(MESSAGE_SHIFT_PLANNEDTIME_LESS);
+        }
     }
 
     @Override

@@ -47,18 +47,24 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
     public void validateRules(ShiftWithActivityDTO shift) {
         List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-            ActivityRuleViolation activityRuleViolation = null;
-            if (isNotNull(shiftActivityDTO.getActivity().getExpertises()) && !shiftActivityDTO.getActivity().getExpertises().contains(expertise.getId())) {
-                errorMessages.add(convertMessage(MESSAGE_ACTIVITY_EXPERTISE_MATCH, shiftActivityDTO.getActivity().getName(), expertise.getName()));
-                activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
-                if (activityRuleViolation == null) {
-                    activityRuleViolation = new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(), shiftActivityDTO.getActivity().getName(), 0, errorMessages);
-                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
-                } else {
-                    activityRuleViolation.getErrorMessages().addAll(errorMessages);
-                }
+            for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
+                validateExpertise(errorMessages, childActivity);
             }
+            validateExpertise(errorMessages,shiftActivityDTO);
+        }
+    }
 
+    private void validateExpertise(List<String> errorMessages, ShiftActivityDTO childActivity) {
+        ActivityRuleViolation activityRuleViolation = null;
+        if (isNotNull(childActivity.getActivity().getExpertises()) && !childActivity.getActivity().getExpertises().contains(expertise.getId())) {
+            errorMessages.add(convertMessage(MESSAGE_ACTIVITY_EXPERTISE_MATCH, childActivity.getActivity().getName(), expertise.getName()));
+            activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(childActivity.getActivity().getId())).findAny().orElse(null);
+            if (activityRuleViolation == null) {
+                activityRuleViolation = new ActivityRuleViolation(childActivity.getActivity().getId(), childActivity.getActivity().getName(), 0, errorMessages);
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+            } else {
+                activityRuleViolation.getErrorMessages().addAll(errorMessages);
+            }
         }
     }
 

@@ -125,6 +125,7 @@ public class TimeBankCalculationService {
                                 totalPublishedDailyPlannedMinutes += ctaBonusAndScheduledMinutes;
                                 anyShiftPublish = true;
                             }
+                            updateChildActivitiesTimebankCtaBonus(shiftActivity.getChildActivities(),ruleTemplate,dateTimeInterval);
                         }
                     }
                 }
@@ -1057,30 +1058,24 @@ public class TimeBankCalculationService {
     }
 
     public Map<java.time.LocalDate, TimeBankByDateDTO> getAccumulatedTimebankDTO(Set<DateTimeInterval> dateTimeIntervals, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate startDate, java.time.LocalDate endDate,long actualTimebankMinutes) {
-        long accumulatedTimebank = 0;
+        long expectedTimebank = actualTimebankMinutes;
         java.time.LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
         Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k -> k.getDate(), v -> v));
         Map<java.time.LocalDate, TimeBankByDateDTO> localDateTimeBankByDateDTOMap = new HashMap<>();
         endDate = isNull(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : endDate.isBefore(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : employmentWithCtaDetailsDTO.getEndDate();
         while (employmentStartDate.isBefore(endDate) || employmentStartDate.equals(endDate)) {
-            TimeBankByDateDTO timeBankByDateDTO = new TimeBankByDateDTO();
             int totalTimeBankMinutes;
             long publishedBalancesMinutes = 0;
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate)) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
                 totalTimeBankMinutes = dailyTimeBankEntry.getDeltaTimeBankMinutes();
-                //accumulatedTimebank += dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
                 publishedBalancesMinutes = dailyTimeBankEntry.getPublishedBalances().values().stream().mapToLong(value -> value).sum();
             } else {
                 totalTimeBankMinutes = -getContractualMinutesByDate(dateTimeIntervals, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines());
             }
-            /*if(employmentStartDate.equals(employmentWithCtaDetailsDTO.getAccumulatedTimebankDate())) {
-                accumulatedTimebank = employmentWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
-            }
-            timeBankByDateDTO.setAccumulatedTimebankMinutes(accumulatedTimebank);*/
-            timeBankByDateDTO.setTimeBankChangeMinutes(totalTimeBankMinutes);
+            expectedTimebank +=totalTimeBankMinutes;
             if(employmentStartDate.isAfter(startDate) || startDate.equals(employmentStartDate)) {
-                localDateTimeBankByDateDTOMap.put(employmentStartDate, new TimeBankByDateDTO(totalTimeBankMinutes,accumulatedTimebank,actualTimebankMinutes+ totalTimeBankMinutes,publishedBalancesMinutes));
+                localDateTimeBankByDateDTOMap.put(employmentStartDate, new TimeBankByDateDTO(totalTimeBankMinutes,actualTimebankMinutes,expectedTimebank,publishedBalancesMinutes));
             }
             employmentStartDate = employmentStartDate.plusDays(1);
         }
@@ -1173,5 +1168,25 @@ public class TimeBankCalculationService {
             employmentStartDate = employmentStartDate.plusDays(1);
         }
         return actualTimebank;
+    }
+
+    private void updateChildActivitiesTimebankCtaBonus(List<ShiftActivityDTO> childActivitiesDTOS,CTARuleTemplateDTO ruleTemplate,DateTimeInterval dateTimeInterval){
+        childActivitiesDTOS.sort(Comparator.comparing(ShiftActivityDTO::getStartDate));
+        int ctaBonusAndScheduledMinutes = 0;
+        for (ShiftActivityDTO childActivitiesDTO : childActivitiesDTOS) {
+            if(ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && dateTimeInterval.contains(childActivitiesDTO.getStartDate().getTime())) {
+                ctaBonusAndScheduledMinutes = childActivitiesDTO.getScheduledMinutes();
+            } else if(ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
+                    DateTimeInterval shiftInterval = dateTimeInterval.overlap(new DateTimeInterval(childActivitiesDTO.getStartDate(), childActivitiesDTO.getEndDate()));
+                    ctaBonusAndScheduledMinutes = calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
+                    if(asLocalDate(childActivitiesDTO.getStartDate()).isBefore(asLocalDate(childActivitiesDTO.getEndDate()))) {
+                        DateTimeInterval nextDayInterval = new DateTimeInterval(getStartOfDay(childActivitiesDTO.getEndDate()), getEndOfDay(childActivitiesDTO.getEndDate()));
+                        shiftInterval = nextDayInterval.overlap(new DateTimeInterval(getStartOfDay(childActivitiesDTO.getEndDate()), childActivitiesDTO.getEndDate()));
+                        ctaBonusAndScheduledMinutes += calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
+                    }
+                LOGGER.debug("rule template : {} minutes {}", ruleTemplate.getId(),ctaBonusAndScheduledMinutes);
+            }
+            childActivitiesDTO.getTimeBankCTADistributions().add(new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(childActivitiesDTO.getStartDate()),  ctaBonusAndScheduledMinutes));
+        }
     }
 }

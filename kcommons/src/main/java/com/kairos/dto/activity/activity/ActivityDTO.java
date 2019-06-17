@@ -36,7 +36,6 @@ public class ActivityDTO {
     private TimeTypeDTO timeType;
     private TimeCalculationActivityDTO timeCalculationActivityTab;
     private RulesActivityTabDTO rulesActivityTab;
-    private List<ActivityDTO> compositeActivities;
     private List<ActivityDTO> childActivities;
     private BalanceSettingActivityTabDTO balanceSettingsActivityTab;
     private Long countryActivityId;
@@ -192,15 +191,6 @@ public class ActivityDTO {
 
     public void setParentActivity(boolean parentActivity) {
         isParentActivity = parentActivity;
-    }
-
-
-    public List<ActivityDTO> getCompositeActivities() {
-        return compositeActivities;
-    }
-
-    public void setCompositeActivities(List<ActivityDTO> compositeActivities) {
-        this.compositeActivities = compositeActivities;
     }
 
     public LocalDate getStartDate() {

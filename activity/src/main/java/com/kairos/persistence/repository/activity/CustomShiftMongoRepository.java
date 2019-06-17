@@ -88,5 +88,5 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllShiftBetweenDurationByUnitId(Long unitId, Date startDate, Date endDate);
 
-
+    void deleteShiftBetweenDatesByEmploymentId(Long employmentId,Date startDate,Date endDate);
 }

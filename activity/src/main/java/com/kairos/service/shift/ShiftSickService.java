@@ -44,6 +44,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
@@ -78,6 +79,7 @@ public class ShiftSickService extends MongoBaseService {
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private TimeBankRepository timeBankRepository;
+    @Inject private ShiftBreakService shiftBreakService;
 
 
     public Map<String, Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId, Duration duration) {
@@ -165,7 +167,7 @@ public class ShiftSickService extends MongoBaseService {
             Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);
             //shiftMongoRepository.saveEntities(shifts);
 
-            List<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toList());
+            Set<BigInteger> activityIds = shiftService.getActivityIds(shifts,null);
             List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             for (Shift shift : shifts) {
@@ -177,10 +179,8 @@ public class ShiftSickService extends MongoBaseService {
                 }
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                List<ShiftActivity> breakActivities = shiftService.updateBreakInShift(shift,false,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
-                if (!breakActivities.isEmpty()) {
-                    shift.setActivities(breakActivities);
-                }
+                ShiftActivity breakActivity = shiftBreakService.updateBreakInShift(shift,false,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
+                shift.setBreakActivity(breakActivity);
                 shiftService.saveShiftWithActivity( activityWrapperMap, shift, staffAdditionalInfoDTO,false,null ,phaseListByDate.get(shift.getStartDate()),null);
             }
 

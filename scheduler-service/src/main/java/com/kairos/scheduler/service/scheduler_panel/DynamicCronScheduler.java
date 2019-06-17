@@ -34,7 +34,7 @@ import java.util.concurrent.ScheduledFuture;
  */
 
 @Service
-public class DynamicCronScheduler implements DisposableBean {
+public class DynamicCronScheduler {//implements DisposableBean {
 
 
     @Inject
@@ -165,7 +165,7 @@ public class DynamicCronScheduler implements DisposableBean {
         };
     }
 
-    public void destroy() {
+    /*public void destroy() {
         List<SchedulerPanel> schedulerPanels = schedulerPanelService.getAllControlPanels();
         if (schedulerPanels.size() != 0) {
             for (SchedulerPanel schedulerPanel : schedulerPanels) {
@@ -173,7 +173,7 @@ public class DynamicCronScheduler implements DisposableBean {
                 stopCronJob("scheduler" + schedulerPanel.getId());
             }
         }
-    }
+    }*/
 
 
 }

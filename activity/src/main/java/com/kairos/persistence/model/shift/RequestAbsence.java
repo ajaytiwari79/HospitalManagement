@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * Created by pradeep
@@ -18,7 +19,7 @@ import java.time.ZonedDateTime;
 public class RequestAbsence {
     private BigInteger shiftId;
     private BigInteger activityId;
-    private ZonedDateTime startDate;
-    private ZonedDateTime endDate;
+    private Date startDate;
+    private Date endDate;
     private TodoStatus todoStatus;
 }

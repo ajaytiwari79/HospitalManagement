@@ -226,9 +226,13 @@ public class ShiftCopyService extends MongoBaseService {
             Activity activity = activityMap.get(sourceShift.getActivities().get(0).getActivityId()).getActivity();
 
               ShiftType shiftType = TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
-
+            WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffEmployment.getId(), DateUtils.onlyDate(copiedShift.getStartDate()));
+            if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
+                exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
+            }
             //  ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
-            shiftActivities = shiftBreakService.addBreakInShiftsWhileCopy(activityMap, copiedShift, null, dataWrapper.getTimeSlotWrappers(), breakSettings);
+            ShiftActivity breakActivity = shiftBreakService.updateBreakInShift( copiedShift, activityMap, staffEmployment.getExpertise().getId(),wtaQueryResultDTO.getBreakRule());
+            copiedShift.setBreakActivity(breakActivity);
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffEmployment, planningPeriod, activityConfigurations);
             copiedShift.setShiftType(shiftType);

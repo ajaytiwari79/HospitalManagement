@@ -9,6 +9,8 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
+import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
@@ -75,7 +77,7 @@ public class StaffingLevelServiceUnitTest {
     public void  updateStaffingLevelAvailableStaffCountForNewlyCreatedShiftTest(){
         ShiftNotificationEvent shiftNotificationEvent=new ShiftNotificationEvent();
         Shift shift =new Shift();
-        shift.setActivities(Arrays.asList(new ShiftActivity("Senior Day Activity",DateUtils.asDate(LocalDateTime.now()),DateUtils.asDate(LocalDateTime.now().plusMinutes(120)),new BigInteger("11"))));
+        shift.setActivities(Arrays.asList(new ShiftActivity("Senior Day Activity",DateUtils.asDate(LocalDateTime.now()),DateUtils.asDate(LocalDateTime.now().plusMinutes(120)),new BigInteger("11"),TimeTypes.WORKING_TYPE.toValue())));
         shift.setStartDate(shift.getActivities().get(0).getStartDate());
         shift.setEndDate(shift.getActivities().get(shift.getActivities().size()-1).getEndDate());
         shiftNotificationEvent.setShift(shift);
@@ -99,13 +101,13 @@ public class StaffingLevelServiceUnitTest {
 
         ShiftNotificationEvent shiftNotificationEvent=new ShiftNotificationEvent();
         Shift shift =new Shift();
-        shift.setActivities(Arrays.asList(new ShiftActivity("Senior Day Activity",DateUtils.asDate(LocalDateTime.now()),DateUtils.asDate(LocalDateTime.now().plusMinutes(300)),new BigInteger("11"))));
+        shift.setActivities(Arrays.asList(new ShiftActivity("Senior Day Activity",DateUtils.asDate(LocalDateTime.now()),DateUtils.asDate(LocalDateTime.now().plusMinutes(300)),new BigInteger("11"),TimeTypes.WORKING_TYPE.toValue())));
         shift.setStartDate(shift.getActivities().get(0).getStartDate());
         shift.setEndDate(shift.getActivities().get(shift.getActivities().size()-1).getEndDate());
         shiftNotificationEvent.setShift(shift);
 
         Shift updatedShift=new Shift();
-        updatedShift.setActivities(Arrays.asList(new ShiftActivity("Senior Day Activity",DateUtils.asDate(LocalDateTime.now()),DateUtils.asDate(LocalDateTime.now().plusMinutes(300)),new BigInteger("11"))));
+        updatedShift.setActivities(Arrays.asList(new ShiftActivity("Senior Day Activity",DateUtils.asDate(LocalDateTime.now()),DateUtils.asDate(LocalDateTime.now().plusMinutes(300)),new BigInteger("11"),TimeTypes.WORKING_TYPE.toValue())));
         updatedShift.setStartDate(updatedShift.getActivities().get(0).getStartDate());
         updatedShift.setEndDate(updatedShift.getActivities().get(updatedShift.getActivities().size()-1).getEndDate());
         shiftNotificationEvent.setPreviousStateShift(shift);

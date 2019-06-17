@@ -53,21 +53,28 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-            List<PhaseTemplateValue> phaseTemplateValues = shiftActivityDTO.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues();
-            PhaseTemplateValue phaseTemplateValue1 = null;
-            for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
-                if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
-                    phaseTemplateValue1 = phaseTemplateValue;
-                    break;
-                }
+            for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
+                validateStaffEmployment(childActivity);
             }
-            if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-                if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()) {
-                    ShiftValidatorService.throwException(MESSAGE_MANAGEMENT_AUTHORITY_PHASE);
-                }
-                if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
-                    ShiftValidatorService.throwException(MESSAGE_STAFF_EMPLOYMENTTYPE_ABSENT);
-                }
+            validateStaffEmployment(shiftActivityDTO);
+        }
+    }
+
+    private void validateStaffEmployment(ShiftActivityDTO shiftActivityDTO) {
+        List<PhaseTemplateValue> phaseTemplateValues = shiftActivityDTO.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues();
+        PhaseTemplateValue phaseTemplateValue1 = null;
+        for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
+            if (phase.getId().equals(phaseTemplateValue.getPhaseId())) {
+                phaseTemplateValue1 = phaseTemplateValue;
+                break;
+            }
+        }
+        if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
+            if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && !phaseTemplateValue1.isEligibleForManagement()) {
+                ShiftValidatorService.throwException(MESSAGE_MANAGEMENT_AUTHORITY_PHASE);
+            }
+            if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
+                ShiftValidatorService.throwException(MESSAGE_STAFF_EMPLOYMENTTYPE_ABSENT);
             }
         }
     }

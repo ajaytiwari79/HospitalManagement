@@ -235,6 +235,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         mongoTemplate.remove(query, Shift.class);
     }
 
+    @Override
+    public void deleteShiftBetweenDatesByEmploymentId(Long employmentId,Date startDate,Date endDate) {
+        Query query = new Query(where("employmentId").is(employmentId).and("startDate").lt(endDate).and("endDate").gt(startDate));
+        Update update = Update.update("deleted",true);
+        mongoTemplate.updateMulti(query,update, Shift.class);
+    }
+
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsByIds(List<BigInteger> shiftIds ) {

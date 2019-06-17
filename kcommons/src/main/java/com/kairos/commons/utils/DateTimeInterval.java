@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static javax.management.timer.Timer.ONE_MINUTE;
@@ -29,25 +29,35 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
     public DateTimeInterval(ZonedDateTime start, ZonedDateTime end) {
         this.start = start.toInstant().toEpochMilli();
         this.end = end.toInstant().toEpochMilli();
+        checkInterval();
     }
 
     public DateTimeInterval(Date start, Date end) {
         this.start = start.getTime();
         this.end = end.getTime();
+        checkInterval();
     }
 
     public DateTimeInterval(LocalDate start, LocalDate end) {
         this.start = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         this.end = end.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        checkInterval();
     }
 
     public DateTimeInterval(Long start, Long end) {
         this.start = start;
         this.end = end;
+        checkInterval();
     }
 
     public ZonedDateTime getStart() {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(start), ZoneId.systemDefault());
+    }
+
+    public void checkInterval(){
+        if(this.start>this.end){
+            throw new IllegalArgumentException("The end instant must be greater than the start instant");
+        }
     }
 
     public Date getStartDate() {
@@ -232,6 +242,21 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
+    }
+
+    public List<DateTimeInterval> minusInterval(DateTimeInterval dateTimeInterval){
+        List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
+        if(this.overlaps(dateTimeInterval)){
+            if(this.start<dateTimeInterval.start && this.end>dateTimeInterval.end){
+                dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
+            }else if(this.contains(dateTimeInterval.start) && dateTimeInterval.contains(this.end)){
+                dateTimeIntervals.add(new DateTimeInterval(this.start,dateTimeInterval.start));
+            }else if (this.contains(dateTimeInterval.end) && dateTimeInterval.contains(this.start)){
+                dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
+            }
+        }
+        return dateTimeIntervals;
     }
 
     @Override

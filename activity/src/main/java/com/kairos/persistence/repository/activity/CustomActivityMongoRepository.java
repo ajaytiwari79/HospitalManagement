@@ -7,6 +7,7 @@ import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettings
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -99,4 +100,5 @@ public interface CustomActivityMongoRepository {
     ActivityDTO findByIdAndChildActivityEligibleForStaffingLevelTrue(BigInteger activityId);
 
     List<ActivityTagDTO> findAllActivityByUnitIdAndNotPartOfTeam(Long unitId);
+    TimeTypeEnum findTimeTypeByActivityId(BigInteger activityId);
 }

@@ -6,8 +6,7 @@ import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -22,6 +21,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
  */
 @Getter
 @Setter
+@Builder
 public class ShiftActivityDTO {
 
     private Set<ShiftStatus> status;

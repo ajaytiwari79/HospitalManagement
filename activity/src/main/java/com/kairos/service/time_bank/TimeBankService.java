@@ -295,7 +295,7 @@ public class TimeBankService extends MongoBaseService {
             dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, interval.getStart().toDate(), interval.getEnd().toDate());
         }
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, employmentWithCtaDetailsDTO);
-        Long actualTimebankMinutes = getAccumulatedTimebankAndDeltaDTO(employmentId,unitId,true);
+        Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId,unitId,true);
         timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
         return timeBankDTO;
     }
@@ -580,7 +580,7 @@ public class TimeBankService extends MongoBaseService {
         return ctaResponse;
     }
 
-    public <T> T getAccumulatedTimebankAndDeltaDTO(Long employmentId, Long unitId,Boolean includeActualTimebank) {
+    public <T> T getAccumulatedTimebankAndDelta(Long employmentId, Long unitId, Boolean includeActualTimebank) {
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>());
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO, unitId);
         T object;

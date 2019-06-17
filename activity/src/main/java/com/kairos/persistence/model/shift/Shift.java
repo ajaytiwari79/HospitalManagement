@@ -10,13 +10,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -73,6 +72,7 @@ public class Shift extends MongoBaseEntity {
     private Shift draftShift;
     private boolean draft;
     private RequestAbsence requestAbsence;
+    private ShiftActivity breakActivity;
 
 
     public Shift() {
@@ -178,7 +178,7 @@ public class Shift extends MongoBaseEntity {
 
     public void setActivities(List<ShiftActivity> activities) {
         activities = isNull(activities) ? new ArrayList<>() : activities;
-        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        Collections.sort(activities);
         this.activities = activities;
     }
     public Date getStartDate() {

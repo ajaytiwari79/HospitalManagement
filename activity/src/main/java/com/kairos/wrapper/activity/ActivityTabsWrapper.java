@@ -30,7 +30,6 @@ public class ActivityTabsWrapper {
     private RulesActivityTab rulesTab;
     private IndividualPointsActivityTab individualPointsTab;
     private TimeCalculationActivityTab timeCalculationActivityTab;
-    private CompositeActivity compositeActivity;
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
     private BonusActivityTab bonusActivityTab;
@@ -165,14 +164,6 @@ public class ActivityTabsWrapper {
     public void setTimeCalculationActivityTab(TimeCalculationActivityTab timeCalculationActivityTab) {
         this.timeCalculationActivityTab = timeCalculationActivityTab;
 
-    }
-
-    public CompositeActivity getCompositeActivity() {
-        return compositeActivity;
-    }
-
-    public void setCompositeActivity(CompositeActivity compositeActivity) {
-        this.compositeActivity = compositeActivity;
     }
 
     public NotesActivityTab getNotesActivityTab() {

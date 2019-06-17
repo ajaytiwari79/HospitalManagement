@@ -63,6 +63,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
@@ -111,7 +112,7 @@ public class ShiftValidatorService {
     @Inject
     private TimeBankRepository timeBankRepository;
     @Inject
-    private TimeBankCalculationService timeBankCalculationService;
+    private TimeBankService timeBankService;
     @Inject
     private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
     @Inject
@@ -232,29 +233,27 @@ public class ShiftValidatorService {
         }
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
         activitySpecification.validateRules(shift);
-
-
-        //ruleTemplateSpecificInfo.getViolatedRules().setActivities(activityRuleViolations);
         return new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
     }
 
     private void validateAbsenceReasonCodeRule(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shift, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
-            Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
-            ActivityRuleViolation activityRuleViolation = null;
-            if (activity.getRulesActivityTab().isReasonCodeRequired() && activity.getRulesActivityTab().getReasonCodeRequiredState().
-                    equals(ReasonCodeRequiredState.MANDATORY) && !Optional.ofNullable(shiftActivity.getAbsenceReasonCodeId()).isPresent()) {
+            for (ShiftActivityDTO childActivity : shiftActivity.getChildActivities()) {
+                Activity activity = activityWrapperMap.get(childActivity.getActivityId()).getActivity();
+                ActivityRuleViolation activityRuleViolation = null;
+                if (activity.getRulesActivityTab().isReasonCodeRequired() && activity.getRulesActivityTab().getReasonCodeRequiredState().
+                        equals(ReasonCodeRequiredState.MANDATORY) && !Optional.ofNullable(childActivity.getAbsenceReasonCodeId()).isPresent()) {
 
-                activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().orElse(null);
-                if (activityRuleViolation == null) {
-                    activityRuleViolation = new ActivityRuleViolation(activity.getId(), activity.getName(), 0, singletonList(exceptionService.
-                            convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId())));
-                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
-                } else {
-                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().get().getErrorMessages().add(exceptionService.
-                            convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId()));
+                    activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().orElse(null);
+                    if (activityRuleViolation == null) {
+                        activityRuleViolation = new ActivityRuleViolation(activity.getId(), activity.getName(), 0, singletonList(exceptionService.
+                                convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId())));
+                        ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+                    } else {
+                        ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().get().getErrorMessages().add(exceptionService.
+                                convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId()));
+                    }
                 }
-
             }
         }
 
@@ -317,15 +316,9 @@ public class ShiftValidatorService {
             shifts = shifts.stream().filter(shiftWithActivityDTO -> !shiftWithActivityDTO.getId().equals(shiftId)).collect(Collectors.toList());
         }
         shifts = updateFullDayAndFullWeekActivityShift(shifts);
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
         Date endTimeOfInterval = DateUtils.getStartOfTheDay(DateUtils.asDate(DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1)));
-        Interval interval = new Interval(DateUtils.getLongFromLocalDate(staffAdditionalInfoDTO.getEmployment().getStartDate()),
-                staffAdditionalInfoDTO.getEmployment().getEndDate() == null ? endTimeOfInterval.getTime() : DateUtils.getLongFromLocalDate(staffAdditionalInfoDTO.getEmployment().getEndDate()));
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes(), staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek(),
-                staffAdditionalInfoDTO.getEmployment().getStartDate(), staffAdditionalInfoDTO.getEmployment().getEndDate() != null ? staffAdditionalInfoDTO.getEmployment().getEndDate() : null, staffAdditionalInfoDTO.getEmployment().getTotalWeeklyHours());
-        Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shift.getUnitId(), interval.getStart().toDate(), interval.getEnd().toDate());
-        int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
+        int totalTimeBank = timeBankService.getAccumulatedTimebankAndDelta(shift.getEmploymentId(),shift.getUnitId(),false);
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         shift = updateFullDayAndFullWeekActivityShift(newArrayList(shift)).get(0);
@@ -347,19 +340,9 @@ public class ShiftValidatorService {
             shifts = newCreatedShiftWithActivityDTOs;
         }
         shifts = updateFullDayAndFullWeekActivityShift(shifts);
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(staffEmploymentDetails.getId(), shift.getStartDate());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
         Date endTimeOfInterval = DateUtils.getStartOfTheDay(DateUtils.asDate(DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1)));
-        Interval interval = new Interval(DateUtils.getLongFromLocalDate(staffEmploymentDetails.getStartDate()),
-                staffEmploymentDetails.getEndDate() == null ? endTimeOfInterval.getTime() : DateUtils.getLongFromLocalDate(staffEmploymentDetails.getEndDate()));
-
-        EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = new EmploymentWithCtaDetailsDTO(staffEmploymentDetails.getId(), staffEmploymentDetails.getTotalWeeklyMinutes(), staffEmploymentDetails.getWorkingDaysInWeek(),
-                staffEmploymentDetails.getStartDate(), staffEmploymentDetails.getEndDate(), staffEmploymentDetails.getTotalWeeklyMinutes());
-
-        Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(shift.getUnitId(), interval.getStart().toDate(), interval.getEnd().toDate());
-
-        int totalTimeBank = -timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals, interval, employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
-        Map<String, TimeSlotWrapper> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
+        int totalTimeBank = timeBankService.getAccumulatedTimebankAndDelta(shift.getEmploymentId(),shift.getUnitId(),false);Map<String, TimeSlotWrapper> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         shift = updateFullDayAndFullWeekActivityShift(newArrayList(shift)).get(0);
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndUnitId(staffEmploymentDetails.getExpertise().getId(),shift.getUnitId());

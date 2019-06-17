@@ -4,8 +4,10 @@ import com.kairos.enums.shift.TodoStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * Created by pradeep
@@ -14,9 +16,13 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 public class RequestAbsenceDTO {
+    @NotNull
     private BigInteger shiftId;
+    @NotNull
     private BigInteger activityId;
-    private ZonedDateTime startDate;
-    private ZonedDateTime endDate;
+    @NotNull
+    private Date startDate;
+    @NotNull
+    private Date endDate;
     private TodoStatus todoStatus = TodoStatus.PENDING;
 }

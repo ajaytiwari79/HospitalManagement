@@ -20,7 +20,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
  */
 @Getter
 @Setter
-public class ShiftActivity {
+public class ShiftActivity implements Comparable<ShiftActivity>{
 
 
     private BigInteger activityId;
@@ -69,11 +69,12 @@ public class ShiftActivity {
 
 
 
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId) {
+    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType) {
         this.activityId = activityId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.activityName = activityName;
+        this.timeType = timeType;
     }
 
     public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute, String startLocation, String endLocation) {
@@ -127,4 +128,12 @@ public class ShiftActivity {
         return plannedTimes=Optional.ofNullable(plannedTimes).orElse(new ArrayList<>());
     }
 
+    public void getChildActivities(List<ShiftActivity> childActivities) {
+        this.childActivities = isNullOrElse(childActivities,new ArrayList<>());
+    }
+
+    @Override
+    public int compareTo(ShiftActivity shiftActivity) {
+        return this.startDate.compareTo(shiftActivity.startDate);
+    }
 }
