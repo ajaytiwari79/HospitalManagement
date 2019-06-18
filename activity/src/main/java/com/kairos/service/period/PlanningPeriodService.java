@@ -505,8 +505,12 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.actionNotPermittedException(MESSAGE_PERIOD_PHASE_REQUEST_NAME, planningPeriod.getName());
         }
         List<BigInteger> schedulerPanelIds = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId() != null).map(PeriodPhaseFlippingDate::getSchedulerPanelId).collect(Collectors.toList());
-        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, null, null);
+        try {
+            schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+            }, null, null);
+        }catch (Exception ex){
+            LOGGER.error("ex "+ex);
+        }
         planningPeriod.setDeleted(true);
         save(planningPeriod);
         return true;
