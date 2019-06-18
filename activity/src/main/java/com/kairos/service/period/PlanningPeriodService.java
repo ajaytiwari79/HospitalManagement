@@ -514,7 +514,7 @@ public class PlanningPeriodService extends MongoBaseService {
         schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         }, null, null);
         planningPeriod.setDeleted(true);
-        //save(planningPeriod);
+        save(planningPeriod);
         return true;
     }
 
