@@ -287,8 +287,11 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId, planningPeriodDTO.getDurationType(), planningPeriodDTO.getDuration());
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         // Add planning period object in list
+            if(planningPeriodDTO.getDuration() <= 0){
+                exceptionService.actionNotPermittedException(MESSAGE_VALID_DURATION);
+            }
 
-            planningPeriods.add(planningPeriod);
+                planningPeriods.add(planningPeriod);
 
         if (recurringNumber > 1) {
             createPlanningPeriod(unitId, endDate.plusDays(1),
