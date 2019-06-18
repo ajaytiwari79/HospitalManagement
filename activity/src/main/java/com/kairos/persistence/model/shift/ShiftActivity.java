@@ -56,6 +56,7 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     private int scheduledMinutesOfPayout;
     private List<PlannedTime> plannedTimes;
     private List<ShiftActivity> childActivities;
+    private boolean breakHeld;
 
     @IgnoreLogging
     public DateTimeInterval getInterval() {

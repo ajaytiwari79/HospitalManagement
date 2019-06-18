@@ -1,5 +1,7 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
@@ -21,9 +23,12 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_ACTIVITY_NOTASSIGNED;
 import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
@@ -58,11 +63,32 @@ public class ShiftBreakService {
     public ShiftActivity updateBreakInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Long  expertiseId, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
         List<BreakSettingsDTO> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(expertiseId);
         activityWrapperMap.putAll(getBreakActivities(breakSettings, shift.getUnitId()));
+        boolean placeBreakAnyWhereInShift = true;
+        ShiftActivity breakActivity;
+        DateTimeInterval eligibleBreakInterval;
         if(isNotNull(breakWTATemplate)){
-
+            BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(),timeSlot,breakWTATemplate);
+            placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes()+breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
+            eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift,breakAvailabilitySettings);
+            placeBreakAnyWhereInShift = eligibleBreakInterval.getMinutes()<breakSettings.get(0).getBreakDurationInMinute();
         }
-        return breakActivities.get(0);
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+            boolean breakAllowed = activity.getRulesActivityTab().isBreakAllowed();
+            if(breakAllowed) {
+                for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
+                    activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+                    breakAllowed = activity.getRulesActivityTab().isBreakAllowed();
+                }
+            }
+        }
+        return null;//breakActivities.get(0);
+    }
 
+    private DateTimeInterval getBreakInterval(Shift shift,BreakAvailabilitySettings breakAvailabilitySettings){
+        ZonedDateTime startDate = asZoneDateTime(shift.getStartDate()).plusMinutes(breakAvailabilitySettings.getStartAfterMinutes());
+        ZonedDateTime endDate = asZoneDateTime(shift.getStartDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
+        return new DateTimeInterval(startDate,endDate);
     }
 
     private BreakAvailabilitySettings findCurrentBreakAvailability(Date startDate, List<TimeSlotWrapper> timeSlots, BreakWTATemplate breakWTATemplate) {
