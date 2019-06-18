@@ -136,7 +136,7 @@ public class CounterDistService extends MongoBaseService {
                 copyAndkpidtos.addAll(copyKpidtos);
             }
         }
-        copyAndkpidtos.addAll(kpidtos);
+       copyAndkpidtos.addAll(kpidtos);
         kpiIds = copyAndkpidtos.stream().map(KPIDTO::getId).collect(Collectors.toSet());
         List<ApplicableKPI> applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(kpiIds), ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
         Map<BigInteger, String> kpiIdAndTitleMap = applicableKPIS.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, ApplicableKPI::getTitle));
