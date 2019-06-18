@@ -469,7 +469,7 @@ public class UserService {
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
-        permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
+         permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
         return permissionData;
     }
 
