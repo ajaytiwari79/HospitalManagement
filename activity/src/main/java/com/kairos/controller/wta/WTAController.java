@@ -43,7 +43,7 @@ public class WTAController {
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value =   COUNTRY_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @Validated @RequestBody WTADTO wta) {
+    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody @Valid WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(countryId, wta, true,false));
     }
 

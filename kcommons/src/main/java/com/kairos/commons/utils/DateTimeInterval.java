@@ -8,6 +8,7 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static javax.management.timer.Timer.ONE_MINUTE;
 
@@ -121,6 +122,9 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
         return getEnd().toLocalDateTime();
     }
 
+    public Date getMiddleOfTheInterval(){
+        return asDate(getStart().plusMinutes(this.getMinutes()/2));
+    }
 
     public void setEnd(ZonedDateTime end) {
         this.end = end.toInstant().toEpochMilli();

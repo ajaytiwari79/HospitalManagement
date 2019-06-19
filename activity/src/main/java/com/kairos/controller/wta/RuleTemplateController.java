@@ -45,7 +45,7 @@ public class RuleTemplateController {
     }
 
     @RequestMapping(value = COUNTRY_URL + "/rule_templates/{ruleTemplateId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId, @RequestBody WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO) {
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId, @RequestBody @Valid WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO) {
         // WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = WTABuilderService.copyRuleTemplateMapToDTO(template);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId, ruleTemplateId,wtaBaseRuleTemplateDTO));
     }

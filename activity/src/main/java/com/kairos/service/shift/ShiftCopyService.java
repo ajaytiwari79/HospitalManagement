@@ -10,6 +10,7 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
@@ -227,7 +228,8 @@ public class ShiftCopyService extends MongoBaseService {
                 exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
             }
             //  ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
-            ShiftActivity breakActivity = shiftBreakService.updateBreakInShift(copiedShift, activityMap, staffEmployment.getExpertise().getId(),wtaQueryResultDTO.getBreakRule(),dataWrapper.getTimeSlotWrappers());
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmployment,dataWrapper.getDayTypes());
+            ShiftActivity breakActivity = shiftBreakService.updateBreakInShift(copiedShift, activityMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),dataWrapper.getTimeSlotWrappers());
             copiedShift.setBreakActivity(breakActivity);
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffEmployment, planningPeriod, activityConfigurations);

@@ -6,8 +6,7 @@ import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -20,6 +19,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
  */
 @Getter
 @Setter
+@Builder
 public class ShiftActivity implements Comparable<ShiftActivity>{
 
 
@@ -56,7 +56,7 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     private int scheduledMinutesOfPayout;
     private List<PlannedTime> plannedTimes;
     private List<ShiftActivity> childActivities;
-    private boolean breakHeld;
+    private boolean breakNotHeld;
 
     @IgnoreLogging
     public DateTimeInterval getInterval() {
