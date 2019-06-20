@@ -59,7 +59,7 @@ public class ProcessingActivity extends BaseEntity {
     private Long maxDataSubjectVolume;
     private Integer dataRetentionPeriod;
     private boolean isSubProcessingActivity;
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     private List<RelatedDataSubject> dataSubjectList = new ArrayList<>();
     private Long organizationId;
     private boolean active = true;
