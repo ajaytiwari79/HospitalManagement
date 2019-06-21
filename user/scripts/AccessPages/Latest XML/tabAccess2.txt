@@ -352,7 +352,15 @@ Match(ap:AccessPage) where ap.moduleId="module_7" merge (ap)-[:SUB_PAGE]-(access
 
 Match(ap:AccessPage) where ap.moduleId="module_3" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Optaplanner Configurations",isModule:false,moduleId:"tab_422",active:true});
 
+Match(ap:AccessPage) where ap.moduleId="tab_422" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Shift Planning",isModule:false,moduleId:"tab_423",active:true});
 
+Match(ap:AccessPage) where ap.moduleId="tab_423" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Solver Configuration Settings",isModule:false,moduleId:"tab_424",active:true});
+
+
+After that use this script for create relationship between them:
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+Match (ap:AccessPage)
+CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);
 
 
 
