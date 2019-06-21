@@ -300,6 +300,7 @@ public class StaffCreationService {
         user.setUserName(payload.getUserName());
         staff = updateStaffDetailsOnCreationOfStaff(parent, unit, payload);
         boolean isEmploymentExist = (staff.getId()) != null;
+        user.setLastSelectedOrganizationId(unitId);
         staff.setUser(user);
         staffService.addStaffInChatServer(staff);
         staffGraphRepository.save(staff);
