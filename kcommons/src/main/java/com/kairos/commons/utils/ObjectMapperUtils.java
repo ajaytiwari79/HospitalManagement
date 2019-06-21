@@ -180,7 +180,7 @@ public class ObjectMapperUtils {
                 Map<String, Object> subModelObjects = new HashMap<>();
                 for (KPermissionModelFieldDTO kPermissionModelFieldDTO : accessibleFieldsWithModelName) {
                     String modelName = kPermissionModelFieldDTO.getModelName();
-                    if (!modelName.equalsIgnoreCase(src.getClass().getSimpleName()) && baseClass.isAssignableFrom(srcWrapper.getPropertyType(modelName)) ) {
+                    if (!modelName.equalsIgnoreCase(src.getClass().getSimpleName()) && srcWrapper.getPropertyType(modelName) != null && baseClass.isAssignableFrom(srcWrapper.getPropertyType(modelName)) ) {
                         Object validatedObject = copyObjectSpecificPropertiesByMapper(srcWrapper.getPropertyValue(modelName),
                                 targetWrapper.getPropertyValue(modelName), kPermissionModelFieldDTO.getModelFields());
                         subModelObjects.put(modelName, validatedObject);
@@ -193,6 +193,31 @@ public class ObjectMapperUtils {
                             }
                         }
                     }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return (E) targetWrapper.getWrappedInstance();
+        }else{
+            return null;
+        }
+    }
+
+    public static <E extends Object>  E copySpecificPropertiesByMapper(Object src, Object target, List<KPermissionModelFieldDTO> accessibleFieldsWithModelName) {
+        if (src != null) {
+            BeanWrapper targetWrapper = null;
+            try {
+                BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
+                if (target == null) {
+                    target = src.getClass().newInstance();
+                }
+                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
+                for (KPermissionModelFieldDTO kPermissionModelFieldDTO : accessibleFieldsWithModelName) {
+                    for (String field : kPermissionModelFieldDTO.getModelFields()) {
+                        if(targetWrapper.isWritableProperty(field) && srcWrapper.isReadableProperty(field)) {
+                            targetWrapper.setPropertyValue(field, srcWrapper.getPropertyValue(field));
+                        }
+                        }
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
