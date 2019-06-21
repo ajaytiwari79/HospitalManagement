@@ -52,7 +52,7 @@ import static com.kairos.constants.AppConstants.WEEKS;
  */
 @Transactional
 @Service
-public class RuleTemplateService extends MongoBaseService {
+public class RuleTemplateService{
     @Inject
     private UserIntegrationService userIntegrationService;
     @Autowired
@@ -79,7 +79,7 @@ public class RuleTemplateService extends MongoBaseService {
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             ruleTemplateCategory = new RuleTemplateCategory("NONE", "None", RuleTemplateCategoryType.WTA);
             ruleTemplateCategory.setCountryId(countryDTO.getId());
-            save(ruleTemplateCategory);
+            ruleTemplateCategoryMongoRepository.save(ruleTemplateCategory);
         }
         if (Optional.ofNullable(wtaBaseRuleTemplates).isPresent() && !wtaBaseRuleTemplates.isEmpty()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_WTARULETEMPLATE_ALREADYEXISTS);
@@ -230,7 +230,7 @@ public class RuleTemplateService extends MongoBaseService {
         wtaBaseRuleTemplates1.add(breakWTATemplate);
         WTAForCareDays careDays = new WTAForCareDays("WTA For Care Days","WTA For Care Days");
         wtaBaseRuleTemplates1.add(careDays);
-        save(wtaBaseRuleTemplates1);
+        wtaBaseRuleTemplateMongoRepository.saveEntities(wtaBaseRuleTemplates1);
 
 
         return true;
@@ -302,7 +302,7 @@ public class RuleTemplateService extends MongoBaseService {
         oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
         oldTemplate.setRuleTemplateCategoryId(templateDTO.getRuleTemplateCategory().getId());
         oldTemplate.setCountryId(countryId);
-        save(oldTemplate);
+        wtaBaseRuleTemplateMongoRepository.save(oldTemplate);
         return templateDTO;
     }
 
@@ -325,7 +325,7 @@ public class RuleTemplateService extends MongoBaseService {
         WTABaseRuleTemplate wtaBaseRuleTemplate = WTABuilderService.copyRuleTemplate(wtaRuleTemplateDTO, true);
         wtaBaseRuleTemplate.setCountryId(countryId);
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        save(wtaBaseRuleTemplate);
+        wtaBaseRuleTemplateMongoRepository.save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());
         wtaRuleTemplateDTO.setRuleTemplateCategory(wtaRuleTemplateDTO.getRuleTemplateCategory());
         return wtaRuleTemplateDTO;

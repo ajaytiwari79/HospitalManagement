@@ -43,7 +43,7 @@ import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
  * CreatedBy vipulpandey on 15/10/18
  **/
 @Service
-public class ShiftReminderService extends MongoBaseService {
+public class ShiftReminderService{
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
