@@ -193,7 +193,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_CANNOT_UPDATE  = "message.shift.cannot.update ";
     public static final String MESSAGE_SHIFT_ACTIVITY_EMPTY  = "message.shift.activity.empty ";
     public static final String MESSAGE_ACTIVITY_EMPTY = "message.activity.empty";
-    public static final String MESSAGE_SHIFT_VALIDATION_ACCESS  = "message.shift.validation.access ";
+    public static final String MESSAGE_SHIFT_VALIDATION_ACCESS  = "message.shift.validation.access";
     public static final String MESSAGE_SHIFT_SAVE_ACCESS  = "message.shift.save.access ";
     public static final String MESSAGE_SHIFT_SHIFTDATE  = "message.shift.shiftDate ";
     public static final String MESSAGE_SHIFT_REASONCODE_REQUIRED = "message.shift.reasoncode.required";
