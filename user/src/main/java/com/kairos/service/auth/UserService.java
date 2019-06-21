@@ -410,9 +410,7 @@ public class UserService {
                         permission.setActive(permission.isRead() || permission.isWrite());
                         unitPermissionMap.put(permission.getModuleId(), permission);
                     } else {
-                        permission.setActive(false);
-                        permission.setRead(false);
-                        permission.setWrite(false);
+                        permission.setActive(permission.isRead() || permission.isWrite());
                         unitPermissionMap.put(permission.getModuleId(), permission);
                     }
                 } else {
@@ -469,7 +467,7 @@ public class UserService {
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
-        permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
+         permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
         return permissionData;
     }
 

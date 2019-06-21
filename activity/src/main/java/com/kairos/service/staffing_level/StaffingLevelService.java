@@ -232,6 +232,7 @@ public class StaffingLevelService extends MongoBaseService {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         Date startDate = asDate(localDate);
         Date endDate = getEndOfDay(startDate);
+
         List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse( startDate, endDate,unitId);
         List<ShiftDTO>  shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class),userAccessRoleDTO);
         StaffingLevel staffingLevel=staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),startDate);

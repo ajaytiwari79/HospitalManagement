@@ -25,7 +25,7 @@ public class RelatedDataSubject  {
     @NotNull
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<RelatedDataCategory> dataCategories = new ArrayList<>();
 
 

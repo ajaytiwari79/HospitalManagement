@@ -180,6 +180,12 @@ public class OrganizationActivityService extends MongoBaseService {
                 }
             }
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
+            if (!userIntegrationService.isUnit(unitId)){
+                List<Long>  childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
+                if(activityMongoRepository.existsByParentIdAndDeletedFalse(activityCopied.getId(), childUnitIds)) {
+                    exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
+                }
+            }
             activityCopied.setDeleted(true);
         }
         activityMongoRepository.save(activityCopied);
