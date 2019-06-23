@@ -72,7 +72,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployment(Long employmentId, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
@@ -81,15 +81,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate);
         }
-        Aggregation aggregation = getShiftWithActivityAggregation(criteria);
-        AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
-        return result.getMappedResults();
-    }
-
-
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
-                .and("startDate").gte(startDate).lt(endDate);
         Aggregation aggregation = getShiftWithActivityAggregation(criteria);
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
