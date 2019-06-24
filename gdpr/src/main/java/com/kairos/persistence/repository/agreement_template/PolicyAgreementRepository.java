@@ -39,5 +39,7 @@ public interface PolicyAgreementRepository extends CustomGenericRepository<Polic
     @Query(value = "Select EN from PolicyAgreementTemplate EN WHERE EN.deleted = false and  EN.generalAgreementTemplate = true order by EN.createdAt desc")
     List<PolicyAgreementTemplate> findAllGeneralAgreementTemplate();
 
+    @Query(value = "Select EN from PolicyAgreementTemplate EN WHERE EN.deleted = false and  EN.dataHandlerHtmlContent != null and EN.countryId = ?1 order by EN.createdAt desc")
+    List<PolicyAgreementTemplate> findAllDataHandlerAgreementTemplateByCountry(Long countryId);
 
 }

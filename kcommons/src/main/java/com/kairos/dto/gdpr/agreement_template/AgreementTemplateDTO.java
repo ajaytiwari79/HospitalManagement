@@ -23,7 +23,16 @@ public class AgreementTemplateDTO {
     @NotNull(message = "error.message.templateType.notNull")
     protected Long templateTypeId;
 
+    protected String dataHandlerHtmlContent;
+
     private boolean generalAgreementTemplate;
 
+    public AgreementTemplateDTO(Long id,String name,String description,Long templateTypeId,String dataHandlerHtmlContent){
+        this.id=id;
+        this.name=name;
+        this.description=description;
+        this.templateTypeId=templateTypeId;
+        this.dataHandlerHtmlContent=dataHandlerHtmlContent;
+    }
 
 }

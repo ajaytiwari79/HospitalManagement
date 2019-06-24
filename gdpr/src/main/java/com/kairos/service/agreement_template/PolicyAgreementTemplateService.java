@@ -301,6 +301,34 @@ public class PolicyAgreementTemplateService {
 
     }
 
+    public <E extends AgreementTemplateDTO> E updateMasterAgreementTemplateForDataHandler(Long referenceId, Long agreementTemplateId, E policyAgreementTemplateDto) {
+        try {
+            PolicyAgreementTemplate template = policyAgreementRepository.getOne(agreementTemplateId);
+            template.setDataHandlerHtmlContent(policyAgreementTemplateDto.getDataHandlerHtmlContent());
+            policyAgreementRepository.save(template);
+        } catch (EntityNotFoundException nfe) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+        }
+        return policyAgreementTemplateDto;
+
+    }
+
+    public List<AgreementTemplateDTO> getAllDataHandlerTemplate(Long unitId) {
+        Long countryId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllDataHandlerAgreementTemplateByCountry(countryId);
+        return policyAgreementTemplates.stream().map(policyAgreementTemplate ->
+                new AgreementTemplateDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), policyAgreementTemplate.getTemplateType().getId(), policyAgreementTemplate.getDataHandlerHtmlContent())
+        ).collect(Collectors.toList());
+    }
+
+    public AgreementTemplateDTO getDataHandlerTemplate(Long unitId, Long agreementTemplateId) {
+        Long countryId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        PolicyAgreementTemplate policyAgreementTemplate=policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, countryId);
+        if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+        }
+        return new AgreementTemplateDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), policyAgreementTemplate.getTemplateType().getId(), policyAgreementTemplate.getDataHandlerHtmlContent());
+    }
 }
 
 
