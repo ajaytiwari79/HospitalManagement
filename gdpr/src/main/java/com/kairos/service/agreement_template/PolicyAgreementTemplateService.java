@@ -321,8 +321,8 @@ public class PolicyAgreementTemplateService {
         ).collect(Collectors.toList());
     }
 
-    public AgreementTemplateDTO getDataHandlerTemplate(Long unitId, Long agreementTemplateId) {
-        Long countryId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+    public AgreementTemplateDTO getDataHandlerTemplate(Long referenceId,boolean isCountry, Long agreementTemplateId) {
+        Long countryId = isCountry?referenceId:genericRestClient.publishRequest(null, referenceId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
         PolicyAgreementTemplate policyAgreementTemplate=policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, countryId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);

@@ -414,7 +414,7 @@ public class RuletemplateUtils {
 
     public static DateTimeInterval getIntervalByWTACareDaysRuleTemplate(ShiftWithActivityDTO shift, WTAForCareDays wtaForCareDays) {
         LocalDate shiftDate = DateUtils.asLocalDate(shift.getStartDate());
-        Map<BigInteger, ActivityCareDayCount> careDayCountMap = wtaForCareDays.getCareDaysCountMap();
+        Map<BigInteger, ActivityCareDayCount> careDayCountMap = wtaForCareDays.careDaysCountMap();
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             if (careDayCountMap.containsKey(shiftActivityDTO.getActivityId())) {

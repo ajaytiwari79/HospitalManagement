@@ -825,7 +825,7 @@ public class ShiftValidatorService {
         List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ?
                         shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), startDate,
                 endDate);
-        if (isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+        if (!FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
         return shiftOverlappedWithNonWorkingType;

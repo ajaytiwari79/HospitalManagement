@@ -391,11 +391,6 @@ public class EmploymentService {
     public PositionWrapper updateEmployment(long employmentId, EmploymentDTO employmentDTO, Long unitId, String type, Boolean saveAsDraft) throws Exception {
 
         Organization organization = organizationService.getOrganizationDetail(unitId, type);
-        List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(employmentDTO.getStaffId());
-        if (clientMinimumDTO.size() > 0) {
-            return new PositionWrapper(clientMinimumDTO);
-        }
-
         Employment oldEmployment = employmentGraphRepository.findOne(employmentId, 2);
         if (!Optional.ofNullable(oldEmployment).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_POSITIONID_NOTFOUND, employmentId);
@@ -489,6 +484,11 @@ public class EmploymentService {
         // calculative value is not changed it means only end date is updated.
         else {
             currentEmploymentLine.setEndDate(employmentDTO.getEndDate());
+            oldEmployment.setEndDate(employmentDTO.getEndDate());
+            if(saveAsDraft){
+                currentEmploymentLine.setStartDate(employmentDTO.getStartDate());
+                oldEmployment.setStartDate(employmentDTO.getStartDate());
+            }
             setEndDateToEmployment(oldEmployment, employmentDTO);
             oldEmployment.setLastWorkingDate(employmentDTO.getLastWorkingDate());
             employmentGraphRepository.save(oldEmployment);
