@@ -19,8 +19,7 @@ public class InitialTimeBankLog extends UserBaseEntity {
     private Long previousInitialBalanceInMinutes;
     private Long updateInitialBalanceInMinutes;
 
-    public InitialTimeBankLog(Long id, Long employmentId, Long previousInitialBalanceInMinutes, Long updateInitialBalanceInMinutes){
-        super.id=id;
+    public InitialTimeBankLog(Long employmentId, Long previousInitialBalanceInMinutes, Long updateInitialBalanceInMinutes){
         this.employmentId=employmentId;
         this.previousInitialBalanceInMinutes=previousInitialBalanceInMinutes;
         this.updateInitialBalanceInMinutes=updateInitialBalanceInMinutes;

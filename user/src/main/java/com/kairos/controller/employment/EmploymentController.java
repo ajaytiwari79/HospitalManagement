@@ -206,12 +206,6 @@ public class EmploymentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentExpertiseMap(unitId));
     }
 
-    @ApiOperation(value = "Save Initial Time Bank Log")
-    @PostMapping(value = "/initial_time_bank_log")
-    public ResponseEntity<Map<String, Object>> saveInitialTimeBankLog(@RequestBody @Valid InitialTimeBankLogDTO timeBankLogDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, initialTimeBankLogService.saveTimeBankLog(timeBankLogDTO));
-    }
-
     @ApiOperation("fetch Initial Time Bank Log by employment id")
     @GetMapping("/initial_time_bank_log/{employmentId}")
     public ResponseEntity<Map<String, Object>> getInitialTimeBalanceByEmployment(@PathVariable Long employmentId) {

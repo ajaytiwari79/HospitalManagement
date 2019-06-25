@@ -23,20 +23,18 @@ public class InitialTimeBankLogService {
     @Inject
     private ExceptionService exceptionService;
 
-    public InitialTimeBankLogDTO saveTimeBankLog(InitialTimeBankLogDTO timeBankLogDTO) {
-        List<InitialTimeBankLog> previousInitialTimeBankLogs=initialTimeBankLogRepository.getInitialTimeBankLogByEmployment(timeBankLogDTO.getEmploymentId());
+    public boolean saveTimeBankLog(Long employmentId,Long initialBalanceInMinutes) {
+        List<InitialTimeBankLog> previousInitialTimeBankLogs=initialTimeBankLogRepository.getInitialTimeBankLogByEmployment(employmentId);
+        Long previousInitialBalanceInMinutes=0L;
         if(previousInitialTimeBankLogs.size()>0){
-            timeBankLogDTO.setPreviousInitialBalanceInMinutes(previousInitialTimeBankLogs.get(0).getUpdateInitialBalanceInMinutes());
-        }else{
-            timeBankLogDTO.setPreviousInitialBalanceInMinutes(0L);
+            previousInitialBalanceInMinutes=previousInitialTimeBankLogs.get(0).getUpdateInitialBalanceInMinutes();
         }
-        if(timeBankLogDTO.getPreviousInitialBalanceInMinutes()==timeBankLogDTO.getUpdateInitialBalanceInMinutes()){
-            exceptionService.actionNotPermittedException("Previous and Update both value are not equals");
+        if(previousInitialBalanceInMinutes==initialBalanceInMinutes){
+            return false;
         }
-        InitialTimeBankLog initialTimeBankLog =new InitialTimeBankLog(timeBankLogDTO.getId(),timeBankLogDTO.getEmploymentId(),timeBankLogDTO.getPreviousInitialBalanceInMinutes(),timeBankLogDTO.getUpdateInitialBalanceInMinutes());
+        InitialTimeBankLog initialTimeBankLog =new InitialTimeBankLog(employmentId,previousInitialBalanceInMinutes,initialBalanceInMinutes);
         initialTimeBankLogRepository.save(initialTimeBankLog);
-        timeBankLogDTO.setId(initialTimeBankLog.getId());
-        return timeBankLogDTO;
+        return true;
     }
 
     public List<InitialTimeBankLogDTO> getInitialTimeBalanceByEmployment(Long employmentId) {
