@@ -27,7 +27,7 @@ public class RulesActivityTab{
     private boolean eligibleToBeForced;
     private List<Long> dayTypes= new ArrayList<>();
     private boolean eligibleForStaffingLevel;
-    private boolean breakAllowed = false;
+    private boolean breakAllowed;
     private List<BigInteger> approvalAllowedPhaseIds;
     private LocalDate cutOffStartFrom;
     private CutOffIntervalUnit cutOffIntervalUnit;
