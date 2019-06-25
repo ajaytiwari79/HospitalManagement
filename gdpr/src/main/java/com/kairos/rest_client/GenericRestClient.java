@@ -59,7 +59,7 @@ public class GenericRestClient {
                             getHttpMethod(integrationOperation),
                             new HttpEntity<>(t), typeReference, pathParams);
             RestTemplateResponseEnvelope<V> response = restExchange.getBody();
-            if (!restExchange.getStatusCode().is2xxSuccessful()) {
+           if (!restExchange.getStatusCode().is2xxSuccessful()) {
                 exceptionService.internalServerError(response.getMessage());
             }
             return response.getData();
