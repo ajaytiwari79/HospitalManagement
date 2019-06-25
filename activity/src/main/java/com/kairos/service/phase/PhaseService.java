@@ -398,7 +398,7 @@ public class PhaseService extends MongoBaseService {
         return phaseMongoRepository.findByOrganizationIdAndDeletedFalseOrderByPhaseTypeDescSequenceAsc(unitId);
     }
 
-    public Map<BigInteger, PhaseTemplateValue> constructMapOfActivityAndPhaseTemplateValue(Phase phase, List<ActivityWrapper> activities) {
+    public Map<BigInteger, PhaseTemplateValue> constructMapOfActivityAndPhaseTemplateValue(Phase phase, Collection<ActivityWrapper> activities) {
         Map<BigInteger, PhaseTemplateValue> phaseTemplateValueMap = new HashMap<>();
         for (ActivityWrapper activityWrapper : activities) {
             for (PhaseTemplateValue phaseTemplateValue : activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues()) {

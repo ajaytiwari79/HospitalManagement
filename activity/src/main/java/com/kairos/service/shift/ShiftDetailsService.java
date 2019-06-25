@@ -124,18 +124,20 @@ public class ShiftDetailsService extends MongoBaseService {
         return userIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
     }
 
-    public void addPlannedTimeInShift(Shift shiftDTO, ActivityWrapper activityWrapper, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
-        BigInteger plannedTimeId = shiftService.addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activityWrapper.getActivity(), staffAdditionalInfoDTO);
-        if (isNull(shiftDTO.getId())) {
-            assignedPlannedTimeInActivity(shiftDTO, plannedTimeId);
+    public void addPlannedTimeInShift(Shift shift, ActivityWrapper activityWrapper, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
+        BigInteger plannedTimeId = shiftService.addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrapper.getActivity(), staffAdditionalInfoDTO);
+        if (isNull(shift.getId())) {
+            assignedPlannedTimeInActivity(shift, plannedTimeId);
         } else {
-            adjustPlannedTimeInActivity(shiftDTO, plannedTimeId);
+            adjustPlannedTimeInActivity(shift, plannedTimeId);
         }
     }
 
     private void assignedPlannedTimeInActivity(Shift shiftDTO, BigInteger plannedTimeId) {
-        shiftDTO.getActivities().forEach(shiftActivity -> shiftActivity.setPlannedTimes(Arrays.asList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate()))));
+        shiftDTO.getActivities().forEach(shiftActivity ->
+                shiftActivity.setPlannedTimes(Arrays.asList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())))
+        );
     }
 
     private void adjustPlannedTimeInActivity(Shift shiftDTO, BigInteger plannedTimeId) {

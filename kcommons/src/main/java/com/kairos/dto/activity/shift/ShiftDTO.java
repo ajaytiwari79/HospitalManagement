@@ -89,7 +89,12 @@ public class ShiftDTO {
         //default Const
     }
 
-    public ShiftDTO(Date startDate, Date endDate,List<ShiftActivityDTO> activities) {
+    public ShiftDTO(@NotNull(message = "message.shift.shiftDate") LocalDate shiftDate,List<ShiftActivityDTO> activities) {
+        this.shiftDate = shiftDate;
+        this.activities = activities;
+    }
+
+    public ShiftDTO(Date startDate, Date endDate, List<ShiftActivityDTO> activities) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.activities = activities;
