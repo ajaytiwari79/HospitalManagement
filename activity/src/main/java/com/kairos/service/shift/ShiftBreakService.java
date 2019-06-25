@@ -41,7 +41,7 @@ import static javax.management.timer.Timer.ONE_MINUTE;
  */
 @Service
 public class ShiftBreakService {
-    private static final Logger logger = LoggerFactory.getLogger(ShiftBreakService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShiftBreakService.class);
     @Inject
     private BreakSettingMongoRepository breakSettingMongoRepository;
     @Inject
@@ -61,7 +61,7 @@ public class ShiftBreakService {
 
 
     public ShiftActivity updateBreakInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO  staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
-        BreakSettingsDTO breakSetting = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(staffAdditionalInfoDTO.getEmployment().getExpertise().getId()).get(0);
+        /*BreakSettingsDTO breakSetting = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(staffAdditionalInfoDTO.getEmployment().getExpertise().getId()).get(0);
         activityWrapperMap.putAll(getBreakActivities(breakSetting, shift.getUnitId()));
         boolean placeBreakAnyWhereInShift = true;
         ShiftActivity breakActivity = null;
@@ -83,7 +83,13 @@ public class ShiftBreakService {
                 breakActivity = getBreakActivityAfterCalculation(activityWrapperMap, breakSetting, placeBreakAnyWhereInShift, placeBreakAfterThisDate, shiftActivity,staffAdditionalInfoDTO);
             }
         }
-        return breakActivity;
+        if(isNull(breakActivity)){
+            Date breakEndDate = asDate(asZoneDateTime(placeBreakAfterThisDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
+            breakActivity = buildBreakActivity(placeBreakAfterThisDate,breakEndDate,breakSetting,staffAdditionalInfoDTO,activityWrapperMap);
+            breakActivity.setBreakNotHeld(true);
+        }
+        return breakActivity;*/
+        return null;
     }
 
     private ShiftActivity getBreakActivityAfterCalculation(Map<BigInteger, ActivityWrapper> activityWrapperMap, BreakSettingsDTO breakSetting, boolean placeBreakAnyWhereInShift, Date placeBreakAfterThisDate, ShiftActivity childActivity,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -108,11 +114,7 @@ public class ShiftBreakService {
 
     private ShiftActivity buildBreakActivity(Date startDate,Date endDate,BreakSettingsDTO breakSettingsDTO,StaffAdditionalInfoDTO staffAdditionalInfoDTO,Map<BigInteger, ActivityWrapper> activityWrapperMap){
         ActivityWrapper activityWrapper = activityWrapperMap.get(breakSettingsDTO.getActivityId());
-        ShiftActivity shiftActivity = ShiftActivity.builder()
-                                        .startDate(startDate)
-                                        .endDate(endDate)
-                                        .activityId(activityWrapper.getActivity().getId())
-                                        .build();
+        ShiftActivity shiftActivity = new ShiftActivity(activityWrapper.getActivity().getName(),startDate,endDate,activityWrapper.getActivity().getId(),activityWrapper.getTimeType());
         shiftService.updateActivityDetailsInShiftActivity(shiftActivity,activityWrapperMap,staffAdditionalInfoDTO);
         return shiftActivity;
     }

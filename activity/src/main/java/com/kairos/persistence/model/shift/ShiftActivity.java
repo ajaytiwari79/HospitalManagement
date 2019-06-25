@@ -19,7 +19,6 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
  */
 @Getter
 @Setter
-@Builder
 public class ShiftActivity implements Comparable<ShiftActivity>{
 
 

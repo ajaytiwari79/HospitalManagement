@@ -243,6 +243,10 @@ public  class DateUtils {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+    public static String asLocalDateString(Date date, String pattern) {
+        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern(pattern));
+    }
+
     public static LocalDate asLocalDate(Long date) {
         return Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate();
     }

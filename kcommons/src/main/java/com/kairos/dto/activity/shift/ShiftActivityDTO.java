@@ -21,7 +21,6 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
  */
 @Getter
 @Setter
-@Builder
 public class ShiftActivityDTO {
 
     private Set<ShiftStatus> status;

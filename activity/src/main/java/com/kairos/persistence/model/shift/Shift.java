@@ -72,7 +72,7 @@ public class Shift extends MongoBaseEntity {
     private Shift draftShift;
     private boolean draft;
     private RequestAbsence requestAbsence;
-    private ShiftActivity breakActivity;
+    private List<ShiftActivity> breakActivities;
 
 
     public Shift() {

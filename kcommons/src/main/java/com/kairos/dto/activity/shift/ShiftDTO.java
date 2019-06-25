@@ -29,7 +29,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-@Builder
 public class ShiftDTO {
 
     protected BigInteger id;

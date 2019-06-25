@@ -6,23 +6,33 @@ import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
+import com.kairos.enums.todo.TodoSubtype;
+import com.kairos.enums.todo.TodoType;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.todo.Todo;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.RequestAbsenceService;
 import com.kairos.service.shift.ShiftStatusService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDateString;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.enums.shift.TodoStatus.APPROVE;
-import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
+import static com.kairos.enums.shift.TodoStatus.*;
 
 /**
  * Created by pradeep
@@ -36,6 +46,24 @@ public class TodoService {
     @Inject private RequestAbsenceService requestAbsenceService;
     @Inject private ShiftStatusService shiftStatusService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private PhaseService phaseService;
+
+    public void createTodo(Shift shift, TodoType todoType){
+        List<Todo> todos = new ArrayList<>();
+        if(todoType.equals(TodoType.APPROVAL_REQUIRED)){
+            Set<BigInteger> activityIds = shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
+            List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
+            activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).forEach(activity -> {
+                String description = "An activity <span class='activity-details'>"+activity.getName()+"</span> has been requested for <span class='activity-details'>"+asLocalDateString(shift.getStartDate(),"dd LLLL yyyy")+"</span>";
+                todos.add(new Todo(TodoType.APPROVAL_REQUIRED,TodoSubtype.APPROVAL,shift.getId(),activity.getId(),PENDING,asLocalDate(shift.getStartDate()),description,shift.getStaffId(),shift.getEmploymentId(),shift.getUnitId()));
+            });
+        }
+        if(isCollectionNotEmpty(todos)){
+            todoRepository.saveEntities(todos);
+        }
+    }
 
     public List<TodoDTO> getAllTodo(Long unitId){
         return todoRepository.findAllByNotApproved(unitId,newArrayList(APPROVE,DISAPPROVE));
