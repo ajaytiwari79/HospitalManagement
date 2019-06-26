@@ -11,8 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.PACKAGE_NAME;
@@ -37,9 +39,11 @@ public class AuditLogging {
         this.mongoTemplate = mongoTemplate;
     }
 
-    // @Test
-    // @AfterReturning(value = "execution(* org.springframework.data.repository.*.*(..))",returning = "entity")
-    //@Async
+    @Async
+    public static void doAudit(Object oldEntity, Object newEntity){
+        checkDifferences(oldEntity,newEntity);
+    }
+
     public static Map<String, Object> checkDifferences(Object oldEntity, Object newEntity) {
         Map<String, Object> result = null;
         try {
@@ -69,7 +73,6 @@ public class AuditLogging {
     }
 
     private static boolean isIgnoreLogging(DiffNode arg0) {
-        LOGGER.info("property Name {}", arg0.getPropertyName());
         boolean isIgnoreLogging = false;
         if(isIgnoredField(arg0) || isIgnoredMethod(arg0) || (isNotNull(arg0.getParentNode()) && isIgnoredClass(arg0.getParentNode().getValueType()))) {
             isIgnoreLogging = true;

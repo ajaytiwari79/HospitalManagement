@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.DurationType;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,7 @@ public class PlanningPeriodDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long unitId = -1L;
+   @Positive(message = "message.valid.duration")
     private int duration;
     private DurationType durationType;
     private int recurringNumber; // TODO HARISH rename

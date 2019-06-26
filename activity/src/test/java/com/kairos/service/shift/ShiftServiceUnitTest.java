@@ -233,7 +233,7 @@ public class ShiftServiceUnitTest {
         when(shiftMongoRepository.findShiftBetweenDurationByEmploymentId(any(Long.class), any(Date.class),any(Date.class))).thenReturn(overLappedShifts);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
-        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate);
+        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate,shift);
         List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
         escalationFreeShiftIds.add(new BigInteger("2636"));
         escalationFreeShiftIds.add(new BigInteger("2637"));
@@ -254,7 +254,7 @@ public class ShiftServiceUnitTest {
         when(activityMongoRepository.findActivityAndTimeTypeByActivityId(shift.getActivities().get(0).getActivityId())).thenReturn(activityWrapper);
         shiftDTO.setStartDate(updatedStartDate);
         shiftDTO.setEndDate(updatedEndDate);
-        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate);
+        ShiftDTO result=shiftValidatorService.escalationCorrectionInShift(shiftDTO,startDate,endDate,shift);
         List<BigInteger> escalationFreeShiftIds=new ArrayList<>();
         escalationFreeShiftIds.add(new BigInteger("2636"));
         escalationFreeShiftIds.add(new BigInteger("2637"));
