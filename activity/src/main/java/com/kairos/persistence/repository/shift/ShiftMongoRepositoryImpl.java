@@ -32,7 +32,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
@@ -73,7 +72,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate,Boolean draftShiftInclude) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployment(Long employmentId, Date startDate, Date endDate) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
@@ -82,24 +81,16 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate);
         }
-        if(isNotNull(draftShiftInclude)){
-            criteria.where("draft").is(draftShiftInclude);
-        }
         Aggregation aggregation = getShiftWithActivityAggregation(criteria);
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
 
-    @Override
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists) {
+
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate) {
         Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
-                    .and("startDate").gte(startDate).lt(endDate).and("draftShift").exists(draftShiftExists);
-        Aggregation aggregation;
-        if(draftShiftExists){
-            aggregation = getShiftWithActivityAggregation(criteria,replaceRoot("draftShift"));
-        }else {
-            aggregation = getShiftWithActivityAggregation(criteria);
-        }
+                .and("startDate").gte(startDate).lt(endDate);
+        Aggregation aggregation = getShiftWithActivityAggregation(criteria);
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
@@ -285,12 +276,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    private Aggregation getShiftWithActivityAggregation(Criteria criteria,AggregationOperation... aggregationOperation) {
-        List<AggregationOperation> aggregationOperations = new ArrayList<>();
-        if(aggregationOperation.length>0){
-            aggregationOperations = newArrayList(aggregationOperation);
-        }
-        aggregationOperations.addAll(newArrayList(match(criteria),
+    private Aggregation getShiftWithActivityAggregation(Criteria criteria) {
+        return Aggregation.newAggregation(
+                match(criteria),
                 unwind("activities", true),
                 lookup("activities", "activities.activityId", "_id", "activities.activity"),
                 lookup("activities", "activityId", "_id", "activity"),
@@ -298,8 +286,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 new CustomAggregationOperation(shiftWithActivityGroup()),
                 new CustomAggregationOperation(anotherShiftWithActivityProjection()),
                 new CustomAggregationOperation(replaceRootForShift()),
-                sort(Sort.Direction.ASC, "startDate")));
-        return Aggregation.newAggregation(aggregationOperations);
+                sort(Sort.Direction.ASC, "startDate")
+        );
     }
 
     public static Document shiftWithActivityAndDescriptionProjection() {
