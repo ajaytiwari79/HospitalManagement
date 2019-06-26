@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.shift;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
@@ -10,16 +9,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by vipul on 30/8/17.

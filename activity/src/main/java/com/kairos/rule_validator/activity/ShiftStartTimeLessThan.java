@@ -7,9 +7,7 @@ import com.kairos.enums.DurationType;
 import com.kairos.service.shift.ShiftValidatorService;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_PLANNEDTIME_LESS;
 

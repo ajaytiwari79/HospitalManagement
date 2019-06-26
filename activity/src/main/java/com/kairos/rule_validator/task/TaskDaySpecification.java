@@ -5,9 +5,7 @@ import com.kairos.persistence.model.task.Task;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_DAY_INVALID;
 import static com.kairos.enums.Day.*;

@@ -7,9 +7,7 @@ import com.kairos.enums.gdpr.AssessmentSchedulingFrequency;
 import com.kairos.enums.gdpr.AssessmentStatus;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 import com.kairos.response.dto.data_inventory.ProcessingActivityBasicDTO;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;

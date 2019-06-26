@@ -6,7 +6,8 @@ import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

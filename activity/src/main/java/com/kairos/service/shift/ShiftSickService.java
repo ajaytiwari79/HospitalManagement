@@ -29,6 +29,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -79,6 +80,7 @@ public class ShiftSickService extends MongoBaseService {
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject private TimeBankRepository timeBankRepository;
+    @Inject private TimeBankService timeBankService;
     @Inject private ShiftBreakService shiftBreakService;
 
 
@@ -297,7 +299,7 @@ public class ShiftSickService extends MongoBaseService {
             //Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dates);
 
             shiftMongoRepository.saveEntities(shifts);
-            shifts.sort((shift1,shift2)->shift1.getStartDate().compareTo(shift2.getStartDate()));
+            shifts.sort(Comparator.comparing(Shift::getStartDate));
             List<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toList());
             List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
@@ -313,11 +315,9 @@ public class ShiftSickService extends MongoBaseService {
                     }
                     staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                     setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                    shiftService.updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
+                    timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
                 }
             }
-            //shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
-
         }
     }
 

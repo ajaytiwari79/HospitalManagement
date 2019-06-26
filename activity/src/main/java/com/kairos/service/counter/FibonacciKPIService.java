@@ -1,8 +1,6 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.persistence.repository.counter.*;
-import com.kairos.utils.counter.KPIUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
@@ -17,6 +15,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.repository.counter.*;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.counter.KPIUtils;
@@ -35,7 +34,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.activity.counter.enums.ConfLevel.STAFF;
 import static com.kairos.dto.activity.counter.enums.ConfLevel.UNIT;
-import static com.kairos.utils.counter.KPIUtils.getLongValue;
 
 @Service
 public class FibonacciKPIService implements CounterService{

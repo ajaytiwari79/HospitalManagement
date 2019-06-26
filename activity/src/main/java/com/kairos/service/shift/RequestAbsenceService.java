@@ -1,12 +1,12 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.*;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.TodoStatus;
-import com.kairos.persistence.model.activity.*;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -16,7 +16,6 @@ import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 

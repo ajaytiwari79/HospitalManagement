@@ -1,6 +1,5 @@
 package com.kairos.rule_validator.activity;
 
-
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -9,9 +8,7 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.shift.ShiftValidatorService;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MANAGEMENT_AUTHORITY_PHASE;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_EMPLOYMENTTYPE_ABSENT;

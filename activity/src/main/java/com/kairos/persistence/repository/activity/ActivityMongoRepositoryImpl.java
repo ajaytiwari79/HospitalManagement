@@ -1,19 +1,14 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.CompositeActivityDTO;
-import com.kairos.dto.activity.activity.OrganizationActivityDTO;
+import com.kairos.dto.activity.activity.*;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.break_settings.BreakActivitiesDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
-import com.kairos.enums.ActivityStateEnum;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.TimeTypes;
-import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.activity.*;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.service.counter.ActivityFilterCriteria;
@@ -22,19 +17,14 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import com.mongodb.BasicDBObject;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.*;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;

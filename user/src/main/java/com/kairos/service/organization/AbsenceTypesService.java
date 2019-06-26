@@ -1,13 +1,12 @@
 package com.kairos.service.organization;
+
 import com.kairos.persistence.model.organization.AbsenceTypes;
 import com.kairos.persistence.repository.organization.AbsenceTypesRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by oodles on 16/12/16.

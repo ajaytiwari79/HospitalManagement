@@ -1,12 +1,9 @@
 package com.kairos.persistence.model.agreement_template;
 
-
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

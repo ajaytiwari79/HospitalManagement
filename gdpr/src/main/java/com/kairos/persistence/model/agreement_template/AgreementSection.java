@@ -1,11 +1,8 @@
 package com.kairos.persistence.model.agreement_template;
 
-
 import com.kairos.persistence.model.clause.AgreementSectionClause;
 import com.kairos.persistence.model.common.BaseEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

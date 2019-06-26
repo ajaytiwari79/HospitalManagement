@@ -10,9 +10,7 @@ import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
-import com.kairos.persistence.repository.user.region.RegionGraphRepository;
-import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.persistence.repository.user.region.*;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.DistanceCalculator;
@@ -23,13 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GEOGRAPHYDATA_NOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_MUNICIPALITY_NOTFOUND;
 
@@ -181,7 +177,10 @@ public class StaffAddressService {
         return contactAddressDTO;
     }
 
-     ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
+    public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
+        if (isNull(organization.getContactAddress())) {
+            return null;
+        }
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
         if (Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();

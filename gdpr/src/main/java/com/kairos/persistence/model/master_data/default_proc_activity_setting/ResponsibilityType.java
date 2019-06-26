@@ -1,11 +1,8 @@
 package com.kairos.persistence.model.master_data.default_proc_activity_setting;
 
-
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;

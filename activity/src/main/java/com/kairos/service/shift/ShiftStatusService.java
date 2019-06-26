@@ -1,13 +1,10 @@
 package com.kairos.service.shift;
 
-
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
-import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
@@ -42,12 +39,10 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
+import static com.kairos.constants.AppConstants.MAIL_SUBJECT;
 import static com.kairos.constants.CommonConstants.EMAIL_GREETING;
+import static com.kairos.constants.CommonConstants.SHIFT_NOTIFICATION_EMAIL_TEMPLATE;
 import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
-import static com.kairos.constants.CommonConstants.*;
-
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 @Service

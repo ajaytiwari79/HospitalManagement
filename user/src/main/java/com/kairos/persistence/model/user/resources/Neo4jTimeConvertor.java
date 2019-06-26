@@ -2,10 +2,7 @@ package com.kairos.persistence.model.user.resources;
 
 import org.neo4j.ogm.typeconversion.AttributeConverter;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.Optional;
 
 /**

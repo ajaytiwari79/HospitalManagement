@@ -1,9 +1,7 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
@@ -15,7 +13,6 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
@@ -41,9 +38,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,7 +46,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.NO_CONFLICTS;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static java.util.stream.Collectors.groupingBy;

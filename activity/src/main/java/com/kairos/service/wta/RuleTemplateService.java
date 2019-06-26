@@ -1,13 +1,10 @@
 package com.kairos.service.wta;
 
-
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
-import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateWrapper;
+import com.kairos.dto.activity.wta.rule_template_category.*;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
@@ -23,13 +20,10 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
 import com.kairos.utils.user_context.CurrentUserDetails;
 import com.kairos.utils.user_context.UserContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +38,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.WEEKS;
 
 
 /**

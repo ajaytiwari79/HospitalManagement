@@ -1,16 +1,12 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
-import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
@@ -29,11 +25,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.ERROR_ACTIVITY_NOTASSIGNED;
-import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
-import static com.kairos.constants.AppConstants.SHIFT_LEAST_GRANULARITY;
-import static javax.management.timer.Timer.ONE_MINUTE;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 
 /**
  * @author pradeep

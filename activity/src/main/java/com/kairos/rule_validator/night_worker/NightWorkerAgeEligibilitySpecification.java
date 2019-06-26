@@ -5,9 +5,7 @@ import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpecification<StaffDTO> {
 

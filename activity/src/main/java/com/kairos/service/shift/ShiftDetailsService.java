@@ -1,17 +1,13 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.shift.PlannedTime;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
+import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -31,7 +27,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.isEqualOrBefore;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static java.util.Comparator.comparing;

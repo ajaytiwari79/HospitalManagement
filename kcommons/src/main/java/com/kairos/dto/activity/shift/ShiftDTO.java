@@ -1,13 +1,12 @@
 package com.kairos.dto.activity.shift;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;

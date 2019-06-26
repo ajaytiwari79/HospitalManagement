@@ -27,19 +27,13 @@ import com.kairos.persistence.model.user.region.LocalAreaTag;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.utils.ZoneIdStringConverter;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
-import org.neo4j.ogm.annotation.typeconversion.DateString;
-import org.neo4j.ogm.annotation.typeconversion.EnumString;
+import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.typeconversion.*;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_CONTACTADDRESS_NOTNULL;
 import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_FORMAL_NOTNULL;

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.*;
 
@@ -37,35 +38,40 @@ public class AuditLogging {
         this.mongoTemplate = mongoTemplate;
     }
 
-    // @Test
-    // @AfterReturning(value = "execution(* org.springframework.data.repository.*.*(..))",returning = "entity")
-    //@Async
-    public static Map<String, Object> checkDifferences(Object oldEntity, Object newEntity) {
-        Map<String, Object> result;
-        ObjectDifferBuilder builder = ObjectDifferBuilder.startBuilding();
-        Class parentNodeClass = oldEntity.getClass();
-        DiffNode diff = builder.build().compare(newEntity, oldEntity);
-        final Map<String, Object> diffResult = new HashMap<>();
-        diff.visit(new DiffNode.Visitor() {
-            @Override
-            public void node(DiffNode arg0, Visit arg1) {
-                final Object oldValue = arg0.canonicalGet(oldEntity);
-                final Object newValue = arg0.canonicalGet(newEntity);
-                if(!isIgnoreLogging(arg0)) {
-                    updateMap(arg0, oldValue, newValue, arg0.getPropertyName(), diffResult, parentNodeClass);
-                }
-            }
+    @Async
+    public static void doAudit(Object oldEntity, Object newEntity){
+        checkDifferences(oldEntity,newEntity);
+    }
 
-        });
-        diffResult.put("loggingType", getLoggingType(ObjectMapperUtils.copyPropertiesByMapper(oldEntity, HashMap.class), ObjectMapperUtils.copyPropertiesByMapper(newEntity, HashMap.class)));
-        result = diffResult;
-        mongoTemplate.save(result, newEntity.getClass().getSimpleName());
-        LOGGER.info("test {}", oldEntity);
+    public static Map<String, Object> checkDifferences(Object oldEntity, Object newEntity) {
+        Map<String, Object> result = null;
+        try {
+            ObjectDifferBuilder builder = ObjectDifferBuilder.startBuilding();
+            Class parentNodeClass = oldEntity.getClass();
+            DiffNode diff = builder.build().compare(newEntity, oldEntity);
+            final Map<String, Object> diffResult = new HashMap<>();
+            diff.visit(new DiffNode.Visitor() {
+                @Override
+                public void node(DiffNode arg0, Visit arg1) {
+                    final Object oldValue = arg0.canonicalGet(oldEntity);
+                    final Object newValue = arg0.canonicalGet(newEntity);
+                    if(!isIgnoreLogging(arg0)) {
+                        updateMap(arg0, oldValue, newValue, arg0.getPropertyName(), diffResult, parentNodeClass);
+                    }
+                }
+
+            });
+            diffResult.put("loggingType", getLoggingType(ObjectMapperUtils.copyPropertiesByMapper(oldEntity, HashMap.class), ObjectMapperUtils.copyPropertiesByMapper(newEntity, HashMap.class)));
+            result = diffResult;
+            mongoTemplate.save(result, newEntity.getClass().getSimpleName());
+            LOGGER.info("test {}", oldEntity);
+        }catch (Exception e){
+            e.getStackTrace();
+        }
         return result;
     }
 
     private static boolean isIgnoreLogging(DiffNode arg0) {
-        LOGGER.info("property Name {}", arg0.getPropertyName());
         boolean isIgnoreLogging = false;
         if(isIgnoredField(arg0) || isIgnoredMethod(arg0) || (isNotNull(arg0.getParentNode()) && isIgnoredClass(arg0.getParentNode().getValueType()))) {
             isIgnoreLogging = true;

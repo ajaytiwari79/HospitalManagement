@@ -1,8 +1,6 @@
 package com.kairos.rule_validator.task;
 
-import com.kairos.rule_validator.AndSpecification;
-import com.kairos.rule_validator.OrSpecification;
-import com.kairos.rule_validator.TaskSpecification;
+import com.kairos.rule_validator.*;
 
 /**
  * Created by prabjot on 24/11/17.

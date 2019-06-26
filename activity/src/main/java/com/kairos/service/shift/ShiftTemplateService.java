@@ -11,7 +11,6 @@ import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -25,8 +24,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
-import static com.kairos.constants.AppConstants.FULL_WEEK;
 
 @Service
 @Transactional

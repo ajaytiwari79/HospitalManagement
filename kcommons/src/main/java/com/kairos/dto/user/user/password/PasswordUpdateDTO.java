@@ -1,8 +1,6 @@
 package com.kairos.dto.user.user.password;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.Arrays;
 
 /**

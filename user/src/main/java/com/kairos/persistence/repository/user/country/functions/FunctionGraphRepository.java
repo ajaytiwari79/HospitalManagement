@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.user.country.functions;
 
-import com.kairos.persistence.model.country.functions.Function;
-import com.kairos.persistence.model.country.functions.FunctionDTO;
-import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
+import com.kairos.persistence.model.country.functions.*;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

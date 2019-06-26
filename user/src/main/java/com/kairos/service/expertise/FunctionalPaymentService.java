@@ -2,10 +2,7 @@ package com.kairos.service.expertise;
 
 import com.google.common.base.Functions;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.user.country.experties.FunctionalPaymentMatrixDTO;
-import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
-import com.kairos.dto.user.country.experties.FunctionsDTO;
-import com.kairos.dto.user.country.experties.SeniorityLevelFunctionDTO;
+import com.kairos.dto.user.country.experties.*;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.user.expertise.*;
 import com.kairos.persistence.model.user.expertise.Response.*;
@@ -14,9 +11,7 @@ import com.kairos.persistence.repository.user.country.functions.FunctionGraphRep
 import com.kairos.persistence.repository.user.expertise.*;
 import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRepository;
 import com.kairos.rule_validator.Specification;
-import com.kairos.rule_validator.functional_paymment.IsFunctionalPaymentAvailable;
-import com.kairos.rule_validator.functional_paymment.IsGreaterThanStartDate;
-import com.kairos.rule_validator.functional_paymment.IsGreaterThanToday;
+import com.kairos.rule_validator.functional_paymment.*;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;

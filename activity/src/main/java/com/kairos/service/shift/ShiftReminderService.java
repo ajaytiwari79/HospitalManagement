@@ -17,12 +17,8 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.rest_client.SchedulerServiceRestClient;
-import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.rest_client.UserRestClientForScheduler;
+import com.kairos.rest_client.*;
 import com.kairos.scheduler_listener.ActivityToSchedulerQueueService;
-import com.kairos.service.MongoBaseService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +32,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.AppConstants.SHIFT_EMAIL_BODY;
 
 /**
  * CreatedBy vipulpandey on 15/10/18

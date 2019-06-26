@@ -1,21 +1,16 @@
 package com.kairos.dto.activity.shift;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.user.country.experties.FunctionsDTO;
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;

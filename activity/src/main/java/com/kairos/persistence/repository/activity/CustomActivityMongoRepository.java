@@ -1,14 +1,11 @@
 package com.kairos.persistence.repository.activity;
 
-import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.CompositeActivityDTO;
-import com.kairos.dto.activity.activity.OrganizationActivityDTO;
+import com.kairos.dto.activity.activity.*;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
 import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;

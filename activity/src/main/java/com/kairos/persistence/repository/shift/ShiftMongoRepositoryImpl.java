@@ -1,11 +1,7 @@
 package com.kairos.persistence.repository.shift;
 
-
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.shift.ShiftCountDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.enums.TimeTypes;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
@@ -22,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.query.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -32,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.AppConstants.FULL_WEEK;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -72,7 +66,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployment(Long employmentId, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate,Boolean draftShiftInclude) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
@@ -81,16 +75,26 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate);
         }
+        if(isNotNull(draftShiftInclude)){
+            criteria.where("draft").is(draftShiftInclude);
+        }
         Aggregation aggregation = getShiftWithActivityAggregation(criteria);
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
 
-
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate) {
+    @Override
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists) {
         Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
-                .and("startDate").gte(startDate).lt(endDate);
-        Aggregation aggregation = getShiftWithActivityAggregation(criteria);
+                    .and("startDate").gte(startDate).lt(endDate).and("draftShift").exists(draftShiftExists);
+        Aggregation aggregation;
+        if(draftShiftExists){
+            aggregation = getShiftWithActivityAggregation(criteria);/*,new CustomAggregationOperation(Document.parse("{\n" +
+                    "     $replaceRoot: { newRoot: '$draftShift' }\n" +
+                    "   }")));*/
+        }else {
+            aggregation = getShiftWithActivityAggregation(criteria);
+        }
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
         return result.getMappedResults();
     }
@@ -283,9 +287,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return result.getMappedResults();
     }
 
-    private Aggregation getShiftWithActivityAggregation(Criteria criteria) {
-        return Aggregation.newAggregation(
-                match(criteria),
+    private Aggregation getShiftWithActivityAggregation(Criteria criteria,AggregationOperation... aggregationOperation) {
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
+        if(aggregationOperation.length>0){
+            aggregationOperations = newArrayList(aggregationOperation);
+        }
+        aggregationOperations.addAll(newArrayList(match(criteria),
                 unwind("activities", true),
                 lookup("activities", "activities.activityId", "_id", "activities.activity"),
                 lookup("activities", "activityId", "_id", "activity"),
@@ -293,8 +300,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 new CustomAggregationOperation(shiftWithActivityGroup()),
                 new CustomAggregationOperation(anotherShiftWithActivityProjection()),
                 new CustomAggregationOperation(replaceRootForShift()),
-                sort(Sort.Direction.ASC, "startDate")
-        );
+                sort(Sort.Direction.ASC, "startDate")));
+        return Aggregation.newAggregation(aggregationOperations);
     }
 
     public static Document shiftWithActivityAndDescriptionProjection() {

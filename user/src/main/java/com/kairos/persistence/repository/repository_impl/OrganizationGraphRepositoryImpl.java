@@ -2,9 +2,7 @@ package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.dto.user.staff.client.ClientFilterDTO;
-import com.kairos.enums.Employment;
-import com.kairos.enums.FilterType;
-import com.kairos.enums.ModuleId;
+import com.kairos.enums.*;
 import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;

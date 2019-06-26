@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.shift;
 
-
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
@@ -11,9 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vipul on 30/8/17.

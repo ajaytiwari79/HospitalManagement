@@ -1,18 +1,13 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
-import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
-import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
-import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by pawanmandhan on 23/8/17.
@@ -27,7 +22,7 @@ public class RulesActivityTab{
     private boolean eligibleToBeForced;
     private List<Long> dayTypes= new ArrayList<>();
     private boolean eligibleForStaffingLevel;
-    private boolean breakAllowed = false;
+    private boolean breakAllowed;
     private List<BigInteger> approvalAllowedPhaseIds;
     private LocalDate cutOffStartFrom;
     private CutOffIntervalUnit cutOffIntervalUnit;

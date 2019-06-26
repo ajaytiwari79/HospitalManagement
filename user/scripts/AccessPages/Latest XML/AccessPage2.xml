@@ -1,0 +1,73 @@
+<root>
+	<page moduleId="module_4" isModule="true" name="Country" sequence="2">
+		<page moduleId="tab_46" name="Add new country Tab" />
+		<page moduleId="tab_47" name="Services" />
+		<page moduleId="tab_48" name="Organization Mapping">
+			<page moduleId="tab_99" name="Create Organization Type"/>
+			<page moduleId="tab_100" name="Map Service"/>
+			<page moduleId="tab_101" name="Map Expertise"/>
+			<page moduleId="tab_134" name="CTA"/>
+			<page moduleId="tab_135" name="WTA"/></page>
+		<page moduleId="tab_69" name="Calander" />
+		<page moduleId="tab_70" name="Skill And Expertise" />
+		<page moduleId="tab_71" name="Map Symbol" />
+		<page moduleId="tab_72" name="Geography" />
+		<page moduleId="tab_73" name="Organizations" />
+		<page moduleId="tab_82" name="Default Data Settings">
+			<page moduleId="tab_84" name="Day Type" />
+			<page moduleId="tab_161" name="Shift Settings">
+				<page moduleId="tab_162" name="Time Type" />
+				<page moduleId="tab_163" name="Planned Time" /></page>
+			<page moduleId="tab_85" name="Industry Type" />
+			<page moduleId="tab_86" name="Clinic Type" />
+			<page moduleId="tab_87" name="Ownership Type" />
+			<page moduleId="tab_88" name="Contract Type" />
+			<page moduleId="tab_89" name="Business Type" />
+			<page moduleId="tab_90" name="Kairos Status" />
+			<page moduleId="tab_91" name="Employee Limit" />
+			<page moduleId="tab_92" name="Payment Type" />
+			<page moduleId="tab_93" name="Housing Type" />
+			<page moduleId="tab_94" name="Engineer Type" />
+			<page moduleId="tab_95" name="Location Type" />
+			<page moduleId="tab_96" name="Civilian Status" />
+			<page moduleId="tab_97" name="Language" />
+			<page moduleId="tab_105" name="Currency" />
+			<page moduleId="tab_98" name="Vat Type" />
+			<page moduleId="tab_164" name="Resources">
+				<page moduleId="tab_165" name="Features" />
+				<page moduleId="tab_166" name="Type" />
+				<page moduleId="tab_167" name="Equipments" />
+				<page moduleId="tab_168" name="Location" />
+				<page moduleId="tab_169" name="Weather" />
+				<page moduleId="tab_170" name="Weather Mapping" /></page>
+			<page moduleId="tab_171" name="Relation Type" />
+			<page moduleId="tab_172" name="Employment Type" />
+			<page moduleId="tab_173" name="Phases" />
+			<page moduleId="tab_174" name="Reason">
+				<page moduleId="tab_175" name="Employment" /></page>
+			<page moduleId="tab_176" name="Functions" />
+			<page moduleId="tab_177" name="Pay Group Area" /></page>
+		<page moduleId="tab_83" name="Integration" />
+		<page moduleId="tab_74" name="Unions" />
+		<page moduleId="tab_115" name="Rule Templates"></page>
+		<page moduleId="tab_116" name="CTA">
+			<page moduleId="tab_178" name="CTA Templates"></page>
+			<page moduleId="tab_179" name="CTA Rule Templates"></page>
+		</page>
+		<page moduleId="tab_117" name="WTA">
+			<page moduleId="tab_180" name="WTA Templates" />
+			<page moduleId="tab_181" name="WTA Rule Templates" /></page>
+		<page moduleId="tab_118" name="Organization Levels"></page>
+		<page moduleId="tab_182" name="Tags"></page>
+		<page moduleId="tab_183" name="Pay Level"></page>
+		<page moduleId="tab_184" name="Access Group"></page>
+		<page moduleId="tab_185" name="Pay Group Mapping">
+			<page moduleId="tab_186" name="Map Municipacity" /></page>
+	</page>
+	<page moduleId="module_5" isModule="true" name="Visitation" sequence="5">
+		<page moduleId="tab_75" name="Manage Task" /></page>
+	<page moduleId="module_6" isModule="true" name="Pre/Actual Planning" sequence="6"></page>
+	<page moduleId="module_7" isModule="true" name="Self Rostering" sequence="7">
+		<page moduleId="tab_187" name="Staff" />
+		<page moduleId="tab_188" name="Resources" /></page>
+</root>

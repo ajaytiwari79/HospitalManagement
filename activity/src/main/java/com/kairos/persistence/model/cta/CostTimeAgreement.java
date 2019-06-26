@@ -3,9 +3,7 @@ package com.kairos.persistence.model.cta;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.wta.Expertise;
-import com.kairos.persistence.model.wta.OrganizationType;
-import com.kairos.persistence.model.wta.WTAOrganization;
+import com.kairos.persistence.model.wta.*;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 

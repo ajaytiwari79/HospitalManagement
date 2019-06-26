@@ -3,9 +3,7 @@ package com.kairos.controller.shift;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
-import com.kairos.enums.shift.ShiftActionType;
-import com.kairos.enums.shift.ShiftFilterParam;
-import com.kairos.enums.shift.ViewType;
+import com.kairos.enums.shift.*;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.*;
 import com.kairos.utils.response.ResponseHandler;
@@ -20,9 +18,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
