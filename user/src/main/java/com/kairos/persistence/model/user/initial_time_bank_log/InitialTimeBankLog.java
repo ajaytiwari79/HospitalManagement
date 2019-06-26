@@ -17,12 +17,12 @@ import org.neo4j.ogm.annotation.NodeEntity;
 public class InitialTimeBankLog extends UserBaseEntity {
     private Long employmentId;
     private Long previousInitialBalanceInMinutes;
-    private Long updateInitialBalanceInMinutes;
+    private Long updatedInitialBalanceInMinutes;
 
-    public InitialTimeBankLog(Long employmentId, Long previousInitialBalanceInMinutes, Long updateInitialBalanceInMinutes){
+    public InitialTimeBankLog(Long employmentId, Long previousInitialBalanceInMinutes, Long updatedInitialBalanceInMinutes){
         this.employmentId=employmentId;
         this.previousInitialBalanceInMinutes=previousInitialBalanceInMinutes;
-        this.updateInitialBalanceInMinutes=updateInitialBalanceInMinutes;
+        this.updatedInitialBalanceInMinutes=updatedInitialBalanceInMinutes;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class InitialTimeBankLog extends UserBaseEntity {
                 "id=" + id +
                 "employmentId=" + employmentId +
                 ", previousInitialBalanceInMinutes=" + previousInitialBalanceInMinutes +
-                ", updateInitialBalanceInMinutes=" + updateInitialBalanceInMinutes +
+                ", updateInitialBalanceInMinutes=" + updatedInitialBalanceInMinutes +
                 '}';
     }
 }

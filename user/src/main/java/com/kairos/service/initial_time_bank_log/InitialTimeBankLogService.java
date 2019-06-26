@@ -23,25 +23,25 @@ public class InitialTimeBankLogService {
     @Inject
     private ExceptionService exceptionService;
 
-    public boolean saveTimeBankLog(Long employmentId,Long initialBalanceInMinutes) {
+    public boolean saveInitialTimeBankLog(Long employmentId,Long updatedInitialBalanceInMinutes) {
         List<InitialTimeBankLog> previousInitialTimeBankLogs=initialTimeBankLogRepository.getInitialTimeBankLogByEmployment(employmentId);
-        Long previousInitialBalanceInMinutes=0L;
-        if(previousInitialTimeBankLogs.size()>0){
-            previousInitialBalanceInMinutes=previousInitialTimeBankLogs.get(0).getUpdateInitialBalanceInMinutes();
+        Long previousInitialBalanceInMinutes = 0L;
+        if(previousInitialTimeBankLogs.size() > 0){
+            previousInitialBalanceInMinutes=previousInitialTimeBankLogs.get(0).getUpdatedInitialBalanceInMinutes();
         }
-        if(previousInitialBalanceInMinutes==initialBalanceInMinutes){
+        if(previousInitialBalanceInMinutes == updatedInitialBalanceInMinutes){
             return false;
         }
-        InitialTimeBankLog initialTimeBankLog =new InitialTimeBankLog(employmentId,previousInitialBalanceInMinutes,initialBalanceInMinutes);
+        InitialTimeBankLog initialTimeBankLog = new InitialTimeBankLog(employmentId,previousInitialBalanceInMinutes,updatedInitialBalanceInMinutes);
         initialTimeBankLogRepository.save(initialTimeBankLog);
         return true;
     }
 
     public List<InitialTimeBankLogDTO> getInitialTimeBalanceByEmployment(Long employmentId) {
-        List<InitialTimeBankLog> initialTimeBankLogs=initialTimeBankLogRepository.getInitialTimeBankLogByEmployment(employmentId);
-        List<InitialTimeBankLogDTO> initialTimeBankLogDTOs=new ArrayList<>();
+        List<InitialTimeBankLog> initialTimeBankLogs = initialTimeBankLogRepository.getInitialTimeBankLogByEmployment(employmentId);
+        List<InitialTimeBankLogDTO> initialTimeBankLogDTOs = new ArrayList<>();
         initialTimeBankLogs.forEach(initialTimeBankLog->{
-            initialTimeBankLogDTOs.add(new InitialTimeBankLogDTO(initialTimeBankLog.getId(),initialTimeBankLog.getEmploymentId(),initialTimeBankLog.getPreviousInitialBalanceInMinutes(),initialTimeBankLog.getUpdateInitialBalanceInMinutes(),initialTimeBankLog.getCreationDate(),initialTimeBankLog.getCreatedBy()));
+            initialTimeBankLogDTOs.add(new InitialTimeBankLogDTO(initialTimeBankLog.getId(),initialTimeBankLog.getEmploymentId(),initialTimeBankLog.getPreviousInitialBalanceInMinutes(),initialTimeBankLog.getUpdatedInitialBalanceInMinutes(),initialTimeBankLog.getCreationDate(),initialTimeBankLog.getCreatedBy()));
         });
         return initialTimeBankLogDTOs;
     }

@@ -27,17 +27,17 @@ public class InitialTimeBankLogDTO {
     private Long previousInitialBalanceInMinutes;
     
     @NotNull(message = "update initial balance is required for time bank log")
-    private Long updateInitialBalanceInMinutes;
+    private Long updatedInitialBalanceInMinutes;
 
     private LocalDateTime updatedOn;
 
     private Long updatedBy;
 
-    public InitialTimeBankLogDTO(Long id, Long employmentId, Long previousInitialBalanceInMinutes, Long updateInitialBalanceInMinutes,LocalDateTime updatedOn,Long updatedBy){
+    public InitialTimeBankLogDTO(Long id, Long employmentId, Long previousInitialBalanceInMinutes, Long updatedInitialBalanceInMinutes,LocalDateTime updatedOn,Long updatedBy){
         this.id=id;
         this.employmentId=employmentId;
         this.previousInitialBalanceInMinutes=previousInitialBalanceInMinutes;
-        this.updateInitialBalanceInMinutes=updateInitialBalanceInMinutes;
+        this.updatedInitialBalanceInMinutes=updatedInitialBalanceInMinutes;
         this.updatedOn=updatedOn;
         this.updatedBy=updatedBy;
     }
