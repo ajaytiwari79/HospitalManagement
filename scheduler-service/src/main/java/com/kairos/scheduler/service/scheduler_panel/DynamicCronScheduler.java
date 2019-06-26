@@ -34,7 +34,7 @@ import java.util.concurrent.ScheduledFuture;
  */
 
 @Service
-public class DynamicCronScheduler implements DisposableBean {
+public class DynamicCronScheduler{
 
 
     @Inject
@@ -164,16 +164,5 @@ public class DynamicCronScheduler implements DisposableBean {
             kafkaProducer.pushToQueue(jobToExecute);
         };
     }
-
-    public void destroy() {
-        List<SchedulerPanel> schedulerPanels = schedulerPanelService.getAllControlPanels();
-        if (schedulerPanels.size() != 0) {
-            for (SchedulerPanel schedulerPanel : schedulerPanels) {
-                logger.info("Shutdown Cron Job of process name " + schedulerPanel.getName());
-                stopCronJob("scheduler" + schedulerPanel.getId());
-            }
-        }
-    }
-
 
 }
