@@ -54,9 +54,10 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+        String exception = "";
         if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)){
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
-            boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getTotalTimeBank().intValue()/60);
+            boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getTotalTimeBank()/60);
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                     limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0],this.name));
         }
@@ -66,7 +67,7 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
         this.name=name;
         this.disabled=disabled;
         this.description=description;
-        this.wtaTemplateType = WTATemplateType.TIME_BANK;
+        wtaTemplateType = WTATemplateType.TIME_BANK;
     }
 
     @Override
