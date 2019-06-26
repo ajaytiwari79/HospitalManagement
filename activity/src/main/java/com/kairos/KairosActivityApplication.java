@@ -27,6 +27,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -44,6 +45,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableMongoRepositories(basePackages ={"com.kairos.persistence.repository"},
 repositoryBaseClass = MongoBaseRepositoryImpl.class)
 @EnableAuditLogging
+@EnableAsync
 public class KairosActivityApplication implements WebMvcConfigurer {
 	@Autowired
 	private Environment environment;

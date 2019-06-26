@@ -159,6 +159,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PERIODSETTING_NOTFOUND = "message.periodsetting.notFound";
     public static final String MESSAGE_ORGANIZATION_PHASE_NOTFOUND = "message.organization.phase.notfound";
     public static final String MESSAGE_EMPLOYMENTTYPE_NOTFOUND="message.employmenttype.notfound";
+    public static final String MESSAGE_VALID_DURATION="message.valid.duration";
     public static final String MESSAGE_ORGANIZATION_ID = "message.organization.id";
     public static final String MESSAGE_ORGANIZATION_TYPE = "message.organization.type";
     public static final String MESSAGE_ORGANIZATION_TYPE_UPDATE = "message.organization.type.update";
@@ -194,7 +195,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_CANNOT_UPDATE  = "message.shift.cannot.update ";
     public static final String MESSAGE_SHIFT_ACTIVITY_EMPTY  = "message.shift.activity.empty ";
     public static final String MESSAGE_ACTIVITY_EMPTY = "message.activity.empty";
-    public static final String MESSAGE_SHIFT_VALIDATION_ACCESS  = "message.shift.validation.access ";
+    public static final String MESSAGE_SHIFT_VALIDATION_ACCESS  = "message.shift.validation.access";
     public static final String MESSAGE_SHIFT_SAVE_ACCESS  = "message.shift.save.access ";
     public static final String MESSAGE_SHIFT_SHIFTDATE  = "message.shift.shiftDate ";
     public static final String MESSAGE_SHIFT_REASONCODE_REQUIRED = "message.shift.reasoncode.required";

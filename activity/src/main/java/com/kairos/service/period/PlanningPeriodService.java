@@ -288,7 +288,7 @@ public class PlanningPeriodService extends MongoBaseService {
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         // Add planning period object in list
 
-            planningPeriods.add(planningPeriod);
+                planningPeriods.add(planningPeriod);
 
         if (recurringNumber > 1) {
             createPlanningPeriod(unitId, endDate.plusDays(1),
@@ -508,8 +508,12 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.actionNotPermittedException(MESSAGE_PERIOD_PHASE_REQUEST_NAME, planningPeriod.getName());
         }
         List<BigInteger> schedulerPanelIds = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId() != null).map(PeriodPhaseFlippingDate::getSchedulerPanelId).collect(Collectors.toList());
-        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, null, null);
+        try {
+            schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+            }, null, null);
+        }catch (Exception ex){
+            LOGGER.error("ex "+ex);
+        }
         planningPeriod.setDeleted(true);
         save(planningPeriod);
         return true;
