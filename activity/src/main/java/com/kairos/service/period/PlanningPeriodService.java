@@ -288,7 +288,6 @@ public class PlanningPeriodService extends MongoBaseService {
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         // Add planning period object in list
 
-
                 planningPeriods.add(planningPeriod);
 
         if (recurringNumber > 1) {
