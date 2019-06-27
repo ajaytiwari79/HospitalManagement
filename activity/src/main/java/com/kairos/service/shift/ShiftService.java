@@ -656,7 +656,10 @@ public class ShiftService extends MongoBaseService {
         }
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
         if(!shiftDTO.isDraft()) {
-            shiftValidatorService.escalationCorrectionInShift(shiftDTO, currentShiftStartDate, currentShiftEndDate);
+            if(byTAndAView){
+                shiftDTO.setId(shiftDTO.getShiftId());
+            }
+            shiftValidatorService.escalationCorrectionInShift(shiftDTO, currentShiftStartDate, currentShiftEndDate,shift);
         }
         return shiftWithViolatedInfoDTO;
     }

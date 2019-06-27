@@ -153,6 +153,7 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setPlannedMinutesOfTimebank(totalDailyPlannedMinutes);
         dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : 0);
         dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(ctaTimeBankMinMap.values().stream().mapToInt(ctaBonus -> ctaBonus).sum());
+        dailyTimeBankEntry.setPublishedSomeActivities(anyShiftPublish);
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         dailyTimeBankEntry.setScheduledMinutesOfTimeBank(scheduledMinutesOfTimeBank);
         dailyTimeBankEntry.setDeltaTimeBankMinutes(deltaTimeBankMinutes);
@@ -1156,7 +1157,7 @@ public class TimeBankCalculationService {
         Set<PhaseDefaultName> validPhaseForActualTimeBank = newHashSet(DRAFT, PhaseDefaultName.REALTIME, TIME_ATTENDANCE, PhaseDefaultName.TENTATIVE, PhaseDefaultName.PAYROLL);
         while (employmentStartDate.isBefore(endDate) || employmentStartDate.equals(endDate)) {
             int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeIntervals, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
-            if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate)) {
+            if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate) && dateDailyTimeBankEntryMap.get(employmentStartDate).isPublishedSomeActivities()) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
                 if(deltaTimeBankMinutes!=dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes()) {
                     actualTimebank += deltaTimeBankMinutes;
