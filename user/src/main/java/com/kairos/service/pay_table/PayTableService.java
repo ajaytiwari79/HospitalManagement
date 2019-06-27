@@ -321,6 +321,7 @@ public class PayTableService {
 
     public List<PayGradeResponse> getPayGradesByPayTableId(Long payTableId) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
+
         if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYTABLE_ID_NOTFOUND);
 
