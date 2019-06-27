@@ -64,16 +64,17 @@ public class PublicLegalDocumentService {
 
     public boolean removePublicLegalDocument(Long publicLegalDocumentId) {
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.getOne(publicLegalDocumentId);
-        if (!Optional.ofNullable(publicLegalDocument).isPresent()) {
+        if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
             return false;
         }
-        publicLegalDocumentRepository.delete(publicLegalDocument);
+        publicLegalDocument.setDeleted(true);
+        publicLegalDocumentRepository.save(publicLegalDocument);
         return true;
     }
 
     public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId, PublicLegalDocumentDTO publicLegalDocumentDTO) {
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.getOne(publicLegalDocumentId);
-        if (!Optional.ofNullable(publicLegalDocument).isPresent()) {
+        if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
             exceptionService.dataNotFoundByIdException("Data Not Found", publicLegalDocumentId);
         }
         publicLegalDocumentDTO.setId(publicLegalDocumentId);
