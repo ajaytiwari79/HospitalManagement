@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GEOGRAPHYDATA_NOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_MUNICIPALITY_NOTFOUND;
 
@@ -181,7 +182,10 @@ public class StaffAddressService {
         return contactAddressDTO;
     }
 
-     ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
+    public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
+        if (isNull(organization.getContactAddress())) {
+            return null;
+        }
         ContactAddress organizationAddress = contactAddressGraphRepository.findOne(organization.getContactAddress().getId());
         if (Optional.ofNullable(organizationAddress).isPresent()) {
             ContactAddress contactAddress = new ContactAddress();
