@@ -12,13 +12,17 @@ import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.TodoStatus;
+import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
@@ -71,6 +75,7 @@ public class ShiftStatusService {
     private ExceptionService exceptionService;
     @Inject
     private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
+    @Inject private TodoRepository todoRepository;
 
     public ShiftAndActivtyStatusDTO updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
@@ -210,6 +215,12 @@ public class ShiftStatusService {
                 break;
             default:
                 break;
+        }
+        if(newHashSet(APPROVE,DISAPPROVE).contains(shiftStatus)){
+            TodoStatus todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE: TodoStatus.DISAPPROVE;
+            Todo todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED,newHashSet(todoStatus),shiftActivity.getActivityId());
+            todo.setStatus(todoStatus);
+            todoRepository.save(todo);
         }
     }
 

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.enums.*;
@@ -11,7 +13,7 @@ import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
-import com.kairos.persistence.model.staff.StaffFilterDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -30,6 +32,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,8 +42,9 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.distinctByKey;
-import static com.kairos.commons.utils.ObjectUtils.isNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
+import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -136,11 +140,20 @@ public class StaffFilterService {
             case EMPLOYMENT: {
                 return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
             }
-            default:
+            case ACTIVITY_TIMECALCULATION_TYPE:
+                return newArrayList(new FilterSelectionQueryResult(FULL_DAY_CALCULATION,StringUtils.capitalize(FULL_DAY_CALCULATION.toLowerCase().replace("_"," "))),new FilterSelectionQueryResult(FULL_WEEK,StringUtils.capitalize(FULL_WEEK.toLowerCase().replace("_"," "))));
+            case TIME_TYPE:
+                return getAllTimeType(countryId);
+                default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
         }
         return null;
+    }
+
+    private List<FilterSelectionQueryResult> getAllTimeType(Long countryId){
+        List<TimeTypeDTO> timeTypeDTOS = activityIntegrationService.getAllTimeType(countryId);
+        return timeTypeDTOS.stream().flatMap(timeTypeDTO -> timeTypeDTO.getChildren().stream()).filter(timeTypeDTO -> "Presence".equals(timeTypeDTO.getLabel()) || "Absence".equals(timeTypeDTO.getLabel())).map(timeTypeDTO -> new FilterSelectionQueryResult(timeTypeDTO.getSecondLevelType().toString(),timeTypeDTO.getLabel())).collect(Collectors.toList());
     }
 
     private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {
@@ -194,7 +207,7 @@ public class StaffFilterService {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(staffFilterDTO.getModuleId());
 
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter(staffFilterDTO.getName(),
-                staffFilterDTO.getFiltersData(), filterGroup);
+                ObjectMapperUtils.copyPropertiesOfListByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         staff.addFavouriteFilters(staffFavouriteFilter);
         staffGraphRepository.save(staff);
@@ -226,9 +239,9 @@ public class StaffFilterService {
 
         }
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
-        List<FilterSelection> filters = favouriteFilterDTO.getFiltersData();
+        List<FilterSelectionDTO> filters = favouriteFilterDTO.getFiltersData();
         filters.forEach(filterSelection -> filterSelection.setId(null));
-        staffFavouriteFilter.setFiltersData(filters);
+        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyPropertiesOfListByMapper(filters, FilterSelection.class));
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return favouriteFilterDTO;
@@ -252,8 +265,8 @@ public class StaffFilterService {
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    private Map<FilterType, List<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelection> filters) {
-        Map<FilterType, List<String>> mapOfFilters = new HashMap<>();
+    private Map<FilterType, Set<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelectionDTO> filters) {
+        Map<FilterType, Set<String>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         filters.forEach(filterSelection -> {

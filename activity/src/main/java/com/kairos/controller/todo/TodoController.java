@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -30,8 +32,8 @@ public class TodoController {
     }
 
     @ApiOperation("Update status Of Todo")
-    @PutMapping("/{todoId}")
-    public ResponseEntity<Map<String,Object>> updateTodoStatus(@PathVariable BigInteger todoId, @RequestParam TodoStatus status){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,todoService.updateTodoStatus(todoId,status));
+    @PutMapping
+    public ResponseEntity<Map<String,Object>> updateTodoStatus(@RequestParam(required = false) BigInteger todoId, @RequestParam TodoStatus status,@RequestParam(required = false) BigInteger shiftId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,todoService.updateTodoStatus(todoId,status,shiftId));
     }
 }

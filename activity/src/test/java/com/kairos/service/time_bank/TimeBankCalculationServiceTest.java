@@ -3,6 +3,7 @@ package com.kairos.service.time_bank;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constaints.JsonConstaints;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -159,7 +160,7 @@ public class TimeBankCalculationServiceTest {
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 150);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 150);
-                activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(FULL_DAY_CALCULATION);
+                activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(CommonConstants.FULL_DAY_CALCULATION);
                 timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 2220);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 2220);

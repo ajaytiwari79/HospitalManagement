@@ -624,7 +624,7 @@ public class TimeBankService{
     }
 
     public DailyTimeBankEntry calculateTimebankForDraftShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO,Date startDate,Date endDate,DailyTimeBankEntry dailyTimeBankEntry){
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate,false);
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = new ArrayList<>(shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate,false));
         List<ShiftWithActivityDTO> draftShifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate,true);
         if(isCollectionNotEmpty(draftShifts)) {
             shiftWithActivityDTOS.addAll(draftShifts);

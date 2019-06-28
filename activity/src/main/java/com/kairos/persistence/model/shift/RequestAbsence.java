@@ -18,7 +18,10 @@ import java.util.Date;
 public class RequestAbsence {
     private BigInteger shiftId;
     private BigInteger activityId;
+    private String activityName;
     private Date startDate;
     private Date endDate;
     private TodoStatus todoStatus;
+    private Long reasonCodeId;
+    private String remarks;
 }

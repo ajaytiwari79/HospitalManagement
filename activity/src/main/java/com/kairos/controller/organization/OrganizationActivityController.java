@@ -180,12 +180,12 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignChildActivitiesInActivity(activityId,childActivitiesIds));
     }
 
-    /*@ApiOperation("get compositeShifts Tab of Activity")
+    @ApiOperation("get compositeShifts Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/allowed_child_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getCompositeShiftTabOfActivity(@PathVariable BigInteger activityId,@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCompositeAndChildActivityOfUnitActivity(activityId,unitId));
-    }*/
+    }
 
 
    /* @ApiOperation("Update notes Tab of Activity")

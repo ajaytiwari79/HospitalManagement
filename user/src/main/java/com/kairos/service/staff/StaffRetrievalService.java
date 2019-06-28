@@ -14,6 +14,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.StaffWithSkillDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.staff.staff.StaffDTO;

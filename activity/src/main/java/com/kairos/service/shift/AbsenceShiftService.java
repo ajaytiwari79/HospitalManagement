@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_NOTFOUND;
-import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
+import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 
 @Service
@@ -67,7 +67,7 @@ public class AbsenceShiftService {
                 newShiftDTO = calculateAverageShiftByActivity(shifts, activityWrapper.getActivity(),
                         staffAdditionalInfoDTO, absenceReasonCodeId,shiftDTO.getShiftDate());
             }
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), null);
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), newShiftDTO.getActivities().get(newShiftDTO.getActivities().size()-1).getEndDate());
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
             shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase,shiftOverlappedWithNonWorkingType , shiftActionType);

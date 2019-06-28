@@ -80,6 +80,7 @@ public class ShiftDTO {
     private boolean deleted;
     private ShiftDTO draftShift;
     private boolean draft;
+    private RequestAbsenceDTO requestAbsence;
 
 
 
@@ -87,9 +88,10 @@ public class ShiftDTO {
         //default Const
     }
 
-    public ShiftDTO(@NotNull(message = "message.shift.shiftDate") LocalDate shiftDate,List<ShiftActivityDTO> activities) {
+    public ShiftDTO(@NotNull(message = "message.shift.shiftDate") LocalDate shiftDate,List<ShiftActivityDTO> activities,BigInteger id) {
         this.shiftDate = shiftDate;
         this.activities = activities;
+        this.id = id;
     }
 
     public ShiftDTO(Date startDate, Date endDate, List<ShiftActivityDTO> activities) {

@@ -238,7 +238,7 @@ public  class DateUtils {
     }
 
     public static String asLocalDateString(Date date, String pattern) {
-        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern(pattern));
+        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern(pattern,Locale.ENGLISH));
     }
 
     public static LocalDate asLocalDate(Long date) {

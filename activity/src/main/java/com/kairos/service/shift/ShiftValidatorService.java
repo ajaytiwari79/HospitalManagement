@@ -1,6 +1,7 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.*;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
@@ -437,8 +438,8 @@ public class ShiftValidatorService {
         String staffingLevelStatus = null;
         if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
             for (StaffingLevel staffingLevel : staffingLevels) {
-                List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) ||
-                        activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
+                List<StaffingLevelInterval> staffingLevelIntervals = (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_DAY_CALCULATION) ||
+                        activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) ? staffingLevel.getAbsenceStaffingLevelInterval() : staffingLevel.getPresenceStaffingLevelInterval();
                 for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
                     int shiftsCount = 0;
                     Optional<StaffingLevelActivity> staffingLevelActivity = staffingLevelInterval.getStaffingLevelActivities().stream().filter(sa -> sa.getActivityId().equals(activity.getId())).findFirst();
@@ -775,11 +776,11 @@ public class ShiftValidatorService {
         DateTimeInterval shiftInterval = null;
         Date startDate = asDate(shiftDTO.getShiftDate());
         Date endDate = null;
-        if (FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
+        if (CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
 
             endDate = asDate(shiftDTO.getShiftDate().plusDays(6).atTime(LocalTime.MAX));
             shiftInterval = new DateTimeInterval(startDate, endDate);
-        } else if (FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
+        } else if (CommonConstants.FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
             endDate = asDate(shiftDTO.getShiftDate().atTime(LocalTime.MAX));
             shiftInterval = new DateTimeInterval(startDate, endDate);
         } else {
@@ -793,7 +794,7 @@ public class ShiftValidatorService {
         List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ?
                         shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), startDate,
                 endDate);
-        if (!FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
+        if (!CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
         return shiftOverlappedWithNonWorkingType;
@@ -903,7 +904,7 @@ public class ShiftValidatorService {
     }
 
     private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
-         return (FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
+         return (CommonConstants.FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
         //return true;
     }
 
@@ -916,7 +917,7 @@ public class ShiftValidatorService {
                 if ((WORKING_TYPE.toString().equals(activity.getTimeType())) && shiftInterval.overlaps(existingShiftInterval)) {
                     exceptionService.invalidRequestException("message.shift.date.startandend", shiftWithActivityDTO.getStartDate(),
                             shiftWithActivityDTO.getEndDate());
-                } else if (FULL_WEEK.equals(activity.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY.equals(activity.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
+                } else if (CommonConstants.FULL_WEEK.equals(activity.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY.equals(activity.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
                     existingShiftInterval = new DateTimeInterval(getStartOfDay(shiftWithActivityDTO.getStartDate()), getEndOfDay(shiftWithActivityDTO.getEndDate()));
                     if (shiftInterval.overlaps(existingShiftInterval)) {
                         exceptionService.invalidRequestException("message.shift.date.startandend", shiftWithActivityDTO.getStartDate(),

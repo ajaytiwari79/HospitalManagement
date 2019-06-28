@@ -21,11 +21,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_F
 @NodeEntity
 public class StaffFavouriteFilter extends UserBaseEntity {
 
-    /*@Relationship(type = FILTER_BY_PAGE)
-    private List<AccessPage> accessPages;*/
-
-//    private String filterJson;
-
     @Relationship(type = HAS_FILTER_GROUP)
     private FilterGroup filterGroup;
 
@@ -51,22 +46,6 @@ public class StaffFavouriteFilter extends UserBaseEntity {
     public void setName(String name) {
         this.name = name;
     }
-
-    /*public List<AccessPage> getAccessPages() {
-        return accessPages;
-    }
-
-    public void setAccessPages(List<AccessPage> accessPages) {
-        this.accessPages = accessPages;
-    }*/
-
-    /*public String getFilterJson() {
-        return filterJson;
-    }
-
-    public void setFilterJson(String filterJson) {
-        this.filterJson = filterJson;
-    }*/
 
     public List<FilterSelection> getFiltersData() {
         return filtersData;

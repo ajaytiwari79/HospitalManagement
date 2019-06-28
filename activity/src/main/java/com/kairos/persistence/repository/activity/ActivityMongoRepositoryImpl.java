@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.activity;
 
-import com.kairos.constants.AppConstants;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.*;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
@@ -554,7 +554,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     @Override
     public List<ActivityWrapper> findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(Set<BigInteger> activityIds) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("id").in(activityIds).and("deleted").is(false).and("timeCalculationActivityTab.methodForCalculatingTime").nin(AppConstants.FULL_DAY_CALCULATION, AppConstants.FULL_WEEK)),
+                match(Criteria.where("id").in(activityIds).and("deleted").is(false).and("timeCalculationActivityTab.methodForCalculatingTime").nin(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK)),
                 lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
                         "timeType"),
                 project().and("id").as("activity._id").and("name").as("activity.name")

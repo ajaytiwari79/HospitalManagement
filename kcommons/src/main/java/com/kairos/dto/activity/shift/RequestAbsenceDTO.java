@@ -19,9 +19,10 @@ public class RequestAbsenceDTO {
     private BigInteger shiftId;
     @NotNull
     private BigInteger activityId;
-    @NotNull
+    private String activityName;
     private Date startDate;
-    @NotNull
     private Date endDate;
     private TodoStatus todoStatus = TodoStatus.PENDING;
+    private Long reasonCodeId;
+    private String remarks;
 }

@@ -1,6 +1,7 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -241,8 +242,8 @@ public class ShiftSickService extends MongoBaseService {
                 shiftActivity.setDurationMinutes(shiftDurationInMinute);
                 shiftActivity.setScheduledMinutes(scheduledMinutes);
                 break;
-            case FULL_DAY_CALCULATION:
-            case FULL_WEEK:
+            case CommonConstants.FULL_DAY_CALCULATION:
+            case CommonConstants.FULL_WEEK:
                 weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(timeCalculationActivityTab.getFullDayCalculationType()))
                         ? employment.getFullTimeWeeklyMinutes() : employment.getTotalWeeklyMinutes();
                 int shiftEndHour = weeklyMinutes / employment.getWorkingDaysInWeek();

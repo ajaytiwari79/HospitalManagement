@@ -26,13 +26,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Getter
 @Setter
 public class ShiftWithActivityDTO extends ShiftDTO{
-    private String name;
-    private long bonusTimeBank;
-    private long accumulatedTimeBankInMinutes;
     private PhaseDTO phase;
-    private Integer weekCount;
-    private static boolean overrideWeekCount;
-    private List<ShiftStatus> status;
     private String timeType;
     @JsonIgnore
     private List<BigInteger> activitiesTimeTypeIds = new ArrayList<>();
@@ -49,44 +43,6 @@ public class ShiftWithActivityDTO extends ShiftDTO{
         this.startDate = startDate;
         this.endDate = endDate;
         this.activities = activities;
-    }
-
-    public ShiftWithActivityDTO(BigInteger id, String name, Date startDate, Date endDate, long bonusTimeBank, long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, List<ShiftActivityDTO> activities, Long staffId, Long employmentId, Long unitId) {
-        this.id = id;
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.bonusTimeBank = bonusTimeBank;
-        this.amount = amount;
-        this.probability = probability;
-        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
-        this.remarks = remarks;
-        if(isNotNull(activities)){
-            activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
-            this.activities = activities;
-            this.startDate = activities.get(0).getStartDate();
-            this.endDate = activities.get(activities.size()-1).getEndDate();
-        }else {
-            this.activities = new ArrayList<>();
-        }
-        this.employmentId = employmentId;
-        this.staffId = staffId;
-        this.unitId = unitId;
-    }
-
-    public ShiftWithActivityDTO(BigInteger phaseId,List<ShiftActivityDTO> activities) {
-        this.phaseId= phaseId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        if(isNotNull(activities)){
-            activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
-            this.activities = activities;
-            this.startDate = activities.get(0).getStartDate();
-            this.endDate = activities.get(activities.size()-1).getEndDate();
-        }else {
-            this.activities = new ArrayList<>();
-        }
-
     }
 
     public List<BigInteger> getActivitiesTimeTypeIds(){
@@ -128,10 +84,6 @@ public class ShiftWithActivityDTO extends ShiftDTO{
 
     public int getMinutes() {
         return ((int) (this.activities.get(activities.size() - 1).getEndDate().getTime() - this.activities.get(0).getStartDate().getTime()) / 60000);
-    }
-
-    public static void setOverrideWeekCount(boolean overrideWeekCount) {
-        ShiftWithActivityDTO.overrideWeekCount = overrideWeekCount;
     }
 
     @JsonIgnore

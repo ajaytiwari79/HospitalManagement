@@ -10,6 +10,7 @@ import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffDTO;

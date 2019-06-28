@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDateString;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
+import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.enums.shift.TodoStatus.*;
 
 /**
@@ -49,12 +51,13 @@ public class TodoService {
     @Inject private PhaseService phaseService;
 
     public void createOrUpdateTodo(Shift shift, TodoType todoType, UserAccessRoleDTO userAccessRoleDTO, boolean shiftUpdate){
-        Set<BigInteger> activityIds = shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
-        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet()));
-        List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
-        Set<BigInteger> approvalRequiredActivityIds = activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).map(activity -> activity.getId()).collect(Collectors.toSet());
+        List<Todo> todos = new ArrayList<>();
         if(todoType.equals(TodoType.APPROVAL_REQUIRED)){
+            Set<BigInteger> activityIds = shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
+            activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet()));
+            List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
+            Set<BigInteger> approvalRequiredActivityIds = activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).map(activity -> activity.getId()).collect(Collectors.toSet());
             if(!shiftUpdate && userAccessRoleDTO.getManagement()){
                 shift.getActivities().forEach(shiftActivity -> {
                     updateStatusIfApprovalRequired(approvalRequiredActivityIds, shiftActivity);
@@ -62,21 +65,33 @@ public class TodoService {
                 });
                 shiftMongoRepository.save(shift);
             }else {
-                List<Todo> todoList = todoRepository.findAllByNotApprovedAndEntityId(shift.getId(), newArrayList(PENDING, VIEWED));
+                List<Todo> todoList = todoRepository.findAllByNotApprovedAndEntityId(shift.getId(),TodoType.APPROVAL_REQUIRED, newArrayList(PENDING, VIEWED));
                 Set<BigInteger> subEntitiyIds = todoList.stream().map(todo -> todo.getSubEntityId()).collect(Collectors.toSet());
                 todoList.removeIf(todo -> activityIds.contains(todo.getSubEntityId()));
                 activityIds.removeIf(activityId -> subEntitiyIds.contains(activityId));
                 activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-                List<Todo> todos = new ArrayList<>();
                 if (isCollectionNotEmpty(activityIds)) {
-                    createTodoByActivity(shift, activities);
+                    createTodoForActivityApproval(shift, activities);
                 }
                 todoList.forEach(todo -> todo.setDeleted(true));
                 todos.addAll(todoList);
-                if(isCollectionNotEmpty(todos)){
-                    todoRepository.saveEntities(todos);
-                }
             }
+        }else {
+            createOrUpdateTodoForRequestApproval(shift, todos);
+        }
+        if(isCollectionNotEmpty(todos)){
+            todoRepository.saveEntities(todos);
+        }
+    }
+
+    private void createOrUpdateTodoForRequestApproval(Shift shift, List<Todo> todos) {
+        if(shift.isDeleted()){
+            todoRepository.deleteByEntityId(shift.getId());
+        }else {
+            Activity activity = activityMongoRepository.findOne(shift.getRequestAbsence().getActivityId());
+            TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
+            String description = "Absence request has been genereated for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), "MMM dd,yyyy") + "</span>";
+            todos.add(new Todo(TodoType.REQUEST_ABSENCE, todoSubtype, shift.getId(), activity.getId(), PENDING, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
         }
     }
 
@@ -86,11 +101,15 @@ public class TodoService {
         }
     }
 
-    private void createTodoByActivity(Shift shift, List<Activity> activities) {
+    public Long deleteTodo(BigInteger shiftId,TodoType todoType){
+        return todoRepository.deleteByEntityIdAndTypeAndStatus(shiftId,todoType, newArrayList(PENDING, VIEWED));
+    }
+
+    private void createTodoForActivityApproval(Shift shift, List<Activity> activities) {
         List<Todo> todos = new ArrayList<>();
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).forEach(activity -> {
-            String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), "Mon DD, YYYY") + "</span>";
+            String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), "MMM dd,yyyy") + "</span>";
             todos.add(new Todo(TodoType.APPROVAL_REQUIRED, TodoSubtype.APPROVAL, shift.getId(), activity.getId(), PENDING, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
         });
     }
@@ -99,30 +118,34 @@ public class TodoService {
         return todoRepository.findAllByNotApproved(unitId,newArrayList(PENDING,VIEWED));
     }
 
-    public TodoDTO updateTodoStatus(BigInteger todoId, TodoStatus status){
-        Todo todo = todoRepository.findOne(todoId);
+    public <T> T updateTodoStatus(BigInteger todoId, TodoStatus status,BigInteger shiftId){
+        T response = null;
+        Todo todo = isNotNull(todoId) ? todoRepository.findOne(todoId) : todoRepository.findByEntityIdAndType(shiftId,TodoType.REQUEST_ABSENCE);
         if(isNull(todo)){
-            exceptionService.dataNotFoundException("");
-        }
-        if(newHashSet(APPROVE,DISAPPROVE).contains(status)){
-            approveAndDisapproveTodo(todo);
+            exceptionService.dataNotFoundException("todo not found");
         }
         todo.setStatus(status);
+        if(newHashSet(APPROVE,DISAPPROVE).contains(status)){
+            response = approveAndDisapproveTodo(todo);
+        }
         todoRepository.save(todo);
-        return ObjectMapperUtils.copyPropertiesByMapper(todo,TodoDTO.class);
+        return response;
     }
 
 
-    private void approveAndDisapproveTodo(Todo todo){
+    private <T> T approveAndDisapproveTodo(Todo todo){
+        T response = null;
         switch (todo.getType()){
-            case REQUEST_ABSENCE:requestAbsenceService.approveRequestAbsence(todo);
+            case REQUEST_ABSENCE:
+                response = (T)requestAbsenceService.approveRequestAbsence(todo);
                 break;
             case APPROVAL_REQUIRED:
                 Shift shift = shiftMongoRepository.findOne(todo.getEntityId());
                 List<BigInteger> shiftActivityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(todo.getSubEntityId())).map(shiftActivity -> shiftActivity.getId()).collect(Collectors.toList());
-                shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(newArrayList(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftActivityIds)), todo.getStatus().equals(DISAPPROVE) ? ShiftStatus.DISAPPROVE : ShiftStatus.APPROVE));
+                response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(newArrayList(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftActivityIds)), todo.getStatus().equals(DISAPPROVE) ? ShiftStatus.DISAPPROVE : ShiftStatus.APPROVE));
                 break;
             default:break;
         }
+        return response;
     }
 }

@@ -8,7 +8,7 @@ import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.staff.StaffFilterDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.user.resources.ResourceDTO;
 import com.kairos.persistence.model.user.resources.ResourceUnavailabilityDTO;
 import com.kairos.persistence.model.user.skill.Skill;

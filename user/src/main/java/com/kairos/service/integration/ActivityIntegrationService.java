@@ -6,6 +6,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.*;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -151,6 +152,11 @@ public class ActivityIntegrationService {
 
     public Map<Long,Boolean> getNightWorkerDetails(List<Long> staffIds,Long unitId) {
         return genericRestClient.publishRequest(staffIds, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
+        });
+    }
+
+    public List<TimeTypeDTO> getAllTimeType(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/timeType/", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeTypeDTO>>>() {
         });
     }
 
