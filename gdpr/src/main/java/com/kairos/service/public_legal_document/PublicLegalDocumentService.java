@@ -72,13 +72,19 @@ public class PublicLegalDocumentService {
         return true;
     }
 
-    public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId, PublicLegalDocumentDTO publicLegalDocumentDTO) {
+    public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId,MultipartFile file, PublicLegalDocumentDTO publicLegalDocumentDTO) {
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
         if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
             exceptionService.dataNotFoundByIdException("Data Not Found", publicLegalDocumentId);
         }
+        if (file != null && file.getSize() > 0) {
+            String fileName = uploadPublicLegalLogo(file);
+            if(fileName != null)publicLegalDocument.setPublicLegalDocumentLogo(fileName);
+            publicLegalDocumentDTO.setPublicLegalDocumentLogo(fileName);
+        }
         publicLegalDocumentDTO.setId(publicLegalDocumentId);
-        publicLegalDocument = new PublicLegalDocument(publicLegalDocumentId,publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
+        if(publicLegalDocumentDTO.getName() != null)publicLegalDocument.setName(publicLegalDocumentDTO.getName());
+        if(publicLegalDocumentDTO.getBodyContentInHtml() != null)publicLegalDocument.setBodyContentInHtml(publicLegalDocumentDTO.getBodyContentInHtml());
         publicLegalDocumentRepository.save(publicLegalDocument);
         return publicLegalDocumentDTO;
     }

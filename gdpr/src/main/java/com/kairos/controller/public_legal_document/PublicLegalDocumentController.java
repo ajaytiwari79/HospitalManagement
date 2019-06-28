@@ -31,14 +31,14 @@ public class PublicLegalDocumentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.createPublicLegalDocument(file,publicLegalDocumentDTO));
     }
 
-    @ApiOperation("Update Public Legal Document")
+    @ApiOperation("Update Public Legal Document By Id")
     @PutMapping(COUNTRY_URL + "/public_legal_document/{publicLegalDocumentId}")
-    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long publicLegalDocumentId, @Validated @RequestBody PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.updatePublicLegalDocument(publicLegalDocumentId, publicLegalDocumentDTO));
+    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long publicLegalDocumentId,@RequestParam(value = "file", required = false) MultipartFile file, @RequestBody PublicLegalDocumentDTO publicLegalDocumentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.updatePublicLegalDocument(publicLegalDocumentId, file, publicLegalDocumentDTO));
 
     }
 
-    @ApiOperation("Delete All Public Legal Document")
+    @ApiOperation("Delete Public Legal Document By Id")
     @DeleteMapping(COUNTRY_URL + "/public_legal_document/{publicLegalDocumentId}")
     public ResponseEntity<Object> removePublicLegalDocument(@PathVariable Long publicLegalDocumentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.removePublicLegalDocument(publicLegalDocumentId));
