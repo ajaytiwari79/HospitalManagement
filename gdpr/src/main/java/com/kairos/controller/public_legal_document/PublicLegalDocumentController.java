@@ -28,13 +28,18 @@ public class PublicLegalDocumentController {
     @ApiOperation("Save Public Legal Document")
     @PostMapping(COUNTRY_URL + "/public_legal_document")
     public ResponseEntity<Object> createPublicLegalDocument(@RequestParam(value = "file", required = false) MultipartFile file,@RequestBody @Validated PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.createPublicLegalDocument(file,publicLegalDocumentDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.createPublicLegalDocument(publicLegalDocumentDTO));
     }
 
+    @ApiOperation("Upload Public Legal Document Logo")
+    @PostMapping(COUNTRY_URL + "/public_legal_document/logo")
+    public ResponseEntity<Object> uploadPublicLegalDocumentLogo(@RequestParam("logoFile") MultipartFile logoFile) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.uploadPublicLegalDocumentLogo(logoFile));
+    }
     @ApiOperation("Update Public Legal Document By Id")
     @PutMapping(COUNTRY_URL + "/public_legal_document/{publicLegalDocumentId}")
-    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long publicLegalDocumentId,@RequestParam(value = "file", required = false) MultipartFile file, @RequestBody PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.updatePublicLegalDocument(publicLegalDocumentId, file, publicLegalDocumentDTO));
+    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long publicLegalDocumentId,@RequestBody PublicLegalDocumentDTO publicLegalDocumentDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.updatePublicLegalDocument(publicLegalDocumentId,publicLegalDocumentDTO));
 
     }
 

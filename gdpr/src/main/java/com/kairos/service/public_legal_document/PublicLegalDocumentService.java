@@ -26,19 +26,14 @@ public class PublicLegalDocumentService {
     @Inject
     private ExceptionService exceptionService;
 
-    public PublicLegalDocumentDTO createPublicLegalDocument(MultipartFile file, PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        String fileName = null;
-        if (file != null && file.getSize() > 0) {
-            fileName = uploadPublicLegalLogo(file);
-        }
-        publicLegalDocumentDTO.setPublicLegalDocumentLogo(fileName);
+    public PublicLegalDocumentDTO createPublicLegalDocument(PublicLegalDocumentDTO publicLegalDocumentDTO) {
         PublicLegalDocument publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
         publicLegalDocumentRepository.save(publicLegalDocument);
         publicLegalDocumentDTO.setId(publicLegalDocument.getId());
         return publicLegalDocumentDTO;
     }
 
-    private String uploadPublicLegalLogo(MultipartFile file){
+    public String uploadPublicLegalDocumentLogo(MultipartFile file){
         File directory = new File(PUBLIC_LEGAL_Document_LOGO_PATH);
         if (!directory.exists()) {
             try {
@@ -72,15 +67,10 @@ public class PublicLegalDocumentService {
         return true;
     }
 
-    public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId,MultipartFile file, PublicLegalDocumentDTO publicLegalDocumentDTO) {
+    public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId,PublicLegalDocumentDTO publicLegalDocumentDTO) {
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
         if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
             exceptionService.dataNotFoundByIdException("Data Not Found", publicLegalDocumentId);
-        }
-        if (file != null && file.getSize() > 0) {
-            String fileName = uploadPublicLegalLogo(file);
-            if(fileName != null)publicLegalDocument.setPublicLegalDocumentLogo(fileName);
-            publicLegalDocumentDTO.setPublicLegalDocumentLogo(fileName);
         }
         publicLegalDocumentDTO.setId(publicLegalDocumentId);
         if(publicLegalDocumentDTO.getName() != null)publicLegalDocument.setName(publicLegalDocumentDTO.getName());

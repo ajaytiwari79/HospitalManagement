@@ -21,10 +21,10 @@ public class PublicLegalDocumentDTO {
     @NotNull(message = "Public Legal Document Name Required")
     private String name;
 
-    private String publicLegalDocumentLogo;
-
     @NotNull(message = "Public Legal Document Body Content Required")
     private String bodyContentInHtml;
+
+    private String publicLegalDocumentLogo;
 
     public PublicLegalDocumentDTO(Long id,String name,String publicLegalDocumentLogo,String bodyContentInHtml){
         this.id=id;
