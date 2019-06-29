@@ -181,7 +181,7 @@ public class ShiftServiceUnitTest {
         shiftDTO=new ShiftDTO();
         shiftDTO.setId(BigInteger.valueOf(93));
         shiftDTO.setBid(0l);
-        shiftDTO.setpId(0l);
+        shiftDTO.setPId(0l);
         shiftDTO.setAmount(0);
         shiftDTO.setProbability(0);
         shiftDTO.setUnitId(958l);

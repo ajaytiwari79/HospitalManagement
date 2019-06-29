@@ -17,6 +17,7 @@ import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.RequestAbsenceService;
@@ -49,6 +50,7 @@ public class TodoService {
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private PhaseService phaseService;
+    @Inject private UserIntegrationService userIntegrationService;
 
     public void createOrUpdateTodo(Shift shift, TodoType todoType, UserAccessRoleDTO userAccessRoleDTO, boolean shiftUpdate){
         List<Todo> todos = new ArrayList<>();
@@ -115,7 +117,12 @@ public class TodoService {
     }
 
     public List<TodoDTO> getAllTodo(Long unitId){
-        return todoRepository.findAllByNotApproved(unitId,newArrayList(PENDING,VIEWED));
+        UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessRolesOfStaff(unitId);
+        List<TodoDTO> todoDTOS = new ArrayList<>();
+        if(userAccessRoleDTO.getManagement()) {
+            todoDTOS = todoRepository.findAllByNotApproved(unitId, newArrayList(PENDING, VIEWED));
+        }
+        return todoDTOS;
     }
 
     public <T> T updateTodoStatus(BigInteger todoId, TodoStatus status,BigInteger shiftId){
