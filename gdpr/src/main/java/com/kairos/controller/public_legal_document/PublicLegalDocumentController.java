@@ -27,7 +27,7 @@ public class PublicLegalDocumentController {
 
     @ApiOperation("Save Public Legal Document")
     @PostMapping(COUNTRY_URL + "/public_legal_document")
-    public ResponseEntity<Object> createPublicLegalDocument(@RequestParam(value = "file", required = false) MultipartFile file,@RequestBody @Validated PublicLegalDocumentDTO publicLegalDocumentDTO) {
+    public ResponseEntity<Object> createPublicLegalDocument(@RequestBody @Validated PublicLegalDocumentDTO publicLegalDocumentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.createPublicLegalDocument(publicLegalDocumentDTO));
     }
 

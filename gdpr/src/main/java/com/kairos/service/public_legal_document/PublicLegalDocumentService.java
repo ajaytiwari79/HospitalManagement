@@ -5,14 +5,13 @@ import com.kairos.persistence.model.public_legal_document.PublicLegalDocument;
 import com.kairos.persistence.repository.public_legal_document.PublicLegalDocumentRepository;
 import com.kairos.response.dto.public_legal_document.PublicLegalDocumentDTO;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.AppConstant.PUBLIC_LEGAL_Document_LOGO_PATH;
 
@@ -33,7 +32,7 @@ public class PublicLegalDocumentService {
         return publicLegalDocumentDTO;
     }
 
-    public String uploadPublicLegalDocumentLogo(MultipartFile file){
+    public Map<String,String> uploadPublicLegalDocumentLogo(MultipartFile file){
         File directory = new File(PUBLIC_LEGAL_Document_LOGO_PATH);
         if (!directory.exists()) {
             try {
@@ -54,7 +53,9 @@ public class PublicLegalDocumentService {
         } catch (Exception e) {
             return null;
         }
-        return fileName;
+        Map<String,String> responseResult = new HashMap<>();
+        responseResult.put("logoUrl",fileName);
+        return responseResult;
     }
 
     public boolean removePublicLegalDocument(Long publicLegalDocumentId) {
