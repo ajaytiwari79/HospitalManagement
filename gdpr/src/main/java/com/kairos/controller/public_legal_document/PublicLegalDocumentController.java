@@ -33,8 +33,8 @@ public class PublicLegalDocumentController {
 
     @ApiOperation("Upload Public Legal Document Logo")
     @PostMapping(COUNTRY_URL + "/public_legal_document/logo")
-    public ResponseEntity<Object> uploadPublicLegalDocumentLogo(@RequestParam("logoFile") MultipartFile logoFile) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.uploadPublicLegalDocumentLogo(logoFile));
+    public ResponseEntity<Object> uploadPublicLegalDocumentLogo(@RequestParam("file") MultipartFile file) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.uploadPublicLegalDocumentLogo(file));
     }
     @ApiOperation("Update Public Legal Document By Id")
     @PutMapping(COUNTRY_URL + "/public_legal_document/{publicLegalDocumentId}")
