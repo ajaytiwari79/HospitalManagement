@@ -14,6 +14,7 @@ import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -244,10 +245,15 @@ public class ShiftStatusService {
         return activityShiftStatusSettings;
     }
 
-    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, UserAccessRoleDTO userAccessRoleDTO) {
+    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, UserAccessRoleDTO userAccessRoleDTO, ShiftActionType shiftActionType) {
         Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
+
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
-            if (validPhaseForPublishingShift.contains(phase.getPhaseEnum())) {
+
+           // if(ShiftActionType.SAVE.equals(shiftActionType)) {
+             //  shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+            //}
+            if (validPhaseForPublishingShift.contains(phase.getPhaseEnum()) && ShiftActionType.SAVE.equals(shiftActionType)) {
                 shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {

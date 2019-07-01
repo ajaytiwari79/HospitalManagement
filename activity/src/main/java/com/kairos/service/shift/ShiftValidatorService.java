@@ -104,6 +104,8 @@ public class ShiftValidatorService {
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
+    private ShiftValidatorService shiftValidatorService;
+    @Inject
     private StaffWTACounterRepository wtaCounterRepository;
     @Inject
     private

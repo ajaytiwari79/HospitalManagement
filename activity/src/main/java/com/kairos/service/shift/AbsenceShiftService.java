@@ -62,6 +62,7 @@ public class AbsenceShiftService {
     @Inject private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
     @Inject private ShiftStatusService shiftStatusService;
 
+
     public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean shiftOverlappedWithNonWorkingType , ShiftActionType shiftActionType) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
         Long absenceReasonCodeId = shiftDTO.getActivities().get(0).getAbsenceReasonCodeId();
@@ -85,12 +86,12 @@ public class AbsenceShiftService {
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
             shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase,shiftOverlappedWithNonWorkingType , shiftActionType);
         } else {
-            shiftWithViolatedInfoDTO = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId);
+            shiftWithViolatedInfoDTO = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId,shiftActionType);
         }
         return shiftWithViolatedInfoDTO;
     }
 
-    private ShiftWithViolatedInfoDTO getAverageOfShiftByActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity, ShiftDTO shiftDTO, Long absenceReasonCodeId) {
+    private ShiftWithViolatedInfoDTO getAverageOfShiftByActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity, ShiftDTO shiftDTO, Long absenceReasonCodeId, ShiftActionType shiftActionType) {
         Date fromDate = asDate(shiftDTO.getShiftDate());
         Date endDate = new DateTime(fromDate).withTimeAtStartOfDay().plusDays(8).toDate();
         Date startDate = new DateTime(fromDate).minusWeeks(activity.getTimeCalculationActivityTab().getHistoryDuration()).toDate();
@@ -124,7 +125,7 @@ public class AbsenceShiftService {
         shiftValidatorService.validateShifts(shiftDTOS);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO();
         if (!shiftDTOS.isEmpty()) {
-            shiftWithViolatedInfoDTO = saveShifts(activity, staffAdditionalInfoDTO, shiftDTOS);
+            shiftWithViolatedInfoDTO = saveShifts(activity, staffAdditionalInfoDTO, shiftDTOS,shiftActionType);
 
         }
         return shiftWithViolatedInfoDTO;
@@ -175,7 +176,7 @@ public class AbsenceShiftService {
         return shiftQueryResults;
     }
 
-    private ShiftWithViolatedInfoDTO saveShifts(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftDTO> shiftDTOS) {
+    private ShiftWithViolatedInfoDTO saveShifts(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<Shift> shifts = new ArrayList<>(shiftDTOS.size());
         Set<LocalDateTime> dates = shiftDTOS.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
         Map<Date, Phase> phaseMapByDate = phaseService.getPhasesByDates(shiftDTOS.get(0).getUnitId(), dates);
@@ -202,7 +203,7 @@ public class AbsenceShiftService {
             }
             shift.setPlanningPeriodId(planningPeriodByShift.get().getId());
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
-            shiftStatusService.updateStatusOfShiftIfPhaseValid(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift,activityWrapperMap,staffAdditionalInfoDTO.getUserAccessRoleDTO());
+            shiftStatusService.updateStatusOfShiftIfPhaseValid(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift,activityWrapperMap,staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftActionType);
             shifts.add(shift);
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());

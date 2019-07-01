@@ -57,6 +57,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.ShiftAllowedToDelete;
 import com.kairos.service.MongoBaseService;
+import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.period.PlanningPeriodService;
@@ -178,7 +179,7 @@ public class ShiftService extends MongoBaseService {
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, shiftDTO.getActivities().get(0).getStartDate(), null);
             shiftDTO.setShiftType(ShiftType.PRESENCE);
-            shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType,shiftActionType);
+            shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
         }
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
         return shiftWithViolatedInfoDTO;
@@ -272,7 +273,7 @@ public class ShiftService extends MongoBaseService {
             shiftActivity.setBackgroundColor(activityWrapper.getActivity().getGeneralActivityTab().getBackgroundColor());
             shiftActivity.setActivityName(activityWrapper.getActivity().getName());
         }
-        shiftStatusService.updateStatusOfShiftIfPhaseValid(phase, shift,activityWrapperMap ,staffAdditionalInfoDTO.getUserAccessRoleDTO());
+        shiftStatusService.updateStatusOfShiftIfPhaseValid(phase, shift,activityWrapperMap ,staffAdditionalInfoDTO.getUserAccessRoleDTO(),shiftAction);
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
         Activity activity = activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity();
         //if ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) {
@@ -301,7 +302,7 @@ public class ShiftService extends MongoBaseService {
         }
         if(!updateShift && PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)){
             Shift draftShift=ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class);
-            draftShift.setDraft(true);
+           draftShift.setDraft(true);
             shift.setDraftShift(draftShift);
             shift.setDraft(true);
         }
@@ -616,7 +617,7 @@ public class ShiftService extends MongoBaseService {
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
             boolean valid = isNotNull(shiftAction) && !shiftAction.equals(ShiftActionType.CANCEL) && shift.getActivities().stream().anyMatch(activity -> !activity.getStatus().contains(ShiftStatus.PUBLISH)) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
-            if(!valid) {
+            if(valid) {
                 validateStaffingLevel(shift, staffAdditionalInfoDTO, activityWrapperMap, phase);
             }
             shift.setPhaseId(phase.getId());
@@ -995,7 +996,7 @@ public class ShiftService extends MongoBaseService {
                                                        String type, Boolean updatedByStaff) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         Phase phase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
-        if (!userAccessRoleDTO.getStaff() && updatedByStaff && !shiftDTO.getShiftStatePhaseId().equals(phase.getId())) {
+       if (!userAccessRoleDTO.getStaff() && updatedByStaff && !shiftDTO.getShiftStatePhaseId().equals(phase.getId())) {
             exceptionService.actionNotPermittedException("message.shift.save.access");
         } else if (!userAccessRoleDTO.getManagement() && !updatedByStaff) {
             exceptionService.actionNotPermittedException("message.shift.save.access");
