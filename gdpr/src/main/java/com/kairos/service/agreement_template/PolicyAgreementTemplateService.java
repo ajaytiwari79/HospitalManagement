@@ -315,7 +315,8 @@ public class PolicyAgreementTemplateService {
 
     public List<AgreementTemplateDTO> getAllDataHandlerTemplate(Long unitId) {
         Long countryId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
-        List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllDataHandlerAgreementTemplateByCountry(countryId);
+        TemplateType templateType = templateTypeRepository.findByCountryIdAndName(countryId,"Data Handler Agreement");
+        List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllDataHandlerAgreementTemplateByCountry(countryId,templateType.getId());
         return policyAgreementTemplates.stream().map(policyAgreementTemplate ->
                 new AgreementTemplateDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), policyAgreementTemplate.getTemplateType().getId(), policyAgreementTemplate.getDataHandlerHtmlContent())
         ).collect(Collectors.toList());
