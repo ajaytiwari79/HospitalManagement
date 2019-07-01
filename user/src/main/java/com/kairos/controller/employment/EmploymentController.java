@@ -3,11 +3,13 @@ package com.kairos.controller.employment;
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
+import com.kairos.dto.user.initial_time_bank_log.InitialTimeBankLogDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
 import com.kairos.service.employment.EmploymentFunctionService;
 import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.organization.UnionService;
+import com.kairos.service.initial_time_bank_log.InitialTimeBankLogService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,6 +46,7 @@ public class EmploymentController {
     @Inject private EmploymentFunctionService employmentFunctionService;
     @Inject private EmploymentCTAWTAService employmentCTAWTAService;
     @Inject private UnionService unionService;
+    @Inject private InitialTimeBankLogService initialTimeBankLogService;
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/employment")
@@ -202,4 +205,11 @@ public class EmploymentController {
     public ResponseEntity<Map<String, Object>> getExpertiseOfEmployment(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentExpertiseMap(unitId));
     }
+
+    @ApiOperation("fetch Initial Time Bank Log by employment id")
+    @GetMapping("/initial_time_bank_log/{employmentId}")
+    public ResponseEntity<Map<String, Object>> getInitialTimeBalanceByEmployment(@PathVariable Long employmentId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, initialTimeBankLogService.getInitialTimeBalanceByEmployment(employmentId));
+    }
+
 }
