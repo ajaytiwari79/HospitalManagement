@@ -287,7 +287,10 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId, planningPeriodDTO.getDurationType(), planningPeriodDTO.getDuration());
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         // Add planning period object in list
-        planningPeriods.add(planningPeriod);
+
+
+                planningPeriods.add(planningPeriod);
+
         if (recurringNumber > 1) {
             createPlanningPeriod(unitId, endDate.plusDays(1),
                     planningPeriods, applicablePhases, planningPeriodDTO, --recurringNumber);
@@ -361,6 +364,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 exceptionService.actionNotPermittedException(ERROR_PERIOD_START_DATE_INVALID);
             }
         }
+
         createPlanningPeriod(unitId, planningPeriodDTO.getStartDate(), planningPeriods, unitIdAndPhasesMap.get(unitId), planningPeriodDTO, planningPeriodDTO.getRecurringNumber());
         planningPeriodMongoRepository.saveEntities(planningPeriods);
         createScheduleJobOfPanningPeriod(planningPeriods);
@@ -505,8 +509,12 @@ public class PlanningPeriodService extends MongoBaseService {
             exceptionService.actionNotPermittedException(MESSAGE_PERIOD_PHASE_REQUEST_NAME, planningPeriod.getName());
         }
         List<BigInteger> schedulerPanelIds = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId() != null).map(PeriodPhaseFlippingDate::getSchedulerPanelId).collect(Collectors.toList());
-        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-        }, null, null);
+        try {
+            schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+            }, null, null);
+        }catch (Exception ex){
+            LOGGER.error("ex "+ex);
+        }
         planningPeriod.setDeleted(true);
         save(planningPeriod);
         return true;

@@ -45,7 +45,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled()) {
-            Map<BigInteger,ActivityCareDayCount> careDayCountMap = getCareDaysCountMap();
+            Map<BigInteger,ActivityCareDayCount> careDayCountMap = careDaysCountMap();
             for (ShiftActivityDTO shiftActivityDTO : infoWrapper.getShift().getActivities()) {
                 Activity activity = infoWrapper.getActivityWrapperMap().get(shiftActivityDTO.getActivityId()).getActivity();
                 if(careDayCountMap.containsKey(activity.getId())) {
@@ -63,7 +63,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
         }
     }
 
-    public Map<BigInteger,ActivityCareDayCount> getCareDaysCountMap(){
+    public Map<BigInteger,ActivityCareDayCount> careDaysCountMap(){
         return this.careDayCounts.stream().collect(Collectors.toMap(ActivityCareDayCount::getActivityId,v->v));
     }
 

@@ -109,6 +109,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_RESTRICTIONFREQUENCY_ID = "message.restrictionfrequency.id";
     public static final String ERROR_ACTIVITY_FULLWEEK_START  = "error.activity.fullweek.start ";
     public static final String MESSAGE_ACTIVITY_ID = "message.activity.id";
+    public static final String ACTIVITY_USED_AT_UNIT="activity.used.unit";
     public static final String MESSAGE_ACTIVITY_NAME_NOTEMPTY = "message.activity.name.notEmpty";
     public static final String MESSAGE_ACTIVITY_NAME = "message.activity.name";
     public static final String MESSAGE_ACTIVITY_TIMECARE_ID = "message.activity.timecare.id";
@@ -158,6 +159,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PERIODSETTING_NOTFOUND = "message.periodsetting.notFound";
     public static final String MESSAGE_ORGANIZATION_PHASE_NOTFOUND = "message.organization.phase.notfound";
     public static final String MESSAGE_EMPLOYMENTTYPE_NOTFOUND="message.employmenttype.notfound";
+    public static final String MESSAGE_VALID_DURATION="message.valid.duration";
     public static final String MESSAGE_ORGANIZATION_ID = "message.organization.id";
     public static final String MESSAGE_ORGANIZATION_TYPE = "message.organization.type";
     public static final String MESSAGE_ORGANIZATION_TYPE_UPDATE = "message.organization.type.update";

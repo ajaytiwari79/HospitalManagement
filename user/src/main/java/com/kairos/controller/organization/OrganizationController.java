@@ -1003,4 +1003,10 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> getTimeSlotOfUnit(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlot(unitId));
     }
+
+    @ApiOperation(value = "check child unit")
+    @GetMapping(UNIT_URL + "/is_unit")
+    public ResponseEntity<Map<String, Object>> isChild(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.isUnit(unitId));
+    }
 }

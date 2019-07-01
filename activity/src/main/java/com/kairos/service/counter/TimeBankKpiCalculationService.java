@@ -290,7 +290,7 @@ public class TimeBankKpiCalculationService implements CounterService {
             StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
             DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate()));
             totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, staffAndDailyTimeBankMap, dateTimeInterval, staffKpiFilterDTO.getUnitId(), totalTimeBankOfUnit, staffKpiFilterDTO);
-            kpiAndStaffIdMap.put(staffId,totalTimeBankOfUnit.doubleValue());
+            kpiAndStaffIdMap.put(staffId,getHoursByMinutes(totalTimeBankOfUnit.doubleValue()));
         }
         kpiSetResponseDTO.setKpiName(kpi.getTitle());
         kpiSetResponseDTO.setKpiId(kpi.getId());

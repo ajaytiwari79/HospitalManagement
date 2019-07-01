@@ -73,6 +73,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
@@ -215,7 +216,7 @@ public class CompanyCreationService {
             }
             //accountType is Changed for parent organization We need to add this account type to child organization as well
             if(organization.getAccountType() == null || !organization.getAccountType().getId().equals(orgDetails.getAccountTypeId())) {
-                organization.setAccountType(accountType);
+             organization.setAccountType(accountType);
                 List<Long> organizationIds = new ArrayList<>();
                 organizationIds.addAll(organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList()));
                 organizationIds.add(organization.getId());
@@ -302,6 +303,7 @@ public class CompanyCreationService {
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
                 user.setUserName(unitManagerDTO.getUserName());
+                user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                 user.setUserNameUpdated(true);
                 userGraphRepository.save(user);
             } else {
@@ -329,6 +331,7 @@ public class CompanyCreationService {
                 user.setLastName(unitManagerDTO.getLastName());
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 user.setUserNameUpdated(true);
+                user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                 userGraphRepository.save(user);
                 if(unitManagerDTO.getAccessGroupId() != null) {
                     setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
@@ -347,6 +350,7 @@ public class CompanyCreationService {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getUserName(), true);
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
                     }
+                    user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                     userGraphRepository.save(user);
                     staffService.setUserAndPosition(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
 
