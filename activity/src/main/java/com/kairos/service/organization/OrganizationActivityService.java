@@ -22,6 +22,7 @@ import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityPriority;
 import com.kairos.persistence.model.activity.TimeType;
@@ -50,10 +51,7 @@ import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
-import com.kairos.service.unit_settings.ActivityConfigurationService;
-import com.kairos.service.unit_settings.PhaseSettingsService;
-import com.kairos.service.unit_settings.TimeAttendanceGracePeriodService;
-import com.kairos.service.unit_settings.UnitSettingService;
+import com.kairos.service.unit_settings.*;
 import com.kairos.service.wta.WTAService;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
@@ -132,7 +130,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private OpenShiftRuleTemplateService openShiftRuleTemplateService;
     @Inject
     private KPISetService kpiSetService;
-
+    @Inject
+    private ProtectedDaysOffService protectedDaysOffService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -512,7 +511,7 @@ public class OrganizationActivityService extends MongoBaseService {
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);
         kpiSetService.copyKPISets(unitId, orgTypeAndSubTypeDTO.getSubTypeId(), orgTypeAndSubTypeDTO.getCountryId());
-
+        protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
         return true;
     }
 
