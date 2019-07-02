@@ -1,7 +1,7 @@
 package com.kairos.service.activity;
 
-
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypes;
@@ -12,6 +12,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.activity.ActivityTagDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -91,6 +92,17 @@ public class TimeTypeService extends MongoBaseService {
         timeType.setLabel(timeTypeDTO.getLabel());
         timeType.setDescription(timeTypeDTO.getDescription());
         timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+
+
+        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeType.getId());
+        if (isCollectionNotEmpty(activities)) {
+            activities.forEach(activity ->
+            {
+                activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor());
+            });
+            activityMongoRepository.saveEntities(activities);
+        }
+
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
