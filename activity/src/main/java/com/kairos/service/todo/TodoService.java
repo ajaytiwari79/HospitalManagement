@@ -1,6 +1,5 @@
 package com.kairos.service.todo;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ShiftActivitiesIdDTO;
 import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
@@ -73,7 +72,7 @@ public class TodoService {
                 activityIds.removeIf(activityId -> subEntitiyIds.contains(activityId));
                 activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
                 if (isCollectionNotEmpty(activityIds)) {
-                    createTodoForActivityApproval(shift, activities);
+                    todos.addAll(createTodoForActivityApproval(shift, activities));
                 }
                 todoList.forEach(todo -> todo.setDeleted(true));
                 todos.addAll(todoList);
@@ -107,13 +106,14 @@ public class TodoService {
         return todoRepository.deleteByEntityIdAndTypeAndStatus(shiftId,todoType, newArrayList(PENDING, VIEWED));
     }
 
-    private void createTodoForActivityApproval(Shift shift, List<Activity> activities) {
+    private List<Todo> createTodoForActivityApproval(Shift shift, List<Activity> activities) {
         List<Todo> todos = new ArrayList<>();
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).forEach(activity -> {
             String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), "MMM dd,yyyy") + "</span>";
             todos.add(new Todo(TodoType.APPROVAL_REQUIRED, TodoSubtype.APPROVAL, shift.getId(), activity.getId(), PENDING, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
         });
+        return todos;
     }
 
     public List<TodoDTO> getAllTodo(Long unitId){

@@ -28,7 +28,7 @@ public class ShiftActivityDTO {
     private String message;
     private boolean success;
     //This field is only for validation
-    //@JsonIgnore
+    @JsonIgnore
     private ActivityDTO activity;
     private BigInteger activityId;
     private Date startDate;

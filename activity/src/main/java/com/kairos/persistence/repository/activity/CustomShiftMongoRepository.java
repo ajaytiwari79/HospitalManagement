@@ -80,6 +80,6 @@ public interface CustomShiftMongoRepository {
 
     void deleteShiftBetweenDatesByEmploymentId(Long employmentId,Date startDate,Date endDate,Collection<BigInteger> shiftIds);
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists);
-
+    List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds);
 
 }

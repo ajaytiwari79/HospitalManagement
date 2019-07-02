@@ -134,6 +134,10 @@ public class Shift extends MongoBaseEntity {
         this.shiftType=shiftType;
     }
 
+    public void setBreakActivities(List<ShiftActivity> breakActivities) {
+        this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
+    }
+
     public void setActivities(List<ShiftActivity> activities) {
         activities = isNull(activities) ? new ArrayList<>() : activities;
         Collections.sort(activities);

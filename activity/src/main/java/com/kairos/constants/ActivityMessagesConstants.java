@@ -267,6 +267,7 @@ public class ActivityMessagesConstants {
     public static final String EXCEPTION_OVERLAP_INTERVAL = "exception.overlap.interval";
     public static final String ERROR_BREAKSETTINGS_DUPLICATE = "error.breakSettings.duplicate";
     public static final String ERROR_BREAKSETTINGS_NOTFOUND = "error.breakSettings.notFound";
+    public static final String ERROR_BREAKSACTIVITY_NOT_CONFIGURED = "error.break.activity.not.configured";
     public static final String ERROR_BREAKSETTINGS_SHIFTDURATION_MUST_GREATERTHANZERO = "error.breakSettings.shiftDuration.must.greaterThanZero";
     public static final String ERROR_BREAKSETTINGS_BREAKDURATION_MUST_GREATERTHANZERO = "error.breakSettings.breakDuration.must.greaterThanZero";
     public static final String MESSAGE_NIGHTWORKER_SETTING_NOTFOUND = "message.nightWorker.setting.notFound";

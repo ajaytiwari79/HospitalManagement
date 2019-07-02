@@ -81,6 +81,7 @@ public class ShiftDTO {
     private ShiftDTO draftShift;
     private boolean draft;
     private RequestAbsenceDTO requestAbsence;
+    private List<ShiftActivityDTO> breakActivities;
 
 
 
@@ -140,6 +141,10 @@ public class ShiftDTO {
     @JsonIgnore
     public Duration getDuration() {
         return new Interval(this.activities.get(0).getStartDate().getTime(), this.activities.get(activities.size()-1).getEndDate().getTime()).toDuration();
+    }
+
+    public void setBreakActivities(List<ShiftActivityDTO> breakActivities) {
+        this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
     }
 
     public Date getStartDate() {

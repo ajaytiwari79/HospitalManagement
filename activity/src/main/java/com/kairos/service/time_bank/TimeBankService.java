@@ -412,21 +412,25 @@ public class TimeBankService{
 
     private void updateBonusHoursOfTimeBankInShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<Shift> shifts) {
         if(CollectionUtils.isNotEmpty(shifts)) {
-            Map<BigInteger, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getId(), v -> v));
+            Map<String, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getActivityId()+"_"+k.getStartDate(), v -> v));
+            for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
+                for (ShiftActivityDTO activity : shiftWithActivityDTO.getActivities()) {
+                    for (ShiftActivityDTO childActivity : activity.getChildActivities()) {
+                        shiftActivityDTOMap.put(childActivity.getActivityId()+"_"+childActivity.getStartDate(),childActivity);
+                    }
+                }
+            }
             for (Shift shift : shifts) {
                 int timeBankCtaBonusMinutes = 0;
                 int plannedMinutesOfTimebank = 0;
                 int timeBankScheduledMinutes = 0;
                 for (ShiftActivity shiftActivity : shift.getActivities()) {
-                    if(shiftActivityDTOMap.containsKey(shiftActivity.getId())) {
-                        ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getId());
-                        shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
-                        timeBankCtaBonusMinutes += shiftActivityDTO.getTimeBankCtaBonusMinutes();
-                        shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
-                        shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + shiftActivityDTO.getTimeBankCtaBonusMinutes());
-                        plannedMinutesOfTimebank += shiftActivity.getPlannedMinutesOfTimebank();
-                        shiftActivity.setScheduledMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank());
-                        timeBankScheduledMinutes+=shiftActivity.getScheduledMinutesOfTimebank();
+                    updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, shiftActivity);
+                    timeBankCtaBonusMinutes += shiftActivity.getTimeBankCtaBonusMinutes();
+                    plannedMinutesOfTimebank += shiftActivity.getPlannedMinutesOfTimebank();
+                    timeBankScheduledMinutes+=shiftActivity.getScheduledMinutesOfTimebank();
+                    for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
+                        updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, childActivity);
                     }
                 }
                 shift.setScheduledMinutesOfTimebank(timeBankScheduledMinutes);
@@ -434,6 +438,16 @@ public class TimeBankService{
                 shift.setPlannedMinutesOfTimebank(plannedMinutesOfTimebank);
             }
             shiftMongoRepository.saveEntities(shifts);
+        }
+    }
+
+    private void updateTimebankDetailsInShiftActivity(Map<String, ShiftActivityDTO> shiftActivityDTOMap, ShiftActivity shiftActivity) {
+        if(shiftActivityDTOMap.containsKey(shiftActivity.getActivityId()+"_"+shiftActivity.getStartDate())) {
+            ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getActivityId() + "_" + shiftActivity.getStartDate());
+            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
+            shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
+            shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + shiftActivityDTO.getTimeBankCtaBonusMinutes());
+            shiftActivity.setScheduledMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank());
         }
     }
 

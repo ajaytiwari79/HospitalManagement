@@ -9,6 +9,7 @@ import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
@@ -150,8 +151,8 @@ public class ActivityIntegrationService {
         });
     }
 
-    public Map<Long,Boolean> getNightWorkerDetails(List<Long> staffIds,Long unitId) {
-        return genericRestClient.publishRequest(staffIds, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
+    public Map<Long,Boolean> getNightWorkerDetails(StaffFilterDTO staffFilterDTO, Long unitId) {
+        return genericRestClient.publishRequest(staffFilterDTO, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
         });
     }
 

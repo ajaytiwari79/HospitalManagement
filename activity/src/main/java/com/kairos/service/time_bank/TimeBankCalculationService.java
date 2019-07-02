@@ -220,22 +220,24 @@ public class TimeBankCalculationService {
 
     public int calculateCTARuleTemplateBonus(CTARuleTemplateDTO ctaRuleTemplateDTO, DateTimeInterval dateTimeInterval, DateTimeInterval shiftDateTimeInterval) {
         int ctaTimeBankMin = 0;
-        Interval shiftInterval = new Interval(shiftDateTimeInterval.getStartDate().getTime(), shiftDateTimeInterval.getEndDate().getTime());
-        LOGGER.debug("rule template : {} shiftInterval {}",ctaRuleTemplateDTO.getId(),shiftInterval);
-        for (CompensationTableInterval ctaInterval : ctaRuleTemplateDTO.getCompensationTable().getCompensationTableInterval()) {
-            List<Interval> intervalOfCTAs = getCTAInterval(ctaInterval, new DateTime(dateTimeInterval.getStartDate()));
-            LOGGER.debug("rule template : {} interval size {}",ctaRuleTemplateDTO.getId(),intervalOfCTAs);
-            for (Interval intervalOfCTA : intervalOfCTAs) {
-                if(intervalOfCTA.overlaps(shiftInterval)) {
-                    int overlapTimeInMin = (int) intervalOfCTA.overlap(shiftInterval).toDuration().getStandardMinutes();
-                    if(ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
-                        ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ctaRuleTemplateDTO.getCompensationTable().getGranularityLevel()) * ctaInterval.getValue();
-                        break;
-                    } else if(ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
-                        ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ctaRuleTemplateDTO.getCompensationTable().getGranularityLevel()) / 100) * ctaInterval.getValue());
-                        break;
-                    }
+        if(isNotNull(shiftDateTimeInterval)){
+            Interval shiftInterval = new Interval(shiftDateTimeInterval.getStartDate().getTime(), shiftDateTimeInterval.getEndDate().getTime());
+            LOGGER.debug("rule template : {} shiftInterval {}",ctaRuleTemplateDTO.getId(),shiftInterval);
+            for (CompensationTableInterval ctaInterval : ctaRuleTemplateDTO.getCompensationTable().getCompensationTableInterval()) {
+                List<Interval> intervalOfCTAs = getCTAInterval(ctaInterval, new DateTime(dateTimeInterval.getStartDate()));
+                LOGGER.debug("rule template : {} interval size {}",ctaRuleTemplateDTO.getId(),intervalOfCTAs);
+                for (Interval intervalOfCTA : intervalOfCTAs) {
+                    if(intervalOfCTA.overlaps(shiftInterval)) {
+                        int overlapTimeInMin = (int) intervalOfCTA.overlap(shiftInterval).toDuration().getStandardMinutes();
+                        if(ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.MINUTES)) {
+                            ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ctaRuleTemplateDTO.getCompensationTable().getGranularityLevel()) * ctaInterval.getValue();
+                            break;
+                        } else if(ctaInterval.getCompensationMeasurementType().equals(CompensationMeasurementType.PERCENT)) {
+                            ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ctaRuleTemplateDTO.getCompensationTable().getGranularityLevel()) / 100) * ctaInterval.getValue());
+                            break;
+                        }
 
+                    }
                 }
             }
         }
@@ -1179,20 +1181,20 @@ public class TimeBankCalculationService {
     private void updateChildActivitiesTimebankCtaBonus(List<ShiftActivityDTO> childActivitiesDTOS,CTARuleTemplateDTO ruleTemplate,DateTimeInterval dateTimeInterval){
         childActivitiesDTOS.sort(Comparator.comparing(ShiftActivityDTO::getStartDate));
         int ctaBonusAndScheduledMinutes = 0;
-        for (ShiftActivityDTO childActivitiesDTO : childActivitiesDTOS) {
-            if(ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && dateTimeInterval.contains(childActivitiesDTO.getStartDate().getTime())) {
-                ctaBonusAndScheduledMinutes = childActivitiesDTO.getScheduledMinutes();
+        for (ShiftActivityDTO childActivityDTO : childActivitiesDTOS) {
+            if(ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && dateTimeInterval.contains(childActivityDTO.getStartDate().getTime())) {
+                ctaBonusAndScheduledMinutes = childActivityDTO.getScheduledMinutes();
             } else if(ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
-                    DateTimeInterval shiftInterval = dateTimeInterval.overlap(new DateTimeInterval(childActivitiesDTO.getStartDate(), childActivitiesDTO.getEndDate()));
+                    DateTimeInterval shiftInterval = dateTimeInterval.overlap(new DateTimeInterval(childActivityDTO.getStartDate(), childActivityDTO.getEndDate()));
                     ctaBonusAndScheduledMinutes = calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
-                    if(asLocalDate(childActivitiesDTO.getStartDate()).isBefore(asLocalDate(childActivitiesDTO.getEndDate()))) {
-                        DateTimeInterval nextDayInterval = new DateTimeInterval(getStartOfDay(childActivitiesDTO.getEndDate()), getEndOfDay(childActivitiesDTO.getEndDate()));
-                        shiftInterval = nextDayInterval.overlap(new DateTimeInterval(getStartOfDay(childActivitiesDTO.getEndDate()), childActivitiesDTO.getEndDate()));
+                    if(asLocalDate(childActivityDTO.getStartDate()).isBefore(asLocalDate(childActivityDTO.getEndDate()))) {
+                        DateTimeInterval nextDayInterval = new DateTimeInterval(getStartOfDay(childActivityDTO.getEndDate()), getEndOfDay(childActivityDTO.getEndDate()));
+                        shiftInterval = nextDayInterval.overlap(new DateTimeInterval(getStartOfDay(childActivityDTO.getEndDate()), childActivityDTO.getEndDate()));
                         ctaBonusAndScheduledMinutes += calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
                     }
                 LOGGER.debug("rule template : {} minutes {}", ruleTemplate.getId(),ctaBonusAndScheduledMinutes);
             }
-            childActivitiesDTO.getTimeBankCTADistributions().add(new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(childActivitiesDTO.getStartDate()),  ctaBonusAndScheduledMinutes));
+            childActivityDTO.getTimeBankCTADistributions().add(new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(childActivityDTO.getStartDate()),  ctaBonusAndScheduledMinutes));
         }
     }
 }
