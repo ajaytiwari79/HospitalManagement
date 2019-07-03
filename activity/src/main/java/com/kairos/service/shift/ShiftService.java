@@ -316,9 +316,6 @@ public class ShiftService extends MongoBaseService {
 
             }
         }
-       // if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) && ShiftActionType.SAVE.equals(shiftAction)){
-         //   shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().add(ShiftStatus.PUBLISH));
-        //}
         shiftMongoRepository.save(shift);
         if (!updateShift) {
             updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
@@ -556,13 +553,10 @@ public class ShiftService extends MongoBaseService {
             shift.setDraftShift(null);
             shift.setId(draftShift.getId());
             shift.setDraft(false);
-            List<ShiftActivity> oldActivity = new CopyOnWriteArrayList<>(shift.getActivities());
-            List<ShiftActivity> newActivities = new ArrayList<>();
-            for (ShiftActivity shiftActivity : oldActivity) {
+            for (ShiftActivity shiftActivity : shift.getActivities()) {
                 shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
-                newActivities.add(shiftActivity);
             }
-            shift.setActivities(newActivities);
+
             saveShifts.add(shift);
         }
         shiftStateService.updateShiftDailyTimeBankAndPaidOut(saveShifts, saveShifts, unitId);
@@ -638,7 +632,7 @@ public class ShiftService extends MongoBaseService {
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), shiftDTO.getActivities().get(0).getStartDate(), shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
             boolean valid = isNotNull(shiftAction) && !shiftAction.equals(ShiftActionType.CANCEL) && shift.getActivities().stream().anyMatch(activity -> !activity.getStatus().contains(ShiftStatus.PUBLISH)) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
-            if(valid) {
+            if(!valid) {
                 validateStaffingLevel(shift, staffAdditionalInfoDTO, activityWrapperMap, phase);
             }
             shift.setPhaseId(phase.getId());
