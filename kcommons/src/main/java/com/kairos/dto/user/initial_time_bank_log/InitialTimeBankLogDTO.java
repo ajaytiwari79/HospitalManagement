@@ -33,12 +33,15 @@ public class InitialTimeBankLogDTO {
 
     private Long updatedBy;
 
-    public InitialTimeBankLogDTO(Long id, Long employmentId, Long previousInitialBalanceInMinutes, Long updatedInitialBalanceInMinutes,LocalDateTime updatedOn,Long updatedBy){
+    private String updateByFullName;
+
+    public InitialTimeBankLogDTO(Long id, Long employmentId, Long previousInitialBalanceInMinutes, Long updatedInitialBalanceInMinutes,LocalDateTime updatedOn,Long updatedBy,String updateByFullName){
         this.id=id;
         this.employmentId=employmentId;
         this.previousInitialBalanceInMinutes=previousInitialBalanceInMinutes;
         this.updatedInitialBalanceInMinutes=updatedInitialBalanceInMinutes;
         this.updatedOn=updatedOn;
         this.updatedBy=updatedBy;
+        this.updateByFullName=updateByFullName;
     }
 }
