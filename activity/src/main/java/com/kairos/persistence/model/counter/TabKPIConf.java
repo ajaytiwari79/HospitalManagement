@@ -1,10 +1,7 @@
 package com.kairos.persistence.model.counter;
 
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.CounterSize;
-import com.kairos.dto.activity.counter.enums.KPIValidity;
-import com.kairos.dto.activity.counter.enums.LocationType;
+import com.kairos.dto.activity.counter.enums.*;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;

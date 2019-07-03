@@ -2,9 +2,7 @@ package com.kairos.persistence.model.staff.personal_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.annotations.KPermissionField;
-import com.kairos.annotations.KPermissionModel;
-import com.kairos.annotations.KPermissionSubModel;
+import com.kairos.annotations.*;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;

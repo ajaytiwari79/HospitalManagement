@@ -1,0 +1,1 @@
+MATCH (n:FilterGroup) where id(n)=355 set n.filterTypes=["EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS", "EXPERTISE","TIME_TYPE","ACTIVITY_TIMECALCULATION_TYPE"] return n;

@@ -1,9 +1,7 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.user.expertise.FunctionalPayment;
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentMatrixQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

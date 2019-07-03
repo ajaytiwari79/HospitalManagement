@@ -5,7 +5,8 @@ import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 public interface ExpertiseNightWorkerSettingRepository extends MongoBaseRepository<ExpertiseNightWorkerSetting, BigInteger> {
 

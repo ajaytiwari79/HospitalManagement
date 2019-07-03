@@ -8,7 +8,6 @@ import com.kairos.dto.activity.payroll.*;
 import com.kairos.persistence.model.payroll.*;
 import com.kairos.persistence.repository.payroll.*;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
-public class BankService extends MongoBaseService {
+public class BankService{
 
     @Inject
     private BankRepository bankRepository;

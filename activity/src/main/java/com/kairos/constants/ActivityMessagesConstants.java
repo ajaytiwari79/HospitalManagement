@@ -267,6 +267,7 @@ public class ActivityMessagesConstants {
     public static final String EXCEPTION_OVERLAP_INTERVAL = "exception.overlap.interval";
     public static final String ERROR_BREAKSETTINGS_DUPLICATE = "error.breakSettings.duplicate";
     public static final String ERROR_BREAKSETTINGS_NOTFOUND = "error.breakSettings.notFound";
+    public static final String ERROR_BREAKSACTIVITY_NOT_CONFIGURED = "error.break.activity.not.configured";
     public static final String ERROR_BREAKSETTINGS_SHIFTDURATION_MUST_GREATERTHANZERO = "error.breakSettings.shiftDuration.must.greaterThanZero";
     public static final String ERROR_BREAKSETTINGS_BREAKDURATION_MUST_GREATERTHANZERO = "error.breakSettings.breakDuration.must.greaterThanZero";
     public static final String MESSAGE_NIGHTWORKER_SETTING_NOTFOUND = "message.nightWorker.setting.notFound";
@@ -379,5 +380,7 @@ public class ActivityMessagesConstants {
     public static final String STAFF_ID_END_DATE_NULL = "staff_id.end_date.null";
     public static final String PLEASE_SELECT_VALID_CRITERIA = "please.select.valid.criteria";
     public static final String MESSAGE_SELFROSTERING_METADATA_NULL = "message.selfRostering.metaData.null";
+    public static final String REQUEST_ABSENCE_APPROVED = "request.absence.approved";
+    public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
 
 }

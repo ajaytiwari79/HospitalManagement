@@ -1,6 +1,5 @@
 package com.kairos.dto.activity.widget;
 
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;

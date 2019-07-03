@@ -11,7 +11,6 @@ import com.kairos.persistence.model.shift.ShiftTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
@@ -25,12 +24,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
-import static com.kairos.constants.AppConstants.FULL_WEEK;
 
 @Service
 @Transactional
-public class ShiftTemplateService extends MongoBaseService {
+public class ShiftTemplateService{
 
 
     @Inject
@@ -72,14 +69,14 @@ public class ShiftTemplateService extends MongoBaseService {
             IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
             individualShiftTemplates.add(individualShiftTemplate);
         });
-        save(individualShiftTemplates);
+        individualShiftTemplateRepository.saveEntities(individualShiftTemplates);
         Set<BigInteger> individualShiftTemplateIds = new HashSet<>();
         for (int i = 0; i < individualShiftTemplates.size(); i++) {
             shiftTemplateDTO.getShiftList().get(i).setId(individualShiftTemplates.get(i).getId());
             individualShiftTemplateIds.add(individualShiftTemplates.get(i).getId());
         }
         ShiftTemplate shiftTemplate = new ShiftTemplate(shiftTemplateDTO.getName(), individualShiftTemplateIds, unitId);
-        save(shiftTemplate);
+        shiftTemplateRepository.save(shiftTemplate);
         shiftTemplateDTO.setId(shiftTemplate.getId());
         shiftTemplateDTO.setUnitId(unitId);
         return shiftTemplateDTO;
@@ -116,7 +113,7 @@ public class ShiftTemplateService extends MongoBaseService {
         shiftTemplateDTO.setUnitId(unitId);
         shiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(shiftTemplateDTO, ShiftTemplate.class);
         shiftTemplate.setCreatedBy(userInfo);
-        save(shiftTemplate);
+        shiftTemplateRepository.save(shiftTemplate);
         return shiftTemplateDTO;
     }
 
@@ -129,9 +126,9 @@ public class ShiftTemplateService extends MongoBaseService {
         individualShiftTemplates.forEach(individualShiftTemplate -> {
             individualShiftTemplate.setDeleted(true);
         });
-        save(individualShiftTemplates);
+        individualShiftTemplateRepository.saveEntities(individualShiftTemplates);
         shiftTemplate.setDeleted(true);
-        save(shiftTemplate);
+        shiftTemplateRepository.save(shiftTemplate);
         return true;
 
     }
@@ -144,7 +141,7 @@ public class ShiftTemplateService extends MongoBaseService {
         individualShiftTemplateDTO.setId(shiftDayTemplate.get().getId());
         IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
         individualShiftTemplate.setId(shiftDayTemplate.get().getId());
-        save(individualShiftTemplate);
+        individualShiftTemplateRepository.save(individualShiftTemplate);
         return individualShiftTemplateDTO;
     }
 
@@ -154,9 +151,9 @@ public class ShiftTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_INDIVIDUAL_SHIFTTEMPLATE_ABSENT, shiftTemplateId);
         }
         IndividualShiftTemplate individualShiftTemplate = ObjectMapperUtils.copyPropertiesByMapper(individualShiftTemplateDTO, IndividualShiftTemplate.class);
-        save(individualShiftTemplate);
+        individualShiftTemplateRepository.save(individualShiftTemplate);
         shiftTemplate.getIndividualShiftTemplateIds().add(individualShiftTemplate.getId());
-        save(shiftTemplate);
+        shiftTemplateRepository.save(shiftTemplate);
         individualShiftTemplateDTO.setId(individualShiftTemplate.getId());
         return individualShiftTemplateDTO;
     }
@@ -167,10 +164,10 @@ public class ShiftTemplateService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_INDIVIDUAL_SHIFTTEMPLATE_ABSENT, individualShiftTemplateId);
         }
         individualShiftTemplate.setDeleted(true);
-        save(individualShiftTemplate);
+        individualShiftTemplateRepository.save(individualShiftTemplate);
         ShiftTemplate shiftTemplate = shiftTemplateRepository.findOneById(shiftTemplateId);
         shiftTemplate.getIndividualShiftTemplateIds().remove(individualShiftTemplate.getId());
-        save(shiftTemplate);
+        shiftTemplateRepository.save(shiftTemplate);
         return true;
     }
 
@@ -200,6 +197,9 @@ public class ShiftTemplateService extends MongoBaseService {
 
             if (CollectionUtils.isNotEmpty(result.getViolatedRules().getActivities())) {
                 shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(result.getViolatedRules().getActivities());
+            }
+            if (CollectionUtils.isNotEmpty(result.getViolatedRules().getWorkTimeAgreements())) {
+                shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(result.getViolatedRules().getWorkTimeAgreements());
             }
             shifts.addAll(result.getShifts());
         });

@@ -1,15 +1,12 @@
 package com.kairos.persistence.model.data_inventory.processing_activity;
 
-
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
 import com.kairos.persistence.model.risk_management.Risk;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

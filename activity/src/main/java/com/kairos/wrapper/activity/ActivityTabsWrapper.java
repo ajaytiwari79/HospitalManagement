@@ -13,9 +13,7 @@ import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by pawanmandhan on 23/8/17.
@@ -30,7 +28,6 @@ public class ActivityTabsWrapper {
     private RulesActivityTab rulesTab;
     private IndividualPointsActivityTab individualPointsTab;
     private TimeCalculationActivityTab timeCalculationActivityTab;
-    private CompositeActivity compositeActivity;
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
     private BonusActivityTab bonusActivityTab;
@@ -165,14 +162,6 @@ public class ActivityTabsWrapper {
     public void setTimeCalculationActivityTab(TimeCalculationActivityTab timeCalculationActivityTab) {
         this.timeCalculationActivityTab = timeCalculationActivityTab;
 
-    }
-
-    public CompositeActivity getCompositeActivity() {
-        return compositeActivity;
-    }
-
-    public void setCompositeActivity(CompositeActivity compositeActivity) {
-        this.compositeActivity = compositeActivity;
     }
 
     public NotesActivityTab getNotesActivityTab() {

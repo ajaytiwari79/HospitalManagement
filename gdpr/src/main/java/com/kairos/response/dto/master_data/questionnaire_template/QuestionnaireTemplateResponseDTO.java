@@ -1,14 +1,9 @@
 package com.kairos.response.dto.master_data.questionnaire_template;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
-import com.kairos.enums.gdpr.QuestionType;
-import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
-import com.kairos.enums.gdpr.QuestionnaireTemplateType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.kairos.enums.gdpr.*;
+import lombok.*;
 
 import java.util.List;
 import java.util.Map;
