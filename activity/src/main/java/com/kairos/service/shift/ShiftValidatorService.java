@@ -16,6 +16,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import com.kairos.enums.shift.ShiftStatus;
@@ -296,7 +297,7 @@ public class ShiftValidatorService {
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff());
         PlanningPeriod lastPlanningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(staffAdditionalInfoDTO.getUnitId());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, lastPlanningPeriod.getEndDate());
-        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()),null);
+        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()));
         if (isNotNull(shift.getId())) {
             BigInteger shiftId = shift.getId();
             shifts = shifts.stream().filter(shiftWithActivityDTO -> !shiftWithActivityDTO.getId().equals(shiftId)).collect(Collectors.toList());
@@ -319,14 +320,13 @@ public class ShiftValidatorService {
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, lastPlanningPeriod.getEndDate());
         List<ShiftWithActivityDTO> shifts;
         if (newCreatedShiftWithActivityDTOs.isEmpty()) {
-            shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()),null);
+            shifts = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(shift.getEmploymentId(), DateUtils.asDate(intervalByRuleTemplates.getStart()), DateUtils.asDate(intervalByRuleTemplates.getEnd()));
             newCreatedShiftWithActivityDTOs.addAll(shifts);
         } else {
             shifts = newCreatedShiftWithActivityDTOs;
         }
         shifts = updateFullDayAndFullWeekActivityShift(shifts);
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
-        Date endTimeOfInterval = DateUtils.getStartOfTheDay(DateUtils.asDate(DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1)));
         Map<LocalDate, TimeBankByDateDTO> timeBankByDateDTOMap = timeBankService.getAccumulatedTimebankAndDelta(staffEmploymentDetails.getId(),shift.getUnitId(),null);
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));

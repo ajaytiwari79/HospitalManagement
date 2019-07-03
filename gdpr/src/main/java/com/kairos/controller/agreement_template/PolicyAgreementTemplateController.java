@@ -153,5 +153,30 @@ class PolicyAgreementTemplateController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllGeneralAgreementTemplate());
     }
 
+    @ApiOperation("update data handler agreement template")
+    @PutMapping(COUNTRY_URL + "/data_handler/agreement_template/{agreementTemplateId}")
+    public ResponseEntity<Object> updateMasterAgreementTemplateForDataHandler(@PathVariable Long countryId, @PathVariable Long agreementTemplateId, @RequestBody MasterAgreementTemplateDTO agreementTemplateDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateMasterAgreementTemplateForDataHandler(countryId, agreementTemplateId, agreementTemplateDto));
+
+    }
+
+    @ApiOperation(value = "Get All Data Handler Template")
+    @GetMapping(UNIT_URL + "/data_handler/agreement_template/all")
+    public ResponseEntity<ResponseDTO<List<AgreementTemplateDTO>>> getAllDataHandlerTemplate(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllDataHandlerTemplate(unitId));
+    }
+
+    @ApiOperation(value = "Get One Data Handler Template")
+    @GetMapping(UNIT_URL + "/data_handler/agreement_template/{agreementTemplateId}")
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> getDataHandlerTemplate(@PathVariable Long unitId,@PathVariable Long agreementTemplateId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getDataHandlerTemplate(unitId,false,agreementTemplateId));
+    }
+
+    @ApiOperation(value = "Get One Data Handler Template")
+    @GetMapping(COUNTRY_URL + "/data_handler/agreement_template/{agreementTemplateId}")
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> getDataHandlerTemplateByCountry(@PathVariable Long countryId,@PathVariable Long agreementTemplateId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getDataHandlerTemplate(countryId,true,agreementTemplateId));
+    }
+
 
 }

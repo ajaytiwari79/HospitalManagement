@@ -86,6 +86,6 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{employmentId:?0,deleted:false,'_id':{'$ne':?3}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}",exists=true)
     boolean shiftOverLapped(Long employmentId, Date startDate, Date endDate,BigInteger shiftId);
 
-    @Query(value = "{disabled:false,deleted:false,unitId:0,planningPeriodId:?1,draftState:{$exists:true}}")
-    List<Shift> findAllDraftShift(Long unitId,BigInteger planningPeriodid);
+    @Query(value = "{employmentId:?0,deleted:false, disabled:false,startDate:{$gt:?1,$lt:?2},'activities.activityId':{'$in':?3}}")
+    List<Shift> findAllShiftByActivityIdAndBetweenDuration(Long employmentId, Date startDate, Date endDate,Collection<BigInteger> activityIds);
 }

@@ -9,6 +9,7 @@ import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.enums.*;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
@@ -144,11 +145,17 @@ public class StaffFilterService {
                 return newArrayList(new FilterSelectionQueryResult(FULL_DAY_CALCULATION,StringUtils.capitalize(FULL_DAY_CALCULATION.toLowerCase().replace("_"," "))),new FilterSelectionQueryResult(FULL_WEEK,StringUtils.capitalize(FULL_WEEK.toLowerCase().replace("_"," "))));
             case TIME_TYPE:
                 return getAllTimeType(countryId);
-                default:
+            case ACTIVITY_STATUS:
+                return getStatusFilter();
+            default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
         }
         return null;
+    }
+
+    private List<FilterSelectionQueryResult> getStatusFilter(){
+        return Arrays.stream(ShiftStatus.values()).map(shiftStatus -> new FilterSelectionQueryResult(shiftStatus.toString(),shiftStatus.name())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getAllTimeType(Long countryId){

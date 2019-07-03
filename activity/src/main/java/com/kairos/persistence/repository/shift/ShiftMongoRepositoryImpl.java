@@ -66,7 +66,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
     }
 
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate,Boolean draftShiftInclude) {
+    @Override
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
@@ -75,14 +76,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate);
         }
-        if(isNotNull(draftShiftInclude)){
-            criteria.where("draft").is(draftShiftInclude);
-        }
         return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
     }
 
+
     @Override
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists){
         Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate).lt(endDate).and("draftShift").exists(draftShiftExists);
         if(draftShiftExists){
@@ -527,18 +526,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                     .and("startDate").gte(startDate).orOperator(Criteria.where("endDate").gte(startDate));
         }
         return getShiftWithActivityByCriteria(criteria.and("activities.activityId").in(activityIds),false,ShiftWithActivityDTO.class);
-    }
-
-    @Override
-    public boolean existShiftsBetweenDurationByEmploymentId(BigInteger shiftId, Long employmentId, Date startDate, Date endDate, ShiftType shiftType) {
-        Criteria criteria = Criteria.where("disabled").is(false).and("deleted").is(false).and("employmentId").is(employmentId).and("startDate").lt(endDate).and("endDate").gt(startDate);
-        if (isNotNull(shiftId)) {
-            criteria.and("_id").ne(shiftId);
-        }
-        if (isNotNull(shiftType)) {
-            criteria.and("shiftType").is(shiftType.toString());
-        }
-        return mongoTemplate.exists(new Query(criteria), Shift.class);
     }
 
     @Override

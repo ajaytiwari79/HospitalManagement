@@ -33,7 +33,7 @@ public class RuleTemplateSpecificInfo {
     private Map<BigInteger,Integer> counterMap;
     private Map<Long, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
-    private Long totalTimeBank;
+    private long totalTimeBank;
     private ViolatedRulesDTO violatedRules;
     private int staffAge;
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;

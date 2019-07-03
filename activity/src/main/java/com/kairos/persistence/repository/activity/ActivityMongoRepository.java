@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -76,5 +77,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{deleted: false, parentId :?0,unitId:{$in:?1 }}",exists = true)
     boolean existsByParentIdAndDeletedFalse( BigInteger activityId,List<Long> unitIds);
+
+    @Query(value = "{'balanceSettingsActivityTab.timeType':?0}, deleted:false}")
+    List<Activity>  findAllBySecondLevelTimeType(TimeTypeEnum timeTypeEnum);
 
 }

@@ -732,7 +732,7 @@ public  class DateUtils {
         return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
-    public static String getLocaDateStringByPattern(LocalDate localDate,String pattern){
+    public static String getLocalDateStringByPattern(LocalDate localDate, String pattern){
         return localDate.format(DateTimeFormatter.ofPattern(pattern));
     }
 
@@ -843,10 +843,10 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
+        return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
     }
     public static long getMinutesBetweenDate(Date toDate,Date fromDate){
         return Duration.between(asLocalDateTime(toDate),asLocalDateTime(fromDate)).toMinutes();

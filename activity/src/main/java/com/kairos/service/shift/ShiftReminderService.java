@@ -33,8 +33,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.AppConstants.FORWARD_SLASH;
-import static com.kairos.constants.AppConstants.SHIFT_EMAIL_BODY;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
 
 /**
  * CreatedBy vipulpandey on 15/10/18
@@ -69,7 +70,7 @@ public class ShiftReminderService{
     public void setReminderTrigger(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
         List<SchedulerPanelDTO> scheduledJobs = new ArrayList<>(shift.getActivities().size());
         shift.getActivities().forEach(currentShift -> {
-            if (!currentShift.isBreakShift() && activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().isAllowCommunicationReminder()
+            if (activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().isAllowCommunicationReminder()
                     && !activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().getActivityReminderSettings().isEmpty()) {
                 LocalDateTime firstReminderDateTime = calculateTriggerTime(activityWrapperMap.get(currentShift.getActivityId()).getActivity(), shift.getStartDate(), DateUtils.getCurrentLocalDateTime());
                 if (firstReminderDateTime != null) {
@@ -126,7 +127,7 @@ public class ShiftReminderService{
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
 
-        String description = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), DateUtils.asLocalDate(shiftActivity.get().getStartDate()),
+        String description = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), getLocalDateStringByPattern(asLocalDate(shiftActivity.get().getStartDate()) ,COMMON_DATE_FORMAT),
                 shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
         Map<String,Object> templateParam = new HashMap<>();
         templateParam.put("receiverName",staffDTO.getFullName());
@@ -134,7 +135,7 @@ public class ShiftReminderService{
         if(StringUtils.isNotBlank(staffDTO.getProfilePic())) {
                templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
         }
-        //mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getEmail());
+        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getEmail());
 
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {

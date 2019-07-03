@@ -89,7 +89,7 @@ public class TimeBankCalculationService {
     @Inject private PhaseService phaseService;
     @Inject private TimeBankRepository timeBankRepository;
 
-    public DailyTimeBankEntry calculateDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry, Set<DateTimeInterval> planningPeriodIntervals, List<DayTypeDTO> dayTypeDTOS, boolean validatedByPlanner,boolean calculateDeltaForDraftShifts) {
+    public DailyTimeBankEntry calculateDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry, Set<DateTimeInterval> planningPeriodIntervals, List<DayTypeDTO> dayTypeDTOS, boolean validatedByPlanner) {
         boolean anyShiftPublish = false;
         int contractualMinutes = getContractualMinutesByDate(planningPeriodIntervals, dateTimeInterval.getStartLocalDate(), staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
         if(isCollectionNotEmpty(shifts)) {
@@ -130,11 +130,6 @@ public class TimeBankCalculationService {
                     ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + value);
                     totalDailyPlannedMinutes += value;
                 }
-            }
-            if(calculateDeltaForDraftShifts){
-                dailyTimeBankEntry.setDraftDeltaTimebankMinutes(totalDailyPlannedMinutes - contractualMinutes);
-                dailyTimeBankEntry.setAnyShiftInDraft(true);
-                return dailyTimeBankEntry;
             }
             dailyTimeBankEntry = updateDailyTimeBankEntry(staffAdditionalInfoDTO.getEmployment(), dateTimeInterval, dailyTimeBankEntry, anyShiftPublish, contractualMinutes, totalDailyPlannedMinutes, scheduledMinutesOfTimeBank, totalPublishedDailyPlannedMinutes, ctaTimeBankMinMap);
         } else if(isNotNull(dailyTimeBankEntry)) {

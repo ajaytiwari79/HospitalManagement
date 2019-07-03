@@ -223,6 +223,11 @@ public class ShiftService extends MongoBaseService {
         return shiftWithViolatedInfoDTO;
     }
 
+    public void updateTimeBankAndAvailableCountOfStaffingLevel(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
+    }
+
+
     public Shift saveShiftWithActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift,
                                        StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift, Long functionId,Phase phase,ShiftActionType shiftAction ) {
         int scheduledMinutes = 0;
@@ -234,6 +239,9 @@ public class ShiftService extends MongoBaseService {
             for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
                 updateActivityDetailsInShiftActivity(childActivity,activityWrapperMap,staffAdditionalInfoDTO);
             }
+        }
+        if(isCollectionNotEmpty(shift.getBreakActivities()) && UNPAID_BREAK.equals(activityWrapperMap.get(shift.getBreakActivities().get(0).getActivityId()).getTimeType())){
+            scheduledMinutes -= shift.getBreakActivities().get(0).getInterval().getMinutes();
         }
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
@@ -270,7 +278,7 @@ public class ShiftService extends MongoBaseService {
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shiftMongoRepository.save(shift);
         if (!updateShift) {
-            timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
+            updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
         }
         return shift;
     }
@@ -318,7 +326,7 @@ public class ShiftService extends MongoBaseService {
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         }
         shiftMongoRepository.saveEntities(shifts);
-        shifts.forEach(shift -> timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false));
+        shifts.forEach(shift -> updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO));
     }
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type, Boolean validatedByStaff, boolean updateShiftState, Long unitId,ShiftActionType shiftActionType, TodoType todoType) {

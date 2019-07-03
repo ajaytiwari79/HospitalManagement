@@ -6,8 +6,7 @@ import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -20,6 +19,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class ShiftActivity implements Comparable<ShiftActivity>{
 
 
@@ -40,13 +40,10 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     private BigInteger id;
     private String timeType;
     private String backgroundColor;
-    private boolean haltBreak;
-    private boolean breakShift;
     private boolean breakReplaced;
     private List<TimeBankCTADistribution> timeBankCTADistributions;
     private List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions;
     private int payoutCtaBonusMinutes;
-    private Long allowedBreakDurationInMinute;
     private int timeBankCtaBonusMinutes;
     private String startLocation; // this is for the location from where activity will gets starts
     private String endLocation;   // this is for the location from where activity will gets ends
@@ -57,17 +54,13 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     private List<PlannedTime> plannedTimes;
     private List<ShiftActivity> childActivities;
     private boolean breakNotHeld;
+    private Set<ShiftStatus> status = new HashSet<>();
+
 
     @IgnoreLogging
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
     }
-
-    private Set<ShiftStatus> status = new HashSet<>();
-
-    public ShiftActivity() {
-    }
-
 
 
     public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType) {
@@ -78,44 +71,6 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
         this.timeType = timeType;
     }
 
-    public ShiftActivity(String activityName, Date startDate, Date endDate, BigInteger activityId, boolean breakShift, Long absenceReasonCodeId, Long allowedBreakDurationInMinute, String startLocation, String endLocation) {
-        this.activityId = activityId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.activityName = activityName;
-        this.breakShift=breakShift;
-        this.absenceReasonCodeId = absenceReasonCodeId;
-        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
-        this.startLocation=startLocation;
-        this.endLocation=endLocation;
-    }
-
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,
-                          Long allowedBreakDurationInMinute,String remarks,String startLocation,String endLocation) {
-        this.activityId = activityId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.activityName = activityName;
-        this.breakShift=breakShift;
-        this.absenceReasonCodeId = absenceReasonCodeId;
-        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
-        this.remarks = remarks;
-        this.startLocation=startLocation;
-        this.endLocation=endLocation;
-    }
-    public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,boolean breakShift,Long absenceReasonCodeId,
-                          Long allowedBreakDurationInMinute,boolean breakReplaced,String startLocation,String endLocation) {
-        this.activityId = activityId;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.activityName = activityName;
-        this.breakShift=breakShift;
-        this.absenceReasonCodeId = absenceReasonCodeId;
-        this.allowedBreakDurationInMinute=allowedBreakDurationInMinute;
-        this.breakReplaced=breakReplaced;
-        this.startLocation=startLocation;
-        this.endLocation=endLocation;
-    }
     public ShiftActivity(BigInteger activityId, String activityName) {
         this.activityId = activityId;
         this.activityName = activityName;

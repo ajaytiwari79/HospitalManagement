@@ -80,9 +80,12 @@ public class ShiftSickService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
-    @Inject private TimeBankRepository timeBankRepository;
-    @Inject private TimeBankService timeBankService;
-    @Inject private ShiftBreakService shiftBreakService;
+    @Inject
+    private TimeBankRepository timeBankRepository;
+    @Inject
+    private TimeBankService timeBankService;
+    @Inject
+    private ShiftBreakService shiftBreakService;
 
 
     public Map<String, Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId, Duration duration) {
@@ -300,7 +303,7 @@ public class ShiftSickService extends MongoBaseService {
             //Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dates);
 
             shiftMongoRepository.saveEntities(shifts);
-            shifts.sort(Comparator.comparing(Shift::getStartDate));
+            shifts.sort((shift1,shift2)->shift1.getStartDate().compareTo(shift2.getStartDate()));
             List<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toList());
             List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
             Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
@@ -316,9 +319,11 @@ public class ShiftSickService extends MongoBaseService {
                     }
                     staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                     setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                    timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
+                    shiftService.updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
                 }
             }
+            //shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);
+
         }
     }
 

@@ -58,6 +58,8 @@ public class PolicyAgreementTemplate extends BaseEntity {
     @Embedded
     private CoverPage coverPageData = new CoverPage();
     private Long organizationId;
+    @Column(columnDefinition = "text")
+    private String dataHandlerHtmlContent;
 
     public PolicyAgreementTemplate(String name, String description, Long countryId, List<OrganizationType> organizationTypes, List<OrganizationSubType> organizationSubTypes, List<ServiceCategory> organizationServices, List<SubServiceCategory> organizationSubServices) {
         this.name = name;

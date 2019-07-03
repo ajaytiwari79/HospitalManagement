@@ -23,6 +23,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.persistence.model.activity.*;
+import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
@@ -120,7 +121,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private OpenShiftRuleTemplateService openShiftRuleTemplateService;
     @Inject
     private KPISetService kpiSetService;
-
+    @Inject
+    private ProtectedDaysOffService protectedDaysOffService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -500,7 +502,7 @@ public class OrganizationActivityService extends MongoBaseService {
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);
         kpiSetService.copyKPISets(unitId, orgTypeAndSubTypeDTO.getSubTypeId(), orgTypeAndSubTypeDTO.getCountryId());
-
+        protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
         return true;
     }
 

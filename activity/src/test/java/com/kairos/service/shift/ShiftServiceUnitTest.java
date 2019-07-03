@@ -153,8 +153,6 @@ public class ShiftServiceUnitTest {
         activity.setRemarks("");
         activity.setTimeType("WORKING_TYPE");
         activity.setBackgroundColor("");
-        activity.setHaltBreak(false);
-        activity.setBreakShift(false);
         Set<ShiftStatus> status=new HashSet<>();
         status.add(ShiftStatus.UNPUBLISH);
         activity.setStatus(status);
