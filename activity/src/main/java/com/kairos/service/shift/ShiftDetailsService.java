@@ -135,12 +135,11 @@ public class ShiftDetailsService extends MongoBaseService {
         );
     }
 
-    private void adjustPlannedTimeInActivity(Shift shiftDTO, BigInteger plannedTimeId) {
-        Shift shift = shiftMongoRepository.findOne(shiftDTO.getId());
+    private void adjustPlannedTimeInActivity(Shift shift, BigInteger plannedTimeId) {
         List<PlannedTime> plannedTimeList = shift.getActivities().stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
         Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
-        for (ShiftActivity shiftActivityDTO : shiftDTO.getActivities()) {
-            shiftActivityDTO.setPlannedTimes(filterPlannedTimes(shiftActivityDTO.getStartDate(), shiftActivityDTO.getEndDate(), plannedTimeMap, plannedTimeId));
+        for (ShiftActivity shiftActivity : shift.getActivities()) {
+            shiftActivity.setPlannedTimes(filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), plannedTimeMap, plannedTimeId));
         }
     }
 

@@ -43,6 +43,7 @@ import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.initial_time_bank_log.InitialTimeBankLogService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.PositionService;
@@ -137,6 +138,8 @@ public class EmploymentService {
     private EmploymentLineFunctionRelationShipGraphRepository employmentLineFunctionRelationRepository;
     @Inject
     private EnvConfig envConfig;
+    @Inject
+    private InitialTimeBankLogService initialTimeBankLogService;
 
 
     public PositionWrapper createEmployment(Long id, String type, EmploymentDTO employmentDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
@@ -171,6 +174,7 @@ public class EmploymentService {
             employment.setEmploymentSubType(EmploymentSubType.MAIN);
         }
         employmentGraphRepository.save(employment);
+        initialTimeBankLogService.saveInitialTimeBankLog(employment.getId(),employment.getAccumulatedTimebankMinutes());
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = assignCTAAndWTAToEmployment(employment, employmentDTO);
         Long reasonCodeId = updateEmploymentEndDate(parentOrganization, employmentDTO, position);
 
@@ -482,8 +486,7 @@ public class EmploymentService {
             employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().get(0));
             employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(0));
         }
-
-
+        initialTimeBankLogService.saveInitialTimeBankLog(oldEmployment.getId(),oldEmployment.getAccumulatedTimebankMinutes());
         Position position = positionService.updateEmploymentEndDate(oldEmployment.getUnit(), employmentDTO.getStaffId(),
                 employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId());
         Long reasonCodeId = Optional.ofNullable(position.getReasonCode()).isPresent() ? position.getReasonCode().getId() : null;

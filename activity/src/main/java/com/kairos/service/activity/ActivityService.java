@@ -294,7 +294,7 @@ public class ActivityService {
         return new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
     }
 
-    public ActivityTabsWrapper getGeneralTabOfActivity(Long countryId, BigInteger activityId) {
+     public ActivityTabsWrapper getGeneralTabOfActivity(Long countryId, BigInteger activityId) {
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
