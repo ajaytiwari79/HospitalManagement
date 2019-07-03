@@ -249,11 +249,7 @@ public class ShiftStatusService {
         Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
 
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
-
-           // if(ShiftActionType.SAVE.equals(shiftActionType)) {
-             //  shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
-            //}
-            if (validPhaseForPublishingShift.contains(phase.getPhaseEnum()) && ShiftActionType.SAVE.equals(shiftActionType)) {
+            if (validPhaseForPublishingShift.contains(phase.getPhaseEnum())) {
                 shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {

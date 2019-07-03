@@ -79,6 +79,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -154,6 +155,8 @@ public class ShiftService extends MongoBaseService {
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject
     private ShiftDetailsService shiftDetailsService;
+
+
 
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type ,ShiftActionType shiftActionType) {
@@ -302,10 +305,20 @@ public class ShiftService extends MongoBaseService {
         }
         if(!updateShift && PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)){
             Shift draftShift=ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class);
-           draftShift.setDraft(true);
+            draftShift.setDraft(true);
             shift.setDraftShift(draftShift);
             shift.setDraft(true);
         }
+        if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)){
+            shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
+            if(isNotNull(shift.getDraftShift())){
+                shift.getDraftShift().getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
+
+            }
+        }
+       // if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) && ShiftActionType.SAVE.equals(shiftAction)){
+         //   shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().add(ShiftStatus.PUBLISH));
+        //}
         shiftMongoRepository.save(shift);
         if (!updateShift) {
             updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
@@ -492,6 +505,7 @@ public class ShiftService extends MongoBaseService {
             deletedShiftIds = array[1];
         }
         if(isCollectionNotEmpty(saveShifts)) {
+
             shiftMongoRepository.saveEntities(saveShifts);
         }
         Map<String,Object> response = new HashMap<>();
@@ -542,6 +556,13 @@ public class ShiftService extends MongoBaseService {
             shift.setDraftShift(null);
             shift.setId(draftShift.getId());
             shift.setDraft(false);
+            List<ShiftActivity> oldActivity = new CopyOnWriteArrayList<>(shift.getActivities());
+            List<ShiftActivity> newActivities = new ArrayList<>();
+            for (ShiftActivity shiftActivity : oldActivity) {
+                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+                newActivities.add(shiftActivity);
+            }
+            shift.setActivities(newActivities);
             saveShifts.add(shift);
         }
         shiftStateService.updateShiftDailyTimeBankAndPaidOut(saveShifts, saveShifts, unitId);
