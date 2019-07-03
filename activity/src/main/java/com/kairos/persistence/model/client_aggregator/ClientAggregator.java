@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.client_aggregator;
+
 import com.kairos.dto.activity.client_exception.ClientExceptionCount;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.task.UnhandledTaskCount;
@@ -7,9 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by oodles on 12/7/17.

@@ -2,14 +2,10 @@ package com.planner.domain.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.wta.MinMaxSetting;
-import com.kairos.enums.wta.PartOfDay;
-import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.enums.wta.*;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 /**

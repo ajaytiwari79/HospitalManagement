@@ -7,10 +7,12 @@ package com.kairos.dto.activity.wta.templates;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.WTATemplateType;
 
+import javax.validation.Valid;
 import java.util.Set;
 
 public class BreakWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private short breakGapMinutes;
+    @Valid
     private Set<BreakAvailabilitySettings> breakAvailability;
 
     public BreakWTATemplateDTO(short breakGapMinutes, Set<BreakAvailabilitySettings> breakAvailability) {

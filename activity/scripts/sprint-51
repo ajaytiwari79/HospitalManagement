@@ -1,0 +1,8 @@
+db.activities.find({"balanceSettingsActivityTab.timeType":{"$exists":false}}).forEach( function (activity) {
+    var timeTypeId = activity.balanceSettingsActivityTab.timeTypeId
+    if(timeTypeId){
+            var timeType = db.time_Type.findOne({"_id":timeTypeId});
+        activity.balanceSettingsActivityTab.timeType = timeType.secondLevelType;
+        db.activities.save(activity);
+    }
+});

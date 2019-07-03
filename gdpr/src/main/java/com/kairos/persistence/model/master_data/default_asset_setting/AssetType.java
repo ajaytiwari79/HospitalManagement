@@ -3,9 +3,7 @@ package com.kairos.persistence.model.master_data.default_asset_setting;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.risk_management.Risk;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

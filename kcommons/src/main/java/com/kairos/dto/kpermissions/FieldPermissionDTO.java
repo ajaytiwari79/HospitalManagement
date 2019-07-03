@@ -1,10 +1,7 @@
 package com.kairos.dto.kpermissions;
 
 import com.kairos.enums.kpermissions.FieldLevelPermission;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 

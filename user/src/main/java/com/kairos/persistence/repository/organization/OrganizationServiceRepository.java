@@ -1,16 +1,12 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
-import com.kairos.persistence.model.organization.services.OrganizationService;
-import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
+import com.kairos.persistence.model.organization.services.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 

@@ -1,11 +1,11 @@
 package com.kairos.service.activity;
+
 import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.ActivityCategory;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
  */
 
 @Service
-public class ActivityCategoryService extends MongoBaseService{
+public class ActivityCategoryService{
 
     @Inject
     ActivityCategoryRepository activityCategoryRepository;
@@ -79,7 +79,7 @@ public class ActivityCategoryService extends MongoBaseService{
         ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(countryId, timeType.getId());
         if(category != null){
             category.setName(timeType.getLabel());
-            save(category);
+            activityCategoryRepository.save(category);
         }
     }
 
@@ -128,7 +128,7 @@ public class ActivityCategoryService extends MongoBaseService{
         ActivityCategory category = activityCategoryRepository.getCategoryByTimeType(countryId, timeTypeId);
         if(category !=null){
             category.setDeleted(true);
-            save(category);
+            activityCategoryRepository.save(category);
         }
     }
 

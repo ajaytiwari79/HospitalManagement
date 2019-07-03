@@ -4,13 +4,10 @@ package com.kairos.service.counter;
  *
  */
 
-
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
@@ -33,8 +30,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
-
-
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
