@@ -322,7 +322,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_RULETEMPLATE_BLOCKING_POINT  = "message.ruleTemplate.blocking.point ";
     public static final String MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL  = "message.ruleTemplate.interval.notNull ";
     public static final String MESSAGE_ACTIVITY_DAYTYPE = "message.activity.dayType";
-    public static final String MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL  = "message.ruleTemplate.counter.value.notNull ";
+    public static final String MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL  = "message.ruleTemplate.counter.value.notNull";
     public static final String MESSAGE_RULETEMPLATE_COUNTER_EXHAUSTED  = "message.ruleTemplate.counter.exhausted ";
     public static final String MESSAGE_RULETEMPLATE_HOURS_NOTZERO  = "message.ruleTemplate.hours.notzero";
     public static final String MESSAGE_COUNTER_KPI_NOTFOUND = "message.counter.kpi.notfound";
