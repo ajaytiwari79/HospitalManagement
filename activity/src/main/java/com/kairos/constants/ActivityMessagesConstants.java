@@ -136,6 +136,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_SETTING_ENABLE = "message.activity.setting.enable";
     public static final String ACTIVITIES_NOT_SUPPORT_BREAK = "activities.not.support.break";
     public static final String ACTIVITIES_SUPPORT_BREAK = "activities.support.break";
+    public static final String SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE = "shift.percentage.notvalid.break";
+    public static final String BREAK_NOT_VALID = "break.interval.notvalid";
     public static final String MESSAGE_ACTIVITY_BEING_USED_AS_CHILD = "message.activity.being_used_as_child";
     public static final String MESSAGE_ACTIVITY_BEING_USED_AS_PARENT = "message.activity.being_used_as_parent";
     public static final String MESSAGE_CHILD_ACTIVITIES_NOT_SUPPORT_STAFFING_LEVEL = "message.child_activities.not_support.staffing_level";

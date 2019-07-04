@@ -103,7 +103,7 @@ public class RequestAbsenceService {
             shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
         }
         if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
-            todo.setStatus(TodoStatus.PENDING);
+            todo.setStatus(TodoStatus.REQUESTED);
         }
         return shiftWithViolatedInfoDTO;
     }

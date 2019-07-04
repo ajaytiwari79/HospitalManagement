@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.ActivityMessagesConstants.ERROR_BREAKSACTIVITY_NOT_CONFIGURED;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 
 /**
  * @author pradeep
@@ -61,26 +61,46 @@ public class ShiftBreakService {
         activityWrapperMap.putAll(getBreakActivities(breakSetting, shift.getUnitId()));
         boolean placeBreakAnyWhereInShift = true;
         ShiftActivity breakActivity = null;
-        DateTimeInterval eligibleBreakInterval;
+        DateTimeInterval eligibleBreakInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
         Date placeBreakAfterThisDate = shift.getStartDate();
         List<ShiftActivity> breakActivities = new ArrayList<>();
         if(isNotNull(breakSetting)) {
-            if (isNotNull(breakWTATemplate)) {
-                BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
-                placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
-                eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings);
-                placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSetting.getBreakDurationInMinute();
-                placeBreakAfterThisDate = asDate(asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getInterval().getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100));
+            if(isCollectionEmpty(shift.getBreakActivities())){
+                if (isNotNull(breakWTATemplate)) {
+                    BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
+                    if(isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage()==0 || breakAvailabilitySettings.getShiftPercentage()==100)){
+                        exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE,breakAvailabilitySettings.getShiftPercentage());
+                    }
+                    placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
+                    eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings);
+                    placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSetting.getBreakDurationInMinute();
+                    placeBreakAfterThisDate = asDate(asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getInterval().getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100));
+                }
+                breakActivity = getBreakByShiftActivity(shift, activityWrapperMap, staffAdditionalInfoDTO, breakSetting, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
+                if (isNull(breakActivity)) {
+                    Date breakEndDate = asDate(asZoneDateTime(placeBreakAfterThisDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
+                    breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSetting, staffAdditionalInfoDTO, activityWrapperMap);
+                    breakActivity.setBreakNotHeld(true);
+                }
+            }else {
+                breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate);
             }
-            breakActivity = getBreakByShiftActivity(shift, activityWrapperMap, staffAdditionalInfoDTO, breakSetting, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
-            if (isNull(breakActivity)) {
-                Date breakEndDate = asDate(asZoneDateTime(placeBreakAfterThisDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
-                breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSetting, staffAdditionalInfoDTO, activityWrapperMap);
-                breakActivity.setBreakNotHeld(true);
+            if(isNotNull(breakActivity)) {
+                breakActivities.add(breakActivity);
             }
-            breakActivities.add(breakActivity);
         }
         return breakActivities;
+    }
+
+    private ShiftActivity validateBreakOnUpdateShift(Shift shift, DateTimeInterval eligibleBreakInterval, Date placeBreakAfterThisDate) {
+        ShiftActivity breakActivity = shift.getBreakActivities().get(0);
+        Date startdate = placeBreakAfterThisDate.after(eligibleBreakInterval.getStartDate()) ? eligibleBreakInterval.getStartDate() : placeBreakAfterThisDate;
+        Date endDate = placeBreakAfterThisDate.after(eligibleBreakInterval.getEndDate()) ? placeBreakAfterThisDate : eligibleBreakInterval.getEndDate();
+        eligibleBreakInterval = new DateTimeInterval(startdate,endDate);
+        if(!eligibleBreakInterval.containsInterval(breakActivity.getInterval())){
+            exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
+        }
+        return breakActivity;
     }
 
     private ShiftActivity getBreakByShiftActivity(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakSettingsDTO breakSetting, boolean placeBreakAnyWhereInShift, ShiftActivity breakActivity, Date placeBreakAfterThisDate) {

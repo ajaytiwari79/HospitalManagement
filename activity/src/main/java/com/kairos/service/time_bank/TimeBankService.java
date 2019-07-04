@@ -631,4 +631,13 @@ public class TimeBankService{
         }
         return dailyTimeBankEntry;
     }
+
+    public void updateTimeBankForProtectedDaysOff(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner) {
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asDate(LocalDate.now()));
+        staffAdditionalInfoDTO.getEmployment().setStaffId(shift.getStaffId());
+        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
+        if(isNotNull(dailyTimeBankEntry)) {
+            timeBankRepository.save(dailyTimeBankEntry);
+        }
+    }
 }
