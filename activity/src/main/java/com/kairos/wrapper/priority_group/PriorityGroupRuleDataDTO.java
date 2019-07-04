@@ -6,9 +6,7 @@ import com.kairos.persistence.model.open_shift.OpenShiftNotification;
 import com.kairos.persistence.model.shift.Shift;
 
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class PriorityGroupRuleDataDTO {
 

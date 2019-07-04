@@ -2,10 +2,7 @@ package com.kairos.dto.planner.solverconfig.country;
 
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 public class CountrySolverConfigDTO extends SolverConfigDTO{
 

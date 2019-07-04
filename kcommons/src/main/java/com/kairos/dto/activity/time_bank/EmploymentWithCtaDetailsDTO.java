@@ -6,9 +6,7 @@ import com.kairos.dto.user.employment.EmploymentLinesDTO;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EmploymentWithCtaDetailsDTO {

@@ -2,9 +2,7 @@ package com.kairos.service.planner;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.task_type.TaskTypeEnum;
-import com.kairos.persistence.model.task.Task;
-import com.kairos.persistence.model.task.TaskAddress;
-import com.kairos.persistence.model.task.TaskStatus;
+import com.kairos.persistence.model.task.*;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.task_type.TaskMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;

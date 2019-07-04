@@ -1,6 +1,5 @@
 package com.kairos.controller.activity;
 
-
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
@@ -18,9 +17,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_COUNTRY_URL;
 
@@ -190,12 +187,12 @@ public class ActivityController {
     }
 
 
-    @ApiOperation("Update compositeShifts Tab of Activity")
+   /* @ApiOperation("Update compositeShifts Tab of Activity")
     @PutMapping(value = "/activity/{activityId}/allowed_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId,@RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId,compositeShiftActivityDTO));
-    }
+    }*/
 
     @ApiOperation("get compositeShifts Tab of Activity")
     @GetMapping(value = "/activity/{activityId}/allowed_child_activities")

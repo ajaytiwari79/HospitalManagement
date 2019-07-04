@@ -23,6 +23,11 @@ public class FilterSelectionQueryResult {
         // default constructor
     }
 
+    public FilterSelectionQueryResult(String id, String value) {
+        this.id = id;
+        this.value = value;
+    }
+
     public String getId() {
         return id;
     }

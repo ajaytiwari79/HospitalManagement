@@ -1,15 +1,11 @@
 package com.kairos.scheduler.persistence.model.scheduler_panel;
 
-import com.kairos.enums.scheduler.JobFrequencyType;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
+import com.kairos.enums.scheduler.*;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.Date;
 import java.util.List;
 

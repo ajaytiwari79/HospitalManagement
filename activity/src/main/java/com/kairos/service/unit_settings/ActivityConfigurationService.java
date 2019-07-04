@@ -2,10 +2,7 @@ package com.kairos.service.unit_settings;
 
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
-import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
-import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationWrapper;
-import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
+import com.kairos.dto.activity.unit_settings.activity_configuration.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.persistence.model.phase.Phase;
@@ -21,9 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;

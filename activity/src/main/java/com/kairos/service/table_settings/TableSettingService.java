@@ -1,6 +1,5 @@
 package com.kairos.service.table_settings;
 
-
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.persistence.model.table_settings.TableSetting;
 import com.kairos.persistence.repository.table_settings.TableSettingMongoRepository;
@@ -12,10 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CITIZEN_TABLE_ID;

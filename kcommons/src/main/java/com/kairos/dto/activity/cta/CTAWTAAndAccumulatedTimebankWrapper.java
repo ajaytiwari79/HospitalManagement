@@ -2,10 +2,7 @@ package com.kairos.dto.activity.cta;
 
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 

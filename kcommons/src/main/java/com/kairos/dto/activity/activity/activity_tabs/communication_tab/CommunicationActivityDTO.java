@@ -3,9 +3,7 @@ package com.kairos.dto.activity.activity.activity_tabs.communication_tab;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by vipul on 24/8/17.

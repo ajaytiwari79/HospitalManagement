@@ -1,10 +1,7 @@
 package com.kairos.persistence.model.organization.union;
 
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.Province;
-import com.kairos.persistence.model.user.region.Region;
-import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.model.user.region.*;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

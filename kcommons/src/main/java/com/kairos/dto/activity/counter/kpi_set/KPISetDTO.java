@@ -7,9 +7,7 @@ package com.kairos.dto.activity.counter.kpi_set;
 import com.kairos.commons.utils.NotNullOrEmpty;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.TimeTypeEnum;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;

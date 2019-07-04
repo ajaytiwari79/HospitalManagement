@@ -23,3 +23,5 @@ db.shifts.find({}).forEach(function(e){
 });
 }
  });
+
+ db.time_Type.updateMany({"partOfTeam":{$exists:false}},{$set:{"partOfTeam":false}});

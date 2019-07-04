@@ -10,10 +10,7 @@ import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResul
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionFieldRelationshipGraphRepository;
-import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionModelRelationshipGraphRepository;
-import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
-import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
+import com.kairos.persistence.repository.kpermissions.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;

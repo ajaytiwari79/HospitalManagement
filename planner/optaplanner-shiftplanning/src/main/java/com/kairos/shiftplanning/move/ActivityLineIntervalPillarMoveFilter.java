@@ -9,9 +9,7 @@ import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionFi
 import org.optaplanner.core.impl.heuristic.selector.move.generic.PillarChangeMove;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ActivityLineIntervalPillarMoveFilter implements SelectionFilter<ShiftRequestPhasePlanningSolution,PillarChangeMove<ShiftRequestPhasePlanningSolution>> {
     @Override
