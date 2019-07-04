@@ -7,6 +7,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.IntegrationOperation;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAIRE_FREQUENCY;
+import static com.kairos.service.shift.ShiftFilterUtils.getShiftsByFilters;
 
 /**
  * Created by prerna on 8/5/18.
@@ -49,7 +51,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAI
 public class NightWorkerService {
 
     @Inject
-    NightWorkerMongoRepository nightWorkerMongoRepository;
+    private NightWorkerMongoRepository nightWorkerMongoRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -394,7 +396,13 @@ public class NightWorkerService {
         });
     }
 
-    public Map<Long,Boolean> getStaffNightWorkerDetails(List<Long> staffIds){
+    public Map<Long,Boolean> getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO){
+        List<Long> staffIds = staffFilterDTO.getStaffIds();
+        if(staffFilterDTO.isValidFilterForShift()) {
+            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds());
+            shiftDTOS = getShiftsByFilters(shiftDTOS, staffFilterDTO);
+            staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toList());
+        }
         List<NightWorker> nightWorker = nightWorkerMongoRepository.findByStaffIds(staffIds);
         Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorker.stream().collect(Collectors.toMap(NightWorker::getStaffId,NightWorker::isNightWorker));
         for (Long staffId : staffIds) {

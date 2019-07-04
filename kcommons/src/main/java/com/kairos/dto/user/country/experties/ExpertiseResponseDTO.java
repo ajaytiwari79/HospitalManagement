@@ -6,10 +6,7 @@ import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vipul on 29/3/18.

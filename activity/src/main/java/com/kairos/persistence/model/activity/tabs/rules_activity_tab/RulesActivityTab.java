@@ -1,18 +1,15 @@
 package com.kairos.persistence.model.activity.tabs.rules_activity_tab;
 
-import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
-import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
-import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * Created by pawanmandhan on 23/8/17.
@@ -264,7 +261,7 @@ public class RulesActivityTab{
     }
 
     public List<BigInteger> getApprovalAllowedPhaseIds() {
-        return approvalAllowedPhaseIds;
+        return isNullOrElse(approvalAllowedPhaseIds,new ArrayList<>());
     }
 
     public void setApprovalAllowedPhaseIds(List<BigInteger> approvalAllowedPhaseIds) {

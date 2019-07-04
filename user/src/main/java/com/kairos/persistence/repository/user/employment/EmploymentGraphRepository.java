@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.employment;
 
-
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -12,9 +11,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 

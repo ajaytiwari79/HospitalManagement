@@ -1,9 +1,7 @@
 package com.kairos.dto.activity.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.*;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;

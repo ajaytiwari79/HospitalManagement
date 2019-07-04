@@ -2,9 +2,7 @@ package com.kairos.service.open_shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.dto.activity.staffing_level.StaffingLevelActivityWithDuration;
-import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.open_shift.OpenShiftInterval;
 import com.kairos.persistence.model.open_shift.OpenShiftRuleTemplateDTO;
@@ -19,10 +17,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

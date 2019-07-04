@@ -4,17 +4,13 @@ import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
-import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
-import com.kairos.persistence.model.staff.StaffTeamDTO;
+import com.kairos.persistence.model.staff.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 /**

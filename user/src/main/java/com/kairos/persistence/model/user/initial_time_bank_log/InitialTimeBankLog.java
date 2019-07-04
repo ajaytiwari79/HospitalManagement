@@ -29,7 +29,7 @@ public class InitialTimeBankLog extends UserBaseEntity {
     public String toString() {
         return "InitialTimeBankLog{" +
                 "id=" + id +
-                "employmentId=" + employmentId +
+                ", employmentId=" + employmentId +
                 ", previousInitialBalanceInMinutes=" + previousInitialBalanceInMinutes +
                 ", updateInitialBalanceInMinutes=" + updatedInitialBalanceInMinutes +
                 '}';

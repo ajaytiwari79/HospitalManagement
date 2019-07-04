@@ -2,9 +2,7 @@ package com.kairos.dto.user.organization.skill;
 
 import com.kairos.dto.user.organization.OrganizationTypeAndSubTypeDTO;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class OrganizationSkillAndOrganizationTypesDTO {
 private OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO;
