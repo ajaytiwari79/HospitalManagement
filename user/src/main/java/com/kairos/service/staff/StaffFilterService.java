@@ -44,8 +44,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
-import static com.kairos.constants.CommonConstants.FULL_WEEK;
+import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -63,25 +62,20 @@ public class StaffFilterService {
     @Inject
     private FilterGroupGraphRepository filterGroupGraphRepository;
     @Inject
-    private
-    EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
-    private
-    OrganizationService organizationService;
+    private OrganizationService organizationService;
     @Inject
     private
     EngineerTypeGraphRepository engineerTypeGraphRepository;
     @Inject
-    private
-    StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
+    private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
     @Inject
-    private
-    OrganizationGraphRepository organizationGraphRepository;
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private EnvConfig envConfig;
     @Inject
-    private
-    ExpertiseGraphRepository expertiseGraphRepository;
+    private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -90,7 +84,8 @@ public class StaffFilterService {
     private AccessGroupRepository accessGroupRepository;
     @Inject
     private AccessPageRepository accessPageRepository;
-    @Inject private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
@@ -147,11 +142,21 @@ public class StaffFilterService {
                 return getAllTimeType(countryId);
             case ACTIVITY_STATUS:
                 return getStatusFilter();
+            case TIME_SLOT:
+                return getTimeSlots();
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
         }
         return null;
+    }
+
+    private List<FilterSelectionQueryResult> getTimeSlots(){
+        List<FilterSelectionQueryResult> filterSelectionQueryResults = new ArrayList<>();
+        filterSelectionQueryResults.add(new FilterSelectionQueryResult(AppConstants.DAY,AppConstants.DAY));
+        filterSelectionQueryResults.add(new FilterSelectionQueryResult(AppConstants.EVENING,AppConstants.EVENING));
+        filterSelectionQueryResults.add(new FilterSelectionQueryResult(AppConstants.NIGHT,AppConstants.NIGHT));
+        return filterSelectionQueryResults;
     }
 
     private List<FilterSelectionQueryResult> getStatusFilter(){

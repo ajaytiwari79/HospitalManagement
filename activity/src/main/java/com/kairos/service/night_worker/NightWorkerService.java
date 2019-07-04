@@ -28,6 +28,7 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.rule_validator.night_worker.StaffNonPregnancySpecification;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.shift.ShiftFilterService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAIRE_FREQUENCY;
-import static com.kairos.service.shift.ShiftFilterUtils.getShiftsByFilters;
 
 /**
  * Created by prerna on 8/5/18.
@@ -70,6 +70,7 @@ public class NightWorkerService {
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
     private SchedulerServiceRestClient schedulerRestClient;
+    @Inject private ShiftFilterService shiftFilterService;
 
     public String prepareNameOfQuestionnaireSet() {
         return AppConstants.QUESTIONNAIE_NAME_PREFIX + " " + DateUtils.getDateString(DateUtils.getDate(), "dd_MMM_yyyy");
@@ -389,7 +390,7 @@ public class NightWorkerService {
         List<Long> staffIds = staffFilterDTO.getStaffIds();
         if(staffFilterDTO.isValidFilterForShift()) {
             List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds());
-            shiftDTOS = getShiftsByFilters(shiftDTOS, staffFilterDTO);
+            shiftDTOS = shiftFilterService.getShiftsByFilters(shiftDTOS, staffFilterDTO);
             staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toList());
         }
         List<NightWorker> nightWorker = nightWorkerMongoRepository.findByStaffIds(staffIds);
