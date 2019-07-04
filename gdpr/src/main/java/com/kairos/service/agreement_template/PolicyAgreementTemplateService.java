@@ -1,15 +1,9 @@
 package com.kairos.service.agreement_template;
 
-
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
-import com.kairos.dto.gdpr.OrganizationTypeDTO;
-import com.kairos.dto.gdpr.ServiceCategoryDTO;
-import com.kairos.dto.gdpr.SubServiceCategoryDTO;
-import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
-import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
-import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
+import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.agreement_template.*;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
@@ -21,10 +15,7 @@ import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
-import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
-import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
-import com.kairos.response.dto.policy_agreement.GeneralAgreementTemplateResponseDTO;
-import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
+import com.kairos.response.dto.policy_agreement.*;
 import com.kairos.rest_client.GenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.s3bucket.AWSBucketService;
@@ -35,10 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -301,6 +289,35 @@ public class PolicyAgreementTemplateService {
 
     }
 
+    public <E extends AgreementTemplateDTO> E updateMasterAgreementTemplateForDataHandler(Long referenceId, Long agreementTemplateId, E policyAgreementTemplateDto) {
+        try {
+            PolicyAgreementTemplate template = policyAgreementRepository.getOne(agreementTemplateId);
+            template.setDataHandlerHtmlContent(policyAgreementTemplateDto.getDataHandlerHtmlContent());
+            policyAgreementRepository.save(template);
+        } catch (EntityNotFoundException nfe) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+        }
+        return policyAgreementTemplateDto;
+
+    }
+
+    public List<AgreementTemplateDTO> getAllDataHandlerTemplate(Long unitId) {
+        Long countryId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        TemplateType templateType = templateTypeRepository.findByCountryIdAndName(countryId,"Data Handler Agreement");
+        List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllDataHandlerAgreementTemplateByCountry(countryId,templateType.getId());
+        return policyAgreementTemplates.stream().map(policyAgreementTemplate ->
+                new AgreementTemplateDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), policyAgreementTemplate.getTemplateType().getId(), policyAgreementTemplate.getDataHandlerHtmlContent())
+        ).collect(Collectors.toList());
+    }
+
+    public AgreementTemplateDTO getDataHandlerTemplate(Long referenceId,boolean isCountry, Long agreementTemplateId) {
+        Long countryId = isCountry?referenceId:genericRestClient.publishRequest(null, referenceId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        PolicyAgreementTemplate policyAgreementTemplate=policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, countryId);
+        if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+        }
+        return new AgreementTemplateDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), policyAgreementTemplate.getTemplateType().getId(), policyAgreementTemplate.getDataHandlerHtmlContent());
+    }
 }
 
 

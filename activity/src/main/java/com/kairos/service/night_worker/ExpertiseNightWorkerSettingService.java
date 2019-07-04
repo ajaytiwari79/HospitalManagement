@@ -13,7 +13,6 @@ import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

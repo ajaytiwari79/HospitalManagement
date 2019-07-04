@@ -8,9 +8,7 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DefaultDataDTO {
 

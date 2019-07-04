@@ -28,7 +28,7 @@ import static com.kairos.constants.AppConstants.UNPAID_BREAK;
 import static com.kairos.enums.shift.BreakPaymentSetting.PAID;
 
 @Service
-public class BreakSettingsService extends MongoBaseService {
+public class BreakSettingsService {
 
     @Inject
     private BreakSettingMongoRepository breakSettingMongoRepository;
@@ -49,7 +49,7 @@ public class BreakSettingsService extends MongoBaseService {
             exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
         }
         breakSettings = new BreakSettings(countryId, breakSettingsDTO.getShiftDurationInMinute(), breakSettingsDTO.getBreakDurationInMinute(), expertiseId, breakSettingsDTO.getActivityId());
-        save(breakSettings);
+        breakSettingMongoRepository.save(breakSettings);
         breakSettingsDTO.setId(breakSettings.getId());
         return breakSettingsDTO;
     }
@@ -88,7 +88,7 @@ public class BreakSettingsService extends MongoBaseService {
         breakSettings.setBreakDurationInMinute(breakSettingsDTO.getBreakDurationInMinute());
         breakSettings.setActivityId(breakSettingsDTO.getActivityId());
         breakSettings.setShiftDurationInMinute(breakSettingsDTO.getShiftDurationInMinute());
-        save(breakSettings);
+        breakSettingMongoRepository.save(breakSettings);
         return breakSettingsDTO;
     }
 

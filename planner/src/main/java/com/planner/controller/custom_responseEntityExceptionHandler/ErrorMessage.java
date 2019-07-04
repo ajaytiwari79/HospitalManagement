@@ -1,8 +1,6 @@
 package com.planner.controller.custom_responseEntityExceptionHandler;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ErrorMessage {
 

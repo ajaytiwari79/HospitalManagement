@@ -1,9 +1,9 @@
 package com.kairos.service.pay_out;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

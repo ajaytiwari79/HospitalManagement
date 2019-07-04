@@ -5,21 +5,12 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.*;
 import com.kairos.dto.activity.counter.distribution.category.*;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
-import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
-import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
-import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.KPIValidity;
-import com.kairos.dto.activity.counter.enums.LocationType;
+import com.kairos.dto.activity.counter.distribution.org_type.*;
+import com.kairos.dto.activity.counter.distribution.tab.*;
+import com.kairos.dto.activity.counter.enums.*;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
@@ -39,9 +30,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -463,7 +452,7 @@ public class CounterDistService extends MongoBaseService {
                     if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                         applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                     }
-                    applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),kpiIdAndApplicableKpi.get(kpiId).getFibonacciKPIConfigs()));
+
                     staffIdKpiMap.get(accessGroupAndStaffDTO.getStaffId()).put(kpiId, kpiId);
                 }
             });

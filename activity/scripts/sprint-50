@@ -1,0 +1,1 @@
+db.getCollection('activities').updateMany({},{$unset:{"compositeActivities":1}});

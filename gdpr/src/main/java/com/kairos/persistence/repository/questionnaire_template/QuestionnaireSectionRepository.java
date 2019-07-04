@@ -1,10 +1,7 @@
 package com.kairos.persistence.repository.questionnaire_template;
 
-
 import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;

@@ -1,6 +1,5 @@
 package com.kairos.dto.gdpr.data_inventory;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,10 +7,7 @@ import lombok.Setter;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter

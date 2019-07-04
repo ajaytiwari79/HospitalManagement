@@ -5,10 +5,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
-import com.kairos.dto.activity.period.FlippingDateDTO;
-import com.kairos.dto.activity.period.PeriodDTO;
-import com.kairos.dto.activity.period.PeriodPhaseDTO;
-import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.dto.activity.period.*;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
@@ -16,17 +13,13 @@ import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.phase.PhaseDefaultName;
-import com.kairos.enums.scheduler.JobFrequencyType;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
+import com.kairos.enums.scheduler.*;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftState;
+import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelState;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -35,10 +28,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelStateMongoRepository;
-import com.kairos.rest_client.GenericRestClient;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.rest_client.SchedulerServiceRestClient;
-import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.rest_client.*;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
@@ -55,18 +45,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 /**
@@ -287,7 +272,6 @@ public class PlanningPeriodService extends MongoBaseService {
         PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId, planningPeriodDTO.getDurationType(), planningPeriodDTO.getDuration());
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         // Add planning period object in list
-
 
                 planningPeriods.add(planningPeriod);
 

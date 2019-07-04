@@ -2,9 +2,7 @@ package com.kairos.service.client;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
-import com.kairos.dto.planner.vrp.PreferedTimeWindowDTO;
-import com.kairos.dto.planner.vrp.TaskAddress;
-import com.kairos.dto.planner.vrp.VRPClientDTO;
+import com.kairos.dto.planner.vrp.*;
 import com.kairos.dto.planner.vrp.task.VRPTaskDTO;
 import com.kairos.persistence.model.client.PreferedTimeWindow;
 import com.kairos.persistence.model.client.VRPClient;

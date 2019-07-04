@@ -2,9 +2,7 @@ package com.kairos.persistence.repository.data_inventory.asset;
 
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.util.List;
 
 public class AssetRepositoryImpl implements CustomAssetRepository {

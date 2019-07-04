@@ -1,12 +1,9 @@
 package com.kairos.scheduler.service;
 
-
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.scheduler.persistence.model.common.MongoBaseEntity;
 import com.kairos.scheduler.persistence.repository.custom_repository.MongoSequenceRepository;
-import com.mongodb.BasicDBObject;
-import com.mongodb.BulkWriteOperation;
-import com.mongodb.DB;
+import com.mongodb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
