@@ -96,7 +96,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
     }
 
     private void updateProtectedDaysOffByOnceInAYear(){
-       /* if(LocalDate.now().equals(LocalDate.now().with(TemporalAdjusters.firstDayOfYear()))){
+        /*if(LocalDate.now().equals(LocalDate.now().with(TemporalAdjusters.firstDayOfYear()))){
             List<Activity> activities = activityMongoRepository.findAllBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF);
             List<BigInteger> activityIds = activities.stream().map(activity -> activity.getId()).collect(Collectors.toList());
             ZonedDateTime startDate = ZonedDateTime.now().minusYears(1).with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);

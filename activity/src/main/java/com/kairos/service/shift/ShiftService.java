@@ -144,8 +144,10 @@ public class ShiftService extends MongoBaseService {
     private ShiftViolatedRulesMongoRepository shiftViolatedRulesMongoRepository;
     @Inject
     private ShiftDetailsService shiftDetailsService;
-    @Inject private TodoService todoService;
-    @Inject private TodoRepository todoRepository;
+    @Inject
+    private TodoService todoService;
+    @Inject
+    private TodoRepository todoRepository;
 
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type ,ShiftActionType shiftActionType) {
