@@ -48,6 +48,15 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.publishedBalances = new HashMap<>();
     }
 
+    public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date,int contractualMinutes,int deltaTimeBankMinutes) {
+        this.employmentId = employmentId;
+        this.staffId = staffId;
+        this.date = date;
+        this.publishedBalances = new HashMap<>();
+        this.contractualMinutes = contractualMinutes;
+        this.deltaTimeBankMinutes = deltaTimeBankMinutes;
+    }
+
     public List<TimeBankCTADistribution> getTimeBankCTADistributionList() {
         return isNullOrElse(timeBankCTADistributionList,new ArrayList<>());
     }

@@ -245,7 +245,8 @@ public class CounterDistService extends MongoBaseService {
 
     public List<TabKPIDTO> filterTabKpiDate(List<TabKPIDTO> tabKPIDTOS) {
         Map<BigInteger, TabKPIDTO> filterResults = new LinkedHashMap<>();
-        tabKPIDTOS.stream().forEach(tabKPIDTO -> filterResults.put(tabKPIDTO.getKpi().getId(), tabKPIDTO));
+        tabKPIDTOS = tabKPIDTOS.stream().filter(tabKPIDTO -> isNotNull(tabKPIDTO.getKpi())).collect(Collectors.toList());
+        tabKPIDTOS.forEach(tabKPIDTO -> filterResults.put(tabKPIDTO.getKpi().getId(), tabKPIDTO));
         tabKPIDTOS.stream().forEach(tabKPIDTO -> {
             if (filterResults.get(tabKPIDTO.getKpi().getId()).getKpi().getId().equals(tabKPIDTO.getKpi().getId())) {
                 if (filterResults.get(tabKPIDTO.getKpi().getId()).getPriority() > tabKPIDTO.getPriority()) {
