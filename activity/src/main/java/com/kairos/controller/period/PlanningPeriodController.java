@@ -2,6 +2,7 @@ package com.kairos.controller.period;
 
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.service.period.PlanningPeriodService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +30,7 @@ public class PlanningPeriodController {
 
     @Inject
     PlanningPeriodService planningPeriodService;
+    @Inject private TimeBankService timeBankService;
 
     @ApiOperation(value = "Create Planning Period")
     @PostMapping(value="/period")
@@ -111,6 +113,5 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createJobOfPlanningPeriod());
 
     }
-    
 
 }

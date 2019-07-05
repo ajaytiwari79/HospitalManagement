@@ -674,8 +674,15 @@ public class StaffRetrievalService {
         Organization organization = organizationService.getOrganizationDetail(id, type);
         Long countryId = organization.isParentOrganization() ? organization.getCountry().getId() : organizationGraphRepository.getCountryByParentOrganization(organization.getId()).getId();
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(Arrays.asList(organization.getId()), TimeSlotType.SHIFT_PLANNING);
+        if(isCollectionEmpty(staffIds)){
+            Organization parentOrganization = organizationService.getParentOfOrganization(id);
+            staffIds = staffGraphRepository.getAllStaffIdsByOrganisationId(parentOrganization.getId());
+        }
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
+        if(isCollectionEmpty(employmentIds)){
+            employmentIds = employmentGraphRepository.getEmploymentIdsByStaffIds(staffIds);
+        }
         List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds, organization, countryId);
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
         Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get("dayTypeId") != null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.toList()));
@@ -698,8 +705,10 @@ public class StaffRetrievalService {
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOList = new ArrayList<>();
         for (StaffEmploymentDetails employmentDetail : employmentDetails) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoDTOMap.get(employmentDetail.getStaffId()),StaffAdditionalInfoDTO.class);
-            staffAdditionalInfoDTO.setEmployment(employmentDetail);
-            staffAdditionalInfoDTOList.add(staffAdditionalInfoDTO);
+            if(isNotNull(staffAdditionalInfoDTO)) {
+                staffAdditionalInfoDTO.setEmployment(employmentDetail);
+                staffAdditionalInfoDTOList.add(staffAdditionalInfoDTO);
+            }
         }
         return staffAdditionalInfoDTOList;
     }

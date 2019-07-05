@@ -23,3 +23,5 @@ db.shifts.find({}).forEach(function(e){
 });
 }
  });
+
+ db.shiftViolatedRules.createIndex({ draft:1,shiftId:1,deleted:1}, { unique: true });
