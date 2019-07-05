@@ -1,9 +1,11 @@
 package com.kairos.service.unit_settings;
 
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffDTO;
+import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.persistence.model.unit_settings.ProtectedDaysOff;
 import com.kairos.persistence.repository.unit_settings.ProtectedDaysOffRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ public class ProtectedDaysOffService extends MongoBaseService {
     private ProtectedDaysOffRepository protectedDaysOffRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
 
     public ProtectedDaysOffDTO saveProtectedDaysOff(Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         ProtectedDaysOffDTO protectedDaysOffDTO = new ProtectedDaysOffDTO(unitId, protectedDaysOffUnitSettings);
@@ -61,5 +65,11 @@ public class ProtectedDaysOffService extends MongoBaseService {
             protectedDaysOffDTOS.add(new ProtectedDaysOffDTO(protectedDaysOff.getId(),protectedDaysOff.getUnitId(),protectedDaysOff.getProtectedDaysOffUnitSettings()));
         });
         return protectedDaysOffDTOS;
+    }
+
+    public Boolean createAutoProtectedDaysOffOfAllUnits(Long countryId){
+        List<Long> units=userIntegrationService.getUnitIds(countryId);
+        units.forEach(unit->{ saveProtectedDaysOff(unit,ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);});
+        return true;
     }
 }
