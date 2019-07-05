@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.enums.DurationType;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.TimeTypes;
+import com.kairos.enums.*;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -15,10 +13,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;

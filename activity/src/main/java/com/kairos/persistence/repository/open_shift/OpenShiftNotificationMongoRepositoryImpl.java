@@ -15,8 +15,6 @@ import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 
-import static com.kairos.constants.ActivityMessagesConstants.OPENSHIFT;
-
 public class OpenShiftNotificationMongoRepositoryImpl implements CustomOpenShiftNotificationMongoRepository {
     @Inject private MongoTemplate mongoTemplate;
     @Override

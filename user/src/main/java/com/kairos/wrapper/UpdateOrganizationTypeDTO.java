@@ -1,9 +1,7 @@
 package com.kairos.wrapper;
 
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by prabjot on 9/11/17.

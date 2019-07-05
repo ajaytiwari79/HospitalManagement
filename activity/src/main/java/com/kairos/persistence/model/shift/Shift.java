@@ -1,28 +1,27 @@
 package com.kairos.persistence.model.shift;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * Created by vipul on 30/8/17.
  */
+@Getter
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "shifts")
 public class Shift extends MongoBaseEntity {
@@ -68,6 +67,8 @@ public class Shift extends MongoBaseEntity {
     private int scheduledMinutesOfPayout;
     private Shift draftShift;
     private boolean draft;
+    private RequestAbsence requestAbsence;
+    private List<ShiftActivity> breakActivities;
 
 
     public Shift() {
@@ -133,223 +134,20 @@ public class Shift extends MongoBaseEntity {
         this.shiftType=shiftType;
     }
 
-    public Long getStaffUserId() {
-        return staffUserId;
-    }
-
-    public void setStaffUserId(Long staffUserId) {
-        this.staffUserId = staffUserId;
-    }
-
-    public ShiftType getShiftType() {
-        return shiftType;
-    }
-
-    public void setShiftType(ShiftType shiftType) {
-        this.shiftType = shiftType;
-    }
-
-
-
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public int getScheduledMinutes() {
-        return scheduledMinutes;
-    }
-
-    public void setScheduledMinutes(int scheduledMinutes) {
-        this.scheduledMinutes = scheduledMinutes;
-    }
-
-    public List<ShiftActivity> getActivities() {
-        return activities;
+    public void setBreakActivities(List<ShiftActivity> breakActivities) {
+        this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
     }
 
     public void setActivities(List<ShiftActivity> activities) {
         activities = isNull(activities) ? new ArrayList<>() : activities;
-        activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        Collections.sort(activities);
         this.activities = activities;
     }
-    public Date getStartDate() {
-        return startDate;
-    }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public long getBid() {
-        return bid;
-    }
-
-    public void setBid(long bid) {
-        this.bid = bid;
-    }
-
-    public long getpId() {
-        return pId;
-    }
-
-    public void setpId(long pId) {
-        this.pId = pId;
-    }
-
-    public long getBonusTimeBank() {
-        return bonusTimeBank;
-    }
-
-    public void setBonusTimeBank(long bonusTimeBank) {
-        this.bonusTimeBank = bonusTimeBank;
-    }
-
-    public long getAmount() {
-        return amount;
-    }
-
-    public void setAmount(long amount) {
-        this.amount = amount;
-    }
-
-    public long getProbability() {
-        return probability;
-    }
-
-    public void setProbability(long probability) {
-        this.probability = probability;
-    }
-
-    public long getAccumulatedTimeBankInMinutes() {
-        return accumulatedTimeBankInMinutes;
-    }
-
-    public void setAccumulatedTimeBankInMinutes(long accumulatedTimeBankInMinutes) {
-        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
-    }
 
     public int getMinutes() {
         DateTimeInterval interval = getInterval();
         return isNotNull(interval) ? (int)interval.getMinutes() : 0;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public Integer getWeekCount() {
-        return weekCount;
-    }
-
-    public void setWeekCount(Integer weekCount) {
-        this.weekCount = weekCount;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
-
-    }
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
-
-    public BigInteger getParentOpenShiftId() {
-        return parentOpenShiftId;
-    }
-
-    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
-        this.parentOpenShiftId = parentOpenShiftId;
-    }
-
-    public BigInteger getCopiedFromShiftId() {
-        return copiedFromShiftId;
-    }
-
-    public void setCopiedFromShiftId(BigInteger copiedFromShiftId) {
-        this.copiedFromShiftId = copiedFromShiftId;
-    }
-
-    public boolean isSickShift() {
-        return sickShift;
-    }
-
-    public void setSickShift(boolean sickShift) {
-        this.sickShift = sickShift;
-    }
-
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-    public BigInteger getPlanningPeriodId() {
-        return planningPeriodId;
-    }
-
-    public void setPlanningPeriodId(BigInteger planningPeriodId) {
-        this.planningPeriodId = planningPeriodId;
-    }
-
-    public Long getFunctionId() {
-        return functionId;
-    }
-
-    public void setFunctionId(Long functionId) {
-        this.functionId = functionId;
     }
 
     @IgnoreLogging
@@ -358,71 +156,6 @@ public class Shift extends MongoBaseEntity {
             return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size() - 1).getEndDate().getTime());
         }
         return null;
-    }
-
-
-    public int getTimeBankCtaBonusMinutes() {
-        return timeBankCtaBonusMinutes;
-    }
-
-    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
-        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
-    }
-
-    public int getPlannedMinutesOfTimebank() {
-        return plannedMinutesOfTimebank;
-    }
-
-    public void setPlannedMinutesOfTimebank(int plannedMinutesOfTimebank) {
-        this.plannedMinutesOfTimebank = plannedMinutesOfTimebank;
-    }
-
-    public int getPlannedMinutesOfPayout() {
-        return plannedMinutesOfPayout;
-    }
-
-    public void setPlannedMinutesOfPayout(int plannedMinutesOfPayout) {
-        this.plannedMinutesOfPayout = plannedMinutesOfPayout;
-    }
-
-    public int getPayoutCtaBonusMinutes() {
-        return payoutCtaBonusMinutes;
-    }
-
-    public void setPayoutCtaBonusMinutes(int payoutCtaBonusMinutes) {
-        this.payoutCtaBonusMinutes = payoutCtaBonusMinutes;
-    }
-
-    public int getScheduledMinutesOfTimebank() {
-        return scheduledMinutesOfTimebank;
-    }
-
-    public void setScheduledMinutesOfTimebank(int scheduledMinutesOfTimebank) {
-        this.scheduledMinutesOfTimebank = scheduledMinutesOfTimebank;
-    }
-
-    public int getScheduledMinutesOfPayout() {
-        return scheduledMinutesOfPayout;
-    }
-
-    public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
-        this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
-    }
-
-    public Shift getDraftShift() {
-        return draftShift;
-    }
-
-    public void setDraftShift(Shift draftShift) {
-        this.draftShift = draftShift;
-    }
-
-    public boolean isDraft() {
-        return draft;
-    }
-
-    public void setDraft(boolean draft) {
-        this.draft = draft;
     }
 
     @Override

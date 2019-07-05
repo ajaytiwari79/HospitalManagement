@@ -28,7 +28,7 @@ public class ShiftActivityDTO {
     private String message;
     private boolean success;
     //This field is only for validation
-    //@JsonIgnore
+    @JsonIgnore
     private ActivityDTO activity;
     private BigInteger activityId;
     private Date startDate;
@@ -68,6 +68,7 @@ public class ShiftActivityDTO {
     private BigInteger thirdLevelTimeTypeId;
     private BigInteger fourthLevelTimeTypeId;
     private List<PlannedTime> plannedTimes;
+    private List<ShiftActivityDTO> childActivities = new ArrayList<>();
 
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = startDate;

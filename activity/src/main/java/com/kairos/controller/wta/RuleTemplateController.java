@@ -2,9 +2,7 @@ package com.kairos.controller.wta;
 
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
-import com.kairos.service.wta.RuleTemplateCategoryService;
-import com.kairos.service.wta.RuleTemplateService;
-import com.kairos.service.wta.WTABuilderService;
+import com.kairos.service.wta.*;
 import com.kairos.utils.response.ResponseHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +43,7 @@ public class RuleTemplateController {
     }
 
     @RequestMapping(value = COUNTRY_URL + "/rule_templates/{ruleTemplateId}", method = RequestMethod.PUT)
-    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId, @RequestBody WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO) {
+    ResponseEntity<Map<String, Object>> getRuleTemplate(@PathVariable Long countryId, @PathVariable BigInteger ruleTemplateId, @RequestBody @Valid WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO) {
         // WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = WTABuilderService.copyRuleTemplateMapToDTO(template);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.updateRuleTemplate(countryId, ruleTemplateId,wtaBaseRuleTemplateDTO));
     }

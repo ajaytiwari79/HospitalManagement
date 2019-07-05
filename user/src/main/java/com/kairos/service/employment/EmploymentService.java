@@ -14,7 +14,6 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -23,14 +22,9 @@ import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
-import com.kairos.persistence.model.staff.position.Position;
-import com.kairos.persistence.model.staff.position.PositionQueryResult;
-import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
+import com.kairos.persistence.model.staff.position.*;
 import com.kairos.persistence.model.user.employment.*;
-import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
-import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
-import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
+import com.kairos.persistence.model.user.employment.query_result.*;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
@@ -40,19 +34,16 @@ import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
-import com.kairos.persistence.repository.user.employment.EmploymentAndEmploymentTypeRelationShipGraphRepository;
-import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
-import com.kairos.persistence.repository.user.employment.EmploymentLineFunctionRelationShipGraphRepository;
+import com.kairos.persistence.repository.user.employment.*;
 import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
-import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.initial_time_bank_log.InitialTimeBankLogService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.PositionService;
@@ -75,10 +66,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -87,7 +75,6 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.UserMessagesConstants.EMPLOYMENT_ABSENT;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
@@ -151,6 +138,8 @@ public class EmploymentService {
     private EmploymentLineFunctionRelationShipGraphRepository employmentLineFunctionRelationRepository;
     @Inject
     private EnvConfig envConfig;
+    @Inject
+    private InitialTimeBankLogService initialTimeBankLogService;
 
 
     public PositionWrapper createEmployment(Long id, String type, EmploymentDTO employmentDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
@@ -185,6 +174,7 @@ public class EmploymentService {
             employment.setEmploymentSubType(EmploymentSubType.MAIN);
         }
         employmentGraphRepository.save(employment);
+        initialTimeBankLogService.saveInitialTimeBankLog(employment.getId(),employment.getAccumulatedTimebankMinutes());
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = assignCTAAndWTAToEmployment(employment, employmentDTO);
         Long reasonCodeId = updateEmploymentEndDate(parentOrganization, employmentDTO, position);
 
@@ -496,8 +486,7 @@ public class EmploymentService {
             employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getWta().get(0));
             employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(existingCtaWtaAndAccumulatedTimebankWrapper.getCta().get(0));
         }
-
-
+        initialTimeBankLogService.saveInitialTimeBankLog(oldEmployment.getId(),oldEmployment.getAccumulatedTimebankMinutes());
         Position position = positionService.updateEmploymentEndDate(oldEmployment.getUnit(), employmentDTO.getStaffId(),
                 employmentDTO.getEndDate() != null ? DateUtils.getDateFromEpoch(employmentDTO.getEndDate()) : null, employmentDTO.getReasonCodeId(), employmentDTO.getAccessGroupId());
         Long reasonCodeId = Optional.ofNullable(position.getReasonCode()).isPresent() ? position.getReasonCode().getId() : null;

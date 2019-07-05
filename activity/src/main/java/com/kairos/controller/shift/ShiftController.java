@@ -3,9 +3,9 @@ package com.kairos.controller.shift;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
-import com.kairos.enums.shift.ShiftActionType;
-import com.kairos.enums.shift.ShiftFilterParam;
-import com.kairos.enums.shift.ViewType;
+import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.enums.shift.*;
+import com.kairos.enums.todo.TodoType;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.*;
 import com.kairos.utils.response.ResponseHandler;
@@ -20,9 +20,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
@@ -52,6 +50,7 @@ public class ShiftController {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private ShiftStatusService shiftStatusService;
+    @Inject private RequestAbsenceService requestAbsenceService;
 
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
@@ -65,8 +64,13 @@ public class ShiftController {
     @ApiOperation("save Shift after validation")
     @PostMapping(value = "/shift/validated")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo, @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff, @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState, @RequestParam(required = false, value = "shiftAction") ShiftActionType shiftAction) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type, validatedByStaff, updateShiftState, unitId, shiftAction));
+    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long unitId, @RequestParam("type") String type,
+                                                                        @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo,
+                                                                        @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff,
+                                                                        @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState,
+                                                                        @RequestParam(required = false, value = "shiftAction") ShiftActionType shiftAction,
+                                                                        @RequestParam(required = false) TodoType todoType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type, validatedByStaff, updateShiftState, unitId, shiftAction,todoType));
     }
 
     @ApiOperation("update a Shift of a staff")
@@ -166,7 +170,7 @@ public class ShiftController {
     }
 
     @ApiOperation("Get shifts by staff/unit/expertise/date ")
-    @GetMapping(value = "/shifts")
+    @PostMapping(value = "/shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllShiftAndStates(@PathVariable Long unitId,
                                                                     @RequestParam(value = "employmentId", required = false) Long employmentId,
@@ -175,8 +179,8 @@ public class ShiftController {
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
                                                                     @RequestParam(value = "staffId", required = false) Long staffId,
                                                                     @RequestParam(value = "expertiseId", required = false) Long expertiseId,
-                                                                    @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam, expertiseId));
+                                                                    @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam,@RequestBody(required = false) StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getAllShiftAndStates(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam, expertiseId,staffFilterDTO));
     }
 
     @ApiOperation("Update planning period id in Shifts")
@@ -206,7 +210,21 @@ public class ShiftController {
                                                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
                                                               @RequestParam(value = "staffId", required = false) Long staffId,
                                                               @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam,
-                                                              @RequestParam(value = "shiftActionType") ShiftActionType shiftActionType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveAndCancelDraftShift(unitId, staffId, planningPeriodIds, startDate, endDate, employmentId, viewType, shiftFilterParam, shiftActionType));
+                                                              @RequestParam(value = "shiftActionType") ShiftActionType shiftActionType,@RequestBody(required = false) StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveAndCancelDraftShift(unitId, staffId, planningPeriodIds, startDate, endDate, employmentId, viewType, shiftFilterParam, shiftActionType,staffFilterDTO));
+    }
+
+    @ApiOperation("create request absence")
+    @PostMapping("/request_absence")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createRequestAbsence(@RequestBody @Valid RequestAbsenceDTO requestAbsenceDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, requestAbsenceService.createOrUpdateRequestAbsence(requestAbsenceDTO));
+    }
+
+    @ApiOperation("delete request absence")
+    @DeleteMapping("/request_absence")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createRequestAbsence(@RequestParam BigInteger shiftId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, requestAbsenceService.deleteRequestAbsence(shiftId));
     }
 }

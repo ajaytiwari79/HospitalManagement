@@ -5,7 +5,6 @@ package com.kairos.controller.counters;
  */
 
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
-import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;

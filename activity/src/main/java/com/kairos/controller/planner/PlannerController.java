@@ -1,14 +1,10 @@
 package com.kairos.controller.planner;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.kairos.dto.activity.task.BulkUpdateTaskDTO;
-import com.kairos.dto.activity.task.TaskDTO;
-import com.kairos.dto.activity.task.TaskRestrictionDto;
+import com.kairos.dto.activity.task.*;
 import com.kairos.enums.CitizenHealthStatus;
 import com.kairos.service.CustomTimeScaleService;
-import com.kairos.service.planner.PlannerService;
-import com.kairos.service.planner.TaskExceptionService;
-import com.kairos.service.planner.TasksMergingService;
+import com.kairos.service.planner.*;
 import com.kairos.service.task_type.TaskService;
 import com.kairos.service.visitator.VisitatorService;
 import com.kairos.utils.response.ResponseHandler;

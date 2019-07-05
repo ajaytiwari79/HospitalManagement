@@ -22,10 +22,8 @@ import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.persistence.model.activity.*;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityPriority;
-import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.open_shift.OrderAndActivityDTO;
@@ -39,10 +37,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.activity.ActivityPriorityService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.activity.PlannedTimeTypeService;
-import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.activity.*;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
@@ -53,10 +48,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.unit_settings.*;
 import com.kairos.service.wta.WTAService;
-import com.kairos.wrapper.activity.ActivityTabsWrapper;
-import com.kairos.wrapper.activity.ActivityTagDTO;
-import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
-import com.kairos.wrapper.activity.ActivityWithSelectedDTO;
+import com.kairos.wrapper.activity.*;
 import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +59,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -527,7 +518,7 @@ public class OrganizationActivityService extends MongoBaseService {
      * @date 5-10-2018
      */
     private void updateCompositeActivitiesIds(List<Activity> activities) {
-        Map<BigInteger, BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k -> k.getParentId(), v -> v.getId()));
+       /* Map<BigInteger, BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k -> k.getParentId(), v -> v.getId()));
         for (Activity activity : activities) {
             Iterator<CompositeActivity> compositeActivityIterator = activity.getCompositeActivities().iterator();
             while (compositeActivityIterator.hasNext()) {
@@ -546,7 +537,7 @@ public class OrganizationActivityService extends MongoBaseService {
                 activity.getChildActivityIds().remove(childActivityId);
             }
         }
-        save(activities);
+        save(activities);*/
     }
 
 
