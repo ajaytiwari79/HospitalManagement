@@ -81,6 +81,14 @@ public class ShiftActivityDTO {
         this.activityName = activityName;
         this.absenceReasonCodeId=absenceReasonCodeId;
     }
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, String message, boolean success){
+        this.activityName=activityName;
+        this.startDate=startDate;
+        this.endDate=endDate;
+        this.activityId=activityId;
+        this.message=message;
+        this.success=success;
+    }
 
     public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {
         this.message = message;
