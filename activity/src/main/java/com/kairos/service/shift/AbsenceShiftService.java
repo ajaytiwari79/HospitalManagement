@@ -1,21 +1,12 @@
 package com.kairos.service.shift;
 
-
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
+import com.kairos.commons.utils.*;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
-import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftType;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.activity.*;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -33,18 +24,14 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_NOTFOUND;
-import static com.kairos.constants.AppConstants.FULL_DAY_CALCULATION;
-import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
+import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 
 @Service
@@ -61,6 +48,7 @@ public class AbsenceShiftService {
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
     @Inject private ShiftStatusService shiftStatusService;
+
 
     public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean shiftOverlappedWithNonWorkingType , ShiftActionType shiftActionType) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
@@ -80,17 +68,17 @@ public class AbsenceShiftService {
                 newShiftDTO = calculateAverageShiftByActivity(shifts, activityWrapper.getActivity(),
                         staffAdditionalInfoDTO, absenceReasonCodeId,shiftDTO.getShiftDate());
             }
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), null);
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), newShiftDTO.getActivities().get(newShiftDTO.getActivities().size()-1).getEndDate());
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
             shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase,shiftOverlappedWithNonWorkingType , shiftActionType);
         } else {
-            shiftWithViolatedInfoDTO = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId);
+            shiftWithViolatedInfoDTO = getAverageOfShiftByActivity(staffAdditionalInfoDTO, activityWrapper.getActivity(), shiftDTO, absenceReasonCodeId,shiftActionType);
         }
         return shiftWithViolatedInfoDTO;
     }
 
-    private ShiftWithViolatedInfoDTO getAverageOfShiftByActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity, ShiftDTO shiftDTO, Long absenceReasonCodeId) {
+    private ShiftWithViolatedInfoDTO getAverageOfShiftByActivity(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity, ShiftDTO shiftDTO, Long absenceReasonCodeId, ShiftActionType shiftActionType) {
         Date fromDate = asDate(shiftDTO.getShiftDate());
         Date endDate = new DateTime(fromDate).withTimeAtStartOfDay().plusDays(8).toDate();
         Date startDate = new DateTime(fromDate).minusWeeks(activity.getTimeCalculationActivityTab().getHistoryDuration()).toDate();
@@ -124,7 +112,7 @@ public class AbsenceShiftService {
         shiftValidatorService.validateShifts(shiftDTOS);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO();
         if (!shiftDTOS.isEmpty()) {
-            shiftWithViolatedInfoDTO = saveShifts(activity, staffAdditionalInfoDTO, shiftDTOS);
+            shiftWithViolatedInfoDTO = saveShifts(activity, staffAdditionalInfoDTO, shiftDTOS,shiftActionType);
 
         }
         return shiftWithViolatedInfoDTO;
@@ -175,7 +163,7 @@ public class AbsenceShiftService {
         return shiftQueryResults;
     }
 
-    private ShiftWithViolatedInfoDTO saveShifts(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftDTO> shiftDTOS) {
+    private ShiftWithViolatedInfoDTO saveShifts(Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<ShiftDTO> shiftDTOS, ShiftActionType shiftActionType) {
         List<Shift> shifts = new ArrayList<>(shiftDTOS.size());
         Set<LocalDateTime> dates = shiftDTOS.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
         Map<Date, Phase> phaseMapByDate = phaseService.getPhasesByDates(shiftDTOS.get(0).getUnitId(), dates);
@@ -193,7 +181,7 @@ public class AbsenceShiftService {
         List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdAndBetweenDates(staffAdditionalInfoDTO.getUnitId(),startDate,endDate);
         for (ShiftDTO shiftDTO : shiftDTOS) {
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap,staffAdditionalInfoDTO,phaseMapByDate.get(shiftDTO.getStartDate()));
+            ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap);
             ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
             Shift shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
             Optional<PlanningPeriod> planningPeriodByShift = planningPeriods.stream().filter(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()),asDate(planningPeriod.getEndDate())).contains(shift.getStartDate()) || planningPeriod.getEndDate().equals(asLocalDate(shift.getStartDate()))).findAny();
@@ -202,7 +190,7 @@ public class AbsenceShiftService {
             }
             shift.setPlanningPeriodId(planningPeriodByShift.get().getId());
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
-            shiftStatusService.updateStatusOfShiftIfPhaseValid(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift,activityWrapperMap,staffAdditionalInfoDTO.getUserAccessRoleDTO());
+            shiftStatusService.updateStatusOfShiftIfPhaseValid(phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift,activityWrapperMap,staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftActionType);
             shifts.add(shift);
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());

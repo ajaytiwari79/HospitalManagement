@@ -1,11 +1,8 @@
 package com.kairos.response.dto.data_inventory;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.response.dto.common.RiskBasicResponseDTO;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 

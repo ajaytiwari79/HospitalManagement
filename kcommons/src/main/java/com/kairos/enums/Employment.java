@@ -2,9 +2,7 @@ package com.kairos.enums;
 
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 
 public enum Employment {
     STAFF_WITH_EMPLOYMENT("Staff with Employment"),

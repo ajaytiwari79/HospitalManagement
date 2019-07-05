@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.WTATemplateType;

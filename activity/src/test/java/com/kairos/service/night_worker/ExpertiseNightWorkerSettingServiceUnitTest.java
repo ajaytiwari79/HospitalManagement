@@ -10,10 +10,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -21,8 +18,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.math.BigInteger;
-
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ExpertiseNightWorkerSettingServiceUnitTest {

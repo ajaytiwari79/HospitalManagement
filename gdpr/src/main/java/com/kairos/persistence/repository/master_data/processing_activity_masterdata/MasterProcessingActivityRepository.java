@@ -2,9 +2,7 @@ package com.kairos.persistence.repository.master_data.processing_activity_master
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;

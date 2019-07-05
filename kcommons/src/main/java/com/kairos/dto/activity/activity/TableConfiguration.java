@@ -1,7 +1,6 @@
 package com.kairos.dto.activity.activity;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+
+import java.util.*;
 
 public class TableConfiguration {
 

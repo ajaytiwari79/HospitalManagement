@@ -7,10 +7,7 @@ import org.optaplanner.core.impl.heuristic.move.Move;
 import org.optaplanner.core.impl.heuristic.selector.move.factory.MoveIteratorFactory;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ActivityLineIntervalSwapMoveIteratorFactory implements MoveIteratorFactory<ShiftRequestPhasePlanningSolution> {
 

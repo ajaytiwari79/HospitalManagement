@@ -1,7 +1,6 @@
 package com.kairos.dto.activity.presence_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;

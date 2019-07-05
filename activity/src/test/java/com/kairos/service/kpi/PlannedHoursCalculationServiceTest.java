@@ -2,7 +2,6 @@ package com.kairos.service.kpi;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.service.counter.PlannedHoursCalculationService;
 import org.junit.Test;
@@ -12,9 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static junit.framework.TestCase.assertTrue;
 
