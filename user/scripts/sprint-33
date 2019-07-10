@@ -3,7 +3,7 @@
 MATCH (fg:FilterGroup{deleted:false})-[:APPLICABLE_FOR]-(ap:AccessPage) WHERE ap.moduleId in ["module_7","module_12"] DETACH delete fg
 
 //To create ["module_7"] specific filters
-CREATE (fg:FilterGroup{filterTypes:["EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS", "EXPERTISE","TIME_TYPE","ACTIVITY_TIMECALCULATION_TYPE"],deleted:false}) WITH fg
+CREATE (fg:FilterGroup{filterTypes:["EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS", "EXPERTISE","TIME_TYPE","ACTIVITY_TIMECALCULATION_TYPE","ACTIVITY_STATUS"],deleted:false}) WITH fg
 MATCH (ap:AccessPage) WHERE ap.moduleId in ["module_7"] WITH fg,ap
 CREATE UNIQUE (ap)-[:APPLICABLE_FOR]-(fg) return ap,fg;
 
