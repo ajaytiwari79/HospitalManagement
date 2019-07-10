@@ -217,6 +217,8 @@ public class AppConstants {
 
     //for use timeslot in timeslot kpi
     public static final String NIGHT = "Night";
+    public static final String EVENING = "Evening";
+    public static final String DAY = "Day";
 
     //Timebank Ruletemplate not valid reason
     public static final String DAYTYPE_IS_NOT_VALID = "Daytype is not valid";
