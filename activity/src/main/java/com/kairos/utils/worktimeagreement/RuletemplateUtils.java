@@ -299,7 +299,7 @@ public class RuletemplateUtils {
     }
 
     public static boolean isValid(MinMaxSetting minMaxSetting, int limitValue, int calculatedValue) {
-        return minMaxSetting.equals(MinMaxSetting.MINIMUM) ? limitValue <= calculatedValue : limitValue >= calculatedValue;
+        return minMaxSetting.equals(MinMaxSetting.MINIMUM) ? limitValue <= calculatedValue  : limitValue >= calculatedValue;
     }
 
     public static Set<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
