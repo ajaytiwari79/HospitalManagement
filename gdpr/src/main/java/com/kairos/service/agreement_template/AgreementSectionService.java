@@ -1,15 +1,12 @@
 package com.kairos.service.agreement_template;
 
-
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.agreement_template.AgreementSectionDTO;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateSectionDTO;
 import com.kairos.dto.gdpr.master_data.ClauseBasicDTO;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistence.model.clause.Clause;
-import com.kairos.persistence.model.clause.MasterClause;
-import com.kairos.persistence.model.clause.OrganizationClause;
+import com.kairos.persistence.model.clause.*;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.repository.agreement_template.AgreementSectionRepository;

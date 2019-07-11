@@ -1,9 +1,6 @@
 package com.kairos.dto.activity.wta.templates;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by pavan on 24/4/18.

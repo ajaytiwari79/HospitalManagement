@@ -1,6 +1,6 @@
 package com.kairos.controller.staff;
 
-import com.kairos.persistence.model.staff.StaffFilterDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.service.staff.StaffFilterService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;

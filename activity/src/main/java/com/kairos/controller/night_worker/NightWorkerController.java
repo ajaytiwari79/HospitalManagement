@@ -2,6 +2,7 @@ package com.kairos.controller.night_worker;
 
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
 import com.kairos.dto.activity.night_worker.QuestionnaireAnswerResponseDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -16,7 +17,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_V1;
+import static com.kairos.constants.ApiConstants.UNIT_URL;
 
 @RestController
 @RequestMapping(API_V1)
@@ -73,8 +75,8 @@ public class NightWorkerController {
     @ApiOperation(value = "get night worker details")
     @PostMapping(value = UNIT_URL+"/get_night_worker_details")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@RequestBody List<Long> staffIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,nightWorkerService.getStaffNightWorkerDetails(staffIds));
+    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@RequestBody StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,nightWorkerService.getFilteredStaffNightWorkerDetails(staffFilterDTO));
     }
 
 

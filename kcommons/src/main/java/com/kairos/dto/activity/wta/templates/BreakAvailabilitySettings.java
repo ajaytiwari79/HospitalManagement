@@ -4,49 +4,26 @@ package com.kairos.dto.activity.wta.templates;/*
  */
 
 import com.kairos.enums.wta.PartOfDay;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
+@Getter
+@Setter
 public class BreakAvailabilitySettings {
     private PartOfDay timeSlot;
     private short startAfterMinutes;
     private short endBeforeMinutes;
+    private short shiftPercentage;
 
     public BreakAvailabilitySettings() {
         //Default Constructor
     }
-    public BreakAvailabilitySettings( short startAfterMinutes, short endBeforeMinutes) {
 
-        this.startAfterMinutes = startAfterMinutes;
-        this.endBeforeMinutes = endBeforeMinutes;
-    }
     public BreakAvailabilitySettings(PartOfDay timeSlot, short startAfterMinutes, short endBeforeMinutes) {
         this.timeSlot = timeSlot;
         this.startAfterMinutes = startAfterMinutes;
-        this.endBeforeMinutes = endBeforeMinutes;
-    }
-
-    public PartOfDay getTimeSlot() {
-        return timeSlot;
-    }
-
-    public void setTimeSlot(PartOfDay timeSlot) {
-        this.timeSlot = timeSlot;
-    }
-
-    public short getStartAfterMinutes() {
-        return startAfterMinutes;
-    }
-
-    public void setStartAfterMinutes(short startAfterMinutes) {
-        this.startAfterMinutes = startAfterMinutes;
-    }
-
-    public short getEndBeforeMinutes() {
-        return endBeforeMinutes;
-    }
-
-    public void setEndBeforeMinutes(short endBeforeMinutes) {
         this.endBeforeMinutes = endBeforeMinutes;
     }
 

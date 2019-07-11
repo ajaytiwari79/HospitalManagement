@@ -1,12 +1,8 @@
 package com.kairos.utils.worktimeagreement;
 
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.TimeInterval;
+import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -27,9 +23,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
