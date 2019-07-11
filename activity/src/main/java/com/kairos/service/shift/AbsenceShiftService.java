@@ -28,8 +28,7 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_NOTFOUND;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
@@ -117,7 +116,15 @@ public class AbsenceShiftService {
         }
         return shiftWithViolatedInfoDTO;
     }
-
+    private Date convertStartAndEndDateSuitableForShift(DateTime dateTime){
+        int time=dateTime.getMinuteOfHour();
+        if(time % 15 > 7) {
+          dateTime = dateTime.plusMinutes(15 - (time % 15));
+        }else{
+           dateTime= dateTime.minusMinutes(time % 15);
+        }
+        return dateTime.toDate();
+    }
     private ShiftDTO calculateAverageShiftByActivity(List<ShiftDTO> shifts, Activity activity,
                                                      StaffAdditionalInfoDTO staffAdditionalInfoDTO, Long absenceReasonCodeId,LocalDate shiftDate) {
         int contractualMinutesInADay = staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes() / staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek();
@@ -132,8 +139,8 @@ public class AbsenceShiftService {
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes(startAverageMin) :
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes((activity.getTimeCalculationActivityTab().getDefaultStartTime().getHour() * 60) + activity.getTimeCalculationActivityTab().getDefaultStartTime().getMinute());
 
-        shiftActivity.setStartDate(startDateTime.toDate());
-        shiftActivity.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
+        shiftActivity.setStartDate(convertStartAndEndDateSuitableForShift(startDateTime));
+        shiftActivity.setEndDate(convertStartAndEndDateSuitableForShift(startDateTime.plusMinutes(contractualMinutesInADay)));
         shiftActivity.setActivityName(activity.getName());
         shiftActivity.setAbsenceReasonCodeId(absenceReasonCodeId);
 
