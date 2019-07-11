@@ -14,6 +14,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -118,19 +120,30 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
             shifts.add(infoWrapper.getShift());
             List<DateTimeInterval> intervals = getSortedIntervals(shifts);
-            if (intervals.size() > 2) {
+            if (intervals.size() > 0) {
                 count = getDayOFF(intervals,dateTimeInterval);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count-1);
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                         limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
             }
         }
     }
 
+    private List<DateTimeInterval> getSortedIntervals(List<ShiftWithActivityDTO> shifts) {
+        List<DateTimeInterval> intervals = new ArrayList<>();
+        for (ShiftWithActivityDTO s : sortShifts(shifts)) {
+            if(restingTimeAllowed){
+                intervals.add(new DateTimeInterval(s.getStartDate(),asDate(asZoneDateTime(s.getEndDate()).plusMinutes(s.getRestingMinutes()))));
+            }else {
+                intervals.add(s.getDateTimeInterval());
+            }
+        }
+        return intervals;
+    }
+
 
     private int getDayOFF(List<DateTimeInterval> intervals,DateTimeInterval dateTimeInterval){
-        int count = 0;
         List<DateTimeInterval> dayIntervals = getDaysIntervals(dateTimeInterval);
         Set<DateTimeInterval> overLapsIntervals = new HashSet<>();
         for (int i = 1; i < intervals.size(); i++) {
