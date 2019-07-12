@@ -31,6 +31,9 @@ public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger> {
     @Query(value = "{entityId:?0,deleted:false,type:?1,status:{$in:?2}}",delete = true)
     Long deleteByEntityIdAndTypeAndStatus(BigInteger entityId, TodoType todoType, Collection<TodoStatus> statuses);
 
+    @Query(value = "{entityId:?0,deleted:false,status:{$in:?1}}",delete = true)
+    Long deleteByEntityIdAndStatus(BigInteger entityId, Collection<TodoStatus> statuses);
+
     @Query(value = "{entityId:?0,deleted:false,type:?1,status:{$in:?2},subEntityId:?3}")
     Todo findAllByEntityIdAndSubEntityAndTypeAndStatus(BigInteger entityId, TodoType todoType, Collection<TodoStatus> statuses,BigInteger subEntityId);
 
