@@ -40,5 +40,9 @@ public class ProtectedDaysOffController {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, protectedDaysOffService.updateProtectedDaysOffByUnitId(unitId, protectedDaysOffDTO));
     }
 
-
+    @ApiOperation("create old unit protected days off ")
+    @PostMapping(COUNTRY_URL + "/protected_days_off")
+    public ResponseEntity<Map<String,Object>> createAutoProtectedDaysOffOfAllUnits(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, protectedDaysOffService.createAutoProtectedDaysOffOfAllUnits(countryId));
+    }
 }
