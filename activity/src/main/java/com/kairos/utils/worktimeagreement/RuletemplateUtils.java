@@ -2,6 +2,7 @@ package com.kairos.utils.worktimeagreement;
 
 import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
@@ -407,16 +408,11 @@ public class RuletemplateUtils {
     }
 
     public static DateTimeInterval getIntervalByWTACareDaysRuleTemplate(ShiftWithActivityDTO shift, WTAForCareDays wtaForCareDays) {
-        LocalDate shiftDate = DateUtils.asLocalDate(shift.getStartDate());
         Map<BigInteger, ActivityCareDayCount> careDayCountMap = wtaForCareDays.careDaysCountMap();
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             if (careDayCountMap.containsKey(shiftActivityDTO.getActivityId())) {
-                Optional<CutOffInterval> cutOffIntervalOptional = shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate)) && (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
-                if (cutOffIntervalOptional.isPresent()) {
-                    CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
-                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()), DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
-                }
+                dateTimeInterval = getCutoffInterval(shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffStartFrom(), shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffdayValue(),shift.getStartDate());
             }
         }
         return dateTimeInterval;
@@ -428,11 +424,43 @@ public class RuletemplateUtils {
         for (BigInteger activityId : activityIds) {
             if (activityWrapperMap.containsKey(activityId)) {
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
-                Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate)) && (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
-                if (cutOffIntervalOptional.isPresent()) {
-                    CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
-                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()), DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
+                dateTimeInterval = getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(),shiftStartDate);
+            }
+        }
+        return dateTimeInterval;
+    }
+
+    public static DateTimeInterval getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue,Date shiftStartDate) {
+        LocalDate startDate = dateFrom;
+        LocalDate endDate = startDate.plusYears(1);
+        DateTimeInterval dateTimeInterval = null;
+        if(startDate.isBefore(asLocalDate(shiftStartDate))) {
+            while (isNull(dateTimeInterval) || !dateTimeInterval.contains(shiftStartDate)) {
+                LocalDate nextEndDate = startDate;
+                switch (cutOffIntervalUnit) {
+                    case DAYS:
+                        nextEndDate = startDate.plusDays(dayValue - 1);
+                        break;
+                    case HALF_YEARLY:
+                        nextEndDate = startDate.plusMonths(6).minusDays(1);
+                        break;
+                    case WEEKS:
+                        nextEndDate = startDate.plusWeeks(1).minusDays(1);
+                        break;
+                    case MONTHS:
+                        nextEndDate = startDate.plusMonths(1).minusDays(1);
+                        break;
+                    case QUARTERS:
+                        nextEndDate = startDate.plusMonths(3).minusDays(1);
+                        break;
+                    case YEARS:
+                        nextEndDate = startDate.plusYears(1).minusDays(1);
+                        break;
+                    default:
+                        break;
                 }
+                dateTimeInterval = new DateTimeInterval(startDate, nextEndDate.plusDays(1));
+                startDate = nextEndDate.plusDays(1);
             }
         }
         return dateTimeInterval;
