@@ -52,6 +52,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
                     if (careDayCount.getCount() < (shifts.size()+1)) {
                         WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                 new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
+
                                         DurationType.DAYS,String.valueOf(careDayCount.getCount()));
                         infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         break;
