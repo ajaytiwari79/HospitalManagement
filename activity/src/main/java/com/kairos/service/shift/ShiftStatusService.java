@@ -108,7 +108,7 @@ public class ShiftStatusService {
 
             }
             shiftMongoRepository.saveEntities(shifts);
-            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
+                timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
         }
         wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
         return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);

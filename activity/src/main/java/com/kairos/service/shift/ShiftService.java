@@ -279,11 +279,11 @@ public class ShiftService extends MongoBaseService {
             shift.setDraftShift(draftShift);
             shift.setDraft(true);
         }
-        if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)){
-            shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
-            if(isNotNull(shift.getDraftShift())){
-                shift.getDraftShift().getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
+        if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
 
+            shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
+            if (isNotNull(shift.getDraftShift())) {
+                shift.getDraftShift().getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
             }
         }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
@@ -381,7 +381,7 @@ public class ShiftService extends MongoBaseService {
                 todo.setStatus(TodoStatus.APPROVE);
                 todoRepository.save(todo);
             }
-            todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED,staffAdditionalInfoDTO.getUserAccessRoleDTO(),isNotNull(shiftDTO.getId()));
+            todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, staffAdditionalInfoDTO.getUserAccessRoleDTO(), isNotNull(shiftDTO.getId()));
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
             if (isNull(shiftActionType) || ShiftActionType.SAVE.equals(shiftActionType)) {
                 payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
