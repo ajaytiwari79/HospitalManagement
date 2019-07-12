@@ -103,7 +103,13 @@ public class TodoService {
     }
 
     public Long deleteTodo(BigInteger shiftId,TodoType todoType){
-        return todoRepository.deleteByEntityIdAndTypeAndStatus(shiftId,todoType, newArrayList(PENDING, VIEWED,REQUESTED));
+        Long deletedCount;
+        if(isNotNull(todoType)){
+            deletedCount = todoRepository.deleteByEntityIdAndTypeAndStatus(shiftId,todoType, newArrayList(PENDING, VIEWED,REQUESTED));
+        }else {
+            deletedCount = todoRepository.deleteByEntityIdAndStatus(shiftId,newArrayList(PENDING, VIEWED,REQUESTED));
+        }
+        return deletedCount;
     }
 
     private List<Todo> createTodoForActivityApproval(Shift shift, List<Activity> activities) {

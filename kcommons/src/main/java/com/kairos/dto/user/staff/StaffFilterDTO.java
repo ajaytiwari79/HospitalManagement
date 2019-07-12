@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import lombok.*;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class StaffFilterDTO {
     private String searchText;
     private String name;
     private List<Long> staffIds;
+    private List<BigInteger> planningPeriodIds;
 
     public void setFiltersData(List<FilterSelectionDTO> filtersData) {
         this.filtersData = isNullOrElse(filtersData,new ArrayList<>());
