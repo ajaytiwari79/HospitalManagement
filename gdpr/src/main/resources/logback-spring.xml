@@ -33,7 +33,7 @@
                 <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
             </rollingPolicy>
         </appender>
-        <root level="INFO">
+        <root level="INFO,DEBUG" class="com.kairos">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ROLLING-FILE"/>
         </root>
