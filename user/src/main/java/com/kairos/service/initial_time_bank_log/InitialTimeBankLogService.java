@@ -35,9 +35,10 @@ public class InitialTimeBankLogService {
         Long previousInitialBalanceInMinutes = 0L;
         if(previousInitialTimeBankLogs.size() > 0){
             previousInitialBalanceInMinutes=previousInitialTimeBankLogs.get(0).getUpdatedInitialBalanceInMinutes();
-        }
-        if(previousInitialBalanceInMinutes == updatedInitialBalanceInMinutes){
-            return false;
+
+            if(previousInitialBalanceInMinutes == updatedInitialBalanceInMinutes){
+                return false;
+            }
         }
         InitialTimeBankLog initialTimeBankLog = new InitialTimeBankLog(employmentId,previousInitialBalanceInMinutes,updatedInitialBalanceInMinutes);
         initialTimeBankLogRepository.save(initialTimeBankLog);
