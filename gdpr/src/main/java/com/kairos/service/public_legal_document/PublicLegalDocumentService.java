@@ -26,7 +26,11 @@ public class PublicLegalDocumentService {
     private ExceptionService exceptionService;
 
     public PublicLegalDocumentDTO createPublicLegalDocument(PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        PublicLegalDocument publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
+        PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameAndDeletedFalse(publicLegalDocumentDTO.getName());
+        if (Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
+            exceptionService.duplicateDataException("Duplicate Name ", publicLegalDocumentDTO.getName());
+        }
+        publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
         publicLegalDocumentRepository.save(publicLegalDocument);
         publicLegalDocumentDTO.setId(publicLegalDocument.getId());
         return publicLegalDocumentDTO;
