@@ -227,4 +227,10 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> createRequestAbsence(@RequestParam BigInteger shiftId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, requestAbsenceService.deleteRequestAbsence(shiftId));
     }
+
+    @ApiOperation("get shift count")
+    @GetMapping("employment/{employmentId}/shift_count")
+    public ResponseEntity<Map<String, Object>> getShiftCount(@PathVariable Long employmentId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftCount(employmentId));
+    }
 }

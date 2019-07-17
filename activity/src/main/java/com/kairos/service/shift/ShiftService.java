@@ -1187,4 +1187,9 @@ public class ShiftService extends MongoBaseService {
         Set<BigInteger> updatedViolatedRuleTemplateIds = updatedShiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().stream().map(WorkTimeAgreementRuleViolation::getRuleTemplateId).collect(Collectors.toSet());
         return violatedRuleTemplateIds.equals(updatedViolatedRuleTemplateIds);
     }
+
+    public Long getShiftCount(Long EmploymentId){
+        Long count= shiftMongoRepository.countShiftsByEmploymentId(EmploymentId);
+        return count;
+    }
 }
