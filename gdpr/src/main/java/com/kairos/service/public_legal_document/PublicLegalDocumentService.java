@@ -27,7 +27,7 @@ public class PublicLegalDocumentService {
 
     public PublicLegalDocumentDTO createPublicLegalDocument(PublicLegalDocumentDTO publicLegalDocumentDTO) {
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameAndDeletedFalse(publicLegalDocumentDTO.getName());
-        if (Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
+        if (Optional.ofNullable(publicLegalDocument).isPresent()) {
             exceptionService.duplicateDataException("Duplicate Name ", publicLegalDocumentDTO.getName());
         }
         publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
@@ -73,14 +73,20 @@ public class PublicLegalDocumentService {
     }
 
     public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId,PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
-        if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
+        PublicLegalDocument oldPublicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
+        if (!Optional.ofNullable(oldPublicLegalDocument).isPresent() || oldPublicLegalDocument.isDeleted()) {
             exceptionService.dataNotFoundByIdException("Data Not Found", publicLegalDocumentId);
         }
+        if(!oldPublicLegalDocument.getName().equals(publicLegalDocumentDTO.getName())){
+            PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameAndDeletedFalse(publicLegalDocumentDTO.getName());
+            if (Optional.ofNullable(publicLegalDocument).isPresent()) {
+                exceptionService.duplicateDataException("Duplicate Name ", publicLegalDocumentDTO.getName());
+            }
+        }
         publicLegalDocumentDTO.setId(publicLegalDocumentId);
-        if(publicLegalDocumentDTO.getName() != null)publicLegalDocument.setName(publicLegalDocumentDTO.getName());
-        if(publicLegalDocumentDTO.getBodyContentInHtml() != null)publicLegalDocument.setBodyContentInHtml(publicLegalDocumentDTO.getBodyContentInHtml());
-        publicLegalDocumentRepository.save(publicLegalDocument);
+        if(publicLegalDocumentDTO.getName() != null)oldPublicLegalDocument.setName(publicLegalDocumentDTO.getName());
+        if(publicLegalDocumentDTO.getBodyContentInHtml() != null)oldPublicLegalDocument.setBodyContentInHtml(publicLegalDocumentDTO.getBodyContentInHtml());
+        publicLegalDocumentRepository.save(oldPublicLegalDocument);
         return publicLegalDocumentDTO;
     }
 
