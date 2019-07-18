@@ -417,8 +417,10 @@ public class TimeBankService{
                     timeBankCtaBonusMinutes += shiftActivity.getTimeBankCtaBonusMinutes();
                     plannedMinutesOfTimebank += shiftActivity.getPlannedMinutesOfTimebank();
                     timeBankScheduledMinutes+=shiftActivity.getScheduledMinutesOfTimebank();
-                    for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
-                        updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, childActivity);
+                    if(Optional.ofNullable(shiftActivity.getChildActivities()).isPresent()) {
+                        for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
+                            updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, childActivity);
+                        }
                     }
                 }
                 shift.setScheduledMinutesOfTimebank(timeBankScheduledMinutes);
