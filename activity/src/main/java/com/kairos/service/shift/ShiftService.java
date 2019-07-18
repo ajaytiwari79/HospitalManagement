@@ -336,6 +336,7 @@ public class ShiftService extends MongoBaseService {
             shift.setDurationMinutes(durationMinutes);
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
+            shiftDetailsService.addPlannedTimeInShift(shift,activityWrapperMap,staffAdditionalInfoDTO);
         }
         shiftMongoRepository.saveEntities(shifts);
         shifts.forEach(shift -> updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO));
@@ -628,6 +629,7 @@ public class ShiftService extends MongoBaseService {
                 if(isNull(shift.getDraftShift())){
                     payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
                     timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
+                    shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class);
                     shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
                 }
                 // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
