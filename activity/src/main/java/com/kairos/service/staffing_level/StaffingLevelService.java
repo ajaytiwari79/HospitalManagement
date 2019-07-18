@@ -729,7 +729,7 @@ public class StaffingLevelService extends MongoBaseService {
     private void updateStaffingLevelInterval(int durationMinutes,StaffingLevel staffingLevel, ShiftActivity shiftActivity,Map<BigInteger,BigInteger> childAndParentActivityIdMap) {
         for (StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()) {
             Date startDate = getDateByLocalTime(staffingLevel.getCurrentDate(),staffingLevelInterval.getStaffingLevelDuration().getFrom());
-            Date endDate = getDateByLocalTime(staffingLevel.getCurrentDate(),staffingLevelInterval.getStaffingLevelDuration().getTo());
+            Date endDate = staffingLevelInterval.getStaffingLevelDuration().getFrom().isAfter(staffingLevelInterval.getStaffingLevelDuration().getTo()) ? asDate(asLocalDate(staffingLevel.getCurrentDate()).plusDays(1)) : getDateByLocalTime(staffingLevel.getCurrentDate(),staffingLevelInterval.getStaffingLevelDuration().getTo());
             DateTimeInterval interval = new DateTimeInterval(startDate,endDate);
             updateShiftActivityStaffingLevel(durationMinutes, shiftActivity, staffingLevelInterval, interval);
             for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
