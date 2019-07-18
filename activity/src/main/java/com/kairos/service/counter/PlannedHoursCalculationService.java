@@ -53,7 +53,7 @@ public class PlannedHoursCalculationService implements CounterService {
     private ShiftMongoRepository shiftMongoRepository;
 
 
-    private double getPlannedHoursOfStaff(List<Shift> shifts) {
+    public double getPlannedHoursOfStaff(List<Shift> shifts) {
         long plannedHours = 0l;
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -149,7 +149,7 @@ public class PlannedHoursCalculationService implements CounterService {
         return verifyKPIResponseData(staffplannedHours) ? staffplannedHours : new HashMap<>();
     }
 
-    private Map<Object, Double> getStaffPlannedHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType) {
+    public Map<Object, Double> getStaffPlannedHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType) {
         Map<Object, Double> staffplannedHours = new HashMap<>();
         Double plannedHours;
         Map<Long, List<Shift>> staffShiftMapping;
@@ -166,7 +166,7 @@ public class PlannedHoursCalculationService implements CounterService {
         return staffplannedHours;
     }
 
-    private Map<Object, Double> getStaffPlannedHoursByRepresentTotalData(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts, Double plannedHours) {
+    public Map<Object, Double> getStaffPlannedHoursByRepresentTotalData(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts, Double plannedHours) {
         Map<Object, Double> staffplannedHours = new HashMap<>();
         Map<Long, List<Shift>> staffShiftMapping;
         staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));

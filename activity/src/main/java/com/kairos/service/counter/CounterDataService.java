@@ -123,7 +123,7 @@ public class CounterDataService extends MongoBaseService {
         List<CommonRepresentationData> kpisData = new ArrayList();
         for (Future<CommonRepresentationData> data : kpiResults) {
             try {
-                kpisData.add(data.get());
+                if(isNotNull(data))kpisData.add(data.get());
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             } catch (ExecutionException ex) {
@@ -220,6 +220,12 @@ public class CounterDataService extends MongoBaseService {
             getStaffDefaultData(criteriaList, defaultKpiDataDTO);
         }
         if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_STATUS)) {
+            getActivityStatusDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.STAFF_LIST)) {
+            getActivityStatusDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.UNIT_NAME)) {
             getActivityStatusDefaultData(criteriaList);
         }
         if (kpi.getFilterTypes().contains(FilterType.DAYS_OF_WEEK)) {

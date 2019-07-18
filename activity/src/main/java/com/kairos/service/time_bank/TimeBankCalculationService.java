@@ -264,6 +264,16 @@ public class TimeBankCalculationService {
         return contractualMinutes;
     }
 
+    public int getDeltaTimebankByDate(Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap,Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate, List<EmploymentLinesDTO> employmentLines){
+        int deltaTimebank = 0;
+        if(dateDailyTimeBankEntryMap.containsKey(localDate)){
+            deltaTimebank+=dateDailyTimeBankEntryMap.get(localDate).getDeltaTimeBankMinutes();
+        }else {
+            deltaTimebank+=(-getContractualMinutesByDate(planningPeriodIntervals, localDate, employmentLines));
+        }
+        return deltaTimebank;
+    }
+
     public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails) {
         if(shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
             exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, shiftActivity.getActivityName());
