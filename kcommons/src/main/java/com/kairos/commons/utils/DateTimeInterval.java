@@ -57,7 +57,7 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
 
     public void checkInterval(){
         if(this.start>this.end){
-            throw new IllegalArgumentException("The end instant must be greater than the start instant");
+            //throw new IllegalArgumentException("The end instant must be greater than the start instant");
         }
     }
 
