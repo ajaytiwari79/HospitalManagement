@@ -166,6 +166,7 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         dailyTimeBankEntry.setScheduledMinutesOfTimeBank(0);
         dailyTimeBankEntry.setDeltaTimeBankMinutes(-contractualMinutes);
+        dailyTimeBankEntry.setPublishedSomeActivities(false);
         dailyTimeBankEntry.setTimeBankCTADistributionList(new ArrayList<>());
     }
 

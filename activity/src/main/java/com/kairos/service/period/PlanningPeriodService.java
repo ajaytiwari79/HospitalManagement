@@ -791,9 +791,8 @@ public class PlanningPeriodService extends MongoBaseService {
                 }
             }
             shiftMongoRepository.saveEntities(shifts);
-            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
+            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts,planningPeriod);
             LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
-
         }
     }
 }
