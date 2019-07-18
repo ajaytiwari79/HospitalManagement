@@ -1,0 +1,6 @@
+//Script for Set unionRepresentative=false for All Expertise And All Units
+
+MATCH (organization:Organization)-[: HAS_POSITIONS ]-(position:Position)-[: BELONGS_TO ]-(staff:Staff)
+MATCH (staff)-[rel: STAFF_HAS_EXPERTISE]->(expertise:Expertise) WHERE rel.unionRepresentative
+SET rel.unionRepresentative=false
+RETURN count(rel)

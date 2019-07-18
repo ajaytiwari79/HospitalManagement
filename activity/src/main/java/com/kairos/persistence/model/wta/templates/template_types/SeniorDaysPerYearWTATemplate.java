@@ -71,13 +71,20 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                 int leaveCount = careDays.getLeavesAllowed();
 
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
-                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
-                if (leaveCount < (shifts.size()+1)) {
-                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
-                            new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
-                                    DurationType.DAYS,String.valueOf(leaveCount));
-                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                if(isNotNull(dateTimeInterval)){
+                    List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
+                    if (leaveCount < (shifts.size()+1)) {
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
+                                new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
+                                        DurationType.DAYS,String.valueOf(leaveCount));
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                    }
                 }
+            }else {
+                WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
+                        new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
+                                DurationType.DAYS,String.valueOf(0));
+                infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
             }
         }
     }

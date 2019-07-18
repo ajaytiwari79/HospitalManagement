@@ -99,9 +99,11 @@ public class CounterDataService extends MongoBaseService {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
         }
         for (BigInteger kpiId : filters.getKpiIds()) {
-            Callable<CommonRepresentationData> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId),kpiIdAndApplicableKPIMap.get(kpiId));
-            Future<CommonRepresentationData> responseData = executorService.submit(data);
-            kpiResults.add(responseData);
+            if(kpiIdAndApplicableKPIMap.containsKey(kpiId)) {
+                Callable<CommonRepresentationData> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
+                Future<CommonRepresentationData> responseData = executorService.submit(data);
+                kpiResults.add(responseData);
+            }
         }
         List<CommonRepresentationData> kpisData = new ArrayList();
         for (Future<CommonRepresentationData> data : kpiResults) {
