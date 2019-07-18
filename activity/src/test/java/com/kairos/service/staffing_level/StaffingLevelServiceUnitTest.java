@@ -28,9 +28,9 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
-@RunWith(MockitoJUnitRunner.class)
+//@RunWith(MockitoJUnitRunner.class)
 public class StaffingLevelServiceUnitTest {
-    @InjectMocks
+  /*  @InjectMocks
     private StaffingLevelService staffingLevelService;
 
     //mocking all dependency
@@ -70,6 +70,6 @@ public class StaffingLevelServiceUnitTest {
     @After
     public void tearDown() throws Exception {
 
-    }
+    }*/
 
 }
