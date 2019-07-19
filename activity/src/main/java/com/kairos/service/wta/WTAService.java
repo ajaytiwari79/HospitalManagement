@@ -56,8 +56,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
@@ -470,9 +469,9 @@ public class WTAService extends MongoBaseService {
 
     }
 
-    public WTAResponseDTO getWTAOfEmployment(Long employmentId) {
-        WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getWTAByEmploymentIdAndDate(employmentId, new Date());
-        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
+    public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
     }
 
 
