@@ -328,7 +328,10 @@ public class ShiftValidatorService {
             expertiseNightWorkerSetting =expertiseNightWorkerSettingRepository.findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
         }
         DailyTimeBankEntry dailyTimeBankEntry = timeBankService.renewDailyTimeBank(staffAdditionalInfoDTO, ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class), false,false);
-        long expectedTimebank = timeBankByDateDTOMap.get(asLocalDate(shift.getStartDate())).getExpectedTimebankMinutes() + dailyTimeBankEntry.getDeltaTimeBankMinutes();
+        long expectedTimebank = timeBankByDateDTOMap.get(asLocalDate(shift.getStartDate())).getExpectedTimebankMinutes();
+        if(isNotNull(dailyTimeBankEntry)){
+            expectedTimebank+= dailyTimeBankEntry.getDeltaTimeBankMinutes();
+        }
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(shift.getStaffId());
         staffAdditionalInfoDTO.setStaffAge(getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(), asLocalDate(shift.getStartDate())));
         return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUserAccessRoleDTO(),expectedTimebank , activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting,nightWorker.isNightWorker());
