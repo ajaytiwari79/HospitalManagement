@@ -282,7 +282,7 @@ public class NightWorkerService {
     }
 
     public Map[] getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
-        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = getExpertiseSettingMap(employmentAndExpertiseIdMap);
+        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = getMapOfExpetiseNightWorkerSetting(employmentAndExpertiseIdMap.values());
         Map<Long, Boolean> staffIdAndNightWorkerMap = new HashMap<>();
         Map<Long, Boolean> employementIdAndNightWorkerMap = new HashMap<>();
         for (Map.Entry<Long, Long> employmentAndExpertiseIdEntry : employmentAndExpertiseIdMap.entrySet()) {
@@ -307,14 +307,15 @@ public class NightWorkerService {
         return new Map[]{staffIdAndNightWorkerMap,employementIdAndNightWorkerMap};
     }
 
-    public Map<Long, ExpertiseNightWorkerSetting> getExpertiseSettingMap(Map<Long, Long> employmentAndExpertiseIdMap){
-        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = new HashMap<>();
-        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(employmentAndExpertiseIdMap.values());
-        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettingsByCountry = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfCountry(employmentAndExpertiseIdMap.values());
-        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingUnitMap = expertiseNightWorkerSettings.stream().collect(Collectors.toMap(ExpertiseNightWorkerSetting::getExpertiseId, v -> v));
-        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingCountryMap = expertiseNightWorkerSettingsByCountry.stream().collect(Collectors.toMap(ExpertiseNightWorkerSetting::getExpertiseId, v -> v));
-        for (Map.Entry<Long, Long> employmentAndExpertiseIdEntry : employmentAndExpertiseIdMap.entrySet()) {
-            expertiseNightWorkerSettingMap.put(employmentAndExpertiseIdEntry.getValue(),expertiseNightWorkerSettingUnitMap.getOrDefault(employmentAndExpertiseIdEntry.getValue(),expertiseNightWorkerSettingCountryMap.get(employmentAndExpertiseIdEntry.getValue())));
+    private Map<Long,ExpertiseNightWorkerSetting> getMapOfExpetiseNightWorkerSetting(Collection<Long> expertiseIds){
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(expertiseIds);
+        Map<Long,ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = new HashMap<>();
+        for (ExpertiseNightWorkerSetting expertiseNightWorkerSetting : expertiseNightWorkerSettings) {
+            if(isNotNull(expertiseNightWorkerSetting.getUnitId())){
+                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
+            }else if(!expertiseNightWorkerSettingMap.containsKey(expertiseNightWorkerSetting.getExpertiseId())){
+                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
+            }
         }
         return expertiseNightWorkerSettingMap;
     }
