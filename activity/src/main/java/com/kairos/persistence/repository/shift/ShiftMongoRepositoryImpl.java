@@ -588,6 +588,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     private List<AggregationOperation> getShiftWithActivityAggregationOperations(Criteria criteria, boolean replaceDraftShift, String[] shiftProjection) {
         List<AggregationOperation> aggregationOperations = newArrayList(match(criteria));
         if(replaceDraftShift){
+            aggregationOperations.add(new CustomAggregationOperation(Document.parse("{\n" +
+                    "  $addFields: {\n" +
+                    "       \"draftShift._id\": \"$_id\",\n" +
+                    "        \"draftShift.draft\": \"$draft\"\n" +
+                    "     }}")));
             aggregationOperations.add(replaceRoot("draftShift"));
         }
         if(shiftProjection.length>0){

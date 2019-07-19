@@ -200,7 +200,7 @@ public class StaffDTO {
         this.active = active;
     }
 
-    public long getInactiveFrom() {
+    public Long getInactiveFrom() {
         return inactiveFrom;
     }
 

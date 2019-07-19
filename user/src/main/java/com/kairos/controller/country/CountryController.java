@@ -425,5 +425,12 @@ public class CountryController {
 
     }
 
+    @ApiOperation(value = "get all units of Country")
+    @GetMapping(value = COUNTRY_URL + "/get_all_units")
+    public ResponseEntity<Map<String, Object>> getAllUnits(@PathVariable long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getAllUnits(countryId));
+
+    }
+
 }
 

@@ -188,9 +188,9 @@ public class WTAController {
 
     @ApiOperation(value = "assign wta and cta to employment on employment creation")
     @PostMapping(value =  UNIT_URL + "/employment/{employmentId}/wta/{wtaId}/cta/{ctaId}")
-    public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId, @PathVariable BigInteger wtaId, @PathVariable BigInteger ctaId,
+    public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId,@PathVariable Long unitId, @PathVariable BigInteger wtaId, @PathVariable BigInteger ctaId,
                                                                         @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,wtaId,ctaId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,unitId,wtaId,ctaId,startDate));
     }
 
     @ApiOperation(value = "get wta of employment")
@@ -240,13 +240,13 @@ public class WTAController {
 
     @ApiOperation(value = "assign wta and cta to employment")
     @PostMapping(value =  UNIT_URL + "/employment/{employmentId}/apply_cta_wta")
-    public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId,
+    public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId,@PathVariable Long unitId,
                                                                         @RequestParam(value = "wtaId",required = false)  BigInteger wtaId,
                                                                         @RequestParam(value = "oldwtaId",required = false)  BigInteger oldwtaId,
                                                                         @RequestParam(value = "ctaId",required = false)   BigInteger ctaId,
                                                                         @RequestParam(value = "oldctaId",required = false)   BigInteger oldctaId,
                                                                         @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,unitId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
     }
 
 

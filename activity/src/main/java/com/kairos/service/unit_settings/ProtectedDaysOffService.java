@@ -1,7 +1,6 @@
 package com.kairos.service.unit_settings;
 
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffDTO;
-import com.kairos.dto.user.country.day_type.PublicHoliday;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
@@ -10,6 +9,7 @@ import com.kairos.persistence.model.unit_settings.ProtectedDaysOff;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ProtectedDaysOffRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,8 @@ public class ProtectedDaysOffService extends MongoBaseService {
     private ProtectedDaysOffRepository protectedDaysOffRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
 
@@ -74,6 +76,12 @@ public class ProtectedDaysOffService extends MongoBaseService {
             protectedDaysOffDTOS.add(new ProtectedDaysOffDTO(protectedDaysOff.getId(),protectedDaysOff.getUnitId(),protectedDaysOff.getProtectedDaysOffUnitSettings()));
         });
         return protectedDaysOffDTOS;
+    }
+
+    public Boolean createAutoProtectedDaysOffOfAllUnits(Long countryId){
+        List<Long> units=userIntegrationService.getUnitIds(countryId);
+        units.forEach(unit->{ saveProtectedDaysOff(unit,ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);});
+        return true;
     }
 
     public void updateProtectedDaysOffDetails(){

@@ -283,7 +283,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
     @Query("MATCH (n:AccessPage) -[:SUB_PAGE *]->(subPages:AccessPage{active:true,kpiEnabled:true}) WHERE n.moduleId={0} RETURN subPages")
     List<AccessPage> getKPITabsList(String moduleId);
 
-    @Query("MATCH(accessPage:AccessPage)-[rel:"+ ACCESS_PAGE_HAS_LANGUAGE +"]->(language:SystemLanguage{deleted:false}) WHERE accessPage.moduleId={0} AND id(language)={1} " +
+    @Query("MATCH(accessPage:AccessPage)-[rel:"+ ACCESS_PAGE_HAS_LANGUAGE +"]->(language:SystemLanguage{deleted:false}) WHERE accessPage.moduleId={0} AND id(language)={1} AND exists(rel.creationDate) " +
             "RETURN rel.description as description, id(rel) as id, rel.languageId as languageId, rel.moduleId as moduleId order by rel.creationDate DESC limit 1")
     AccessPageLanguageDTO findLanguageSpecificDataByModuleIdAndLanguageId(String moduleId, Long languageId);
 
