@@ -26,9 +26,13 @@ public class PublicLegalDocumentService {
     private ExceptionService exceptionService;
 
     public PublicLegalDocumentDTO createPublicLegalDocument(PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameAndDeletedFalse(publicLegalDocumentDTO.getName());
+        publicLegalDocumentDTO.setName(publicLegalDocumentDTO.getName().trim());
+        if(publicLegalDocumentDTO.getName().equals("")){
+            exceptionService.illegalArgumentException("message.enter.valid.data");
+        }
+        PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
         if (Optional.ofNullable(publicLegalDocument).isPresent()) {
-            exceptionService.duplicateDataException("Duplicate Name ", publicLegalDocumentDTO.getName());
+            exceptionService.duplicateDataException("message.duplicate","Public Legal Document",publicLegalDocument.getName());
         }
         publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
         publicLegalDocumentRepository.save(publicLegalDocument);
@@ -73,14 +77,15 @@ public class PublicLegalDocumentService {
     }
 
     public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId,PublicLegalDocumentDTO publicLegalDocumentDTO) {
+        publicLegalDocumentDTO.setName(publicLegalDocumentDTO.getName().trim());
         PublicLegalDocument oldPublicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
         if (!Optional.ofNullable(oldPublicLegalDocument).isPresent()) {
-            exceptionService.dataNotFoundByIdException("Data Not Found", publicLegalDocumentId);
+            exceptionService.dataNotFoundByIdException("message.enter.valid.data");
         }
-        if(!oldPublicLegalDocument.getName().equals(publicLegalDocumentDTO.getName())){
-            PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameAndDeletedFalse(publicLegalDocumentDTO.getName());
+        if(!oldPublicLegalDocument.getName().equalsIgnoreCase(publicLegalDocumentDTO.getName())){
+            PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
             if (Optional.ofNullable(publicLegalDocument).isPresent()) {
-                exceptionService.duplicateDataException("Duplicate Name ", publicLegalDocumentDTO.getName());
+                exceptionService.duplicateDataException("message.duplicate","Public Legal Document",publicLegalDocument.getName());
             }
         }
         publicLegalDocumentDTO.setId(publicLegalDocumentId);
