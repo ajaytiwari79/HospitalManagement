@@ -30,6 +30,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
 
@@ -151,8 +153,12 @@ public class ActivityIntegrationService {
         });
     }
 
-    public Map<Long,Boolean> getNightWorkerDetails(StaffFilterDTO staffFilterDTO, Long unitId) {
-        return genericRestClient.publishRequest(staffFilterDTO, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
+    public Map<Long,Boolean> getNightWorkerDetails(StaffFilterDTO staffFilterDTO, Long unitId,LocalDate startDate,LocalDate endDate) {
+        List<NameValuePair> param = null;
+        if(isNotNull(startDate) && isNotNull(endDate)) {
+            param = newArrayList(new BasicNameValuePair("startDate", startDate.toString()), new BasicNameValuePair("endDate", endDate.toString()));
+        }
+        return genericRestClient.publishRequest(staffFilterDTO, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
         });
     }
 
