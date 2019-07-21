@@ -161,4 +161,10 @@ public class TodoService {
         }
         return response;
     }
+
+    //
+    public List<TodoDTO> getAllTodoOfStaff(Long staffId){
+        List<TodoDTO> todoDTOS=todoRepository.findAllTodoByStaffId(staffId);
+        return todoDTOS;
+    }
 }

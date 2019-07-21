@@ -39,4 +39,7 @@ public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger> {
 
     @Query(value = "{entityId:?0,deleted:false,type:?1}")
     Todo findByEntityIdAndType(BigInteger entityId, TodoType todoType);
+
+    @Query(value = "{staffId:?0,deleted:false}")
+    List<TodoDTO> findAllTodoByStaffId(Long staffId);
 }
