@@ -319,7 +319,7 @@ public class StaffRetrievalService {
         List<AccessGroup> roles = null;
         Map<String, Object> map = new HashMap<>();
         if (ORGANIZATION.equalsIgnoreCase(type)) {
-            map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId).getStaffList());
+            map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId,null,null).getStaffList());
             roles = accessGroupService.getAccessGroups(unitId);
         }
         map.put("roles", roles);
