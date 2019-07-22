@@ -280,6 +280,12 @@ public class ShiftService extends MongoBaseService {
             shift.setDraftShift(draftShift);
             shift.setDraft(true);
         }
+        if(ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)){
+            shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
+            if(isNotNull(shift.getDraftShift())){
+                shift.getDraftShift().getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
+            }
+        }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shiftMongoRepository.save(shift);
         if (!updateShift) {
@@ -654,6 +660,7 @@ public class ShiftService extends MongoBaseService {
 
     private void validateShiftViolatedRules(Shift shift, boolean shiftOverlappedWithNonWorkingType, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO,ShiftActionType actionType) {
         ShiftViolatedRules shiftViolatedRules = shiftViolatedRulesMongoRepository.findOneViolatedRulesByShiftId(shift.getId(),isNotNull(shift.getDraftShift()));
+        shiftViolatedRulesMongoRepository.deleteAllViolatedRulesByShiftIds(newArrayList(shift.getId()));
         if(ShiftActionType.SAVE.equals(actionType) || ShiftActionType.CANCEL.equals(actionType)) {
             shiftViolatedRules = updateOrDeleteShiftViolatedRule(shift, actionType, shiftViolatedRules);
         }else {
