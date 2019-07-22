@@ -550,7 +550,7 @@ public class EmploymentService {
         }
         Long shiftcount = activityIntegrationService.shiftCountWithEmploymentId(positionId);
         if(shiftcount>0) {
-            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE);
+            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_CONTAIN_SHIFT, positionId);
         }
         employment.setDeleted(true);
         employmentGraphRepository.save(employment);
