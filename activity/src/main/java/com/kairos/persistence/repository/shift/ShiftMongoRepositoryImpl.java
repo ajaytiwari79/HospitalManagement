@@ -244,8 +244,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return getShiftWithActivityByCriteria(Criteria.where("deleted").is(false).and("id").in(shiftIds),false,ShiftWithActivityDTO.class);
     }
 
-    public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds){
-        return getShiftWithActivityByCriteria(Criteria.where("deleted").is(false).and("disabled").is(false).and("staffId").in(staffIds),false,ShiftDTO.class);
+    public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds, LocalDate startDate, LocalDate endDate){
+        Criteria criteria = Criteria.where("deleted").is(false).and("disabled").is(false).and("staffId").in(staffIds);
+        if(isNotNull(startDate) && isNotNull(endDate)){
+            criteria.and("startDate").gte(startDate).lte(endDate);
+        }
+        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
     };
 
     @Override
@@ -588,6 +592,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     private List<AggregationOperation> getShiftWithActivityAggregationOperations(Criteria criteria, boolean replaceDraftShift, String[] shiftProjection) {
         List<AggregationOperation> aggregationOperations = newArrayList(match(criteria));
         if(replaceDraftShift){
+            aggregationOperations.add(new CustomAggregationOperation(Document.parse("{\n" +
+                    "  $addFields: {\n" +
+                    "       \"draftShift._id\": \"$_id\",\n" +
+                    "        \"draftShift.draft\": \"$draft\"\n" +
+                    "     }}")));
             aggregationOperations.add(replaceRoot("draftShift"));
         }
         if(shiftProjection.length>0){

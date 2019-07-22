@@ -234,7 +234,8 @@ public class CounterDistService extends MongoBaseService {
 
     public List<TabKPIDTO> filterTabKpiDate(List<TabKPIDTO> tabKPIDTOS) {
         Map<BigInteger, TabKPIDTO> filterResults = new LinkedHashMap<>();
-        tabKPIDTOS.stream().forEach(tabKPIDTO -> filterResults.put(tabKPIDTO.getKpi().getId(), tabKPIDTO));
+        tabKPIDTOS = tabKPIDTOS.stream().filter(tabKPIDTO -> isNotNull(tabKPIDTO.getKpi())).collect(toList());
+        tabKPIDTOS.forEach(tabKPIDTO -> filterResults.put(tabKPIDTO.getKpi().getId(), tabKPIDTO));
         tabKPIDTOS.stream().forEach(tabKPIDTO -> {
             if (filterResults.get(tabKPIDTO.getKpi().getId()).getKpi().getId().equals(tabKPIDTO.getKpi().getId())) {
                 if (filterResults.get(tabKPIDTO.getKpi().getId()).getPriority() > tabKPIDTO.getPriority()) {
@@ -452,7 +453,7 @@ public class CounterDistService extends MongoBaseService {
                     if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                         applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                     }
-                    applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),kpiIdAndApplicableKpi.get(kpiId).getFibonacciKPIConfigs()));
+
                     staffIdKpiMap.get(accessGroupAndStaffDTO.getStaffId()).put(kpiId, kpiId);
                 }
             });

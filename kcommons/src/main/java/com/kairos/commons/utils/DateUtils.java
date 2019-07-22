@@ -366,6 +366,10 @@ public  class DateUtils {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute()).toDate();
     }
 
+    public static Date getDateByLocalTime(Date date, LocalTime localTime) {
+        return getDateByLocalDateAndLocalTime(asLocalDate(date),localTime);
+    }
+
 
     public static String getDateStringWithFormat(Date date, String dateFormat) {
 

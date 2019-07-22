@@ -12,6 +12,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
+import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ public class ShiftBreakService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private ShiftService shiftService;
+    @Inject private MongoSequenceRepository mongoSequenceRepository;
 
 
     public Map<BigInteger, ActivityWrapper> getBreakActivities(BreakSettingsDTO breakSetting, Long unitId) {
@@ -64,7 +66,7 @@ public class ShiftBreakService {
         DateTimeInterval eligibleBreakInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
         Date placeBreakAfterThisDate = shift.getStartDate();
         List<ShiftActivity> breakActivities = new ArrayList<>();
-        if(isNotNull(breakSetting)) {
+        if(isNotNull(breakSetting) && breakSetting.getShiftDurationInMinute()>=shift.getMinutes()) {
             if(isCollectionEmpty(shift.getBreakActivities())){
                 if (isNotNull(breakWTATemplate)) {
                     BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
@@ -86,6 +88,9 @@ public class ShiftBreakService {
                 breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate);
             }
             if(isNotNull(breakActivity)) {
+                if (breakActivity.getId() == null) {
+                    breakActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+                }
                 breakActivities.add(breakActivity);
             }
         }

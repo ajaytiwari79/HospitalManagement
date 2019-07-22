@@ -11,6 +11,7 @@ import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
@@ -107,7 +108,7 @@ public class ShiftStatusService {
 
             }
             shiftMongoRepository.saveEntities(shifts);
-            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
+            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts,null);
         }
         wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
         return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
@@ -144,9 +145,9 @@ public class ShiftStatusService {
             removeOppositeStatus(shift, shiftActivity, shiftPublishDTO.getStatus());
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, shiftActivity.getStatus()));
         } else if (validAccessGroup && !validateShiftActivityStatus) {
-            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID), false));
+            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID), false));
         } else {
-            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED), false));
+            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED), false));
         }
         return shiftActivityResponseDTO;
     }
@@ -230,7 +231,7 @@ public class ShiftStatusService {
         }
         if(newHashSet(APPROVE,DISAPPROVE).contains(shiftStatus)){
             TodoStatus todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE: TodoStatus.DISAPPROVE;
-            Todo todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED,newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED),shiftActivity.getActivityId());
+            Todo todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED,newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED),shiftActivity.getActivityId());
             todo.setStatus(todoStatus);
             todoRepository.save(todo);
         }
@@ -290,8 +291,9 @@ public class ShiftStatusService {
         return activityShiftStatusSettings;
     }
 
-    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, UserAccessRoleDTO userAccessRoleDTO) {
+    public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, UserAccessRoleDTO userAccessRoleDTO, ShiftActionType shiftActionType) {
         Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
+
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
             if (validPhaseForPublishingShift.contains(phase.getPhaseEnum())) {
                 shiftActivity.getStatus().add(ShiftStatus.PUBLISH);

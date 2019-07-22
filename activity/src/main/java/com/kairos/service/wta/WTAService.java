@@ -56,8 +56,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
@@ -456,10 +455,10 @@ public class WTAService extends MongoBaseService {
     }
 
 
-    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToEmployment(Long employmentId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
+    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToEmployment(Long employmentId,Long unitId, BigInteger wtaId, BigInteger ctaId, LocalDate startDate) {
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
         if (wtaId != null) {
-            WTAResponseDTO wtaResponseDTO = assignWTAToEmployment(employmentId, wtaId, startDate);
+            WTAResponseDTO wtaResponseDTO = assignWTAToEmployment(employmentId,unitId, wtaId, startDate);
             ctawtaAndAccumulatedTimebankWrapper.setWta(Arrays.asList(wtaResponseDTO));
         }
         if (ctaId != null) {
@@ -470,25 +469,25 @@ public class WTAService extends MongoBaseService {
 
     }
 
-    public WTAResponseDTO getWTAOfEmployment(Long employmentId) {
-        WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getWTAByEmploymentIdAndDate(employmentId, new Date());
-        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
+    public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
     }
 
 
-    private WTAResponseDTO assignWTAToEmployment(Long employmentId, BigInteger wtaId, LocalDate startLocalDate) {
+    private WTAResponseDTO assignWTAToEmployment(Long employmentId,Long unitId, BigInteger wtaId, LocalDate startLocalDate) {
         WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getOne(wtaId);
         if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
             exceptionService.duplicateDataException(MESSAGE_WTA_ID, wtaId);
         }
-        OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(wtaQueryResultDTO.getOrganization().getId());
+        OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         WTAResponseDTO wtaResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
         WorkingTimeAgreement workingTimeAgreement = ObjectMapperUtils.copyPropertiesByMapper(wtaResponseDTO, WorkingTimeAgreement.class);
         List<WTABaseRuleTemplate> ruleTemplates = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(wtaResponseDTO.getRuleTemplates())) {
             ruleTemplates = wtaBuilderService.copyRuleTemplates(wtaResponseDTO.getRuleTemplates(), true);
             for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
-                updateExistingPhaseIdOfWTA(ruleTemplate.getPhaseTemplateValues(), wtaQueryResultDTO.getOrganization().getId(), organizationDTO.getCountryId(), true);
+                updateExistingPhaseIdOfWTA(ruleTemplate.getPhaseTemplateValues(), unitId, organizationDTO.getCountryId(), true);
             }
             save(ruleTemplates);
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());
@@ -665,10 +664,10 @@ public class WTAService extends MongoBaseService {
         return ctaWtas;
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToEmployment(Long employmentId, BigInteger wtaId, BigInteger oldwtaId, BigInteger ctaId, BigInteger oldctaId, LocalDate startDate) {
+    public CTAWTAAndAccumulatedTimebankWrapper assignCTAWTAToEmployment(Long employmentId,Long unitId, BigInteger wtaId, BigInteger oldwtaId, BigInteger ctaId, BigInteger oldctaId, LocalDate startDate) {
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = new CTAWTAAndAccumulatedTimebankWrapper();
         if (wtaId != null) {
-            WTAResponseDTO wtaResponseDTO = assignWTAToEmployment(employmentId, wtaId, startDate);
+            WTAResponseDTO wtaResponseDTO = assignWTAToEmployment(employmentId,unitId, wtaId, startDate);
             ctawtaAndAccumulatedTimebankWrapper.setWta(Arrays.asList(wtaResponseDTO));
             wtaRepository.disableOldWta(oldwtaId, startDate.minusDays(1));
         }

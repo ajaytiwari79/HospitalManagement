@@ -25,6 +25,9 @@ public interface ExpertiseNightWorkerSettingRepository extends MongoBaseReposito
     @Query(value = "{ expertiseId:{$in:?0},unitId:{$exists:true},deleted:false}")
     List<ExpertiseNightWorkerSetting> findAllByExpertiseIdsOfUnit(Collection<Long> expertiseIds);
 
+    @Query(value = "{ expertiseId:{$in:?0},countryId:{$exists:true},deleted:false}")
+    List<ExpertiseNightWorkerSetting> findAllByExpertiseIdsOfCountry(Collection<Long> expertiseIds);
+
     @Query(value = "{ expertiseId:?0,deleted:false}")
     ExpertiseNightWorkerSetting findOneByExpertiseId(Long expertiseId);
 }

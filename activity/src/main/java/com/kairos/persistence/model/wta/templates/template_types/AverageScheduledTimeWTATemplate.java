@@ -177,7 +177,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         List<DateTimeInterval> intervals = new ArrayList<>();
         ZonedDateTime nextEnd = getNextDateOfInterval(interval.getStart());
         intervals.add(new DateTimeInterval(interval.getStart(),nextEnd));
-        intervals.add(new DateTimeInterval(nextEnd,getNextDateOfInterval(nextEnd)));
+        intervals.add(new DateTimeInterval(nextEnd.minusDays(1),getNextDateOfInterval(nextEnd).minusDays(1)));
         return intervals;
     }
 

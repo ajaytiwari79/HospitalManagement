@@ -283,8 +283,7 @@ public class NightWorkerService {
     }
 
     public Map[] getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
-        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(employmentAndExpertiseIdMap.values());
-        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = expertiseNightWorkerSettings.stream().collect(Collectors.toMap(ExpertiseNightWorkerSetting::getExpertiseId, v -> v));
+        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = getMapOfExpetiseNightWorkerSetting(employmentAndExpertiseIdMap.values());
         Map<Long, Boolean> staffIdAndNightWorkerMap = new HashMap<>();
         Map<Long, Boolean> employementIdAndNightWorkerMap = new HashMap<>();
         for (Map.Entry<Long, Long> employmentAndExpertiseIdEntry : employmentAndExpertiseIdMap.entrySet()) {
@@ -307,6 +306,19 @@ public class NightWorkerService {
             }
         }
         return new Map[]{staffIdAndNightWorkerMap,employementIdAndNightWorkerMap};
+    }
+
+    private Map<Long,ExpertiseNightWorkerSetting> getMapOfExpetiseNightWorkerSetting(Collection<Long> expertiseIds){
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(expertiseIds);
+        Map<Long,ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = new HashMap<>();
+        for (ExpertiseNightWorkerSetting expertiseNightWorkerSetting : expertiseNightWorkerSettings) {
+            if(isNotNull(expertiseNightWorkerSetting.getUnitId())){
+                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
+            }else if(!expertiseNightWorkerSettingMap.containsKey(expertiseNightWorkerSetting.getExpertiseId())){
+                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
+            }
+        }
+        return expertiseNightWorkerSettingMap;
     }
 
     private void updateWTARuleTemplateForNightWorker(Map<Long, Boolean> employmentAndNightWorkerMap) {
@@ -386,10 +398,10 @@ public class NightWorkerService {
         });
     }
 
-    public Map<Long,Boolean> getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO){
+    public Map<Long,Boolean> getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO,LocalDate startDate,LocalDate endDate){
         List<Long> staffIds = staffFilterDTO.getStaffIds();
         if(staffFilterDTO.isValidFilterForShift()) {
-            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds());
+            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds(),startDate,endDate);
             shiftDTOS = shiftFilterService.getShiftsByFilters(shiftDTOS, staffFilterDTO);
             staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toList());
         }

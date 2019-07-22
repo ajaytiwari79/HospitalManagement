@@ -23,18 +23,23 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.*;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
+
+import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelActivityRank;
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
+import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.*;
@@ -52,6 +57,8 @@ import com.kairos.rule_validator.activity.*;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
@@ -77,6 +84,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.TimeTypes.NON_WORKING_TYPE;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
+import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static java.util.Collections.singletonList;
@@ -92,6 +100,8 @@ public class ShiftValidatorService {
 
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject
+    private ShiftValidatorService shiftValidatorService;
     @Inject
     private StaffWTACounterRepository wtaCounterRepository;
     @Inject
@@ -137,6 +147,9 @@ public class ShiftValidatorService {
 
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
+
+    @Inject private NightWorkerMongoRepository nightWorkerMongoRepository;
 
 
     private static ExceptionService exceptionService;
@@ -248,7 +261,8 @@ public class ShiftValidatorService {
 
     private List<ActivityRuleViolation> validateTimingOfActivity(ShiftWithActivityDTO shiftDTO, List<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         List<StaffActivitySetting> staffActivitySettings = staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shiftDTO.getStaffId(), activityIds);
-        Map<BigInteger, StaffActivitySetting> staffActivitySettingMap = staffActivitySettings.stream().collect(Collectors.toMap(StaffActivitySetting::getActivityId, v -> v));
+        Map<BigInteger, StaffActivitySetting> staffActivitySettingMap = new HashMap<>();
+        staffActivitySettings.forEach(staffActivitySetting -> staffActivitySettingMap.put(staffActivitySetting.getActivityId(),staffActivitySetting));
         Map<BigInteger, ShiftTimeDetails> shiftTimeDetailsMap = new HashMap<>();
         shiftDTO.getActivities().forEach(shiftActivity -> shiftTimeDetailsMap.put(shiftActivity.getActivityId(), prepareShiftTimeDetails(shiftActivity, shiftTimeDetailsMap)));
         List<ActivityRuleViolation> activityRuleViolations = new ArrayList<>();
@@ -309,8 +323,19 @@ public class ShiftValidatorService {
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         shift = updateFullDayAndFullWeekActivityShift(newArrayList(shift)).get(0);
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
+        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts,staffAdditionalInfoDTO.getUserAccessRoleDTO());
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndUnitId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId(),shift.getUnitId());
-        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUserAccessRoleDTO(), timeBankByDateDTOMap.get(asLocalDate(shift.getStartDate())).getExpectedTimebankMinutes(), activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting);
+        if(expertiseNightWorkerSetting==null){
+            expertiseNightWorkerSetting =expertiseNightWorkerSettingRepository.findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
+        }
+        DailyTimeBankEntry dailyTimeBankEntry = timeBankService.renewDailyTimeBank(staffAdditionalInfoDTO, ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class), false,false);
+        long expectedTimebank = timeBankByDateDTOMap.get(asLocalDate(shift.getStartDate())).getExpectedTimebankMinutes();
+        if(isNotNull(dailyTimeBankEntry)){
+            expectedTimebank+= dailyTimeBankEntry.getDeltaTimeBankMinutes();
+        }
+        NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(shift.getStaffId());
+        staffAdditionalInfoDTO.setStaffAge(getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(), asLocalDate(shift.getStartDate())));
+        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUserAccessRoleDTO(),expectedTimebank , activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting,nightWorker.isNightWorker());
     }
 
     private RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(PlanningPeriodDTO planningPeriod, ShiftWithActivityDTO shift, WTAQueryResultDTO wtaQueryResultDTO, StaffEmploymentDetails staffEmploymentDetails, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffEmploymentUnitDataWrapper dataWrapper, List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs) {
@@ -331,10 +356,17 @@ public class ShiftValidatorService {
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         shift = updateFullDayAndFullWeekActivityShift(newArrayList(shift)).get(0);
+        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shifts,dataWrapper.getUser());
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndUnitId(staffEmploymentDetails.getExpertise().getId(),shift.getUnitId());
-        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, planningPeriod.getCurrentPhaseId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, dataWrapper.getUser(), timeBankByDateDTOMap.get(asLocalDate(shift.getStartDate())).getExpectedTimebankMinutes(), activityWrapperMap, dataWrapper.getStaffAge(), dataWrapper.getSeniorAndChildCareDays().getChildCareDays(), dataWrapper.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting);
+        if(expertiseNightWorkerSetting==null){
+            expertiseNightWorkerSetting =expertiseNightWorkerSettingRepository.findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(staffEmploymentDetails.getExpertise().getId());
+        }
+        DailyTimeBankEntry dailyTimeBankEntry = timeBankService.renewDailyTimeBank(new StaffAdditionalInfoDTO(staffEmploymentDetails,dataWrapper.getDayTypes()), ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class), false,false);
+        long expectedTimebank = timeBankByDateDTOMap.get(asLocalDate(shift.getStartDate())).getExpectedTimebankMinutes() + dailyTimeBankEntry.getDeltaTimeBankMinutes();
+        dataWrapper.setStaffAge(getAgeByCPRNumberAndStartDate(dataWrapper.getCprNumber(), asLocalDate(shift.getStartDate())));
+        NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(shift.getStaffId());
+        return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, planningPeriod.getCurrentPhaseId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, dataWrapper.getUser(), expectedTimebank, activityWrapperMap, dataWrapper.getStaffAge(), dataWrapper.getSeniorAndChildCareDays().getChildCareDays(), dataWrapper.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting,nightWorker.isNightWorker());
     }
-
 
     public List<String> validateShiftWhileCopy(StaffEmploymentUnitDataWrapper dataWrapper, ShiftWithActivityDTO shiftWithActivityDTO, StaffEmploymentDetails staffEmploymentDetails, List<WTAQueryResultDTO> wtaQueryResultDTOS, PlanningPeriodDTO planningPeriod, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs) {
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(planningPeriod, shiftWithActivityDTO, wtaQueryResultDTOS.get(0), staffEmploymentDetails, activityWrapperMap, dataWrapper, newCreatedShiftWithActivityDTOs);

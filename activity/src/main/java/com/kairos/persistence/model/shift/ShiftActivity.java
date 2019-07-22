@@ -84,7 +84,11 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
         return plannedTimes=Optional.ofNullable(plannedTimes).orElse(new ArrayList<>());
     }
 
-    public void getChildActivities(List<ShiftActivity> childActivities) {
+    public List<ShiftActivity> getChildActivities() {
+        return this.childActivities = isNullOrElse(this.childActivities,new ArrayList<>());
+    }
+
+    public void setChildActivities(List<ShiftActivity> childActivities) {
         this.childActivities = isNullOrElse(childActivities,new ArrayList<>());
     }
 

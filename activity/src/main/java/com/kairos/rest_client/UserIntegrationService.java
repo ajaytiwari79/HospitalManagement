@@ -796,7 +796,9 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/is_unit",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
     }
 
-
+    public List<Long> getUnitIds(Long countryId) {
+       return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/get_all_units", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
+    }
 }
 
 
