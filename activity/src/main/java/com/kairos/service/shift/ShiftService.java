@@ -169,6 +169,7 @@ public class ShiftService extends MongoBaseService {
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, shiftDTO.getActivities().get(0).getStartDate(), null);
             shiftDTO.setShiftType(ShiftType.PRESENCE);
             shiftWithViolatedInfoDTO = saveShift(staffAdditionalInfoDTO, shiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);
+
         }
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
         return shiftWithViolatedInfoDTO;
@@ -279,12 +280,6 @@ public class ShiftService extends MongoBaseService {
             draftShift.setDraft(true);
             shift.setDraftShift(draftShift);
             shift.setDraft(true);
-        }
-        if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
-            shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
-            if (isNotNull(shift.getDraftShift())) {
-                shift.getDraftShift().getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
-            }
         }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shiftMongoRepository.save(shift);

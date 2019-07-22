@@ -546,7 +546,7 @@ public class EmploymentService {
     public PositionQueryResult removeEmployment(long positionId, Long unitId) throws Exception {
         Employment employment = employmentGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(employment).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ID_NOTEXIST, positionId);
+           exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ID_NOTEXIST, positionId);
         }
         Long shiftcount = activityIntegrationService.shiftCountWithEmploymentId(positionId);
         if(shiftcount>0) {

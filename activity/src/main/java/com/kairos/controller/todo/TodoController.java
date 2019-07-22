@@ -36,4 +36,10 @@ public class TodoController {
     public ResponseEntity<Map<String,Object>> updateTodoStatus(@RequestParam(required = false) BigInteger todoId, @RequestParam TodoStatus status,@RequestParam(required = false) BigInteger shiftId){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,todoService.updateTodoStatus(todoId,status,shiftId));
     }
+
+    @ApiOperation("get all todo of Staff")
+    @GetMapping(value = "/staff/{staffId}/getTodoOfStaff")
+       public ResponseEntity<Map<String,Object>>   getLeavesBalances(@PathVariable Long staffId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,todoService.getAllTodoOfStaff(staffId));
+    }
 }
