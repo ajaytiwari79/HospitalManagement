@@ -13,18 +13,18 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProtectedDaysOffDTO {
+public class ProtectedDaysOffSettingDTO {
     private BigInteger id;
     private Long unitId;
     private ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings;
 
-    public ProtectedDaysOffDTO(BigInteger id,Long unitId,ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
+    public ProtectedDaysOffSettingDTO(BigInteger id, Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         this.id=id;
         this.unitId=unitId;
         this.protectedDaysOffUnitSettings=protectedDaysOffUnitSettings;
     }
 
-    public ProtectedDaysOffDTO(Long unitId,ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
+    public ProtectedDaysOffSettingDTO(Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         this.unitId=unitId;
         this.protectedDaysOffUnitSettings=protectedDaysOffUnitSettings;
     }
