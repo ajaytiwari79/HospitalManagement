@@ -5,8 +5,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.shift.ShiftActionType;
-import com.kairos.enums.shift.TodoStatus;
+import com.kairos.enums.shift.*;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -31,6 +30,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
+import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
 
 /**
  * Created by pradeep
@@ -46,6 +46,7 @@ public class RequestAbsenceService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private TodoService todoService;
     @Inject private ShiftDetailsService shiftDetailsService;
+    @Inject private ShiftStatusService shiftStatusService;
 
 
     public List<ShiftWithActivityDTO> createOrUpdateRequestAbsence(RequestAbsenceDTO requestAbsenceDTO){
@@ -80,9 +81,10 @@ public class RequestAbsenceService {
         return todoService.deleteTodo(shiftId,TodoType.REQUEST_ABSENCE);
     }
 
-    public ShiftWithViolatedInfoDTO approveRequestAbsence(Todo todo){
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
+    public <T> T approveRequestAbsence(Todo todo){
+        T response = null;
         if(TodoStatus.APPROVE.equals(todo.getStatus())){
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
             Optional<Shift> shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
             if(!shiftOptional.isPresent()){
                 exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
@@ -105,9 +107,16 @@ public class RequestAbsenceService {
             }
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
                 todo.setStatus(TodoStatus.REQUESTED);
+                response = (T)shiftWithViolatedInfoDTO;
+            }else {
+                List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
+                for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
+                    shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftDTO.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
+                }
+                response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
             }
         }
-        return shiftWithViolatedInfoDTO;
+        return response;
     }
 
     private ShiftWithViolatedInfoDTO updateShiftWithRequestAbsence(ActivityWrapper activityWrapper,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO){

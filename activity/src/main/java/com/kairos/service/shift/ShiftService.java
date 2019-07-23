@@ -281,7 +281,9 @@ public class ShiftService extends MongoBaseService {
             shift.setDraft(true);
         }
         if(ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)){
-            shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
+            if(shift.isDraft()) {
+                shift.getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
+            }
             if(isNotNull(shift.getDraftShift())){
                 shift.getDraftShift().getActivities().forEach(shiftActivity -> shiftActivity.getStatus().remove(ShiftStatus.PUBLISH));
             }
