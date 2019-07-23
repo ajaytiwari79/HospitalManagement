@@ -436,10 +436,10 @@ public class WTAService extends MongoBaseService {
         return ctawtaAndAccumulatedTimebankWrapper;
     }
 
-    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<Long> upIds) {
+    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<Long> employmentIds) {
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
-        List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(upIds);
-        List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(upIds);
+        List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(employmentIds);
+        List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(employmentIds);
         List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyPropertiesOfListByMapper(currentWTAList, WTAResponseDTO.class);
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
         Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
@@ -471,7 +471,9 @@ public class WTAService extends MongoBaseService {
 
     public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        wtaResponseDTOS.addAll(ObjectMapperUtils.copyPropertiesOfListByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)),WTAResponseDTO.class));
+        return wtaResponseDTOS;
     }
 
 
