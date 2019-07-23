@@ -222,7 +222,7 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_STATUS)) {
             getActivityStatusDefaultData(criteriaList);
         }
-        if (kpi.getFilterTypes().contains(FilterType.STAFF_LIST)) {
+        if (kpi.getFilterTypes().contains(STAFF_IDS)) {
             getActivityStatusDefaultData(criteriaList);
         }
         if (kpi.getFilterTypes().contains(FilterType.UNIT_NAME)) {
