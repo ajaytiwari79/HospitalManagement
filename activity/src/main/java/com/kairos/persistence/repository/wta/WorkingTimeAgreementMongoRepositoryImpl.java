@@ -132,7 +132,29 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     @Override
     public List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId,LocalDate selectedDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("organization.id").is(unitId).and("expertise.Id").is(expertiseId).and("employmentId").exists(false).orOperator(Criteria.where("startDate").lte(selectedDate).and("endDate").gte(selectedDate), Criteria.where("endDate").exists(false).and("startDate").lte(selectedDate))),
+                match(Criteria.where("deleted").is(false).and("organization.id").is(unitId).and("expertise.id").is(expertiseId).and("employmentId").exists(false).orOperator(Criteria.where("startDate").lte(selectedDate).and("endDate").gte(selectedDate), Criteria.where("endDate").exists(false).and("startDate").lte(selectedDate))),
+                //lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                project("name", "description")
+        );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<WTAQueryResultDTO> getAllWtaOfEmploymentIdAndDate(Long employmentId,LocalDate selectedDate) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("employmentId").is(employmentId).orOperator(Criteria.where("startDate").lte(selectedDate).and("endDate").gte(selectedDate), Criteria.where("endDate").exists(false).and("startDate").lte(selectedDate))),
+                //lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                project("name", "description","organizationParentId")
+        );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
+    }
+
+    @Override
+    public List<WTAQueryResultDTO> getAllWtaOfOrganizationAndNotOrganizationParentByExpertise(Long unitId, Long expertiseId,LocalDate selectedDate,List<BigInteger> orgnizationParentIds) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("deleted").is(false).and("organization.id").is(unitId).and("expertise.id").is(expertiseId).and("organizationParentId").nin(orgnizationParentIds).orOperator(Criteria.where("startDate").lte(selectedDate).and("endDate").gte(selectedDate), Criteria.where("endDate").exists(false).and("startDate").lte(selectedDate))),
                 //lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
                 project("name", "description")
         );
