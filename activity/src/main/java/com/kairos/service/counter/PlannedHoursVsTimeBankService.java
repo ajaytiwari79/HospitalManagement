@@ -101,7 +101,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
        List<Long> unitIds =(List<Long>)filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
-        List<String> StaffList =filterBasedCriteria.getOrDefault(FilterType.STAFF_LIST,new ArrayList());
+        List<String> StaffList =filterBasedCriteria.getOrDefault(FilterType.STAFF_IDS,new ArrayList());
         List<String> unitName =filterBasedCriteria.getOrDefault(FilterType.UNIT_NAME,new ArrayList());
 
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
