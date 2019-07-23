@@ -4,9 +4,7 @@ import com.kairos.shiftplanning.domain.skill.Skill;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class SkillService {

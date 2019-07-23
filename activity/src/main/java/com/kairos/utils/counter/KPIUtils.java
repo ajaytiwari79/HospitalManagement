@@ -1,8 +1,6 @@
 package com.kairos.utils.counter;
 
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.enums.DurationType;
@@ -39,7 +37,7 @@ public class KPIUtils {
     public static List<DateTimeInterval> getDateTimeIntervals(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates) {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         if(isCollectionNotEmpty(filterDates)){
-            dateTimeIntervals.add(new DateTimeInterval(filterDates.get(0),filterDates.get(1)));
+            dateTimeIntervals.add(new DateTimeInterval(asLocalDate(filterDates.get(0).toString()),asLocalDate(filterDates.get(1).toString())));
             return dateTimeIntervals;
         }
         LocalDate currentDate = DateUtils.getCurrentLocalDate();

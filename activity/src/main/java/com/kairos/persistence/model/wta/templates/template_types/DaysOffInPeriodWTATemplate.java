@@ -14,6 +14,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -114,7 +116,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)) {
             int count = 0;
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-            //dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1),dateTimeInterval.getEnd().plusDays(1));
+            dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1),dateTimeInterval.getEnd().plusDays(1));
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
             shifts.add(infoWrapper.getShift());
             List<DateTimeInterval> intervals = getSortedIntervals(shifts);
@@ -128,9 +130,20 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         }
     }
 
+    private List<DateTimeInterval> getSortedIntervals(List<ShiftWithActivityDTO> shifts) {
+        List<DateTimeInterval> intervals = new ArrayList<>();
+        for (ShiftWithActivityDTO s : sortShifts(shifts)) {
+            if(restingTimeAllowed){
+                intervals.add(new DateTimeInterval(s.getStartDate(),asDate(asZoneDateTime(s.getEndDate()).plusMinutes(s.getRestingMinutes()))));
+            }else {
+                intervals.add(s.getDateTimeInterval());
+            }
+        }
+        return intervals;
+    }
+
 
     private int getDayOFF(List<DateTimeInterval> intervals,DateTimeInterval dateTimeInterval){
-        int count = 0;
         List<DateTimeInterval> dayIntervals = getDaysIntervals(dateTimeInterval);
         Set<DateTimeInterval> overLapsIntervals = new HashSet<>();
         for (int i = 1; i < intervals.size(); i++) {

@@ -1,12 +1,7 @@
 package com.kairos.controller.task;
 
-import com.kairos.dto.activity.task_type.TaskTypeCopyDTO;
-import com.kairos.dto.activity.task_type.TaskTypeDTO;
-import com.kairos.dto.activity.task_type.TaskTypeSettingDTO;
-import com.kairos.dto.activity.task_type.TaskTypeSlaConfigDTO;
-import com.kairos.persistence.model.task_type.MapPointer;
-import com.kairos.persistence.model.task_type.TaskType;
-import com.kairos.persistence.model.task_type.TaskTypeDefination;
+import com.kairos.dto.activity.task_type.*;
+import com.kairos.persistence.model.task_type.*;
 import com.kairos.service.MapPointerService;
 import com.kairos.service.task_type.TaskTypeService;
 import com.kairos.utils.response.ResponseHandler;
@@ -25,10 +20,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.*;
 

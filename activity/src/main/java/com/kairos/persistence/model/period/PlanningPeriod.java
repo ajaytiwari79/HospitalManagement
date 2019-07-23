@@ -4,19 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import de.danielbechler.diff.inclusion.Inclusion;
-import de.danielbechler.diff.introspection.ObjectDiffProperty;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
  * Created by prerna on 6/4/18.

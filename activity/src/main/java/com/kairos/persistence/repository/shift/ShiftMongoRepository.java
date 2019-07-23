@@ -1,19 +1,17 @@
 package com.kairos.persistence.repository.shift;
 
-
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import org.apache.poi.ss.formula.functions.Count;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vipul on 30/8/17.
@@ -24,8 +22,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{employmentId:?0,deleted:false,disabled:false,startDate:{$gte:?1,$lte:?2}}", fields = "{ 'startDate' : 1, 'endDate' : 1,'employmentId':1,'activities':1}")
     List<ShiftDTO> findAllShiftBetweenDuration(Long employmentId, Date startDate, Date endDate);
 
-    @Query(value = "{employmentId:?0,staffId:?1,unitId:?4,deleted:false,disabled:false,startDate:{$gte:?2,$lte:?3}}")
-    List<ShiftDTO> getAllShiftBetweenDuration(Long employmentId,Long staffId, Date startDate, Date endDate,Long unitId);
+
+
 
     @Query(value = "{'planningPeriodId':{'$in':?2},employmentId:?0,staffId:?1,unitId:?3,deleted:false,disabled:false,draftShift:{$exists:true}}")
     List<Shift> getAllDraftShiftBetweenDuration(Long employmentId,Long staffId,List<BigInteger> planningPeriodIds,Long unitId);
@@ -89,6 +87,9 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{employmentId:?0,deleted:false,'_id':{'$ne':?3}, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}",exists=true)
     boolean shiftOverLapped(Long employmentId, Date startDate, Date endDate,BigInteger shiftId);
 
-    @Query(value = "{disabled:false,deleted:false,unitId:0,planningPeriodId:?1,draftState:{$exists:true}}")
-    List<Shift> findAllDraftShift(Long unitId,BigInteger planningPeriodid);
+    @Query(value = "{employmentId:?0,deleted:false, disabled:false,startDate:{$gt:?1,$lt:?2},'activities.activityId':{'$in':?3}}")
+    List<Shift> findAllShiftByActivityIdAndBetweenDuration(Long employmentId, Date startDate, Date endDate,Collection<BigInteger> activityIds);
+
+    @Query(value = "{'deleted':false, 'disabled':false, 'employmentId':?0}",count = true)
+    Long countShiftsByEmploymentId(Long EmploymentId);
 }

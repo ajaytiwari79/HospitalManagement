@@ -122,9 +122,7 @@ public class AppConstants {
     public static final String ENTERED_TIMES = "ENTERED_TIMES";
     public static final String WEEKLY_HOURS = "WEEKLY_HOURS";
     public static final String FIXED_TIME = "FIXED_TIME";
-    public static final String FULL_DAY_CALCULATION = "FULL_DAY";
     public static final String ENTERED_MANUALLY = "ENTERED_MANUALLY";
-    public static final String FULL_WEEK = "FULL_WEEK";
     //hours calculation types
     public static final String TIMEBANK_ACCOUNT = "TIMEBANK_ACCOUNT";
     public static final String PAIDOUT_ACCOUNT = "PAID_OUT";
@@ -222,6 +220,8 @@ public class AppConstants {
 
     //for use timeslot in timeslot kpi
     public static final String NIGHT = "Night";
+    public static final String EVENING = "Evening";
+    public static final String DAY = "Day";
 
     //Timebank Ruletemplate not valid reason
     public static final String DAYTYPE_IS_NOT_VALID = "Daytype is not valid";

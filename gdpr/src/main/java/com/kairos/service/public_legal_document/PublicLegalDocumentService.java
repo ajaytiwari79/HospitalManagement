@@ -26,7 +26,15 @@ public class PublicLegalDocumentService {
     private ExceptionService exceptionService;
 
     public PublicLegalDocumentDTO createPublicLegalDocument(PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        PublicLegalDocument publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
+        publicLegalDocumentDTO.setName(publicLegalDocumentDTO.getName().trim());
+        if(publicLegalDocumentDTO.getName().equals("")){
+            exceptionService.illegalArgumentException("message.enter.valid.data");
+        }
+        PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
+        if (Optional.ofNullable(publicLegalDocument).isPresent()) {
+            exceptionService.duplicateDataException("message.duplicate","Public Legal Document",publicLegalDocument.getName());
+        }
+        publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
         publicLegalDocumentRepository.save(publicLegalDocument);
         publicLegalDocumentDTO.setId(publicLegalDocument.getId());
         return publicLegalDocumentDTO;
@@ -60,7 +68,7 @@ public class PublicLegalDocumentService {
 
     public boolean removePublicLegalDocument(Long publicLegalDocumentId) {
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
-        if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
+        if (!Optional.ofNullable(publicLegalDocument).isPresent()) {
             return false;
         }
         publicLegalDocument.setDeleted(true);
@@ -69,14 +77,22 @@ public class PublicLegalDocumentService {
     }
 
     public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId,PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
-        if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("Data Not Found", publicLegalDocumentId);
+        publicLegalDocumentDTO.setName(publicLegalDocumentDTO.getName().trim());
+        PublicLegalDocument oldPublicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
+        if (!Optional.ofNullable(oldPublicLegalDocument).isPresent()) {
+            exceptionService.dataNotFoundByIdException("message.enter.valid.data");
+        }
+        if(!oldPublicLegalDocument.getName().equalsIgnoreCase(publicLegalDocumentDTO.getName())){
+            PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
+            if (Optional.ofNullable(publicLegalDocument).isPresent()) {
+                exceptionService.duplicateDataException("message.duplicate","Public Legal Document",publicLegalDocument.getName());
+            }
         }
         publicLegalDocumentDTO.setId(publicLegalDocumentId);
-        if(publicLegalDocumentDTO.getName() != null)publicLegalDocument.setName(publicLegalDocumentDTO.getName());
-        if(publicLegalDocumentDTO.getBodyContentInHtml() != null)publicLegalDocument.setBodyContentInHtml(publicLegalDocumentDTO.getBodyContentInHtml());
-        publicLegalDocumentRepository.save(publicLegalDocument);
+        if(publicLegalDocumentDTO.getName() != null)oldPublicLegalDocument.setName(publicLegalDocumentDTO.getName());
+        if(publicLegalDocumentDTO.getBodyContentInHtml() != null)oldPublicLegalDocument.setBodyContentInHtml(publicLegalDocumentDTO.getBodyContentInHtml());
+        if(publicLegalDocumentDTO.getPublicLegalDocumentLogo() != null)oldPublicLegalDocument.setPublicLegalDocumentLogo(publicLegalDocumentDTO.getPublicLegalDocumentLogo());
+        publicLegalDocumentRepository.save(oldPublicLegalDocument);
         return publicLegalDocumentDTO;
     }
 

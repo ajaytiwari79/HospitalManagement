@@ -1,19 +1,14 @@
 package com.kairos.persistence.model.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
-import com.kairos.dto.activity.staffing_level.StaffingLevelTemplatePeriod;
+import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.enums.Day;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "staffing_level_template")

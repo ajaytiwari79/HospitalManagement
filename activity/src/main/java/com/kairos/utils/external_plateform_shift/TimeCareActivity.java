@@ -3,9 +3,7 @@ package com.kairos.utils.external_plateform_shift;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import javax.xml.bind.annotation.XmlElementWrapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by oodles on 14/12/16.

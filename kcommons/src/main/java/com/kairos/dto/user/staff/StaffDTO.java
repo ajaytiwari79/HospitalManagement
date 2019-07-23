@@ -7,9 +7,7 @@ import com.kairos.enums.Gender;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by oodles on 3/2/17.
@@ -202,7 +200,7 @@ public class StaffDTO {
         this.active = active;
     }
 
-    public long getInactiveFrom() {
+    public Long getInactiveFrom() {
         return inactiveFrom;
     }
 

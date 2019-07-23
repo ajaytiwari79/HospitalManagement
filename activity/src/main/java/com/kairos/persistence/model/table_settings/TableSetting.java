@@ -4,9 +4,7 @@ import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by prabjot on 28/4/17.

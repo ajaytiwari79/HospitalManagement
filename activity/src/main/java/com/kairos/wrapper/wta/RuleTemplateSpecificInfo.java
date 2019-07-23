@@ -14,9 +14,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -35,7 +33,7 @@ public class RuleTemplateSpecificInfo {
     private Map<BigInteger,Integer> counterMap;
     private Map<Long, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
-    private int totalTimeBank;
+    private long totalTimeBank;
     private ViolatedRulesDTO violatedRules;
     private int staffAge;
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;
@@ -48,7 +46,7 @@ public class RuleTemplateSpecificInfo {
 
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;

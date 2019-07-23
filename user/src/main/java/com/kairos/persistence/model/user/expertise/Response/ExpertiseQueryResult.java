@@ -11,9 +11,7 @@ import com.kairos.persistence.model.pay_table.PayTable;
 import com.kairos.persistence.model.user.expertise.CareDays;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vipul on 28/3/18.

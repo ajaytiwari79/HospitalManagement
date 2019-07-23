@@ -14,9 +14,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -60,14 +58,15 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
             CareDaysDTO careDays = getCareDays(infoWrapper.getChildCareDays(), infoWrapper.getStaffAge());
             if (isNotNull(careDays)) {
                 int leaveCount = careDays.getLeavesAllowed();
-
-                DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
-                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
-                if (leaveCount < (shifts.size()+1)) {
-                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
-                            new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
-                                    DurationType.DAYS,String.valueOf(leaveCount));
-                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
+                if (isNotNull(dateTimeInterval)) {
+                    List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
+                    if (leaveCount < (shifts.size() + 1)) {
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
+                                new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
+                                        DurationType.DAYS, String.valueOf(leaveCount));
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                    }
                 }
             }
         }

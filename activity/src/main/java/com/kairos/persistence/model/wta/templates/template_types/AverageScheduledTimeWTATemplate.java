@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
-import com.kairos.enums.wta.MinMaxSetting;
-import com.kairos.enums.wta.PartOfDay;
-import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.enums.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
@@ -179,7 +177,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         List<DateTimeInterval> intervals = new ArrayList<>();
         ZonedDateTime nextEnd = getNextDateOfInterval(interval.getStart());
         intervals.add(new DateTimeInterval(interval.getStart(),nextEnd));
-        intervals.add(new DateTimeInterval(nextEnd,getNextDateOfInterval(nextEnd)));
+        intervals.add(new DateTimeInterval(nextEnd.minusDays(1),getNextDateOfInterval(nextEnd).minusDays(1)));
         return intervals;
     }
 

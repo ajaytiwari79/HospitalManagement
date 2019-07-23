@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.user.resources;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.io.Serializable;

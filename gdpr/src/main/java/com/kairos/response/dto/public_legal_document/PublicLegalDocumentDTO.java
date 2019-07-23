@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 
@@ -21,7 +20,6 @@ public class PublicLegalDocumentDTO {
     @NotNull(message = "Public Legal Document Name Required")
     private String name;
 
-    @NotNull(message = "Public Legal Document Body Content Required")
     private String bodyContentInHtml;
 
     private String publicLegalDocumentLogo;

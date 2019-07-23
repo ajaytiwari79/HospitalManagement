@@ -1,18 +1,13 @@
 package com.kairos.persistence.model.questionnaire_template;
 
-
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.List;
 

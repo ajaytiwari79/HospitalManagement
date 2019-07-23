@@ -1,16 +1,12 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.dto.activity.shift.ActivityRuleViolation;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_SKILL_MATCH;
 
@@ -46,24 +42,29 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
     public void validateRules(ShiftWithActivityDTO shift) {
         List<String> errorMessages = new ArrayList<>();
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
-            ActivityRuleViolation activityRuleViolation;
-            if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
-                    (CollectionUtils.isEmpty(staffSkills) || !CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills))) {
-                errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
-                 activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
-                if(activityRuleViolation==null){
-                    activityRuleViolation=new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(),shiftActivityDTO.getActivity().getName(),0,errorMessages);
-                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
-                }
-                else {
-                    activityRuleViolation.getErrorMessages().addAll(errorMessages);
-                }
+            for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
+                validateStaffSkills(errorMessages, childActivity);
             }
-
+            validateStaffSkills(errorMessages, shiftActivityDTO);
         }
 
     }
 
+    private void validateStaffSkills(List<String> errorMessages, ShiftActivityDTO shiftActivityDTO) {
+        ActivityRuleViolation activityRuleViolation;
+        if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
+                (CollectionUtils.isEmpty(staffSkills) || !CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills))) {
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
+            activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
+            if(activityRuleViolation==null){
+                activityRuleViolation=new ActivityRuleViolation(shiftActivityDTO.getActivity().getId(),shiftActivityDTO.getActivity().getName(),0,errorMessages);
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+            }
+            else {
+                activityRuleViolation.getErrorMessages().addAll(errorMessages);
+            }
+        }
+    }
 
     @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
