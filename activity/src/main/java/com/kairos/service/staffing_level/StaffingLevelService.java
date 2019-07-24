@@ -735,6 +735,8 @@ public class StaffingLevelService extends MongoBaseService {
             for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
                 updateShiftActivityStaffingLevel(durationMinutes, childActivity, staffingLevelInterval, interval);
             }
+            int availableNoOfStaff = staffingLevelInterval.getStaffingLevelActivities().stream().mapToInt(staffingLevelActivity -> staffingLevelActivity.getAvailableNoOfStaff()).sum();
+            staffingLevelInterval.setAvailableNoOfStaff(availableNoOfStaff);
         }
     }
 

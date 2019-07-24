@@ -60,7 +60,6 @@ public class ShiftDetailsService extends MongoBaseService {
         if(showDraft){
             shiftWithActivityDTOS  = new ArrayList<>(shiftMongoRepository.findAllDraftShiftsByIds(shiftIds,showDraft));
             List<BigInteger> draftShiftIds=shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList());
-            shiftWithActivityDTOS.get(0).getActivities().get(0).getStatus().remove(ShiftStatus.PUBLISH);
             shiftIds.removeAll(draftShiftIds);
             if(isCollectionNotEmpty(shiftIds)){
                 shiftWithActivityDTOS.addAll(shiftMongoRepository.findAllShiftsByIds(shiftIds));

@@ -5,8 +5,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.shift.ShiftActionType;
-import com.kairos.enums.shift.TodoStatus;
+import com.kairos.enums.shift.*;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -31,6 +30,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
+import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
 
 /**
  * Created by pradeep
@@ -46,6 +46,7 @@ public class RequestAbsenceService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private TodoService todoService;
     @Inject private ShiftDetailsService shiftDetailsService;
+    @Inject private ShiftStatusService shiftStatusService;
 
 
     public List<ShiftWithActivityDTO> createOrUpdateRequestAbsence(RequestAbsenceDTO requestAbsenceDTO){
@@ -80,32 +81,42 @@ public class RequestAbsenceService {
         return todoService.deleteTodo(shiftId,TodoType.REQUEST_ABSENCE);
     }
 
-    public ShiftWithViolatedInfoDTO approveRequestAbsence(Todo todo){
-        Optional<Shift> shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
-        if(!shiftOptional.isPresent()){
-            exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
+    public <T> T approveRequestAbsence(Todo todo){
+        T response = null;
+        if(TodoStatus.APPROVE.equals(todo.getStatus())){
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
+            Optional<Shift> shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
+            if(!shiftOptional.isPresent()){
+                exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
+            }
+            if(isNull(shiftOptional.get().getRequestAbsence())){
+                exceptionService.actionNotPermittedException(REQUEST_ABSENCE_APPROVED);
+            }
+            Shift shift = shiftOptional.get();
+            ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getEmploymentId(), new HashSet<>());
+            if(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
+                Date startDate = getStartOfDay(shift.getStartDate());
+                Date endDate = CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? asDate(asZoneDateTime(shift.getStartDate()).plusWeeks(1).plusDays(1).truncatedTo(ChronoUnit.DAYS)) : asDate(asZoneDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                ShiftDTO shiftDTO = new ShiftDTO(asLocalDate(startDate),newArrayList(new ShiftActivityDTO(activityWrapper.getActivity().getId(),activityWrapper.getActivity().getName())),shift.getId());
+                shiftDTO.setUnitId(shift.getUnitId());
+                shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper,shiftDTO,staffAdditionalInfoDTO, false,ShiftActionType.SAVE);
+                shiftMongoRepository.deleteShiftBetweenDatesByEmploymentId(shift.getEmploymentId(),startDate,endDate,shiftWithViolatedInfoDTO.getShifts().stream().filter(shiftDTO1->isNotNull(shiftDTO1.getId())).map(shiftDTO1->shiftDTO1.getId()).collect(Collectors.toList()));
+            }else {
+                shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
+            }
+            if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
+                todo.setStatus(TodoStatus.REQUESTED);
+                response = (T)shiftWithViolatedInfoDTO;
+            }else {
+                List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
+                for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
+                    shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftDTO.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
+                }
+                response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
+            }
         }
-        if(isNull(shiftOptional.get().getRequestAbsence())){
-            exceptionService.actionNotPermittedException(REQUEST_ABSENCE_APPROVED);
-        }
-        Shift shift = shiftOptional.get();
-        ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getEmploymentId(), new HashSet<>());
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
-        if(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
-            Date startDate = getStartOfDay(shift.getStartDate());
-            Date endDate = CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? asDate(asZoneDateTime(shift.getStartDate()).plusWeeks(1).plusDays(1).truncatedTo(ChronoUnit.DAYS)) : asDate(asZoneDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
-            ShiftDTO shiftDTO = new ShiftDTO(asLocalDate(startDate),newArrayList(new ShiftActivityDTO(activityWrapper.getActivity().getId(),activityWrapper.getActivity().getName())),shift.getId());
-            shiftDTO.setUnitId(shift.getUnitId());
-            shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper,shiftDTO,staffAdditionalInfoDTO, false,ShiftActionType.SAVE);
-            shiftMongoRepository.deleteShiftBetweenDatesByEmploymentId(shift.getEmploymentId(),startDate,endDate,shiftWithViolatedInfoDTO.getShifts().stream().filter(shiftDTO1->isNotNull(shiftDTO1.getId())).map(shiftDTO1->shiftDTO1.getId()).collect(Collectors.toList()));
-        }else {
-            shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
-        }
-        if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
-            todo.setStatus(TodoStatus.REQUESTED);
-        }
-        return shiftWithViolatedInfoDTO;
+        return response;
     }
 
     private ShiftWithViolatedInfoDTO updateShiftWithRequestAbsence(ActivityWrapper activityWrapper,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO){

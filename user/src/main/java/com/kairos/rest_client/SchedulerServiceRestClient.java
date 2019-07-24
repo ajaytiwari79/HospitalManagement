@@ -83,7 +83,7 @@ public class SchedulerServiceRestClient {
         } catch (HttpClientErrorException e) {
             logger.info("status {}", e.getStatusCode());
             logger.info("response {}", e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in activity micro service " + e.getMessage());
+            throw new RuntimeException("exception occurred in scheduler micro service " + e.getMessage());
         }
 
     }

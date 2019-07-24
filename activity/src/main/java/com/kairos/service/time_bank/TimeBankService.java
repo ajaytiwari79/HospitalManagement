@@ -189,6 +189,9 @@ public class TimeBankService{
         DateTimeInterval interval = new DateTimeInterval(startDate.getMillis(), endDate.getMillis());
         List<ShiftWithActivityDTO> shiftWithActivityDTOList = getShiftsByInterval(shiftWithActivityDTOS, interval);
         staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
+        if(!updateTimebankDetailsInShifts && isNull(dailyTimeBankEntriy)){
+            dailyTimeBankEntriy = new DailyTimeBankEntry(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getEmployment().getStaffId(), asLocalDate(shift.getStartDate()));
+        }
         dailyTimeBankEntriy = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntriy, dateTimeIntervals, staffAdditionalInfoDTO.getDayTypes(), validatedByPlanner);
         if(updateTimebankDetailsInShifts) {
             updateBonusHoursOfTimeBankInShift(shiftWithActivityDTOS, Arrays.asList(shift));
@@ -672,5 +675,14 @@ public class TimeBankService{
             dailyTimeBankEntry.setAnyShiftInDraft(false);
         }
         return dailyTimeBankEntry;
+    }
+
+    public void updateTimeBankForProtectedDaysOff(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner) {
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asDate(LocalDate.now()));
+        staffAdditionalInfoDTO.getEmployment().setStaffId(shift.getStaffId());
+        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner,false);
+        if(isNotNull(dailyTimeBankEntry)) {
+            timeBankRepository.save(dailyTimeBankEntry);
+        }
     }
 }
