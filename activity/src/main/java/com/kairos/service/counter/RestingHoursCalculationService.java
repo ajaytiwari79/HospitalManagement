@@ -53,8 +53,7 @@ public class RestingHoursCalculationService implements CounterService {
         for (Shift shift : shifts) {
             DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
             if (dateTimeInterval.overlaps(shiftInterval)) {
-                totalrestingMinutes -= (int)dateTimeInterval.overlap(shiftInterval).getMinutes();
-                totalrestingMinutes = totalrestingMinutes/60000;
+                totalrestingMinutes -= (int)(dateTimeInterval.overlap(shiftInterval).getMinutes()/60);
 
             }
         }
