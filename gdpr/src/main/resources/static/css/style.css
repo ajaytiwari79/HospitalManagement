@@ -199,33 +199,69 @@ img.logo {
     z-index: -1;
 }
 
-.normal-content-weight {
-    font-weight: 500;
+
+.icon-section:first-of-type
+{
+    padding-left: 0;
+}
+.icon-section:last-of-type
+{
+    padding-right: 0;
+}
+
+.active .logo_img {
+    background-color: #ec7c51;
+    box-shadow: 0px 0px 5px #88665a;
+    border-bottom: 5px solid #ce5223;
+    -webkit-transition: all .5s ease;
+    -o-transition: .5s ease all;
+    transition: all .5s ease;
+    position: relative;
+}
+
+.active .logo_img .img-section {
+    position: relative;
+    transform: translateY(-15px);
+    background-color: #ce5332;
+    -webkit-transition: all .5s ease;
+    -o-transition: .5s ease all;
+    transition: all .5s ease;
+}
+
+.active .logo_img .img-section::before {
+
+    background-color: #ce5332;
+    -webkit-transition: all .5s ease;
+    -o-transition: .5s ease all;
+    transition: all .5s ease;
 }
 
 
+.active .logo_img .icon-content {
+    color: white;
+    -webkit-transition: all .5s ease;
+    -o-transition: .5s ease all;
+    transition: all .5s ease;
 
+}
 
+.active .logo_img::before {
+    content: '';
+    width: 35px;
+    height: 35px;
+    -webkit-transition: all .5s ease;
+    -o-transition: .5s ease all;
+    transition: all .5s ease;
+    background-color: #ce5332;
+    position: absolute;
+    transform: rotate(50deg);
+    bottom: -10px;
+    z-index: -1;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.normal-content-weight {
+    font-weight: 500;
+}
 
 .grid-container {
     display: flex;
@@ -243,7 +279,15 @@ img.logo {
     margin-bottom: 10px;
     min-width: 350px;
     cursor: pointer;
+}
 
+.icon-section:first-of-type
+{
+    padding-left: 0;
+}
+.icon-section:last-of-type
+{
+    padding-right: 0;
 }
 
 .container-tabs {

@@ -23,10 +23,10 @@
 <section class="banner-section">
     <div class="banner-content">
         <div class="content-wrapper">
-            OUR <span class="heading-1">LEGAL</span> POLICY
+            OUR <span class="heading-1">LEGAL</span> POLICIES
         </div>
-        <div class="content-wrapper-2">
-            Privacy Policy
+        <div class="content-wrapper-2" th:text="${selectedDoc.name}">
+
         </div>
 
     </div>
@@ -35,10 +35,10 @@
 <section class="back-section">
     <div class="inner-section">
         <section class="second-section">
-            <div class="container icon-section container-tabs">
+            <div class="container container-tabs">
                 <div class="row tabs-section">
-                    <div class=" icon-section" th:each="document : ${legalDocs}">
-                        <div class="logo_img">
+                    <div class=" icon-section" th:each="document : ${legalDocs}" th:classappend="${document.id == selectedDoc.id } ? active : inactive " >
+                        <a th:href="@{/public/legal/{documentId}/{documentName}(documentId=${document.id},documentName=${document.name})}"> <div class="logo_img">
                             <div class="img-section">
                                 <svg viewBox="0 0 100 99" class="cookies">
 
@@ -49,6 +49,7 @@
                             </div>
                             <span class="text-center icon-content" th:text="${document.name}"></span>
                         </div>
+                        </a>
 
                     </div>
 
@@ -59,54 +60,9 @@
 
     </div>
     <div class="inner-section">
-        <div class="container content-container container-tabs">
-            <div class="inner-section-content row justify-content-center">
-                <div class="text-center col-md-8 font-weight-bold own-col">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis ab facilis delectus ut nihil, quo eos
-                    ipsam alias hic expedita soluta non corrupti deleniti. Ex quasi obcaecati fugit vero ab!
-                </div>
-            </div>
-            <div class="p-3">
-                <div class="small-heading">
-                    Who we are
+        <div class="container content-container container-tabs" th:utext="${selectedDoc.bodyContentInHtml}">
 
-                </div>
-                <div class="normal-content">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quia, fuga! Corporis deleniti tempore odio error
-                    quia, molestiae, possimus non fugiat, nisi excepturi in libero. Repellendus et praesentium consequatur iste
-                    quod?
-                </div>
-                <div class="normal-content normal-content-weight"> Email Customer Service :
-                    <span class="email-content">Support@gmail.com</span>
-                </div>
-                <div class="normal-content normal-content-weight"> Email Customer Service :
-                    <span class="email-content">Support@gmail.com</span>
-                </div>
-                <div class="small-heading">
-                    Statment Privacy & Policy
 
-                </div>
-                <div class="normal-content">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quia, fuga! Corporis deleniti tempore odio error
-                    quia, molestiae, possimus non fugiat, nisi excepturi in libero. Repellendus et praesentium consequatur iste
-                    quod?
-                </div>
-                <div class="normal-content">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quia, fuga! Corporis deleniti tempore odio error
-                    quia, molestiae, possimus non fugiat, nisi excepturi in libero. Repellendus et praesentium consequatur iste
-                    quod?
-                </div>
-                <div class="normal-content">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quia, fuga! Corporis deleniti tempore odio error
-                    quia, molestiae, possimus non fugiat, nisi excepturi in libero. Repellendus et praesentium consequatur iste
-                    quod?
-                </div>
-                <div class="normal-content">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quia, fuga! Corporis deleniti tempore odio error
-                    quia, molestiae, possimus non fugiat, nisi excepturi in libero. Repellendus et praesentium consequatur iste
-                    quod?
-                </div>
-            </div>
 
         </div>
 

@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 public class PublicLegalDocumentDTO {
+
     private Long id;
 
     @NotNull(message = "Public Legal Document Name Required")
@@ -31,5 +32,11 @@ public class PublicLegalDocumentDTO {
         this.name=name;
         this.publicLegalDocumentLogo=publicLegalDocumentLogo;
         this.bodyContentInHtml=bodyContentInHtml;
+    }
+
+
+    @Override
+    public String toString(){
+        return this.name;
     }
 }
