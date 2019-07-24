@@ -25,6 +25,7 @@ import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
@@ -78,7 +79,7 @@ public class PayOutCalculationService {
                             ctaScheduledOrCompensationMinutes = shiftActivity.getScheduledMinutes();
                             shiftActivity.setScheduledMinutesOfPayout(shiftActivity.getScheduledMinutes()+shiftActivity.getScheduledMinutesOfPayout());
                         } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
-                            ctaScheduledOrCompensationMinutes = timeBankCalculationService.calculateCTARuleTemplateBonus(ruleTemplate, interval, shiftInterval);
+                            ctaScheduledOrCompensationMinutes = timeBankCalculationService.calculateCTARuleTemplateBonus(ruleTemplate, interval, shiftInterval).intValue();
                             ctaBonusMinutes += ctaScheduledOrCompensationMinutes;
                             shiftActivity.getPayoutPerShiftCTADistributions().add(new PayOutPerShiftCTADistribution(ruleTemplate.getName(), ctaPayoutMinMap.getOrDefault(ruleTemplate.getId(), 0)+ctaScheduledOrCompensationMinutes, ruleTemplate.getId()));
                             shiftActivity.setPayoutCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaScheduledOrCompensationMinutes);
