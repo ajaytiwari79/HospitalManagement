@@ -49,11 +49,12 @@ public class RestingHoursCalculationService implements CounterService {
     public double getTotalRestingHours(List<Shift> shifts, LocalDate startDate, LocalDate endDate) {
         //all shifts should be sorted on startDate
         DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
-        long totalrestingMinutes = dateTimeInterval.getMilliSeconds();
+        long totalrestingMinutes = dateTimeInterval.getMilliSeconds()/3600000;
         for (Shift shift : shifts) {
             DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
             if (dateTimeInterval.overlaps(shiftInterval)) {
-                totalrestingMinutes -= (int)dateTimeInterval.overlap(shiftInterval).getMinutes();
+                totalrestingMinutes -= (int)(dateTimeInterval.overlap(shiftInterval).getMinutes()/60);
+
             }
         }
         return totalrestingMinutes;
