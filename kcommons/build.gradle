@@ -3,6 +3,11 @@ version '0.0.1-SNAPSHOT'
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
+
+ext {
+    versionlogback="1.2.3"
+}
+
 sourceCompatibility = 1.8
 
 repositories {
@@ -37,7 +42,8 @@ dependencies {
     compile group: 'org.neo4j', name: 'neo4j-ogm-core', version: '3.1.10'
     // compile group: 'org.springframework.data', name: 'spring-data-neo4j', version: '5.0.2.RELEASE'//As there are DTOs with neo4j annotations which needs to be fixed TODO
     //compile 'org.neo4j:neo4j:3.3.4'
-
+    compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback    
 }
 sonarqube {
     properties {

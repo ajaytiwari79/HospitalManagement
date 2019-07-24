@@ -442,9 +442,9 @@ public class TimeBankService{
     private void updateTimebankDetailsInShiftActivity(Map<String, ShiftActivityDTO> shiftActivityDTOMap, ShiftActivity shiftActivity) {
         if(shiftActivityDTOMap.containsKey(shiftActivity.getActivityId()+"_"+shiftActivity.getStartDate())) {
             ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getActivityId() + "_" + shiftActivity.getStartDate());
-            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
+            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes().intValue());
             shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
-            shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + shiftActivityDTO.getTimeBankCtaBonusMinutes());
+            shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + shiftActivityDTO.getTimeBankCtaBonusMinutes().intValue());
             shiftActivity.setScheduledMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank());
         }
     }
@@ -497,7 +497,7 @@ public class TimeBankService{
                 int timeBankCtaBonusMinutes = 0;
                 int scheduledMinutes = 0;
                 for (ShiftActivityDTO activity : shiftDTO.getActivities()) {
-                    activity.setPlannedMinutesOfTimebank(activity.getScheduledMinutesOfTimebank() + activity.getTimeBankCtaBonusMinutes());
+                    activity.setPlannedMinutesOfTimebank(activity.getScheduledMinutesOfTimebank() + activity.getTimeBankCtaBonusMinutes().intValue());
                     plannedMinutes += activity.getPlannedMinutesOfTimebank();
                     timeBankCtaBonusMinutes += activity.getTimeBankCtaBonusMinutes();
                     scheduledMinutes += activity.getScheduledMinutes();
