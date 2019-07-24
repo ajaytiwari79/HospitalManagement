@@ -3,6 +3,7 @@ package com.kairos.persistence.model.todo;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoSubtype;
 import com.kairos.enums.todo.TodoType;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.*;
 
@@ -34,7 +35,7 @@ public class Todo extends MongoBaseEntity {
     private LocalDateTime approvedOn;
     private String remark;
 
-    public Todo(TodoType type, TodoSubtype subtype, BigInteger entityId, BigInteger subEntityId, TodoStatus status, LocalDate shiftDate, String description, Long staffId, Long employmentId, Long unitId) {
+    public Todo(TodoType type, TodoSubtype subtype, BigInteger entityId, BigInteger subEntityId, String activityName, TodoStatus status, LocalDate shiftDate, String description, Long staffId, Long employmentId, Long unitId) {
         this.type = type;
         this.subtype = subtype;
         this.entityId = entityId;
@@ -45,5 +46,6 @@ public class Todo extends MongoBaseEntity {
         this.staffId = staffId;
         this.employmentId = employmentId;
         this.unitId = unitId;
+        this.activityName = activityName;
     }
 }
