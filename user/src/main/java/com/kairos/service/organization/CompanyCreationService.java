@@ -15,9 +15,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.BusinessType;
-import com.kairos.persistence.model.country.default_data.CompanyCategory;
-import com.kairos.persistence.model.country.default_data.UnitType;
+import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
@@ -35,15 +33,10 @@ import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRep
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
-import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.*;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
-import com.kairos.persistence.repository.user.region.LevelGraphRepository;
-import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
-import com.kairos.persistence.repository.user.region.RegionGraphRepository;
-import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.persistence.repository.user.region.*;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
@@ -67,12 +60,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
@@ -215,7 +207,7 @@ public class CompanyCreationService {
             }
             //accountType is Changed for parent organization We need to add this account type to child organization as well
             if(organization.getAccountType() == null || !organization.getAccountType().getId().equals(orgDetails.getAccountTypeId())) {
-                organization.setAccountType(accountType);
+             organization.setAccountType(accountType);
                 List<Long> organizationIds = new ArrayList<>();
                 organizationIds.addAll(organization.getChildren().stream().map(Organization::getId).collect(Collectors.toList()));
                 organizationIds.add(organization.getId());
@@ -302,6 +294,7 @@ public class CompanyCreationService {
                 user.setFirstName(unitManagerDTO.getFirstName());
                 user.setLastName(unitManagerDTO.getLastName());
                 user.setUserName(unitManagerDTO.getUserName());
+                user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                 user.setUserNameUpdated(true);
                 userGraphRepository.save(user);
             } else {
@@ -329,6 +322,7 @@ public class CompanyCreationService {
                 user.setLastName(unitManagerDTO.getLastName());
                 setEncryptedPasswordAndAge(unitManagerDTO, user);
                 user.setUserNameUpdated(true);
+                user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                 userGraphRepository.save(user);
                 if(unitManagerDTO.getAccessGroupId() != null) {
                     setAccessGroupInUserAccount(user, organization.getId(), unitManagerDTO.getAccessGroupId(), union);
@@ -347,6 +341,7 @@ public class CompanyCreationService {
                         user = new User(unitManagerDTO.getCprNumber(), unitManagerDTO.getFirstName(), unitManagerDTO.getLastName(), unitManagerDTO.getEmail(), unitManagerDTO.getUserName(), true);
                         setEncryptedPasswordAndAge(unitManagerDTO, user);
                     }
+                    user.setLastSelectedOrganizationId(isNotNull(unitId) ? unitId : organization.getId());
                     userGraphRepository.save(user);
                     staffService.setUserAndPosition(organization, user, unitManagerDTO.getAccessGroupId(), parentOrganization, union);
 

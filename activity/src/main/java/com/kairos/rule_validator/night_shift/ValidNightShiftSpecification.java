@@ -10,9 +10,7 @@ import com.kairos.enums.DurationType;
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 
 import javax.management.timer.Timer;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.*;
 
 public class ValidNightShiftSpecification extends AbstractActivitySpecification<ShiftAndExpertiseNightWorkerSettingDTO> {

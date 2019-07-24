@@ -25,9 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
@@ -179,7 +177,7 @@ public class AuthController {
     @RequestMapping(value = UNIT_URL + "/user/permissions", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getPermissions(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(unitId));
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermissions(organizationId));
+    // return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getPermission(organizationId));
     }
 
     @PreAuthorize("hasPermission()")

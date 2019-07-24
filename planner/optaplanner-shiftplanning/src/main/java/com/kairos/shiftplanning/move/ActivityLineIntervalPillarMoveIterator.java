@@ -5,9 +5,7 @@ import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ActivityLineIntervalPillarMoveIterator<T>
         implements Iterator<ActivityLineIntervalPillarMove> {

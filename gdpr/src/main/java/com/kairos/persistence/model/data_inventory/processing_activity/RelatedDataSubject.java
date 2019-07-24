@@ -1,10 +1,7 @@
 package com.kairos.persistence.model.data_inventory.processing_activity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -25,7 +22,7 @@ public class RelatedDataSubject  {
     @NotNull
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<RelatedDataCategory> dataCategories = new ArrayList<>();
 
 

@@ -1,12 +1,16 @@
 package com.kairos.commons.controller.audit_logging;
 
 import com.kairos.commons.service.audit_logging.AuditLoggingService;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ResponseHandler;
 import org.springframework.context.ApplicationContext;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static com.kairos.commons.utils.ResponseHandler.generateResponse;
@@ -33,6 +37,14 @@ public class AuditLogController {
             responseEntity = generateResponse(HttpStatus.OK, false,context.getBean(AuditLoggingService.class).getAuditLoggingByType(auditLogType));
         }
         return responseEntity;
+    }
+
+    @GetMapping(value = "/get_audit_log_staff/{staffId}")
+    public ResponseEntity<Map<String,Object>>getAuditLoggingOfStaff(@PathVariable Long staffId,
+                                                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,context.getBean(AuditLoggingService.class).getAuditLogOfStaff(staffId,startDate,endDate));
+
     }
 
 }

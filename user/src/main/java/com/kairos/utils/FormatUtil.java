@@ -1,8 +1,6 @@
 package com.kairos.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by oodles on 16/2/17.

@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.address;
 
-import com.kairos.persistence.model.user.region.Municipality;
-import com.kairos.persistence.model.user.region.Province;
-import com.kairos.persistence.model.user.region.Region;
+import com.kairos.persistence.model.user.region.*;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @QueryResult

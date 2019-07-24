@@ -1,12 +1,9 @@
 package com.kairos.persistence.repository.risk_management;
 
-
 import com.kairos.response.dto.common.RiskResponseDTO;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;

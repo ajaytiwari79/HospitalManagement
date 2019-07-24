@@ -1,9 +1,6 @@
 package com.kairos.dto.user.organization;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by oodles on 17/4/18.

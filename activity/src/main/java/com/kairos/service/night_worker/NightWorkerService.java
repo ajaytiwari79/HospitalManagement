@@ -7,6 +7,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.IntegrationOperation;
@@ -27,6 +28,7 @@ import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.night_worker.NightWorkerAgeEligibilitySpecification;
 import com.kairos.rule_validator.night_worker.StaffNonPregnancySpecification;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.shift.ShiftFilterService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +51,7 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAI
 public class NightWorkerService {
 
     @Inject
-    NightWorkerMongoRepository nightWorkerMongoRepository;
+    private NightWorkerMongoRepository nightWorkerMongoRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -68,6 +70,7 @@ public class NightWorkerService {
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
     private SchedulerServiceRestClient schedulerRestClient;
+    @Inject private ShiftFilterService shiftFilterService;
 
     public String prepareNameOfQuestionnaireSet() {
         return AppConstants.QUESTIONNAIE_NAME_PREFIX + " " + DateUtils.getDateString(DateUtils.getDate(), "dd_MMM_yyyy");
@@ -246,8 +249,10 @@ public class NightWorkerService {
         Map[] staffAndEmploymentAndExpertiseIdArray = getEmploymentAndExpertiseIdMap(staffAndEmploymentIdMap);
         Map<Long, Long> employmentAndExpertiseIdMap = staffAndEmploymentAndExpertiseIdArray[0];
         Map<Long, Long> employmentIdAndStaffIdMap = staffAndEmploymentAndExpertiseIdArray[1];
-        Map<Long, Boolean> staffIdAndnightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
-        updateWTARuleTemplateForNightWorker(staffIdAndnightWorkerDetailsMap);
+        Map[] nightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
+        Map<Long,Boolean> staffIdAndnightWorkerDetailsMap = nightWorkerDetailsMap[0];
+        Map<Long,Boolean> employementIdAndNightWorkerMap = nightWorkerDetailsMap[1];
+        updateWTARuleTemplateForNightWorker(employementIdAndNightWorkerMap);
         List<NightWorker> nightWorkers = nightWorkerMongoRepository.findByStaffIds(employmentIdAndStaffIdMap.values());
         Map<Long,NightWorker> nightWorkerMap = nightWorkers.stream().collect(Collectors.toMap(NightWorker::getStaffId,v->v));
         List<NightWorker> updateNightWorkers = new ArrayList<>();
@@ -277,10 +282,10 @@ public class NightWorkerService {
         return new Map[]{employmentAndExpertiseIdMap,employmentIdAndStaffIdMap};
     }
 
-    public Map<Long, Boolean> getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
-        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(employmentAndExpertiseIdMap.values());
-        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = expertiseNightWorkerSettings.stream().collect(Collectors.toMap(ExpertiseNightWorkerSetting::getExpertiseId, v -> v));
+    public Map[] getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
+        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = getMapOfExpetiseNightWorkerSetting(employmentAndExpertiseIdMap.values());
         Map<Long, Boolean> staffIdAndNightWorkerMap = new HashMap<>();
+        Map<Long, Boolean> employementIdAndNightWorkerMap = new HashMap<>();
         for (Map.Entry<Long, Long> employmentAndExpertiseIdEntry : employmentAndExpertiseIdMap.entrySet()) {
             boolean nightWorker = false;
             if (expertiseNightWorkerSettingMap.containsKey(employmentAndExpertiseIdEntry.getValue())) {
@@ -297,9 +302,23 @@ public class NightWorkerService {
             Long staffId = employmentIdAndStaffIdMap.get(employmentAndExpertiseIdEntry.getKey());
             if(!staffIdAndNightWorkerMap.containsKey(staffId) || !staffIdAndNightWorkerMap.get(staffId)) {
                 staffIdAndNightWorkerMap.put(staffId, nightWorker);
+                employementIdAndNightWorkerMap.put(employmentAndExpertiseIdEntry.getKey(),nightWorker);
             }
         }
-        return staffIdAndNightWorkerMap;
+        return new Map[]{staffIdAndNightWorkerMap,employementIdAndNightWorkerMap};
+    }
+
+    private Map<Long,ExpertiseNightWorkerSetting> getMapOfExpetiseNightWorkerSetting(Collection<Long> expertiseIds){
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(expertiseIds);
+        Map<Long,ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = new HashMap<>();
+        for (ExpertiseNightWorkerSetting expertiseNightWorkerSetting : expertiseNightWorkerSettings) {
+            if(isNotNull(expertiseNightWorkerSetting.getUnitId())){
+                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
+            }else if(!expertiseNightWorkerSettingMap.containsKey(expertiseNightWorkerSetting.getExpertiseId())){
+                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
+            }
+        }
+        return expertiseNightWorkerSettingMap;
     }
 
     private void updateWTARuleTemplateForNightWorker(Map<Long, Boolean> employmentAndNightWorkerMap) {
@@ -379,7 +398,13 @@ public class NightWorkerService {
         });
     }
 
-    public Map<Long,Boolean> getStaffNightWorkerDetails(List<Long> staffIds){
+    public Map<Long,Boolean> getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO,LocalDate startDate,LocalDate endDate){
+        List<Long> staffIds = staffFilterDTO.getStaffIds();
+        if(staffFilterDTO.isValidFilterForShift()) {
+            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds(),startDate,endDate);
+            shiftDTOS = shiftFilterService.getShiftsByFilters(shiftDTOS, staffFilterDTO);
+            staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toList());
+        }
         List<NightWorker> nightWorker = nightWorkerMongoRepository.findByStaffIds(staffIds);
         Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorker.stream().collect(Collectors.toMap(NightWorker::getStaffId,NightWorker::isNightWorker));
         for (Long staffId : staffIds) {

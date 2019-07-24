@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
-import com.kairos.enums.wta.MinMaxSetting;
-import com.kairos.enums.wta.PartOfDay;
-import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.enums.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
@@ -148,8 +146,11 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                             totalMin += (int) dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
                         }
                     }
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin / (60 * (int) dateTimeInterval.getDays()));
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(int)intervalLength);
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0],this.name));
+                    if(!isValid){
+                        break;
+                    }
                 }
             }
         }
@@ -158,13 +159,13 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     public ZonedDateTime getNextDateOfInterval(ZonedDateTime dateTime){
         ZonedDateTime zonedDateTime = null;
         switch (intervalUnit){
-            case DAYS:dateTime.plusDays(intervalLength);
+            case DAYS:zonedDateTime = dateTime.plusDays(intervalLength);
                 break;
-            case WEEKS:dateTime.plusWeeks(intervalLength);
+            case WEEKS:zonedDateTime = dateTime.plusWeeks(intervalLength);
                 break;
-            case MONTHS:dateTime.plusMonths(intervalLength);
+            case MONTHS:zonedDateTime = dateTime.plusMonths(intervalLength);
                 break;
-            case YEARS:dateTime.plusYears(intervalLength);
+            case YEARS:zonedDateTime = dateTime.plusYears(intervalLength);
                 break;
             default:
                 break;
@@ -176,7 +177,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         List<DateTimeInterval> intervals = new ArrayList<>();
         ZonedDateTime nextEnd = getNextDateOfInterval(interval.getStart());
         intervals.add(new DateTimeInterval(interval.getStart(),nextEnd));
-        intervals.add(new DateTimeInterval(nextEnd,getNextDateOfInterval(nextEnd)));
+        intervals.add(new DateTimeInterval(nextEnd.minusDays(1),getNextDateOfInterval(nextEnd).minusDays(1)));
         return intervals;
     }
 
