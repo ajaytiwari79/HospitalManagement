@@ -37,6 +37,7 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         else if(request.getRequestURI().contains("css")) return true;
         else if(request.getRequestURI().contains("js")) return true;
         else if(request.getRequestURI().contains("images")) return true;
+//        else if(request.getRequestURI().contains("public/legal")) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
