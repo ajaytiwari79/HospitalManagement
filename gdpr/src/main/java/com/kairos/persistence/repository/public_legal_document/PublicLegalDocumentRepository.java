@@ -14,9 +14,11 @@ import java.util.List;
 @Repository
 @JaversSpringDataAuditable
 public interface PublicLegalDocumentRepository extends JpaRepository<PublicLegalDocument, Long> {
+
+
     @Query(value = "Select p from PublicLegalDocument p where p.id = ?1 and p.deleted = false")
     PublicLegalDocument findByIdAndDeletedFalse(Long id);
 
-    @Query(value = "Select p from PublicLegalDocument p where p.deleted = false")
-    List<PublicLegalDocument> findAllAndDeletedFalse();
+    List<PublicLegalDocument> findAllByDeletedFalseOrderByCreatedAt();
+
 }
