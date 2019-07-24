@@ -1,9 +1,17 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.OrganizationActivityDTO;
+import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.system_setting.UnitTypeDTO;
+import com.kairos.enums.Day;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.counter.KPIUtils;
@@ -36,6 +44,8 @@ public class CounterHelperService {
         return new Object[]{staffKpiFilterDTOS,dateTimeIntervals,staffIds};
     }
 
+
+
     public Object[] getDataByFilterCriteria(Map<FilterType, List> filterBasedCriteria){
         List staffIds = (filterBasedCriteria.get(FilterType.STAFF_IDS) != null) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.STAFF_IDS)) : new ArrayList<>();
         List<LocalDate> filterDates = new ArrayList<>();
@@ -47,5 +57,23 @@ public class CounterHelperService {
         Set<DayOfWeek> daysOfWeeks = filterBasedCriteria.containsKey(FilterType.DAYS_OF_WEEK) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAYS_OF_WEEK)) ? KPIUtils.getDaysOfWeeksfromString(filterBasedCriteria.get(FilterType.DAYS_OF_WEEK)) : newHashSet(DayOfWeek.values());
         return new Object[]{staffIds,filterDates,unitIds,employmentTypeIds,daysOfWeeks};
     }
+    public Set<DayOfWeek> getDayOfWeek(List<Long> dayTypeIds,Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap)
+    {
+        Set<DayOfWeek> daysOfWeek = new HashSet<>();
+
+        if (!ObjectUtils.isCollectionEmpty(dayTypeIds)) {
+            dayTypeIds.forEach(daysTypeId -> daysTypeIdAndDayTypeMap.get(daysTypeId).getValidDays().forEach(day -> {
+                //TODO if remove Everyday from day enum then remove if statement and use dayOfWeek of java
+                if (day.equals(Day.EVERYDAY)) {
+                    daysOfWeek.addAll(newHashSet(DayOfWeek.values()));
+                } else {
+                    daysOfWeek.add(DayOfWeek.valueOf(day.toString()));
+                }
+            }));
+        }
+        return daysOfWeek;
+    }
+
+
 
 }

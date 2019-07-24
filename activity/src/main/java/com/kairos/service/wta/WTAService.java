@@ -56,8 +56,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
@@ -437,10 +436,10 @@ public class WTAService extends MongoBaseService {
         return ctawtaAndAccumulatedTimebankWrapper;
     }
 
-    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<Long> upIds) {
+    public WTATableSettingWrapper getWTAWithVersionIds(Long unitId, List<Long> employmentIds) {
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
-        List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(upIds);
-        List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(upIds);
+        List<WTAQueryResultDTO> currentWTAList = wtaRepository.getAllParentWTAByIds(employmentIds);
+        List<WTAQueryResultDTO> versionsOfWTAs = wtaRepository.getWTAWithVersionIds(employmentIds);
         List<WTAResponseDTO> parentWTA = ObjectMapperUtils.copyPropertiesOfListByMapper(currentWTAList, WTAResponseDTO.class);
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
         Map<Long, List<WTAQueryResultDTO>> verionWTAMap = versionsOfWTAs.stream().collect(Collectors.groupingBy(k -> k.getEmploymentId(), Collectors.toList()));
@@ -470,9 +469,11 @@ public class WTAService extends MongoBaseService {
 
     }
 
-    public WTAResponseDTO getWTAOfEmployment(Long employmentId) {
-        WTAQueryResultDTO wtaQueryResultDTO = wtaRepository.getWTAByEmploymentIdAndDate(employmentId, new Date());
-        return ObjectMapperUtils.copyPropertiesByMapper(wtaQueryResultDTO, WTAResponseDTO.class);
+    public List<WTAResponseDTO> getWTAOfEmployment(Long employmentId) {
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getWTAWithVersionIds(newArrayList(employmentId));
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        wtaResponseDTOS.addAll(ObjectMapperUtils.copyPropertiesOfListByMapper(wtaRepository.getAllParentWTAByIds(newArrayList(employmentId)),WTAResponseDTO.class));
+        return wtaResponseDTOS;
     }
 
 

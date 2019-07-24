@@ -116,14 +116,14 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
         if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)) {
             int count = 0;
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-            //dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1),dateTimeInterval.getEnd().plusDays(1));
+            dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1),dateTimeInterval.getEnd().plusDays(1));
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
             shifts.add(infoWrapper.getShift());
             List<DateTimeInterval> intervals = getSortedIntervals(shifts);
-            if (intervals.size() > 0) {
+            if (intervals.size() > 2) {
                 count = getDayOFF(intervals,dateTimeInterval);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count-1);
+                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                         limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
             }

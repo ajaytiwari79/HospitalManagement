@@ -244,8 +244,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return getShiftWithActivityByCriteria(Criteria.where("deleted").is(false).and("id").in(shiftIds),false,ShiftWithActivityDTO.class);
     }
 
-    public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds){
-        return getShiftWithActivityByCriteria(Criteria.where("deleted").is(false).and("disabled").is(false).and("staffId").in(staffIds),false,ShiftDTO.class);
+    public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds, LocalDate startDate, LocalDate endDate){
+        Criteria criteria = Criteria.where("deleted").is(false).and("disabled").is(false).and("staffId").in(staffIds);
+        if(isNotNull(startDate) && isNotNull(endDate)){
+            criteria.and("startDate").gte(startDate).lte(endDate.plusDays(1));
+        }
+        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
     };
 
     @Override

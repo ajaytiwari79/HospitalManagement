@@ -80,7 +80,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                         infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                     }
                 }
-            }else {
+            }else if(CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(), activityIds)){
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                         new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
                                 DurationType.DAYS,String.valueOf(0));

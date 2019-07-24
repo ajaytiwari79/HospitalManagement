@@ -40,12 +40,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
-import static com.kairos.constants.CommonConstants.FULL_WEEK;
+import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -63,25 +63,20 @@ public class StaffFilterService {
     @Inject
     private FilterGroupGraphRepository filterGroupGraphRepository;
     @Inject
-    private
-    EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
-    private
-    OrganizationService organizationService;
+    private OrganizationService organizationService;
     @Inject
     private
     EngineerTypeGraphRepository engineerTypeGraphRepository;
     @Inject
-    private
-    StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
+    private StaffFavouriteFilterGraphRepository staffFavouriteFilterGraphRepository;
     @Inject
-    private
-    OrganizationGraphRepository organizationGraphRepository;
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private EnvConfig envConfig;
     @Inject
-    private
-    ExpertiseGraphRepository expertiseGraphRepository;
+    private ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -90,7 +85,8 @@ public class StaffFilterService {
     private AccessGroupRepository accessGroupRepository;
     @Inject
     private AccessPageRepository accessPageRepository;
-    @Inject private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
@@ -147,11 +143,21 @@ public class StaffFilterService {
                 return getAllTimeType(countryId);
             case ACTIVITY_STATUS:
                 return getStatusFilter();
+            case TIME_SLOT:
+                return getTimeSlots();
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
         }
         return null;
+    }
+
+    private List<FilterSelectionQueryResult> getTimeSlots(){
+        List<FilterSelectionQueryResult> filterSelectionQueryResults = new ArrayList<>();
+        filterSelectionQueryResults.add(new FilterSelectionQueryResult(AppConstants.DAY,AppConstants.DAY));
+        filterSelectionQueryResults.add(new FilterSelectionQueryResult(AppConstants.EVENING,AppConstants.EVENING));
+        filterSelectionQueryResults.add(new FilterSelectionQueryResult(AppConstants.NIGHT,AppConstants.NIGHT));
+        return filterSelectionQueryResults;
     }
 
     private List<FilterSelectionQueryResult> getStatusFilter(){
@@ -286,11 +292,10 @@ public class StaffFilterService {
         return mapOfFilters;
     }
 
-    public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId) {
+    public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId, LocalDate startDate,LocalDate endDate) {
         Organization unit = organizationGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
-
         }
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
                 !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
@@ -310,7 +315,7 @@ public class StaffFilterService {
         staffEmploymentTypeWrapper.setStaffList(staffs);
         List<Long> staffIds = (List<Long>) staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
         staffFilterDTO.setStaffIds(staffIds);
-        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO,unitId);
+        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO,unitId,startDate,endDate);
         List<Map> staffList = new ArrayList<>();
         for (Map staffUndModifiable : staffs) {
             if(staffIdAndNightWorkerDetailsMap.containsKey(staffUndModifiable.get("id"))) {

@@ -17,8 +17,7 @@ public interface PublicLegalDocumentRepository extends JpaRepository<PublicLegal
     @Query(value = "Select p from PublicLegalDocument p where p.id = ?1 and p.deleted = false")
     PublicLegalDocument findByIdAndDeletedFalse(Long id);
 
-    @Query(value = "Select p from PublicLegalDocument p where p.name = ?1 and p.deleted = false")
-    PublicLegalDocument findByNameAndDeletedFalse(String name);
+    PublicLegalDocument findByNameIgnoreCaseAndDeletedFalse(String name);
 
     @Query(value = "Select p from PublicLegalDocument p where p.deleted = false")
     List<PublicLegalDocument> findAllAndDeletedFalse();

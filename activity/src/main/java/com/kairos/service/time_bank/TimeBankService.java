@@ -106,7 +106,7 @@ public class TimeBankService{
      */
     public void updateTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner) {
         staffAdditionalInfoDTO.getEmployment().setStaffId(shift.getStaffId());
-        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
+        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner,true);
         if(isNotNull(dailyTimeBankEntry)) {
             timeBankRepository.save(dailyTimeBankEntry);
         }
@@ -179,7 +179,7 @@ public class TimeBankService{
         }
     }
 
-    private DailyTimeBankEntry renewDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner) {
+    public DailyTimeBankEntry renewDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner,boolean updateTimebankDetailsInShifts) {
         DateTime startDate = new DateTime(shift.getStartDate()).withTimeAtStartOfDay();
         DateTime endDate = startDate.plusDays(1);
         DailyTimeBankEntry dailyTimeBankEntriy = timeBankRepository.findByEmploymentAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asLocalDate(startDate));
@@ -188,8 +188,13 @@ public class TimeBankService{
         DateTimeInterval interval = new DateTimeInterval(startDate.getMillis(), endDate.getMillis());
         List<ShiftWithActivityDTO> shiftWithActivityDTOList = getShiftsByInterval(shiftWithActivityDTOS, interval);
         staffAdditionalInfoDTO.getEmployment().setStaffId(staffAdditionalInfoDTO.getId());
+        if(!updateTimebankDetailsInShifts && isNull(dailyTimeBankEntriy)){
+            dailyTimeBankEntriy = new DailyTimeBankEntry(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getEmployment().getStaffId(), asLocalDate(shift.getStartDate()));
+        }
         dailyTimeBankEntriy = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOList, dailyTimeBankEntriy, dateTimeIntervals, staffAdditionalInfoDTO.getDayTypes(), validatedByPlanner);
-        updateBonusHoursOfTimeBankInShift(shiftWithActivityDTOS, Arrays.asList(shift));
+        if(updateTimebankDetailsInShifts) {
+            updateBonusHoursOfTimeBankInShift(shiftWithActivityDTOS, Arrays.asList(shift));
+        }
         return dailyTimeBankEntriy;
     }
 
@@ -380,7 +385,7 @@ public class TimeBankService{
             }
             staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-            dailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
+            dailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false,true));
             ctaResponseDTOMap.put(shiftDate, ctaResponseDTO);
         }
         if(!dailyTimeBanks.isEmpty()) {
@@ -455,14 +460,14 @@ public class TimeBankService{
                     setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                     staffAdditionalInfoDTOMap.put(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO);
                     if(staffAdditionalInfoDTOMap.containsKey(shift.getEmploymentId())) {
-                        dailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getEmploymentId()), shift, false));
+                        dailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getEmploymentId()), shift, false,true));
                     }
                 }
             } catch (Exception e) {
                 LOGGER.info("staff is not the part of this Unit");
             }
             if(staffAdditionalInfoDTOMap.containsKey(shift.getEmploymentId()) && CollectionUtils.isNotEmpty(staffAdditionalInfoDTOMap.get(shift.getEmploymentId()).getEmployment().getCtaRuleTemplates())) {
-                DailyTimeBankEntry dailyTimeBankEntries = renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getEmploymentId()), shift, false);
+                DailyTimeBankEntry dailyTimeBankEntries = renewDailyTimeBank(staffAdditionalInfoDTOMap.get(shift.getEmploymentId()), shift, false,true);
                 dailyTimeBanks.add(dailyTimeBankEntries);
             }
         }
@@ -560,7 +565,7 @@ public class TimeBankService{
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 staffAdditionalInfoDTO.setUnitId(shifts.get(0).getUnitId());
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                updateDailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
+                updateDailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false,true));
             }
             if(isCollectionNotEmpty(updateDailyTimeBanks)) {
                 timeBankRepository.saveEntities(updateDailyTimeBanks);
@@ -668,5 +673,14 @@ public class TimeBankService{
             dailyTimeBankEntry.setAnyShiftInDraft(false);
         }
         return dailyTimeBankEntry;
+    }
+
+    public void updateTimeBankForProtectedDaysOff(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner) {
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asDate(LocalDate.now()));
+        staffAdditionalInfoDTO.getEmployment().setStaffId(shift.getStaffId());
+        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner,false);
+        if(isNotNull(dailyTimeBankEntry)) {
+            timeBankRepository.save(dailyTimeBankEntry);
+        }
     }
 }
