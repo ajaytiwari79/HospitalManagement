@@ -102,7 +102,7 @@ public class PublicLegalDocumentService {
     }
 
     public List<PublicLegalDocumentDTO> getAllPublicLegalDocument() {
-        List<PublicLegalDocument> publicLegalDocuments = publicLegalDocumentRepository.findAllAndDeletedFalse();
+        List<PublicLegalDocument> publicLegalDocuments = publicLegalDocumentRepository.findAllByDeletedFalseOrderByCreatedAt();
         List<PublicLegalDocumentDTO> publicLegalDocumentDTOS = new ArrayList<>();
         publicLegalDocuments.forEach(publicLegalDocument -> {
             publicLegalDocumentDTOS.add(new PublicLegalDocumentDTO(publicLegalDocument.getId(),publicLegalDocument.getName(),publicLegalDocument.getPublicLegalDocumentLogo(),publicLegalDocument.getBodyContentInHtml()));

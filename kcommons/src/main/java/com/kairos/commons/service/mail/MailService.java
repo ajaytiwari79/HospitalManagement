@@ -110,7 +110,7 @@ public class MailService {
                 LOGGER.info("Receiver is {}",receiver);
                 throw new InvalidRequestException("Receiver E-mail id is not correct");
             }
-            personalization.addTo(new Email("kuldeep.sidana@oodlestechnologies.com"));
+            personalization.addTo(new Email(receiver));
         }
         Email from=new Email(NO_REPLY_EMAIL);
         Content content= getContent(templateName,templateParam,body);
