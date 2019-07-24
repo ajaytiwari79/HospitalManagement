@@ -5,6 +5,8 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
@@ -27,8 +29,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toMap;
 
@@ -63,8 +64,8 @@ public class ShiftDetailsService extends MongoBaseService {
             if(isCollectionNotEmpty(shiftIds)){
                 shiftWithActivityDTOS.addAll(shiftMongoRepository.findAllShiftsByIds(shiftIds));
             }
-        }else{
-            shiftWithActivityDTOS  = shiftMongoRepository.findAllShiftsByIds(shiftIds);
+        }else {
+            shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByIds(shiftIds);
         }
         setReasonCodeAndRuleViolationsInShifts(shiftWithActivityDTOS, unitId, shiftIds,showDraft);
         return shiftWithActivityDTOS;
@@ -119,26 +120,27 @@ public class ShiftDetailsService extends MongoBaseService {
         return userIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
     }
 
-    public void addPlannedTimeInShift(Shift shift, ActivityWrapper activityWrapper, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public void addPlannedTimeInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-        BigInteger plannedTimeId = shiftService.addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrapper.getActivity(), staffAdditionalInfoDTO);
         if (isNull(shift.getId())) {
-            assignedPlannedTimeInActivity(shift, plannedTimeId);
+            assignedPlannedTimeInActivity(shift,activityWrappers,staffAdditionalInfoDTO,phase);
         } else {
-            adjustPlannedTimeInActivity(shift, plannedTimeId);
+            adjustPlannedTimeInActivity(shift,activityWrappers,staffAdditionalInfoDTO,phase);
         }
     }
 
-    private void assignedPlannedTimeInActivity(Shift shiftDTO, BigInteger plannedTimeId) {
-        shiftDTO.getActivities().forEach(shiftActivity ->
-                shiftActivity.setPlannedTimes(Arrays.asList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())))
-        );
+    private void assignedPlannedTimeInActivity(Shift shiftDTO, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO,Phase phase) {
+        shiftDTO.getActivities().forEach(shiftActivity ->{
+            BigInteger plannedTimeId = shiftService.addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
+            shiftActivity.setPlannedTimes(Arrays.asList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())));
+        });
     }
 
-    private void adjustPlannedTimeInActivity(Shift shift, BigInteger plannedTimeId) {
+    private void adjustPlannedTimeInActivity(Shift shift, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO,Phase phase) {
         List<PlannedTime> plannedTimeList = shift.getActivities().stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
         Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
         for (ShiftActivity shiftActivity : shift.getActivities()) {
+            BigInteger plannedTimeId = shiftService.addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
             shiftActivity.setPlannedTimes(filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), plannedTimeMap, plannedTimeId));
         }
     }

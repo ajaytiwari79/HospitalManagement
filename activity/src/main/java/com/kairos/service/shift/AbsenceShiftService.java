@@ -19,6 +19,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -86,7 +87,7 @@ public class AbsenceShiftService {
         List<ShiftDTO> shiftDTOS = new ArrayList<>(7);
         //As we support create Fullweek Shift from Monday to sunday
         if(!shiftDTO.getShiftDate().getDayOfWeek().equals(activity.getTimeCalculationActivityTab().getFullWeekStart())){
-            exceptionService.actionNotPermittedException("error.activity.fullweek.start",activity.getTimeCalculationActivityTab().getFullWeekStart());
+            exceptionService.actionNotPermittedException("error.activity.fullweek.start", StringUtils.capitalize(activity.getTimeCalculationActivityTab().getFullWeekStart().toString().toLowerCase()));
         }
         for (int day = 0; day < 7; day++) {
             ShiftDTO newShiftDTO;

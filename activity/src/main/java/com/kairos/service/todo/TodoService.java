@@ -1,7 +1,6 @@
 package com.kairos.service.todo;
 
-import com.kairos.dto.activity.shift.ShiftActivitiesIdDTO;
-import com.kairos.dto.activity.shift.ShiftPublishDTO;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.enums.shift.ShiftStatus;
@@ -103,7 +102,13 @@ public class TodoService {
     }
 
     public Long deleteTodo(BigInteger shiftId,TodoType todoType){
-        return todoRepository.deleteByEntityIdAndTypeAndStatus(shiftId,todoType, newArrayList(PENDING, VIEWED,REQUESTED));
+        Long deletedCount;
+        if(isNotNull(todoType)){
+            deletedCount = todoRepository.deleteByEntityIdAndTypeAndStatus(shiftId,todoType, newArrayList(PENDING, VIEWED,REQUESTED));
+        }else {
+            deletedCount = todoRepository.deleteByEntityIdAndStatus(shiftId,newArrayList(PENDING, VIEWED,REQUESTED));
+        }
+        return deletedCount;
     }
 
     private List<Todo> createTodoForActivityApproval(Shift shift, List<Activity> activities) {
@@ -149,10 +154,21 @@ public class TodoService {
             case APPROVAL_REQUIRED:
                 Shift shift = shiftMongoRepository.findOne(todo.getEntityId());
                 List<BigInteger> shiftActivityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(todo.getSubEntityId())).map(shiftActivity -> shiftActivity.getId()).collect(Collectors.toList());
-                response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(newArrayList(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftActivityIds)), todo.getStatus().equals(DISAPPROVE) ? ShiftStatus.DISAPPROVE : ShiftStatus.APPROVE));
+                ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO = shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(newArrayList(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftActivityIds)), todo.getStatus().equals(DISAPPROVE) ? ShiftStatus.DISAPPROVE : ShiftStatus.APPROVE));
+                boolean allUpdated = shiftAndActivtyStatusDTO.getShiftActivityStatusResponse().stream().flatMap(shiftActivityResponseDTO -> shiftActivityResponseDTO.getActivities().stream()).filter(shiftActivityDTO -> !shiftActivityDTO.isSuccess()).findAny().isPresent();
+                if(allUpdated){
+                    todo.setStatus(REQUESTED);
+                }
+                response = (T) shiftAndActivtyStatusDTO;
                 break;
             default:break;
         }
         return response;
+    }
+
+    //
+    public List<TodoDTO> getAllTodoOfStaff(Long staffId){
+        List<TodoDTO> todoDTOS=todoRepository.findAllTodoByStaffId(staffId);
+        return todoDTOS;
     }
 }

@@ -140,6 +140,7 @@ public class TimeBankCalculationService {
         }
         return dailyTimeBankEntry;
     }
+    
 
     private DailyTimeBankEntry updateDailyTimeBankEntry(StaffEmploymentDetails staffEmploymentDetails, DateTimeInterval dateTimeInterval, DailyTimeBankEntry dailyTimeBankEntry, boolean anyShiftPublish, int contractualMinutes, int totalDailyPlannedMinutes, int scheduledMinutesOfTimeBank, int totalPublishedDailyPlannedMinutes, Map<BigInteger, Integer> ctaTimeBankMinMap) {
         dailyTimeBankEntry = isNullOrElse(dailyTimeBankEntry, new DailyTimeBankEntry(staffEmploymentDetails.getId(), staffEmploymentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
@@ -166,6 +167,7 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         dailyTimeBankEntry.setScheduledMinutesOfTimeBank(0);
         dailyTimeBankEntry.setDeltaTimeBankMinutes(-contractualMinutes);
+        dailyTimeBankEntry.setPublishedSomeActivities(false);
         dailyTimeBankEntry.setTimeBankCTADistributionList(new ArrayList<>());
     }
 
@@ -261,6 +263,16 @@ public class TimeBankCalculationService {
             }
         }
         return contractualMinutes;
+    }
+
+    public int getDeltaTimebankByDate(Map<LocalDate,DailyTimeBankEntry> dateDailyTimeBankEntryMap,Set<DateTimeInterval> planningPeriodIntervals, java.time.LocalDate localDate, List<EmploymentLinesDTO> employmentLines){
+        int deltaTimebank = 0;
+        if(dateDailyTimeBankEntryMap.containsKey(localDate)){
+            deltaTimebank+=dateDailyTimeBankEntryMap.get(localDate).getDeltaTimeBankMinutes();
+        }else {
+            deltaTimebank+=(-getContractualMinutesByDate(planningPeriodIntervals, localDate, employmentLines));
+        }
+        return deltaTimebank;
     }
 
     public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails) {

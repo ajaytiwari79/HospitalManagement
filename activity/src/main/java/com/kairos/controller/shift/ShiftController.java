@@ -204,14 +204,13 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> saveDraftShift(@PathVariable Long unitId,
                                                               @RequestParam(value = "employmentId", required = false) Long employmentId,
-                                                              @RequestBody(required = false) List<BigInteger> planningPeriodIds,
                                                               @RequestParam(value = "startDate", required = false)
                                                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate", required = false)
                                                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate, @RequestParam(value = "viewType", required = false) ViewType viewType,
                                                               @RequestParam(value = "staffId", required = false) Long staffId,
                                                               @RequestParam(value = "shiftFilterParam") ShiftFilterParam shiftFilterParam,
-                                                              @RequestParam(value = "shiftActionType") ShiftActionType shiftActionType,@RequestBody(required = false) StaffFilterDTO staffFilterDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveAndCancelDraftShift(unitId, staffId, planningPeriodIds, startDate, endDate, employmentId, viewType, shiftFilterParam, shiftActionType,staffFilterDTO));
+                                                              @RequestParam(value = "shiftActionType") ShiftActionType shiftActionType,@RequestBody StaffFilterDTO staffFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveAndCancelDraftShift(unitId, staffId, startDate, endDate, employmentId, viewType, shiftFilterParam, shiftActionType,staffFilterDTO));
     }
 
     @ApiOperation("create request absence")
@@ -226,5 +225,11 @@ public class ShiftController {
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createRequestAbsence(@RequestParam BigInteger shiftId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, requestAbsenceService.deleteRequestAbsence(shiftId));
+    }
+
+    @ApiOperation("get shift count")
+    @GetMapping("employment/{employmentId}/shift_count")
+    public ResponseEntity<Map<String, Object>> getShiftCount(@PathVariable Long employmentId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftCount(employmentId));
     }
 }

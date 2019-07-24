@@ -7,6 +7,7 @@ import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -75,8 +77,10 @@ public class NightWorkerController {
     @ApiOperation(value = "get night worker details")
     @PostMapping(value = UNIT_URL+"/get_night_worker_details")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@RequestBody StaffFilterDTO staffFilterDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,nightWorkerService.getFilteredStaffNightWorkerDetails(staffFilterDTO));
+    public ResponseEntity<Map<String, Object>> getStaffNightWorkerDetails(@RequestBody StaffFilterDTO staffFilterDTO,
+                                                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                          @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,nightWorkerService.getFilteredStaffNightWorkerDetails(staffFilterDTO,startDate,endDate));
     }
 
 
