@@ -152,9 +152,9 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
     }
 
     @Override
-    public List<WTAQueryResultDTO> getAllWtaOfOrganizationAndNotOrganizationParentByExpertise(Long unitId, Long expertiseId,LocalDate selectedDate,List<BigInteger> orgnizationParentIds) {
+    public List<WTAQueryResultDTO> getAllWtaByIds(List<BigInteger> ids) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("deleted").is(false).and("organization.id").is(unitId).and("expertise.id").is(expertiseId).and("organizationParentId").nin(orgnizationParentIds).orOperator(Criteria.where("startDate").lte(selectedDate).and("endDate").gte(selectedDate), Criteria.where("endDate").exists(false).and("startDate").lte(selectedDate))),
+                match(Criteria.where("deleted").is(false).and("id").in(ids)),
                 //lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
                 project("name", "description")
         );
