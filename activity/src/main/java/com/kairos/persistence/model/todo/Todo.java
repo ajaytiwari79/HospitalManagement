@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Created by pradeep
@@ -28,6 +30,9 @@ public class Todo extends MongoBaseEntity {
     private Long staffId;
     private Long employmentId;
     private Long unitId;
+    private String activityName;
+    private LocalDateTime approvedOn;
+    private String remark;
 
     public Todo(TodoType type, TodoSubtype subtype, BigInteger entityId, BigInteger subEntityId, TodoStatus status, LocalDate shiftDate, String description, Long staffId, Long employmentId, Long unitId) {
         this.type = type;

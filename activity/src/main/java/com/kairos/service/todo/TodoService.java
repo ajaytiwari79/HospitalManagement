@@ -21,10 +21,12 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.RequestAbsenceService;
 import com.kairos.service.shift.ShiftStatusService;
+import jdk.nashorn.internal.runtime.regexp.joni.Option;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,6 +70,7 @@ public class TodoService {
             }else {
                 List<Todo> todoList = todoRepository.findAllByNotApprovedAndEntityId(shift.getId(),TodoType.APPROVAL_REQUIRED, newArrayList(PENDING, VIEWED,REQUESTED));
                 Set<BigInteger> subEntitiyIds = todoList.stream().map(todo -> todo.getSubEntityId()).collect(Collectors.toSet());
+                updateRemark(todoList,shift);
                 todoList.removeIf(todo -> activityIds.contains(todo.getSubEntityId()));
                 activityIds.removeIf(activityId -> subEntitiyIds.contains(activityId));
                 activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
@@ -138,6 +141,9 @@ public class TodoService {
             exceptionService.dataNotFoundException("todo not found");
         }
         todo.setStatus(status);
+        if(status.equals(APPROVE)){
+            todo.setApprovedOn(LocalDateTime.now());
+        }
         if(newHashSet(APPROVE,DISAPPROVE).contains(status)){
             response = approveAndDisapproveTodo(todo);
         }
@@ -165,6 +171,21 @@ public class TodoService {
     //
     public List<TodoDTO> getAllTodoOfStaff(Long staffId){
         List<TodoDTO> todoDTOS=todoRepository.findAllTodoByStaffId(staffId);
+
         return todoDTOS;
+    }
+
+    public void updateRemark(List<Todo> todoList,Shift shift){
+        List<ShiftActivity> shiftActivities = shift.getActivities();
+        for(Todo todo:todoList){
+            for(ShiftActivity shiftActivity:shiftActivities){
+                if(todo.getSubEntityId() == shiftActivity.getActivityId()){
+                    todo.setRemark(shift.getRemarks());
+
+                }
+            }
+        }
+        todoRepository.saveEntities(todoList);
+
     }
 }
