@@ -34,3 +34,9 @@ db.getCollection('applicableKPI').insert({
     "value" : 2.0,
     "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
 });
+
+db.planningPeriod.find({}).forEach(function(planningPeriod){
+    planningPeriod.duration = 1;
+    planningPeriod.durationType = "WEEKS";
+    db.planningPeriod.save(planningPeriod);
+    });
