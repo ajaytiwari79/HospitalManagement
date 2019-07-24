@@ -24,8 +24,10 @@ class InterceptorRegister extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("swagger-ui.html")
                 .addResourceLocations("classpath:/META-INF/resources/");
 
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/webjars/**","/img/**","/css/**","/js/**","/images/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/","classpath:/static/images/"
+                ,"classpath:/static/css/"
+                ,"classpath:/static/js/");
         registry.addResourceHandler("/**").addResourceLocations("/");
     }
 
