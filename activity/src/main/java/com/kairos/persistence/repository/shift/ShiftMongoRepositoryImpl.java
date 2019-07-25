@@ -123,7 +123,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 count().as("count")
         );
         AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Shift.class, Map.class);
-        return (Long) result.getMappedResults().get(0).get("count");
+        return ((Integer) result.getMappedResults().get(0).get("count")).longValue();
     }
 
 
@@ -205,6 +205,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Query query = new Query();
         query.addCriteria(where("activities._id").is(shiftActivityId));
         return mongoTemplate.findOne(query, Shift.class);
+
+    }
+
+    @Override
+    public List<Shift> findShiftByShiftActivityIdAndBetweenDate(BigInteger shiftActivityId,LocalDate startDate,LocalDate endDate) {
+        Query query = new Query(where("activities.activityId").is(shiftActivityId).and("startDate").gte(startDate).lte(endDate));
+        return mongoTemplate.find(query, Shift.class);
 
     }
 

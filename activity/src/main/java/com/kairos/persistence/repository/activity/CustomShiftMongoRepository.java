@@ -82,4 +82,6 @@ public interface CustomShiftMongoRepository {
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists);
     List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds, LocalDate startDate, LocalDate endDate);
 
+    List<Shift> findShiftByShiftActivityIdAndBetweenDate(BigInteger shiftActivityId,LocalDate startDate,LocalDate endDate);
+
 }
