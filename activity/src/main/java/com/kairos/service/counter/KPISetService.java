@@ -153,6 +153,7 @@ public class KPISetService {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
                     KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
                     List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
+                    Map<BigInteger,KPIResponseDTO> kpiResponseDTOMap = new HashMap<>();
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
                         kpiSetResponseDTO.setKpiSetName(kpiSet.getName());
                         kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
@@ -163,10 +164,11 @@ public class KPISetService {
                                 FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
                                 KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
                                 if (isNotNull(kpiResponseDTO)) {
-                                    kpiResponseDTOList.add(kpiResponseDTO);
+                                    kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(),kpiResponseDTO);
                                 }
                             }
                         }
+                        kpiResponseDTOList = kpiResponseDTOMap.values().stream().collect(Collectors.toList());
                     }
                     if(isCollectionNotEmpty(kpiResponseDTOList)) {
                         kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
