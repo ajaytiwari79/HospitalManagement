@@ -168,7 +168,7 @@ public class KPISetService {
                                 }
                             }
                         }
-                        kpiResponseDTOList = kpiResponseDTOMap.values().stream().collect(Collectors.toList());
+                        kpiResponseDTOList=kpiResponseDTOMap.values().stream().collect(Collectors.toList());
                     }
                     if(isCollectionNotEmpty(kpiResponseDTOList)) {
                         kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
