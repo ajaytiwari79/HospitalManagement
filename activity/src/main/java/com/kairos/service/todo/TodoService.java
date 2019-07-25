@@ -182,7 +182,7 @@ public class TodoService {
         List<BigInteger> shiftActivityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(todo.getSubEntityId())).map(shiftActivity -> shiftActivity.getId()).collect(Collectors.toList());
         List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
         if(FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())){
-            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(shift.getActivities().get(0).getActivityId(),asLocalDate(shift.getStartDate()),asLocalDate(shift.getStartDate()).plusDays(7));
+            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(shift.getActivities().get(0).getActivityId(),asLocalDate(shift.getStartDate()),asLocalDate(shift.getStartDate()).plusDays(7),shift.getStaffId());
             shifts.forEach(shift1 -> shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shift1.getId(),shiftActivityIds)));
         }else {
             shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftActivityIds));
