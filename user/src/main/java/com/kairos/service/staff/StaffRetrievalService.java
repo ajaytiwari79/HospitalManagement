@@ -665,7 +665,7 @@ public class StaffRetrievalService {
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(Arrays.asList(organization.getId()), TimeSlotType.SHIFT_PLANNING);
         if(isCollectionEmpty(staffIds)){
             Organization parentOrganization = organizationService.getParentOfOrganization(id);
-            staffIds = staffGraphRepository.getAllStaffIdsByOrganisationId(parentOrganization.getId());
+            staffIds = staffGraphRepository.getAllStaffIdsByOrganisationId(isNotNull(parentOrganization) ? parentOrganization.getId() : id);
         }
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(organization.getId(), staffIds,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult, StaffAdditionalInfoDTO.class);
