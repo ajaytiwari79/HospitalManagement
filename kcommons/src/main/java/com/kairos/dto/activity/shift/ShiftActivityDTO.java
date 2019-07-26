@@ -117,9 +117,10 @@ public class ShiftActivityDTO {
     public ShiftActivityDTO() {
     }
 
-    public ShiftActivityDTO(BigInteger activityId, String activityName) {
+    public ShiftActivityDTO(BigInteger activityId, String activityName,Set<ShiftStatus> status) {
         this.activityId = activityId;
         this.activityName = activityName;
+        this.status = status;
     }
 
     public Set<ShiftStatus> getStatus() {

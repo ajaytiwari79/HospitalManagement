@@ -40,3 +40,5 @@ db.planningPeriod.find({}).forEach(function(planningPeriod){
     planningPeriod.durationType = "WEEKS";
     db.planningPeriod.save(planningPeriod);
     });
+
+db.getCollection('wtaBaseRuleTemplate').updateMany({"intervalUnit" : "WEEK"},{$set:{"intervalUnit" : "WEEKS"}});
