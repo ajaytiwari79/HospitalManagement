@@ -1,6 +1,8 @@
 package com.kairos.service.public_legal_document;
 
 import com.kairos.commons.utils.DateUtils;
+
+import com.kairos.constants.GdprMessagesConstants;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.public_legal_document.PublicLegalDocument;
 import com.kairos.persistence.repository.public_legal_document.PublicLegalDocumentRepository;
@@ -31,13 +33,12 @@ public class PublicLegalDocumentService {
     private ExceptionService exceptionService;
 
     public PublicLegalDocumentDTO createPublicLegalDocument(PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        publicLegalDocumentDTO.setName(publicLegalDocumentDTO.getName().trim());
         if(publicLegalDocumentDTO.getName().equals("")){
-            exceptionService.illegalArgumentException("message.enter.valid.data");
+            exceptionService.duplicateDataException(GdprMessagesConstants.MESSAGE_ENTER_VALID_DATA);
         }
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
         if (Optional.ofNullable(publicLegalDocument).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate","Public Legal Document",publicLegalDocument.getName());
+            exceptionService.duplicateDataException(GdprMessagesConstants.MESSAGE_NAME_ALREADY_EXIST);
         }
         publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
         publicLegalDocumentRepository.save(publicLegalDocument);
@@ -82,15 +83,14 @@ public class PublicLegalDocumentService {
     }
 
     public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId,PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        publicLegalDocumentDTO.setName(publicLegalDocumentDTO.getName().trim());
         PublicLegalDocument oldPublicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
         if (!Optional.ofNullable(oldPublicLegalDocument).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.enter.valid.data");
+            exceptionService.dataNotFoundByIdException(GdprMessagesConstants.MESSAGE_DATANOTFOUND,null,publicLegalDocumentId);
         }
         if(!oldPublicLegalDocument.getName().equalsIgnoreCase(publicLegalDocumentDTO.getName())){
             PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
             if (Optional.ofNullable(publicLegalDocument).isPresent()) {
-                exceptionService.duplicateDataException("message.duplicate","Public Legal Document",publicLegalDocument.getName());
+                exceptionService.duplicateDataException(GdprMessagesConstants.MESSAGE_NAME_ALREADY_EXIST);
             }
         }
         publicLegalDocumentDTO.setId(publicLegalDocumentId);

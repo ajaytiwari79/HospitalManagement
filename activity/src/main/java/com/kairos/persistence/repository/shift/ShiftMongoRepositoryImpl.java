@@ -208,6 +208,19 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
+    public List<Shift> findShiftByShiftActivityIdAndBetweenDate(BigInteger shiftActivityId,LocalDate startDate,LocalDate endDate,Long staffId) {
+        Criteria criteria = where("activities.activityId").is(shiftActivityId).and("deleted").is(false);
+        if(isNotNull(startDate) && isNotNull(endDate)){
+            criteria = criteria.and("startDate").gte(startDate).lte(endDate);
+        }if(isNotNull(staffId)){
+            criteria = criteria.and("staffId").is(staffId);
+        }
+        Query query = new Query(criteria);
+        return mongoTemplate.find(query, Shift.class);
+
+    }
+
+    @Override
     public List<ShiftDTO> getAllShiftBetweenDuration(Long employmentId,Long staffId, Date startDate, Date endDate,Long unitId){
         Criteria criteria = Criteria.where("employmentId").is(employmentId).and("staffId").is(staffId).and("unitId").is(unitId).and("deleted").is(false).and("disabled").is(false).and("startDate").gte(startDate).lte(endDate);
         return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
