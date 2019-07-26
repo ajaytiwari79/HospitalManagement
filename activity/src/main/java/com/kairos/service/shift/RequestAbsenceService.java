@@ -1,20 +1,25 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.constants.CommonConstants;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.*;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.todo.TodoService;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +35,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
+import static com.kairos.enums.shift.TodoStatus.APPROVE;
 import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
 
 /**
@@ -47,6 +53,9 @@ public class RequestAbsenceService {
     @Inject private TodoService todoService;
     @Inject private ShiftDetailsService shiftDetailsService;
     @Inject private ShiftStatusService shiftStatusService;
+    @Inject private PhaseService phaseService;
+    @Inject private ShiftValidatorService shiftValidatorService;
+    @Inject private LocaleService localeService;
 
 
     public List<ShiftWithActivityDTO> createOrUpdateRequestAbsence(RequestAbsenceDTO requestAbsenceDTO){
@@ -83,16 +92,21 @@ public class RequestAbsenceService {
 
     public <T> T approveRequestAbsence(Todo todo){
         T response = null;
+        Optional<Shift> shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
+        if(!shiftOptional.isPresent()){
+            exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
+        }
         if(TodoStatus.APPROVE.equals(todo.getStatus())){
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
-            Optional<Shift> shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
-            if(!shiftOptional.isPresent()){
-                exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
-            }
             if(isNull(shiftOptional.get().getRequestAbsence())){
                 exceptionService.actionNotPermittedException(REQUEST_ABSENCE_APPROVED);
             }
             Shift shift = shiftOptional.get();
+            ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO = validateAccessGroupForUpdateStatus(todo, shift);
+            if(isNotNull(shiftAndActivtyStatusDTO)){
+                todo.setStatus(TodoStatus.REQUESTED);
+                return (T)shiftAndActivtyStatusDTO;
+            }
             ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getEmploymentId(), new HashSet<>());
             if(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
@@ -115,8 +129,28 @@ public class RequestAbsenceService {
                 }
                 response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
             }
+        }else {
+            shiftOptional.get().setRequestAbsence(null);
+            todo.setDeleted(true);
         }
         return response;
+    }
+
+    private ShiftAndActivtyStatusDTO validateAccessGroupForUpdateStatus(Todo todo, Shift shift) {
+        StaffAccessGroupDTO staffAccessGroupDTO = userIntegrationService.getStaffAccessGroupDTO(shift.getUnitId());
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), null);
+        List<Activity> activities = activityMongoRepository.findAllPhaseSettingsByActivityIds(newArrayList(todo.getSubEntityId()));
+        PhaseSettingsActivityTab phaseSettingsActivityTab = activities.get(0).getPhaseSettingsActivityTab();
+        PhaseTemplateValue phaseTemplateValue = phaseSettingsActivityTab.getPhaseTemplateValues().stream().filter(p -> p.getPhaseId().equals(phase.getId())).findFirst().get();
+        ActivityShiftStatusSettings activityShiftStatusSettings = shiftStatusService.getActivityShiftStatusSettingByStatus(phaseTemplateValue, ShiftStatus.APPROVE);
+        boolean validAccessGroup = shiftValidatorService.validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
+        ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO = null;
+        if(!validAccessGroup){
+            ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
+            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(activities.get(0).getName(),shift.getStartDate(), shift.getEndDate(), shift.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED), false));
+            shiftAndActivtyStatusDTO = new ShiftAndActivtyStatusDTO(new ArrayList<>(), newArrayList(shiftActivityResponseDTO));
+        }
+        return shiftAndActivtyStatusDTO;
     }
 
     private ShiftWithViolatedInfoDTO updateShiftWithRequestAbsence(ActivityWrapper activityWrapper,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
