@@ -20,10 +20,12 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.RequestAbsenceService;
 import com.kairos.service.shift.ShiftStatusService;
+import jdk.nashorn.internal.runtime.regexp.joni.Option;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,6 +69,7 @@ public class TodoService {
             }else {
                 List<Todo> todoList = todoRepository.findAllByNotApprovedAndEntityId(shift.getId(),TodoType.APPROVAL_REQUIRED, newArrayList(PENDING, VIEWED,REQUESTED));
                 Set<BigInteger> subEntitiyIds = todoList.stream().map(todo -> todo.getSubEntityId()).collect(Collectors.toSet());
+                updateRemark(todoList,shift);
                 todoList.removeIf(todo -> activityIds.contains(todo.getSubEntityId()));
                 activityIds.removeIf(activityId -> subEntitiyIds.contains(activityId));
                 activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
@@ -82,7 +85,9 @@ public class TodoService {
         }
         if(isCollectionNotEmpty(todos)){
             todoRepository.saveEntities(todos);
+            updateRemark(todos,shift);
         }
+
     }
 
     private void createOrUpdateTodoForRequestApproval(Shift shift, List<Todo> todos) {
@@ -92,7 +97,7 @@ public class TodoService {
             Activity activity = activityMongoRepository.findOne(shift.getRequestAbsence().getActivityId());
             TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
             String description = "Absence request has been genereated for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), "MMM dd,yyyy") + "</span>";
-            todos.add(new Todo(TodoType.REQUEST_ABSENCE, todoSubtype, shift.getId(), activity.getId(), REQUESTED, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
+            todos.add(new Todo(TodoType.REQUEST_ABSENCE, todoSubtype, shift.getId(), activity.getId(),activity.getName(), REQUESTED, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
         }
     }
 
@@ -118,7 +123,7 @@ public class TodoService {
         activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).forEach(activity -> {
             TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
             String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), "MMM dd,yyyy") + "</span>";
-            todos.add(new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(), REQUESTED, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
+            todos.add(new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(),activity.getName(), REQUESTED, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
         });
         return todos;
     }
@@ -139,6 +144,9 @@ public class TodoService {
             exceptionService.dataNotFoundException("todo not found");
         }
         todo.setStatus(status);
+        if(status.equals(APPROVE)){
+            todo.setApprovedOn(LocalDateTime.now());
+        }
         if(newHashSet(APPROVE,DISAPPROVE).contains(status)){
             response = approveAndDisapproveTodo(todo);
         }
@@ -207,6 +215,21 @@ public class TodoService {
     //
     public List<TodoDTO> getAllTodoOfStaff(Long staffId){
         List<TodoDTO> todoDTOS=todoRepository.findAllTodoByStaffId(staffId);
+
         return todoDTOS;
+    }
+
+    public void updateRemark(List<Todo> todoList,Shift shift){
+        List<ShiftActivity> shiftActivities = shift.getActivities();
+        for(Todo todo:todoList){
+            for(ShiftActivity shiftActivity:shiftActivities){
+                if(todo.getSubEntityId().equals(shiftActivity.getActivityId())){
+                    todo.setRemark(shiftActivity.getRemarks());
+
+                }
+            }
+        }
+        todoRepository.saveEntities(todoList);
+
     }
 }

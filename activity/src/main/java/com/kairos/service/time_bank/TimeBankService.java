@@ -99,6 +99,7 @@ public class TimeBankService{
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
 
+
     /**
      * @param staffAdditionalInfoDTO
      * @param shift
@@ -284,14 +285,15 @@ public class TimeBankService{
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getEmploymentDetails(employmentId);
         Interval interval = getIntervalByDateTimeBank(employmentWithCtaDetailsDTO, year);
         List<DailyTimeBankEntry> dailyTimeBankEntries = new ArrayList<>();
-        if(interval.getStart().getYear() <= new DateTime().getYear()) {
-            dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, interval.getStart().toDate(), interval.getEnd().toDate());
-        }
+            if (interval.getStart().getYear() <= new DateTime().getYear()) {
+                dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, interval.getStart().toDate(), interval.getEnd().toDate());
+            }
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, employmentWithCtaDetailsDTO);
-        Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId,unitId,true);
-        timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
+            Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId, unitId, true);
+            timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
         return timeBankDTO;
-    }
+        }
+
 
     public TimeBankVisualViewDTO getTimeBankForVisualView(Long unitId, Long employmentId, String query, Integer value, Date startDate, Date endDate) {
         ZonedDateTime endZonedDate = null;
