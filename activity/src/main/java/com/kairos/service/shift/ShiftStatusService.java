@@ -280,7 +280,7 @@ public class ShiftStatusService {
         }
     }
 
-    private ActivityShiftStatusSettings getActivityShiftStatusSettingByStatus(PhaseTemplateValue phaseTemplateValue, ShiftStatus status) {
+    public ActivityShiftStatusSettings getActivityShiftStatusSettingByStatus(PhaseTemplateValue phaseTemplateValue, ShiftStatus status) {
         ActivityShiftStatusSettings activityShiftStatusSettings = null;
         for (ActivityShiftStatusSettings statusSettings : phaseTemplateValue.getActivityShiftStatusSettings()) {
             if (status.equals(statusSettings.getShiftStatus())) {

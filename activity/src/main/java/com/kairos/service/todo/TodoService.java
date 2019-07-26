@@ -71,7 +71,8 @@ public class TodoService {
                 activityIds.removeIf(activityId -> subEntitiyIds.contains(activityId));
                 activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
                 if (isCollectionNotEmpty(activityIds)) {
-                    todos.addAll(createTodoForActivityApproval(shift, activities));
+                    todos.addAll(
+                            createTodoForActivityApproval(shift, activities));
                 }
                 todoList.forEach(todo -> todo.setDeleted(true));
                 todos.addAll(todoList);
@@ -115,8 +116,9 @@ public class TodoService {
         List<Todo> todos = new ArrayList<>();
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
         activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).forEach(activity -> {
+            TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
             String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), "MMM dd,yyyy") + "</span>";
-            todos.add(new Todo(TodoType.APPROVAL_REQUIRED, TodoSubtype.APPROVAL, shift.getId(), activity.getId(), REQUESTED, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
+            todos.add(new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(), REQUESTED, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId()));
         });
         return todos;
     }
@@ -152,17 +154,45 @@ public class TodoService {
                 response = (T)requestAbsenceService.approveRequestAbsence(todo);
                 break;
             case APPROVAL_REQUIRED:
-                Shift shift = shiftMongoRepository.findOne(todo.getEntityId());
-                List<BigInteger> shiftActivityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(todo.getSubEntityId())).map(shiftActivity -> shiftActivity.getId()).collect(Collectors.toList());
-                ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO = shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(newArrayList(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftActivityIds)), todo.getStatus().equals(DISAPPROVE) ? ShiftStatus.DISAPPROVE : ShiftStatus.APPROVE));
-                boolean allUpdated = shiftAndActivtyStatusDTO.getShiftActivityStatusResponse().stream().flatMap(shiftActivityResponseDTO -> shiftActivityResponseDTO.getActivities().stream()).filter(shiftActivityDTO -> !shiftActivityDTO.isSuccess()).findAny().isPresent();
-                if(allUpdated){
-                    todo.setStatus(REQUESTED);
-                }
-                response = (T) shiftAndActivtyStatusDTO;
+                ShiftStatus shiftStatus = getShiftStatusByTodoStatus(todo.getStatus());
+                response = updateStatusOfApprovalRequiredTodo(todo,shiftStatus);
                 break;
             default:break;
         }
+        return response;
+    }
+
+    private ShiftStatus getShiftStatusByTodoStatus(TodoStatus status){
+        ShiftStatus shiftStatus = null;
+        switch (status){
+            case APPROVE:shiftStatus = ShiftStatus.APPROVE;
+                break;
+            case PENDING:shiftStatus = ShiftStatus.PENDING;
+                break;
+            case DISAPPROVE:shiftStatus = ShiftStatus.DISAPPROVE;
+                break;
+        }
+        return shiftStatus;
+    }
+
+    private <T> T updateStatusOfApprovalRequiredTodo(Todo todo,ShiftStatus shiftStatus) {
+        T response;
+        Shift shift = shiftMongoRepository.findOne(todo.getEntityId());
+        Activity activity = activityMongoRepository.findOne(todo.getSubEntityId());
+        List<BigInteger> shiftActivityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(todo.getSubEntityId())).map(shiftActivity -> shiftActivity.getId()).collect(Collectors.toList());
+        List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
+        if(FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())){
+            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(shift.getActivities().get(0).getActivityId(),asLocalDate(shift.getStartDate()),asLocalDate(shift.getStartDate()).plusDays(7),shift.getStaffId());
+            shifts.forEach(shift1 -> shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shift1.getId(),shiftActivityIds)));
+        }else {
+            shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(todo.getEntityId(),shiftActivityIds));
+        }
+        ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO = shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS, shiftStatus));
+        boolean allUpdated = shiftAndActivtyStatusDTO.getShiftActivityStatusResponse().stream().flatMap(shiftActivityResponseDTO -> shiftActivityResponseDTO.getActivities().stream()).filter(shiftActivityDTO -> !shiftActivityDTO.isSuccess()).findAny().isPresent();
+        if(allUpdated){
+            todo.setStatus(REQUESTED);
+        }
+        response = (T) shiftAndActivtyStatusDTO;
         return response;
     }
 
