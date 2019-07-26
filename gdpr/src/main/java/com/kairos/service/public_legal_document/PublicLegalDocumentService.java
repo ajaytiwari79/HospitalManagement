@@ -1,12 +1,15 @@
 package com.kairos.service.public_legal_document;
 
 import com.kairos.commons.utils.DateUtils;
+
 import com.kairos.constants.GdprMessagesConstants;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.public_legal_document.PublicLegalDocument;
 import com.kairos.persistence.repository.public_legal_document.PublicLegalDocumentRepository;
 import com.kairos.response.dto.public_legal_document.PublicLegalDocumentDTO;
 import com.kairos.service.exception.ExceptionService;
-import org.springframework.beans.factory.support.ManagedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +24,9 @@ import static com.kairos.constants.AppConstant.PUBLIC_LEGAL_Document_LOGO_PATH;
  **/
 @Service
 public class PublicLegalDocumentService {
+
+    private Logger LOGGER = LoggerFactory.getLogger(PublicLegalDocumentService.class);
+
     @Inject
     private PublicLegalDocumentRepository publicLegalDocumentRepository;
     @Inject
@@ -96,11 +102,18 @@ public class PublicLegalDocumentService {
     }
 
     public List<PublicLegalDocumentDTO> getAllPublicLegalDocument() {
-        List<PublicLegalDocument> publicLegalDocuments = publicLegalDocumentRepository.findAllAndDeletedFalse();
+        List<PublicLegalDocument> publicLegalDocuments = publicLegalDocumentRepository.findAllByDeletedFalseOrderByCreatedAt();
         List<PublicLegalDocumentDTO> publicLegalDocumentDTOS = new ArrayList<>();
         publicLegalDocuments.forEach(publicLegalDocument -> {
             publicLegalDocumentDTOS.add(new PublicLegalDocumentDTO(publicLegalDocument.getId(),publicLegalDocument.getName(),publicLegalDocument.getPublicLegalDocumentLogo(),publicLegalDocument.getBodyContentInHtml()));
         });
+        LOGGER.debug("total documeents found are"+publicLegalDocumentDTOS.size());
         return publicLegalDocumentDTOS;
+    }
+
+    public PublicLegalDocumentDTO getLegalDocumentById(long docId){
+        Optional<PublicLegalDocument> publicLegalDocument = publicLegalDocumentRepository.findById(docId);
+        PublicLegalDocumentDTO publicLegalDocumentDTO = ObjectMapperUtils.copyPropertiesByMapper(publicLegalDocument.get(),PublicLegalDocumentDTO.class);
+        return publicLegalDocumentDTO;
     }
 }

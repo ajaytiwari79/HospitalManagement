@@ -4,6 +4,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import org.apache.poi.ss.formula.functions.Count;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -88,4 +89,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query(value = "{employmentId:?0,deleted:false, disabled:false,startDate:{$gt:?1,$lt:?2},'activities.activityId':{'$in':?3}}")
     List<Shift> findAllShiftByActivityIdAndBetweenDuration(Long employmentId, Date startDate, Date endDate,Collection<BigInteger> activityIds);
+
+    @Query(value = "{'deleted':false, 'disabled':false, 'employmentId':?0}",count = true)
+    Long countShiftsByEmploymentId(Long EmploymentId);
 }

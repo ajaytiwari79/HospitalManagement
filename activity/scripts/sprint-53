@@ -1,0 +1,53 @@
+db.getCollection('counter').insert({
+    "_id" : "23",
+    "type" : "PLANNED_HOURS_VS_TIMEBANK",
+    "title" : "Planned Hours vs timebank Of Staff",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR_LINE",
+    "size" : "SIZE_8X2",
+    "filterTypes" : [
+        "STAFF_IDS",
+        "EMPLOYMENT_TYPE",
+        "UNIT_IDS"
+	"DAYS_OF_WEEK",
+    ],
+    "multiDimensional" : true
+})
+
+
+db.getCollection('applicableKPI').insert({
+    "_id" : "512",
+    "activeKpiId" : "23",
+    "baseKpiId" : "23",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "deleted" : false,
+    "frequencyType" : "DAYS",
+    "interval" : "LAST",
+    "kpiRepresentation" : "REPRESENT_PER_INTERVAL",
+    "value" : 2.0,
+    "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
+});
+
+
+db.todo.find({}).forEach(function(todo){
+    var activity = db.activities.findOne({"_id":todo.subEntityId});
+    todo.activityName = activity.name;
+    if(todo.status=="APPROVE"){
+    todo.approvedOn = ISODate("1970-01-01T00:00:00.000Z");
+    }
+    db.todo.save(todo);
+    });
+
+db.planningPeriod.find({}).forEach(function(planningPeriod){
+    planningPeriod.duration = 1;
+    planningPeriod.durationType = "WEEKS";
+    db.planningPeriod.save(planningPeriod);
+
+    });

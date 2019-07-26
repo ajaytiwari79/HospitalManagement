@@ -7,11 +7,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
@@ -60,8 +62,12 @@ public class StaffFilterController {
     @RequestMapping(value = UNIT_URL+"/staff_list_with_filter", method = RequestMethod.POST)
     @ApiOperation("Get All staff List available in Org")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId, @RequestBody StaffFilterDTO staffFilterDTO,@RequestParam String moduleId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO,moduleId));
+    public ResponseEntity<Map<String, Object>> getAllStaffByUnitId(@PathVariable long unitId,
+                                                                   @RequestBody StaffFilterDTO staffFilterDTO,
+                                                                   @RequestParam String moduleId,
+                                                                   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                   @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO,moduleId,startDate,endDate));
     }
 
 }

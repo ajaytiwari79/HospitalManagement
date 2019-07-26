@@ -109,6 +109,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 // Date is not supported as a return type in Bolt protocol version 1. Please make sure driver supports at least protocol version 2. Driver upgrade is most likely required
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment{deleted:false}) where id(staff)={0} return employment.endDate as endDate")
     List<String> getAllEmploymentsByStaffId(Long staffId);
+    @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment{deleted:false}) where id(staff) in {0} return id(employment)")
+    List<Long> getEmploymentIdsByStaffIds(List<Long> staffids);
 
     @Query("MATCH(employment:Employment)-[:" + IN_UNIT + "]->(subOrg:Organization) where id(employment)={0} " +
             "MATCH(employment)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +

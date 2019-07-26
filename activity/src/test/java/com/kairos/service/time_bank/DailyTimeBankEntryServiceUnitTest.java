@@ -30,7 +30,7 @@ public class DailyTimeBankEntryServiceUnitTest {
 
     
 
-    @Test
+ //   @Test
     public void getIntervals(){
         Integer i = 2018;
         int dayCount = 1;

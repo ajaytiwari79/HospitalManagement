@@ -6,3 +6,14 @@ db.activities.find({"balanceSettingsActivityTab.timeType":{"$exists":false}}).fo
         db.activities.save(activity);
     }
 });
+
+db.shifts.find({"deleted":false}).forEach( function (shift) {
+shift.activities.forEach( function (ac) {
+      var activity = db.activities.findOne({"_id":ac.activityId});
+if(activity.deleted){
+	print("acc",activity._id)
+        activity.deleted = false;
+        db.activities.save(activity);
+    }
+});
+});

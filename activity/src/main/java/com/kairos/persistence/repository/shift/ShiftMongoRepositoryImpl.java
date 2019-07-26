@@ -123,7 +123,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 count().as("count")
         );
         AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Shift.class, Map.class);
-        return (Long) result.getMappedResults().get(0).get("count");
+        return ((Integer) result.getMappedResults().get(0).get("count")).longValue();
     }
 
 
@@ -209,6 +209,19 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
+    public List<Shift> findShiftByShiftActivityIdAndBetweenDate(BigInteger shiftActivityId,LocalDate startDate,LocalDate endDate,Long staffId) {
+        Criteria criteria = where("activities.activityId").is(shiftActivityId).and("deleted").is(false);
+        if(isNotNull(startDate) && isNotNull(endDate)){
+            criteria = criteria.and("startDate").gte(startDate).lte(endDate);
+        }if(isNotNull(staffId)){
+            criteria = criteria.and("staffId").is(staffId);
+        }
+        Query query = new Query(criteria);
+        return mongoTemplate.find(query, Shift.class);
+
+    }
+
+    @Override
     public List<ShiftDTO> getAllShiftBetweenDuration(Long employmentId,Long staffId, Date startDate, Date endDate,Long unitId){
         Criteria criteria = Criteria.where("employmentId").is(employmentId).and("staffId").is(staffId).and("unitId").is(unitId).and("deleted").is(false).and("disabled").is(false).and("startDate").gte(startDate).lte(endDate);
         return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
@@ -244,8 +257,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return getShiftWithActivityByCriteria(Criteria.where("deleted").is(false).and("id").in(shiftIds),false,ShiftWithActivityDTO.class);
     }
 
-    public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds){
-        return getShiftWithActivityByCriteria(Criteria.where("deleted").is(false).and("disabled").is(false).and("staffId").in(staffIds),false,ShiftDTO.class);
+    public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds, LocalDate startDate, LocalDate endDate){
+        Criteria criteria = Criteria.where("deleted").is(false).and("disabled").is(false).and("staffId").in(staffIds);
+        if(isNotNull(startDate) && isNotNull(endDate)){
+            criteria.and("startDate").gte(startDate).lte(endDate.plusDays(1));
+        }
+        return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
     };
 
     @Override

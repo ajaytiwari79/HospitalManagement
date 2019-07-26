@@ -851,8 +851,11 @@ public class StaffService {
         return new ClientStaffInfoDTO(staff.getId());
     }
 
-    public Staff getStaffById(long staffId) {
-        return staffGraphRepository.findOne(staffId, 0);
+    public com.kairos.dto.user.staff.StaffDTO getStaffById(long staffId) {
+        Staff staff = staffGraphRepository.findOne(staffId, 1);
+        com.kairos.dto.user.staff.StaffDTO staffDTO =  ObjectMapperUtils.copyPropertiesByMapper(staff,com.kairos.dto.user.staff.StaffDTO.class);
+        staffDTO.setEmail(staff.getUser().getEmail());
+        return staffDTO;
     }
 
     public List<Long> getCountryAdminIds(long organizationId) {
@@ -1028,4 +1031,6 @@ public class StaffService {
         }
         return newUserName;
     }
+
+
 }

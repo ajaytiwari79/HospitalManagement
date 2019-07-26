@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @EnableStringTrimer
 public class PublicLegalDocumentDTO {
+
     private Long id;
 
     @Valid
@@ -34,5 +35,11 @@ public class PublicLegalDocumentDTO {
         this.name=name;
         this.publicLegalDocumentLogo=publicLegalDocumentLogo;
         this.bodyContentInHtml=bodyContentInHtml;
+    }
+
+
+    @Override
+    public String toString(){
+        return this.name;
     }
 }
