@@ -31,17 +31,17 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
-@Configuration
-@EnableAspectJAutoProxy
-@Order(Ordered.HIGHEST_PRECEDENCE)
+//@Configuration
+//@EnableAspectJAutoProxy
+//@Order(Ordered.HIGHEST_PRECEDENCE)
 public class JaversMongoConfig {
 
 
-    @Inject
+  //  @Inject
     private EnvConfig environment;
 
 
-    @Bean
+    //@Bean
     public Javers javers() {
         MongoRepository javersMongoRepository =
                 new MongoRepository(mongo().getDatabase(environment.getDataBaseName()));
@@ -50,7 +50,7 @@ public class JaversMongoConfig {
                 .build();
     }
 
-    @Bean
+    //@Bean
     public MongoClient mongo() {
 
         BSON.addEncodingHook(BigInteger.class, new BigIntegerTransformer());
@@ -66,23 +66,23 @@ public class JaversMongoConfig {
 
     }
 
-    @Bean
+    //@Bean
     public JaversAuditableAspect javersAuditableAspect() {
         return new JaversAuditableAspect(javers(), authorProvider(), commitPropertiesProvider());
     }
 
-    @Bean
+    //@Bean
     public JaversSpringDataAuditableRepositoryAspect javersSpringDataAuditableAspect() {
         return new JaversSpringDataAuditableRepositoryAspect(javers(), authorProvider(),
                 commitPropertiesProvider());
     }
 
-    @Bean
+    //@Bean
     public AuthorProvider authorProvider() {
         return new SpringSecurityAuthorProvider();
     }
 
-    @Bean
+    //@Bean
     public CommitPropertiesProvider commitPropertiesProvider() {
         //String userName = UserContext.getUserDetails().getFirstName() + UserContext.getUserDetails().getLastName();
         return () -> ImmutableMap.of("key", "ok");
