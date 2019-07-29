@@ -186,7 +186,7 @@ public class RequestAbsenceService {
                 ShiftActivity updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity,ShiftActivity.class);
                 updatedShiftActivity.setPlannedTimes(new ArrayList<>());
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
-                updatedShiftActivity.setEndDate(timeInterval.getStartDate());
+                updatedShiftActivity.setEndDate(timeInterval.getEndDate());
                 shiftActivities.add(updatedShiftActivity);
             }
             shiftActivities.add(absenceActivity);
