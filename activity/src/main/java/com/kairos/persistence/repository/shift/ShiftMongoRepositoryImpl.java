@@ -27,8 +27,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
@@ -123,7 +122,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 count().as("count")
         );
         AggregationResults<Map> result = mongoTemplate.aggregate(aggregation, Shift.class, Map.class);
-        return ((Integer) result.getMappedResults().get(0).get("count")).longValue();
+        return isCollectionNotEmpty(result.getMappedResults())? ((Integer)result.getMappedResults().get(0).get("count")).longValue():0l;
     }
 
 
@@ -260,7 +259,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds, LocalDate startDate, LocalDate endDate){
         Criteria criteria = Criteria.where("deleted").is(false).and("disabled").is(false).and("staffId").in(staffIds);
         if(isNotNull(startDate) && isNotNull(endDate)){
-            criteria.and("startDate").gte(startDate).lte(endDate.plusDays(1));
+
+            criteria.and("startDate").gte(startDate).lte(endDate);
+
         }
         return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
     };

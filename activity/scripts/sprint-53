@@ -35,8 +35,23 @@ db.getCollection('applicableKPI').insert({
     "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
 });
 
+
+
+db.todo.find({}).forEach(function(todo){
+    var activity = db.activities.findOne({"_id":todo.subEntityId});
+    todo.activityName = activity.name;
+    if(todo.status=="APPROVE"){
+    todo.approvedOn = ISODate("1970-01-01T00:00:00.000Z");
+    }
+    db.todo.save(todo);
+    });
+
 db.planningPeriod.find({}).forEach(function(planningPeriod){
     planningPeriod.duration = 1;
     planningPeriod.durationType = "WEEKS";
     db.planningPeriod.save(planningPeriod);
     });
+
+db.getCollection('wtaBaseRuleTemplate').updateMany({"intervalUnit" : "WEEK"},{$set:{"intervalUnit" : "WEEKS"}});
+
+db.getCollection('kPIDashboard').updateMany({"defaultTab" : false},{$set:{"defaultTab" : true}});

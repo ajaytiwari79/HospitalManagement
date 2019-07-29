@@ -936,9 +936,10 @@ public class ShiftValidatorService {
     }
 
     private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
-         return (CommonConstants.FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
-        //return true;
-    }
+        return (CommonConstants.FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime());
+            //return true;
+        }
+
 
 
     private boolean isShiftOverlap(List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval shiftInterval) {

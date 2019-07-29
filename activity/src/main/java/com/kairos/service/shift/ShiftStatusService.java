@@ -232,8 +232,10 @@ public class ShiftStatusService {
         if(newHashSet(APPROVE,DISAPPROVE).contains(shiftStatus)){
             TodoStatus todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE: TodoStatus.DISAPPROVE;
             Todo todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED,newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED),shiftActivity.getActivityId());
-            todo.setStatus(todoStatus);
-            todoRepository.save(todo);
+            if(isNotNull(todo)) {
+                todo.setStatus(todoStatus);
+                todoRepository.save(todo);
+            }
         }
     }
 
