@@ -35,6 +35,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.enums.shift.TodoStatus.*;
+import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
  * Created by pradeep
@@ -63,7 +64,7 @@ public class TodoService {
     public void createOrUpdateTodo(Shift shift, TodoType todoType, UserAccessRoleDTO userAccessRoleDTO, boolean shiftUpdate) {
         List<Todo> todos = new ArrayList<>();
         if (todoType.equals(TodoType.APPROVAL_REQUIRED)) {
-            Set<BigInteger> activityIds = shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
+            Set<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivity.getStatus())).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
             activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet()));
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
