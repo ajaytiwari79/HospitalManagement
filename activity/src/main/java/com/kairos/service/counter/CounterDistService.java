@@ -12,6 +12,7 @@ import com.kairos.dto.activity.counter.distribution.org_type.*;
 import com.kairos.dto.activity.counter.distribution.tab.*;
 import com.kairos.dto.activity.counter.enums.*;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.UNCATEGORIES;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -698,6 +700,16 @@ public class CounterDistService extends MongoBaseService {
         }
         kpiDashboards.stream().forEach(kpiDashboard -> kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId())));
         if (!kpiDashboards.isEmpty()) save(kpiDashboards);
+    }
+
+    public void createDefaultCategory(Long unitId){
+        KPICategory kpiCategory = new KPICategory(UNCATEGORIES,null,unitId,ConfLevel.UNIT);
+        counterRepository.save(kpiCategory);
+    }
+
+    public void createDefaultCategories(Long countryId){
+        List<Long> units=userIntegrationService.getUnitIds(countryId);
+        units.forEach(unit->createDefaultCategory(unit));
     }
 
 

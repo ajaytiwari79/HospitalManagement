@@ -94,7 +94,7 @@ public class RequestAbsenceService {
     }
 
     public <T> T approveRequestAbsence(Todo todo){
-        T response = null;
+        T response = (T)todo;
         Optional<Shift> shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
         if(!shiftOptional.isPresent()){
             exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
@@ -131,10 +131,11 @@ public class RequestAbsenceService {
                     shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().filter(shiftActivityDTO -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivityDTO.getStatus())).map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
                 }
                 response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
+                shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
                 shiftOptional.get().setRequestAbsence(null);
                 shiftMongoRepository.save(shiftOptional.get());
             }
-        }else {
+        }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
             todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
