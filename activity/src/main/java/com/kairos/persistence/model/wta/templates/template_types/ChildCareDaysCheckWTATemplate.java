@@ -11,6 +11,8 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
@@ -26,27 +28,14 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalBy
  */
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
     private float recommendedValue;
     private CutOffIntervalUnit cutOffIntervalUnit;
 
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    public boolean isBorrowLeave() {
-        return borrowLeave;
-    }
-
-    public void setBorrowLeave(boolean borrowLeave) {
-        this.borrowLeave = borrowLeave;
-    }
 
     public ChildCareDaysCheckWTATemplate() {
        this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
@@ -73,29 +62,10 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     }
 
-
-
-    public CutOffIntervalUnit getCutOffIntervalUnit() {
-        return cutOffIntervalUnit;
-    }
-
-    public void setCutOffIntervalUnit(CutOffIntervalUnit cutOffIntervalUnit) {
-        this.cutOffIntervalUnit = cutOffIntervalUnit;
-    }
-
     public ChildCareDaysCheckWTATemplate(String name, boolean disabled, String description) {
         super(name, description);
         this.wtaTemplateType = WTATemplateType.CHILD_CARE_DAYS_CHECK;
         this.disabled=disabled;
-    }
-
-
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
     }
 
     @Override
