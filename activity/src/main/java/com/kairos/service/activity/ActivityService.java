@@ -74,8 +74,7 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.activity.ActivityUtil.*;
@@ -337,7 +336,7 @@ public class ActivityService {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
         if(!activity.getGeneralActivityTab().getBackgroundColor().equals(timeType.getBackgroundColor())){
-            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activity.getId(),null,null,null);
+            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()),null,null,null);
             shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
                 if(shiftActivity.getActivityId().equals(activity.getId())){
                     shiftActivity.setBackgroundColor(timeType.getBackgroundColor());
@@ -348,6 +347,9 @@ public class ActivityService {
                     }
                 });
             }));
+            if(isCollectionNotEmpty(shifts)){
+                shiftMongoRepository.saveEntities(shifts);
+            }
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
