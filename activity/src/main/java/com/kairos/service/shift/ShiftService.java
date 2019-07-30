@@ -214,7 +214,7 @@ public class ShiftService extends MongoBaseService {
         if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false, functionId,phase,shiftActionType);
             todoService.createOrUpdateTodo(mainShift, TodoType.APPROVAL_REQUIRED,staffAdditionalInfoDTO.getUserAccessRoleDTO(),isNotNull(shiftDTO.getId()));
-            if(ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
+            if(!ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
                 payOutService.updatePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
                 shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
             }
