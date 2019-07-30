@@ -38,6 +38,7 @@ import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.*;
+import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
@@ -126,6 +127,7 @@ public class OrganizationActivityService extends MongoBaseService {
     private ProtectedDaysOffService protectedDaysOffService;
     @Inject
     private ShiftService shiftService;
+    @Inject private CounterDistService counterDistService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -513,6 +515,7 @@ public class OrganizationActivityService extends MongoBaseService {
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);
         kpiSetService.copyKPISets(unitId, orgTypeAndSubTypeDTO.getSubTypeId(), orgTypeAndSubTypeDTO.getCountryId());
         protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
+        counterDistService.createDefaultCategory(unitId);
         return true;
     }
 
