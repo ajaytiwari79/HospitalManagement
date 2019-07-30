@@ -244,7 +244,7 @@ public class SchedulerPanelService extends MongoBaseService {
             }
 
         }
-        if(schedulerPanelsUpdated.size()>0){
+        if(isCollectionNotEmpty(schedulerPanelsUpdated)){
             save(schedulerPanelsUpdated);
         }
 
