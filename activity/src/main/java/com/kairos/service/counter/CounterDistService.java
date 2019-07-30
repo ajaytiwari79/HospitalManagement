@@ -707,9 +707,12 @@ public class CounterDistService extends MongoBaseService {
         counterRepository.save(kpiCategory);
     }
 
-    public void createDefaultCategories(Long countryId){
+    public boolean createDefaultCategories(Long countryId){
         List<Long> units=userIntegrationService.getUnitIds(countryId);
         units.forEach(unit->createDefaultCategory(unit));
+        KPICategory kpiCategory = new KPICategory(UNCATEGORIES,countryId,null,ConfLevel.COUNTRY);
+        counterRepository.save(kpiCategory);
+        return true;
     }
 
 

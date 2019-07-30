@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDateString;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.SHIFT_NOT_EXISTS;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.enums.shift.TodoStatus.*;
@@ -150,7 +151,7 @@ public class TodoService {
         T response = null;
         Todo todo = isNotNull(todoId) ? todoRepository.findOne(todoId) : todoRepository.findByEntityIdAndType(shiftId, TodoType.REQUEST_ABSENCE);
         if (isNull(todo)) {
-            exceptionService.dataNotFoundException("todo not found");
+            exceptionService.dataNotFoundException(SHIFT_NOT_EXISTS);
         }
         todo.setStatus(status);
         if (status.equals(APPROVE)) {
