@@ -34,6 +34,10 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
+    public ShiftLengthWTATemplate() {
+        this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
+    }
+
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues)) {

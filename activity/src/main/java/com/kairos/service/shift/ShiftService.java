@@ -378,7 +378,9 @@ public class ShiftService extends MongoBaseService {
         ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldShift, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()));
         List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
         if (isIgnoredAllRuletemplate(shiftWithViolatedInfo, updatedShiftWithViolatedInfo)) {
-            updateWTACounter(staffAdditionalInfoDTO, updatedShiftWithViolatedInfo, shift);
+            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())) {
+                updateWTACounter(staffAdditionalInfoDTO, updatedShiftWithViolatedInfo, shift);
+            }
             shift.setPlanningPeriodId(planningPeriod.getId());
             shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, false, functionId , phase,shiftActionType);
             if(isNotNull(todoType)){
