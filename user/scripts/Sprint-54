@@ -1,0 +1,5 @@
+Match(ap:AccessPage) where ap.moduleId="module_12" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Leave balance",isModule:false,moduleId:"tab_410",active:true});
+
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+Match (ap:AccessPage)
+CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);

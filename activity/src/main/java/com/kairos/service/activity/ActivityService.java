@@ -30,10 +30,12 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
@@ -72,8 +74,7 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.service.activity.ActivityUtil.*;
@@ -123,6 +124,7 @@ public class ActivityService {
     private PlanningPeriodService planningPeriodService;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject private ActivityPriorityMongoRepository activityPriorityMongoRepository;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
     private static final  Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
@@ -291,6 +293,7 @@ public class ActivityService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
+        generalActivityTabWithTagDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
         return new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityCategories);
     }
 
@@ -331,6 +334,22 @@ public class ActivityService {
         TimeType timeType = timeTypeMongoRepository.findOneById(generalActivityTabDTO.getTimeTypeId());
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
+        }
+        if(!activity.getGeneralActivityTab().getBackgroundColor().equals(timeType.getBackgroundColor())){
+            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()),null,null,null);
+            shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
+                if(shiftActivity.getActivityId().equals(activity.getId())){
+                    shiftActivity.setBackgroundColor(timeType.getBackgroundColor());
+                }
+                shiftActivity.getChildActivities().forEach(childActivity -> {
+                    if(childActivity.getActivityId().equals(activity.getId())){
+                        childActivity.setBackgroundColor(timeType.getBackgroundColor());
+                    }
+                });
+            }));
+            if(isCollectionNotEmpty(shifts)){
+                shiftMongoRepository.saveEntities(shifts);
+            }
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);

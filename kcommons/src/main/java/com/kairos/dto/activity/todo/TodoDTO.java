@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Created by pradeep
@@ -29,4 +30,9 @@ public class TodoDTO {
     private Long employmentId;
     private Long unitId;
     private LocalDate createdAt;
+    private String activityName;
+    private LocalDateTime approvedOn;
+    private String remark;
+
+
 }

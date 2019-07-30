@@ -203,7 +203,10 @@ public class AppConstants {
     public static final String HOURS = "Hours";
     public static final String CONTRACTUAL_HOURS = "Contractual Hours";
     public static final String PLANNED_HOURS = "Planned Hours";
+    public static final String TIME_BANK ="time bank";
     public static final String STAFF = "Staff";
+    public static final String STAFF_LIST = "Staff Name";
+
     public static final String DATE = "Dates";
     public static final String LABEL = "label";
     public static final String VALUE_FIELD = "value";
@@ -217,6 +220,8 @@ public class AppConstants {
 
     //for use timeslot in timeslot kpi
     public static final String NIGHT = "Night";
+    public static final String EVENING = "Evening";
+    public static final String DAY = "Day";
 
     //Timebank Ruletemplate not valid reason
     public static final String DAYTYPE_IS_NOT_VALID = "Daytype is not valid";
@@ -229,5 +234,7 @@ public class AppConstants {
 
     //activity status mail
     public static final String MAIL_SUBJECT ="Activiy Status";
+
+    public static final String UNCATEGORIES = "Uncategories";
 
 }

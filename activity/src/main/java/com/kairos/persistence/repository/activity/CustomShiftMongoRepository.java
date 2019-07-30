@@ -9,6 +9,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.wrapper.ShiftResponseDTO;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -79,6 +80,8 @@ public interface CustomShiftMongoRepository {
 
     void deleteShiftBetweenDatesByEmploymentId(Long employmentId,Date startDate,Date endDate,Collection<BigInteger> shiftIds);
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists);
-    List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds);
+    List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds, LocalDate startDate, LocalDate endDate);
+
+    List<Shift> findShiftByShiftActivityIdAndBetweenDate(Collection<BigInteger> shiftActivityIds,LocalDate startDate,LocalDate endDate,Long staffId);
 
 }

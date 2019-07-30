@@ -121,7 +121,7 @@ public class SchedulerPanelController {
     }
 
 
-    @PostMapping(API_UNIT_SCHEDULER_URL+"time_zone")
+    @PostMapping(API_UNIT_SCHEDULER_URL+"/time_zone")
     @ApiOperation("update time zones by unit id and time zone for Scheduler Panels ")
     public ResponseEntity<ResponseDTO<Boolean>> updateSchedularPanelsDateByUnitIdAndTimeZone(@PathVariable Long unitId, @RequestBody String timeZone)  {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsByUnitIdAndTimeZone(unitId, timeZone.substring(1,timeZone.length()-1)));

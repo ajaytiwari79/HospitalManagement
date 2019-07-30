@@ -10,6 +10,8 @@ import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -23,6 +25,8 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
 
     @Positive
@@ -33,53 +37,6 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     private boolean restingTimeAllowed;
     private int restingTime;
 
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(long intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-    public int getNightShiftSequence() {
-        return nightShiftSequence;
-    }
-
-    public void setNightShiftSequence(int nightShiftSequence) {
-        this.nightShiftSequence = nightShiftSequence;
-    }
-
-    public boolean isRestingTimeAllowed() {
-        return restingTimeAllowed;
-    }
-
-    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        this.restingTimeAllowed = restingTimeAllowed;
-    }
-
-    public int getRestingTime() {
-        return restingTime;
-    }
-
-    public void setRestingTime(int restingTime) {
-        this.restingTime = restingTime;
-    }
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
     public DaysOffAfterASeriesWTATemplate() {
         wtaTemplateType = WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
     }
