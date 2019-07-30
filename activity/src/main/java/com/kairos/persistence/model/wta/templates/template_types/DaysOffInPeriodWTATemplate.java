@@ -9,6 +9,7 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -16,6 +17,7 @@ import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
+import static com.kairos.constants.AppConstants.DAYS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 /**
@@ -27,6 +29,8 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
 
+    @Autowired
+    NumberOfPartOfDayShiftsWTATemplate numberOfPartOfDayShiftsWTATemplate;
     @Positive(message = "message.ruleTemplate.interval.notNull")
     private long intervalLength;
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")
@@ -115,17 +119,20 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)) {
             int count = 0;
-            DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-            dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1),dateTimeInterval.getEnd().plusDays(1));
-            List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
-            shifts.add(infoWrapper.getShift());
-            List<DateTimeInterval> intervals = getSortedIntervals(shifts);
-            if (intervals.size() > 2) {
-                count = getDayOFF(intervals,dateTimeInterval);
-                Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
-                boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
-                brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                        limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
+            DateTimeInterval[] dateTimeIntervals = getIntervalsByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+            for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
+               // DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
+               // dateTimeInterval = new DateTimeInterval(dateTimeInterval.getStart().minusDays(1), dateTimeInterval.getEnd().plusDays(1));
+                List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
+                shifts.add(infoWrapper.getShift());
+                List<DateTimeInterval> intervals = getSortedIntervals(shifts);
+                if (intervals.size() > 2) {
+                    count = getDayOFF(intervals, dateTimeInterval);
+                    Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count-1);
+                    brakeRuleTemplateAndUpdateViolationDetails(infoWrapper, limitAndCounter[1], isValid, this,
+                            limitAndCounter[2], DurationType.DAYS, String.valueOf(limitAndCounter[0]));
+                }
             }
         }
     }
