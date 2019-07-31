@@ -320,7 +320,7 @@ public class ShiftService extends MongoBaseService {
 
     public void saveShiftWithActivity(Map<Date, Phase> phaseListByDate, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = getActivityWrapperMap(shifts,null);
-        todoService.createOrUpdateTodo(shifts.get(0), TodoType.APPROVAL_REQUIRED,staffAdditionalInfoDTO.getUserAccessRoleDTO(),isNotNull(shifts.get(0).getId()));
+
         for (Shift shift : shifts) {
             shiftValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, staffAdditionalInfoDTO);
             int scheduledMinutes = 0;
@@ -342,6 +342,7 @@ public class ShiftService extends MongoBaseService {
         }
         shiftMongoRepository.saveEntities(shifts);
         shifts.forEach(shift -> updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO));
+        todoService.createOrUpdateTodo(shifts.get(0), TodoType.APPROVAL_REQUIRED,staffAdditionalInfoDTO.getUserAccessRoleDTO(),isNotNull(shifts.get(0).getId()));
     }
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type, Boolean validatedByStaff, boolean updateShiftState, Long unitId,ShiftActionType shiftActionType, TodoType todoType) {
@@ -476,7 +477,7 @@ public class ShiftService extends MongoBaseService {
             shiftMongoRepository.saveEntities(saveShifts);
         }
         Map<String,Object> response = new HashMap<>();
-        response.put("shiftDetails",getAllShiftAndStates(unitId, staffId, isNull(startDate) ? planningPeriods.get(0).getStartDate() : startDate, isNull(endDate) ? planningPeriods.get(0).getEndDate() : endDate, employmentId, viewType, shiftFilterParam,null,staffFilterDTO));
+        response.put("shiftDetails",getAllShiftAndStates(unitId, staffId, isNull(startDate) ? planningPeriods.get(0).getStartDate() : startDate, isNull(endDate) ? planningPeriods.get(planningPeriods.size()-1).getEndDate() : endDate, employmentId, viewType, shiftFilterParam,null,staffFilterDTO));
         response.put("deletedShiftIds",deletedShiftIds);
         return response;
     }
@@ -695,21 +696,18 @@ public class ShiftService extends MongoBaseService {
     }
 
     private Shift updateShiftAfterPublish(Shift shift, UserAccessRoleDTO userAccessRoleDTO, ShiftActionType shiftActionType) {
-        Shift originalShift = shiftMongoRepository.findOne(shift.getId());
         boolean valid = shift.getActivities().stream().allMatch(activity -> activity.getStatus().contains(ShiftStatus.PUBLISH)) && userAccessRoleDTO.getManagement();
         if (valid && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
             Shift draftShift=ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
-            draftShift.setPlannedMinutesOfTimebank(originalShift.getPlannedMinutesOfTimebank());
-            draftShift.setTimeBankCtaBonusMinutes(originalShift.getTimeBankCtaBonusMinutes());
-            draftShift.setScheduledMinutes(originalShift.getScheduledMinutes());
-            originalShift.setDraftShift(draftShift);
-            originalShift.getDraftShift().setDraft(true);
-        } else if (valid && ShiftActionType.SAVE.equals(shiftActionType)) {
-            originalShift = shift;
-        } else {
-            originalShift.setDraftShift(null);
+            draftShift.setPlannedMinutesOfTimebank(shift.getPlannedMinutesOfTimebank());
+            draftShift.setTimeBankCtaBonusMinutes(shift.getTimeBankCtaBonusMinutes());
+            draftShift.setScheduledMinutes(shift.getScheduledMinutes());
+            shift.setDraftShift(draftShift);
+            shift.getDraftShift().setDraft(true);
+        }else {
+            shift.setDraftShift(null);
         }
-        return originalShift;
+        return shift;
     }
 
     private ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, StaffFilterDTO staffFilterDTO) {

@@ -99,6 +99,7 @@ public class TimeBankService{
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
 
+
     /**
      * @param staffAdditionalInfoDTO
      * @param shift
@@ -284,14 +285,15 @@ public class TimeBankService{
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = userIntegrationService.getEmploymentDetails(employmentId);
         Interval interval = getIntervalByDateTimeBank(employmentWithCtaDetailsDTO, year);
         List<DailyTimeBankEntry> dailyTimeBankEntries = new ArrayList<>();
-        if(interval.getStart().getYear() <= new DateTime().getYear()) {
-            dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, interval.getStart().toDate(), interval.getEnd().toDate());
-        }
+            if (interval.getStart().getYear() <= new DateTime().getYear()) {
+                dailyTimeBankEntries = timeBankRepository.findAllByEmploymentAndDate(employmentId, interval.getStart().toDate(), interval.getEnd().toDate());
+            }
         TimeBankDTO timeBankDTO = timeBankCalculationService.getTimeBankOverview(unitId, employmentId, interval.getStart().dayOfYear().withMinimumValue(), interval.getEnd().dayOfYear().withMaximumValue(), dailyTimeBankEntries, employmentWithCtaDetailsDTO);
-        Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId,unitId,true);
-        timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
+            Long actualTimebankMinutes = getAccumulatedTimebankAndDelta(employmentId, unitId, true);
+            timeBankDTO.setActualTimebankMinutes(actualTimebankMinutes);
         return timeBankDTO;
-    }
+        }
+
 
     public TimeBankVisualViewDTO getTimeBankForVisualView(Long unitId, Long employmentId, String query, Integer value, Date startDate, Date endDate) {
         ZonedDateTime endZonedDate = null;
@@ -440,9 +442,9 @@ public class TimeBankService{
     private void updateTimebankDetailsInShiftActivity(Map<String, ShiftActivityDTO> shiftActivityDTOMap, ShiftActivity shiftActivity) {
         if(shiftActivityDTOMap.containsKey(shiftActivity.getActivityId()+"_"+shiftActivity.getStartDate())) {
             ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getActivityId() + "_" + shiftActivity.getStartDate());
-            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes());
+            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivityDTO.getTimeBankCtaBonusMinutes().intValue());
             shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
-            shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + shiftActivityDTO.getTimeBankCtaBonusMinutes());
+            shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + shiftActivityDTO.getTimeBankCtaBonusMinutes().intValue());
             shiftActivity.setScheduledMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank());
         }
     }
@@ -495,7 +497,7 @@ public class TimeBankService{
                 int timeBankCtaBonusMinutes = 0;
                 int scheduledMinutes = 0;
                 for (ShiftActivityDTO activity : shiftDTO.getActivities()) {
-                    activity.setPlannedMinutesOfTimebank(activity.getScheduledMinutesOfTimebank() + activity.getTimeBankCtaBonusMinutes());
+                    activity.setPlannedMinutesOfTimebank(activity.getScheduledMinutesOfTimebank() + activity.getTimeBankCtaBonusMinutes().intValue());
                     plannedMinutes += activity.getPlannedMinutesOfTimebank();
                     timeBankCtaBonusMinutes += activity.getTimeBankCtaBonusMinutes();
                     scheduledMinutes += activity.getScheduledMinutes();

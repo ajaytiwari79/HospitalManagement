@@ -53,7 +53,7 @@ public class ShiftActivityDTO {
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
 
-    private int timeBankCtaBonusMinutes;
+    private Double timeBankCtaBonusMinutes;
     private List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private Map<String, Object> location;// location where this activity needs to perform
     private String description;// this is from activity description and used in shift detail popup
@@ -117,9 +117,10 @@ public class ShiftActivityDTO {
     public ShiftActivityDTO() {
     }
 
-    public ShiftActivityDTO(BigInteger activityId, String activityName) {
+    public ShiftActivityDTO(BigInteger activityId, String activityName,Set<ShiftStatus> status) {
         this.activityId = activityId;
         this.activityName = activityName;
+        this.status = status;
     }
 
     public Set<ShiftStatus> getStatus() {

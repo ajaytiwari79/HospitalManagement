@@ -232,8 +232,10 @@ public class ShiftStatusService {
         if(newHashSet(APPROVE,DISAPPROVE).contains(shiftStatus)){
             TodoStatus todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE: TodoStatus.DISAPPROVE;
             Todo todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED,newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED),shiftActivity.getActivityId());
-            todo.setStatus(todoStatus);
-            todoRepository.save(todo);
+            if(isNotNull(todo)) {
+                todo.setStatus(todoStatus);
+                todoRepository.save(todo);
+            }
         }
     }
 
@@ -280,7 +282,7 @@ public class ShiftStatusService {
         }
     }
 
-    private ActivityShiftStatusSettings getActivityShiftStatusSettingByStatus(PhaseTemplateValue phaseTemplateValue, ShiftStatus status) {
+    public ActivityShiftStatusSettings getActivityShiftStatusSettingByStatus(PhaseTemplateValue phaseTemplateValue, ShiftStatus status) {
         ActivityShiftStatusSettings activityShiftStatusSettings = null;
         for (ActivityShiftStatusSettings statusSettings : phaseTemplateValue.getActivityShiftStatusSettings()) {
             if (status.equals(statusSettings.getShiftStatus())) {

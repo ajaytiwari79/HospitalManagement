@@ -8,6 +8,8 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
@@ -21,6 +23,8 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
 
     private long timeLimit;
@@ -29,69 +33,6 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
-
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
-
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    public List<Long> getDayTypeIds() {
-        return dayTypeIds;
-    }
-
-    public void setDayTypeIds(List<Long> dayTypeIds) {
-        this.dayTypeIds = dayTypeIds;
-    }
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
-    public long getTimeLimit() {
-        return timeLimit;
-    }
-
-    public void setTimeLimit(long timeLimit) {
-        this.timeLimit = timeLimit;
-    }
-
-
-    public ShiftLengthWTATemplate() {
-        wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
-    }
-
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {

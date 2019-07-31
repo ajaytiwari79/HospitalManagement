@@ -235,4 +235,6 @@ public class AppConstants {
     //activity status mail
     public static final String MAIL_SUBJECT ="Activiy Status";
 
+    public static final String UNCATEGORIES = "Uncategories";
+
 }
