@@ -47,7 +47,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     }
 
     public RestPeriodInAnIntervalWTATemplate() {
-        wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
+        this.wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
     }
 
     @Override
