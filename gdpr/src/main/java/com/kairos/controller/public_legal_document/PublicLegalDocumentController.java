@@ -38,7 +38,7 @@ public class PublicLegalDocumentController {
     }
     @ApiOperation("Update Public Legal Document By Id")
     @PutMapping(COUNTRY_URL + "/public_legal_document/{publicLegalDocumentId}")
-    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long publicLegalDocumentId,@RequestBody PublicLegalDocumentDTO publicLegalDocumentDTO) {
+    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long publicLegalDocumentId,@RequestBody @Validated PublicLegalDocumentDTO publicLegalDocumentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.updatePublicLegalDocument(publicLegalDocumentId,publicLegalDocumentDTO));
 
     }

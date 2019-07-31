@@ -88,7 +88,7 @@ public class StaffingLevelController {
                 staffingLevelService.getPresenceStaffingLevel(id));
     }
 
-    @RequestMapping(value = "presence/{staffingLevelId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/presence/{staffingLevelId}", method = RequestMethod.PUT)
     @ApiOperation("update staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
         @PathVariable Long unitId,@PathVariable BigInteger staffingLevelId) {

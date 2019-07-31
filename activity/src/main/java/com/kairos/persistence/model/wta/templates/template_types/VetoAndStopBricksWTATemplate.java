@@ -7,8 +7,11 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 
 import javax.validation.constraints.NotNull;
@@ -28,6 +31,8 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.validateVetoA
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
 
     @Positive(message = "message.ruleTemplate.weeks.notNull")
@@ -40,7 +45,7 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
     private float totalBlockingPoints; // It's for a duration from @validationStartDate  till the @numberOfWeeks
 
     public VetoAndStopBricksWTATemplate() {
-        //Default Constructor
+        this.wtaTemplateType = WTATemplateType.VETO_AND_STOP_BRICKS;
     }
 
 
@@ -50,46 +55,6 @@ public class VetoAndStopBricksWTATemplate extends WTABaseRuleTemplate {
         this.validationStartDate = validationStartDate;
         this.vetoActivityId = vetoActivityId;
         this.stopBrickActivityId = stopBrickActivityId;
-    }
-
-    public int getNumberOfWeeks() {
-        return numberOfWeeks;
-    }
-
-    public void setNumberOfWeeks(int numberOfWeeks) {
-        this.numberOfWeeks = numberOfWeeks;
-    }
-
-    public LocalDate getValidationStartDate() {
-        return validationStartDate;
-    }
-
-    public void setValidationStartDate(LocalDate validationStartDate) {
-        this.validationStartDate = validationStartDate;
-    }
-
-    public BigInteger getVetoActivityId() {
-        return vetoActivityId;
-    }
-
-    public void setVetoActivityId(BigInteger vetoActivityId) {
-        this.vetoActivityId = vetoActivityId;
-    }
-
-    public BigInteger getStopBrickActivityId() {
-        return stopBrickActivityId;
-    }
-
-    public void setStopBrickActivityId(BigInteger stopBrickActivityId) {
-        this.stopBrickActivityId = stopBrickActivityId;
-    }
-
-    public float getTotalBlockingPoints() {
-        return totalBlockingPoints;
-    }
-
-    public void setTotalBlockingPoints(float totalBlockingPoints) {
-        this.totalBlockingPoints = totalBlockingPoints;
     }
 
     @Override

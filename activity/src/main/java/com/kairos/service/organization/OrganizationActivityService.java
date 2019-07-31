@@ -38,6 +38,7 @@ import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.*;
+import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.exception.ExceptionService;
@@ -46,6 +47,7 @@ import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
+import com.kairos.service.shift.ShiftService;
 import com.kairos.service.unit_settings.*;
 import com.kairos.service.wta.WTAService;
 import com.kairos.wrapper.activity.*;
@@ -123,6 +125,9 @@ public class OrganizationActivityService extends MongoBaseService {
     private KPISetService kpiSetService;
     @Inject
     private ProtectedDaysOffService protectedDaysOffService;
+    @Inject
+    private ShiftService shiftService;
+    @Inject private CounterDistService counterDistService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -176,7 +181,13 @@ public class OrganizationActivityService extends MongoBaseService {
                     exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
                 }
             }
-            activityCopied.setDeleted(true);
+            long activityCount = shiftService.countByActivityId(activityCopied.getId());
+            if (activityCount > 0) {
+                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE);
+            }
+            if(isNotNull(activityCopied)) {
+                activityCopied.setDeleted(true);
+            }
         }
         activityMongoRepository.save(activityCopied);
         return retrieveBasicDetails(activityCopied);
@@ -346,6 +357,7 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
+        generalActivityTabWithTagDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
         return new ActivityTabsWrapper(generalActivityTabWithTagDTO, generalDTO.getActivityId(), activityCategories);
 
     }
@@ -503,6 +515,7 @@ public class OrganizationActivityService extends MongoBaseService {
         openShiftRuleTemplateService.copyOpenShiftRuleTemplateInUnit(unitId, orgTypeAndSubTypeDTO);
         kpiSetService.copyKPISets(unitId, orgTypeAndSubTypeDTO.getSubTypeId(), orgTypeAndSubTypeDTO.getCountryId());
         protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
+        counterDistService.createDefaultCategory(unitId);
         return true;
     }
 

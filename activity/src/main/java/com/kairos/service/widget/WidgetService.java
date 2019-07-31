@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.widget.WidgetMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.http.NameValuePair;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.REALTIME_DURATION_NOT_CONFIGURED;
 import static com.kairos.enums.widget.WidgetFilterType.*;
 
 /**
@@ -55,6 +57,7 @@ public class WidgetService {
     private PhaseMongoRepository phaseMongoRepository;
     @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject private TimeTypeService timeTypeService;
+    @Inject private ExceptionService exceptionService;
 
     public DashboardWidgetDTO getWidgetData(Long unitId) {
         DashboardWidgetDTO dashBoardWidgetDTO = null;
@@ -71,6 +74,9 @@ public class WidgetService {
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
         Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
         List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null,organizationDTO.getCountryId());
+        if(isNull(realTimePhase) || isNull(realTimePhase.getRealtimeDuration())){
+            exceptionService.dataNotFoundException(REALTIME_DURATION_NOT_CONFIGURED);
+        }
         dashBoardWidgetDTO = new DashboardWidgetDTO(null, shiftDTOs, new HashMap<>(), realTimePhase.getRealtimeDuration(),timeTypeDTOS);
         if(isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
             Map<Long, StaffAdditionalInfoDTO> idAndStaffMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getId())).collect(Collectors.toMap(StaffAdditionalInfoDTO::getId, v -> v));
