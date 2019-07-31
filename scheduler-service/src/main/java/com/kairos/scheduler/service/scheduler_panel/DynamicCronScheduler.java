@@ -152,7 +152,7 @@ public class DynamicCronScheduler{
             }
 
             KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(), schedulerPanel.getUnitId(), schedulerPanel.getJobType(), schedulerPanel.getJobSubType(), schedulerPanel.getEntityId(),
-                    integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
+                    integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()),schedulerPanel.getFilterId());
 
             kafkaProducer.pushToQueue(jobToExecute);
         };

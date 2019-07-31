@@ -21,7 +21,7 @@ public class KairosSchedulerExecutorDTO {
 
     }
     public KairosSchedulerExecutorDTO(BigInteger id, Long unitId, JobType jobType, JobSubType jobSubType, BigInteger entityId,
-                                      IntegrationSettingsDTO integrationSettingsDTO, Long oneTimeTriggerDateMillis ) {
+                                      IntegrationSettingsDTO integrationSettingsDTO, Long oneTimeTriggerDateMillis,String filterId ) {
 
         this.id = id;
         this.unitId = unitId;
@@ -30,6 +30,7 @@ public class KairosSchedulerExecutorDTO {
         this.entityId = entityId;
         this.integrationSettingsDTO = integrationSettingsDTO;
         this.oneTimeTriggerDateMillis = oneTimeTriggerDateMillis;
+        this.filterId=filterId;
 
     }
 
