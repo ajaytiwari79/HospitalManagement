@@ -81,7 +81,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     }
 
     private List<DailyTimeBankEntry> getDailyTimeBankEntryByDate(List<Long> staffIds, LocalDate startDate, LocalDate endDate, Set<DayOfWeek> daysOfWeeks) {
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, startDate, endDate);
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, startDate,endDate);
         List<LocalDate> localDates = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(daysOfWeeks)) {
             for (LocalDate date = startDate; date.isBefore(endDate.plusDays(1)); date = date.plusDays(1)) {
@@ -104,7 +104,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
         List<String> StaffList =filterBasedCriteria.getOrDefault(FilterType.STAFF_IDS,new ArrayList());
         List<String> unitName =filterBasedCriteria.getOrDefault(FilterType.UNIT_NAME,new ArrayList());
 
-        List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
+        List<DateTimeInterval> dateTimeIntervals =getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiDefaultData(staffEmploymentTypeDTO);
         List<Long> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAY_TYPE)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(DayTypeDTO::getId).collect(Collectors.toList());
@@ -157,7 +157,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     private Map<Object, Double> getstaffPlannedAndTimeBankHoursPerStaff(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<StaffKpiFilterDTO> staffKpiFilterDTOS, Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, List<DailyTimeBankEntry> dailyTimeBankEntries) {
         Map<Object, Double> staffIdAndDeltaTimeBankMap = new HashedMap();
 
-         dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(0).getEndLocalDate());
+         dailyTimeBankEntries = timeBankRepository.findAllDailyTimeBankByStaffIdsAndBetweenDates(staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(0).getEndLocalDate().minusDays(1));
 
         Map<Long, List<DailyTimeBankEntry>> staffAndDailyTimeBankMap;
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
@@ -257,13 +257,13 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getPlannedHoursVsTimeBankKpiStaffs(organizationId, filterBasedCriteria,null);
-        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.TIME_BANK, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
+        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getPlannedHoursVsTimeBankKpiStaffs(organizationId, filterBasedCriteria ,applicableKPI);
-        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.TIME_BANK, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
+        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
     }
 
     @Override

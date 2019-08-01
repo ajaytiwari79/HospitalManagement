@@ -173,7 +173,9 @@ public class KPISetService {
                     if(isCollectionNotEmpty(kpiResponseDTOList)) {
                         kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
                     }
-                    kpiSetResponseDTOList.add(kpiSetResponseDTO);
+                    if(isCollectionNotEmpty(kpiSetResponseDTO.getKpiData())) {
+                        kpiSetResponseDTOList.add(kpiSetResponseDTO);
+                    }
                 }
             }
         }

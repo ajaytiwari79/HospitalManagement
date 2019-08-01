@@ -7,6 +7,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +31,7 @@ public class BreakWTATemplate extends WTABaseRuleTemplate {
     }
 
     public BreakWTATemplate() {
-        //Default Constructor
+        this.wtaTemplateType = WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT;
     }
 
     @Override

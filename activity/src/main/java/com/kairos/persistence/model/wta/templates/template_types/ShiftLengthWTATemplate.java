@@ -34,6 +34,13 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
 
+    public ShiftLengthWTATemplate(String name, String description, long timeLimit) {
+        super(name, description);
+        this.timeLimit = timeLimit;
+        this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
+    }
+
+
     public ShiftLengthWTATemplate() {
         this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
@@ -54,12 +61,6 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                 }
             }
         }
-    }
-
-    public ShiftLengthWTATemplate(String name, String description, long timeLimit) {
-        super(name, description);
-        this.timeLimit = timeLimit;
-        this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 
     @Override

@@ -309,4 +309,9 @@ public class CounterDistController {
     public ResponseEntity<Map<String, Object>> kpiDataOfCountryByInterval(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria ,@RequestParam(required = false) Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiDataByInterval(kpiId, countryId, filterCriteria, ConfLevel.COUNTRY,staffId));
     }
+
+    @PostMapping(COUNTRY_URL+"/create_default_category")
+    public ResponseEntity<Map<String, Object>> createDefaultCategory(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.createDefaultCategories(countryId));
+    }
 }

@@ -214,7 +214,7 @@ public class ShiftService extends MongoBaseService {
         if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false, functionId,phase,shiftActionType);
             todoService.createOrUpdateTodo(mainShift, TodoType.APPROVAL_REQUIRED,staffAdditionalInfoDTO.getUserAccessRoleDTO(),isNotNull(shiftDTO.getId()));
-            if(ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
+            if(!ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
                 payOutService.updatePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
                 shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
             }
@@ -477,7 +477,8 @@ public class ShiftService extends MongoBaseService {
             shiftMongoRepository.saveEntities(saveShifts);
         }
         Map<String,Object> response = new HashMap<>();
-        response.put("shiftDetails",getAllShiftAndStates(unitId, staffId, isNull(startDate) ? planningPeriods.get(0).getStartDate() : startDate, isNull(endDate) ? planningPeriods.get(planningPeriods.size()-1).getEndDate() : endDate, employmentId, viewType, shiftFilterParam,null,staffFilterDTO));
+        response.put("shiftDetails",getAllShiftAndStates(unitId, staffId, isNull(startDate) ? planningPeriods.get(0).getStartDate() : startDate, isNull(endDate) ? planningPeriods.get(planningPeriods.size()-1).getEndDate(): endDate, employmentId, viewType, shiftFilterParam,null,staffFilterDTO));
+
         response.put("deletedShiftIds",deletedShiftIds);
         return response;
     }
@@ -696,19 +697,23 @@ public class ShiftService extends MongoBaseService {
     }
 
     private Shift updateShiftAfterPublish(Shift shift, UserAccessRoleDTO userAccessRoleDTO, ShiftActionType shiftActionType) {
+        Shift originalShift = shiftMongoRepository.findOne(shift.getId());
         boolean valid = shift.getActivities().stream().allMatch(activity -> activity.getStatus().contains(ShiftStatus.PUBLISH)) && userAccessRoleDTO.getManagement();
         if (valid && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
             Shift draftShift=ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
-            draftShift.setPlannedMinutesOfTimebank(shift.getPlannedMinutesOfTimebank());
-            draftShift.setTimeBankCtaBonusMinutes(shift.getTimeBankCtaBonusMinutes());
-            draftShift.setScheduledMinutes(shift.getScheduledMinutes());
-            shift.setDraftShift(draftShift);
-            shift.getDraftShift().setDraft(true);
-        }else {
-            shift.setDraftShift(null);
+            draftShift.setPlannedMinutesOfTimebank(originalShift.getPlannedMinutesOfTimebank());
+            draftShift.setTimeBankCtaBonusMinutes(originalShift.getTimeBankCtaBonusMinutes());
+            draftShift.setScheduledMinutes(originalShift.getScheduledMinutes());
+            originalShift.setDraftShift(draftShift);
+            originalShift.getDraftShift().setDraft(true);
+        } else if (valid && ShiftActionType.SAVE.equals(shiftActionType)) {
+            originalShift = shift;
+        } else {
+            originalShift.setDraftShift(null);
         }
-        return shift;
+        return originalShift;
     }
+
 
     private ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, StaffFilterDTO staffFilterDTO) {
         if (staffId == null) {
