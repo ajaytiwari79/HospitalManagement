@@ -44,7 +44,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
     private String intervalUnit;
 
     public ConsecutiveWorkWTATemplate() {
-        wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
+        this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;
     }
 
 

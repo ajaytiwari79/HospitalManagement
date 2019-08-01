@@ -697,19 +697,23 @@ public class ShiftService extends MongoBaseService {
     }
 
     private Shift updateShiftAfterPublish(Shift shift, UserAccessRoleDTO userAccessRoleDTO, ShiftActionType shiftActionType) {
+        Shift originalShift = shiftMongoRepository.findOne(shift.getId());
         boolean valid = shift.getActivities().stream().allMatch(activity -> activity.getStatus().contains(ShiftStatus.PUBLISH)) && userAccessRoleDTO.getManagement();
         if (valid && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
             Shift draftShift=ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
-            draftShift.setPlannedMinutesOfTimebank(shift.getPlannedMinutesOfTimebank());
-            draftShift.setTimeBankCtaBonusMinutes(shift.getTimeBankCtaBonusMinutes());
-            draftShift.setScheduledMinutes(shift.getScheduledMinutes());
-            shift.setDraftShift(draftShift);
-            shift.getDraftShift().setDraft(true);
-        }else {
-            shift.setDraftShift(null);
+            draftShift.setPlannedMinutesOfTimebank(originalShift.getPlannedMinutesOfTimebank());
+            draftShift.setTimeBankCtaBonusMinutes(originalShift.getTimeBankCtaBonusMinutes());
+            draftShift.setScheduledMinutes(originalShift.getScheduledMinutes());
+            originalShift.setDraftShift(draftShift);
+            originalShift.getDraftShift().setDraft(true);
+        } else if (valid && ShiftActionType.SAVE.equals(shiftActionType)) {
+            originalShift = shift;
+        } else {
+            originalShift.setDraftShift(null);
         }
-        return shift;
+        return originalShift;
     }
+
 
     private ShiftFunctionWrapper getShiftByStaffId(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, StaffFilterDTO staffFilterDTO) {
         if (staffId == null) {
