@@ -26,14 +26,13 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
 
     private BigInteger activityId;
     private Date startDate;
-    private Time startTime;
-
     private Date endDate;
     private int scheduledMinutes;
     private int durationMinutes;
     private String activityName;
     private long bid;
     private long pId;
+
     //used in T&A view
     private Long reasonCodeId;
     //used for adding absence type of activities.

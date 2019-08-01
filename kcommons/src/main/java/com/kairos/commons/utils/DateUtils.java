@@ -744,13 +744,8 @@ public  class DateUtils {
         return localDate.format(DateTimeFormatter.ofPattern(pattern));
     }
 
-    public static String getLocalTimeStringByPattern(LocalTime localTime, String pattern){
-
-
-
-
+    public static String getLocalTimeStringByPattern(LocalTime localTime, String pattern) {
         return localTime.format(DateTimeFormatter.ofPattern(pattern));
-
     }
 
     public static LocalDate getlastDayOfYear(Integer year){
