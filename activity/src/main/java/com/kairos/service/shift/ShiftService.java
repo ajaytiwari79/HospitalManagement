@@ -70,6 +70,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.*;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -803,6 +804,23 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
+
+    public List<ShiftDTO> deleteAllLinkedShifts(BigInteger shiftId){
+        List<ShiftDTO> shiftDTOS = new ArrayList<>();
+        Shift currentShift = shiftMongoRepository.findOne(shiftId);
+        Activity activity = activityRepository.findOne(currentShift.getActivities().get(0).getActivityId());
+        if(CommonConstants.FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())){
+            ZonedDateTime startDate = asZoneDateTime(currentShift.getStartDate()).with(TemporalAdjusters.previousOrSame(activity.getTimeCalculationActivityTab().getFullWeekStart()));
+            ZonedDateTime endDate = startDate.plusDays(7);
+            List<Shift> shifts= shiftMongoRepository.findAllShiftsByStaffId(currentShift.getStaffId(),asDate(startDate),asDate(endDate));
+            shifts.forEach(shift -> {
+                shiftDTOS.add(deleteShift(shift.getId()));
+            });
+        }else {
+            shiftDTOS.add(deleteShift(shiftId));
+        }
+        return shiftDTOS;
+    }
 
     public ShiftDTO deleteShift(BigInteger shiftId) {
         ShiftDTO shiftDTO = new ShiftDTO();

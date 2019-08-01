@@ -4,6 +4,7 @@ import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -36,12 +37,15 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.MAIL_SUBJECT;
@@ -101,7 +105,7 @@ public class ShiftStatusService {
                     }
                 }
                 if (shift.isDeleted()) {
-                    shiftDTOS.add(shiftService.deleteShift(shift.getId()));
+                    shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()));
                 } else {
                     shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
                 }
