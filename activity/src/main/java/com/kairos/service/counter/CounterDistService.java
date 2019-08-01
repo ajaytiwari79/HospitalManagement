@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.UNCATEGORIES;
 import static com.kairos.constants.AppConstants.UNCATEGORIZED;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
