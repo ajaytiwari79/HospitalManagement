@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -155,7 +156,8 @@ public class TodoService {
         }
         todo.setStatus(status);
         if (status.equals(APPROVE)) {
-            todo.setApprovedOn(LocalDateTime.now());
+            todo.setApprovedOn(new Date());
+
         }
         if (newHashSet(APPROVE, DISAPPROVE,PENDING).contains(status)) {
             response = approveAndDisapproveTodo(todo);
@@ -228,6 +230,7 @@ public class TodoService {
     //
     public List<TodoDTO> getAllTodoOfStaff(Long staffId) {
         List<TodoDTO> todoDTOS = todoRepository.findAllTodoByStaffId(staffId);
+
 
         return todoDTOS;
     }
