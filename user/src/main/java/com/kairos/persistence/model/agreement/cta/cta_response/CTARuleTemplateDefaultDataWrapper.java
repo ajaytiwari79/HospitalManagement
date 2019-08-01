@@ -7,9 +7,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.persistence.model.country.default_data.CurrencyDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CTARuleTemplateDefaultDataWrapper {
     private List<CalculateValueIfPlanned> calculateValueIfPlanned=new ArrayList<>();

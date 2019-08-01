@@ -1,16 +1,11 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.scheduler.JobDetailsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
-import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
-import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDefaultDataDto;
-import com.kairos.enums.scheduler.JobFrequencyType;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
+import com.kairos.dto.scheduler.scheduler_panel.*;
+import com.kairos.enums.scheduler.*;
 import com.kairos.scheduler.constants.AppConstants;
 import com.kairos.scheduler.custom_exception.DataNotFoundByIdException;
 import com.kairos.scheduler.persistence.model.scheduler_panel.IntegrationSettings;
@@ -241,14 +236,17 @@ public class SchedulerPanelService extends MongoBaseService {
         List<SchedulerPanel> schedulerPanelsUpdated = new ArrayList<>();
         for (LocalDateTimeScheduledPanelIdDTO localDateTimeScheduledPanelIdDTO : localDateTimeScheduledPanelIdDTOS) {
             schedulerPanel = schedulerPanelsById.get(localDateTimeScheduledPanelIdDTO.getId());
-            schedulerPanel.setOneTimeTriggerDate(localDateTimeScheduledPanelIdDTO.getDateTime());
-            schedulerPanelsUpdated.add(schedulerPanel);
-            dynamicCronScheduler.stopCronJob(SCHEDULER + localDateTimeScheduledPanelIdDTO.getId());
-            dynamicCronScheduler.startCronJob(schedulerPanel, timezone);
-
+            if(isNotNull(schedulerPanel)) {
+                schedulerPanel.setOneTimeTriggerDate(localDateTimeScheduledPanelIdDTO.getDateTime());
+                schedulerPanelsUpdated.add(schedulerPanel);
+                dynamicCronScheduler.stopCronJob(SCHEDULER + localDateTimeScheduledPanelIdDTO.getId());
+                dynamicCronScheduler.startCronJob(schedulerPanel, timezone);
+            }
 
         }
-        save(schedulerPanelsUpdated);
+        if(isCollectionNotEmpty(schedulerPanelsUpdated)){
+            save(schedulerPanelsUpdated);
+        }
 
         return localDateTimeScheduledPanelIdDTOS;
     }

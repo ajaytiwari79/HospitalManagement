@@ -409,6 +409,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_UNITTYPE_ALREADYEXIST = "message.unitType.alreadyExist";
     public static final String MESSAGE_EMPLOYMENT_CTAMISSING = "message.employment.ctamissing";
     public static final String MESSAGE_EMPLOYMENT_WTAMISSING  = "message.employment.wtamissing ";
+    public static final String MESSAGE_EMPLOYMENT_CONTAIN_SHIFT = "message.employment.contain.shift";
     public static final String MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX = "message_functional_Payment_empty_matrix";
     public static final String MESSAGE_HOUSENUMBER_NULL = "message.houseNumber.null";
     public static final String MESSAGE_PROVINCE_NULL  = "message.province.null ";

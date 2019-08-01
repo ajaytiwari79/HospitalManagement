@@ -24,4 +24,6 @@ db.shifts.find({}).forEach(function(e){
 }
  });
 
+ db.time_Type.updateMany({"partOfTeam":{$exists:false}},{$set:{"partOfTeam":false}});
+
  db.shiftViolatedRules.createIndex({ draft:1,shiftId:1,deleted:1}, { unique: true });

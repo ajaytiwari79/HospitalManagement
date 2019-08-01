@@ -2,14 +2,15 @@ package com.kairos.service.integration;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
-import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.activity.activity.*;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
+import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
@@ -21,6 +22,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +34,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 
 @Service
@@ -155,9 +163,22 @@ public class ActivityIntegrationService {
         });
     }
 
-    public Map<Long,Boolean> getNightWorkerDetails(List<Long> staffIds,Long unitId) {
-        return genericRestClient.publishRequest(staffIds, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
+    public Map<Long,Boolean> getNightWorkerDetails(StaffFilterDTO staffFilterDTO, Long unitId,LocalDate startDate,LocalDate endDate) {
+        List<NameValuePair> param = null;
+        if(isNotNull(startDate) && isNotNull(endDate)) {
+            param = newArrayList(new BasicNameValuePair("startDate", startDate.toString()), new BasicNameValuePair("endDate", endDate.toString()));
+        }
+        return genericRestClient.publishRequest(staffFilterDTO, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
         });
+    }
+
+    public List<TimeTypeDTO> getAllTimeType(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/timeType/", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeTypeDTO>>>() {
+        });
+    }
+
+    public Long shiftCountWithEmploymentId(Long employmentId){
+         return genericRestClient.publishRequest(null, employmentId, true, IntegrationOperation.GET, "/employment/{employmentId}/shift_count", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>(){}, employmentId);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.kairos.controller.wta;
 
-
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
@@ -12,16 +11,13 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -43,7 +39,7 @@ public class WTAController {
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value =   COUNTRY_URL + "/wta")
-    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @Validated @RequestBody WTADTO wta) {
+    public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody @Valid WTADTO wta) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(countryId, wta, true,false));
     }
 
@@ -192,9 +188,9 @@ public class WTAController {
 
     @ApiOperation(value = "assign wta and cta to employment on employment creation")
     @PostMapping(value =  UNIT_URL + "/employment/{employmentId}/wta/{wtaId}/cta/{ctaId}")
-    public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId, @PathVariable BigInteger wtaId, @PathVariable BigInteger ctaId,
+    public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId,@PathVariable Long unitId, @PathVariable BigInteger wtaId, @PathVariable BigInteger ctaId,
                                                                         @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,wtaId,ctaId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,unitId,wtaId,ctaId,startDate));
     }
 
     @ApiOperation(value = "get wta of employment")
@@ -202,9 +198,6 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> getWTAOfEmployment(@PathVariable Long employmentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAOfEmployment(employmentId));
     }
-
-
-
 
     @ApiOperation(value = "get Wta By Id")
     @GetMapping(value =  UNIT_URL + "/wta/{wtaId}")
@@ -244,13 +237,13 @@ public class WTAController {
 
     @ApiOperation(value = "assign wta and cta to employment")
     @PostMapping(value =  UNIT_URL + "/employment/{employmentId}/apply_cta_wta")
-    public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId,
+    public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId,@PathVariable Long unitId,
                                                                         @RequestParam(value = "wtaId",required = false)  BigInteger wtaId,
                                                                         @RequestParam(value = "oldwtaId",required = false)  BigInteger oldwtaId,
                                                                         @RequestParam(value = "ctaId",required = false)   BigInteger ctaId,
                                                                         @RequestParam(value = "oldctaId",required = false)   BigInteger oldctaId,
                                                                         @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,unitId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
     }
 
 

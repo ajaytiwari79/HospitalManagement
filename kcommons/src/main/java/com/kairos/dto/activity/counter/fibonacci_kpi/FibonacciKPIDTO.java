@@ -3,7 +3,6 @@ package com.kairos.dto.activity.counter.fibonacci_kpi;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.enums.FilterType;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,8 +14,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.dto.activity.counter.enums.ChartType.BAR;
-import static com.kairos.dto.activity.counter.enums.CounterSize.SIZE_8X2;
 import static com.kairos.enums.FilterType.STAFF_IDS;
 import static com.kairos.enums.FilterType.TIME_INTERVAL;
 

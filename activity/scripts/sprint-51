@@ -1,0 +1,19 @@
+db.activities.find({"balanceSettingsActivityTab.timeType":{"$exists":false}}).forEach( function (activity) {
+    var timeTypeId = activity.balanceSettingsActivityTab.timeTypeId
+    if(timeTypeId){
+            var timeType = db.time_Type.findOne({"_id":timeTypeId});
+        activity.balanceSettingsActivityTab.timeType = timeType.secondLevelType;
+        db.activities.save(activity);
+    }
+});
+
+db.shifts.find({"deleted":false}).forEach( function (shift) {
+shift.activities.forEach( function (ac) {
+      var activity = db.activities.findOne({"_id":ac.activityId});
+if(activity.deleted){
+	print("acc",activity._id)
+        activity.deleted = false;
+        db.activities.save(activity);
+    }
+});
+});

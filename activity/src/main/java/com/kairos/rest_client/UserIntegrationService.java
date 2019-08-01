@@ -8,14 +8,10 @@ import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.cta.EmploymentDTO;
-import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
-import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.kpi.*;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
-import com.kairos.dto.activity.shift.Expertise;
-import com.kairos.dto.activity.shift.FunctionDTO;
-import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
@@ -23,9 +19,7 @@ import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
-import com.kairos.dto.user.client.Client;
-import com.kairos.dto.user.client.ClientOrganizationIds;
-import com.kairos.dto.user.client.ClientTemporaryAddress;
+import com.kairos.dto.user.client.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
@@ -35,9 +29,7 @@ import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
-import com.kairos.dto.user.staff.ClientStaffInfoDTO;
-import com.kairos.dto.user.staff.OrganizationStaffWrapper;
-import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.dto.user.staff.*;
 import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
@@ -804,7 +796,9 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/is_unit",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
     }
 
-
+    public List<Long> getUnitIds(Long countryId) {
+       return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/get_all_units", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
+    }
 }
 
 

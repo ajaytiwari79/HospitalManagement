@@ -2,9 +2,7 @@ package com.kairos.persistence.model.client_aggregator;
 
 import com.kairos.commons.utils.DateUtils;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 
 import static com.kairos.persistence.model.constants.TaskConstants.*;
 

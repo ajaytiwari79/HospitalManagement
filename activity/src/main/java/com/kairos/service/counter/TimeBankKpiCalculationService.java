@@ -2,28 +2,20 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.counter.data.FilterCriteria;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.utils.counter.KPIUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
-import com.kairos.dto.activity.counter.data.CommonRepresentationData;
-import com.kairos.dto.activity.counter.data.KPIAxisData;
-import com.kairos.dto.activity.counter.data.KPIRepresentationData;
+import com.kairos.dto.activity.counter.data.*;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
-import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
-import com.kairos.persistence.model.counter.KPI;
+import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -32,6 +24,7 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.joda.time.Interval;
@@ -43,12 +36,12 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
-import static com.kairos.utils.counter.KPIUtils.*;
+import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseListData;
 
 @Service
 public class TimeBankKpiCalculationService implements CounterService {

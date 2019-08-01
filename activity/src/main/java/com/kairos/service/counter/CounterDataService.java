@@ -5,37 +5,24 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.google.api.client.util.ArrayMap;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.counter.configuration.CounterDTO;
-import com.kairos.dto.activity.counter.configuration.KPIDTO;
-import com.kairos.dto.activity.counter.configuration.KPIFilterDefaultDataDTO;
-import com.kairos.dto.activity.counter.data.CommonRepresentationData;
-import com.kairos.dto.activity.counter.data.FilterCriteria;
-import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
+import com.kairos.dto.activity.counter.configuration.*;
+import com.kairos.dto.activity.counter.data.*;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.KPIValidity;
-import com.kairos.dto.activity.counter.enums.LocationType;
-import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
-import com.kairos.dto.activity.kpi.KPIResponseDTO;
-import com.kairos.dto.activity.kpi.KPISetResponseDTO;
+import com.kairos.dto.activity.counter.enums.*;
+import com.kairos.dto.activity.kpi.*;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
-import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.counter.ApplicableFilter;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.TabKPIConf;
+import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -54,16 +41,12 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.STAFF_IDS;
 import static java.util.stream.Collectors.toList;
 
@@ -125,7 +108,7 @@ public class CounterDataService extends MongoBaseService {
         List<CommonRepresentationData> kpisData = new ArrayList();
         for (Future<CommonRepresentationData> data : kpiResults) {
             try {
-                kpisData.add(data.get());
+                if(isNotNull(data))kpisData.add(data.get());
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             } catch (ExecutionException ex) {
@@ -222,6 +205,12 @@ public class CounterDataService extends MongoBaseService {
             getStaffDefaultData(criteriaList, defaultKpiDataDTO);
         }
         if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_STATUS)) {
+            getActivityStatusDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(STAFF_IDS)) {
+            getActivityStatusDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.UNIT_NAME)) {
             getActivityStatusDefaultData(criteriaList);
         }
         if (kpi.getFilterTypes().contains(FilterType.DAYS_OF_WEEK)) {

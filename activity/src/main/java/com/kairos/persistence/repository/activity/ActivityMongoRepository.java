@@ -1,15 +1,14 @@
 package com.kairos.persistence.repository.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by pawanmandhan on 17/8/17.
@@ -53,8 +52,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{childActivityIds:{$in:?0}, deleted:false}",fields ="{'_id':1,'childActivityIds':1}")
     List<Activity> findByChildActivityIds(Collection<BigInteger> childActivityIds);
 
-    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'phaseSettingsActivityTab':1 ,'rulesActivityTab':1}")
-    List<Activity> findAllPhaseSettingsByActivityIds(Set<BigInteger> activityIds);
+    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'phaseSettingsActivityTab':1 ,'rulesActivityTab':1,'name':1}")
+    List<Activity> findAllPhaseSettingsByActivityIds(Collection<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
 
@@ -78,5 +77,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{deleted: false, parentId :?0,unitId:{$in:?1 }}",exists = true)
     boolean existsByParentIdAndDeletedFalse( BigInteger activityId,List<Long> unitIds);
+
+    @Query(value = "{'balanceSettingsActivityTab.timeType':?0}, deleted:false}")
+    List<Activity>  findAllBySecondLevelTimeType(TimeTypeEnum timeTypeEnum);
 
 }

@@ -136,6 +136,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_SETTING_ENABLE = "message.activity.setting.enable";
     public static final String ACTIVITIES_NOT_SUPPORT_BREAK = "activities.not.support.break";
     public static final String ACTIVITIES_SUPPORT_BREAK = "activities.support.break";
+    public static final String SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE = "shift.percentage.notvalid.break";
+    public static final String BREAK_NOT_VALID = "break.interval.notvalid";
     public static final String MESSAGE_ACTIVITY_BEING_USED_AS_CHILD = "message.activity.being_used_as_child";
     public static final String MESSAGE_ACTIVITY_BEING_USED_AS_PARENT = "message.activity.being_used_as_parent";
     public static final String MESSAGE_CHILD_ACTIVITIES_NOT_SUPPORT_STAFFING_LEVEL = "message.child_activities.not_support.staffing_level";
@@ -267,6 +269,7 @@ public class ActivityMessagesConstants {
     public static final String EXCEPTION_OVERLAP_INTERVAL = "exception.overlap.interval";
     public static final String ERROR_BREAKSETTINGS_DUPLICATE = "error.breakSettings.duplicate";
     public static final String ERROR_BREAKSETTINGS_NOTFOUND = "error.breakSettings.notFound";
+    public static final String ERROR_BREAKSACTIVITY_NOT_CONFIGURED = "error.break.activity.not.configured";
     public static final String ERROR_BREAKSETTINGS_SHIFTDURATION_MUST_GREATERTHANZERO = "error.breakSettings.shiftDuration.must.greaterThanZero";
     public static final String ERROR_BREAKSETTINGS_BREAKDURATION_MUST_GREATERTHANZERO = "error.breakSettings.breakDuration.must.greaterThanZero";
     public static final String MESSAGE_NIGHTWORKER_SETTING_NOTFOUND = "message.nightWorker.setting.notFound";
@@ -319,7 +322,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_RULETEMPLATE_BLOCKING_POINT  = "message.ruleTemplate.blocking.point ";
     public static final String MESSAGE_RULETEMPLATE_INTERVAL_NOTNULL  = "message.ruleTemplate.interval.notNull ";
     public static final String MESSAGE_ACTIVITY_DAYTYPE = "message.activity.dayType";
-    public static final String MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL  = "message.ruleTemplate.counter.value.notNull ";
+    public static final String MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL  = "message.ruleTemplate.counter.value.notNull";
     public static final String MESSAGE_RULETEMPLATE_COUNTER_EXHAUSTED  = "message.ruleTemplate.counter.exhausted ";
     public static final String MESSAGE_RULETEMPLATE_HOURS_NOTZERO  = "message.ruleTemplate.hours.notzero";
     public static final String MESSAGE_COUNTER_KPI_NOTFOUND = "message.counter.kpi.notfound";
@@ -379,5 +382,9 @@ public class ActivityMessagesConstants {
     public static final String STAFF_ID_END_DATE_NULL = "staff_id.end_date.null";
     public static final String PLEASE_SELECT_VALID_CRITERIA = "please.select.valid.criteria";
     public static final String MESSAGE_SELFROSTERING_METADATA_NULL = "message.selfRostering.metaData.null";
+    public static final String REQUEST_ABSENCE_APPROVED = "request.absence.approved";
+    public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
+    public static final String REALTIME_DURATION_NOT_CONFIGURED = "realtime.duration.not.configured";
+    public static final String SHIFT_NOT_EXISTS = "shift.not.exists";
 
 }

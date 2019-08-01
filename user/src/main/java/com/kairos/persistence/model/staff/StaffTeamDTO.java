@@ -5,9 +5,7 @@ package com.kairos.persistence.model.staff;
  */
 
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @Getter

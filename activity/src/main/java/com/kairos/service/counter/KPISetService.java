@@ -4,13 +4,10 @@ package com.kairos.service.counter;
  *
  */
 
-
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
@@ -33,8 +30,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
-
-
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -158,6 +153,7 @@ public class KPISetService {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
                     KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
                     List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
+                    Map<BigInteger,KPIResponseDTO> kpiResponseDTOMap = new HashMap<>();
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
                         kpiSetResponseDTO.setKpiSetName(kpiSet.getName());
                         kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
@@ -168,15 +164,18 @@ public class KPISetService {
                                 FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
                                 KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
                                 if (isNotNull(kpiResponseDTO)) {
-                                    kpiResponseDTOList.add(kpiResponseDTO);
+                                    kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(),kpiResponseDTO);
                                 }
                             }
                         }
+                        kpiResponseDTOList=kpiResponseDTOMap.values().stream().collect(Collectors.toList());
                     }
                     if(isCollectionNotEmpty(kpiResponseDTOList)) {
                         kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
                     }
-                    kpiSetResponseDTOList.add(kpiSetResponseDTO);
+                    if(isCollectionNotEmpty(kpiSetResponseDTO.getKpiData())) {
+                        kpiSetResponseDTOList.add(kpiSetResponseDTO);
+                    }
                 }
             }
         }

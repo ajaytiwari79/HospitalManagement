@@ -10,12 +10,12 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -26,39 +26,14 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalBy
 /**
  * Created by pavan on 24/4/18.
  */
+@Getter
+@Setter
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
     private boolean borrowLeave;
     private CutOffIntervalUnit cutOffIntervalUnit;
-
-
-    public CutOffIntervalUnit getCutOffIntervalUnit() {
-        return cutOffIntervalUnit;
-    }
-
-    public void setCutOffIntervalUnit(CutOffIntervalUnit cutOffIntervalUnit) {
-        this.cutOffIntervalUnit = cutOffIntervalUnit;
-    }
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
     private float recommendedValue;
-
-
-    public boolean isBorrowLeave() {
-        return borrowLeave;
-    }
-
-    public void setBorrowLeave(boolean borrowLeave) {
-        this.borrowLeave = borrowLeave;
-    }
 
     public SeniorDaysPerYearWTATemplate() {
         this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
@@ -73,13 +48,20 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                 int leaveCount = careDays.getLeavesAllowed();
 
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
-                List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
-                if (leaveCount < (shifts.size()+1)) {
-                    WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
-                            new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
-                                    DurationType.DAYS,String.valueOf(leaveCount));
-                    infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                if(isNotNull(dateTimeInterval)){
+                    List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
+                    if (leaveCount < (shifts.size()+1)) {
+                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
+                                new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
+                                        DurationType.DAYS,String.valueOf(leaveCount));
+                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                    }
                 }
+            }else if(CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(), activityIds)){
+                WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
+                        new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
+                                DurationType.DAYS,String.valueOf(0));
+                infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
             }
         }
     }
@@ -91,32 +73,6 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
         this.ageRange = ageRange;
         this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
     }
-
-    public List<AgeRange> getAgeRange() {
-        return ageRange;
-    }
-
-    public void setAgeRange(List<AgeRange> ageRange) {
-        this.ageRange = ageRange;
-    }
-
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
-
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
 
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {

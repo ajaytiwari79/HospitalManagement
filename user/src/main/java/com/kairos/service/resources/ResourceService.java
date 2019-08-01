@@ -8,10 +8,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
-import com.kairos.persistence.repository.user.resources.ResourceUnAvailabilityGraphRepository;
-import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRelationshipRepository;
-import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
+import com.kairos.persistence.repository.user.resources.*;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
@@ -23,10 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;

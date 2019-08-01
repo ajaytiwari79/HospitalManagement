@@ -2,14 +2,10 @@ package com.kairos.persistence.model.clause;
 
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.template_type.TemplateType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.util.List;
 import java.util.UUID;
 

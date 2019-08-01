@@ -5,22 +5,14 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.*;
 import com.kairos.dto.activity.counter.distribution.category.*;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
-import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
-import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
-import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.KPIValidity;
-import com.kairos.dto.activity.counter.enums.LocationType;
+import com.kairos.dto.activity.counter.distribution.org_type.*;
+import com.kairos.dto.activity.counter.distribution.tab.*;
+import com.kairos.dto.activity.counter.enums.*;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
+import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -39,10 +31,10 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.UNCATEGORIES;
+import static com.kairos.constants.AppConstants.UNCATEGORIZED;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -245,7 +237,7 @@ public class CounterDistService extends MongoBaseService {
 
     public List<TabKPIDTO> filterTabKpiDate(List<TabKPIDTO> tabKPIDTOS) {
         Map<BigInteger, TabKPIDTO> filterResults = new LinkedHashMap<>();
-        tabKPIDTOS = tabKPIDTOS.stream().filter(tabKPIDTO -> isNotNull(tabKPIDTO.getKpi())).collect(Collectors.toList());
+        tabKPIDTOS = tabKPIDTOS.stream().filter(tabKPIDTO -> isNotNull(tabKPIDTO.getKpi())).collect(toList());
         tabKPIDTOS.forEach(tabKPIDTO -> filterResults.put(tabKPIDTO.getKpi().getId(), tabKPIDTO));
         tabKPIDTOS.stream().forEach(tabKPIDTO -> {
             if (filterResults.get(tabKPIDTO.getKpi().getId()).getKpi().getId().equals(tabKPIDTO.getKpi().getId())) {
@@ -464,7 +456,7 @@ public class CounterDistService extends MongoBaseService {
                     if (kpiIdAndApplicableKpi.containsKey(kpiId) && isNotNull(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter())) {
                         applicableFilter = new ApplicableFilter(kpiIdAndApplicableKpi.get(kpiId).getApplicableFilter().getCriteriaList(), false);
                     }
-                    applicableKPISToSave.add(new ApplicableKPI(kpiId, kpiId, null, unitId, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(kpiId).getTitle(), false,kpiIdAndApplicableKpi.get(kpiId).getKpiRepresentation(),kpiIdAndApplicableKpi.get(kpiId).getInterval(),kpiIdAndApplicableKpi.get(kpiId).getValue(),kpiIdAndApplicableKpi.get(kpiId).getFrequencyType(),kpiIdAndApplicableKpi.get(kpiId).getFibonacciKPIConfigs()));
+
                     staffIdKpiMap.get(accessGroupAndStaffDTO.getStaffId()).put(kpiId, kpiId);
                 }
             });
@@ -709,6 +701,19 @@ public class CounterDistService extends MongoBaseService {
         }
         kpiDashboards.stream().forEach(kpiDashboard -> kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId())));
         if (!kpiDashboards.isEmpty()) save(kpiDashboards);
+    }
+
+    public void createDefaultCategory(Long unitId){
+        KPICategory kpiCategory = new KPICategory(UNCATEGORIZED,null,unitId,ConfLevel.UNIT);
+        counterRepository.save(kpiCategory);
+    }
+
+    public boolean createDefaultCategories(Long countryId){
+        List<Long> units=userIntegrationService.getUnitIds(countryId);
+        units.forEach(unit->createDefaultCategory(unit));
+        KPICategory kpiCategory = new KPICategory(UNCATEGORIZED,countryId,null,ConfLevel.COUNTRY);
+        counterRepository.save(kpiCategory);
+        return true;
     }
 
 

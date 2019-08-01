@@ -2,9 +2,7 @@ package com.kairos.wrapper.staff;
 
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StaffEmploymentTypeWrapper {
     private List<EmploymentType> employmentTypes= new ArrayList<>();

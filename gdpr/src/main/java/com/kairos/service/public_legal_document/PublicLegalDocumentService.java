@@ -1,11 +1,15 @@
 package com.kairos.service.public_legal_document;
 
 import com.kairos.commons.utils.DateUtils;
+
+import com.kairos.constants.GdprMessagesConstants;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.public_legal_document.PublicLegalDocument;
 import com.kairos.persistence.repository.public_legal_document.PublicLegalDocumentRepository;
 import com.kairos.response.dto.public_legal_document.PublicLegalDocumentDTO;
 import com.kairos.service.exception.ExceptionService;
-import org.springframework.beans.factory.support.ManagedMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,13 +24,23 @@ import static com.kairos.constants.AppConstant.PUBLIC_LEGAL_Document_LOGO_PATH;
  **/
 @Service
 public class PublicLegalDocumentService {
+
+    private Logger LOGGER = LoggerFactory.getLogger(PublicLegalDocumentService.class);
+
     @Inject
     private PublicLegalDocumentRepository publicLegalDocumentRepository;
     @Inject
     private ExceptionService exceptionService;
 
     public PublicLegalDocumentDTO createPublicLegalDocument(PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        PublicLegalDocument publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
+        if(publicLegalDocumentDTO.getName().equals("")){
+            exceptionService.duplicateDataException(GdprMessagesConstants.MESSAGE_ENTER_VALID_DATA);
+        }
+        PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
+        if (Optional.ofNullable(publicLegalDocument).isPresent()) {
+            exceptionService.duplicateDataException(GdprMessagesConstants.MESSAGE_NAME_ALREADY_EXIST);
+        }
+        publicLegalDocument=new PublicLegalDocument(publicLegalDocumentDTO.getId(),publicLegalDocumentDTO.getName(),publicLegalDocumentDTO.getPublicLegalDocumentLogo(),publicLegalDocumentDTO.getBodyContentInHtml());
         publicLegalDocumentRepository.save(publicLegalDocument);
         publicLegalDocumentDTO.setId(publicLegalDocument.getId());
         return publicLegalDocumentDTO;
@@ -60,7 +74,7 @@ public class PublicLegalDocumentService {
 
     public boolean removePublicLegalDocument(Long publicLegalDocumentId) {
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
-        if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
+        if (!Optional.ofNullable(publicLegalDocument).isPresent()) {
             return false;
         }
         publicLegalDocument.setDeleted(true);
@@ -69,23 +83,37 @@ public class PublicLegalDocumentService {
     }
 
     public PublicLegalDocumentDTO updatePublicLegalDocument(Long publicLegalDocumentId,PublicLegalDocumentDTO publicLegalDocumentDTO) {
-        PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
-        if (!Optional.ofNullable(publicLegalDocument).isPresent() || publicLegalDocument.isDeleted()) {
-            exceptionService.dataNotFoundByIdException("Data Not Found", publicLegalDocumentId);
+        PublicLegalDocument oldPublicLegalDocument = publicLegalDocumentRepository.findByIdAndDeletedFalse(publicLegalDocumentId);
+        if (!Optional.ofNullable(oldPublicLegalDocument).isPresent()) {
+            exceptionService.dataNotFoundByIdException(GdprMessagesConstants.MESSAGE_DATANOTFOUND,null,publicLegalDocumentId);
+        }
+        if(!oldPublicLegalDocument.getName().equalsIgnoreCase(publicLegalDocumentDTO.getName())){
+            PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
+            if (Optional.ofNullable(publicLegalDocument).isPresent()) {
+                exceptionService.duplicateDataException(GdprMessagesConstants.MESSAGE_NAME_ALREADY_EXIST);
+            }
         }
         publicLegalDocumentDTO.setId(publicLegalDocumentId);
-        if(publicLegalDocumentDTO.getName() != null)publicLegalDocument.setName(publicLegalDocumentDTO.getName());
-        if(publicLegalDocumentDTO.getBodyContentInHtml() != null)publicLegalDocument.setBodyContentInHtml(publicLegalDocumentDTO.getBodyContentInHtml());
-        publicLegalDocumentRepository.save(publicLegalDocument);
+        if(publicLegalDocumentDTO.getName() != null)oldPublicLegalDocument.setName(publicLegalDocumentDTO.getName());
+        if(publicLegalDocumentDTO.getBodyContentInHtml() != null)oldPublicLegalDocument.setBodyContentInHtml(publicLegalDocumentDTO.getBodyContentInHtml());
+        if(publicLegalDocumentDTO.getPublicLegalDocumentLogo() != null)oldPublicLegalDocument.setPublicLegalDocumentLogo(publicLegalDocumentDTO.getPublicLegalDocumentLogo());
+        publicLegalDocumentRepository.save(oldPublicLegalDocument);
         return publicLegalDocumentDTO;
     }
 
     public List<PublicLegalDocumentDTO> getAllPublicLegalDocument() {
-        List<PublicLegalDocument> publicLegalDocuments = publicLegalDocumentRepository.findAllAndDeletedFalse();
+        List<PublicLegalDocument> publicLegalDocuments = publicLegalDocumentRepository.findAllByDeletedFalseOrderByCreatedAt();
         List<PublicLegalDocumentDTO> publicLegalDocumentDTOS = new ArrayList<>();
         publicLegalDocuments.forEach(publicLegalDocument -> {
             publicLegalDocumentDTOS.add(new PublicLegalDocumentDTO(publicLegalDocument.getId(),publicLegalDocument.getName(),publicLegalDocument.getPublicLegalDocumentLogo(),publicLegalDocument.getBodyContentInHtml()));
         });
+        LOGGER.debug("total documeents found are"+publicLegalDocumentDTOS.size());
         return publicLegalDocumentDTOS;
+    }
+
+    public PublicLegalDocumentDTO getLegalDocumentById(long docId){
+        Optional<PublicLegalDocument> publicLegalDocument = publicLegalDocumentRepository.findById(docId);
+        PublicLegalDocumentDTO publicLegalDocumentDTO = ObjectMapperUtils.copyPropertiesByMapper(publicLegalDocument.get(),PublicLegalDocumentDTO.class);
+        return publicLegalDocumentDTO;
     }
 }

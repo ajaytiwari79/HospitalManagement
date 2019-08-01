@@ -28,7 +28,7 @@ public class ShiftActivityDTO {
     private String message;
     private boolean success;
     //This field is only for validation
-    //@JsonIgnore
+    @JsonIgnore
     private ActivityDTO activity;
     private BigInteger activityId;
     private Date startDate;
@@ -53,7 +53,7 @@ public class ShiftActivityDTO {
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
 
-    private int timeBankCtaBonusMinutes;
+    private Double timeBankCtaBonusMinutes;
     private List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private Map<String, Object> location;// location where this activity needs to perform
     private String description;// this is from activity description and used in shift detail popup
@@ -68,6 +68,7 @@ public class ShiftActivityDTO {
     private BigInteger thirdLevelTimeTypeId;
     private BigInteger fourthLevelTimeTypeId;
     private List<PlannedTime> plannedTimes;
+    private List<ShiftActivityDTO> childActivities = new ArrayList<>();
 
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = startDate;
@@ -80,6 +81,14 @@ public class ShiftActivityDTO {
         this.endDate = endDate;
         this.activityName = activityName;
         this.absenceReasonCodeId=absenceReasonCodeId;
+    }
+    public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, String message, boolean success){
+        this.activityName=activityName;
+        this.startDate=startDate;
+        this.endDate=endDate;
+        this.activityId=activityId;
+        this.message=message;
+        this.success=success;
     }
 
     public ShiftActivityDTO(String activityName, BigInteger id, String message, boolean success) {
@@ -108,9 +117,10 @@ public class ShiftActivityDTO {
     public ShiftActivityDTO() {
     }
 
-    public ShiftActivityDTO(BigInteger activityId, String activityName) {
+    public ShiftActivityDTO(BigInteger activityId, String activityName,Set<ShiftStatus> status) {
         this.activityId = activityId;
         this.activityName = activityName;
+        this.status = status;
     }
 
     public Set<ShiftStatus> getStatus() {

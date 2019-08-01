@@ -6,6 +6,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
@@ -14,7 +15,6 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
@@ -23,14 +23,9 @@ import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
-import com.kairos.persistence.model.staff.position.Position;
-import com.kairos.persistence.model.staff.position.PositionQueryResult;
-import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
+import com.kairos.persistence.model.staff.position.*;
 import com.kairos.persistence.model.user.employment.*;
-import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
-import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
-import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
+import com.kairos.persistence.model.user.employment.query_result.*;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
@@ -40,15 +35,11 @@ import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
-import com.kairos.persistence.repository.user.employment.EmploymentAndEmploymentTypeRelationShipGraphRepository;
-import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
-import com.kairos.persistence.repository.user.employment.EmploymentLineFunctionRelationShipGraphRepository;
+import com.kairos.persistence.repository.user.employment.*;
 import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
-import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
-import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.staff.*;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.AsynchronousService;
@@ -76,10 +67,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -88,7 +76,6 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ApiConstants.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.UserMessagesConstants.EMPLOYMENT_ABSENT;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
 import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
@@ -154,6 +141,7 @@ public class EmploymentService {
     private EnvConfig envConfig;
     @Inject
     private InitialTimeBankLogService initialTimeBankLogService;
+
 
 
     public PositionWrapper createEmployment(Long id, String type, EmploymentDTO employmentDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
@@ -558,8 +546,11 @@ public class EmploymentService {
     public PositionQueryResult removeEmployment(long positionId, Long unitId) throws Exception {
         Employment employment = employmentGraphRepository.findOne(positionId);
         if (!Optional.ofNullable(employment).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ID_NOTEXIST, positionId);
-
+           exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ID_NOTEXIST, positionId);
+        }
+        Long shiftcount = activityIntegrationService.shiftCountWithEmploymentId(positionId);
+        if(shiftcount>0) {
+            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_CONTAIN_SHIFT, positionId);
         }
         employment.setDeleted(true);
         employmentGraphRepository.save(employment);
