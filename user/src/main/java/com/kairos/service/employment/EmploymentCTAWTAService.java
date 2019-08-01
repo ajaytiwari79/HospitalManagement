@@ -77,8 +77,8 @@ public class EmploymentCTAWTAService {
     private GenericRestClient genericRestClient;
     @Inject private ActivityIntegrationService activityIntegrationService;
 
-    public CtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId, LocalDate selectedDate){
-        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAByExpertiseAndDate(expertiseId,unitId,selectedDate);
+    public CtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId, LocalDate selectedDate,Long employmentId){
+        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAByExpertiseAndDate(expertiseId,unitId,selectedDate,employmentId);
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
         SeniorityLevel appliedSeniorityLevel = employmentService.getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
         SeniorityLevelQueryResult seniorityLevel = null;
