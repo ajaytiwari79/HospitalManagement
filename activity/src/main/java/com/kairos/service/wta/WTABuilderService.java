@@ -70,6 +70,8 @@ public class WTABuilderService extends MongoBaseService {
                         careDayCount.setActivityId(activityId);
                     }
                     break;
+                default:
+                    break;
             }
             wtaBaseRuleTemplates.add(wtaBaseRuleTemplate);
 

@@ -12,6 +12,8 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -26,6 +28,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang.WordUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -37,13 +40,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.DEFAULT_EMAIL_TEMPLATE;
 import static com.kairos.constants.CommonConstants.EMAIL_GREETING;
+import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
+import static com.kairos.constants.CommonConstants.*;
+
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 @Service
@@ -108,7 +112,7 @@ public class ShiftStatusService {
 
             }
             shiftMongoRepository.saveEntities(shifts);
-            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts);
+            timeBankService.updateDailyTimeBankEntriesForStaffs(shifts,null);
         }
         wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
         return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
@@ -140,7 +144,7 @@ public class ShiftStatusService {
     }
 
     private boolean validateShiftActivityStatus(ShiftStatus shiftStatus, ShiftActivity shiftActivity, Activity activity) {
-        boolean valid ;
+        boolean valid;
         if (isCollectionEmpty(activity.getRulesActivityTab().getApprovalAllowedPhaseIds()) && (shiftStatus.equals(ShiftStatus.FIX) || shiftStatus.equals(ShiftStatus.UNFIX) || shiftStatus.equals(ShiftStatus.PUBLISH))) {
             valid = true;
         } else {
@@ -153,15 +157,15 @@ public class ShiftStatusService {
         return getValidShiftStatus(shiftActivity.getStatus()).contains(shiftStatus);
     }
 
-    private Set<ShiftStatus> getValidShiftStatus(Set<ShiftStatus> shiftStatusSet){
+    private Set<ShiftStatus> getValidShiftStatus(Set<ShiftStatus> shiftStatusSet) {
         Set<ShiftStatus> shiftStatuses;
-        if (shiftStatusSet.contains(ShiftStatus.REQUEST)){
-            shiftStatuses = newHashSet(ShiftStatus.PENDING,APPROVE,DISAPPROVE);
-        }else if(shiftStatusSet.contains(ShiftStatus.PENDING)){
-            shiftStatuses = newHashSet(APPROVE,DISAPPROVE);
-        }else if(shiftStatusSet.contains(ShiftStatus.APPROVE) || shiftStatusSet.contains(ShiftStatus.FIX)) {
+        if (shiftStatusSet.contains(ShiftStatus.REQUEST)) {
+            shiftStatuses = newHashSet(ShiftStatus.PENDING, APPROVE, DISAPPROVE);
+        } else if (shiftStatusSet.contains(ShiftStatus.PENDING)) {
+            shiftStatuses = newHashSet(APPROVE, DISAPPROVE);
+        } else if (shiftStatusSet.contains(ShiftStatus.APPROVE) || shiftStatusSet.contains(ShiftStatus.FIX)) {
             shiftStatuses = newHashSet(FIX, UNFIX, PUBLISH);
-        }else {
+        } else {
             shiftStatuses = newHashSet(FIX, PUBLISH);
         }
         return shiftStatuses;
@@ -215,8 +219,10 @@ public class ShiftStatusService {
     }
 
     public int activityChangeStatus(Activity activityOld, Activity activityCurrent) {
-        boolean isShiftOldForPresence = !(activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
-        boolean isShiftCurrentForAbsence = (activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
+        boolean isShiftOldForPresence = TimeTypeEnum.PRESENCE.equals(activityOld.getBalanceSettingsActivityTab().getTimeType());
+        boolean isShiftCurrentForAbsence = TimeTypeEnum.ABSENCE.equals(activityCurrent.getBalanceSettingsActivityTab().getTimeType());
+      //  boolean isShiftOldForPresence = !(activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityOld.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
+      //  boolean isShiftCurrentForAbsence = (activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION) || activityCurrent.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK));
         int activityChangeStatus = 0;
         if (isShiftOldForPresence && isShiftCurrentForAbsence) {
             activityChangeStatus = 1;
@@ -239,8 +245,11 @@ public class ShiftStatusService {
     }
 
     public void updateStatusOfShiftIfPhaseValid(Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, UserAccessRoleDTO userAccessRoleDTO) {
+        Set<PhaseDefaultName> validPhaseForPublishingShift = newHashSet(DRAFT, PhaseDefaultName.REALTIME, PhaseDefaultName.TENTATIVE);
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
-            if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
+            if (validPhaseForPublishingShift.contains(phase.getPhaseEnum())) {
+                shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
+            } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
                     shiftActivity.getStatus().add(userAccessRoleDTO.getManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
                 }
@@ -252,11 +261,19 @@ public class ShiftStatusService {
     public void sendMailToStaffWhenStatusChange(Shift shift, ShiftActivity activity, ShiftStatus shiftStatus) {
         StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
-        String body = "The status of the " + activity.getActivityName() + " activity which is planned on " + getEmailDateTimeWithFormat(shiftDate) + " has been moved to " + shiftStatus + " by " + UserContext.getUserDetails().getFullName() + "\n";
-        //TODO SUBJECT AND MAIL BODY SHOULD IN A SINGLE FILE
+        String bodyPart1 = "The status of the ";
+        String bodyPart2 = activity.getActivityName();
+        String bodyPart3 = " activity which is planned on " + WordUtils.capitalizeFully(getEmailDateTimeWithFormat(shiftDate)) + " has been moved to ";
+        String bodyPart4 = shiftStatus.toString();
+        String bodyPart5 = " by " + UserContext.getUserDetails().getFullName() + ".\n";
+
         Map<String, Object> templateParam = new HashMap<>();
         templateParam.put("receiverName", EMAIL_GREETING + staffDTO.getFullName());
-        templateParam.put("description", body);
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getEmail());
+        templateParam.put("descriptionPart1", bodyPart1);
+        templateParam.put("descriptionPart2", bodyPart2);
+        templateParam.put("descriptionPart3", bodyPart3);
+        templateParam.put("descriptionPart4", bodyPart4);
+        templateParam.put("descriptionPart5", bodyPart5);
+        mailService.sendMailWithSendGrid(SHIFT_NOTIFICATION_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getEmail());
     }
 }

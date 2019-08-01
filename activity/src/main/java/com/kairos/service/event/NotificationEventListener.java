@@ -29,7 +29,7 @@ public class NotificationEventListener {
     public void shiftNotificationEvent(ShiftNotificationEvent shiftNotificationEvent) throws UnsupportedEncodingException {
          logger.info("shift created details {}",shiftNotificationEvent);
 
-         staffingLevelService.updateStaffingLevelAvailableStaffCount(shiftNotificationEvent);
+//         staffingLevelService.updateStaffingLevelAvailableStaffCount(shiftNotificationEvent);
     }
     @Async
     @EventListener

@@ -15,6 +15,6 @@ public class AppConstant {
     public static final String EXISTING_DATA_LIST= "existing";
     public static final String NEW_DATA_LIST = "new";
 
-
+    public static final String PUBLIC_LEGAL_Document_LOGO_PATH = "/opt/kairos/public_legal_document_logo";
 
 }

@@ -24,7 +24,7 @@ apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
-
+applicationDefaultJvmArgs = ["-Xms1024m", "-Xmx1048m"]
 version = "$projectVersion-SNAPSHOT"
 
 sourceCompatibility = 1.8
@@ -80,7 +80,7 @@ dependencies {
     compile 'com.google.oauth-client:google-oauth-client-jetty:1.22.0'
     compile 'com.google.apis:google-api-services-calendar:v3-rev239-1.22.0'//c0
     //javers
-    compile ('org.javers:javers-spring-boot-starter-mongo:3.10.0')
+    //compile ('org.javers:javers-spring-boot-starter-mongo:3.10.0')
     //compile group: 'joda-time', name: 'joda-time', version: '2.9.4'
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.8.RELEASE'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
@@ -130,20 +130,11 @@ dependencyManagement {
 
 test {
     testLogging {
-        // Make sure output from
-        // standard out or error is shown
-        // in Gradle output.
         showStandardStreams = true
-
-        // Or we use events method:
-        // events 'standard_out', 'standard_error'
-
-        // Or set property events:
-        // events = ['standard_out', 'standard_error']
-
-        // Instead of string values we can
-        // use enum values:
-        // events org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
-        //        org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR,
+    }
+}
+tasks.withType(JavaExec) {
+    if (System.getProperty('DEBUG', 'false') == 'true') {
+        jvmArgs '-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9099'
     }
 }

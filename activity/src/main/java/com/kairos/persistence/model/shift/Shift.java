@@ -2,6 +2,7 @@ package com.kairos.persistence.model.shift;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
@@ -63,14 +66,9 @@ public class Shift extends MongoBaseEntity {
     private int plannedMinutesOfPayout;
     private int scheduledMinutesOfTimebank;
     private int scheduledMinutesOfPayout;
+    private Shift draftShift;
+    private boolean draft;
 
-    public Long getStaffUserId() {
-        return staffUserId;
-    }
-
-    public void setStaffUserId(Long staffUserId) {
-        this.staffUserId = staffUserId;
-    }
 
     public Shift() {
         //Default Constructor
@@ -135,6 +133,13 @@ public class Shift extends MongoBaseEntity {
         this.shiftType=shiftType;
     }
 
+    public Long getStaffUserId() {
+        return staffUserId;
+    }
+
+    public void setStaffUserId(Long staffUserId) {
+        this.staffUserId = staffUserId;
+    }
 
     public ShiftType getShiftType() {
         return shiftType;
@@ -244,7 +249,8 @@ public class Shift extends MongoBaseEntity {
     }
 
     public int getMinutes() {
-        return (int)getInterval().getMinutes();
+        DateTimeInterval interval = getInterval();
+        return isNotNull(interval) ? (int)interval.getMinutes() : 0;
     }
 
     public String getRemarks() {
@@ -346,8 +352,12 @@ public class Shift extends MongoBaseEntity {
         this.functionId = functionId;
     }
 
+    @IgnoreLogging
     public DateTimeInterval getInterval() {
-        return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size()-1).getEndDate().getTime());
+        if(isCollectionNotEmpty(this.activities)) {
+            return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size() - 1).getEndDate().getTime());
+        }
+        return null;
     }
 
 
@@ -397,6 +407,22 @@ public class Shift extends MongoBaseEntity {
 
     public void setScheduledMinutesOfPayout(int scheduledMinutesOfPayout) {
         this.scheduledMinutesOfPayout = scheduledMinutesOfPayout;
+    }
+
+    public Shift getDraftShift() {
+        return draftShift;
+    }
+
+    public void setDraftShift(Shift draftShift) {
+        this.draftShift = draftShift;
+    }
+
+    public boolean isDraft() {
+        return draft;
+    }
+
+    public void setDraft(boolean draft) {
+        this.draft = draft;
     }
 
     @Override

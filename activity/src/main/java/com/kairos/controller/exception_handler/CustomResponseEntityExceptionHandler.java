@@ -362,7 +362,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     // 409
 
-    @ExceptionHandler({DuplicateDataException.class, DataAccessException.class, InvalidDataAccessApiUsageException.class})
+    @ExceptionHandler({DuplicateDataException.class, DataAccessException.class, InvalidDataAccessApiUsageException.class,InvalidRequestException.class})
     protected ResponseEntity<Object> handleConflict(final RuntimeException ex, final WebRequest request) {
         logger.error("exception in activity service", ex);
         final String bodyOfResponse = "This should be application specific";
@@ -509,18 +509,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     }
 
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(value = InvalidRequestException.class)
-    @ResponseBody
-    public ResponseEnvelope invalidRequestExceptionHandler(InvalidRequestException ex, HttpServletRequest request) {
-        logger.error("error in user service ", ex);
-        ResponseEnvelope errorMessage = new ResponseEnvelope();
-        errorMessage.setSuccess(false);
-        errorMessage.setPath(request.getRequestURL().toString());
-        errorMessage.setMessage(ex.getMessage());
-        return errorMessage;
-
-    }
 
 
 }

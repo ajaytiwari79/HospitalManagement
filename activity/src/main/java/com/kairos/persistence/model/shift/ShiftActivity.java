@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.shift;
 
+import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.enums.shift.ShiftStatus;
@@ -51,6 +52,7 @@ public class ShiftActivity {
     private int scheduledMinutesOfPayout;
     private List<PlannedTime> plannedTimes;
 
+    @IgnoreLogging
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getStartDate().getTime(), this.getEndDate().getTime());
     }

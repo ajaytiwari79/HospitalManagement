@@ -153,6 +153,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, responseData);
     }
 
+
     @RequestMapping(value = "/{staffId}/partial_leave", method = RequestMethod.POST)
     @ApiOperation("update employments of staff")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
@@ -438,7 +439,7 @@ public class StaffController {
     @RequestMapping(value = "/create_staff_from_web", method = RequestMethod.POST)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createStaffFromWeb(@PathVariable Long unitId, @Validated @RequestBody StaffCreationDTO staffCreationDTO) throws ParseException {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaffFromWeb(unitId, staffCreationDTO));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaff(unitId, staffCreationDTO));
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/basic_info")
@@ -455,18 +456,6 @@ public class StaffController {
     public ResponseEntity<Map<String, Object>> getAssignedTasksOfStaff(@PathVariable long unitId, @PathVariable long staffId, @RequestParam("date") String date) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService
                 .getAssignedTasksOfStaff(unitId, staffId, date));
-    }
-
-    /**
-     * @param unitId
-     * @param staffDTO
-     * @return
-     */
-    @RequestMapping(value = "/createStaff", method = RequestMethod.POST)
-    @ApiOperation("createStaff")
-    public ResponseEntity<Map<String, Object>> createStaff(@PathVariable long unitId, @RequestBody StaffDTO staffDTO) {
-
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffCreationService.createStaffFromPlanningWorkflow(staffDTO, unitId));
     }
 
      /**
@@ -634,6 +623,13 @@ public class StaffController {
     @ApiOperation("update password")
     public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable Long staffId,@Valid @RequestBody PasswordUpdateByAdminDTO passwordUpdateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePasswordByManagement(staffId,passwordUpdateDTO));
+    }
+
+    @GetMapping(value = "/updateNightWorkers")
+    @ApiOperation("update password")
+    public ResponseEntity<Map<String, Object>> updateNightWorkers() {
+        employmentJobService.updateNightWorkers();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
 }

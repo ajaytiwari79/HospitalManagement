@@ -1,5 +1,6 @@
 package com.kairos.commons.utils;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.DurationType;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -31,6 +32,7 @@ public  class DateUtils {
     public static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
+    public static final String COMMON_DATE_FORMAT = "dd-MM-yyyy";
 
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -342,6 +344,7 @@ public  class DateUtils {
             case HOURS: {
                 return (60 * Period.between(startDate, endDate).getDays());
             }
+            default:break;
         }
         return Period.between(startDate, endDate).getDays();
 
@@ -363,6 +366,10 @@ public  class DateUtils {
 
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute()).toDate();
+    }
+
+    public static Date getDateByLocalTime(Date date, LocalTime localTime) {
+        return getDateByLocalDateAndLocalTime(asLocalDate(date),localTime);
     }
 
 
@@ -433,6 +440,7 @@ public  class DateUtils {
             case MINUTES: {
                 return localDateTime.plusMinutes(duration * recurringNumber);
             }
+            default:break;
 
 
         }
@@ -449,8 +457,7 @@ public  class DateUtils {
             case MINUTES: {
                 return localDateTime.minusMinutes(duration );
             }
-
-
+            default:break;
         }
         return localDateTime;
     }
@@ -469,6 +476,7 @@ public  class DateUtils {
             case YEAR: {
                 return localDate.plusYears(duration * recurringNumber);
             }
+            default:break;
         }
         return localDate;
     }
@@ -582,6 +590,11 @@ public  class DateUtils {
     public static LocalDateTime getEndOfDayFromLocalDate(LocalDate localDate) {
 
         return localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    public static Date getEndOfDayDateFromLocalDate(LocalDate localDate) {
+
+        return Date.from(localDate.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static LocalDateTime getLocalDateTime(LocalDate localDate, int hours, int minutes, int seconds) {
@@ -836,10 +849,10 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,"dd-MM-yyyy")+"";
+        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
     }
     public static long getMinutesBetweenDate(Date toDate,Date fromDate){
         return Duration.between(asLocalDateTime(toDate),asLocalDateTime(fromDate)).toMinutes();

@@ -23,6 +23,7 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffTeamRelationshipGraphRepository;
+import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.skill.SkillService;
@@ -72,6 +73,8 @@ public class TeamService {
     private SkillService skillService;
     @Inject
     private StaffTeamRelationshipGraphRepository staffTeamRelationshipGraphRepository;
+    @Inject
+    private AccessGroupService accessGroupService;
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
 
@@ -105,20 +108,11 @@ public class TeamService {
             LOGGER.info("Geography  not found with zipcodeId: " + zipCode.getId());
             exceptionService.dataNotFoundByIdException(MESSAGE_GEOGRAPHYDATA_NOTFOUND, municipality.getId());
         }
-        contactAddress = new ContactAddress();
-        contactAddress.setMunicipality(municipality);
-        contactAddress.setLongitude(organizationContactAddress.getContactAddress().getLongitude());
-        contactAddress.setProvince(organizationContactAddress.getContactAddress().getProvince());
-        contactAddress.setRegionName(organizationContactAddress.getContactAddress().getRegionName());
-        contactAddress.setCity(organizationContactAddress.getContactAddress().getCity());
-        contactAddress.setCountry(organizationContactAddress.getContactAddress().getCountry());
-        contactAddress.setZipCode(zipCode);
-        contactAddress.setLatitude(organizationContactAddress.getContactAddress().getLatitude());
-        contactAddress.setHouseNumber(organizationContactAddress.getContactAddress().getHouseNumber());
-        contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
-        contactAddress.setStreetUrl(organizationContactAddress.getContactAddress().getStreetUrl());
-        contactAddress.setStreet(organizationContactAddress.getContactAddress().getStreet());
-        contactAddress.setFloorNumber(organizationContactAddress.getContactAddress().getFloorNumber());
+        contactAddress = new ContactAddress(municipality, organizationContactAddress.getContactAddress().getLongitude(), organizationContactAddress.getContactAddress().getLatitude(),
+                organizationContactAddress.getContactAddress().getProvince(), organizationContactAddress.getContactAddress().getRegionName(), organizationContactAddress.getContactAddress().getCity(),
+                organizationContactAddress.getContactAddress().getCountry(), zipCode, organizationContactAddress.getContactAddress().getHouseNumber(),
+                organizationContactAddress.getContactAddress().getStreet(), organizationContactAddress.getContactAddress().getStreetUrl(), organizationContactAddress.getContactAddress().getFloorNumber()
+        );
         contactAddressGraphRepository.save(contactAddress, 2);
         Team team = new Team(teamDTO.getName(), teamDTO.getDescription(), contactAddress);
         teamGraphRepository.save(team);
@@ -159,10 +153,13 @@ public class TeamService {
         return true;
     }
 
-    public List<StaffTeamDTO> updateStaffsInTeam(Long teamId, List<StaffTeamDTO> staffTeamDTOs) {
-        for(StaffTeamDTO staffTeamDTO:staffTeamDTOs) {
+    public List<StaffTeamDTO> updateStaffsInTeam(Long unitId, Long teamId, List<StaffTeamDTO> staffTeamDTOs) {
+        for (StaffTeamDTO staffTeamDTO : staffTeamDTOs) {
             if (StaffTeamRelationship.TeamType.MAIN.equals(staffTeamDTO.getTeamType()) && staffTeamRelationshipGraphRepository.anyMainTeamExists(staffTeamDTO.getStaffId(), teamId)) {
                 exceptionService.actionNotPermittedException("staff.main_team.exists");
+            }
+            if (staffTeamDTO.getLeaderType() != null && !accessGroupService.findStaffAccessRole(unitId, staffTeamDTO.getStaffId()).getManagement()) {
+                exceptionService.actionNotPermittedException(STAFF_CAN_NOT_BE_TEAM_LEADER);
             }
             Team team = teamGraphRepository.findByIdAndDeletedFalse(teamId);
             Staff staff = staffGraphRepository.findByStaffId(staffTeamDTO.getStaffId());
@@ -205,7 +202,6 @@ public class TeamService {
         }
         return true;
     }
-
 
 
     public boolean addStaffInTeam(long teamId, long staffId, boolean isAssigned, long unitId) {
@@ -295,7 +291,7 @@ public class TeamService {
 
     }
 
-    public List<TeamDTO> getAllTeamsOfOrganization(Long unitId){
+    public List<TeamDTO> getAllTeamsOfOrganization(Long unitId) {
         return teamGraphRepository.findAllTeamsInOrganization(unitId);
     }
 
@@ -343,21 +339,33 @@ public class TeamService {
         Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
         List<Staff> staffList = staffGraphRepository.findAllById(new ArrayList<>(staffIds));
         teamGraphRepository.removeAllStaffsFromTeam(teamDTO.getId());
+
         List<StaffTeamRelationship> staffTeamRelationships = new ArrayList<>();
+        List<StaffTeamRelationship>  staffTeamRelationShipQueryResults = staffTeamRelationshipGraphRepository.findByStaffIdsAndTeamId(staffIds,teamDTO.getId());
+        Map<Long,StaffTeamRelationship> staffTeamRelationShipQueryResultMap = staffTeamRelationShipQueryResults.stream().collect(Collectors.toMap(k->k.getStaff().getId(),v->v));
         staffList.forEach(staff -> {
-            staffTeamRelationships.add(new StaffTeamRelationship(team, staff, teamDTO.getMainTeamLeaderIds().contains(staff.getId()) ? StaffTeamRelationship.LeaderType.MAIN_LEAD : StaffTeamRelationship.LeaderType.ACTING_LEAD));
+            if(staffTeamRelationShipQueryResultMap.containsKey(staff.getId())){
+                StaffTeamRelationship staffTeamRelationship = staffTeamRelationShipQueryResultMap.get(staff.getId());
+                staffTeamRelationship.setLeaderType(teamDTO.getMainTeamLeaderIds().contains(staff.getId()) ? StaffTeamRelationship.LeaderType.MAIN_LEAD : StaffTeamRelationship.LeaderType.ACTING_LEAD);
+                staffTeamRelationships.add(staffTeamRelationship);
+            }else {
+                staffTeamRelationships.add(new StaffTeamRelationship(team, staff, teamDTO.getMainTeamLeaderIds().contains(staff.getId()) ? StaffTeamRelationship.LeaderType.MAIN_LEAD : StaffTeamRelationship.LeaderType.ACTING_LEAD));
+            }
         });
         if (isCollectionNotEmpty(staffTeamRelationships)) {
             staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationships);
         }
     }
 
-    public void assignStaffInTeams(Staff staff, List<StaffTeamDTO> staffTeamDetails) {
+    public void assignStaffInTeams(Staff staff, List<StaffTeamDTO> staffTeamDetails, Long unitId) {
+        if (staffTeamDetails.stream().anyMatch(k -> k.getLeaderType() != null) && !accessGroupService.findStaffAccessRole(unitId, staff.getId()).getManagement()) {
+            exceptionService.actionNotPermittedException(STAFF_CAN_NOT_BE_TEAM_LEADER);
+        }
         teamGraphRepository.removeStaffFromAllTeams(staff.getId());
-        List<Team> teams=teamGraphRepository.findAllById(new ArrayList<>(staffTeamDetails.stream().map(k->k.getTeamId()).collect(Collectors.toSet())));
-        Map<Long,Team> teamMap=teams.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
-        List<StaffTeamRelationship> staffTeamRelationshipList = staffTeamDetails.stream().map(staffTeamDetail ->new StaffTeamRelationship(null,teamMap.get(staffTeamDetail.getTeamId()),staff,staffTeamDetail.getLeaderType(),staffTeamDetail.getTeamType())).collect(Collectors.toList());
-        if(isCollectionNotEmpty(staffTeamRelationshipList)){
+        List<Team> teams = teamGraphRepository.findAllById(new ArrayList<>(staffTeamDetails.stream().map(k -> k.getTeamId()).collect(Collectors.toSet())));
+        Map<Long, Team> teamMap = teams.stream().collect(Collectors.toMap(k -> k.getId(), Function.identity()));
+        List<StaffTeamRelationship> staffTeamRelationshipList = staffTeamDetails.stream().map(staffTeamDetail -> new StaffTeamRelationship(null, teamMap.get(staffTeamDetail.getTeamId()), staff, staffTeamDetail.getLeaderType(), staffTeamDetail.getTeamType())).collect(Collectors.toList());
+        if (isCollectionNotEmpty(staffTeamRelationshipList)) {
             staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationshipList);
         }
     }

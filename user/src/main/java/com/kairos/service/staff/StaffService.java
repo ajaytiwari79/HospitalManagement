@@ -225,7 +225,7 @@ public class StaffService {
             redisService.invalidateAllTokenOfUser(user.getUserName());
             userGraphRepository.save(user);
         } else {
-            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
+            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSCODE_NOTMATCH);
         }
         return true;
     }
@@ -240,7 +240,7 @@ public class StaffService {
             redisService.invalidateAllTokenOfUser(userForStaff.getUserName());
             userGraphRepository.save(userForStaff);
         } else {
-            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSWORD_NOTMATCH);
+            exceptionService.dataNotMatchedException(MESSAGE_STAFF_USER_PASSCODE_NOTMATCH);
         }
         return true;
     }
@@ -318,7 +318,7 @@ public class StaffService {
         staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
-        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails());
+        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
         return staffPersonalDetail;
     }
 
@@ -729,31 +729,6 @@ public class StaffService {
         positionGraphRepository.save(position,2);
     }
 
-    public void setUnitManagerAndPosition(Organization organization, User user, Long accessGroupId) {
-        Staff staff = new Staff(user.getEmail(), user.getEmail(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
-        Position position = new Position();
-        position.setStaff(staff);
-        staff.setUser(user);
-        position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
-        position.setStaff(staff);
-        position.setStartDateMillis(DateUtils.getCurrentDateMillis());
-        organization.getPositions().add(position);
-        organizationGraphRepository.save(organization);
-        if (accessGroupId != null) {
-            UnitPermission unitPermission = new UnitPermission();
-            unitPermission.setOrganization(organization);
-            AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-            if (Optional.ofNullable(accessGroup).isPresent()) {
-                unitPermission.setAccessGroup(accessGroup);
-            }
-            position.getUnitPermissions().add(unitPermission);
-        }
-        staff.setContactAddress(staffAddressService.getStaffContactAddressByOrganizationAddress(organization));
-        positionGraphRepository.save(position);
-        activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(position.getStaff().getId())), organization.getId());
-
-    }
-
     public void updateStaffFromExcel(MultipartFile multipartFile) {
         int staffUpdated = 0;
         List<Staff> staffList = new ArrayList<>();
@@ -885,8 +860,11 @@ public class StaffService {
         return new ClientStaffInfoDTO(staff.getId());
     }
 
-    public Staff getStaffById(long staffId) {
-        return staffGraphRepository.findOne(staffId, 0);
+    public com.kairos.dto.user.staff.StaffDTO getStaffById(long staffId) {
+        Staff staff = staffGraphRepository.findOne(staffId, 1);
+        com.kairos.dto.user.staff.StaffDTO staffDTO =  ObjectMapperUtils.copyPropertiesByMapper(staff,com.kairos.dto.user.staff.StaffDTO.class);
+        staffDTO.setEmail(staff.getUser().getEmail());
+        return staffDTO;
     }
 
     public List<Long> getCountryAdminIds(long organizationId) {

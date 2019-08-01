@@ -11,9 +11,15 @@ import java.util.List;
 @Repository
 public interface ShiftViolatedRulesMongoRepository extends MongoBaseRepository<ShiftViolatedRules,BigInteger> {
 
+    @Query(value = "{'shiftId':{'$in':?0},draft:?1}")
+    List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds,boolean draft);
+
     @Query(value = "{'shiftId':{'$in':?0}}")
     List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds);
 
-    @Query(value = "{shiftId:?0}" )
-    ShiftViolatedRules findOneViolatedRulesByShiftId(BigInteger shiftId);
+    @Query(value = "{shiftId:?0,draft:?1}" )
+    ShiftViolatedRules findOneViolatedRulesByShiftId(BigInteger shiftId ,boolean draft);
+
+    @Query(value = "{'shiftId':{'$in':?0},draft:?1}",delete = true)
+    Long deleteAllViolatedRulesByShiftIds(List<BigInteger> shiftIds,boolean draft);
 }

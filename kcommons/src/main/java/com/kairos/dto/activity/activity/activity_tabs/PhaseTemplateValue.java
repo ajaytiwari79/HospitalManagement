@@ -11,7 +11,7 @@ import java.util.Optional;
  */
 
 //This for Activity
-public class PhaseTemplateValue implements Serializable {
+public class PhaseTemplateValue {
     private BigInteger phaseId;
     private String name;
     private String description;

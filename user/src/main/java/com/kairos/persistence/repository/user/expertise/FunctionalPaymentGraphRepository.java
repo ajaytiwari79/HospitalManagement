@@ -16,7 +16,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<FunctionalPayment, Long> {
     @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0}" +
             " RETURN id(functionalPayment) as id,functionalPayment.startDate as startDate,functionalPayment.endDate as endDate,functionalPayment.percentageValue as percentageValue,functionalPayment.published as published, " +
-            " functionalPayment.paymentUnit as paymentUnit ORDER BY startDate ASC")
+            " functionalPayment.paymentUnit as paymentUnit,functionalPayment.oneTimeUpdatedAfterPublish as oneTimeUpdatedAfterPublish ORDER BY startDate ASC")
     List<FunctionalPaymentDTO> getFunctionalPaymentOfExpertise(Long expertiseId);
 
     @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise:Expertise{deleted:false}) WHERE id(expertise)={0}" +
@@ -106,7 +106,7 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "set functionalPayment.hasDraftCopy=false  detach delete relation")
     void detachFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId);
 
-    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,published:false}) WHERE id(functionalPayment)={0}" +
-            "SET functionalPayment.deleted=true RETURN count(functionalPayment)>0")
+    @Query("MATCH(functionalPayment:FunctionalPayment{deleted:false,published:false})-[rel:"+VERSION_OF+"]-(version:FunctionalPayment) WHERE id(functionalPayment)={0}" +
+            "SET functionalPayment.deleted=true,version.oneTimeUpdatedAfterPublish=false RETURN count(functionalPayment)>0")
     boolean deleteFunctionalPayment(Long functionPaymentId);
 }

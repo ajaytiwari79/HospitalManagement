@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Created by vipul on 13/4/18.
  */
-public class LocationActivityTab implements Serializable {
+public class LocationActivityTab{
     private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
     private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
 

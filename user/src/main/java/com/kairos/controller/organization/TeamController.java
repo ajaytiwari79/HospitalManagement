@@ -138,9 +138,9 @@
         @ApiOperation(value = "Update Staffs in Team")
         @PutMapping(value = "/team/{teamId}/update_staffs")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> updateStaffInTeam(@PathVariable long teamId, @RequestBody List<StaffTeamDTO> staffDetails) {
+        public ResponseEntity<Map<String, Object>> updateStaffInTeam(@PathVariable long unitId,@PathVariable long teamId, @RequestBody List<StaffTeamDTO> staffDetails) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                    teamService.updateStaffsInTeam(teamId,staffDetails));
+                    teamService.updateStaffsInTeam(unitId,teamId,staffDetails));
         }
 
         @ApiOperation(value = "Remove Staff from Team")

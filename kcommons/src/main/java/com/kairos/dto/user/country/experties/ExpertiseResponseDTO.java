@@ -38,6 +38,7 @@ public class ExpertiseResponseDTO {
     private SectorDTO sector;
 
     public ExpertiseResponseDTO() {
+        //Not in use
     }
 
     public Long getId() {

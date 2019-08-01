@@ -2,6 +2,7 @@ package com.kairos.controller.period;
 
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.service.period.PlanningPeriodService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +15,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
@@ -28,6 +30,7 @@ public class PlanningPeriodController {
 
     @Inject
     PlanningPeriodService planningPeriodService;
+    @Inject private TimeBankService timeBankService;
 
     @ApiOperation(value = "Create Planning Period")
     @PostMapping(value="/period")
@@ -70,8 +73,8 @@ public class PlanningPeriodController {
     @ApiOperation(value = "update period's phase to next phase")
     @PutMapping(value = "/period/{periodId}/next_phase")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToNext(unitId, periodId));
+    public ResponseEntity<Map<String, Object>> updatePlanningPeriodPhaseToNext(@PathVariable BigInteger periodId, @PathVariable Long unitId , @RequestBody(required=false) List<Long> employmentTypeIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setPlanningPeriodPhaseToNext(unitId, periodId ,employmentTypeIds));
     }
 //test api
 //    @ApiOperation(value = "update period's flipping Date")
@@ -110,6 +113,5 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createJobOfPlanningPeriod());
 
     }
-    
 
 }

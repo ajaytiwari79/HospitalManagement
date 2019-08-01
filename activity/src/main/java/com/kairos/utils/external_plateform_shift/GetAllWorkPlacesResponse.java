@@ -14,6 +14,7 @@ public class GetAllWorkPlacesResponse {
     private List<GetAllWorkPlacesResult> GetAllWorkPlacesResult;
 
     public GetAllWorkPlacesResponse() {
+        //Not in use
     }
 
     public List<GetAllWorkPlacesResult> getWorkPlaceList() {

@@ -14,8 +14,8 @@ import java.math.BigInteger;
 
 @Document(collection = "counter")
 public class KPI extends Counter {
-    private ChartType chart;
-    private CounterSize size;
+    protected ChartType chart;
+    protected CounterSize size;
 
     public KPI() {
         //Default Constructor

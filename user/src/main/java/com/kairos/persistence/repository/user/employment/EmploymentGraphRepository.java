@@ -60,17 +60,18 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
     @Query("MATCH (employment:Employment{deleted:false}) where id(employment) IN {0} \n" +
             "MATCH(employment)-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) \n" +
-            "MATCH(employment)-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine) WHERE  date(employmentLine.startDate) <= date() AND (NOT exists(employmentLine.endDate) OR date(employmentLine.endDate) >= date()) \n" +
+            "MATCH(employment)-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine)  \n" +
             "MATCH (employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)\n" +
             "MATCH(employmentLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) \n" +
             "WITH staff,expertise,employment,employmentLine,{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)} as employmentType \n" +
             "OPTIONAL MATCH (employment)-[rel:" + APPLIED_FUNCTION + "]->(appliedFunction:Function)  \n" +
             "WITH employment, Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) as appliedFunctions ,staff,expertise,employmentType,employmentLine\n" +
-            "WITH staff,expertise,employment,employmentLine,employmentType,appliedFunctions\n" +
-            "return expertise as expertise,id(staff) as staffId,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.published as published, employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,\n" +
-            "CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),startDate:employmentLine.startDate, hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
+            "WITH staff,expertise,employment,employmentType,appliedFunctions,\n" +
+            "COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),startDate:employmentLine.startDate, hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
             "fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes , \n" +
-            " avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,employmentType:employmentType}) end as employmentLines,appliedFunctions ")
+            "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,employmentType:employmentType}) as employmentLines  \n" +
+            "return expertise as expertise,id(staff) as staffId,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.published as published, employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,\n" +
+           "employmentLines,appliedFunctions ")
     List<EmploymentQueryResult> getEmploymentByIds(List<Long> employmentIds);
 
 
@@ -111,6 +112,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 // Date is not supported as a return type in Bolt protocol version 1. Please make sure driver supports at least protocol version 2. Driver upgrade is most likely required
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment{deleted:false}) where id(staff)={0} return employment.endDate as endDate")
     List<String> getAllEmploymentsByStaffId(Long staffId);
+    @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment{deleted:false}) where id(staff) in {0} return id(employment)")
+    List<Long> getEmploymentIdsByStaffIds(List<Long> staffids);
 
     @Query("MATCH(employment:Employment)-[:" + IN_UNIT + "]->(subOrg:Organization) where id(employment)={0} " +
             "MATCH(employment)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +
@@ -317,6 +320,10 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(employment:Employment)-[:"+HAS_EMPLOYMENT_LINES+"]->(employmentLines:EmploymentLine{deleted:false}) " +
             "WHERE id(employment) IN {0} AND ( employmentLines.endDate IS NULL OR DATE(employmentLines.endDate) > DATE({1})) WITH employmentLines SET employmentLines.endDate = {1} RETURN  COUNT(employmentLines)>0")
     boolean updateEmploymentLineEndDateByEmploymentIds(Set<Long> employmentIds,String endDate);
+
+    @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]-(e:Expertise{deleted:false}) \n" +
+            "RETURN id(staff) as staffId,COLLECT({id:id(employment),expId:id(e)}) as employmentDetails")
+    List<Map> findStaffsWithEmploymentIds();
 
 
 }

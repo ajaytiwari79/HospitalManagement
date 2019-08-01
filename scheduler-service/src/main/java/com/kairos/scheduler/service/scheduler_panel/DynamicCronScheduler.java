@@ -34,7 +34,7 @@ import java.util.concurrent.ScheduledFuture;
  */
 
 @Service
-public class DynamicCronScheduler implements DisposableBean {
+public class DynamicCronScheduler{
 
 
     @Inject
@@ -70,7 +70,7 @@ public class DynamicCronScheduler implements DisposableBean {
             future = threadPoolTaskScheduler.schedule(runnable, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
         }
 
-        logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
+        logger.info("Name of cron job is --> {} scheduler {}",schedulerPanel.getId(),TimeZone.getDefault());
         BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
         logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
 
@@ -164,16 +164,5 @@ public class DynamicCronScheduler implements DisposableBean {
             kafkaProducer.pushToQueue(jobToExecute);
         };
     }
-
-    public void destroy() {
-        List<SchedulerPanel> schedulerPanels = schedulerPanelService.getAllControlPanels();
-        if (schedulerPanels.size() != 0) {
-            for (SchedulerPanel schedulerPanel : schedulerPanels) {
-                logger.info("Shutdown Cron Job of process name " + schedulerPanel.getName());
-                stopCronJob("scheduler" + schedulerPanel.getId());
-            }
-        }
-    }
-
 
 }

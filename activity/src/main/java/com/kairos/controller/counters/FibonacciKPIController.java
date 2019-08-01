@@ -54,8 +54,8 @@ public class FibonacciKPIController {
     }
 
     @GetMapping(value = COUNTRY_URL+FIBONACCI+"/{fibonacciKPIId}")
-    public ResponseEntity<ResponseDTO<Object>> getOneFibonacciKPIAtCountry(@PathVariable BigInteger fibonacciKPIId){
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.getOneFibonacciKPI(fibonacciKPIId));
+    public ResponseEntity<ResponseDTO<Object>> getOneFibonacciKPIAtCountry(@PathVariable BigInteger fibonacciKPIId,@PathVariable Long countryId){
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.getOneFibonacciKPI(fibonacciKPIId,countryId,ConfLevel.COUNTRY));
     }
 
     @PostMapping(value = UNIT_URL+FIBONACCI)
@@ -84,7 +84,7 @@ public class FibonacciKPIController {
     }
 
     @GetMapping(value = UNIT_URL+FIBONACCI+"/{fibonacciKPIId}")
-    public ResponseEntity<ResponseDTO<Object>> getOneFibonacciKPIAtUnit(@PathVariable BigInteger fibonacciKPIId){
-        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.getOneFibonacciKPI(fibonacciKPIId));
+    public ResponseEntity<ResponseDTO<Object>> getOneFibonacciKPIAtUnit(@PathVariable BigInteger fibonacciKPIId,@PathVariable Long unitId){
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, fibonacciKPIService.getOneFibonacciKPI(fibonacciKPIId,unitId,ConfLevel.UNIT));
     }
 }

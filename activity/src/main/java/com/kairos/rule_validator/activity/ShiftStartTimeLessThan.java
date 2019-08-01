@@ -17,6 +17,7 @@ public class ShiftStartTimeLessThan extends AbstractActivitySpecification<ShiftW
 
 
     public ShiftStartTimeLessThan() {
+        //Not in use
     }
 
     @Override

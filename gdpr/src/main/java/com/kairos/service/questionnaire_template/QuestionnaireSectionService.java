@@ -117,7 +117,9 @@ public class QuestionnaireSectionService {
                     question = isOrganization ? new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), null, referenceId)
                             : new Question(questionDTO.getQuestion(), questionDTO.getDescription(), questionDTO.isRequired(), questionDTO.getQuestionType(), questionDTO.isNotSureAllowed(), referenceId, null);
                 }
-                addAttributeNameToQuestion(question, questionDTO.getAttributeName(), templateType);
+                if(templateType != QuestionnaireTemplateType.RISK) {
+                    addAttributeNameToQuestion(question, questionDTO.getAttributeName(), templateType);
+                }
                 questions.add(question);
             });
         }
@@ -144,6 +146,8 @@ public class QuestionnaireSectionService {
                         exceptionService.invalidRequestException("Attribute not found for Asset ");
                     }
                     aClass = ProcessingActivity.class.getDeclaredField(ProcessingActivityAttributeName.valueOf(attributeName).value).getType();
+                    break;
+                default:
                     break;
             }
             boolean isQuestionTypeValid=false;
@@ -257,6 +261,8 @@ public class QuestionnaireSectionService {
                 if (Optional.ofNullable(previousTemplate).isPresent() && !previousTemplate.getId().equals(questionnaireTemplate.getId())) {
                     exceptionService.duplicateDataException("duplicate.questionnaireTemplate.ofTemplateType", questionnaireTemplate.getTemplateType().value);
                 }
+                break;
+            default:
                 break;
         }
     }

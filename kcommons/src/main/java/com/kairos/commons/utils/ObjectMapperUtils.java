@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.kairos.dto.kpermissions.KPermissionModelFieldDTO;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
@@ -15,9 +16,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 
@@ -169,21 +168,85 @@ public class ObjectMapperUtils {
         return objectListwithCopiedData;
     }
 
-    public static <E extends Object>  E copyObjectSpecificPropertiesByMapper(Object src, Object target, List<String> props) {
-        BeanWrapper targetWrapper = null;
-        try {
-            BeanWrapper srcWrappper = PropertyAccessorFactory.forBeanPropertyAccess(src);
-            targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
-            for(String prop : props){
-                targetWrapper.setPropertyValue(prop, srcWrappper.getPropertyValue(prop));
+    public static <E extends Object>  E copyObjectSpecificPropertiesByMapper(Object src, Object target, List<KPermissionModelFieldDTO> accessibleFieldsWithModelName, Class baseClass) {
+        if (src != null) {
+            BeanWrapper targetWrapper = null;
+            try {
+                BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
+                if (target == null) {
+                    target = src.getClass().newInstance();
+                }
+                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
+                Map<String, Object> subModelObjects = new HashMap<>();
+                for (KPermissionModelFieldDTO kPermissionModelFieldDTO : accessibleFieldsWithModelName) {
+                    String modelName = kPermissionModelFieldDTO.getModelName();
+                    if (!modelName.equalsIgnoreCase(src.getClass().getSimpleName()) && srcWrapper.getPropertyType(modelName) != null && baseClass.isAssignableFrom(srcWrapper.getPropertyType(modelName)) ) {
+                        Object validatedObject = copyObjectSpecificPropertiesByMapper(srcWrapper.getPropertyValue(modelName),
+                                targetWrapper.getPropertyValue(modelName), kPermissionModelFieldDTO.getModelFields());
+                        subModelObjects.put(modelName, validatedObject);
+                    } else if (modelName.equalsIgnoreCase(src.getClass().getSimpleName())) {
+                        for (String field : kPermissionModelFieldDTO.getModelFields()) {
+                            if (subModelObjects.containsKey(field)) {
+                                targetWrapper.setPropertyValue(field, subModelObjects.get(field));
+                            } else {
+                                targetWrapper.setPropertyValue(field, srcWrapper.getPropertyValue(field));
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            return (E) targetWrapper.getWrappedInstance();
+        }else{
+            return null;
         }
-        return (E)targetWrapper.getWrappedInstance();
     }
 
+    public static <E extends Object>  E copySpecificPropertiesByMapper(Object src, Object target, List<KPermissionModelFieldDTO> accessibleFieldsWithModelName) {
+        if (src != null) {
+            BeanWrapper targetWrapper = null;
+            try {
+                BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
+                if (target == null) {
+                    target = src.getClass().newInstance();
+                }
+                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
+                for (KPermissionModelFieldDTO kPermissionModelFieldDTO : accessibleFieldsWithModelName) {
+                    for (String field : kPermissionModelFieldDTO.getModelFields()) {
+                        if(targetWrapper.isWritableProperty(field) && srcWrapper.isReadableProperty(field)) {
+                            targetWrapper.setPropertyValue(field, srcWrapper.getPropertyValue(field));
+                        }
+                        }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return (E) targetWrapper.getWrappedInstance();
+        }else{
+            return null;
+        }
+    }
 
-
+    public static <E extends Object>  E copyObjectSpecificPropertiesByMapper(Object src, Object target, List<String> accessibleFieldNames) {
+        BeanWrapper targetWrapper = null;
+        if (src != null) {
+            try {
+                BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
+                if (target == null) {
+                    target = src.getClass().newInstance();
+                }
+                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
+                for (String prop : accessibleFieldNames) {
+                    targetWrapper.setPropertyValue(prop, srcWrapper.getPropertyValue(prop));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        return (E)targetWrapper.getWrappedInstance();
+        }else{
+            return null;
+        }
+    }
 
 }

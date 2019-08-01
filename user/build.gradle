@@ -35,8 +35,7 @@ apply plugin: 'application'
 version = "$projectVersion-SNAPSHOT"
 sourceCompatibility = 1.8
 mainClassName = 'com.kairos.UserServiceApplication'
-
-applicationDefaultJvmArgs = ["-Xdiag"]
+applicationDefaultJvmArgs = ["-Xdiag","-Xms1024m", "-Xmx1048m"]
 
 
 repositories {
@@ -72,7 +71,7 @@ dependencies {
     //send grid
     compile ('com.sendgrid:sendgrid-java:4.0.1')
 
-
+    compile("org.aspectj:aspectjweaver:1.8.8")
 
 
     compile('org.springframework.boot:spring-boot-starter-websocket')

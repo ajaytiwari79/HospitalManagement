@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
@@ -27,6 +28,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -51,6 +53,8 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 @EnableTransactionManagement(proxyTargetClass=true)
 @EnableCircuitBreaker
 @EnableKafka
+@EnableAsync
+@EnableAuditLogging
 public class UserServiceApplication implements WebMvcConfigurer {
 
 	public static final DateTimeFormatter FORMATTER = ofPattern("yyyy-MM-dd");
