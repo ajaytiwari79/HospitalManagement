@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.unit_settings.activity_configuration;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 public class PresencePlannedTime {
     private BigInteger phaseId;

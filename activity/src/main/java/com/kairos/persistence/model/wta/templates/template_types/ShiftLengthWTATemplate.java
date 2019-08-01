@@ -40,6 +40,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
 
+
     public ShiftLengthWTATemplate() {
         this.wtaTemplateType = WTATemplateType.SHIFT_LENGTH;
     }
