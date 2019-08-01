@@ -34,12 +34,11 @@ public class StaffingLevelActivityRankService extends MongoBaseService {
         List<StaffingLevelActivityRank> staffingLevelActivityRanks = new ArrayList<>();
         if(activitiesRankMap!=null){
             activitiesRankMap.forEach((k, v) -> {
-                if (staffingLevelActivityRankingMap.get(k) != null) {
+                /*if (staffingLevelActivityRankingMap.get(k) != null) {
                     staffingLevelActivityRanks.add(new StaffingLevelActivityRank(staffingLevelActivityRankingMap.get(k).getId(), k, staffingLevelDate, staffingLevelId, v));
-                }
-                else{
+                } else {
                     staffingLevelActivityRanks.add(new StaffingLevelActivityRank(k, staffingLevelDate, staffingLevelId, v));
-                }
+                }*/
             });
         }
         return staffingLevelActivityRanks;
