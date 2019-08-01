@@ -5,8 +5,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+import org.mockito.cglib.core.Local;
 
 import javax.validation.constraints.NotNull;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.*;
 import java.time.*;
@@ -27,6 +29,7 @@ public  class DateUtils {
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
     public static final String COMMON_DATE_FORMAT = "dd-MM-yyyy";
+    public static final String COMMON_TIME_FORMAT="HH:mm";
 
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -629,6 +632,7 @@ public  class DateUtils {
 
     }
 
+
     public static LocalDateTime getLocalDateTimeFromMillis(Long longValue) {
         return (longValue == null) ? null : LocalDateTime.ofInstant(Instant.ofEpochMilli(longValue), ZoneId.systemDefault());
     }
@@ -738,6 +742,15 @@ public  class DateUtils {
 
     public static String getLocalDateStringByPattern(LocalDate localDate, String pattern){
         return localDate.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    public static String getLocalTimeStringByPattern(LocalTime localTime, String pattern){
+
+
+
+
+        return localTime.format(DateTimeFormatter.ofPattern(pattern));
+
     }
 
     public static LocalDate getlastDayOfYear(Integer year){
@@ -852,6 +865,7 @@ public  class DateUtils {
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
         return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
     }
+
     public static long getMinutesBetweenDate(Date toDate,Date fromDate){
         return Duration.between(asLocalDateTime(toDate),asLocalDateTime(fromDate)).toMinutes();
     }
@@ -864,5 +878,6 @@ public  class DateUtils {
         String localtime=time.format(DateTimeFormatter.ofPattern("HH:mm"));
         String date = dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
         return date;
+
     }
 }

@@ -9,6 +9,7 @@ import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.sql.Time;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
@@ -25,6 +26,8 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
 
     private BigInteger activityId;
     private Date startDate;
+    private Time startTime;
+
     private Date endDate;
     private int scheduledMinutes;
     private int durationMinutes;
