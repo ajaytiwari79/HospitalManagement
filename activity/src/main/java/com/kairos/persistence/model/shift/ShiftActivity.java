@@ -9,6 +9,7 @@ import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.sql.Time;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
@@ -31,6 +32,7 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     private String activityName;
     private long bid;
     private long pId;
+
     //used in T&A view
     private Long reasonCodeId;
     //used for adding absence type of activities.
