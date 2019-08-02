@@ -841,20 +841,12 @@ public class AccessGroupService {
         Long userId = UserContext.getUserDetails().getId();
         //Todo Yatharth please check and verify our code
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
-        UserAccessRoleDTO userAccessRoleDTO = null;
+        UserAccessRoleDTO userAccessRoleDTO;
         if (staffAtHub != null) {
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
-        }if(isNull(staffAtHub)){
-            Organization parent = organizationService.fetchParentOrganization(unitId);
-            Long hubIdByOrganizationId = organizationGraphRepository.getHubIdByOrganizationId(parent.getId());
-            staffAtHub = staffGraphRepository.getStaffOfHubByHubIdAndUserId(parent.isKairosHub() ? parent.getId() : hubIdByOrganizationId,userId);
-            if (staffAtHub != null) {
-                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
-            }
-        }
-        else if(isNull(userAccessRoleDTO)){
+        } else {
             AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
-            if (isNull(accessGroupQueryResult)) {
+            if (accessGroupQueryResult == null) {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
             }
             String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
@@ -862,8 +854,8 @@ public class AccessGroupService {
             boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
             userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
-
         }
+        //Todo till here
         return userAccessRoleDTO;
     }
 
