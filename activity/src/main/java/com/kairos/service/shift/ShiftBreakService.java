@@ -66,7 +66,7 @@ public class ShiftBreakService {
         DateTimeInterval eligibleBreakInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
         Date placeBreakAfterThisDate = shift.getStartDate();
         List<ShiftActivity> breakActivities = new ArrayList<>();
-        if(isNotNull(breakSetting) && breakSetting.getShiftDurationInMinute()>=shift.getMinutes()) {
+        if(isNotNull(breakSetting) && shift.getMinutes()>=breakSetting.getShiftDurationInMinute()) {
             if(isCollectionEmpty(shift.getBreakActivities())){
                 if (isNotNull(breakWTATemplate)) {
                     BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
