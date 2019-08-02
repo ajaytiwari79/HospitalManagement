@@ -335,7 +335,7 @@ public class ActivityService {
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
-        if(!activity.getGeneralActivityTab().getBackgroundColor().equals(timeType.getBackgroundColor())){
+        if(!timeType.getBackgroundColor().equals(activity.getGeneralActivityTab().getBackgroundColor())){
             List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()),null,null,null);
             shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
                 if(shiftActivity.getActivityId().equals(activity.getId())){
