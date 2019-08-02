@@ -48,7 +48,7 @@ public class ShiftBreakService {
 
     public Map<BigInteger, ActivityWrapper> getBreakActivities(BreakSettingsDTO breakSetting, Long unitId) {
         List<ActivityWrapper> breakActivities = activityRepository.findActivitiesAndTimeTypeByParentIdsAndUnitId(newArrayList(breakSetting.getActivityId()), unitId);
-        if(isCollectionEmpty(breakActivities)){
+        if(isCollectionEmpty(breakActivities) || breakActivities.size() > 1){
             exceptionService.dataNotFoundException(ERROR_BREAKSACTIVITY_NOT_CONFIGURED,unitId);
         }
         Map<BigInteger, ActivityWrapper> activityWrapperMap =
