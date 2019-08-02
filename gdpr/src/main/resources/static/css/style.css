@@ -300,6 +300,10 @@ img.logo {
     text-decoration: none;
 }
 
+.icon-section a {
+   color:black;
+}
+
 .cookies {
     width: 60px;
     fill: white;

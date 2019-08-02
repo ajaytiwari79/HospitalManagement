@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-
+import static com.kairos.service.wta.WTABuilderService.copyRuleTemplatesToDTO;
 
 /**
  * Created by pawanmandhan on 5/8/17.
@@ -243,7 +243,7 @@ public class RuleTemplateService{
         }
 
         //
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(templateList, WTABaseRuleTemplateDTO.class);
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = copyRuleTemplatesToDTO(templateList);
         assignCategoryToRuleTemplate(categoryList, wtaBaseRuleTemplateDTOS);
         RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
         wrapper.setCategoryList(categoryList);
@@ -258,7 +258,7 @@ public class RuleTemplateService{
         }
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(organization.getCountryId());
         List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(organization.getCountryId());
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(templateList, WTABaseRuleTemplateDTO.class);
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = copyRuleTemplatesToDTO(templateList);
         RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
         assignCategoryToRuleTemplate(categoryList, wtaBaseRuleTemplateDTOS);
         ruleTemplateWrapper.setCategoryList(categoryList);

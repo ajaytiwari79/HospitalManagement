@@ -4,6 +4,7 @@ import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.*;
 import com.kairos.persistence.model.activity.*;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -197,7 +198,8 @@ public class AbsenceShiftService {
             shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());
             shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
         }
-        if (shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
+        Phase phase=phaseMapByDate.get(shiftDTOS.get(0).getActivities().get(0).getStartDate());
+        if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             shiftService.saveShiftWithActivity(phaseMapByDate, shifts, staffAdditionalInfoDTO);
             shiftDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS,staffAdditionalInfoDTO.getUserAccessRoleDTO());
