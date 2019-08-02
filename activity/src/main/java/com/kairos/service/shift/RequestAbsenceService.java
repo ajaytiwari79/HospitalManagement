@@ -175,7 +175,7 @@ public class RequestAbsenceService {
         shift.setActivities(shiftActivityList);
         ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class);
         shiftDTO.setShiftDate(asLocalDate(shift.getStartDate()));
-        return shiftService.updateShift(shiftDTO,ORGANIZATION,false,false,ShiftActionType.SAVE);
+        return shiftService.updateShift(shiftDTO,ORGANIZATION,false,false,null);
     }
 
     private List<ShiftActivity> updateShiftActivity(ActivityWrapper activityWrapper,DateTimeInterval dateTimeInterval, List<ShiftActivity> shiftActivities, ShiftActivity shiftActivity) {
