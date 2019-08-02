@@ -38,7 +38,7 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
     private int restingTime;
 
     public DaysOffAfterASeriesWTATemplate() {
-        wtaTemplateType = WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
+        this.wtaTemplateType = WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
     }
 
     @Override

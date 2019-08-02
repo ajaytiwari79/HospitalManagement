@@ -1,4 +1,4 @@
-Match(ap:AccessPage) where ap.moduleId="module_12" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Leave balance",isModule:false,moduleId:"tab_410",active:true});
+Match(ap:AccessPage) where ap.moduleId="module_12" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Approval Requests",isModule:false,moduleId:"tab_420",active:true});
 
 Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
 Match (ap:AccessPage)

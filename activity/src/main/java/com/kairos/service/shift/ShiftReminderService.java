@@ -127,8 +127,9 @@ public class ShiftReminderService{
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
 
-        String description = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), getLocalDateStringByPattern(asLocalDate(shiftActivity.get().getStartDate()) ,COMMON_DATE_FORMAT),
-                shiftActivity.get().getStartDate().getHours() + " : " + shiftActivity.get().getStartDate().getMinutes());
+        String description = String.format(SHIFT_EMAIL_BODY, staffDTO.getFirstName(), shiftActivity.get().getActivityName(), getLocalDateStringByPattern(asLocalDate(shiftActivity.get().getStartDate()) ,COMMON_DATE_FORMAT),getLocalTimeStringByPattern(asLocalTime(shiftActivity.get().getStartDate()),COMMON_TIME_FORMAT));
+
+
         Map<String,Object> templateParam = new HashMap<>();
         templateParam.put("receiverName",staffDTO.getFullName());
         templateParam.put("description", description);

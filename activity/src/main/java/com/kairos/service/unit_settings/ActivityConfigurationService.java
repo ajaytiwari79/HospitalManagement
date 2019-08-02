@@ -66,7 +66,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     private void createDefaultPresentSettings(BigInteger phaseId, BigInteger applicablePlannedTimeId, List<ActivityConfiguration> activityConfigurations, Long unitId) {
-        activityConfigurations.add(new ActivityConfiguration(unitId, new PresencePlannedTime(phaseId, applicablePlannedTimeId, applicablePlannedTimeId)));
+        activityConfigurations.add(new ActivityConfiguration(unitId, new PresencePlannedTime(phaseId,applicablePlannedTimeId, applicablePlannedTimeId)));
 
     }
 

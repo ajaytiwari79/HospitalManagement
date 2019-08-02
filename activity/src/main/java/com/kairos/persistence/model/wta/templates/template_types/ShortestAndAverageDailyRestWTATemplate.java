@@ -52,7 +52,7 @@ public class ShortestAndAverageDailyRestWTATemplate extends WTABaseRuleTemplate 
         wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
     public ShortestAndAverageDailyRestWTATemplate() {
-        wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
+        this.wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;
     }
 
     @Override
