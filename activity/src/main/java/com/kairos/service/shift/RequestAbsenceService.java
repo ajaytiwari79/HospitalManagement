@@ -121,6 +121,7 @@ public class RequestAbsenceService {
                 shiftMongoRepository.deleteShiftBetweenDatesByEmploymentId(shift.getEmploymentId(),startDate,endDate,shiftWithViolatedInfoDTO.getShifts().stream().filter(shiftDTO1->isNotNull(shiftDTO1.getId())).map(shiftDTO1->shiftDTO1.getId()).collect(Collectors.toList()));
             }else {
                 shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
+                response = (T)shiftWithViolatedInfoDTO;
             }
             if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
                 todo.setStatus(TodoStatus.REQUESTED);
@@ -186,6 +187,7 @@ public class RequestAbsenceService {
             for (DateTimeInterval timeInterval : dateTimeIntervals) {
                 ShiftActivity updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity,ShiftActivity.class);
                 updatedShiftActivity.setPlannedTimes(new ArrayList<>());
+                updatedShiftActivity.setId(null);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
                 updatedShiftActivity.setEndDate(timeInterval.getEndDate());
                 shiftActivities.add(updatedShiftActivity);
