@@ -33,6 +33,9 @@ public class PublicLegalDocumentService {
     private ExceptionService exceptionService;
 
     public PublicLegalDocumentDTO createPublicLegalDocument(PublicLegalDocumentDTO publicLegalDocumentDTO) {
+        if(publicLegalDocumentDTO.getName().equals("")){
+            exceptionService.duplicateDataException(GdprMessagesConstants.MESSAGE_ENTER_VALID_DATA);
+        }
         PublicLegalDocument publicLegalDocument = publicLegalDocumentRepository.findByNameIgnoreCaseAndDeletedFalse(publicLegalDocumentDTO.getName());
         if (Optional.ofNullable(publicLegalDocument).isPresent()) {
             exceptionService.duplicateDataException(GdprMessagesConstants.MESSAGE_NAME_ALREADY_EXIST);
