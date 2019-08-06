@@ -118,7 +118,7 @@ public class DaysOffInPeriodWTATemplate extends WTABaseRuleTemplate {
             List<ShiftWithActivityDTO> shifts = getShiftsByInterval(dateTimeInterval, infoWrapper.getShifts());
             shifts.add(infoWrapper.getShift());
             List<DateTimeInterval> intervals = getSortedIntervals(shifts);
-            if (intervals.size() > 2) {
+            if (intervals.size() > 0) {
                 count = getDayOFF(intervals,dateTimeInterval);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                 boolean isValid = isValid(minMaxSetting, limitAndCounter[0], count);
