@@ -162,7 +162,7 @@ public class KPISetService {
                             if(isNotNull(applicableKPI)) {
                                 applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                                 FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
-                                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId(),startDate);
                                 if (isNotNull(kpiResponseDTO)) {
                                     kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(),kpiResponseDTO);
                                 }

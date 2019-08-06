@@ -767,19 +767,19 @@ public  class DateUtils {
         return dateTime.toDate();
     }
 
-    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType) {
+    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
         switch (durationType) {
             case DAYS:
-                date = date.plusDays(1);
+                date = date.plusDays(value);
                 break;
             case MONTHS:
-                date = date.plusMonths(1);
+                date = date.plusMonths(value);
                 break;
             case WEEKS:
-                date = date.plusWeeks(1);
+                date = date.plusWeeks(value);
                 break;
             case YEAR:
-                date = date.plusYears(1);
+                date = date.plusYears(value);
                 break;
             default:
                 break;
@@ -787,19 +787,19 @@ public  class DateUtils {
         return date;
     }
 
-    public static LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType) {
+    public static LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
         switch (durationType) {
             case DAYS:
-                date = date.minusDays(1);
+                date = date.minusDays(value);
                 break;
             case MONTHS:
-                date = date.minusMonths(1);
+                date = date.minusMonths(value);
                 break;
             case WEEKS:
-                date = date.minusWeeks(1);
+                date = date.minusWeeks(value);
                 break;
             case YEAR:
-                date = date.minusYears(1);
+                date = date.minusYears(value);
                 break;
             default:
                 break;
