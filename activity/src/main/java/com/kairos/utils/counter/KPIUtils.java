@@ -64,24 +64,24 @@ public class KPIUtils {
         return dateTimeIntervals;
     }
 
-    public static LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+    public static LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = date;
         LocalDate nextDate = getNextLocaDateByDurationType(date, durationType);
         dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
         return nextDate;
     }
 
-    public static LocalDate getCurrentDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+    public static LocalDate getCurrentDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = getFirstLocalDateByDurationType(date, durationType);
         LocalDate nextDate = getLastLocaDateByDurationType(date, durationType);
         dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
         return nextDate;
     }
 
-    public static LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+    public static LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = date;
         LocalDate nextDate = getPriviousLocaDateByDurationType(date, durationType);
-        dateTimeIntervals.add(new DateTimeInterval(nextDate, currentDate));
+        dateTimeIntervals.add(new DateTimeInterval( nextDate, currentDate));
         return nextDate;
     }
 

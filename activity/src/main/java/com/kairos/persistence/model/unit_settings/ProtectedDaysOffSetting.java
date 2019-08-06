@@ -5,14 +5,12 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.javers.core.metamodel.annotation.Entity;
 
 import java.math.BigInteger;
 
 /**
  * Created By G.P.Ranjan on 1/7/19
  **/
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor

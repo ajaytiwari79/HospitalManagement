@@ -7,11 +7,15 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.TodoStatus;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.*;
+import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
+import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.phase.PhaseService;
@@ -28,6 +32,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.HashSet;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static java.util.Comparator.comparing;
@@ -54,6 +59,8 @@ public class ShiftDetailsService extends MongoBaseService {
     private ActivityConfigurationService activityConfigurationService;
     @Inject
     private ShiftService shiftService;
+    @Inject
+    private TodoRepository todoRepository;
 
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds , boolean showDraft) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS;
@@ -73,6 +80,16 @@ public class ShiftDetailsService extends MongoBaseService {
 
     public boolean updateRemarkInShiftActivity(BigInteger shiftActivityId, ShiftActivityDTO shiftActivityDTO) {
         shiftMongoRepository.updateRemarkInShiftActivity(shiftActivityId, shiftActivityDTO.getRemarks());
+        Shift shift = shiftMongoRepository.findShiftByShiftActivityId(shiftActivityId);
+        List<ShiftActivity> activities = shift.getActivities();
+        for(ShiftActivity activity:activities){
+            if(activity.getId().equals(shiftActivityId)){
+                Todo todo=todoRepository.findTodoBySubEntityId(activity.getActivityId(),shift.getId(),newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED));
+                todo.setRemark(shiftActivityDTO.getRemarks());
+                todoRepository.save(todo);
+            }
+        }
+
         return true;
     }
 

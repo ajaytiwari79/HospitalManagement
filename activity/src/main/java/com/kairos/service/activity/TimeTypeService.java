@@ -99,11 +99,11 @@ public class TimeTypeService extends MongoBaseService {
             List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
             shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
                 if(activitiyIds.contains(shiftActivity.getActivityId())){
-                    shiftActivity.setBackgroundColor(timeType.getBackgroundColor());
+                    shiftActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
                 }
                 shiftActivity.getChildActivities().forEach(childActivity -> {
                     if(activitiyIds.contains(childActivity.getActivityId())){
-                        childActivity.setBackgroundColor(timeType.getBackgroundColor());
+                        childActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
                     }
                 });
             }));

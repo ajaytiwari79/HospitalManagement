@@ -3,4 +3,4 @@
 MATCH (organization:Organization)-[: HAS_POSITIONS ]-(position:Position)-[: BELONGS_TO ]-(staff:Staff)
 MATCH (staff)-[rel: STAFF_HAS_EXPERTISE]->(expertise:Expertise) WHERE rel.unionRepresentative
 SET rel.unionRepresentative=false
-RETURN count(rel)
+RETURN count(rel);

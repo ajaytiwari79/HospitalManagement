@@ -161,11 +161,13 @@ public class WTABuilderService extends MongoBaseService {
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
-        wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategoryId());
-        if (isIdnull) {
-            wtaBaseRuleTemplate.setId(null);
-            wtaBaseRuleTemplate.setCountryId(null);
-        }
+
+            wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategoryId());
+            if (isIdnull) {
+                wtaBaseRuleTemplate.setId(null);
+                wtaBaseRuleTemplate.setCountryId(null);
+            }
+
         return wtaBaseRuleTemplate;
     }
 

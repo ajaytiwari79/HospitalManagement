@@ -385,5 +385,6 @@ public class ActivityMessagesConstants {
     public static final String REQUEST_ABSENCE_APPROVED = "request.absence.approved";
     public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
     public static final String REALTIME_DURATION_NOT_CONFIGURED = "realtime.duration.not.configured";
+    public static final String SHIFT_NOT_EXISTS = "shift.not.exists";
 
 }

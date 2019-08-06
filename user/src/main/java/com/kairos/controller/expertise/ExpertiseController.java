@@ -75,8 +75,8 @@ public class ExpertiseController {
     @ApiOperation(value = "Get cta and wta by expertise")
     @RequestMapping(value =  UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId,
-                                                                  @RequestParam(value = "selectedDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate));
+                                                                  @RequestParam(value = "selectedDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,@RequestParam(name="employmentId",required = false) Long employmentId) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate,employmentId));
     }
 
     @ApiOperation(value = "Get Available expertise")
