@@ -4,3 +4,5 @@ db.todo.updateMany(
 db.todo.remove({"activityName": null});
 
 db.categoryKPIConf.drop();
+
+db.kPICategory.drop();
