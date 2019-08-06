@@ -5,6 +5,7 @@ package com.kairos.service.activity;
  */
 
 import com.kairos.constants.AppConstants;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
@@ -14,6 +15,7 @@ import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
@@ -25,6 +27,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND;
 import static com.kairos.constants.AppConstants.*;
 
 public class ActivityUtil {
@@ -94,7 +97,7 @@ public class ActivityUtil {
                 calculationType = FIXED_TIME;
                 break;
             case WEEKLY_WORK_TIME:
-                calculationType = FULL_DAY_CALCULATION;
+                calculationType = CommonConstants.FULL_DAY_CALCULATION;
                 break;
             case FULL_TIME_HOUR:
                 calculationType = WEEKLY_HOURS;
@@ -235,9 +238,9 @@ public class ActivityUtil {
     }
 
     public static void updateCompositeActivities(Set<BigInteger> activityIds,Activity activity){
-        Set<CompositeActivity> compositeActivities=new HashSet<>();
+        /*Set<CompositeActivity> compositeActivities=new HashSet<>();
         activityIds.forEach(activityId-> compositeActivities.add(new CompositeActivity(activityId,false,false)));
-        activity.getCompositeActivities().addAll(compositeActivities);
+        activity.getCompositeActivities().addAll(compositeActivities);*/
 
     }
 

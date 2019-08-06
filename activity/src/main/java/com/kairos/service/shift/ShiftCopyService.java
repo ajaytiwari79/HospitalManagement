@@ -1,20 +1,18 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
@@ -40,16 +38,15 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.NO_CONFLICTS;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static java.util.stream.Collectors.groupingBy;
@@ -109,10 +106,6 @@ public class ShiftCopyService extends MongoBaseService {
         findAndAddCTAInEmployments(staffDataList, copyShiftDTO, dataWrapper, employmentIds);
         Map<Long, List<WTAQueryResultDTO>> WTAMapByEmploymentId = findAllWTAGroupByEmploymentId(employmentIds, copyShiftDTO);
         List<Long> expertiseIds = staffDataList.stream().map(staffEmploymentDetails -> staffEmploymentDetails.getExpertise().getId()).collect(Collectors.toList());
-        List<BreakSettings> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(expertiseIds);
-        Map<BigInteger, ActivityWrapper> breakActivitiesMap = shiftBreakService.getBreakActivities(breakSettings, unitId);
-        activityMap.putAll(breakActivitiesMap);
-
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllByUnitIdAndDeletedFalse(unitId); // might we add more optimization later
         if (activityConfigurations.isEmpty()) {
             exceptionService.dataNotFoundException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
@@ -134,7 +127,7 @@ public class ShiftCopyService extends MongoBaseService {
             List<WTAQueryResultDTO> wtaQueryResultDTOS = WTAMapByEmploymentId.get(staffEmployment.getId());
             List<Shift> currentStaffPreviousShifts = employmentWiseShifts.get(staffEmployment.getId());
 
-            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffEmployment, activityMap, copyShiftDTO, breakActivitiesMap, dataWrapper, breakSettings, wtaQueryResultDTOS, planningPeriodMap, activityConfigurations, currentStaffPreviousShifts);
+            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffEmployment, activityMap, copyShiftDTO,dataWrapper, wtaQueryResultDTOS, planningPeriodMap, activityConfigurations, currentStaffPreviousShifts);
             StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffEmployment.getStaff(), response.get("success"));
             StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffEmployment.getStaff(), response.get("error"));
             unCopiedShiftCount += response.get("error").size();
@@ -145,7 +138,7 @@ public class ShiftCopyService extends MongoBaseService {
         return copyShiftResponse;
     }
 
-    private Map<String, List<ShiftResponse>> copyForThisStaff(List<ShiftResponseDTO> shifts, StaffEmploymentDetails staffEmployment, Map<BigInteger, ActivityWrapper> activityMap, CopyShiftDTO copyShiftDTO, Map<BigInteger, ActivityWrapper> breakActivitiesMap, StaffEmploymentUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<WTAQueryResultDTO> wtaQueryResultDTOS, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, List<ActivityConfiguration> activityConfigurations, List<Shift> currentStaffPreviousShifts) {
+    private Map<String, List<ShiftResponse>> copyForThisStaff(List<ShiftResponseDTO> shifts, StaffEmploymentDetails staffEmployment, Map<BigInteger, ActivityWrapper> activityMap, CopyShiftDTO copyShiftDTO,  StaffEmploymentUnitDataWrapper dataWrapper, List<WTAQueryResultDTO> wtaQueryResultDTOS, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, List<ActivityConfiguration> activityConfigurations, List<Shift> currentStaffPreviousShifts) {
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
         List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs = new ArrayList<>();
@@ -187,7 +180,7 @@ public class ShiftCopyService extends MongoBaseService {
                 } else {
                     validationMessages.add(convertMessage(MESSAGE_EMPLOYMENT_NOT_ACTIVE, shiftCreationStartDate));
                 }
-                shiftResponse = addShift(validationMessages, sourceShift, staffEmployment, startDate, endDate, newShifts, breakActivitiesMap, activityMap, dataWrapper, breakSettings, activityConfigurations, planningPeriod);
+                shiftResponse = addShift(validationMessages, sourceShift, staffEmployment, startDate, endDate, newShifts, activityMap, dataWrapper, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {
                     successfullyCopiedShifts.add(shiftResponse);
                     newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter), activityMap));
@@ -212,7 +205,7 @@ public class ShiftCopyService extends MongoBaseService {
         return statusMap;
     }
 
-    private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffEmploymentDetails staffEmployment, Date startDate, Date endDate, List<Shift> newShifts, Map<BigInteger, ActivityWrapper> breakActivitiesMap, Map<BigInteger, ActivityWrapper> activityMap, StaffEmploymentUnitDataWrapper dataWrapper, List<BreakSettings> breakSettings, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
+    private ShiftResponse addShift(List<String> responseMessages, Shift sourceShift, StaffEmploymentDetails staffEmployment, Date startDate, Date endDate, List<Shift> newShifts,  Map<BigInteger, ActivityWrapper> activityMap, StaffEmploymentUnitDataWrapper dataWrapper, List<ActivityConfiguration> activityConfigurations, PlanningPeriodDTO planningPeriod) {
         if (responseMessages.isEmpty()) {
             List<ShiftActivity> shiftActivities = ObjectMapperUtils.copyPropertiesOfListByMapper(sourceShift.getActivities(),ShiftActivity.class);
             for (ShiftActivity shiftActivity : shiftActivities) {
@@ -226,9 +219,14 @@ public class ShiftCopyService extends MongoBaseService {
             Activity activity = activityMap.get(sourceShift.getActivities().get(0).getActivityId()).getActivity();
 
               ShiftType shiftType = TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
-
+            WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffEmployment.getId(), DateUtils.onlyDate(copiedShift.getStartDate()));
+            if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
+                exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
+            }
             //  ShiftType shiftType = ((FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))) ? ShiftType.ABSENCE : ShiftType.PRESENCE;
-            shiftActivities = shiftBreakService.addBreakInShiftsWhileCopy(activityMap, copiedShift, null, dataWrapper.getTimeSlotWrappers(), breakSettings);
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmployment,dataWrapper.getDayTypes());
+            List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(copiedShift, activityMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),dataWrapper.getTimeSlotWrappers());
+            copiedShift.setBreakActivities(breakActivities);
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffEmployment, planningPeriod, activityConfigurations);
             copiedShift.setShiftType(shiftType);

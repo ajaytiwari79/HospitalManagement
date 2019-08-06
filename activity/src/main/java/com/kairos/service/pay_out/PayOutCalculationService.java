@@ -5,9 +5,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
-import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
-import com.kairos.dto.activity.pay_out.PayOutDTO;
-import com.kairos.dto.activity.pay_out.PayOutIntervalDTO;
+import com.kairos.dto.activity.pay_out.*;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.CTARuletemplateBonus;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
@@ -27,6 +25,7 @@ import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
@@ -80,7 +79,7 @@ public class PayOutCalculationService {
                             ctaScheduledOrCompensationMinutes = shiftActivity.getScheduledMinutes();
                             shiftActivity.setScheduledMinutesOfPayout(shiftActivity.getScheduledMinutes()+shiftActivity.getScheduledMinutesOfPayout());
                         } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
-                            ctaScheduledOrCompensationMinutes = timeBankCalculationService.calculateCTARuleTemplateBonus(ruleTemplate, interval, shiftInterval);
+                            ctaScheduledOrCompensationMinutes = timeBankCalculationService.calculateCTARuleTemplateBonus(ruleTemplate, interval, shiftInterval).intValue();
                             ctaBonusMinutes += ctaScheduledOrCompensationMinutes;
                             shiftActivity.getPayoutPerShiftCTADistributions().add(new PayOutPerShiftCTADistribution(ruleTemplate.getName(), ctaPayoutMinMap.getOrDefault(ruleTemplate.getId(), 0)+ctaScheduledOrCompensationMinutes, ruleTemplate.getId()));
                             shiftActivity.setPayoutCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaScheduledOrCompensationMinutes);

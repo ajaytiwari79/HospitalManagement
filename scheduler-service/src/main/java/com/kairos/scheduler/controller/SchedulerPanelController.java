@@ -1,6 +1,5 @@
 package com.kairos.scheduler.controller;
 
-
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -16,9 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.scheduler.constants.ApiConstants.API_SCHEDULER_URL;
 import static com.kairos.scheduler.constants.ApiConstants.API_UNIT_SCHEDULER_URL;
@@ -124,7 +121,7 @@ public class SchedulerPanelController {
     }
 
 
-    @PostMapping(API_UNIT_SCHEDULER_URL+"time_zone")
+    @PostMapping(API_UNIT_SCHEDULER_URL+"/time_zone")
     @ApiOperation("update time zones by unit id and time zone for Scheduler Panels ")
     public ResponseEntity<ResponseDTO<Boolean>> updateSchedularPanelsDateByUnitIdAndTimeZone(@PathVariable Long unitId, @RequestBody String timeZone)  {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, schedulerPanelService.updateSchedulerPanelsByUnitIdAndTimeZone(unitId, timeZone.substring(1,timeZone.length()-1)));

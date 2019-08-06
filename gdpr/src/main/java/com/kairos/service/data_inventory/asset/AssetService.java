@@ -20,9 +20,7 @@ import com.kairos.persistence.repository.master_data.asset_management.storage_fo
 import com.kairos.persistence.repository.master_data.asset_management.tech_security_measure.TechnicalSecurityMeasureRepository;
 import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.*;
-import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import com.kairos.response.dto.data_inventory.AssetResponseDTO;
-import com.kairos.response.dto.data_inventory.RelatedProcessingActivityResponseDTO;
+import com.kairos.response.dto.data_inventory.*;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.asset_management.MasterAssetService;

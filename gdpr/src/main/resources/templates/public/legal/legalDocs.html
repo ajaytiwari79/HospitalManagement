@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymleaf.org">
+<head>
+    <title>Kairos Planning</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<header class="header">
+    <div class="container-fluid my-container">
+        <div class="nav-items">
+            <img th:src="@{/images/kairos-logo-white.png}" class="logo"/>
+        </div>
+        <div class="nav-items">
+            Back to home
+        </div>
+    </div>
+</header>
+<section class="banner-section">
+    <div class="banner-content">
+        <div class="content-wrapper">
+            OUR <span class="heading-1">LEGAL</span> POLICIES
+        </div>
+        <div class="content-wrapper-2" th:text="${selectedDoc.name}">
+
+        </div>
+
+    </div>
+    </div>
+</section>
+<section class="back-section">
+    <div class="inner-section">
+        <section class="second-section">
+            <div class="container container-tabs">
+                <div class="row tabs-section">
+                    <div class=" icon-section" th:each="document : ${legalDocs}" th:classappend="${document.id == selectedDoc.id } ? active : inactive " >
+                        <a th:href="@{/public/legal/{documentId}/{documentName}(documentId=${document.id},documentName=${document.name})}"> <div class="logo_img">
+                            <div class="img-section">
+                                <svg viewBox="0 0 100 99" class="cookies">
+
+                                    <path id="Forma_1" data-name="Forma 1" class="cls-1"
+                                          d="M91.666,413H8.333A8.343,8.343,0,0,0,0,421.333v83.334A8.343,8.343,0,0,0,8.333,513H91.667A8.343,8.343,0,0,0,100,504.667V421.333A8.343,8.343,0,0,0,91.666,413Zm5,91.667a5,5,0,0,1-5,5H8.333a5,5,0,0,1-5-5v-75H96.667v75h0Zm0-78.334H3.333v-5a5,5,0,0,1,5-5H91.667a5,5,0,0,1,5,5v5h0Zm-85-6.666H10A1.667,1.667,0,1,0,10,423h1.667A1.667,1.667,0,1,0,11.667,419.667Zm7.3,0.133a1.53,1.53,0,0,0-1.267,0,1.935,1.935,0,0,0-.55.35,1.69,1.69,0,0,0,0,2.367,1.935,1.935,0,0,0,.55.35,1.577,1.577,0,0,0,1.267,0,1.937,1.937,0,0,0,.55-0.35,1.691,1.691,0,0,0,0-2.367A1.937,1.937,0,0,0,18.967,419.8Zm6.672-.016a1.668,1.668,0,0,0-1.822.366,1.923,1.923,0,0,0-.35.55,1.57,1.57,0,0,0,0,1.267,1.937,1.937,0,0,0,.35.55,1.691,1.691,0,0,0,2.367,0,1.937,1.937,0,0,0,.35-0.55,1.4,1.4,0,0,0,.133-0.634A1.667,1.667,0,0,0,25.639,419.784ZM90,419.667H33.333a1.667,1.667,0,1,0,0,3.333H90A1.667,1.667,0,1,0,90,419.667Zm-64.412,72.7a1.629,1.629,0,0,0,.247.185,33.184,33.184,0,0,0,48.357-.015,0.687,0.687,0,0,0,.377-0.41,33.132,33.132,0,0,0,0-44.914l-0.007,0a1.6,1.6,0,0,0-.143-0.243,1.454,1.454,0,0,0-.248-0.187,33.184,33.184,0,0,0-48.333,0,1.451,1.451,0,0,0-.248.187,1.59,1.59,0,0,0-.143.243,33.131,33.131,0,0,0,0,44.913A1.63,1.63,0,0,0,25.588,492.367Zm33.5,5.878a30.631,30.631,0,0,0,5.675-10.5v0a30.518,30.518,0,0,1,5.888,3.623A30,30,0,0,1,59.092,498.245Zm13.863-9.3a33.775,33.775,0,0,0-7.243-4.442,59.413,59.413,0,0,0,1.745-13.167H79.915A29.835,29.835,0,0,1,72.955,488.942ZM79.915,468H67.457a59.444,59.444,0,0,0-1.745-13.167,33.808,33.808,0,0,0,7.243-4.438A29.835,29.835,0,0,1,79.915,468Zm-9.26-20.035a30.468,30.468,0,0,1-5.888,3.623,30.633,30.633,0,0,0-5.675-10.5A30,30,0,0,1,70.655,447.965ZM51.667,439.9c4.085,1.07,7.7,5.982,9.975,12.935a35.388,35.388,0,0,1-9.975,1.9V439.9Zm0,18.168a38.537,38.537,0,0,0,10.893-2A56.435,56.435,0,0,1,64.125,468H51.667v-9.932Zm0,13.265H64.125a56.426,56.426,0,0,1-1.565,11.929,38.535,38.535,0,0,0-10.893-2v-9.932Zm0,13.267a35.39,35.39,0,0,1,9.975,1.9c-2.277,6.953-5.89,11.865-9.975,12.935V484.6Zm-22.322,6.758a30.557,30.557,0,0,1,5.888-3.613v0a30.631,30.631,0,0,0,5.675,10.5A30,30,0,0,1,29.345,491.358Zm18.988,8.075c-4.085-1.07-7.7-5.981-9.975-12.935a35.388,35.388,0,0,1,9.975-1.9v14.833h0Zm0-18.168a38.539,38.539,0,0,0-10.893,2,56.428,56.428,0,0,1-1.565-11.932H48.333v9.932Zm0-13.265H35.875a56.417,56.417,0,0,1,1.565-11.928,38.534,38.534,0,0,0,10.893,2V468Zm0-28.1v14.835a35.355,35.355,0,0,1-9.975-1.9C40.635,445.88,44.248,440.968,48.333,439.9Zm-7.425,1.18a30.626,30.626,0,0,0-5.675,10.51v0a30.518,30.518,0,0,1-5.888-3.623A30,30,0,0,1,40.908,441.078Zm-13.863,9.314a33.811,33.811,0,0,0,7.243,4.441A59.421,59.421,0,0,0,32.543,468H20.085A29.832,29.832,0,0,1,27.045,450.392Zm5.5,20.941A59.436,59.436,0,0,0,34.288,484.5a33.808,33.808,0,0,0-7.243,4.438,29.831,29.831,0,0,1-6.96-17.6H32.543Z"
+                                          transform="translate(0 -413)" />
+                                </svg>
+                            </div>
+                            <span class="text-center icon-content" th:text="${document.name}"></span>
+                        </div>
+                        </a>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+    </div>
+    <div class="inner-section">
+        <div class="container content-container container-tabs content-overflow" th:utext="${selectedDoc.bodyContentInHtml}">
+
+
+
+        </div>
+
+    </div>
+    </div>
+</section>
+
+
+<script
+        src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

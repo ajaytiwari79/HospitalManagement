@@ -1,9 +1,7 @@
 package com.kairos.scheduler.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.*;
 
 import java.math.BigInteger;
 import java.util.Date;

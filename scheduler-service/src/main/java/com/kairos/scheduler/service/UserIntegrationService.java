@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static com.kairos.scheduler.constants.ApiConstants.SCHEDULER_EXECUTE_JOB;
-
 @Service
 public class UserIntegrationService {
 

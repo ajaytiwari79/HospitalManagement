@@ -11,17 +11,10 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
+import javax.activation.*;
 import javax.inject.Inject;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.Multipart;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import javax.mail.*;
+import javax.mail.internet.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -40,7 +33,7 @@ import static com.kairos.constants.CommonConstants.*;
 
 @Service
 public class MailService {
-    static final Logger logger = LoggerFactory.getLogger(MailService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
 
     @Inject
     private JavaMailSender javaMailSender;
@@ -65,9 +58,9 @@ public class MailService {
             request.setEndpoint(MAIL_REQUEST_ENDPOINT);
             request.setBody(mail.build());
             Response response = sendGrid.api(request);
-            logger.info("Mail response {}", response.getBody());
+            LOGGER.info("Mail response {}", response.getBody());
         } catch (IOException ex) {
-            logger.error("exception occured {}", ex);
+            LOGGER.error("exception occured {}", ex);
         }
 
     }
@@ -83,25 +76,25 @@ public class MailService {
 
             StringBuilder sb = getRecipientsFromArray(recipients);
             String recipientsString = sb.toString();
-            logger.info("List: {}",recipientsString);
+            LOGGER.info("List: {}",recipientsString);
             mail.setFrom("info@kairosplanning.com");
             mail.setRecipients(Message.RecipientType.TO,InternetAddress.parse(recipientsString));
             mail.setSubject(subject);
             mail.setText(message);
             bodyPart.setFileName(source.getName());
-            logger.info("File has dataType: {}",source.getContentType());
+            LOGGER.info("File has dataType: {}",source.getContentType());
             bodyPart.setDataHandler(new DataHandler(source));
             multipart.addBodyPart(bodyPart);
             mail.setContent(multipart);
 
             javaMailSender.send(mail);
 
-            logger.info("Message send successfully....");
+            LOGGER.info("Message send successfully....");
             return true;
 
 
             } catch (Exception e) {
-             logger.info("exception occured {}",e);
+             LOGGER.info("exception occured {}",e);
              return false;
             }
 
@@ -114,7 +107,7 @@ public class MailService {
         Personalization personalization = new Personalization();
         for (String receiver : receivers) {
             if(StringUtils.isBlank(receiver) || StringUtils.containsWhitespace(receiver)){
-                logger.info("Receiver is {}",receiver);
+                LOGGER.info("Receiver is {}",receiver);
                 throw new InvalidRequestException("Receiver E-mail id is not correct");
             }
             personalization.addTo(new Email(receiver));

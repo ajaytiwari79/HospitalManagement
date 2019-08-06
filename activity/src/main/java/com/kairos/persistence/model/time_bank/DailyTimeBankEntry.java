@@ -39,6 +39,8 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     //It is the sum of scheduledMinutesOfTimeBank + ctaBonusMinutesOfTimeBank
     private int plannedMinutesOfTimebank;
     private Map<LocalDate,Integer> publishedBalances;
+    private boolean anyShiftInDraft;
+    private int draftDeltaTimebankMinutes;
 
 
     public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date) {
@@ -46,6 +48,15 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.staffId = staffId;
         this.date = date;
         this.publishedBalances = new HashMap<>();
+    }
+
+    public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date,int contractualMinutes,int deltaTimeBankMinutes) {
+        this.employmentId = employmentId;
+        this.staffId = staffId;
+        this.date = date;
+        this.publishedBalances = new HashMap<>();
+        this.contractualMinutes = contractualMinutes;
+        this.deltaTimeBankMinutes = deltaTimeBankMinutes;
     }
 
     public List<TimeBankCTADistribution> getTimeBankCTADistributionList() {

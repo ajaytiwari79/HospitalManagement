@@ -21,7 +21,7 @@ import java.util.Objects;
 @PlanningEntity
 public class ActivityLineInterval implements StaffingLineInterval, Comparable<ActivityLineInterval> {
 
-    private static Logger log= LoggerFactory.getLogger(ActivityLineInterval.class);
+    private static Logger log = LoggerFactory.getLogger(ActivityLineInterval.class);
 
     private String id;
     private ActivityLineInterval previous;
@@ -31,18 +31,22 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     private Activity activity;
     @PlanningVariable(valueRangeProviderRefs = "shifts", nullable = true)
     private ShiftImp shift;
+
     public ActivityLineInterval() {
     }
+
     private int duration;
     private int staffNo;
+
     public ActivityLineInterval(String id, DateTime start, int duration, boolean required, Activity activity, int staffNo) {
-        this.id=id;
+        this.id = id;
         this.start = start;
         this.duration = duration;
         this.required = required;
         this.activity = activity;
         this.staffNo = staffNo;
     }
+
     public Activity getActivity() {
         return activity;
     }
@@ -60,7 +64,6 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     }
 
 
-
     public boolean isRequired() {
         return required;
     }
@@ -68,8 +71,9 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     public void setRequired(boolean required) {
         this.required = required;
     }
-    public Interval getInterval(){
-        return start==null?null:new Interval(start,start.plusMinutes(duration));
+
+    public Interval getInterval() {
+        return start == null ? null : new Interval(start, start.plusMinutes(duration));
     }
 
     public String getIntervalAsString() {
@@ -77,7 +81,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     }
 
     @Deprecated
-    public boolean overlaps(StaffingLineInterval staffingLineInterval){
+    public boolean overlaps(StaffingLineInterval staffingLineInterval) {
         return Objects.equals(this.getInterval(), staffingLineInterval.getInterval()) &&
                 this.getClass().isInstance(staffingLineInterval) || this.getActivity().getSkills().contains(((SkillLineInterval) staffingLineInterval).getSkill());
     }
@@ -92,15 +96,17 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
 
     @Override
     public String toString() {
-        return id+"-"+staffNo+"-"+ activity.getName()+"-"+getIntervalAsString();
-    }
-    public String getLabel() {
-        return id+"---"+getIntervalAsString();
+        return id + "-" + staffNo + "-" + activity.getName() + "-" + getIntervalAsString();
     }
 
-    public boolean similarInterval(Interval interval){
+    public String getLabel() {
+        return id + "---" + getIntervalAsString();
+    }
+
+    public boolean similarInterval(Interval interval) {
         return this.getInterval().equals(interval);
     }
+
     public ActivityLineInterval getPrevious() {
         return previous;
     }
@@ -116,6 +122,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     public void setNext(ActivityLineInterval next) {
         this.next = next;
     }
+
     public int getDuration() {
         return duration;
     }
@@ -123,8 +130,9 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     public void setDuration(int duration) {
         this.duration = duration;
     }
-    public DateTime getEnd(){
-        return start==null?null:start.plusMinutes(duration);
+
+    public DateTime getEnd() {
+        return start == null ? null : start.plusMinutes(duration);
     }
 
     public int getStaffNo() {
@@ -134,16 +142,19 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     public void setStaffNo(int staffNo) {
         this.staffNo = staffNo;
     }
+
     public String getId() {
         return id;
     }
-    public boolean overlapsActivity(ActivityLineInterval ali){
-        boolean overlaps=staffNo!=ali.staffNo && start.equals(ali.start)  && Objects.equals(shift,ali.shift);
+
+    public boolean overlapsActivity(ActivityLineInterval ali) {
+        boolean overlaps = staffNo != ali.staffNo && start.equals(ali.start) && Objects.equals(shift, ali.shift);
         return overlaps;
     }
+
     //TODO this should be a shift constraint for performance of fetching a shift is easier than fethcing a ali from drools memory
-    public boolean overlapOnBreak(){
-        return shift.getBreaks()!=null && shift.getBreaks().stream().filter(brk->brk.getInterval().overlaps(this.getInterval())).findFirst().isPresent();
+    public boolean overlapOnBreak() {
+        return shift.getBreaks() != null && shift.getBreaks().stream().filter(brk -> brk.getInterval().overlaps(this.getInterval())).findFirst().isPresent();
     }
 
     @Override

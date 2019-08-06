@@ -1,8 +1,6 @@
 package com.kairos.utils.counter;
 
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.enums.DurationType;
@@ -39,7 +37,7 @@ public class KPIUtils {
     public static List<DateTimeInterval> getDateTimeIntervals(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates) {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         if(isCollectionNotEmpty(filterDates)){
-            dateTimeIntervals.add(new DateTimeInterval(filterDates.get(0),filterDates.get(1)));
+            dateTimeIntervals.add(new DateTimeInterval(asLocalDate(filterDates.get(0).toString()),asLocalDate(filterDates.get(1).toString())));
             return dateTimeIntervals;
         }
         LocalDate currentDate = DateUtils.getCurrentLocalDate();
@@ -66,24 +64,24 @@ public class KPIUtils {
         return dateTimeIntervals;
     }
 
-    public static LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+    public static LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = date;
         LocalDate nextDate = getNextLocaDateByDurationType(date, durationType);
         dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
         return nextDate;
     }
 
-    public static LocalDate getCurrentDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+    public static LocalDate getCurrentDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = getFirstLocalDateByDurationType(date, durationType);
         LocalDate nextDate = getLastLocaDateByDurationType(date, durationType);
         dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
         return nextDate;
     }
 
-    public static LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+    public static LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = date;
         LocalDate nextDate = getPriviousLocaDateByDurationType(date, durationType);
-        dateTimeIntervals.add(new DateTimeInterval(nextDate, currentDate));
+        dateTimeIntervals.add(new DateTimeInterval( nextDate, currentDate));
         return nextDate;
     }
 

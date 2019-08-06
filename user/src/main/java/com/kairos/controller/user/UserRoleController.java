@@ -1,11 +1,7 @@
 package com.kairos.controller.user;
 
-import com.kairos.persistence.model.auth.Role;
-import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.auth.UserRole;
-import com.kairos.service.auth.RoleServiceUser;
-import com.kairos.service.auth.UserRoleServiceUser;
-import com.kairos.service.auth.UserService;
+import com.kairos.persistence.model.auth.*;
+import com.kairos.service.auth.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;

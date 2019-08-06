@@ -1,7 +1,7 @@
 package com.kairos.utils;
 
 import com.kairos.enums.Gender;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
 import java.time.Period;

@@ -7,8 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /*
 * Created By Pradeep singh rajawat
@@ -25,11 +24,16 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
     @Query(value = "{employmentId:{$in:?0},deleted:false,date:{$gte:?1 , $lt:?2}}")
     List<DailyTimeBankEntry> findAllDailyTimeBankByIdsAndBetweenDates(List<Long> employmentIds, Date startDate, Date endDate);
 
+    @Query(value = "{staffId:{$in:?0},deleted:false,date:{$gte:?1 , $lte:?2}}")
+    List<DailyTimeBankEntry> findAllDailyTimeBankByStaffIdsAndBetweenDates(List<Long> staffIds, LocalDate startDate, LocalDate endDate);
+
     @Query("{employmentId:?0,deleted:false,date:{$lt:?1}}")
     List<DailyTimeBankEntry> findAllByEmploymentIdAndBeforeDate(Long employmentId, Date timeBankDate);
 
+
     @Query("{employmentId:{$in:?0},deleted:false,date:{ $lte:?1}}")
     List<DailyTimeBankEntry> findAllByEmploymentIdsAndBeforDate(List<Long> employmentIds, Date endDate);
+
 
     @Query(value = "{employmentId:{$in:?0},deleted:false,date:{$gte:?1 , $lt:?2}}",delete = true)
     void deleteDailyTimeBank(List<Long> employmentIds, Date startDate, Date endDate);
@@ -42,5 +46,8 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
 
     @Query("{employmentId:?0,deleted:false,date:?1}")
     DailyTimeBankEntry findByEmploymentAndDate(Long employmentId, LocalDate startDate);
+
+    @Query("{employmentId:{$in:?0},deleted:false,date:{$gte:?1 , $lte:?2}}")
+    List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, Date startDate, Date endDate);
 
 }

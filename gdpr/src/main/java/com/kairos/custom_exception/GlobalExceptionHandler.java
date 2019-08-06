@@ -1,29 +1,22 @@
 package com.kairos.custom_exception;
 
-
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.custom_exception.DuplicateDataException;
-import com.kairos.commons.custom_exception.InvalidRequestException;
+import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static com.kairos.constants.GdprMessagesConstants.INTERNAL_SERVER_ERROR;
 /*
  *
  *  created by bobby 25/4/2018
@@ -85,6 +78,15 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         result.put("request URl", request.getRequestURI());
         return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
 
+    }
+
+    @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class, Exception.class, MessagingException.class})
+    public ResponseEntity<Object> handleInternal(final Exception ex, final WebRequest request) {
+        logger.error("error in user service ", ex);
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setSuccess(false);
+        errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
+        return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
 

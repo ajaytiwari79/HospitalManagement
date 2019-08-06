@@ -122,9 +122,7 @@ public class AppConstants {
     public static final String ENTERED_TIMES = "ENTERED_TIMES";
     public static final String WEEKLY_HOURS = "WEEKLY_HOURS";
     public static final String FIXED_TIME = "FIXED_TIME";
-    public static final String FULL_DAY_CALCULATION = "FULL_DAY";
     public static final String ENTERED_MANUALLY = "ENTERED_MANUALLY";
-    public static final String FULL_WEEK = "FULL_WEEK";
     //hours calculation types
     public static final String TIMEBANK_ACCOUNT = "TIMEBANK_ACCOUNT";
     public static final String PAIDOUT_ACCOUNT = "PAID_OUT";
@@ -205,7 +203,10 @@ public class AppConstants {
     public static final String HOURS = "Hours";
     public static final String CONTRACTUAL_HOURS = "Contractual Hours";
     public static final String PLANNED_HOURS = "Planned Hours";
+    public static final String TIME_BANK ="time bank";
     public static final String STAFF = "Staff";
+    public static final String STAFF_LIST = "Staff Name";
+
     public static final String DATE = "Dates";
     public static final String LABEL = "label";
     public static final String VALUE_FIELD = "value";
@@ -215,10 +216,10 @@ public class AppConstants {
     public static final String KPI_DEFAULT_COLOR = "#b7b7b7";
     public static final String SEND_GRID_API_KEY = "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";
 
-    public static final short MULTIPLE_ACTIVITY = 1;
-
     //for use timeslot in timeslot kpi
     public static final String NIGHT = "Night";
+    public static final String EVENING = "Evening";
+    public static final String DAY = "Day";
 
     //Timebank Ruletemplate not valid reason
     public static final String DAYTYPE_IS_NOT_VALID = "Daytype is not valid";
@@ -231,5 +232,7 @@ public class AppConstants {
 
     //activity status mail
     public static final String MAIL_SUBJECT ="Activiy Status";
+
+    public static final String UNCATEGORIZED = "Uncategorized";
 
 }

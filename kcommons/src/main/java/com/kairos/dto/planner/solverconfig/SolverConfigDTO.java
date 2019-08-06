@@ -6,7 +6,6 @@ import com.kairos.dto.planner.constarints.ConstraintDTO;
 import com.kairos.enums.TimeTypeEnum;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;

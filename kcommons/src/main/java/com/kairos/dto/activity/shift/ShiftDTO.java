@@ -1,12 +1,12 @@
 package com.kairos.dto.activity.shift;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.Duration;
 import org.joda.time.Interval;
@@ -20,12 +20,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 
 /**
  * Created by vipul on 30/8/17.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class ShiftDTO {
 
     protected BigInteger id;
@@ -78,14 +81,22 @@ public class ShiftDTO {
     private boolean deleted;
     private ShiftDTO draftShift;
     private boolean draft;
-
+    private RequestAbsenceDTO requestAbsence;
+    private List<ShiftActivityDTO> breakActivities;
+    private boolean hasOriginalShift;
 
 
     public ShiftDTO() {
         //default Const
     }
 
-    public ShiftDTO(Date startDate, Date endDate,List<ShiftActivityDTO> activities) {
+    public ShiftDTO(@NotNull(message = "message.shift.shiftDate") LocalDate shiftDate,List<ShiftActivityDTO> activities,BigInteger id) {
+        this.shiftDate = shiftDate;
+        this.activities = activities;
+        this.id = id;
+    }
+
+    public ShiftDTO(Date startDate, Date endDate, List<ShiftActivityDTO> activities) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.activities = activities;
@@ -115,111 +126,9 @@ public class ShiftDTO {
         this.endDate = endDate;
     }
 
-    public ShiftDTO getDraftShift() {
-        return draftShift;
-    }
-
-    public void setDraftShift(ShiftDTO draftShift) {
-        this.draftShift = draftShift;
-    }
-
-    public boolean isDraft() {
-        return draft;
-    }
-
-    public void setDraft(boolean draft) {
-        this.draft = draft;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public boolean isEditable() {
-        return editable;
-    }
-
-    public void setEditable(boolean editable) {
-        this.editable = editable;
-    }
-
-    public BigInteger getShiftId() {
-        return shiftId;
-    }
-
-    public void setShiftId(BigInteger shiftId) {
-        this.shiftId = shiftId;
-    }
-
-    public int getScheduledMinutes() {
-        return scheduledMinutes;
-    }
-
-    public void setScheduledMinutes(int scheduledMinutes) {
-        this.scheduledMinutes = scheduledMinutes;
-    }
-
-    public int getDurationMinutes() {
-        return durationMinutes;
-    }
-
-    public void setDurationMinutes(int durationMinutes) {
-        this.durationMinutes = durationMinutes;
-    }
-
-    public LocalDateTime getClockIn() {
-        return clockIn;
-    }
-
-    public void setClockIn(LocalDateTime clockIn) {
-        this.clockIn = clockIn;
-    }
-
-    public LocalDateTime getClockOut() {
-        return clockOut;
-    }
-
-    public void setClockOut(LocalDateTime clockOut) {
-        this.clockOut = clockOut;
-    }
-
-
     @JsonIgnore
     public DateTimeInterval getInterval() {
         return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), this.getActivities().get(this.getActivities().size()-1).getEndDate().getTime());
-    }
-
-    public ShiftType getShiftType() {
-        return shiftType;
-    }
-
-    public void setShiftType(ShiftType shiftType) {
-        this.shiftType = shiftType;
-    }
-
-    public LocalDate getValidated() {
-        return validated;
-    }
-
-    public void setValidated(LocalDate validated) {
-        this.validated = validated;
-    }
-
-    public Long getExpertiseId() {
-        return expertiseId;
-    }
-
-    public void setExpertiseId(Long expertiseId) {
-        this.expertiseId = expertiseId;
-    }
-
-
-    public List<ShiftActivityDTO> getActivities() {
-        return activities;
     }
 
     public void setActivities(List<ShiftActivityDTO> activities) {
@@ -229,104 +138,24 @@ public class ShiftDTO {
         this.activities = activities;
     }
 
-    public BigInteger getPlannedTimeId() {
-        return plannedTimeId;
-    }
-
-    public void setPlannedTimeId(BigInteger plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
-    }
-
-    public LocalDate getShiftDate() {
-        return shiftDate;
-    }
-
-    public void setShiftDate(LocalDate shiftDate) {
-        this.shiftDate = shiftDate;
-    }
-
-    public AccessGroupRole getAccessGroupRole() {
-        return accessGroupRole;
-    }
-
-    public void setAccessGroupRole(AccessGroupRole accessGroupRole) {
-        this.accessGroupRole = accessGroupRole;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-
-    public long getBid() {
-        return bid;
-    }
-
-    public void setBid(long bid) {
-        this.bid = bid;
-    }
-
-    public long getpId() {
-        return pId;
-    }
-
-    public void setpId(long pId) {
-        this.pId = pId;
-    }
-
-
-    public long getAmount() {
-        return amount;
-    }
-
-    public void setAmount(long amount) {
-        this.amount = amount;
-    }
-
-    public long getProbability() {
-        return probability;
-    }
-
-    public void setProbability(long probability) {
-        this.probability = probability;
-    }
-
-    public BigInteger getShiftStatePhaseId() {
-        return shiftStatePhaseId;
-    }
-
-    public void setShiftStatePhaseId(BigInteger shiftStatePhaseId) {
-        this.shiftStatePhaseId = shiftStatePhaseId;
-    }
 
     @JsonIgnore
     public Duration getDuration() {
         return new Interval(this.activities.get(0).getStartDate().getTime(), this.activities.get(activities.size()-1).getEndDate().getTime()).toDuration();
     }
 
-    public String getRemarks() {
-        return remarks;
+    public void setBreakActivities(List<ShiftActivityDTO> breakActivities) {
+        this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
     }
 
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
+    public boolean isMultipleActivity() {
+        Set<BigInteger> multipleActivityCount = new HashSet<>();
+        for (ShiftActivityDTO activity : this.getActivities()) {
+            if (!activity.isBreakShift()) {
+                multipleActivityCount.add(activity.getActivityId());
+            }
+        }
+        return multipleActivityCount.size() > MULTIPLE_ACTIVITY;
     }
 
     public Date getStartDate() {
@@ -337,11 +166,6 @@ public class ShiftDTO {
          return this.startDate;
     }
 
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
     public Date getEndDate() {
         if(isNull(endDate) && isCollectionNotEmpty(activities)){
             activities.sort(Comparator.comparing(ShiftActivityDTO::getStartDate));
@@ -350,150 +174,15 @@ public class ShiftDTO {
         return this.endDate;
     }
 
-
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
-
-    public Long getAllowedBreakDurationInMinute() {
-        return allowedBreakDurationInMinute;
-    }
-
-    public void setAllowedBreakDurationInMinute(Long allowedBreakDurationInMinute) {
-        this.allowedBreakDurationInMinute = allowedBreakDurationInMinute;
-    }
-
-    public BigInteger getParentOpenShiftId() {
-        return parentOpenShiftId;
-    }
-
-    public void setParentOpenShiftId(BigInteger parentOpenShiftId) {
-        this.parentOpenShiftId = parentOpenShiftId;
-    }
-
-    public ShiftTemplateDTO getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(ShiftTemplateDTO template) {
-        this.template = template;
-    }
-
-    public boolean isFunctionDeleted() {
-        return functionDeleted;
-    }
-
-    public void setFunctionDeleted(boolean functionDeleted) {
-        this.functionDeleted = functionDeleted;
-    }
-
-    public boolean isMultipleActivity() {
-        return multipleActivity;
-    }
-
-    public void setMultipleActivity(boolean multipleActivity) {
-        this.multipleActivity = multipleActivity;
-    }
-
-    public int getTimeBankCtaBonusMinutes() {
-        return timeBankCtaBonusMinutes;
-    }
-
-    public void setTimeBankCtaBonusMinutes(int timeBankCtaBonusMinutes) {
-        this.timeBankCtaBonusMinutes = timeBankCtaBonusMinutes;
-    }
-
-    public int getDeltaTimeBankMinutes() {
-        return deltaTimeBankMinutes;
-    }
-
-    public void setDeltaTimeBankMinutes(int deltaTimeBankMinutes) {
-        this.deltaTimeBankMinutes = deltaTimeBankMinutes;
-    }
-
-    public long getAccumulatedTimeBankMinutes() {
-        return accumulatedTimeBankMinutes;
-    }
-
-    public void setAccumulatedTimeBankMinutes(long accumulatedTimeBankMinutes) {
-        this.accumulatedTimeBankMinutes = accumulatedTimeBankMinutes;
-    }
-
-    public int getPlannedMinutesOfTimebank() {
-        return plannedMinutesOfTimebank;
-    }
-
-    public void setPlannedMinutesOfTimebank(int plannedMinutes) {
-        this.plannedMinutesOfTimebank = plannedMinutes;
-    }
-
-    public BigInteger getPlanningPeriodId() {
-        return planningPeriodId;
-    }
-
-    public void setPlanningPeriodId(BigInteger planningPeriodId) {
-        this.planningPeriodId = planningPeriodId;
-    }
-
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-    public int getRestingMinutes() {
-        return restingMinutes;
-    }
-
-    public void setRestingMinutes(int restingMinutes) {
-        this.restingMinutes = restingMinutes;
-    }
-
-    public Set<ShiftEscalationReason> getEscalationReasons() {
-        return escalationReasons;
-    }
-
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
         this.escalationReasons = isNullOrElse(escalationReasons,new HashSet<>());
     }
-
-    public Long getFunctionId() {
-        return functionId;
-    }
-
-    public void setFunctionId(Long functionId) {
-        this.functionId = functionId;
-    }
-
     public Set<BigInteger> getEscalationFreeShiftIds() {
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
     }
 
-    public void setEscalationFreeShiftIds(Set<BigInteger> escalationFreeShiftIds) {
-        this.escalationFreeShiftIds = escalationFreeShiftIds;
-    }
-
-    public boolean isEscalationResolved() {
-        return escalationResolved;
-    }
-
-    public void setEscalationResolved(boolean escalationResolved) {
-        this.escalationResolved = escalationResolved;
+    public boolean isHasOriginalShift() {
+        return !draft;
     }
 
     @Override

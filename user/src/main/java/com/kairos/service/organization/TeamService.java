@@ -6,10 +6,7 @@ import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
-import com.kairos.persistence.model.organization.StaffTeamRelationship;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
@@ -339,9 +336,18 @@ public class TeamService {
         Set<Long> staffIds = getUnionOfList(new ArrayList<>(teamDTO.getMainTeamLeaderIds()), new ArrayList<>(teamDTO.getActingTeamLeaderIds()));
         List<Staff> staffList = staffGraphRepository.findAllById(new ArrayList<>(staffIds));
         teamGraphRepository.removeAllStaffsFromTeam(teamDTO.getId());
+
         List<StaffTeamRelationship> staffTeamRelationships = new ArrayList<>();
+        List<StaffTeamRelationship>  staffTeamRelationShipQueryResults = staffTeamRelationshipGraphRepository.findByStaffIdsAndTeamId(staffIds,teamDTO.getId());
+        Map<Long,StaffTeamRelationship> staffTeamRelationShipQueryResultMap = staffTeamRelationShipQueryResults.stream().collect(Collectors.toMap(k->k.getStaff().getId(),v->v));
         staffList.forEach(staff -> {
-            staffTeamRelationships.add(new StaffTeamRelationship(team, staff, teamDTO.getMainTeamLeaderIds().contains(staff.getId()) ? StaffTeamRelationship.LeaderType.MAIN_LEAD : StaffTeamRelationship.LeaderType.ACTING_LEAD));
+            if(staffTeamRelationShipQueryResultMap.containsKey(staff.getId())){
+                StaffTeamRelationship staffTeamRelationship = staffTeamRelationShipQueryResultMap.get(staff.getId());
+                staffTeamRelationship.setLeaderType(teamDTO.getMainTeamLeaderIds().contains(staff.getId()) ? StaffTeamRelationship.LeaderType.MAIN_LEAD : StaffTeamRelationship.LeaderType.ACTING_LEAD);
+                staffTeamRelationships.add(staffTeamRelationship);
+            }else {
+                staffTeamRelationships.add(new StaffTeamRelationship(team, staff, teamDTO.getMainTeamLeaderIds().contains(staff.getId()) ? StaffTeamRelationship.LeaderType.MAIN_LEAD : StaffTeamRelationship.LeaderType.ACTING_LEAD));
+            }
         });
         if (isCollectionNotEmpty(staffTeamRelationships)) {
             staffTeamRelationshipGraphRepository.saveAll(staffTeamRelationships);

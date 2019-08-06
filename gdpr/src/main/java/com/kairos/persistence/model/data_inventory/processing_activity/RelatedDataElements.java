@@ -1,18 +1,11 @@
 package com.kairos.persistence.model.data_inventory.processing_activity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import javax.validation.constraints.Min;
-
 import com.kairos.enums.gdpr.RetentionDuration;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -1,17 +1,20 @@
 package com.kairos.service.activity;
 
-
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.activity.ActivityTagDTO;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -35,6 +38,7 @@ public class TimeTypeService extends MongoBaseService {
     private ActivityCategoryService activityCategoryService;
     @Inject
     private UserIntegrationService userIntegrationService;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -90,7 +94,33 @@ public class TimeTypeService extends MongoBaseService {
         }
         timeType.setLabel(timeTypeDTO.getLabel());
         timeType.setDescription(timeTypeDTO.getDescription());
+        if(!timeType.getBackgroundColor().equals(timeTypeDTO.getBackgroundColor())){
+            Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeType.getId()).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
+            shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
+                if(activitiyIds.contains(shiftActivity.getActivityId())){
+                    shiftActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                }
+                shiftActivity.getChildActivities().forEach(childActivity -> {
+                    if(activitiyIds.contains(childActivity.getActivityId())){
+                        childActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                    }
+                });
+            }));
+            if(isCollectionNotEmpty(shifts)){
+                shiftMongoRepository.saveEntities(shifts);
+            }
+        }
         timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeType.getId());
+        if (isCollectionNotEmpty(activities)) {
+            activities.forEach(activity ->
+            {
+                activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor());
+            });
+            activityMongoRepository.saveEntities(activities);
+        }
+
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
@@ -300,6 +330,7 @@ public class TimeTypeService extends MongoBaseService {
         TimeType vetoTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", AppConstants.NON_WORKING_TYPE_COLOR, VETO, countryId, Collections.EMPTY_SET);
         TimeType stopBrickTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", AppConstants.NON_WORKING_TYPE_COLOR, STOP_BRICK, countryId, Collections.EMPTY_SET);
         TimeType availableTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Available Time", "", AppConstants.NON_WORKING_TYPE_COLOR, AVAILABLE_TIME, countryId, Collections.EMPTY_SET);
+        TimeType protectedDaysOff = new TimeType(TimeTypes.NON_WORKING_TYPE, "Protected Days off", "", AppConstants.NON_WORKING_TYPE_COLOR, PROTECTED_DAYS_OFF, countryId, Collections.EMPTY_SET);
         nonWorkingTimeTypes.add(volunteerTimeType);
         nonWorkingTimeTypes.add(timeBankOffTimeType);
         nonWorkingTimeTypes.add(unPaidBreakTimeType);
@@ -311,11 +342,11 @@ public class TimeTypeService extends MongoBaseService {
         nonWorkingTimeTypes.add(vetoTimeType);
         nonWorkingTimeTypes.add(stopBrickTimeType);
         nonWorkingTimeTypes.add(availableTimeType);
-
+        nonWorkingTimeTypes.add(protectedDaysOff);
         allTimeTypes.addAll(workingTimeTypes);
         allTimeTypes.addAll(nonWorkingTimeTypes);
 
-        save(allTimeTypes);
+        timeTypeMongoRepository.saveEntities(allTimeTypes);
 
         return true;
     }
