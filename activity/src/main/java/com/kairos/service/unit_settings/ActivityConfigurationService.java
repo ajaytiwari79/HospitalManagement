@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 
@@ -45,8 +46,9 @@ public class ActivityConfigurationService extends MongoBaseService {
             exceptionService.actionNotPermittedException(MESSAGE_ALREADY_EXISTS);
         }
         List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
-        if (phases == null || phases.isEmpty())
+        if (isCollectionEmpty(phases)) {
             phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+        }
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
         Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
         Optional<PresenceTypeDTO> extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny();

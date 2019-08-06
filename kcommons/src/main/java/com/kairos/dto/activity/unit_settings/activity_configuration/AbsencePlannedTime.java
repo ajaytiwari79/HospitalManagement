@@ -1,59 +1,34 @@
 package com.kairos.dto.activity.unit_settings.activity_configuration;
 
-import java.math.BigInteger;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.math.BigInteger;
+import java.util.List;
+
+@Getter
+@Setter
 public class AbsencePlannedTime {
     private BigInteger phaseId;
     private BigInteger timeTypeId;  // if exception is true then time type is null
-    private BigInteger plannedTimeId;
+    private List<BigInteger> plannedTimeIds;
     private boolean exception;
 
     public AbsencePlannedTime() {
         // DC
     }
 
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
 
-    public void setPhaseId(BigInteger phaseId) {
+    public AbsencePlannedTime(BigInteger phaseId,List<BigInteger> plannedTimeIds, boolean exception) {
         this.phaseId = phaseId;
-    }
-
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
-    }
-
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
-    }
-
-    public BigInteger getPlannedTimeId() {
-        return plannedTimeId;
-    }
-
-    public void setPlannedTimeId(BigInteger plannedTimeId) {
-        this.plannedTimeId = plannedTimeId;
-    }
-
-    public boolean isException() {
-        return exception;
-    }
-
-    public void setException(boolean exception) {
+        this.plannedTimeIds = plannedTimeIds;
         this.exception = exception;
     }
 
-    public AbsencePlannedTime(BigInteger phaseId,  BigInteger plannedTimeId, boolean exception) {
-        this.phaseId = phaseId;
-        this.plannedTimeId = plannedTimeId;
-        this.exception = exception;
-    }
-
-    public AbsencePlannedTime(BigInteger phaseId, BigInteger timeTypeId, BigInteger plannedTimeId, boolean exception) {
+    public AbsencePlannedTime(BigInteger phaseId, BigInteger timeTypeId, List<BigInteger> plannedTimeIds, boolean exception) {
         this.phaseId = phaseId;
         this.timeTypeId = timeTypeId;
-        this.plannedTimeId = plannedTimeId;
+        this.plannedTimeIds = plannedTimeIds;
         this.exception = exception;
     }
 }
