@@ -38,6 +38,7 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.enums.shift.TodoStatus.APPROVE;
 import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
+import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
  * Created by pradeep
@@ -93,7 +94,7 @@ public class RequestAbsenceService {
     }
 
     public <T> T approveRequestAbsence(Todo todo){
-        T response = null;
+        T response = (T)todo;
         Optional<Shift> shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
         if(!shiftOptional.isPresent()){
             exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
@@ -127,13 +128,14 @@ public class RequestAbsenceService {
             }else {
                 List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
                 for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
-                    shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
+                    shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().filter(shiftActivityDTO -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivityDTO.getStatus())).map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
                 }
                 response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
+                shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
                 shiftOptional.get().setRequestAbsence(null);
                 shiftMongoRepository.save(shiftOptional.get());
             }
-        }else {
+        }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
             todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
@@ -178,10 +180,15 @@ public class RequestAbsenceService {
 
     private List<ShiftActivity> updateShiftActivity(ActivityWrapper activityWrapper,DateTimeInterval dateTimeInterval, List<ShiftActivity> shiftActivities, ShiftActivity shiftActivity) {
         ShiftActivity absenceActivity = new ShiftActivity(activityWrapper.getActivity().getName(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate(),activityWrapper.getActivity().getId(),activityWrapper.getTimeType());
+        absenceActivity.getStatus().add(ShiftStatus.REQUEST);
         if(shiftActivity.getInterval().overlaps(dateTimeInterval)){
             List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(dateTimeInterval);
             for (DateTimeInterval timeInterval : dateTimeIntervals) {
-                shiftActivities.add(new ShiftActivity(shiftActivity.getActivityName(),timeInterval.getStartDate(),timeInterval.getEndDate(),shiftActivity.getActivityId(),shiftActivity.getTimeType()));
+                ShiftActivity updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity,ShiftActivity.class);
+                updatedShiftActivity.setPlannedTimes(new ArrayList<>());
+                updatedShiftActivity.setStartDate(timeInterval.getStartDate());
+                updatedShiftActivity.setEndDate(timeInterval.getEndDate());
+                shiftActivities.add(updatedShiftActivity);
             }
             shiftActivities.add(absenceActivity);
         }else {

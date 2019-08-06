@@ -236,14 +236,17 @@ public class SchedulerPanelService extends MongoBaseService {
         List<SchedulerPanel> schedulerPanelsUpdated = new ArrayList<>();
         for (LocalDateTimeScheduledPanelIdDTO localDateTimeScheduledPanelIdDTO : localDateTimeScheduledPanelIdDTOS) {
             schedulerPanel = schedulerPanelsById.get(localDateTimeScheduledPanelIdDTO.getId());
-            schedulerPanel.setOneTimeTriggerDate(localDateTimeScheduledPanelIdDTO.getDateTime());
-            schedulerPanelsUpdated.add(schedulerPanel);
-            dynamicCronScheduler.stopCronJob(SCHEDULER + localDateTimeScheduledPanelIdDTO.getId());
-            dynamicCronScheduler.startCronJob(schedulerPanel, timezone);
-
+            if(isNotNull(schedulerPanel)) {
+                schedulerPanel.setOneTimeTriggerDate(localDateTimeScheduledPanelIdDTO.getDateTime());
+                schedulerPanelsUpdated.add(schedulerPanel);
+                dynamicCronScheduler.stopCronJob(SCHEDULER + localDateTimeScheduledPanelIdDTO.getId());
+                dynamicCronScheduler.startCronJob(schedulerPanel, timezone);
+            }
 
         }
-        save(schedulerPanelsUpdated);
+        if(isCollectionNotEmpty(schedulerPanelsUpdated)){
+            save(schedulerPanelsUpdated);
+        }
 
         return localDateTimeScheduledPanelIdDTOS;
     }

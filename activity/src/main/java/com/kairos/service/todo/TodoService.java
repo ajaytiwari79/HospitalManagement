@@ -26,15 +26,18 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDateString;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.SHIFT_NOT_EXISTS;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.enums.shift.TodoStatus.*;
+import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
  * Created by pradeep
@@ -63,7 +66,7 @@ public class TodoService {
     public void createOrUpdateTodo(Shift shift, TodoType todoType, UserAccessRoleDTO userAccessRoleDTO, boolean shiftUpdate) {
         List<Todo> todos = new ArrayList<>();
         if (todoType.equals(TodoType.APPROVAL_REQUIRED)) {
-            Set<BigInteger> activityIds = shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
+            Set<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivity.getStatus())).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
             activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet()));
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
@@ -149,11 +152,12 @@ public class TodoService {
         T response = null;
         Todo todo = isNotNull(todoId) ? todoRepository.findOne(todoId) : todoRepository.findByEntityIdAndType(shiftId, TodoType.REQUEST_ABSENCE);
         if (isNull(todo)) {
-            exceptionService.dataNotFoundException("todo not found");
+            exceptionService.dataNotFoundException(SHIFT_NOT_EXISTS);
         }
         todo.setStatus(status);
         if (status.equals(APPROVE)) {
-            todo.setApprovedOn(LocalDateTime.now());
+            todo.setApprovedOn(new Date());
+
         }
         if (newHashSet(APPROVE, DISAPPROVE,PENDING).contains(status)) {
             response = approveAndDisapproveTodo(todo);
@@ -201,7 +205,7 @@ public class TodoService {
         List<BigInteger> shiftActivityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(todo.getSubEntityId())).map(shiftActivity -> shiftActivity.getId()).collect(Collectors.toList());
         List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
         if (FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
-            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(shift.getActivities().get(0).getActivityId(), asLocalDate(shift.getStartDate()), asLocalDate(shift.getStartDate()).plusDays(7), shift.getStaffId());
+            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(shift.getActivities().get(0).getActivityId()), asLocalDate(shift.getStartDate()), asLocalDate(shift.getStartDate()).plusDays(7), shift.getStaffId());
             for (Shift shift1 : shifts) {
                 shiftActivityIds = new ArrayList<>();
                 for (ShiftActivity shiftActivity : shift1.getActivities()) {
@@ -226,6 +230,7 @@ public class TodoService {
     //
     public List<TodoDTO> getAllTodoOfStaff(Long staffId) {
         List<TodoDTO> todoDTOS = todoRepository.findAllTodoByStaffId(staffId);
+
 
         return todoDTOS;
     }

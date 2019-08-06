@@ -161,7 +161,7 @@ public class StaffFilterService {
     }
 
     private List<FilterSelectionQueryResult> getStatusFilter(){
-        return Arrays.stream(ShiftStatus.values()).map(shiftStatus -> new FilterSelectionQueryResult(shiftStatus.toString(),shiftStatus.name())).collect(Collectors.toList());
+        return Arrays.stream(ShiftStatus.values()).map(shiftStatus -> new FilterSelectionQueryResult(shiftStatus.toString(),StringUtils.capitalize(shiftStatus.name().toLowerCase()))).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getAllTimeType(Long countryId){

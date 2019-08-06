@@ -5,7 +5,9 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
-import com.kairos.dto.user.access_permission.*;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.access_permission.AccessPermissionDTO;
+import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -25,8 +27,13 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.access_permission.*;
-import com.kairos.persistence.repository.user.country.*;
+import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
+import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -44,6 +51,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.SUPER_ADMIN;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -836,18 +844,26 @@ public class AccessGroupService {
         UserAccessRoleDTO userAccessRoleDTO;
         if (staffAtHub != null) {
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
-        } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
-            if (accessGroupQueryResult == null) {
-                exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
+        } else if(isNull(staffAtHub)){
+            Organization parent = organizationService.fetchParentOrganization(unitId);
+            Long hubIdByOrganizationId = organizationGraphRepository.getHubIdByOrganizationId(parent.getId());
+            staffAtHub = staffGraphRepository.getStaffOfHubByHubIdAndUserId(parent.isKairosHub() ? parent.getId() : hubIdByOrganizationId,userId);
+            if (staffAtHub != null) {
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
             }
-            String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
-            boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
-            boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
-            userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
-            userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
+            else if(isNull(userAccessRoleDTO)) {
+                AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
+                if (isNull(accessGroupQueryResult)) {
+                    exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
+                }
+                String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
+                boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
+                boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
+                userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
+
+            }
         }
-        //Todo till here
         return userAccessRoleDTO;
     }
 

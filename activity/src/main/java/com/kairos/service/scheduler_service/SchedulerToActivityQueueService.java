@@ -34,7 +34,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
     private ActivityService activityService;
     @Override
     public void execute(KairosSchedulerExecutorDTO job) {
-
+        logger.info("Job type----------------->"+job.getJobSubType());
         switch (job.getJobSubType()) {
             case FLIP_PHASE:
                 logger.info("JOB for flipping phase");
