@@ -146,8 +146,12 @@ public class ActivityIntegrationService {
         return genericRestClient.publishRequest(employmentLinesMap, unitId, true, IntegrationOperation.CREATE, GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){});
     }
 
-    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAByExpertiseAndDate(Long expertiseId, Long unitId,LocalDate selectedDate){
-        List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("selectedDate", selectedDate.toString()));
+    public CTAWTAAndAccumulatedTimebankWrapper getCTAWTAByExpertiseAndDate(Long expertiseId, Long unitId,LocalDate selectedDate,Long employmentId){
+        List<NameValuePair> param = new ArrayList<>();
+        param.add(new BasicNameValuePair("selectedDate", selectedDate.toString()));
+        if(employmentId!=null){
+            param.add(new BasicNameValuePair("employmentId", employmentId.toString()));
+        }
         return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, GET_CTA_WTA_BY_EXPERTISE, param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>(){}, expertiseId);
     }
   public boolean verifyTimeType(BigInteger timeTypeId,Long countryId){

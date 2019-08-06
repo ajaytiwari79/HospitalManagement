@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.TIME_TYPE;
 
 /**
@@ -33,7 +34,7 @@ public class TimeTypeFilter implements ShiftFilter{
                     timeTypeEnums.add(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType().toString());
                     shiftActivityDTO.getChildActivities().forEach(childActivityDTO ->  timeTypeEnums.add(childActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType().toString()));
                 });
-                if(CollectionUtils.containsAny(filterCriteriaMap.get(TIME_TYPE),timeTypeEnums)){
+                if(CollectionUtils.containsAny(filterCriteriaMap.get(TIME_TYPE),timeTypeEnums) || isNotNull(shiftDTO.getRequestAbsence())){
                     filteredShifts.add((T)shiftDTO);
                 }
             }

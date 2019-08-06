@@ -26,10 +26,13 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 
@@ -153,8 +156,21 @@ public class WTAOrganizationService extends MongoBaseService {
     }
 
 
-    public CTAWTAAndAccumulatedTimebankWrapper getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId, LocalDate selectedDate) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWtaOfOrganizationByExpertise(unitId, expertiseId, selectedDate);
+    public CTAWTAAndAccumulatedTimebankWrapper getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId, LocalDate selectedDate,Long employmentId) {
+        List<WTAQueryResultDTO> wtaQueryResultDTOS=new ArrayList<>();
+        wtaQueryResultDTOS.addAll(workingTimeAgreementMongoRepository.getAllWtaOfOrganizationByExpertise(unitId, expertiseId, selectedDate));
+        if(isNotNull(employmentId)){
+            Map<BigInteger,WTAQueryResultDTO> wtaQueryResultMap=wtaQueryResultDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+            List<WTAQueryResultDTO> wtaQueryResultDTOSByEmployments=workingTimeAgreementMongoRepository.getAllWtaOfEmploymentIdAndDate(employmentId,selectedDate);
+            List<BigInteger> orgnizationParentIds=wtaQueryResultDTOSByEmployments.stream().map(wtaQueryResultDTO -> wtaQueryResultDTO.getOrganizationParentId()).collect(Collectors.toList());
+            List<WTAQueryResultDTO> wtaQueryResultDTOByIds = workingTimeAgreementMongoRepository.getAllWtaByIds(orgnizationParentIds);
+            wtaQueryResultDTOByIds.forEach(wtaQueryResultDTO -> {
+                if(!wtaQueryResultMap.containsKey(wtaQueryResultDTO.getId())){
+                    wtaQueryResultMap.put(wtaQueryResultDTO.getId(),wtaQueryResultDTO);
+                }
+            });
+            wtaQueryResultDTOS=wtaQueryResultMap.values().stream().collect(Collectors.toList());
+        }
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getDefaultCTAOfExpertiseAndDate(unitId, expertiseId, selectedDate);
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
