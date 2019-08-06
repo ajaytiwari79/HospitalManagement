@@ -60,7 +60,6 @@ import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
-import lombok.Builder;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.BeanUtils;
@@ -71,7 +70,6 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -184,7 +182,7 @@ public class ShiftService extends MongoBaseService {
                     multipleActivityCount.add(activity.getActivityId());
                 }
             }
-            shift.setMultipleActivity(multipleActivityCount.size() > MULTIPLE_ACTIVITY);
+            shift.setMultipleActivity(multipleActivityCount.size() > CommonConstants.MULTIPLE_ACTIVITY);
         }
     }
 
