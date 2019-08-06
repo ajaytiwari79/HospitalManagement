@@ -57,7 +57,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
     public ProtectedDaysOffSettingDTO updateProtectedDaysOffByUnitId(Long unitId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO){
         ProtectedDaysOffSetting protectedDaysOffSetting =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
         if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
-            exceptionService.dataNotFoundException(ActivityMessagesConstants.Message_Organization_Protected_Days_Off, protectedDaysOffSettingDTO.getId());
+            exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF, protectedDaysOffSettingDTO.getId());
         }
         protectedDaysOffSetting.setProtectedDaysOffUnitSettings(protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings());
         protectedDaysOffRepository.save(protectedDaysOffSetting);
@@ -67,7 +67,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
     public ProtectedDaysOffSettingDTO getProtectedDaysOffByUnitId(Long unitId){
         ProtectedDaysOffSetting protectedDaysOffSetting =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
         if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
-            exceptionService.dataNotFoundException(ActivityMessagesConstants.Message_Organization_Protected_Days_Off,unitId);
+            exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF,unitId);
         }
         ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO =new ProtectedDaysOffSettingDTO(protectedDaysOffSetting.getId(), protectedDaysOffSetting.getUnitId(), protectedDaysOffSetting.getProtectedDaysOffUnitSettings());
         return protectedDaysOffSettingDTO;
