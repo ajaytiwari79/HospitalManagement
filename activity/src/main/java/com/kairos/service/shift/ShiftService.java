@@ -190,7 +190,6 @@ public class ShiftService extends MongoBaseService {
 
 
     public ShiftWithViolatedInfoDTO saveShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftDTO shiftDTO, Phase phase, boolean shiftOverlappedWithNonWorkingType , ShiftActionType shiftActionType)  {
-        ShiftEscalationReason shiftStaffingLevelEscalationReason=null;
         Long functionId = shiftDTO.getFunctionId();
         shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shiftDTO.getUnitId(), DateUtils.asLocalDate(shiftDTO.getActivities().get(0).getStartDate()));
@@ -205,7 +204,7 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = getActivityWrapperMap(newArrayList(),shiftDTO);
         mainShift.setPlanningPeriodId(planningPeriod.getId());
         mainShift.setPhaseId(planningPeriod.getCurrentPhaseId());
-        shiftStaffingLevelEscalationReason = shiftValidatorService.validateStaffingLevel(phase, mainShift, activityWrapperMap, true, staffAdditionalInfoDTO);
+        ShiftEscalationReason shiftStaffingLevelEscalationReason = shiftValidatorService.validateStaffingLevel(phase, mainShift, activityWrapperMap, true, staffAdditionalInfoDTO);
         List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(mainShift,  activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
         mainShift.setBreakActivities(breakActivities);
         shiftDetailsService.addPlannedTimeInShift(mainShift,activityWrapperMap,staffAdditionalInfoDTO);
@@ -680,6 +679,17 @@ public class ShiftService extends MongoBaseService {
             }
             if(isCollectionNotEmpty(shiftEscalationReasons)){
                 shiftViolatedRules.getEscalationReasons().addAll(shiftEscalationReasons);
+
+                List<ShiftEscalationReason> shiftEscalationReasonList = new ArrayList<ShiftEscalationReason>(shiftEscalationReasons);
+                for (ShiftEscalationReason shiftEscalationReasonForCheckingOverAndUnderStaffing : shiftEscalationReasonList) {
+                    if(shiftEscalationReasonForCheckingOverAndUnderStaffing==null);
+                    else if (shiftEscalationReasonForCheckingOverAndUnderStaffing.equals(ShiftEscalationReason.OVER_STAFFING)) {
+                        shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.OVER_STAFFING));
+                    }
+                    else{
+                        shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.UNDER_STAFFING));
+                    }
+                }
             }
             if(isCollectionNotEmpty(shiftViolatedRules.getEscalationReasons())){
                 shiftViolatedRules.setEscalationResolved(false);

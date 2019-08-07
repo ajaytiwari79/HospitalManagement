@@ -649,6 +649,7 @@ public class ShiftValidatorService {
                         exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING);
                     }else {
                         shiftEscalationReason = ShiftEscalationReason.OVER_STAFFING;
+                        break;
                     }
                 }
                 if (!checkOverStaffing && totalCount <= 0) {
@@ -656,6 +657,7 @@ public class ShiftValidatorService {
                         exceptionService.actionNotPermittedException(MESSAGE_SHIFT_UNDERSTAFFING);
                     }else {
                         shiftEscalationReason = ShiftEscalationReason.UNDER_STAFFING;
+                        break;
                     }
                 }
 
@@ -663,10 +665,12 @@ public class ShiftValidatorService {
                     for (StaffingLevelActivity staffingLevelActivityObj : applicableIntervals.get(currentIndex).getStaffingLevelActivities()) {
                         if (checkOverStaffing && staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() >= staffingLevelActivityObj.getMaxNoOfStaff()) {
                             shiftEscalationReason = ShiftEscalationReason.OVER_STAFFING;
+                            break;
                             // exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING);
                         } else if (!checkOverStaffing && staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() <= staffingLevelActivityObj.getMinNoOfStaff()) {
                             shiftEscalationReason = ShiftEscalationReason.UNDER_STAFFING;
                             //exceptionService.actionNotPermittedException(MESSAGE_SHIFT_UNDERSTAFFING);
+                            break;
                         }
                     }
                 }
