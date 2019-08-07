@@ -160,26 +160,22 @@ public class Shift extends MongoBaseEntity {
     }
 
     public boolean isShiftUpdated(Shift shift) {
-        if (this != shift || this.getActivities().size() != shift.getActivities().size() || isActivityChanged(shift)) {
+        if (this != shift || this.getActivities().size() != shift.getActivities().size()) {
             return true;
+        }
+        for (int i = 0; i < shift.getActivities().size(); i++) {
+            DateTimeInterval thisInterVal = new DateTimeInterval(this.getActivities().get(i).getStartDate(), this.getActivities().get(i).getEndDate());
+            DateTimeInterval thatInterVal = new DateTimeInterval(shift.getActivities().get(i).getStartDate(), shift.getActivities().get(i).getEndDate());
+            if (!thisInterVal.equals(thatInterVal) || !this.getActivities().get(i).getActivityId().equals(shift.getActivities().get(i).getActivityId())) {
+                return true;
+            }
+            if (this.getActivities().get(i).isShiftActivityChanged(shift.getActivities().get(i))) {
+                return true;
+            }
         }
         return false;
     }
 
-    private boolean isActivityChanged(Shift shift) {
-        try {
-            for (int i = 0; i < shift.getActivities().size(); i++) {
-                DateTimeInterval thisInterVal = new DateTimeInterval(this.getActivities().get(i).getStartDate(), this.getActivities().get(i).getEndDate());
-                DateTimeInterval thatInterVal = new DateTimeInterval(shift.getActivities().get(i).getStartDate(), shift.getActivities().get(i).getEndDate());
-                if (!thisInterVal.equals(thatInterVal) || !this.getActivities().get(i).getActivityName().equals(shift.getActivities().get(i).getActivityName())) {
-                    return true;
-                }
-            }
-        } catch (IndexOutOfBoundsException ie) {
-            return true;
-        }
-        return false;
-    }
 
     @Override
     public String toString() {
