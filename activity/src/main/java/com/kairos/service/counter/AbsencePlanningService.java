@@ -60,8 +60,9 @@ public class AbsencePlanningService {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
         staffIds=(List<Long>)kpiData[2];
         List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFiltersWithActivityStatus(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-        List<String> absencePlanningActivityStatus = getAbsencePlanningActivityStatus();
-        kpiDataUnits = getKpiDataUnits(absencePlanningActivityStatus,applicableKPI,staffKpiFilterDTOS);
+        List<String> absencePlanningActivityStatus = getAbsencePlanningActivityStatus(shifts);
+        //kpiDataUnits = getKpiDataUnits(absencePlanningActivityStatus,applicableKPI,staffKpiFilterDTOS);
+        kpiDataUnits = null;
         sortKpiDataByDateTimeInterval(kpiDataUnits);
         return kpiDataUnits;
     }
