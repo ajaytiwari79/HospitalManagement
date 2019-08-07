@@ -705,6 +705,12 @@ public class CounterDistService extends MongoBaseService {
     public void createDefaultCategory(Long unitId){
         KPICategory kpiCategory = new KPICategory(UNCATEGORIZED,null,unitId,ConfLevel.UNIT);
         counterRepository.save(kpiCategory);
+        List<CategoryKPIConf> newCategoryKPIConfs=new ArrayList<>();
+        List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPI(null,ConfLevel.UNIT,unitId);
+        applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategory.getId(), null, unitId, ConfLevel.UNIT)));
+        if (!newCategoryKPIConfs.isEmpty()) {
+            save(newCategoryKPIConfs);
+        }
     }
 
     public boolean createDefaultCategories(Long countryId){
@@ -712,6 +718,12 @@ public class CounterDistService extends MongoBaseService {
         units.forEach(unit->createDefaultCategory(unit));
         KPICategory kpiCategory = new KPICategory(UNCATEGORIZED,countryId,null,ConfLevel.COUNTRY);
         counterRepository.save(kpiCategory);
+        List<CategoryKPIConf> newCategoryKPIConfs=new ArrayList<>();
+        List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPI(null,ConfLevel.COUNTRY,countryId);
+        applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategory.getId(), countryId, null, ConfLevel.COUNTRY)));
+        if (!newCategoryKPIConfs.isEmpty()) {
+            save(newCategoryKPIConfs);
+        }
         return true;
     }
 

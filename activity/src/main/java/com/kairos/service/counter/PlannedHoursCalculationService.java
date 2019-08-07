@@ -201,8 +201,8 @@ public class PlannedHoursCalculationService implements CounterService {
     @Override
     public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,ApplicableKPI applicableKPI) {
         Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria,organizationId,applicableKPI);
-        Map<Long, Integer> staffAndRestingHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
-        return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
+        Map<Long, Integer> staffAndPlannedHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
+        return getFibonacciCalculation(staffAndPlannedHoursMap,sortingOrder);
     }
 
 

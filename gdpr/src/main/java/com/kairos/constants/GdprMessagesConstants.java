@@ -139,4 +139,5 @@ public class GdprMessagesConstants {
     public static final String ERROR_MESSAGE_RISK_LEVEL_NOTNULL = "error.message.risk.level.notnull";
     public static final String ERROR_MESSAGE_NAME_SPECIAL_CHARACTER_NOTALLOWED = "error.message.name.special.character.notAllowed";
     public static final String MESSAGE_NAME_ALREADY_EXIST = "message.name.already.exist";
+    public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
 }
