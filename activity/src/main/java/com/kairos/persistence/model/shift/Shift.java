@@ -160,16 +160,18 @@ public class Shift extends MongoBaseEntity {
     }
 
     public boolean isShiftUpdated(Shift shift) {
-        if (this != shift || this.getActivities().size() != shift.getActivities().size()) {
+        if (this.getActivities().size() != shift.getActivities().size()) {
             return true;
         }
         for (int i = 0; i < shift.getActivities().size(); i++) {
-            DateTimeInterval thisInterVal = new DateTimeInterval(this.getActivities().get(i).getStartDate(), this.getActivities().get(i).getEndDate());
-            DateTimeInterval thatInterVal = new DateTimeInterval(shift.getActivities().get(i).getStartDate(), shift.getActivities().get(i).getEndDate());
-            if (!thisInterVal.equals(thatInterVal) || !this.getActivities().get(i).getActivityId().equals(shift.getActivities().get(i).getActivityId())) {
+            ShiftActivity thisShiftActivity=this.getActivities().get(i);
+            ShiftActivity thatShiftActivity=shift.getActivities().get(i);
+            DateTimeInterval thisInterVal = new DateTimeInterval(thisShiftActivity.getStartDate(), thisShiftActivity.getEndDate());
+            DateTimeInterval thatInterVal = new DateTimeInterval(thatShiftActivity.getStartDate(), thatShiftActivity.getEndDate());
+            if (!thisInterVal.equals(thatInterVal) || !thisShiftActivity.getActivityId().equals(thatShiftActivity.getActivityId())) {
                 return true;
             }
-            if (this.getActivities().get(i).isShiftActivityChanged(shift.getActivities().get(i))) {
+            if (thisShiftActivity.isShiftActivityChanged(thatShiftActivity)) {
                 return true;
             }
         }
