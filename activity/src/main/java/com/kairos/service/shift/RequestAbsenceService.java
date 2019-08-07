@@ -122,22 +122,29 @@ public class RequestAbsenceService {
             }else {
                 shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
             }
-            if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
-                todo.setStatus(TodoStatus.REQUESTED);
-                response = (T)shiftWithViolatedInfoDTO;
-            }else {
-                List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
-                for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
-                    shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().filter(shiftActivityDTO -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivityDTO.getStatus())).map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
-                }
-                response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
-                shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
-                shiftOptional.get().setRequestAbsence(null);
-                shiftMongoRepository.save(shiftOptional.get());
-            }
+            response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTO);
         }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
             todo.setDeleted(true);
+            shiftMongoRepository.save(shiftOptional.get());
+        }
+        return response;
+    }
+
+    private <T> T updateStatusAfterUpdateShift(Todo todo, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO) {
+        T response;
+        Optional<Shift> shiftOptional;
+        if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
+            todo.setStatus(TodoStatus.REQUESTED);
+            response = (T)shiftWithViolatedInfoDTO;
+        }else {
+            List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
+            for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
+                shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().filter(shiftActivityDTO -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivityDTO.getStatus())).map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
+            }
+            response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
+            shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
+            shiftOptional.get().setRequestAbsence(null);
             shiftMongoRepository.save(shiftOptional.get());
         }
         return response;
@@ -175,7 +182,7 @@ public class RequestAbsenceService {
         shift.setActivities(shiftActivityList);
         ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class);
         shiftDTO.setShiftDate(asLocalDate(shift.getStartDate()));
-        return shiftService.updateShift(shiftDTO,ORGANIZATION,false,false,ShiftActionType.SAVE);
+        return shiftService.updateShift(shiftDTO,ORGANIZATION,false,false,null);
     }
 
     private List<ShiftActivity> updateShiftActivity(ActivityWrapper activityWrapper,DateTimeInterval dateTimeInterval, List<ShiftActivity> shiftActivities, ShiftActivity shiftActivity) {
@@ -186,6 +193,7 @@ public class RequestAbsenceService {
             for (DateTimeInterval timeInterval : dateTimeIntervals) {
                 ShiftActivity updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity,ShiftActivity.class);
                 updatedShiftActivity.setPlannedTimes(new ArrayList<>());
+                updatedShiftActivity.setId(null);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
                 updatedShiftActivity.setEndDate(timeInterval.getEndDate());
                 shiftActivities.add(updatedShiftActivity);

@@ -59,9 +59,9 @@ public class ShiftStateService {
     @Inject private UserIntegrationService userIntegrationService;
 
     public boolean createShiftState(Long unitId, Date startDate, Date endDate){
-//        if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
-//            exceptionService.actionNotPermittedException(PAST_DATE_ALLOWED);
-//        }
+        if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
+            exceptionService.actionNotPermittedException(PAST_DATE_ALLOWED);
+        }
         List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
         createShiftState(shifts,false,unitId);
         return true;

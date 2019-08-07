@@ -333,6 +333,7 @@ img.logo {
     overflow: hidden;
     justify-content: center;
     align-items: end;
+    color: #737373!important;
     -webkit-transition: all .5s ease;
     -o-transition: .5s ease all;
     transition: all .5s ease;

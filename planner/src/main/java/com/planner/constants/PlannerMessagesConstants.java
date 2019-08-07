@@ -18,4 +18,5 @@ public class PlannerMessagesConstants {
     public static final String ERROR_PHASEID_NOT_EXISTS  = "error.phaseId.not.exists ";
     public static final String ERROR_PLANNINGPROBLEM_NOT_EXISTS  = "error.planningproblem.not.exists ";
     public static final String ERROR_TIMETYPE_NOT_EXISTS  = "error.timetype.not.exists ";
+    public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
 }

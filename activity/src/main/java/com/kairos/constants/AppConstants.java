@@ -216,8 +216,6 @@ public class AppConstants {
     public static final String KPI_DEFAULT_COLOR = "#b7b7b7";
     public static final String SEND_GRID_API_KEY = "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";
 
-    public static final short MULTIPLE_ACTIVITY = 1;
-
     //for use timeslot in timeslot kpi
     public static final String NIGHT = "Night";
     public static final String EVENING = "Evening";

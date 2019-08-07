@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 
 /**
  * Created by vipul on 30/8/17.
@@ -145,6 +146,16 @@ public class ShiftDTO {
 
     public void setBreakActivities(List<ShiftActivityDTO> breakActivities) {
         this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
+    }
+
+    public boolean isMultipleActivity() {
+        Set<BigInteger> multipleActivityCount = new HashSet<>();
+        for (ShiftActivityDTO activity : this.getActivities()) {
+            if (!activity.isBreakShift()) {
+                multipleActivityCount.add(activity.getActivityId());
+            }
+        }
+        return multipleActivityCount.size() > MULTIPLE_ACTIVITY;
     }
 
     public Date getStartDate() {
