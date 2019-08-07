@@ -100,15 +100,16 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     }
 
     public boolean isShiftActivityChanged(ShiftActivity shiftActivity){
+        if(!(startDate.equals(shiftActivity.getStartDate()) && endDate.equals(endDate) && activityId.equals(shiftActivity.getActivityId()))){
+            return true;
+        }
         if (this.getChildActivities().size() != shiftActivity.getChildActivities().size()) {
             return true;
         }
         for (int i = 0; i <this.getChildActivities().size() ; i++) {
             ShiftActivity thisChildActivity=this.getChildActivities().get(i);
-            ShiftActivity thatChildActivity=shiftActivity.getChildActivities().get(i);
-            DateTimeInterval thisInterVal = new DateTimeInterval(thisChildActivity.getStartDate(), thisChildActivity.getEndDate());
-            DateTimeInterval thatInterVal = new DateTimeInterval(thatChildActivity.getStartDate(), thatChildActivity.getEndDate());
-            if (!thisInterVal.equals(thatInterVal) || !thisChildActivity.getActivityId().equals(thatChildActivity.getActivityId())) {
+            ShiftActivity childActivity=shiftActivity.getChildActivities().get(i);
+            if(thisChildActivity.isShiftActivityChanged(childActivity)){
                 return true;
             }
         }

@@ -165,13 +165,8 @@ public class Shift extends MongoBaseEntity {
         }
         for (int i = 0; i < shift.getActivities().size(); i++) {
             ShiftActivity thisShiftActivity=this.getActivities().get(i);
-            ShiftActivity thatShiftActivity=shift.getActivities().get(i);
-            DateTimeInterval thisInterVal = new DateTimeInterval(thisShiftActivity.getStartDate(), thisShiftActivity.getEndDate());
-            DateTimeInterval thatInterVal = new DateTimeInterval(thatShiftActivity.getStartDate(), thatShiftActivity.getEndDate());
-            if (!thisInterVal.equals(thatInterVal) || !thisShiftActivity.getActivityId().equals(thatShiftActivity.getActivityId())) {
-                return true;
-            }
-            if (thisShiftActivity.isShiftActivityChanged(thatShiftActivity)) {
+            ShiftActivity shiftActivity=shift.getActivities().get(i);
+            if(thisShiftActivity.isShiftActivityChanged(shiftActivity)){
                 return true;
             }
         }
