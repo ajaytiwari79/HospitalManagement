@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -420,7 +421,7 @@ public class CounterDataService extends MongoBaseService {
         return tabKPIDTO;
     }
 
-    public  KPIResponseDTO generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId,Date startDate) {
+    public  KPIResponseDTO generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId, LocalDate startDate) {
         Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));
@@ -438,7 +439,7 @@ public class CounterDataService extends MongoBaseService {
         for (BigInteger kpiId : filters.getKpiIds()) {
             if(!staffKpiFilterCritera.get(kpiId).containsKey(FilterType.TIME_INTERVAL)){
                 ApplicableKPI staffApplicableKPI = kpiIdAndApplicableKPIMap.get(kpiId);
-                DateTimeInterval dateTimeInterval = getDateTimeInterval(staffApplicableKPI.getInterval(), isNull(staffApplicableKPI) ? 0 : staffApplicableKPI.getValue(), staffApplicableKPI.getFrequencyType(), null,null);
+                DateTimeInterval dateTimeInterval = getDateTimeInterval(staffApplicableKPI.getInterval(), isNull(staffApplicableKPI) ? 0 : staffApplicableKPI.getValue(), staffApplicableKPI.getFrequencyType(), null,startDate);
                 staffKpiFilterCritera.get(kpiId).put(FilterType.TIME_INTERVAL,Arrays.asList(dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate()));
             }
             if(!counterRepository.getKPIByid(kpiId).isMultiDimensional() && isNotNull(kpiIdAndApplicableKPIMap.get(kpiId))) {
