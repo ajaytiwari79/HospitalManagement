@@ -66,8 +66,10 @@ public class AbsencePlanningService {
         return kpiDataUnits;
     }
 
-    public List<String> getAbsencePlanningActivityStatus()
-    {
+    public List<String> getAbsencePlanningActivityStatus(List<Shift> shifts) {
+
+
+
         return null;
     }
 
