@@ -12,8 +12,11 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.inject.Inject;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
+import static com.kairos.constants.GdprMessagesConstants.INTERNAL_SERVER_ERROR;
 /*
  *
  *  created by bobby 25/4/2018
@@ -75,6 +78,15 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         result.put("request URl", request.getRequestURI());
         return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
 
+    }
+
+    @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class, Exception.class, MessagingException.class})
+    public ResponseEntity<Object> handleInternal(final Exception ex, final WebRequest request) {
+        logger.error("error in user service ", ex);
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setSuccess(false);
+        errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
+        return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
 

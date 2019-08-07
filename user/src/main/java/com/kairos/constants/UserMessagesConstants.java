@@ -439,4 +439,5 @@ public class UserMessagesConstants {
     public static final String MESSAGE_ACCESSGROUP_ID_NULL = "message.accessGroup.id.null";
     public static final String MESSAGE_MODEL_PERMISSIONS_NULL = "message.model.permissions.null";
     public static final String MESSAGE_DRAFT_COPY_CREATED = "message.draft.copy.exists";
+    public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
 }
