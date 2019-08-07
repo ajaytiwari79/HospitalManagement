@@ -158,8 +158,8 @@ public class FibonacciKPIService implements CounterService{
         applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
         for (KPI counter : counters) {
             FibonacciKPIConfig fibonacciKPIConfig = fibonacciKPIConfigMap.get(counter.getId());
-            TreeSet<FibonacciKPICalculation> kpiCalculation = counterServiceMapping.getService(counter.getType()).getFibonacciCalculatedCounter(filterBasedCriteria, organizationId, fibonacciKPIConfig.getSortingOrder(), staffKpiFilterDTOS, applicableKPI);
-            for (FibonacciKPICalculation fibonacciKPICalculation : kpiCalculation) {
+            TreeSet<FibonacciKPICalculation> kpiCalculations = counterServiceMapping.getService(counter.getType()).getFibonacciCalculatedCounter(filterBasedCriteria, organizationId, fibonacciKPIConfig.getSortingOrder(), staffKpiFilterDTOS, applicableKPI);
+            for (FibonacciKPICalculation fibonacciKPICalculation : kpiCalculations) {
                 FibonacciKPICalculation fibonacciKPIValueCalulation = kpiAndFibonacciDataMap.getOrDefault(fibonacciKPICalculation.getStaffId(), new FibonacciKPICalculation(fibonacciKPICalculation.getOrderValueByFiboncci(),fibonacciKPICalculation.getStaffId()));
                 fibonacciKPIValueCalulation.setFibonacciKpiCount(fibonacciKPIValueCalulation.getFibonacciKpiCount().add(fibonacciKPICalculation.getFibonacciKpiCount()));
                 kpiAndFibonacciDataMap.put(fibonacciKPICalculation.getStaffId(),fibonacciKPIValueCalulation);
@@ -167,7 +167,7 @@ public class FibonacciKPIService implements CounterService{
         }
         Map<Long,Double> staffIdAndOrderMap = new HashMap<>();
         double order = 1;
-        for (FibonacciKPICalculation fibonacciKPICalculation : kpiAndFibonacciDataMap.values().stream().sorted().collect(Collectors.toList())) {
+        for (FibonacciKPICalculation fibonacciKPICalculation : kpiAndFibonacciDataMap.values().stream().sorted(Comparator.comparing(FibonacciKPICalculation::getFibonacciKpiCount)).collect(Collectors.toList())) {
             staffIdAndOrderMap.put(fibonacciKPICalculation.getStaffId(),order++);
         }
         return new KPIResponseDTO(applicableKPI.getActiveKpiId(),applicableKPI.getTitle(),staffIdAndOrderMap);
