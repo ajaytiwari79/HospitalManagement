@@ -31,4 +31,5 @@ public class CommonConstants {
 
     public static final String FULL_DAY_CALCULATION = "FULL_DAY";
     public static final String FULL_WEEK = "FULL_WEEK";
+    public static final short MULTIPLE_ACTIVITY = 1;
 }

@@ -48,7 +48,7 @@ public class ShiftBreakService {
 
     public Map<BigInteger, ActivityWrapper> getBreakActivities(BreakSettingsDTO breakSetting, Long unitId) {
         List<ActivityWrapper> breakActivities = activityRepository.findActivitiesAndTimeTypeByParentIdsAndUnitId(newArrayList(breakSetting.getActivityId()), unitId);
-        if(isCollectionEmpty(breakActivities)){
+        if(isCollectionEmpty(breakActivities) || breakActivities.size() > 1){
             exceptionService.dataNotFoundException(ERROR_BREAKSACTIVITY_NOT_CONFIGURED,unitId);
         }
         Map<BigInteger, ActivityWrapper> activityWrapperMap =
@@ -66,7 +66,7 @@ public class ShiftBreakService {
         DateTimeInterval eligibleBreakInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
         Date placeBreakAfterThisDate = shift.getStartDate();
         List<ShiftActivity> breakActivities = new ArrayList<>();
-        if(isNotNull(breakSetting) && breakSetting.getShiftDurationInMinute()>=shift.getMinutes()) {
+        if(isNotNull(breakSetting) && shift.getMinutes()>=breakSetting.getShiftDurationInMinute()) {
             if(isCollectionEmpty(shift.getBreakActivities())){
                 if (isNotNull(breakWTATemplate)) {
                     BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);

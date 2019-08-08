@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.planner.constants.PlannerMessagesConstants.INTERNAL_SERVER_ERROR;
 
 @ControllerAdvice
 @Order(1)
@@ -53,6 +56,15 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
         return new ResponseEntity<Object>(errorMessage, headers, HttpStatus.UNPROCESSABLE_ENTITY);
 
+    }
+
+    @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class, Exception.class, MessagingException.class})
+    public ResponseEntity<Object> handleInternal(final Exception ex, final WebRequest request) {
+        logger.error("error in user service ", ex);
+        ResponseEnvelope errorMessage = new ResponseEnvelope();
+        errorMessage.setSuccess(false);
+        errorMessage.setMessage(exceptionService.convertMessage(INTERNAL_SERVER_ERROR));
+        return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
     @ExceptionHandler({DataNotFoundByIdException.class})

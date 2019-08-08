@@ -76,8 +76,12 @@ public class TodoService {
                     updateStatusIfApprovalRequired(approvalRequiredActivityIds, shiftActivity);
                     shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(approvalRequiredActivityIds, childActivity));
                 });
-                shiftMongoRepository.save(shift);
-            } else {
+                Activity activity = activityMongoRepository.findOne(shift.getActivities().get(0).getActivityId());
+                TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
+                String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), "MMM dd,yyyy") + "</span>";
+                Todo todo = new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(), activity.getName(), APPROVE, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId());
+                todoRepository.save(todo);
+                shiftMongoRepository.save(shift); } else {
                 List<Todo> todoList = todoRepository.findAllByNotApprovedAndEntityId(shift.getId(), TodoType.APPROVAL_REQUIRED, newArrayList(PENDING, VIEWED, REQUESTED));
                 Set<BigInteger> subEntitiyIds = todoList.stream().map(todo -> todo.getSubEntityId()).collect(Collectors.toSet());
                 updateRemark(todoList, shift);
