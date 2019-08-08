@@ -35,7 +35,7 @@ public class CounterDTO {
     private KPIRepresentation kpiRepresentation;
     private DurationType frequencyType;
     // frequency value
-    @PositiveOrZero
+    @Positive(message = "Frequency vaue is always positive")
     private int value;
     private IntervalUnit interval;
 
