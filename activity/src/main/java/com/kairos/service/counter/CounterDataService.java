@@ -181,6 +181,7 @@ public class CounterDataService extends MongoBaseService {
         kpiDTO.setTitle(applicableKPI.getTitle());
         kpiDTO.setValue(applicableKPI.getValue());
         kpiDTO.setFrequencyType(applicableKPI.getFrequencyType());
+
         kpiDTO.setInterval(applicableKPI.getInterval());
         kpiDTO.setKpiRepresentation(applicableKPI.getKpiRepresentation());
         if (isNotNull(applicableKPI.getApplicableFilter())) {
