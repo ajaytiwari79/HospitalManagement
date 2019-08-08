@@ -112,6 +112,8 @@ public class WTAService extends MongoBaseService {
 
     @Inject
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    @Inject
+    private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -887,6 +889,10 @@ public class WTAService extends MongoBaseService {
             }
         }
         return true;
+    }
+    public WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long employmentId,Date date)
+    {
+      return  workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(employmentId, date);
     }
 
 }
