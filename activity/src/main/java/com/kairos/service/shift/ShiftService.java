@@ -234,7 +234,7 @@ public class ShiftService extends MongoBaseService {
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(isNotNull(mainShift.getDraftShift()) ?mainShift.getDraftShift():mainShift , ShiftDTO.class);
             shiftDTO.setId(mainShift.getId());
             shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
-            validateShiftViolatedRules(mainShift, shiftOverlappedWithNonWorkingType, shiftWithViolatedInfoDTO,PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) ? ShiftActionType.SAVE_AS_DRAFT : null,newHashSet(shiftStaffingLevelEscalationReason));
+            validateShiftViolatedRules(mainShift, shiftOverlappedWithNonWorkingType, shiftWithViolatedInfoDTO,PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) ? ShiftActionType.SAVE_AS_DRAFT : null,isNull(shiftStaffingLevelEscalationReason)?newHashSet():newHashSet(shiftStaffingLevelEscalationReason));
             shiftDTO = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(Arrays.asList(shiftDTO), staffAdditionalInfoDTO.getUserAccessRoleDTO()).get(0);
         }
         shiftWithViolatedInfoDTO.setShifts(newArrayList(shiftDTO));
@@ -697,11 +697,10 @@ public class ShiftService extends MongoBaseService {
 
                 List<ShiftEscalationReason> shiftEscalationReasonList = new ArrayList<ShiftEscalationReason>(shiftEscalationReasons);
                 for (ShiftEscalationReason shiftEscalationReasonForCheckingOverAndUnderStaffing : shiftEscalationReasonList) {
-                    if(shiftEscalationReasonForCheckingOverAndUnderStaffing==null);
-                    else if (shiftEscalationReasonForCheckingOverAndUnderStaffing.equals(ShiftEscalationReason.OVER_STAFFING)) {
+                    if (shiftEscalationReasonForCheckingOverAndUnderStaffing.equals(ShiftEscalationReason.OVER_STAFFING)) {
                         shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.OVER_STAFFING));
                     }
-                    else{
+                    else if (shiftEscalationReasonForCheckingOverAndUnderStaffing.equals(ShiftEscalationReason.UNDER_STAFFING)) {
                         shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.UNDER_STAFFING));
                     }
                 }
