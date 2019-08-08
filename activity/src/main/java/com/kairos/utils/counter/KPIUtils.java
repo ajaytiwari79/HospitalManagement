@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 public class KPIUtils {
 
@@ -23,7 +24,7 @@ public class KPIUtils {
     }
 
     public static List<LocalDate> getLocalDate(List<Object> objects){
-        return !(ObjectUtils.isCollectionEmpty(objects))?objects.stream().map(o-> DateUtils.asLocalDate((String)o)).collect(Collectors.toList()) : Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
+        return !(ObjectUtils.isCollectionEmpty(objects))?objects.stream().map(o-> (o instanceof LocalDate) ? (LocalDate) o : DateUtils.asLocalDate((String)o)).collect(Collectors.toList()) : Arrays.asList(DateUtils.getStartDateOfWeek(),DateUtils.getEndDateOfWeek());
     }
 
     public static List<BigInteger> getBigIntegerValue(List<Object> objects){
@@ -34,27 +35,30 @@ public class KPIUtils {
         return objects.stream().map(o -> DayOfWeek.valueOf((o.toString()))).collect(Collectors.toSet());
     }
 
-    public static List<DateTimeInterval> getDateTimeIntervals(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates) {
+    public static List<DateTimeInterval> getDateTimeIntervals(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates,LocalDate localDate) {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         if(isCollectionNotEmpty(filterDates)){
             dateTimeIntervals.add(new DateTimeInterval(asLocalDate(filterDates.get(0).toString()),asLocalDate(filterDates.get(1).toString())));
             return dateTimeIntervals;
         }
-        LocalDate currentDate = DateUtils.getCurrentLocalDate();
+        if(isNull(localDate)){
+            localDate = DateUtils.getCurrentLocalDate();
+        }
+
         switch (interval) {
             case LAST:
-                currentDate.minusDays(1);
+                localDate.minusDays(1);
                 for (int i = 0; i < value; i++) {
-                    currentDate = getLastDateTimeIntervalByDate(currentDate,frequencyType, dateTimeIntervals);
+                    localDate = getLastDateTimeIntervalByDate(localDate,frequencyType, dateTimeIntervals);
                 }
                 break;
             case CURRENT:
-                getCurrentDateTimeIntervalByDate(currentDate, frequencyType, dateTimeIntervals);
+                getCurrentDateTimeIntervalByDate(localDate, frequencyType, dateTimeIntervals);
                 break;
             case NEXT:
-                currentDate=currentDate.plusDays(1);
+                localDate=localDate.plusDays(1);
                 for (int i = 0; i < value; i++) {
-                    currentDate = getNextDateTimeIntervalByDate(currentDate, frequencyType, dateTimeIntervals);
+                    localDate = getNextDateTimeIntervalByDate(localDate, frequencyType, dateTimeIntervals);
                 }
                 break;
             default:
@@ -64,9 +68,35 @@ public class KPIUtils {
         return dateTimeIntervals;
     }
 
+    public static DateTimeInterval getDateTimeInterval(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates,LocalDate localDate) {
+        DateTimeInterval dateTimeInterval = null;
+        if(isCollectionNotEmpty(filterDates)){
+            return new DateTimeInterval(asLocalDate(filterDates.get(0).toString()),asLocalDate(filterDates.get(1).toString()));
+        }
+        if(isNull(localDate)){
+            localDate = DateUtils.getCurrentLocalDate();
+        }
+        switch (interval) {
+            case LAST:
+                localDate = localDate.minusDays(1);
+                dateTimeInterval = new DateTimeInterval(getPriviousLocaDateByDurationType(localDate, frequencyType,1),localDate);
+                break;
+            case CURRENT:
+                dateTimeInterval = new DateTimeInterval(getFirstLocalDateByDurationType(localDate, frequencyType),getLastLocaDateByDurationType(localDate, frequencyType));
+                break;
+            case NEXT:
+                localDate=localDate.plusDays(1);
+                dateTimeInterval = new DateTimeInterval(localDate,getNextLocaDateByDurationType(localDate, frequencyType,value));
+                break;
+            default:
+                break;
+        }
+        return dateTimeInterval;
+    }
+
     public static LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = date;
-        LocalDate nextDate = getNextLocaDateByDurationType(date, durationType);
+        LocalDate nextDate = getNextLocaDateByDurationType(date, durationType,1);
         dateTimeIntervals.add(new DateTimeInterval(currentDate, nextDate));
         return nextDate;
     }
@@ -80,7 +110,7 @@ public class KPIUtils {
 
     public static LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = date;
-        LocalDate nextDate = getPriviousLocaDateByDurationType(date, durationType);
+        LocalDate nextDate = getPriviousLocaDateByDurationType(date, durationType,1);
         dateTimeIntervals.add(new DateTimeInterval( nextDate, currentDate));
         return nextDate;
     }

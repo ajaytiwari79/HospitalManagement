@@ -5,6 +5,7 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -40,14 +41,16 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.FilterType.STAFF_IDS;
+import static com.kairos.utils.counter.KPIUtils.getDateTimeInterval;
+import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
 import static java.util.stream.Collectors.toList;
 
 
@@ -418,7 +421,7 @@ public class CounterDataService extends MongoBaseService {
         return tabKPIDTO;
     }
 
-    public  KPIResponseDTO generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
+    public  KPIResponseDTO generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId, LocalDate startDate) {
         Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));
@@ -434,6 +437,11 @@ public class CounterDataService extends MongoBaseService {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
         }
         for (BigInteger kpiId : filters.getKpiIds()) {
+            if(!staffKpiFilterCritera.get(kpiId).containsKey(FilterType.TIME_INTERVAL)){
+                ApplicableKPI staffApplicableKPI = kpiIdAndApplicableKPIMap.get(kpiId);
+                DateTimeInterval dateTimeInterval = getDateTimeInterval(staffApplicableKPI.getInterval(), isNull(staffApplicableKPI) ? 0 : staffApplicableKPI.getValue(), staffApplicableKPI.getFrequencyType(), null,startDate);
+                staffKpiFilterCritera.get(kpiId).put(FilterType.TIME_INTERVAL,Arrays.asList(dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate()));
+            }
             if(!counterRepository.getKPIByid(kpiId).isMultiDimensional() && isNotNull(kpiIdAndApplicableKPIMap.get(kpiId))) {
                 kpiIdAndApplicableKPIMap.get(kpiId).setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                 Callable<KPIResponseDTO> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedDataOfKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
