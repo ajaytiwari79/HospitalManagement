@@ -21,7 +21,7 @@ public class FilterCriteriaDTO {
     private List<BigInteger> counterIds;
     private DurationType frequencyType;
     // frequency value
-    @Positive(message = "Frequency valiue is always zero")
+    @Positive(message = "FREQUENCY_VALUE_IS_ALWAYS_POSITIVE")
     private int value;
     private KPIRepresentation kpiRepresentation;
     private IntervalUnit interval;
