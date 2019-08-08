@@ -16,10 +16,10 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.unit_settings.ActivityConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -54,7 +54,7 @@ public class PhaseService extends MongoBaseService {
     @Inject
     private ExceptionService exceptionService;
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
-    @Inject private ActivityConfigurationRepository activityConfigurationRepository;
+    @Inject private ActivityConfigurationService activityConfigurationService;
 
 
 
@@ -409,7 +409,7 @@ public class PhaseService extends MongoBaseService {
     }
 
     public BigInteger getPresencePlannedTime(Long unitId, BigInteger phaseId, Boolean managementPerson, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+        ActivityConfiguration activityConfiguration = activityConfigurationService.findPresenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
         if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
         }
