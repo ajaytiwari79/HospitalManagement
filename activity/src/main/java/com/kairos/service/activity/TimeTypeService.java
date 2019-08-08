@@ -95,32 +95,10 @@ public class TimeTypeService extends MongoBaseService {
         timeType.setLabel(timeTypeDTO.getLabel());
         timeType.setDescription(timeTypeDTO.getDescription());
         if(!timeType.getBackgroundColor().equals(timeTypeDTO.getBackgroundColor())){
-            Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeType.getId()).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
-            List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
-            shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
-                if(activitiyIds.contains(shiftActivity.getActivityId())){
-                    shiftActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                }
-                shiftActivity.getChildActivities().forEach(childActivity -> {
-                    if(activitiyIds.contains(childActivity.getActivityId())){
-                        childActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                    }
-                });
-            }));
-            if(isCollectionNotEmpty(shifts)){
-                shiftMongoRepository.saveEntities(shifts);
-            }
+            updateColorInShift(timeTypeDTO, timeType);
+            updateColorInActivity(timeTypeDTO, timeType);
         }
         timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeType.getId());
-        if (isCollectionNotEmpty(activities)) {
-            activities.forEach(activity ->
-            {
-                activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor());
-            });
-            activityMongoRepository.saveEntities(activities);
-        }
-
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
@@ -145,6 +123,32 @@ public class TimeTypeService extends MongoBaseService {
         }
         timeTypeMongoRepository.saveEntities(timeTypes);
         return timeTypeDTO;
+    }
+
+    private void updateColorInActivity(TimeTypeDTO timeTypeDTO, TimeType timeType) {
+        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeType.getId());
+        if (isCollectionNotEmpty(activities)) {
+            activities.forEach(activity -> activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor()));
+            activityMongoRepository.saveEntities(activities);
+        }
+    }
+
+    private void updateColorInShift(TimeTypeDTO timeTypeDTO, TimeType timeType) {
+        Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeType.getId()).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
+        shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
+            if(activitiyIds.contains(shiftActivity.getActivityId())){
+                shiftActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+            }
+            shiftActivity.getChildActivities().forEach(childActivity -> {
+                if(activitiyIds.contains(childActivity.getActivityId())){
+                    childActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                }
+            });
+        }));
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
+        }
     }
 
     private void setPropertiesInChildren(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> timeTypes, Map<BigInteger, List<TimeType>> leafTimeTypesMap, List<TimeType> childTimeTypeList) {
