@@ -1,6 +1,7 @@
 package com.kairos.service.unit_settings;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.constants.ActivityMessagesConstants;
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.enums.TimeTypeEnum;
@@ -56,7 +57,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
     public ProtectedDaysOffSettingDTO updateProtectedDaysOffByUnitId(Long unitId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO){
         ProtectedDaysOffSetting protectedDaysOffSetting =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
         if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
-            exceptionService.dataNotFoundException("Data Not Found ", protectedDaysOffSettingDTO.getId());
+            exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF, protectedDaysOffSettingDTO.getId());
         }
         protectedDaysOffSetting.setProtectedDaysOffUnitSettings(protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings());
         protectedDaysOffRepository.save(protectedDaysOffSetting);
@@ -66,7 +67,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
     public ProtectedDaysOffSettingDTO getProtectedDaysOffByUnitId(Long unitId){
         ProtectedDaysOffSetting protectedDaysOffSetting =protectedDaysOffRepository.getProtectedDaysOffByUnitIdAndDeletedFalse(unitId);
         if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
-            exceptionService.dataNotFoundException("Data Not Found ",unitId);
+            exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF,unitId);
         }
         ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO =new ProtectedDaysOffSettingDTO(protectedDaysOffSetting.getId(), protectedDaysOffSetting.getUnitId(), protectedDaysOffSetting.getProtectedDaysOffUnitSettings());
         return protectedDaysOffSettingDTO;

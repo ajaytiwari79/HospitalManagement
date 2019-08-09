@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -23,7 +24,7 @@ public class PublicLegalDocumentDTO {
     private Long id;
 
     @Valid
-    @NotNull(message = GdprMessagesConstants.MESSAGE_ENTER_VALID_DATA)
+    @NotEmpty(message = GdprMessagesConstants.MESSAGE_ENTER_VALID_DATA)
     private String name;
 
     private String bodyContentInHtml;
