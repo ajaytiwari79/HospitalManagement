@@ -25,6 +25,7 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
+import static com.kairos.constants.ActivityMessagesConstants.INTERNAL_SERVER_ERROR;
 
 @ControllerAdvice
 @Order(1)
@@ -377,7 +378,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         logger.error("exception in activity service", ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         errorMessage.setData(ex.getMessage());
         errorMessage.setPath(httprequest.getRequestURL().toString());
         mailService.sendMailToBackendOnException(ex);

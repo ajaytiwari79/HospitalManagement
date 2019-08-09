@@ -841,21 +841,29 @@ public class AccessGroupService {
         Long userId = UserContext.getUserDetails().getId();
         //Todo Yatharth please check and verify our code
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
-        UserAccessRoleDTO userAccessRoleDTO;
+        UserAccessRoleDTO userAccessRoleDTO = null;
         if (staffAtHub != null) {
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
-        } else {
-            AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
-            if (accessGroupQueryResult == null) {
-                exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
+        } else if(isNull(staffAtHub)){
+            Organization parent = organizationService.fetchParentOrganization(unitId);
+            Long hubIdByOrganizationId = organizationGraphRepository.getHubIdByOrganizationId(parent.getId());
+            staffAtHub = staffGraphRepository.getStaffOfHubByHubIdAndUserId(parent.isKairosHub() ? parent.getId() : hubIdByOrganizationId,userId);
+            if (staffAtHub != null) {
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
             }
-            String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
-            boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
-            boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
-            userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
-            userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
+            else if(isNull(userAccessRoleDTO)) {
+                AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
+                if (isNull(accessGroupQueryResult)) {
+                    exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
+                }
+                String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
+                boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
+                boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
+                userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
+
+            }
         }
-        //Todo till here
         return userAccessRoleDTO;
     }
 

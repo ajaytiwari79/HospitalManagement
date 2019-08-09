@@ -1,0 +1,23 @@
+//update sequence number if sequence is 0
+db.phaseSettings.find({"sequence":0}).forEach( function (phaseSetting) {
+    var sequenceValue;
+    switch(phaseSetting.name){
+        case "Request": sequenceValue = 1;
+            break;
+        case "Puzzle": sequenceValue = 2;
+            break;
+        case "Construction": sequenceValue = 3;
+            break;
+        case "Draft": sequenceValue = 4;
+            break;
+        case "Tentative": sequenceValue = 5;
+            break;
+        case "Realtime": sequenceValue = 6;
+            break;
+        case "Time & Attendance": sequenceValue = 7;
+            break;
+        case "Payroll": sequenceValue = 8;
+            break;
+    }
+    db.getCollection('phaseSettings').update({ "_id" : phaseSetting._id},{"$set":{"sequence" : NumberInt(sequenceValue) }});
+});

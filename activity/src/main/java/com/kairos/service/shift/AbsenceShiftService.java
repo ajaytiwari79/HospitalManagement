@@ -68,7 +68,7 @@ public class AbsenceShiftService {
                 newShiftDTO = shiftDTO;
             }else {
                 newShiftDTO = calculateAverageShiftByActivity(shifts, activityWrapper.getActivity(),
-                        staffAdditionalInfoDTO, absenceReasonCodeId,shiftDTO.getShiftDate(),shiftDTO.getActivities().get(0).getStatus());
+                        staffAdditionalInfoDTO, absenceReasonCodeId,shiftDTO.getShiftDate(),shiftDTO.getActivities().get(0));
             }
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), newShiftDTO.getActivities().get(newShiftDTO.getActivities().size()-1).getEndDate());
             newShiftDTO.setId(shiftDTO.getId());
@@ -99,11 +99,12 @@ public class AbsenceShiftService {
                 shiftDTO.setStartDate(startDate);
                 shiftDTO.getActivities().get(0).setStartDate(startDate);
                 shiftDTO.getActivities().get(0).setEndDate(endDate);
+
                 shiftDTO.setEndDate(endDate);
                 newShiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftDTO.class);
             }else {
                 newShiftDTO = calculateAverageShiftByActivity(shiftQueryResultsInInterval, activity,
-                        staffAdditionalInfoDTO, absenceReasonCodeId,shiftDate,shiftDTO.getActivities().get(0).getStatus());
+                        staffAdditionalInfoDTO, absenceReasonCodeId,shiftDate,shiftDTO.getActivities().get(0));
             }
             newShiftDTO.setId(shiftDTO.getId());
             shiftDTO.setId(null);
@@ -121,9 +122,10 @@ public class AbsenceShiftService {
     }
 
     private ShiftDTO calculateAverageShiftByActivity(List<ShiftDTO> shifts, Activity activity,
-                                                     StaffAdditionalInfoDTO staffAdditionalInfoDTO, Long absenceReasonCodeId, LocalDate shiftDate, Set<ShiftStatus> statuses) {
+                                                     StaffAdditionalInfoDTO staffAdditionalInfoDTO, Long absenceReasonCodeId, LocalDate shiftDate, ShiftActivityDTO shiftActivityDTO) {
         int contractualMinutesInADay = staffAdditionalInfoDTO.getEmployment().getTotalWeeklyMinutes() / staffAdditionalInfoDTO.getEmployment().getWorkingDaysInWeek();
-        ShiftActivityDTO shiftActivity = new ShiftActivityDTO(activity.getId(), activity.getName(),statuses);
+        ShiftActivityDTO shiftActivity = new ShiftActivityDTO(activity.getId(), activity.getName(),shiftActivityDTO.getStatus());
+        shiftActivity.setRemarks(shiftActivityDTO.getRemarks());
         Integer startAverageMin = null;
         Date fromDate = asDate(shiftDate);
         if (shifts != null && !shifts.isEmpty() && activity.getTimeCalculationActivityTab().getHistoryDuration() != 0) {
@@ -138,7 +140,6 @@ public class AbsenceShiftService {
         shiftActivity.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
         shiftActivity.setActivityName(activity.getName());
         shiftActivity.setAbsenceReasonCodeId(absenceReasonCodeId);
-
         return new ShiftDTO(Arrays.asList(shiftActivity), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), startDateTime.toDate(), startDateTime.plusMinutes(contractualMinutesInADay).toDate());
     }
 
