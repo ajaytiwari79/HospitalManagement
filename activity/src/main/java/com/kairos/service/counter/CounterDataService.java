@@ -184,6 +184,7 @@ public class CounterDataService extends MongoBaseService {
         kpiDTO.setTitle(applicableKPI.getTitle());
         kpiDTO.setValue(applicableKPI.getValue());
         kpiDTO.setFrequencyType(applicableKPI.getFrequencyType());
+
         kpiDTO.setInterval(applicableKPI.getInterval());
         kpiDTO.setKpiRepresentation(applicableKPI.getKpiRepresentation());
         if (isNotNull(applicableKPI.getApplicableFilter())) {
@@ -334,6 +335,7 @@ public class CounterDataService extends MongoBaseService {
         applicableKPIS.addAll(updateApplicableKPI);
         save(applicableKPIS);
         save(kpi);
+
         kpi.setTitle(counterDTO.getTitle());
         return getTabKpiData(kpi, counterDTO, accessGroupPermissionCounterDTO);
     }
@@ -401,7 +403,8 @@ public class CounterDataService extends MongoBaseService {
         filterCriteria.setKpiIds(Arrays.asList(kpiId));
         refId = ConfLevel.UNIT.equals(level) ? refId : UserContext.getUserDetails().getLastSelectedOrganizationId();
         Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, accessGroupPermissionCounterDTO.getStaffId());
-        tabKPIDTO.setData(data.get(kpiId));
+
+            tabKPIDTO.setData(data.get(kpiId));
         return tabKPIDTO;
 
     }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 
 import static com.kairos.constants.ApiConstant.*;
 
@@ -19,38 +20,38 @@ import static com.kairos.constants.ApiConstant.*;
  * Created By G.P.Ranjan on 26/6/19
  **/
 @RestController
-@RequestMapping(API_V1)
-@Api(API_V1)
+@RequestMapping(API_ORGANIZATION_COUNTRY_URL)
+@Api(API_ORGANIZATION_COUNTRY_URL)
 public class PublicLegalDocumentController {
     @Inject
     private PublicLegalDocumentService publicLegalDocumentService;
 
     @ApiOperation("Save Public Legal Document")
-    @PostMapping(COUNTRY_URL + "/public_legal_document")
-    public ResponseEntity<Object> createPublicLegalDocument(@RequestBody @Validated PublicLegalDocumentDTO publicLegalDocumentDTO) {
+    @PostMapping("/public_legal_document")
+    public ResponseEntity<Object> createPublicLegalDocument(@RequestBody @Valid PublicLegalDocumentDTO publicLegalDocumentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.createPublicLegalDocument(publicLegalDocumentDTO));
     }
 
     @ApiOperation("Upload Public Legal Document Logo")
-    @PostMapping(COUNTRY_URL + "/public_legal_document/logo")
+    @PostMapping("/public_legal_document/logo")
     public ResponseEntity<Object> uploadPublicLegalDocumentLogo(@RequestParam("file") MultipartFile file) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.uploadPublicLegalDocumentLogo(file));
     }
     @ApiOperation("Update Public Legal Document By Id")
-    @PutMapping(COUNTRY_URL + "/public_legal_document/{publicLegalDocumentId}")
-    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long publicLegalDocumentId,@RequestBody @Validated PublicLegalDocumentDTO publicLegalDocumentDTO) {
+    @PutMapping("/public_legal_document/{publicLegalDocumentId}")
+    public ResponseEntity<Object> updateMasterAgreementTemplate(@PathVariable Long publicLegalDocumentId,@RequestBody @Valid PublicLegalDocumentDTO publicLegalDocumentDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.updatePublicLegalDocument(publicLegalDocumentId,publicLegalDocumentDTO));
 
     }
 
     @ApiOperation("Delete Public Legal Document By Id")
-    @DeleteMapping(COUNTRY_URL + "/public_legal_document/{publicLegalDocumentId}")
+    @DeleteMapping("/public_legal_document/{publicLegalDocumentId}")
     public ResponseEntity<Object> removePublicLegalDocument(@PathVariable Long publicLegalDocumentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.removePublicLegalDocument(publicLegalDocumentId));
     }
 
     @ApiOperation("Get All Public Legal Document")
-    @GetMapping(COUNTRY_URL + "/public_legal_document/all")
+    @GetMapping("/public_legal_document/all")
     public ResponseEntity<Object> getAllPublicLegalDocument() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, publicLegalDocumentService.getAllPublicLegalDocument());
     }

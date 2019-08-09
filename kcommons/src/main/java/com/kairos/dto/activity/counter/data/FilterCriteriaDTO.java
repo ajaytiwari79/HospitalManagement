@@ -4,6 +4,8 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.wta.IntervalUnit;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +21,7 @@ public class FilterCriteriaDTO {
     private List<BigInteger> counterIds;
     private DurationType frequencyType;
     // frequency value
+    @Positive(message = "FREQUENCY_VALUE_IS_ALWAYS_POSITIVE")
     private int value;
     private KPIRepresentation kpiRepresentation;
     private IntervalUnit interval;

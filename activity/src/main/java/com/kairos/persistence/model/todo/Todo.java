@@ -35,7 +35,7 @@ public class Todo extends MongoBaseEntity {
     private Date approvedOn;
     private String remark;
 
-    public Todo(TodoType type, TodoSubtype subtype, BigInteger entityId, BigInteger subEntityId, String activityName, TodoStatus status, LocalDate shiftDate, String description, Long staffId, Long employmentId, Long unitId) {
+    public Todo(TodoType type, TodoSubtype subtype, BigInteger entityId, BigInteger subEntityId, String activityName, TodoStatus status, LocalDate shiftDate, String description, Long staffId, Long employmentId, Long unitId,String remark) {
         this.type = type;
         this.subtype = subtype;
         this.entityId = entityId;
@@ -47,5 +47,6 @@ public class Todo extends MongoBaseEntity {
         this.employmentId = employmentId;
         this.unitId = unitId;
         this.activityName = activityName;
+        this.remark = remark;
     }
 }

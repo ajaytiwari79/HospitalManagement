@@ -386,6 +386,7 @@ public class ActivityMessagesConstants {
     public static final String REQUEST_ABSENCE_ACTIVITY_TYPE = "request.absence.activity.type";
     public static final String REALTIME_DURATION_NOT_CONFIGURED = "realtime.duration.not.configured";
     public static final String SHIFT_NOT_EXISTS = "shift.not.exists";
+    public static final String MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF = "message.organization.protected.days.off";
     public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
-
+    public static final String FREQUENCY_VALUE_IS_ALWAYS_POSITIVE="frequency.value.is.always.positive";
 }

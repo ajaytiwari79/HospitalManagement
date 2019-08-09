@@ -9,7 +9,10 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.wta.IntervalUnit;
 
+import javax.annotation.Nonnegative;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +35,7 @@ public class CounterDTO {
     private KPIRepresentation kpiRepresentation;
     private DurationType frequencyType;
     // frequency value
+    @Positive(message = "FREQUENCY_VALUE_IS_ALWAYS_POSITIVE")
     private int value;
     private IntervalUnit interval;
 
