@@ -387,5 +387,5 @@ public class ActivityMessagesConstants {
     public static final String REALTIME_DURATION_NOT_CONFIGURED = "realtime.duration.not.configured";
     public static final String SHIFT_NOT_EXISTS = "shift.not.exists";
     public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
-
+    public static final String FREQUENCY_VALUE_IS_ALWAYS_POSITIVE="frequency.value.is.always.positive";
 }
