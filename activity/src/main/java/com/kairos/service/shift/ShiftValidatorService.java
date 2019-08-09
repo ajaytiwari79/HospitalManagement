@@ -101,18 +101,12 @@ public class ShiftValidatorService {
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
-    private ShiftValidatorService shiftValidatorService;
-    @Inject
     private StaffWTACounterRepository wtaCounterRepository;
     @Inject
     private
     ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private TimeBankRepository timeBankRepository;
-    @Inject
     private TimeBankService timeBankService;
-    @Inject
-    private TimeAttendanceGracePeriodRepository timeAttendanceGracePeriodRepository;
     @Inject
     private StaffActivitySettingRepository staffActivitySettingRepository;
     @Inject
@@ -127,9 +121,6 @@ public class ShiftValidatorService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private StaffingLevelService staffingLevelService;
-
-    @Inject
-    private ShiftStateService shiftStateService;
     @Inject
     private MongoSequenceRepository mongoSequenceRepository;
     @Inject
@@ -240,7 +231,7 @@ public class ShiftValidatorService {
         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
             for (ShiftActivityDTO childActivity : shiftActivity.getChildActivities()) {
                 Activity activity = activityWrapperMap.get(childActivity.getActivityId()).getActivity();
-                ActivityRuleViolation activityRuleViolation = null;
+                ActivityRuleViolation activityRuleViolation;
                 if (activity.getRulesActivityTab().isReasonCodeRequired() && activity.getRulesActivityTab().getReasonCodeRequiredState().
                         equals(ReasonCodeRequiredState.MANDATORY) && !Optional.ofNullable(childActivity.getAbsenceReasonCodeId()).isPresent()) {
 
@@ -307,7 +298,7 @@ public class ShiftValidatorService {
     }
 
     private RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(PlanningPeriod planningPeriod, Phase phase, ShiftWithActivityDTO shift, WTAQueryResultDTO wtaQueryResultDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        logger.info("Current phase is " + phase.getName() + " for date " + new DateTime(shift.getStartDate()));
+        logger.info("Current phase is {} for date {}",phase.getName() , new DateTime(shift.getStartDate()));
         List<StaffWTACounter> staffWTACounters = wtaCounterRepository.getStaffWTACounterByDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.asDate(planningPeriod.getStartDate()), DateUtils.asDate(planningPeriod.getEndDate()), staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff());
         PlanningPeriod lastPlanningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(staffAdditionalInfoDTO.getUnitId());
         DateTimeInterval intervalByRuleTemplates = getIntervalByRuleTemplates(shift, wtaQueryResultDTO.getRuleTemplates(), activityWrapperMap, lastPlanningPeriod.getEndDate());
@@ -316,7 +307,7 @@ public class ShiftValidatorService {
             BigInteger shiftId = shift.getId();
             shifts = shifts.stream().filter(shiftWithActivityDTO -> !shiftWithActivityDTO.getId().equals(shiftId)).collect(Collectors.toList());
         }
-        shifts = updateFullDayAndFullWeekActivityShift(shifts);
+        updateFullDayAndFullWeekActivityShift(shifts);
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
         Map<LocalDate, TimeBankByDateDTO> timeBankByDateDTOMap = timeBankService.getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),null);
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
