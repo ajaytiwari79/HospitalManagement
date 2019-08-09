@@ -7,7 +7,6 @@ import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.period.*;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -631,10 +630,7 @@ public class PlanningPeriodService extends MongoBaseService {
             staffingLevelStateMongoRepository.saveEntities(staffingLevelStates);
         }
     }
-    public PlanningPeriod getPlanningPeriodContainsDate (Long unitId,LocalDate startDate)
-    {
-        return planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, startDate);
-    }
+
     /**
      * for restore shift initial data
      */
@@ -799,9 +795,4 @@ public class PlanningPeriodService extends MongoBaseService {
             LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
         }
     }
-   public PlanningPeriod findOneByUnitIdAndDate(Long unitId, Date startDate)
-   {
-     return  planningPeriodMongoRepository.findOneByUnitIdAndDate(unitId, startDate);
-   }
-
 }
