@@ -189,7 +189,7 @@ public class OpenShiftService extends MongoBaseService {
         int[] data={0,0};
         if(role.equals(AccessGroupRole.STAFF)){
             Long employmentId = userIntegrationService.getEmploymentId(unitId, staffId, openShiftActivityWrapper.getExpertiseId());
-            EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = timeBankService.getCostTimeAgreement(employmentId,startDate,endDate);
+            EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = timeBankService.updateCostTimeAgreementDetails(employmentId,startDate,endDate);
             data = timeBankCalculationService.calculateDailyTimeBankForOpenShift(openShift, openShiftActivityWrapper.getActivity(), employmentWithCtaDetailsDTO);
         }
 

@@ -408,21 +408,5 @@ public class PhaseService extends MongoBaseService {
         return phaseTemplateValueMap;
     }
 
-    public BigInteger getPresencePlannedTime(Long unitId, BigInteger phaseId, Boolean managementPerson, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        ActivityConfiguration activityConfiguration = activityConfigurationService.findPresenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
-        if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
-            exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
-        }
-        return (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO.getEmployment(), activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
-                : getApplicablePlannedType(staffAdditionalInfoDTO.getEmployment(), activityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
-    }
-
-    private BigInteger getApplicablePlannedType(StaffEmploymentDetails staffEmploymentDetails, BigInteger plannedTypeId) {
-        if (Optional.ofNullable(staffEmploymentDetails.getIncludedPlannedTime()).isPresent()) {
-            plannedTypeId = plannedTypeId.equals(staffEmploymentDetails.getExcludedPlannedTime()) ? staffEmploymentDetails.getIncludedPlannedTime() : plannedTypeId;
-        }
-        return plannedTypeId;
-
-    }
 
 }

@@ -59,6 +59,7 @@ import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
+import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -147,6 +148,7 @@ public class ShiftService extends MongoBaseService {
     @Inject private TodoService todoService;
     @Inject private TodoRepository todoRepository;
     @Inject private ShiftFilterService shiftFilterService;
+    @Inject private ActivityConfigurationService activityConfigurationService;
 
 
 
@@ -205,7 +207,7 @@ public class ShiftService extends MongoBaseService {
         shiftValidatorService.validateStaffingLevel(phase, mainShift, activityWrapperMap, true, staffAdditionalInfoDTO);
         List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(mainShift,  activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
         mainShift.setBreakActivities(breakActivities);
-        shiftDetailsService.addPlannedTimeInShift(mainShift,activityWrapperMap,staffAdditionalInfoDTO);
+        activityConfigurationService.addPlannedTimeInShift(mainShift,activityWrapperMap,staffAdditionalInfoDTO);
         shiftDTO =ObjectMapperUtils.copyPropertiesByMapper(mainShift,ShiftDTO.class);
         ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityWrapperMap);
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, null, activityWrapperMap, false, false);
@@ -336,7 +338,7 @@ public class ShiftService extends MongoBaseService {
             shift.setDurationMinutes(durationMinutes);
             shift.setStartDate(shift.getActivities().get(0).getStartDate());
             shift.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-            shiftDetailsService.addPlannedTimeInShift(shift,activityWrapperMap,staffAdditionalInfoDTO);
+            activityConfigurationService.addPlannedTimeInShift(shift,activityWrapperMap,staffAdditionalInfoDTO);
         }
         shiftMongoRepository.saveEntities(shifts);
         shifts.forEach(shift -> updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO));
@@ -412,43 +414,6 @@ public class ShiftService extends MongoBaseService {
         }
         shiftWithViolatedInfo.setShifts(shiftDTOS);
         return shiftWithViolatedInfo;
-    }
-
-    public BigInteger addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        /**
-         * This is used for checking the activity is for presence type
-         **/
-        Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
-
-         /* return (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
-                || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK))
-                ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
-                : phaseService.getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);*/
-
-
-        return (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())) ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
-                : phaseService.getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
-    }
-
-    private BigInteger getAbsencePlannedTime(Long unitId, BigInteger phaseId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity) {
-        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
-        BigInteger plannedTimeId = null;
-        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
-            if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
-                exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
-            }
-            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
-                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
-                break;
-            } else {
-                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
-            }
-        }
-        // checking weather this is allowed to staff or not
-        if (Optional.ofNullable(staffAdditionalInfoDTO.getEmployment().getIncludedPlannedTime()).isPresent() && plannedTimeId.equals(staffAdditionalInfoDTO.getEmployment().getExcludedPlannedTime())) {
-            plannedTimeId = staffAdditionalInfoDTO.getEmployment().getIncludedPlannedTime();
-        }
-        return plannedTimeId;
     }
 
     public Map<String,Object> saveAndCancelDraftShift(Long unitId, Long staffId, LocalDate startDate, LocalDate endDate, Long employmentId, ViewType viewType,
@@ -622,7 +587,7 @@ public class ShiftService extends MongoBaseService {
             shift.setPlanningPeriodId(oldStateOfShift.getPlanningPeriodId());
             List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shift,  activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
             shift.setBreakActivities(breakActivities);
-            shiftDetailsService.addPlannedTimeInShift(shift,activityWrapperMap,staffAdditionalInfoDTO);
+            activityConfigurationService.addPlannedTimeInShift(shift,activityWrapperMap,staffAdditionalInfoDTO);
             ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class), activityWrapperMap);
             shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, shift, activityWrapperMap, true, false);
             List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);

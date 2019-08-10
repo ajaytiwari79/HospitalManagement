@@ -1,15 +1,20 @@
 package com.kairos.service.unit_settings;
 
+import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.PlannedTime;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.activity_configuration.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -22,6 +27,7 @@ import com.kairos.persistence.repository.unit_settings.ActivityConfigurationRepo
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -33,6 +39,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toMap;
 
@@ -51,6 +58,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private PlannedTimeTypeRepository plannedTimeTypeRepository;
+    @Inject private PhaseService phaseService;
 
     public void createDefaultSettings(Long unitId, Long countryId, List<Phase> phases,List<Long> employmentTypeIds) {
         if(activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)){
@@ -227,27 +235,62 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public void addPlannedTimeInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
-        if (isNull(shift.getId())) {
-            assignedPlannedTimeInActivity(shift,activityWrappers,staffAdditionalInfoDTO,phase);
-        } else {
-            adjustPlannedTimeInActivity(shift,activityWrappers,staffAdditionalInfoDTO,phase);
-        }
-    }
-
-    private void assignedPlannedTimeInActivity(Shift shiftDTO, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO,Phase phase) {
-        shiftDTO.getActivities().forEach(shiftActivity ->{
-            BigInteger plannedTimeId = shiftService.addPlannedTimeInShift(shiftDTO.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
-            shiftActivity.setPlannedTimes(Arrays.asList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())));
-        });
-    }
-
-    private void adjustPlannedTimeInActivity(Shift shift, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO,Phase phase) {
         List<PlannedTime> plannedTimeList = shift.getActivities().stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
         Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            BigInteger plannedTimeId = shiftService.addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
-            shiftActivity.setPlannedTimes(filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), plannedTimeMap, plannedTimeId));
+            List<BigInteger> plannedTimeIds = addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
+            BigInteger plannedTimeId = plannedTimeIds.get(0);
+            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
+                plannedTimeId = shiftActivity.getPlannedTimeId();
+            }
+            List<PlannedTime> plannedTimes = isNull(shift.getId()) ? newArrayList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())) : filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), plannedTimeMap, plannedTimeId);
+            shiftActivity.setPlannedTimes(plannedTimes);
         }
+    }
+
+    public List<BigInteger> addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
+        return (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())) ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
+                : getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
+    }
+
+    private List<BigInteger> getAbsencePlannedTime(Long unitId, BigInteger phaseId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity) {
+        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+        List<BigInteger> plannedTimeIds = null;
+        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
+            if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
+                exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
+            }
+            if (activityConfiguration.getAbsencePlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getAbsencePlannedTime().getTimeTypeId())) {
+                plannedTimeIds = activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds();
+                break;
+            } else {
+                plannedTimeIds = activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds();
+            }
+        }
+        if(isCollectionEmpty(plannedTimeIds)){
+            exceptionService.dataNotFoundByIdException(PLANNED_TIME_NOT_CONFIGURE);
+        }
+        return plannedTimeIds;
+    }
+
+    public List<BigInteger> getPresencePlannedTime(Long unitId, BigInteger phaseId, Boolean managementPerson, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        List<BigInteger> plannedTimeIds;
+        ActivityConfiguration activityConfiguration = findPresenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+        if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
+            exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
+        }
+        if(managementPerson){
+            plannedTimeIds = activityConfiguration.getPresencePlannedTime().getManagementPlannedTimeIds();
+        }else {
+            plannedTimeIds = activityConfiguration.getPresencePlannedTime().getEmploymentWisePlannedTimeConfigurations().stream()
+                    .filter(employmentWisePlannedTimeConfiguration -> employmentWisePlannedTimeConfiguration.getEmploymentTypeId().equals(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()))
+                    .findFirst().orElseThrow(()->new DataNotFoundException(convertMessage(PLANNED_TIME_NOT_CONFIGURE))).getStaffPlannedTimeIds();
+        }
+        if(isCollectionEmpty(plannedTimeIds)){
+            exceptionService.dataNotFoundByIdException(PLANNED_TIME_NOT_CONFIGURE);
+        }
+        return plannedTimeIds;
     }
 
     private List<PlannedTime> filterPlannedTimes(Date startDate, Date endDate, Map<DateTimeInterval, PlannedTime> plannedTimeMap, BigInteger plannedTimeId) {
