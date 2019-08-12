@@ -58,6 +58,7 @@ import java.time.LocalTime;
 import java.time.*;
 import java.time.temporal.ChronoField;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
@@ -403,7 +404,7 @@ public class TimeBankCalculationService {
         timeBankDTO.setApprovePayOut(approvePayOut);
         timeBankDTO.setPaidoutChange(paidPayOut);
         timeBankDTO.setRequestPayOut(requestPayOut);
-        timeBankDTO.setTimeBankDistribution(new TimeBankCTADistributionDTO(scheduledCTADistributions, getCTABonusDistributions(ctaBonusDistributionMap, employmentWithCtaDetailsDTO), plannedMinutesOfTimebank));
+        timeBankDTO.setTimeBankDistribution(new TimeBankCTADistributionDTO(scheduledCTADistributions, getCTABonusDistributions(ctaBonusDistributionMap, employmentWithCtaDetailsDTO.getCtaRuleTemplates()), plannedMinutesOfTimebank));
         timeBankDTO.setWorkingTimeType(getWorkingTimeType(interval, shifts, timeTypeDTOS));
         timeBankDTO.setTotalContractedMin(totalContractedMin);
         timeBankDTO.setTotalTimeBankMin(totalTimeBank - approvePayOut);
@@ -429,10 +430,10 @@ public class TimeBankCalculationService {
         return scheduledCTADistributions;
     }
 
-    private CTARuletemplateBonus getCTABonusDistributions(Map<String, Integer> ctaDistributionMap, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
+    private CTARuletemplateBonus getCTABonusDistributions(Map<String, Integer> ctaDistributionMap, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
         List<CTADistributionDTO> ctaBonusDistributions = new ArrayList<>();
         long ctaBonusMinutes = 0;
-        for (CTARuleTemplateDTO ctaRuleTemplate : employmentWithCtaDetailsDTO.getCtaRuleTemplates()) {
+        for (CTARuleTemplateDTO ctaRuleTemplate : ctaRuleTemplateDTOS) {
             if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT) && (ctaRuleTemplate.getCalculationFor().equals(BONUS_HOURS) || ctaRuleTemplate.getCalculationFor().equals(FUNCTIONS))) {
                 CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
                 ctaBonusDistributions.add(ctaDistributionDTO);
@@ -1052,18 +1053,23 @@ public class TimeBankCalculationService {
         while (employmentStartDate.isBefore(endDate) || employmentStartDate.equals(endDate)) {
             int totalTimeBankMinutes;
             long publishedBalancesMinutes = 0;
+            DailyTimeBankEntry dailyTimeBankEntry;
+            Map<String,Integer> ctaRuletemplateNameAndMinutesMap = new HashMap<>();
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate)) {
-                DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
+                dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
                 totalTimeBankMinutes = userAccessRoleDTO.getManagement() && dailyTimeBankEntry.isAnyShiftInDraft() ? dailyTimeBankEntry.getDraftDeltaTimebankMinutes() : dailyTimeBankEntry.getDeltaTimeBankMinutes();
                 publishedBalancesMinutes = dailyTimeBankEntry.getPublishedBalances().values().stream().mapToLong(value -> value).sum();
+                ctaRuletemplateNameAndMinutesMap = dailyTimeBankEntry.getTimeBankCTADistributionList().stream().collect(Collectors.toMap(k->k.getCtaName(),v->v.getMinutes()));
             } else {
                 totalTimeBankMinutes = -getContractualMinutesByDate(planningPeriodInterval, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines());
             }
             if(validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate))) {
                 expectedTimebankMinutes += totalTimeBankMinutes;
             }
+            CTARuletemplateBonus ctaRuletemplateBonus = getCTABonusDistributions(ctaRuletemplateNameAndMinutesMap,ctaRuleTemplateDTOS);
+            TimeBankCTADistributionDTO timeBankCTADistributionDTO = new TimeBankCTADistributionDTO(newArrayList(),ctaRuletemplateBonus,0);
             if(employmentStartDate.isAfter(startDate) || startDate.equals(employmentStartDate)) {
-                localDateTimeBankByDateDTOMap.put(employmentStartDate, new TimeBankIntervalDTO(totalTimeBankMinutes,0,expectedTimebankMinutes,publishedBalancesMinutes));
+                localDateTimeBankByDateDTOMap.put(employmentStartDate, new TimeBankIntervalDTO(totalTimeBankMinutes,0,expectedTimebankMinutes,publishedBalancesMinutes,timeBankCTADistributionDTO));
             }
             employmentStartDate = employmentStartDate.plusDays(1);
         }

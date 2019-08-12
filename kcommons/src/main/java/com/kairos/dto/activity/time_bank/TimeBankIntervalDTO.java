@@ -46,11 +46,12 @@ public class TimeBankIntervalDTO {
         this.title = title;
     }
 
-    public TimeBankIntervalDTO(int timeBankChangeMinutes, long accumulatedTimebankMinutes, long expectedTimebankMinutes, long publishedBalancesMinutes) {
+    public TimeBankIntervalDTO(int timeBankChangeMinutes, long accumulatedTimebankMinutes, long expectedTimebankMinutes, long publishedBalancesMinutes,TimeBankCTADistributionDTO timeBankDistribution) {
         this.timeBankChangeMinutes = timeBankChangeMinutes;
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
         this.expectedTimebankMinutes = expectedTimebankMinutes;
         this.publishedBalancesMinutes = publishedBalancesMinutes;
+        this.timeBankDistribution = timeBankDistribution;
     }
 
     public TimeBankIntervalDTO(long totalScheduledMin, long totalTimeBankDiff, String title) {
