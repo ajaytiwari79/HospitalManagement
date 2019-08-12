@@ -26,6 +26,7 @@ import org.joda.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -45,7 +46,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 /**
  * Created by oodles on 30/1/17.
  */
-@Service
+@Service("nametest")
 @Transactional
 public class AbsencePlanningService {
     @Autowired
