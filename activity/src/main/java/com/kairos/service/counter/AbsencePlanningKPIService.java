@@ -146,6 +146,8 @@ public class AbsencePlanningKPIService {
     public Map<Object,Map<ShiftStatus,Long>> getActivityStatusForTimeSlot(Long unitId)
     {
         List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
+        Map<Object,ShiftStatus> activityStatusTimeSlotMap;
+
 
      
         return null;
