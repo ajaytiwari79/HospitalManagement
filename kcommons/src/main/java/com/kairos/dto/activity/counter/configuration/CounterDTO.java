@@ -8,15 +8,19 @@ import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.wta.IntervalUnit;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.annotation.Nonnegative;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class CounterDTO {
     private BigInteger id;
     private CounterType type;
@@ -35,125 +39,7 @@ public class CounterDTO {
     private KPIRepresentation kpiRepresentation;
     private DurationType frequencyType;
     // frequency value
-    @Positive(message = "FREQUENCY_VALUE_IS_ALWAYS_POSITIVE")
+    @Positive(message = "frequency.value.is.always.positive")
     private int value;
     private IntervalUnit interval;
-
-    public CounterDTO() {
-        //Default Constructor
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public CounterType getType() {
-        return type;
-    }
-
-    public void setType(CounterType type) {
-        this.type = type;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title.trim();
-    }
-
-    public boolean isCounter() {
-        return counter;
-    }
-
-    public void setCounter(boolean counter) {
-        this.counter = counter;
-    }
-
-    public BigInteger getPrimaryCounter() {
-        return primaryCounter;
-    }
-
-    public void setPrimaryCounter(BigInteger primaryCounter) {
-        this.primaryCounter = primaryCounter;
-    }
-
-    public BigInteger getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(BigInteger categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public List<FilterCriteria> getCriteriaList() {
-        return criteriaList;
-    }
-
-    public void setCriteriaList(List<FilterCriteria> criteriaList) {
-        this.criteriaList = criteriaList;
-    }
-
-    public Set<ModuleType> getSupportedModuleTypes() {
-        return supportedModuleTypes;
-    }
-
-    public void setSupportedModuleTypes(Set<ModuleType> supportedModuleTypes) {
-        this.supportedModuleTypes = supportedModuleTypes;
-    }
-
-    public List<FilterCriteria> getSelectedFilters() {
-        return selectedFilters;
-    }
-
-    public void setSelectedFilters(List<FilterCriteria> selectedFilters) {
-        this.selectedFilters = selectedFilters;
-    }
-
-    public String getCalculationFormula() {
-
-        return calculationFormula;
-    }
-
-    public void setCalculationFormula(String calculationFormula) {
-        this.calculationFormula = calculationFormula;
-    }
-
-    public DurationType getFrequencyType() {
-        return frequencyType;
-    }
-
-    public void setFrequencyType(DurationType frequencyType) {
-        this.frequencyType = frequencyType;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
-    }
-
-    public IntervalUnit getInterval() {
-        return interval;
-    }
-
-    public void setInterval(IntervalUnit interval) {
-        this.interval = interval;
-    }
-
-    public KPIRepresentation getKpiRepresentation() {
-
-        return kpiRepresentation;
-    }
-
-    public void setKpiRepresentation(KPIRepresentation kpiRepresentation) {
-        this.kpiRepresentation = kpiRepresentation;
-    }
 }
