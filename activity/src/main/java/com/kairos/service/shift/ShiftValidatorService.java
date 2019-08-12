@@ -428,7 +428,7 @@ public class ShiftValidatorService {
                     Date endDate = DateUtils.getDateByZoneDateTime(DateUtils.asZoneDateTime(shiftActivities.get(0).getEndDate()).truncatedTo(ChronoUnit.DAYS));
                     List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, startDate, endDate);
                     if (!Optional.ofNullable(staffingLevels).isPresent() || staffingLevels.isEmpty()) {
-                        throwException(MESSAGE_STAFFINGLEVEL_ABSENT);
+                        exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
                     }
                     List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftActivities.get(0).getStartDate(), shiftActivities.get(0).getEndDate(), unitId);
                     StaffingLevelActivityRank rankOfExisting = staffingLevelActivityRankRepository.findByStaffingLevelDateAndActivityId(asLocalDate(shiftActivities.get(0).getStartDate()), shiftActivities.get(0).getActivityId());
@@ -453,7 +453,7 @@ public class ShiftValidatorService {
                                 ) {
                             logger.info("shift can be replaced");
                         } else {
-                            throwException(SHIFT_CAN_NOT_MOVE, staffingLevelForReplacedActivity);
+                            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelForReplacedActivity);
                         }
 
                     }
