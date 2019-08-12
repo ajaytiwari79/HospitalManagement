@@ -202,7 +202,7 @@ public class CounterRepository{
 
     public KPICategory getKPICategoryByName(String categoryName, ConfLevel level, Long refId) {
         String queryField = getRefQueryField(level);
-        Query query = new Query(Criteria.where("deleted").is(false).and("name").is(categoryName).and(queryField).is(refId).and("level").is(level));
+        Query query = new Query(Criteria.where("deleted").is(false).and("name").is(categoryName).regex(Pattern.compile("^" + categoryName + "$", Pattern.CASE_INSENSITIVE)).and(queryField).is(refId).and("level").is(level));
         return mongoTemplate.findOne(query, KPICategory.class);
 
     }

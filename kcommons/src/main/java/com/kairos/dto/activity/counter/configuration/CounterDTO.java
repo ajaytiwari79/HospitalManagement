@@ -18,6 +18,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
+import static com.kairos.constants.MessageConstants.FREQUENCY_VALUE_IS_NOT_POSITIVE;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -39,7 +41,7 @@ public class CounterDTO {
     private KPIRepresentation kpiRepresentation;
     private DurationType frequencyType;
     // frequency value
-    @Positive(message = "frequency.value.is.always.positive")
+    @Positive(message = FREQUENCY_VALUE_IS_NOT_POSITIVE)
     private int value;
     private IntervalUnit interval;
 }
