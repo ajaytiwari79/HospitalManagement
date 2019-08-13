@@ -453,11 +453,6 @@ public class CounterDataService extends MongoBaseService {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
         }
         for (BigInteger kpiId : filters.getKpiIds()) {
-            if(!staffKpiFilterCritera.get(kpiId).containsKey(FilterType.TIME_INTERVAL)){
-                ApplicableKPI staffApplicableKPI = kpiIdAndApplicableKPIMap.get(kpiId);
-                DateTimeInterval dateTimeInterval = getDateTimeInterval(staffApplicableKPI.getInterval(), isNull(staffApplicableKPI) ? 0 : staffApplicableKPI.getValue(), staffApplicableKPI.getFrequencyType(), null,startDate);
-                staffKpiFilterCritera.get(kpiId).put(FilterType.TIME_INTERVAL,Arrays.asList(dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate()));
-            }
             if(!counterRepository.getKPIByid(kpiId).isMultiDimensional() && isNotNull(kpiIdAndApplicableKPIMap.get(kpiId))) {
                 kpiIdAndApplicableKPIMap.get(kpiId).setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                 Callable<KPIResponseDTO> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedDataOfKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
