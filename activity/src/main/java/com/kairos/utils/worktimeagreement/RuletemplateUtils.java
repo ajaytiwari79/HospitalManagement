@@ -1,12 +1,9 @@
 package com.kairos.utils.worktimeagreement;
 
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.TimeInterval;
+import com.kairos.commons.utils.*;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -16,6 +13,7 @@ import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
@@ -27,9 +25,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -39,6 +35,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.enums.wta.WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -78,6 +75,34 @@ public class RuletemplateUtils {
         return dateTimeInterval;
     }
 
+
+    public static DateTimeInterval[] getIntervalsByRuleTemplate(ShiftWithActivityDTO shift, String intervalUnit, long intervalValue) {
+        DateTimeInterval[] interval = new DateTimeInterval[2];
+        if (intervalValue == 0 || StringUtils.isEmpty(intervalUnit)) {
+            throwException("message.ruleTemplate.interval.notNull");
+        }
+        switch (intervalUnit) {
+            case DAYS:
+                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusDays(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case WEEKS:
+                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusWeeks(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case MONTHS:
+                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusMonths(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            case YEARS:
+                interval[0] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
+                interval[1] = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getStartDate()).plusYears(intervalValue).truncatedTo(ChronoUnit.DAYS));
+                break;
+            default:
+                break;
+        }
+        return interval;
+    }
 
     public static TimeInterval getTimeSlotByPartOfDay(List<PartOfDay> partOfDays, Map<String, TimeSlotWrapper> timeSlotWrapperMap, ShiftWithActivityDTO shift) {
         TimeInterval timeInterval = null;
@@ -145,16 +170,16 @@ public class RuletemplateUtils {
         }
         switch (intervalUnit) {
             case DAYS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusDays((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
                 break;
             case WEEKS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusWeeks((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
                 break;
             case MONTHS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusMonths((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
                 break;
             case YEARS:
-                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS), DateUtils.asZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS));
+                interval = new DateTimeInterval(DateUtils.asZoneDateTime(shift.getStartDate()).minusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).plusDays(1), DateUtils.asZoneDateTime(shift.getEndDate()).plusYears((int) intervalValue).truncatedTo(ChronoUnit.DAYS).minusDays(1).plusDays(1));
                 break;
             default:
                 break;
@@ -191,7 +216,9 @@ public class RuletemplateUtils {
                                                                   String unitValue) {
         if (!isValid) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation;
-            if (counterCount != null) {
+            if (PhaseDefaultName.TIME_ATTENDANCE.equals(infoWrapper.getPhaseEnum())){
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), counterCount, true, true,totalCounter,unitType,unitValue);
+            }else if (counterCount != null) {
                 int counterValue = counterCount - 1;
                 boolean canBeIgnore = true;
                 if (counterValue < 0) {
@@ -199,7 +226,8 @@ public class RuletemplateUtils {
                     canBeIgnore = false;
                 }
                 workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), counterCount, true, canBeIgnore,totalCounter,unitType,unitValue);
-            } else {
+            }
+            else {
                 workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), null, true, false,totalCounter,unitType,unitValue);
             }
             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
@@ -305,7 +333,7 @@ public class RuletemplateUtils {
     }
 
     public static boolean isValid(MinMaxSetting minMaxSetting, int limitValue, int calculatedValue) {
-        return minMaxSetting.equals(MinMaxSetting.MINIMUM) ? limitValue <= calculatedValue : limitValue >= calculatedValue;
+        return minMaxSetting.equals(MinMaxSetting.MINIMUM) ? limitValue <= calculatedValue  : limitValue >= calculatedValue;
     }
 
     public static Set<LocalDate> getSortedAndUniqueDates(List<ShiftWithActivityDTO> shifts) {
@@ -405,6 +433,12 @@ public class RuletemplateUtils {
                 case DURATION_BETWEEN_SHIFTS:
                     interval = interval.addInterval(new DateTimeInterval(minusMonths(shift.getStartDate(),1),plusMonths(shift.getStartDate(),1)));
                 break;
+                case DAYS_OFF_AFTER_A_SERIES:
+                DaysOffAfterASeriesWTATemplate daysOffAfterASeriesWTATemplate = (DaysOffAfterASeriesWTATemplate) ruleTemplate;
+                    validateRuleTemplate(daysOffAfterASeriesWTATemplate.getIntervalLength(), daysOffAfterASeriesWTATemplate.getIntervalUnit());
+                    dateTimeInterval = getIntervalByRuleTemplate(shift, daysOffAfterASeriesWTATemplate.getIntervalUnit(), daysOffAfterASeriesWTATemplate.getIntervalLength());
+                    interval = interval.addInterval(dateTimeInterval);
+
                 default:
                     break;
             }
@@ -413,16 +447,11 @@ public class RuletemplateUtils {
     }
 
     public static DateTimeInterval getIntervalByWTACareDaysRuleTemplate(ShiftWithActivityDTO shift, WTAForCareDays wtaForCareDays) {
-        LocalDate shiftDate = DateUtils.asLocalDate(shift.getStartDate());
-        Map<BigInteger, ActivityCareDayCount> careDayCountMap = wtaForCareDays.getCareDaysCountMap();
+        Map<BigInteger, ActivityCareDayCount> careDayCountMap = wtaForCareDays.careDaysCountMap();
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             if (careDayCountMap.containsKey(shiftActivityDTO.getActivityId())) {
-                Optional<CutOffInterval> cutOffIntervalOptional = shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate)) && (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
-                if (cutOffIntervalOptional.isPresent()) {
-                    CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
-                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()), DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
-                }
+                dateTimeInterval = getCutoffInterval(shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffStartFrom(), shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), shiftActivityDTO.getActivity().getRulesActivityTab().getCutOffdayValue(),shift.getStartDate());
             }
         }
         return dateTimeInterval;
@@ -434,11 +463,43 @@ public class RuletemplateUtils {
         for (BigInteger activityId : activityIds) {
             if (activityWrapperMap.containsKey(activityId)) {
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
-                Optional<CutOffInterval> cutOffIntervalOptional = activity.getRulesActivityTab().getCutOffIntervals().stream().filter(interval -> ((interval.getStartDate().isBefore(shiftDate) || interval.getStartDate().isEqual(shiftDate)) && (interval.getEndDate().isAfter(shiftDate) || interval.getEndDate().isEqual(shiftDate)))).findAny();
-                if (cutOffIntervalOptional.isPresent()) {
-                    CutOffInterval cutOffInterval = cutOffIntervalOptional.get();
-                    dateTimeInterval = dateTimeInterval.addInterval(new DateTimeInterval(DateUtils.asDate(cutOffInterval.getStartDate()), DateUtils.asDate(cutOffInterval.getEndDate().plusDays(1))));
+                dateTimeInterval = getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(),shiftStartDate);
+            }
+        }
+        return dateTimeInterval;
+    }
+
+    public static DateTimeInterval getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue,Date shiftStartDate) {
+        LocalDate startDate = dateFrom;
+        LocalDate endDate = startDate.plusYears(1);
+        DateTimeInterval dateTimeInterval = null;
+        if(startDate.isBefore(asLocalDate(shiftStartDate))) {
+            while (isNull(dateTimeInterval) || !dateTimeInterval.contains(shiftStartDate)) {
+                LocalDate nextEndDate = startDate;
+                switch (cutOffIntervalUnit) {
+                    case DAYS:
+                        nextEndDate = startDate.plusDays(dayValue - 1);
+                        break;
+                    case HALF_YEARLY:
+                        nextEndDate = startDate.plusMonths(6).minusDays(1);
+                        break;
+                    case WEEKS:
+                        nextEndDate = startDate.plusWeeks(1).minusDays(1);
+                        break;
+                    case MONTHS:
+                        nextEndDate = startDate.plusMonths(1).minusDays(1);
+                        break;
+                    case QUARTERS:
+                        nextEndDate = startDate.plusMonths(3).minusDays(1);
+                        break;
+                    case YEARS:
+                        nextEndDate = startDate.plusYears(1).minusDays(1);
+                        break;
+                    default:
+                        break;
                 }
+                dateTimeInterval = new DateTimeInterval(startDate, nextEndDate.plusDays(1));
+                startDate = nextEndDate.plusDays(1);
             }
         }
         return dateTimeInterval;

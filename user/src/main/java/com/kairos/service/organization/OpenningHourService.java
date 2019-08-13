@@ -2,8 +2,8 @@ package com.kairos.service.organization;
 
 import com.kairos.persistence.model.organization.DayType;
 import com.kairos.persistence.model.organization.OpeningHours;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationSetting;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.organization.OpeningHourGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;

@@ -1,23 +1,19 @@
 package com.kairos.commons.utils;
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.enums.DurationType;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+import org.mockito.cglib.core.Local;
 
 import javax.validation.constraints.NotNull;
+import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
+import java.time.temporal.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +29,7 @@ public  class DateUtils {
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
     public static final String COMMON_DATE_FORMAT = "dd-MM-yyyy";
+    public static final String COMMON_TIME_FORMAT="HH:mm";
 
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -243,6 +240,10 @@ public  class DateUtils {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
+    public static String asLocalDateString(Date date, String pattern) {
+        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofPattern(pattern,Locale.ENGLISH));
+    }
+
     public static LocalDate asLocalDate(Long date) {
         return Instant.ofEpochMilli(date).atZone(ZoneId.systemDefault()).toLocalDate();
     }
@@ -366,6 +367,10 @@ public  class DateUtils {
 
     public static Date getDateByLocalDateAndLocalTime(LocalDate localDate, LocalTime localTime) {
         return new DateTime(localDate.getYear(), localDate.getMonthValue(), localDate.getDayOfMonth(), localTime.getHour(), localTime.getMinute()).toDate();
+    }
+
+    public static Date getDateByLocalTime(Date date, LocalTime localTime) {
+        return getDateByLocalDateAndLocalTime(asLocalDate(date),localTime);
     }
 
 
@@ -627,6 +632,7 @@ public  class DateUtils {
 
     }
 
+
     public static LocalDateTime getLocalDateTimeFromMillis(Long longValue) {
         return (longValue == null) ? null : LocalDateTime.ofInstant(Instant.ofEpochMilli(longValue), ZoneId.systemDefault());
     }
@@ -734,8 +740,12 @@ public  class DateUtils {
         return localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
     }
 
-    public static String getLocaDateStringByPattern(LocalDate localDate,String pattern){
+    public static String getLocalDateStringByPattern(LocalDate localDate, String pattern){
         return localDate.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    public static String getLocalTimeStringByPattern(LocalTime localTime, String pattern) {
+        return localTime.format(DateTimeFormatter.ofPattern(pattern));
     }
 
     public static LocalDate getlastDayOfYear(Integer year){
@@ -765,19 +775,19 @@ public  class DateUtils {
         return dateTime.toDate();
     }
 
-    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType) {
+    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
         switch (durationType) {
             case DAYS:
-                date = date.plusDays(1);
+                date = date.plusDays(value);
                 break;
             case MONTHS:
-                date = date.plusMonths(1);
+                date = date.plusMonths(value);
                 break;
             case WEEKS:
-                date = date.plusWeeks(1);
+                date = date.plusWeeks(value);
                 break;
             case YEAR:
-                date = date.plusYears(1);
+                date = date.plusYears(value);
                 break;
             default:
                 break;
@@ -785,19 +795,19 @@ public  class DateUtils {
         return date;
     }
 
-    public static LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType) {
+    public static LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
         switch (durationType) {
             case DAYS:
-                date = date.minusDays(1);
+                date = date.minusDays(value);
                 break;
             case MONTHS:
-                date = date.minusMonths(1);
+                date = date.minusMonths(value);
                 break;
             case WEEKS:
-                date = date.minusWeeks(1);
+                date = date.minusWeeks(value);
                 break;
             case YEAR:
-                date = date.minusYears(1);
+                date = date.minusYears(value);
                 break;
             default:
                 break;
@@ -845,11 +855,12 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+getLocaDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return getLocaDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
+        return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
     }
+
     public static long getMinutesBetweenDate(Date toDate,Date fromDate){
         return Duration.between(asLocalDateTime(toDate),asLocalDateTime(fromDate)).toMinutes();
     }
@@ -862,5 +873,6 @@ public  class DateUtils {
         String localtime=time.format(DateTimeFormatter.ofPattern("HH:mm"));
         String date = dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
         return date;
+
     }
 }

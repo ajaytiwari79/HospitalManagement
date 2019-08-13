@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
@@ -77,8 +76,8 @@ public class TimeBankController {
     //As discussed with Shiv kumar API name should be get_timebank_metadata
     @ApiOperation("Get accumulated timebank and delta timebank")
     @GetMapping("/get_timebank_metadata")
-    public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId,@RequestParam Long employmentId, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,@RequestParam(required = false) Boolean includeActualTimebank){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDeltaDTO(employmentId,unitId,startDate,endDate,includeActualTimebank));
+    public ResponseEntity<Map<String,Object>> getAccumulatedTimebankDTO(@PathVariable Long unitId,@RequestParam Long employmentId,@RequestParam(required = false) Boolean includeActualTimebank){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getAccumulatedTimebankAndDelta(employmentId,unitId,includeActualTimebank));
     }
 
     //Todo remove this API after sprint 46 is closed

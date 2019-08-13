@@ -1,15 +1,12 @@
 package com.kairos.service.clause;
 
-
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.ClauseDTO;
 import com.kairos.dto.gdpr.master_data.MasterClauseDTO;
 import com.kairos.persistence.model.agreement_template.PolicyAgreementTemplate;
-import com.kairos.persistence.model.clause.Clause;
-import com.kairos.persistence.model.clause.MasterClause;
-import com.kairos.persistence.model.clause.OrganizationClause;
+import com.kairos.persistence.model.clause.*;
 import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.embeddables.*;
 import com.kairos.persistence.model.template_type.TemplateType;

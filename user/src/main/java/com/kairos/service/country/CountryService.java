@@ -1,6 +1,5 @@
 package com.kairos.service.country;
 
-
 import com.google.api.services.calendar.model.Event;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
@@ -16,6 +15,7 @@ import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
@@ -27,9 +27,7 @@ import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryGraphRepository;
-import com.kairos.persistence.repository.user.country.CountryHolidayCalenderGraphRepository;
-import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.*;
 import com.kairos.persistence.repository.user.country.default_data.RelationTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.VehicalGraphRepository;
 import com.kairos.persistence.repository.user.region.LevelGraphRepository;
@@ -596,5 +594,9 @@ public class CountryService {
             return ((Unit) entity).getCountryId();
         }
         return ((Organization) entity).getCountry().getId();
+    }
+
+    public List<Long> getAllUnits(long countryId) {
+        return organizationService.getAllOrganizationIds();
     }
 }

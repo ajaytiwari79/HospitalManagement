@@ -11,6 +11,7 @@ import org.neo4j.ogm.annotation.StartNode;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PERSONALIZED_LOCATION;
 
+
 /**
  * CreatedBy vipulpandey on 20/11/18
  **/

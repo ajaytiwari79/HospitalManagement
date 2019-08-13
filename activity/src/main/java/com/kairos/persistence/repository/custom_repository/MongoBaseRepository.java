@@ -7,7 +7,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.List;
 
 @NoRepositoryBean
 public interface MongoBaseRepository<T, ID extends Serializable> extends MongoRepository<T, ID> {

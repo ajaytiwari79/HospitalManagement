@@ -7,6 +7,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.CareDaysDTO;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import lombok.Getter;
@@ -14,9 +15,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author pradeep
@@ -35,7 +34,7 @@ public class RuleTemplateSpecificInfo {
     private Map<BigInteger,Integer> counterMap;
     private Map<Long, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
-    private int totalTimeBank;
+    private long totalTimeBank;
     private ViolatedRulesDTO violatedRules;
     private int staffAge;
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;
@@ -44,11 +43,12 @@ public class RuleTemplateSpecificInfo {
     private LocalDate lastPlanningPeriodEndDate;
     private boolean nightWorker;
     private ExpertiseNightWorkerSetting expertiseNightWorkerSetting;
+    PhaseDefaultName phaseEnum;
 
 
 
 
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, int totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
@@ -65,6 +65,8 @@ public class RuleTemplateSpecificInfo {
         this.seniorCareDays = seniorCareDays;
         this.lastPlanningPeriodEndDate = lastPlanningPeriodEndDate;
         this.expertiseNightWorkerSetting = expertiseNightWorkerSetting;
+        this.nightWorker = nightWorker;
+        this.phaseEnum=phaseEnum;
     }
 
     public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, boolean nightWorker, ExpertiseNightWorkerSetting expertiseNightWorkerSetting,BigInteger phaseId,ShiftWithActivityDTO shift,UserAccessRoleDTO user,ViolatedRulesDTO violatedRules) {
@@ -76,4 +78,5 @@ public class RuleTemplateSpecificInfo {
         this.user = user;
         this.violatedRules = violatedRules;
     }
+
 }

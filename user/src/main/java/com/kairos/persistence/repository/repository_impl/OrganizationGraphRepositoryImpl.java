@@ -34,7 +34,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return subString;
     }
 
-    public String getMatchQueryForNameGenderStatusOfStaffByFilters(Map<FilterType, List<String>> filters, String searchText) {
+    public String getMatchQueryForNameGenderStatusOfStaffByFilters(Map<FilterType, Set<String>> filters, String searchText) {
         String matchQueryForStaff = "";
         int countOfSubString = 0;
         if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent()) {
@@ -53,7 +53,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return matchQueryForStaff;
     }
 
-    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, List<String>> filters) {
+    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, Set<String>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
             matchRelationshipQueryForStaff += "MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)  " +
@@ -61,7 +61,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "WHERE id(employmentType) IN {employmentTypeIds}  " +
                     "OPTIONAL MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]-(exp:Expertise) WITH staff,organization,employment,user,exp,employmentType,employmentLine \n" +
                     "OPTIONAL MATCH(employmentLine)-[:" + APPLICABLE_FUNCTION + "]-(function:Function) " +
-                    "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,employmentLine,exp,employmentType\n" +
+                    "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name,icon:function.icon}) END as functions,employmentLine,exp,employmentType\n" +
                     "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions}) as employmentLines,exp,employmentType\n" +
                     "with staff,user,CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList, \n" +
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
@@ -70,7 +70,7 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     "OPTIONAL MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]-(exp:Expertise)\n" +
                     "OPTIONAL MATCH (employmentLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  " +
                     "OPTIONAL MATCH(employmentLine)-[:" + APPLICABLE_FUNCTION + "]-(function:Function) " +
-                    "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name}) END as functions,employmentLine,exp,employmentType\n" +
+                    "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name,icon:function.icon}) END as functions,employmentLine,exp,employmentType\n" +
                     "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions}) as employmentLines,exp,employmentType\n" +
                     "with staff,user,CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList, \n" +
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
@@ -90,12 +90,12 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         return matchRelationshipQueryForStaff;
     }
 
-    public List<Long> convertListOfStringIntoLong(List<String> listOfString) {
+    public List<Long> convertListOfStringIntoLong(Set<String> listOfString) {
         return listOfString.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 
     public List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, String moduleId,
-                                         Map<FilterType, List<String>> filters, String searchText, String imagePath) {
+                                         Map<FilterType, Set<String>> filters, String searchText, String imagePath) {
 
         Map<String, Object> queryParameters = new HashMap();
 

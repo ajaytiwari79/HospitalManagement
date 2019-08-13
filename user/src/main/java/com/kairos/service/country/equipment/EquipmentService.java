@@ -15,7 +15,6 @@ import com.kairos.persistence.repository.user.country.EquipmentGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.google_calender.CountryCalenderService;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

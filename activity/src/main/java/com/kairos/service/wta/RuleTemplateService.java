@@ -1,14 +1,11 @@
 package com.kairos.service.wta;
 
-
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.CurrentUserDetails;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
-import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
-import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateWrapper;
+import com.kairos.dto.activity.wta.rule_template_category.*;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
@@ -24,12 +21,9 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
 import com.kairos.utils.user_context.UserContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,15 +38,14 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.WEEKS;
-
+import static com.kairos.service.wta.WTABuilderService.copyRuleTemplatesToDTO;
 
 /**
  * Created by pawanmandhan on 5/8/17.
  */
 @Transactional
 @Service
-public class RuleTemplateService extends MongoBaseService {
+public class RuleTemplateService{
     @Inject
     private UserIntegrationService userIntegrationService;
     @Autowired
@@ -79,7 +72,7 @@ public class RuleTemplateService extends MongoBaseService {
         if (!Optional.ofNullable(ruleTemplateCategory).isPresent()) {
             ruleTemplateCategory = new RuleTemplateCategory("NONE", "None", RuleTemplateCategoryType.WTA);
             ruleTemplateCategory.setCountryId(countryDTO.getId());
-            save(ruleTemplateCategory);
+            ruleTemplateCategoryMongoRepository.save(ruleTemplateCategory);
         }
         if (Optional.ofNullable(wtaBaseRuleTemplates).isPresent() && !wtaBaseRuleTemplates.isEmpty()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_WTARULETEMPLATE_ALREADYEXISTS);
@@ -230,7 +223,7 @@ public class RuleTemplateService extends MongoBaseService {
         wtaBaseRuleTemplates1.add(breakWTATemplate);
         WTAForCareDays careDays = new WTAForCareDays("WTA For Care Days","WTA For Care Days");
         wtaBaseRuleTemplates1.add(careDays);
-        save(wtaBaseRuleTemplates1);
+        wtaBaseRuleTemplateMongoRepository.saveEntities(wtaBaseRuleTemplates1);
 
 
         return true;
@@ -250,7 +243,7 @@ public class RuleTemplateService extends MongoBaseService {
         }
 
         //
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(templateList, WTABaseRuleTemplateDTO.class);
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = copyRuleTemplatesToDTO(templateList);
         assignCategoryToRuleTemplate(categoryList, wtaBaseRuleTemplateDTOS);
         RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
         wrapper.setCategoryList(categoryList);
@@ -265,7 +258,7 @@ public class RuleTemplateService extends MongoBaseService {
         }
         List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(organization.getCountryId());
         List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(organization.getCountryId());
-        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(templateList, WTABaseRuleTemplateDTO.class);
+        List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = copyRuleTemplatesToDTO(templateList);
         RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
         assignCategoryToRuleTemplate(categoryList, wtaBaseRuleTemplateDTOS);
         ruleTemplateWrapper.setCategoryList(categoryList);
@@ -302,7 +295,7 @@ public class RuleTemplateService extends MongoBaseService {
         oldTemplate.setLastUpdatedBy(currentUserDetails.getFirstName());
         oldTemplate.setRuleTemplateCategoryId(templateDTO.getRuleTemplateCategory().getId());
         oldTemplate.setCountryId(countryId);
-        save(oldTemplate);
+        wtaBaseRuleTemplateMongoRepository.save(oldTemplate);
         return templateDTO;
     }
 
@@ -325,7 +318,7 @@ public class RuleTemplateService extends MongoBaseService {
         WTABaseRuleTemplate wtaBaseRuleTemplate = WTABuilderService.copyRuleTemplate(wtaRuleTemplateDTO, true);
         wtaBaseRuleTemplate.setCountryId(countryId);
         wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplateCategory.getId());
-        save(wtaBaseRuleTemplate);
+        wtaBaseRuleTemplateMongoRepository.save(wtaBaseRuleTemplate);
         wtaRuleTemplateDTO.setId(wtaBaseRuleTemplate.getId());
         wtaRuleTemplateDTO.setRuleTemplateCategory(wtaRuleTemplateDTO.getRuleTemplateCategory());
         return wtaRuleTemplateDTO;

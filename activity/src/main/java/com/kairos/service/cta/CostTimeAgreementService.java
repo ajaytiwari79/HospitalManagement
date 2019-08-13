@@ -1,6 +1,5 @@
 package com.kairos.service.cta;
 
-
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.*;
@@ -25,7 +24,6 @@ import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
 import com.kairos.rest_client.UserIntegrationService;
-import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.table_settings.TableSettingService;
@@ -45,8 +43,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.ActivityMessagesConstants.END_DATE_FROM_END_DATE;
-import static com.kairos.constants.ActivityMessagesConstants.START_DATE_FROM_END_DATE;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_CTA_AGREEMENT_VERSION_TABLE_ID;
@@ -59,7 +55,7 @@ import static com.kairos.persistence.model.constants.TableSettingConstants.ORGAN
 
 @Transactional
 @Service
-public class CostTimeAgreementService extends MongoBaseService {
+public class CostTimeAgreementService {
     private static final Logger logger = LoggerFactory.getLogger(CostTimeAgreementService.class);
 
 
@@ -94,7 +90,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         if (category == null) {
             category = new RuleTemplateCategory("NONE", "None", RuleTemplateCategoryType.CTA);
             category.setCountryId(countryId);
-            save(category);
+            ruleTemplateCategoryRepository.save(category);
             /*CountryDTO country = countryRestClient.getCountryById(countryId);
             if (country != null) {
                 List<CTARuleTemplate> ctaRuleTemplates = createDefaultRuleTemplate(countryId, country.getCurrencyId(), category.getId());
@@ -123,7 +119,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         this.buildCTARuleTemplate(ctaRuleTemplate, ctaRuleTemplateDTO, false, countryDTO);
         ctaRuleTemplate.setCountryId(countryId);
         ctaRuleTemplate.setStaffFunctions(null);
-        this.save(ctaRuleTemplate);
+        ctaRuleTemplateRepository.save(ctaRuleTemplate);
         ctaRuleTemplateDTO.setId(ctaRuleTemplate.getId());
         return ctaRuleTemplateDTO;
     }
@@ -157,7 +153,7 @@ public class CostTimeAgreementService extends MongoBaseService {
                     ruleTemplates.forEach(ctaRuleTemplate -> {
                         ctaRuleTemplate.setId(null);
                     });
-                    save(ruleTemplates);
+                    ctaRuleTemplateRepository.saveEntities(ruleTemplates);
                     ruleTemplateIds = ruleTemplates.stream().map(rt -> rt.getId()).collect(Collectors.toList());
                 }
                 organisationCTA.setRuleTemplateIds(ruleTemplateIds);
@@ -165,7 +161,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             }
         }
         if (!costTimeAgreements.isEmpty()) {
-            save(costTimeAgreements);
+            costTimeAgreementRepository.saveEntities(costTimeAgreements);
         }
 
     }
@@ -272,7 +268,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
         ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
         if (CollectionUtils.isNotEmpty(ctaRuleTemplates)) {
-            save(ctaRuleTemplates);
+            ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
         }
         List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
         costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
@@ -280,7 +276,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         costTimeAgreement.setEndDate(ctaDTO.getEndDate());
         costTimeAgreement.setDescription(ctaDTO.getDescription());
         costTimeAgreement.setName(ctaDTO.getName());
-        save(costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaRuleTemplates, CTARuleTemplateDTO.class);
         ExpertiseResponseDTO expertiseResponseDTO = ObjectMapperUtils.copyPropertiesByMapper(costTimeAgreement.getExpertise(), ExpertiseResponseDTO.class);
         return new CTAResponseDTO(costTimeAgreement.getId(), costTimeAgreement.getName(), expertiseResponseDTO, ctaRuleTemplateDTOS, costTimeAgreement.getStartDate(), costTimeAgreement.getEndDate(), false, costTimeAgreement.getEmploymentId(), costTimeAgreement.getDescription());
@@ -298,7 +294,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaDTO.getRuleTemplates(), CTARuleTemplate.class);
         if (!ctaRuleTemplates.isEmpty()) {
             ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
-            save(ctaRuleTemplates);
+            ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
             List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
             costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
         }
@@ -397,7 +393,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_CTA_ID_NOTFOUND, ctaId);
         }
         costTimeAgreement.setDeleted(true);
-        this.save(costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
         return true;
     }
 
@@ -436,7 +432,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateDTO.getRuleTemplateCategoryId());
             ctaRuleTemplates.add(ctaRuleTemplate);
         }
-        save(ctaRuleTemplates);
+        ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
         List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
         costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
         costTimeAgreement.setStartDate(collectiveTimeAgreementDTO.getStartDate());
@@ -474,7 +470,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         this.buildCTARuleTemplate(udpdateCtaRuleTemplate, ctaRuleTemplateDTO, true, countryDTO);
         udpdateCtaRuleTemplate.setId(ctaRuleTemplate.getId());
         udpdateCtaRuleTemplate.setCountryId(countryId);
-        this.save(udpdateCtaRuleTemplate);
+        ctaRuleTemplateRepository.save(udpdateCtaRuleTemplate);
         return ctaRuleTemplateDTO;
     }
 
@@ -494,7 +490,7 @@ public class CostTimeAgreementService extends MongoBaseService {
         collectiveTimeAgreementDTO.setId(null);
         CostTimeAgreement costTimeAgreement = buildCTA(collectiveTimeAgreementDTO);
         costTimeAgreement.setOrganization(new WTAOrganization(organization.getId(), organization.getName(), organization.getDescription()));
-        this.save(costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
         collectiveTimeAgreementDTO.setId(costTimeAgreement.getId());
         return collectiveTimeAgreementDTO;
     }
@@ -528,7 +524,7 @@ public class CostTimeAgreementService extends MongoBaseService {
             if (!Optional.ofNullable(cta).isPresent())
                 exceptionService.dataNotFoundByIdException(MESSAGE_CTA_ID_NOTFOUND, ctaId);
             cta.setDeleted(true);
-            save(cta);
+            costTimeAgreementRepository.save(cta);
         }
         return collectiveTimeAgreementDTO1;
     }
@@ -561,12 +557,12 @@ public class CostTimeAgreementService extends MongoBaseService {
         List<CTARuleTemplate> ctaRuleTemplates = ObjectMapperUtils.copyPropertiesOfListByMapper(ctaResponseDTO.getRuleTemplates(), CTARuleTemplate.class);
         ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setId(null));
         if (!ctaRuleTemplates.isEmpty()) {
-            save(ctaRuleTemplates);
+            ctaRuleTemplateRepository.saveEntities(ctaRuleTemplates);
         }
         costTimeAgreement.setEmploymentId(employmentId);
         List<BigInteger> ruleTemplateIds = ctaRuleTemplates.stream().map(MongoBaseEntity::getId).collect(Collectors.toList());
         costTimeAgreement.setRuleTemplateIds(ruleTemplateIds);
-        save(costTimeAgreement);
+        costTimeAgreementRepository.save(costTimeAgreement);
 
         return costTimeAgreementRepository.getOneCtaById(costTimeAgreement.getId());
     }

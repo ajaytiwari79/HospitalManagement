@@ -3,10 +3,8 @@ package com.kairos.persistence.repository.organization;/*
  *
  */
 
-import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.union.UnionDataQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -16,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_LOCATION;
 
 @Repository
 public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organization,Long> {

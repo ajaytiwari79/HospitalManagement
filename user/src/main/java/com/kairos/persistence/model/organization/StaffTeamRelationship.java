@@ -1,14 +1,10 @@
 package com.kairos.persistence.model.organization;
 
-import com.kairos.annotations.KPermissionRelatedModel;
-import com.kairos.annotations.KPermissionRelationshipFrom;
-import com.kairos.annotations.KPermissionRelationshipTo;
+import com.kairos.annotations.*;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import org.neo4j.ogm.annotation.EndNode;
-import org.neo4j.ogm.annotation.RelationshipEntity;
-import org.neo4j.ogm.annotation.StartNode;
+import org.neo4j.ogm.annotation.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_HAS_MEMBER;
 

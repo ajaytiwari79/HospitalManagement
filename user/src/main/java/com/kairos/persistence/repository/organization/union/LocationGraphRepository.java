@@ -1,8 +1,6 @@
 package com.kairos.persistence.repository.organization.union;
 
-import com.kairos.persistence.model.organization.union.Location;
-import com.kairos.persistence.model.organization.union.LocationDataQueryResult;
-import com.kairos.persistence.model.organization.union.LocationQueryResult;
+import com.kairos.persistence.model.organization.union.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

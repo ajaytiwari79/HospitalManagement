@@ -2,6 +2,8 @@ package com.kairos.dto.activity.counter.distribution.dashboard;
 
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 
+import java.util.List;
+
 public class KPIDashboardDTO {
     //private BigInteger id;
     private String parentModuleId;
@@ -14,6 +16,7 @@ public class KPIDashboardDTO {
     private boolean enable=true;
     private boolean active=true;
     private boolean defaultTab;
+    private List<Long> unitIds;
 
 
 //    public BigInteger getId() {
@@ -102,5 +105,13 @@ public class KPIDashboardDTO {
 
     public void setDefaultTab(boolean defaultTab) {
         this.defaultTab = defaultTab;
+    }
+
+    public List<Long> getUnitIds() {
+        return unitIds;
+    }
+
+    public void setUnitIds(List<Long> unitIds) {
+        this.unitIds = unitIds;
     }
 }

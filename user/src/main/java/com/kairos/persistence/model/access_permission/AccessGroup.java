@@ -5,9 +5,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.*;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotBlank;

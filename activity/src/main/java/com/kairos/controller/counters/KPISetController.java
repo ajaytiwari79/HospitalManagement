@@ -5,7 +5,6 @@ package com.kairos.controller.counters;
  */
 
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
-import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.service.counter.KPISetService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Map;
 
@@ -74,7 +74,7 @@ public class KPISetController {
 
 
     @GetMapping(UNIT_URL+"/kpi_set_calculation")
-    public ResponseEntity<Map<String, Object>> createKPISetCalculation(@PathVariable Long unitId, @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate) {
+    public ResponseEntity<Map<String, Object>> createKPISetCalculation(@PathVariable Long unitId, @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getKPISetCalculationData(unitId,startDate));
     }
 

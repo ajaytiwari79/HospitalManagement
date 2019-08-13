@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -123,7 +122,7 @@ public class OrganizationActivityController {
     @ApiOperation("Update Phase setting Tab of Activity")
     @PutMapping(value = "/activity/phase_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    ResponseEntity<Map<String, Object>> updatePhaseSettingTab(@RequestBody PhaseSettingsActivityTab phaseSettingsActivityTab) {
+    ResponseEntity<Map<String, Object>> updatePhaseSetticopyngTab(@RequestBody PhaseSettingsActivityTab phaseSettingsActivityTab) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updatePhaseSettingTab(phaseSettingsActivityTab));
     }
 
@@ -165,14 +164,16 @@ public class OrganizationActivityController {
     }
 
 
+/*
     @ApiOperation("Update compositeShifts Tab of Activity")
     @PutMapping(value = "/activity/{activityId}/allowed_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId, compositeShiftActivityDTO));
     }
+*/
 
-    @ApiOperation("Update compositeShifts Tab of Activity")
+    @ApiOperation("Update child Activivty of Activity")
     @PutMapping(value = "/activity/{activityId}/child_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignChildActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody Set<BigInteger> childActivitiesIds) {

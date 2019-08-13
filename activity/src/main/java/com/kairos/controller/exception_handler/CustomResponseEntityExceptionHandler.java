@@ -5,27 +5,15 @@ import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.service.mail.MailService;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.dao.*;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingPathVariableException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.ServletRequestBindingException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.validation.*;
+import org.springframework.web.*;
+import org.springframework.web.bind.*;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
@@ -35,10 +23,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import static com.kairos.constants.ActivityMessagesConstants.INTERNAL_SERVER_ERROR;
 
 @ControllerAdvice
 @Order(1)
@@ -391,7 +378,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         logger.error("exception in activity service", ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
-        errorMessage.setMessage(ex.getMessage());
+        errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         errorMessage.setData(ex.getMessage());
         errorMessage.setPath(httprequest.getRequestURL().toString());
         mailService.sendMailToBackendOnException(ex);

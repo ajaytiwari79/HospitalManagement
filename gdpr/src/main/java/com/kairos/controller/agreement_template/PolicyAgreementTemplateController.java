@@ -3,9 +3,7 @@ package com.kairos.controller.agreement_template;
 import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
 import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.dto.response.ResponseDTO;
-import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
-import com.kairos.response.dto.policy_agreement.GeneralAgreementTemplateResponseDTO;
-import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
+import com.kairos.response.dto.policy_agreement.*;
 import com.kairos.service.agreement_template.PolicyAgreementTemplateService;
 import com.kairos.utils.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -153,6 +151,31 @@ class PolicyAgreementTemplateController {
     @GetMapping("/legal")
     public ResponseEntity<ResponseDTO<List<GeneralAgreementTemplateResponseDTO>>> getAllGeneralAgreementTemplate() {
         return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllGeneralAgreementTemplate());
+    }
+
+    @ApiOperation("update data handler agreement template")
+    @PutMapping(COUNTRY_URL + "/data_handler/agreement_template/{agreementTemplateId}")
+    public ResponseEntity<Object> updateMasterAgreementTemplateForDataHandler(@PathVariable Long countryId, @PathVariable Long agreementTemplateId, @RequestBody MasterAgreementTemplateDTO agreementTemplateDto) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, policyAgreementTemplateService.updateMasterAgreementTemplateForDataHandler(countryId, agreementTemplateId, agreementTemplateDto));
+
+    }
+
+    @ApiOperation(value = "Get All Data Handler Template")
+    @GetMapping(UNIT_URL + "/data_handler/agreement_template/all")
+    public ResponseEntity<ResponseDTO<List<AgreementTemplateDTO>>> getAllDataHandlerTemplate(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getAllDataHandlerTemplate(unitId));
+    }
+
+    @ApiOperation(value = "Get One Data Handler Template")
+    @GetMapping(UNIT_URL + "/data_handler/agreement_template/{agreementTemplateId}")
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> getDataHandlerTemplate(@PathVariable Long unitId,@PathVariable Long agreementTemplateId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getDataHandlerTemplate(unitId,false,agreementTemplateId));
+    }
+
+    @ApiOperation(value = "Get One Data Handler Template")
+    @GetMapping(COUNTRY_URL + "/data_handler/agreement_template/{agreementTemplateId}")
+    public ResponseEntity<ResponseDTO<AgreementTemplateDTO>> getDataHandlerTemplateByCountry(@PathVariable Long countryId,@PathVariable Long agreementTemplateId) {
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, policyAgreementTemplateService.getDataHandlerTemplate(countryId,true,agreementTemplateId));
     }
 
 

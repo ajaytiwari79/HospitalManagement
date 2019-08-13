@@ -13,10 +13,7 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by vipul on 10/8/17.

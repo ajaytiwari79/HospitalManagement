@@ -17,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.handler.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,9 +25,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
@@ -92,7 +88,7 @@ public class StaffingLevelController {
                 staffingLevelService.getPresenceStaffingLevel(id));
     }
 
-    @RequestMapping(value = "presence/{staffingLevelId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/presence/{staffingLevelId}", method = RequestMethod.PUT)
     @ApiOperation("update staffing_level")
     public ResponseEntity<Map<String, Object>> updateStaffingLevel(@RequestBody @Valid PresenceStaffingLevelDto presenceStaffingLevelDto,
         @PathVariable Long unitId,@PathVariable BigInteger staffingLevelId) {

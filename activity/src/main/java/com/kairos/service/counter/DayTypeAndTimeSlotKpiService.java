@@ -1,34 +1,22 @@
 package com.kairos.service.counter;
 
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
-import com.kairos.dto.activity.counter.data.CommonRepresentationData;
-import com.kairos.dto.activity.counter.data.FilterCriteria;
-import com.kairos.dto.activity.counter.data.KPIAxisData;
-import com.kairos.dto.activity.counter.data.KPIRepresentationData;
+import com.kairos.dto.activity.counter.data.*;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
-import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
-import com.kairos.dto.activity.kpi.KPISetResponseDTO;
-import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.kpi.*;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.enums.Day;
-import com.kairos.enums.DurationType;
-import com.kairos.enums.FilterType;
+import com.kairos.enums.*;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
-import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.counter.KPIUtils;
@@ -37,19 +25,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
-import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseListData;
+import static com.kairos.utils.counter.KPIUtils.*;
 
 
 @Service
@@ -118,14 +101,13 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
 
 
     private List<CommonKpiDataUnit> getDayTypeAndTimeSlotHours(Long organizationId, Map<FilterType, List> filterBasedCriteria,ApplicableKPI applicableKPI) {
-        Set<DayOfWeek> daysOfWeek = new HashSet<>();
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = (List<Long>)filterCriteria[0];
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
         List<Long> unitIds = (List<Long>)filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
-        List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
+        List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates,null);
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiDefaultData(staffEmploymentTypeDTO);
         //filter staffids base on kpi filter rest call
@@ -133,17 +115,7 @@ public class DayTypeAndTimeSlotKpiService implements CounterService {
         List<Long> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAY_TYPE)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(DayTypeDTO::getId).collect(Collectors.toList());
         List<Long> timeSlotIds = filterBasedCriteria.containsKey(FilterType.TIME_SLOT) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_SLOT)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.TIME_SLOT)) : Arrays.asList(defaultKpiDataDTO.getTimeSlotDTOS().get(0).getId());
         Map<Long, DayTypeDTO> daysTypeIdAndDayTypeMap = defaultKpiDataDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
-
-        if (!ObjectUtils.isCollectionEmpty(dayTypeIds)) {
-            dayTypeIds.forEach(daysTypeId -> daysTypeIdAndDayTypeMap.get(daysTypeId).getValidDays().forEach(day -> {
-                //TODO if remove Everyday from day enum then remove if statement and use dayOfWeek of java
-                if (day.equals(Day.EVERYDAY)) {
-                    daysOfWeek.addAll(newHashSet(DayOfWeek.values()));
-                } else {
-                    daysOfWeek.add(DayOfWeek.valueOf(day.toString()));
-                }
-            }));
-        }
+        Set<DayOfWeek> daysOfWeek = counterHelperService.getDayOfWeek(dayTypeIds,daysTypeIdAndDayTypeMap);
         List<Integer> dayOfWeeksNo = new ArrayList<>();
         daysOfWeek.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());

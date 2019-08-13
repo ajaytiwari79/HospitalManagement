@@ -1,9 +1,6 @@
 package com.kairos.scheduler.service.scheduler_panel;
 
-
-import com.kairos.commons.utils.BeanFactoryUtil;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.dto.scheduler.IntegrationSettingsDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.scheduler.kafka.producer.KafkaProducer;
@@ -12,7 +9,6 @@ import com.kairos.scheduler.persistence.model.scheduler_panel.SchedulerPanel;
 import com.kairos.scheduler.persistence.repository.scheduler_panel.IntegrationConfigurationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -22,10 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
 
@@ -34,7 +27,7 @@ import java.util.concurrent.ScheduledFuture;
  */
 
 @Service
-public class DynamicCronScheduler implements DisposableBean {
+public class DynamicCronScheduler{
 
 
     @Inject
@@ -159,21 +152,10 @@ public class DynamicCronScheduler implements DisposableBean {
             }
 
             KairosSchedulerExecutorDTO jobToExecute = new KairosSchedulerExecutorDTO(schedulerPanel.getId(), schedulerPanel.getUnitId(), schedulerPanel.getJobType(), schedulerPanel.getJobSubType(), schedulerPanel.getEntityId(),
-                    integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()));
+                    integrationSettingsDTO, DateUtils.getMillisFromLocalDateTime(schedulerPanel.getOneTimeTriggerDate()),schedulerPanel.getFilterId());
 
             kafkaProducer.pushToQueue(jobToExecute);
         };
     }
-
-    public void destroy() {
-        List<SchedulerPanel> schedulerPanels = schedulerPanelService.getAllControlPanels();
-        if (schedulerPanels.size() != 0) {
-            for (SchedulerPanel schedulerPanel : schedulerPanels) {
-                logger.info("Shutdown Cron Job of process name " + schedulerPanel.getName());
-                stopCronJob("scheduler" + schedulerPanel.getId());
-            }
-        }
-    }
-
 
 }

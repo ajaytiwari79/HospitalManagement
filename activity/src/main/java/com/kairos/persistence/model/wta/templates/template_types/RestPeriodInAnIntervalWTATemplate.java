@@ -9,13 +9,13 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -26,6 +26,8 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
 
     @Positive(message = "message.ruleTemplate.interval.notNull")
@@ -34,41 +36,6 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     private String intervalUnit;
     private float recommendedValue;
     private List<BigInteger> timeTypeIds = new ArrayList<>();
-
-
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(long intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
 
     public RestPeriodInAnIntervalWTATemplate(String name, boolean disabled,
                                              String description) {
@@ -80,16 +47,7 @@ public class RestPeriodInAnIntervalWTATemplate extends WTABaseRuleTemplate {
     }
 
     public RestPeriodInAnIntervalWTATemplate() {
-        wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
-    }
-
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
+        this.wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;
     }
 
     @Override

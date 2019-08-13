@@ -16,6 +16,7 @@ public final class ApiConstants {
     public static final String API_REQUEST_COMPONENT_URL = API_V1 + "/resourceComponent";
     public static final String API_ORGANIZATION_COUNTRY_URL = API_V1 + COUNTRY_URL;
     public static final String TIMEBANK_URL = API_UNIT_URL + "/timeBank";
+    public static final String TODO_URL = API_UNIT_URL + "/toDo";
     public static final String PAYOUT_URL = API_UNIT_URL + "/payOut";
     public static final String COUNTER_DIST_URL = "/counter/dist";
     public static final String KPI_URL = "/kpi/{kpiId}";
@@ -139,7 +140,7 @@ public final class ApiConstants {
     public static final String GET_FUNCTIONS_OF_EMPLOYMENT = STAFF_WITH_STAFF_ID + "/employment/{employmentId}/functions";
     public static final String FUNCTIONS_OF_EMPLOYMENT = "/employment/functions";
     public static final String UNIT_TIMEZONE = "/time_zone";
-    public static final String UNITS_TIMEZONE = "units_time_zone";
+    public static final String UNITS_TIMEZONE = "/units_time_zone";
     public static final String GET_ORGANIZATION_IDS = "/get_organization_ids";
     public static final String GET_PUBLIC_HOLIDAY_DAY_TYPE_REASON_CODE = "/holiday_day_type_reason_code";
 
@@ -162,6 +163,9 @@ public final class ApiConstants {
     public static final String FIBONACCI = "/fibonacci";
     public static final String IS_ACTIVITY_ASSIGNED = "/team/is_activity_assigned";
     public static final String KPI_SET="/kpi_set";
+
+    public static final String REQUEST_ABSENCE = API_V1+"/request_absence";
+    public static final String TODO = API_V1 + UNIT_URL+"/todo";
 
 
 }

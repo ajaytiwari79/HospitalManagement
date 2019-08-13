@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.employment;
 
-
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -12,9 +11,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -112,6 +109,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 // Date is not supported as a return type in Bolt protocol version 1. Please make sure driver supports at least protocol version 2. Driver upgrade is most likely required
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment{deleted:false}) where id(staff)={0} return employment.endDate as endDate")
     List<String> getAllEmploymentsByStaffId(Long staffId);
+    @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment{deleted:false}) where id(staff) in {0} return id(employment)")
+    List<Long> getEmploymentIdsByStaffIds(List<Long> staffids);
 
     @Query("MATCH(employment:Employment)-[:" + IN_UNIT + "]->(subOrg:Unit) where id(employment)={0} " +
             "MATCH(employment)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +

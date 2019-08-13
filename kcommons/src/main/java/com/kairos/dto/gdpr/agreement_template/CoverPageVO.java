@@ -1,10 +1,7 @@
 package com.kairos.dto.gdpr.agreement_template;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Objects;
 @Getter

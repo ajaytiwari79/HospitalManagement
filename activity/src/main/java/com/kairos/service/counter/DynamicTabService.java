@@ -80,6 +80,26 @@ public class DynamicTabService extends MongoBaseService {
         }
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
+    public List<KPIDashboardDTO> addDashboardDefaultTabToRef(KPIDashboardDTO kpiDashboardDTO, ConfLevel level) {
+        List<KPIDashboard> dashboardKPIDTOS=counterRepository.getKPIDashboardsOfStaffAndUnits(kpiDashboardDTO.getUnitIds(),ConfLevel.STAFF, Arrays.asList(kpiDashboardDTO.getStaffId()));
+        Map<Long,List<KPIDashboard>> kpiDashboardMap=dashboardKPIDTOS.stream().collect(Collectors.groupingBy(k->k.getUnitId(),Collectors.toList()));
+        List<KPIDashboard> kpiDashboards = new ArrayList<>();
+        kpiDashboardDTO.getUnitIds().forEach(unit->{
+            if(!kpiDashboardMap.get(unit).stream().anyMatch(k->k.getName().equalsIgnoreCase(kpiDashboardDTO.getName()))){
+                kpiDashboards.add(new KPIDashboard(kpiDashboardDTO.getParentModuleId(), kpiDashboardDTO.getModuleId(), kpiDashboardDTO.getName(), kpiDashboardDTO.getCountryId(), unit, kpiDashboardDTO.getStaffId(), level,kpiDashboardDTO.isDefaultTab()));
+            }
+
+        });
+
+        if (!kpiDashboards.isEmpty()){
+            save(kpiDashboards);
+            kpiDashboards.stream().forEach(kpiDashboard -> {
+                kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId()));
+            });
+            save(kpiDashboards);
+        }
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
+    }
 
     private String createModuleId(BigInteger id, String parentModuleId) {
         return parentModuleId + "_" + id;

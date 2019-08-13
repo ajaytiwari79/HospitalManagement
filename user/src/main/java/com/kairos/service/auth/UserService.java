@@ -1,10 +1,7 @@
 package com.kairos.service.auth;
 
 import com.kairos.commons.service.mail.MailService;
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.commons.utils.ObjectUtils;
+import com.kairos.commons.utils.*;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
@@ -14,10 +11,7 @@ import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.access_permission.AccessPageDTO;
-import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
-import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
+import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.DayType;
@@ -416,9 +410,7 @@ public class UserService {
                         permission.setActive(permission.isRead() || permission.isWrite());
                         unitPermissionMap.put(permission.getModuleId(), permission);
                     } else {
-                        permission.setActive(false);
-                        permission.setRead(false);
-                        permission.setWrite(false);
+                        permission.setActive(permission.isRead() || permission.isWrite());
                         unitPermissionMap.put(permission.getModuleId(), permission);
                     }
                 } else {
@@ -475,7 +467,7 @@ public class UserService {
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
-        permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
+         permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
         return permissionData;
     }
 

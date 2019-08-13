@@ -36,6 +36,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_H
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SECONDARY_ADDRESS;
 
 
+
 /**
  * Created by Jasgeet on 22/5/17.
  */

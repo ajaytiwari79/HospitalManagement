@@ -10,30 +10,23 @@ import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.enums.Gender;
-import com.kairos.enums.OrganizationLevel;
-import com.kairos.enums.StaffStatusEnum;
+import com.kairos.enums.*;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.Client;
-import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.client.*;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.*;
-import com.kairos.persistence.model.staff.permission.AccessPermission;
-import com.kairos.persistence.model.staff.permission.UnitPermission;
-import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
-import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.permission.*;
+import com.kairos.persistence.model.staff.personal_details.*;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
@@ -90,9 +83,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.CharBuffer;
@@ -848,8 +839,11 @@ public class StaffService {
         return new ClientStaffInfoDTO(staff.getId());
     }
 
-    public Staff getStaffById(long staffId) {
-        return staffGraphRepository.findOne(staffId, 0);
+    public com.kairos.dto.user.staff.StaffDTO getStaffById(long staffId) {
+        Staff staff = staffGraphRepository.findOne(staffId, 1);
+        com.kairos.dto.user.staff.StaffDTO staffDTO =  ObjectMapperUtils.copyPropertiesByMapper(staff,com.kairos.dto.user.staff.StaffDTO.class);
+        staffDTO.setEmail(staff.getUser().getEmail());
+        return staffDTO;
     }
 
     public List<Long> getCountryAdminIds(long organizationId) {
@@ -1011,4 +1005,6 @@ public class StaffService {
         }
         return newUserName;
     }
+
+
 }

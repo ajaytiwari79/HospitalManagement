@@ -51,6 +51,8 @@ public class ExpertiseUnitService {
     private CountryService countryService;
     @Inject
     private OrganizationPersonalizeLocationRelationShipGraphRepository organizationLocationRelationShipGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
 
     public List<ExpertiseQueryResult> findAllExpertise(Long unitId) {
         Long countryId= countryService.getCountryIdByUnitId(unitId);
@@ -64,8 +66,7 @@ public class ExpertiseUnitService {
         if (CollectionUtils.isNotEmpty(expertises)) {
             List<Long> expertiseIds = expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
             List<ExpertiseLocationStaffQueryResult> locations = organizationLocationRelationShipGraphRepository.getExpertisesLocationInOrganization(expertiseIds, unitId);
-            List<ExpertiseLocationStaffQueryResult> staffs = staffGraphRepository.findAllUnionRepresentativeOfExpertiseInUnit(expertiseIds, unitId);
-
+            List<ExpertiseLocationStaffQueryResult> staffs = staffGraphRepository.findAllUnionRepresentativeOfExpertiseInUnit(expertiseIds, organization.isParentOrganization()?unitId:organizationService.fetchParentOrganization(unitId).getId());
             Map<Long, Map<String, Object>> staffMap = staffs.stream().collect(Collectors.toMap(current -> current.getExpertiseId(), v -> v.getStaff()));
             Map<Long, Location> locationMap = locations.stream().collect(Collectors.toMap(current -> current.getExpertiseId(), v -> v.getLocation()));
             expertises.forEach(current -> {
@@ -91,7 +92,7 @@ public class ExpertiseUnitService {
 
     public boolean updateExpertiseAtUnit(Long unitId, Long staffId, Long expertiseId, Long locationId) {
         organizationLocationRelationShipGraphRepository.setLocationInOrganizationForExpertise(expertiseId, unitId, locationId);
-        staffGraphRepository.removePreviousUnionRepresentativeOfExpertiseInUnit(unitId, expertiseId);
+        staffGraphRepository.removePreviousUnionRepresentativeOfExpertiseInUnit(organizationGraphRepository.findOne(unitId).isParentOrganization()?unitId:organizationService.fetchParentOrganization(unitId).getId(), expertiseId);
         staffGraphRepository.assignStaffAsUnionRepresentativeOfExpertise(staffId, expertiseId);
         return true;
     }

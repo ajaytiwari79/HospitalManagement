@@ -3,9 +3,7 @@ package com.kairos.response.dto.clause;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.gdpr.master_data.ClauseTagDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;

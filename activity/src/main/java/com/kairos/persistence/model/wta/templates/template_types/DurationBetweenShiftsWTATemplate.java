@@ -5,20 +5,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.enums.DurationType;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.TimeTypes;
+import com.kairos.enums.*;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -33,6 +30,8 @@ import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
 
@@ -40,51 +39,6 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     private Set<BigInteger> timeTypeIds = new HashSet<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
-
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
-
-
-    public Set<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
-
-    public Set<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
-
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
 
     public DurationBetweenShiftsWTATemplate(String name, boolean disabled, String description) {
         this.name = name;
@@ -94,6 +48,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     public DurationBetweenShiftsWTATemplate() {
+        this.wtaTemplateType = WTATemplateType.DURATION_BETWEEN_SHIFTS;
     }
 
     @Override

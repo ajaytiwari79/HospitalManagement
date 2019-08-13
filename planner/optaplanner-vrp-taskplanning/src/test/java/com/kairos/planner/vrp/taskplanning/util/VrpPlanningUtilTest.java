@@ -4,9 +4,7 @@ import com.kairos.planner.vrp.taskplanning.model.Employee;
 import com.kairos.planner.vrp.taskplanning.model.Task;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.assertTrue;
 

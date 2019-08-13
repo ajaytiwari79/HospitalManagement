@@ -2,9 +2,7 @@ package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.filter.FilterAndFavouriteFilterDTO;
-import com.kairos.dto.gdpr.filter.FilterAttributes;
-import com.kairos.dto.gdpr.filter.FilterResponseDTO;
+import com.kairos.dto.gdpr.filter.*;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;

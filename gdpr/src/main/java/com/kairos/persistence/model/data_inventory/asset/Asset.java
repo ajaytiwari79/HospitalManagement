@@ -1,20 +1,15 @@
 package com.kairos.persistence.model.data_inventory.asset;
 
-
 import com.kairos.enums.gdpr.AssetAssessor;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

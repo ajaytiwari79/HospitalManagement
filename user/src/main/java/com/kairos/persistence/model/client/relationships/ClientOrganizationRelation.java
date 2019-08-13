@@ -1,4 +1,5 @@
 package com.kairos.persistence.model.client.relationships;
+
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -9,6 +10,7 @@ import org.neo4j.ogm.annotation.StartNode;
 import java.util.UUID;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.GET_SERVICE_FROM;
+
 
 /**
  * Created by oodles on 4/10/16.

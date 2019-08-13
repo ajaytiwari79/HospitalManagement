@@ -5,29 +5,21 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
-import com.kairos.dto.activity.counter.data.CommonRepresentationData;
-import com.kairos.dto.activity.counter.data.KPIAxisData;
-import com.kairos.dto.activity.counter.data.KPIRepresentationData;
+import com.kairos.dto.activity.counter.data.*;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
-import com.kairos.dto.activity.kpi.KPIResponseDTO;
-import com.kairos.dto.activity.kpi.KPISetResponseDTO;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.kpi.*;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
-import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -53,7 +45,7 @@ public class PlannedHoursCalculationService implements CounterService {
     private ShiftMongoRepository shiftMongoRepository;
 
 
-    private double getPlannedHoursOfStaff(List<Shift> shifts) {
+    public double getPlannedHoursOfStaff(List<Shift> shifts) {
         long plannedHours = 0l;
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -149,7 +141,7 @@ public class PlannedHoursCalculationService implements CounterService {
         return verifyKPIResponseData(staffplannedHours) ? staffplannedHours : new HashMap<>();
     }
 
-    private Map<Object, Double> getStaffPlannedHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType) {
+    public Map<Object, Double> getStaffPlannedHoursByRepresentPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType) {
         Map<Object, Double> staffplannedHours = new HashMap<>();
         Double plannedHours;
         Map<Long, List<Shift>> staffShiftMapping;
@@ -166,7 +158,7 @@ public class PlannedHoursCalculationService implements CounterService {
         return staffplannedHours;
     }
 
-    private Map<Object, Double> getStaffPlannedHoursByRepresentTotalData(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts, Double plannedHours) {
+    public Map<Object, Double> getStaffPlannedHoursByRepresentTotalData(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts, Double plannedHours) {
         Map<Object, Double> staffplannedHours = new HashMap<>();
         Map<Long, List<Shift>> staffShiftMapping;
         staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
@@ -209,8 +201,8 @@ public class PlannedHoursCalculationService implements CounterService {
     @Override
     public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,ApplicableKPI applicableKPI) {
         Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria,organizationId,applicableKPI);
-        Map<Long, Integer> staffAndRestingHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
-        return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
+        Map<Long, Integer> staffAndPlannedHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
+        return getFibonacciCalculation(staffAndPlannedHoursMap,sortingOrder);
     }
 
 
