@@ -11,11 +11,11 @@ import java.util.*;
  * Created by oodles on 26/10/17.
  */
 public interface CustomOrganizationGraphRepository {
-    List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,
-                                             Long organizationId, String imagePath, String skip,String moduleId);
-
-    List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, String moduleId,
-                                  Map<FilterType, Set<String>> filters, String searchText, String imagePath);
-
-    OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
+//    List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,
+//                                             Long organizationId, String imagePath, String skip,String moduleId);
+//
+//    List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, String moduleId,
+//                                  Map<FilterType, Set<String>> filters, String searchText, String imagePath);
+//
+//    OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
 }

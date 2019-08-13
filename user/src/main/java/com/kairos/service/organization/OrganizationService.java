@@ -669,10 +669,9 @@ public class OrganizationService {
     }
 
     public Organization fetchParentOrganization(Long unitId) {
-        OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(unitId);
-        OrganizationBaseEntity organizationBaseEntity1=organizationBaseRepository.findOneById(unitId);
-        if(organizationBaseEntity1 instanceof Organization)
-            return (Organization) organizationBaseEntity1;
+        OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOneById(unitId);
+        if(organizationBaseEntity instanceof Organization)
+            return (Organization) organizationBaseEntity;
         else
             return unitGraphRepository.getParentOfOrganization(unitId);
     }
