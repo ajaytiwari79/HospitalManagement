@@ -713,7 +713,7 @@ public class WTAService extends MongoBaseService {
         }
         List<Long> organisationIds = organizations.stream().map(organizationBasicDTO -> organizationBasicDTO.getId()).collect(Collectors.toList());
         List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitIds(organisationIds, activityIds);
-        Map<String, BigInteger> activitiesIdsAndUnitIdsMap = activities.stream().collect(toMap(k -> k.getParentId() + "-" + k.getUnitId(), v -> v.getId()));
+        Map<String, BigInteger> activitiesIdsAndUnitIdsMap = activities.stream().collect(toMap(k -> k.getCountryParentId() + "-" + k.getUnitId(), v -> v.getId()));
         return activitiesIdsAndUnitIdsMap;
     }
 

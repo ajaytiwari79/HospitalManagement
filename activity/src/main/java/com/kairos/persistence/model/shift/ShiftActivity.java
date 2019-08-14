@@ -98,4 +98,23 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     public int compareTo(ShiftActivity shiftActivity) {
         return this.startDate.compareTo(shiftActivity.startDate);
     }
+
+    public boolean isShiftActivityChanged(ShiftActivity shiftActivity){
+        DateTimeInterval thisInterVal=new DateTimeInterval(startDate,endDate);
+        DateTimeInterval shiftActivityInterval=new DateTimeInterval(shiftActivity.getStartDate(),shiftActivity.getEndDate());
+        if(!thisInterVal.equals(shiftActivityInterval) || !activityId.equals(shiftActivity.getActivityId())){
+            return true;
+        }
+        if (this.getChildActivities().size() != shiftActivity.getChildActivities().size()) {
+            return true;
+        }
+        for (int i = 0; i <this.getChildActivities().size() ; i++) {
+            ShiftActivity thisChildActivity=this.getChildActivities().get(i);
+            ShiftActivity childActivity=shiftActivity.getChildActivities().get(i);
+            if(thisChildActivity.isShiftActivityChanged(childActivity)){
+                return true;
+            }
+        }
+        return false;
+    }
 }

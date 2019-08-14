@@ -4,6 +4,7 @@ import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -36,12 +37,16 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.MAIL_SUBJECT;
@@ -79,6 +84,17 @@ public class ShiftStatusService {
     @Inject private TodoRepository todoRepository;
 
     public ShiftAndActivtyStatusDTO updateStatusOfShifts(Long unitId, ShiftPublishDTO shiftPublishDTO) {
+        Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
+        Activity activity = activityMongoRepository.findOne(currentShift.getActivities().get(0).getActivityId());
+        if(CommonConstants.FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())){
+            ZonedDateTime startDate = asZoneDateTime(currentShift.getStartDate()).with(TemporalAdjusters.previousOrSame(activity.getTimeCalculationActivityTab().getFullWeekStart())).truncatedTo(ChronoUnit.DAYS);
+            ZonedDateTime endDate = startDate.plusDays(7);
+            List<Shift> shifts= shiftMongoRepository.findAllShiftsByStaffId(currentShift.getStaffId(),asDate(startDate),asDate(endDate));
+            shiftPublishDTO.getShifts().clear();
+            shifts.forEach(shift -> {
+                shiftPublishDTO.getShifts().add(new ShiftActivitiesIdDTO(shift.getId(),shift.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
+            });
+        }
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         Object[] objects = getActivitiesAndShiftIds(shiftPublishDTO.getShifts());
         Set<BigInteger> shiftActivitiyIds = ((Set<BigInteger>) objects[1]);
@@ -101,7 +117,7 @@ public class ShiftStatusService {
                     }
                 }
                 if (shift.isDeleted()) {
-                    shiftDTOS.add(shiftService.deleteShift(shift.getId()));
+                    shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()));
                 } else {
                     shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
                 }
