@@ -1,6 +1,7 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.TimeInterval;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.FilterType;
@@ -37,7 +38,7 @@ public class TimeSlotFilter implements ShiftFilter {
             for (String timeSlotName : filterCriteriaMap.get(TIME_SLOT)) {
                 for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
                     if(timeSlotName.equals(timeSlotDTO.getName())){
-                        timeIntervals.add(new TimeInterval((timeSlotDTO.getStartHour()*60)+timeSlotDTO.getStartMinute(),(timeSlotDTO.getEndHour()*60)+timeSlotDTO.getEndMinute()-1));
+                        timeIntervals.add(new TimeInterval((timeSlotDTO.getStartHour()* AppConstants.ONE_HOUR_MINUTES)+timeSlotDTO.getStartMinute(),(timeSlotDTO.getEndHour()*AppConstants.ONE_HOUR_MINUTES)+timeSlotDTO.getEndMinute()-1));
                     }
                 }
             }
