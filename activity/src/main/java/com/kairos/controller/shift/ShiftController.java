@@ -68,9 +68,9 @@ public class ShiftController {
                                                                         @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo,
                                                                         @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff,
                                                                         @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState,
-                                                                        @RequestParam(required = false, value = "shiftAction") ShiftActionType shiftAction,
+                                                                        @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType,
                                                                         @RequestParam(required = false) TodoType todoType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type, validatedByStaff, updateShiftState, unitId, shiftAction,todoType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type, validatedByStaff, updateShiftState, unitId, shiftActionType,todoType));
     }
 
     @ApiOperation("update a Shift of a staff")
