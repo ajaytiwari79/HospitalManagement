@@ -30,6 +30,7 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
 
 /**
  * @author pradeep
@@ -78,7 +79,7 @@ public class ShiftBreakService {
                     placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
                     eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings);
                     placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSetting.getBreakDurationInMinute();
-                    placeBreakAfterThisDate = asDate(asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getInterval().getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100));
+                    placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? eligibleBreakInterval.getStartDate() : placeBreakAfterThisDate;
                 }
                 breakActivity = getBreakByShiftActivity(shift, activityWrapperMap, staffAdditionalInfoDTO, breakSetting, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
                 if (isNull(breakActivity)) {
@@ -152,13 +153,15 @@ public class ShiftBreakService {
 
     private DateTimeInterval getBreakInterval(Shift shift,BreakAvailabilitySettings breakAvailabilitySettings){
         ZonedDateTime startDate = asZoneDateTime(shift.getStartDate()).plusMinutes(breakAvailabilitySettings.getStartAfterMinutes());
-        ZonedDateTime endDate = asZoneDateTime(shift.getStartDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
+        ZonedDateTime endDate = asZoneDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
+        ZonedDateTime startDateWithShiftPercentage = asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100);
+        startDate = startDate.isAfter(startDateWithShiftPercentage) ? startDate : startDateWithShiftPercentage;
         return new DateTimeInterval(startDate,endDate);
     }
 
     private BreakAvailabilitySettings findCurrentBreakAvailability(Date startDate, List<TimeSlotWrapper> timeSlots, BreakWTATemplate breakWTATemplate) {
         BreakAvailabilitySettings breakAvailabilitySettings = null;
-        TimeSlotWrapper currentTimeSlot = timeSlots.stream().filter(current -> new TimeInterval((current.getStartHour()*60)+current.getStartMinute(),(current.getEndHour()*60)+current.getEndMinute()-1).contains(asZoneDateTime(startDate).get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
+        TimeSlotWrapper currentTimeSlot = timeSlots.stream().filter(current -> new TimeInterval((current.getStartHour()*ONE_HOUR_MINUTES)+current.getStartMinute(),(current.getEndHour()*ONE_HOUR_MINUTES)+current.getEndMinute()-1).contains(asZoneDateTime(startDate).get(ChronoField.MINUTE_OF_DAY))).findFirst().orElse(null);
         if (currentTimeSlot != null && breakWTATemplate != null && !breakWTATemplate.isDisabled()) {
             breakAvailabilitySettings = breakWTATemplate.getBreakAvailability().stream().filter(currentAvailability -> (currentAvailability.getTimeSlot().toString().equalsIgnoreCase(currentTimeSlot.getName()))).findFirst().get();
         }
