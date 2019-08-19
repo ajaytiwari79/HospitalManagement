@@ -624,6 +624,7 @@ public class ShiftService extends MongoBaseService {
             Shift oldStateOfShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
             if (!byTAndAView) {
                 shiftValidatorService.updateStatusOfShiftActvity(oldStateOfShift, shiftDTO);
+
             }
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             shiftDTO.setShiftType(ShiftType.PRESENCE);
@@ -638,7 +639,7 @@ public class ShiftService extends MongoBaseService {
             shift.setPlanningPeriodId(oldStateOfShift.getPlanningPeriodId());
             List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
             shift.setBreakActivities(breakActivities);
-            shiftDetailsService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO);
+
             ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class), activityWrapperMap);
             shiftWithViolatedInfoDTO = validateRuleCheck(shiftDTO, shift, ruleCheckRequired, staffAdditionalInfoDTO, activityWrapperMap, phase, shiftActivities, shiftWithViolatedInfoDTO, valid, wtaQueryResultDTO, shiftWithActivityDTO);
             List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
@@ -655,6 +656,7 @@ public class ShiftService extends MongoBaseService {
                 // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
                 //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
                 if (ruleCheckRequired) {
+                    shiftDetailsService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO);
                     validateShiftViolatedRules(shift, shiftOverlappedWithNonWorkingType, shiftWithViolatedInfoDTO, shiftAction);
                     shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(newArrayList(shiftDTO), staffAdditionalInfoDTO.getUserAccessRoleDTO());
                 }
