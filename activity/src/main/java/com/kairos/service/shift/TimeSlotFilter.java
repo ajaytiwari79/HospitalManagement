@@ -37,7 +37,7 @@ public class TimeSlotFilter implements ShiftFilter {
             for (String timeSlotName : filterCriteriaMap.get(TIME_SLOT)) {
                 for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
                     if(timeSlotName.equals(timeSlotDTO.getName())){
-                        timeIntervals.add(new TimeInterval((timeSlotDTO.getStartHour()*60)+timeSlotDTO.getStartMinute(),(timeSlotDTO.getEndHour()*60)+timeSlotDTO.getEndMinute()));
+                        timeIntervals.add(new TimeInterval((timeSlotDTO.getStartHour()*60)+timeSlotDTO.getStartMinute(),(timeSlotDTO.getEndHour()*60)+timeSlotDTO.getEndMinute()-1));
                     }
                 }
             }
