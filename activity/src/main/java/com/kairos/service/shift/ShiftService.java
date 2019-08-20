@@ -1252,8 +1252,7 @@ public class ShiftService extends MongoBaseService {
         return violatedRuleTemplateIds.equals(updatedViolatedRuleTemplateIds);
     }
 
-    public Long getShiftCount(Long EmploymentId) {
-        Long count = shiftMongoRepository.countShiftsByEmploymentId(EmploymentId);
-        return count;
+    public Long getShiftCount(Long employmentId) {
+       return shiftMongoRepository.countShiftsByEmploymentId(employmentId);
     }
 }

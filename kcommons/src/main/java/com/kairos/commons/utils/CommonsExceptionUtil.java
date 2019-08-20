@@ -73,5 +73,4 @@ public class CommonsExceptionUtil {
     public void userNotFoundInRedis(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
     }
-
 }
