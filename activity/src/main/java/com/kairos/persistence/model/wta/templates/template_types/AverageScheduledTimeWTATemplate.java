@@ -79,11 +79,11 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
             if (intervalLength == 0l || StringUtils.isEmpty(intervalUnit)) {
                 throwException("message.ruleTemplate.interval.notNull");
             }
-            if (isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds())) {
+            if (isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues) && CollectionUtils.containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds()) && CollectionUtils.containsAny(plannedTimeIds,infoWrapper.getShift().getActivitiesPlannedTimeIds())) {
                 DateTimeInterval interval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
-                List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
-                shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
-                shifts.add(infoWrapper.getShift());
+                infoWrapper.getShifts().add(infoWrapper.getShift());
+                List<ShiftWithActivityDTO> shifts = getShiftsByInterval(interval, infoWrapper.getShifts(), null);
+                shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
                 List<DateTimeInterval> intervals = getIntervals(interval);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
                 for (DateTimeInterval dateTimeInterval : intervals) {

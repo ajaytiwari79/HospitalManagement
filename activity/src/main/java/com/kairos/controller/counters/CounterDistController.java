@@ -291,12 +291,12 @@ public class CounterDistController {
     }
 
     @PostMapping(UNIT_URL + KPI_URL + "/preview_kpi")
-    public ResponseEntity<Map<String, Object>> kpiPreviewDataOfUnit(@PathVariable BigInteger kpiId, @PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria) {
+    public ResponseEntity<Map<String, Object>> kpiPreviewDataOfUnit(@PathVariable BigInteger kpiId, @PathVariable Long unitId, @Valid @RequestBody FilterCriteriaDTO filterCriteria) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiPreviewWithFilter(kpiId, unitId, filterCriteria, ConfLevel.UNIT));
     }
 
     @PostMapping(COUNTRY_URL + KPI_URL + "/preview_kpi")
-    public ResponseEntity<Map<String, Object>> kpiPreviewDataOfCountry(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria) {
+    public ResponseEntity<Map<String, Object>> kpiPreviewDataOfCountry(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @Valid @RequestBody FilterCriteriaDTO filterCriteria) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiPreviewWithFilter(kpiId, countryId, filterCriteria, ConfLevel.COUNTRY));
     }
 

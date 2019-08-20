@@ -5,17 +5,24 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.counter.configuration.*;
-import com.kairos.dto.activity.counter.data.*;
+import com.kairos.dto.activity.counter.configuration.CounterDTO;
+import com.kairos.dto.activity.counter.configuration.KPIDTO;
+import com.kairos.dto.activity.counter.configuration.KPIFilterDefaultDataDTO;
+import com.kairos.dto.activity.counter.data.CommonRepresentationData;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
+import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
-import com.kairos.dto.activity.counter.enums.*;
-import com.kairos.dto.activity.kpi.*;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.KPIValidity;
+import com.kairos.dto.activity.counter.enums.LocationType;
+import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
+import com.kairos.dto.activity.kpi.KPIResponseDTO;
+import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
@@ -23,7 +30,10 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.counter.ApplicableFilter;
+import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.counter.TabKPIConf;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -43,14 +53,16 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.FilterType.STAFF_IDS;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeInterval;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
 import static java.util.stream.Collectors.toList;
 
 
@@ -440,11 +452,6 @@ public class CounterDataService extends MongoBaseService {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera);
         }
         for (BigInteger kpiId : filters.getKpiIds()) {
-            if(!staffKpiFilterCritera.get(kpiId).containsKey(FilterType.TIME_INTERVAL)){
-                ApplicableKPI staffApplicableKPI = kpiIdAndApplicableKPIMap.get(kpiId);
-                DateTimeInterval dateTimeInterval = getDateTimeInterval(staffApplicableKPI.getInterval(), isNull(staffApplicableKPI) ? 0 : staffApplicableKPI.getValue(), staffApplicableKPI.getFrequencyType(), null,startDate);
-                staffKpiFilterCritera.get(kpiId).put(FilterType.TIME_INTERVAL,Arrays.asList(dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate()));
-            }
             if(!counterRepository.getKPIByid(kpiId).isMultiDimensional() && isNotNull(kpiIdAndApplicableKPIMap.get(kpiId))) {
                 kpiIdAndApplicableKPIMap.get(kpiId).setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                 Callable<KPIResponseDTO> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedDataOfKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
