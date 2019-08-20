@@ -6,7 +6,7 @@ import com.kairos.enums.Employment;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
-import com.kairos.persistence.repository.organization.CustomOrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.CustomUnitGraphRepository;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.session.Session;
@@ -24,7 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Created by oodles on 26/10/17.
  */
 @Repository
-public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphRepository {
+public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
 
     @Inject
     private Session session;

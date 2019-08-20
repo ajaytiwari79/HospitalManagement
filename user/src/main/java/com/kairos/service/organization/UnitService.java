@@ -147,7 +147,7 @@ public class UnitService {
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
             orgTypeAndSubTypeDTO.setOrganizationSubTypeName(organization.getOrganizationSubTypes().get(0).getName());
         } else {
-            logger.info("Organization Type and Organization Sub Type is not present for " + organization.getName());
+            logger.info("Organization Type and Organization Sub Type is not present for {} " , organization.getName());
         }
 
 

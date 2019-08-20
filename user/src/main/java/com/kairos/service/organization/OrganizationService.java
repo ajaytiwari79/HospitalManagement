@@ -5,7 +5,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -20,23 +19,25 @@ import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
-import com.kairos.enums.OrganizationLevel;
-import com.kairos.enums.*;
+import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
 import com.kairos.persistence.model.organization.AbsenceTypes;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
-import com.kairos.persistence.model.staff.personal_details.*;
+import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
+import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
@@ -47,7 +48,6 @@ import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.VehicleQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.*;
@@ -57,10 +57,14 @@ import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.rest_client.*;
+import com.kairos.rest_client.PhaseRestClient;
+import com.kairos.rest_client.PlannedTimeTypeRestClient;
+import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.client.ClientService;
-import com.kairos.service.country.*;
+import com.kairos.service.country.CitizenStatusService;
+import com.kairos.service.country.DayTypeService;
+import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.region.RegionService;
@@ -80,8 +84,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
-import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -106,8 +108,6 @@ public class OrganizationService {
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
-    private OrganizationService organizationService;
-    @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
     private MunicipalityGraphRepository municipalityGraphRepository;
@@ -119,8 +119,6 @@ public class OrganizationService {
     private OwnershipTypeGraphRepository ownershipTypeGraphRepository;
     @Inject
     private ContractTypeGraphRepository contractTypeGraphRepository;
-    @Inject
-    private EmployeeLimitGraphRepository employeeLimitGraphRepository;
     @Inject
     private VatTypeGraphRepository vatTypeGraphRepository;
     @Inject
@@ -145,8 +143,6 @@ public class OrganizationService {
     private StaffGraphRepository staffGraphRepository;
     @Inject
     private TeamService teamService;
-    @Inject
-    private PhaseRestClient phaseRestClient;
     @Inject
     private ClientService clientService;
     @Inject
@@ -184,7 +180,7 @@ public class OrganizationService {
     @Inject
     private OrganizationMetadataRepository organizationMetadataRepository;
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
     public Organization getOrganizationById(long id) {
         return organizationGraphRepository.findOne(id);
@@ -539,7 +535,7 @@ public class OrganizationService {
         OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(id);
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = new OrganizationTypeAndSubTypeDTO();
         if(!organizationBaseEntity.isParentOrganization()) {
-            Organization organization=organizationService.fetchParentOrganization(id);
+            Organization organization=fetchParentOrganization(id);
             organizationTypeAndSubTypeDTO.setParentOrganizationId(organization.getId());
             organizationTypeAndSubTypeDTO.setParent(false);
         } else {

@@ -67,8 +67,7 @@ public class TaskPlanningUtility {
             }
         });
        iter.forEachRemaining(tsk->{
-    	   tsk=tsk;
-       });
+	   });
        
 
     }

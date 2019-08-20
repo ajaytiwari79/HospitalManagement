@@ -115,7 +115,8 @@ public class OrganizationHierarchyService {
      * @return
      */
     public OrganizationBaseEntity generateOrganizationHierarchyByFilter(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
-        return null;//unitGraphRepository.getOrganizationHierarchyByFilters(parentOrganizationId, organizationHierarchyFilterDTO);
+        OrganizationBaseEntity hierarchy=unitGraphRepository.getOrganizationHierarchyByFilters(parentOrganizationId, organizationHierarchyFilterDTO);
+        return null;
 //        if(hierarchy instanceof Organization){
 //
 //        }

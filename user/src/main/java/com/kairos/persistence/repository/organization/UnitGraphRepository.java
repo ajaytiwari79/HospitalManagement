@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.organization;
 
-import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
@@ -28,7 +27,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  * Interface for CRUD operation on Organization
  */
 @Repository
-public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, CustomOrganizationGraphRepository {
+public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, CustomUnitGraphRepository {
 
     Unit findByName(String name);
 
