@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonMessageConstants.PLANNED_TIME_NOT_CONFIGURE;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toMap;

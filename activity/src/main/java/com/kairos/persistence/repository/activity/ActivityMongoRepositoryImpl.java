@@ -203,10 +203,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(List<BigInteger> activityIds) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("_id").in(activityIds).and("deleted").is(false)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id",
-                        "timeTypeInfo"));
+        Aggregation aggregation = getParentActivityAggregation(Criteria.where("_id").in(activityIds).and("deleted").is(false));
         AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
         return result.getMappedResults();
     }
@@ -639,18 +636,23 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
-                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
-                lookup("activities", "_id", "childActivityIds", "parentActivity"),
-                project("id","name","generalActivityTab","timeCalculationActivityTab","expertises","employmentTypes","rulesActivityTab","skillActivityTab",
-                        "phaseSettingsActivityTab",
-                        "balanceSettingsActivityTab",
-                        "unitId",
-                        "childActivityIds").and("parentActivity._id").as("parentActivityId").and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
-                );
+        Criteria criteria = Criteria.where("unitId").is(unitId).and("deleted").is(false);
+        Aggregation aggregation = getParentActivityAggregation(criteria);
         AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
         return result.getMappedResults();
+    }
+
+    private Aggregation getParentActivityAggregation(Criteria criteria) {
+        return Aggregation.newAggregation(
+                    match(criteria),
+                    lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                    lookup("activities", "_id", "childActivityIds", "parentActivity"),
+                    project("id","name","generalActivityTab","timeCalculationActivityTab","expertises","employmentTypes","rulesActivityTab","skillActivityTab",
+                            "phaseSettingsActivityTab",
+                            "balanceSettingsActivityTab",
+                            "unitId",
+                            "childActivityIds").and("parentActivity._id").as("parentActivityId").and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
+                    );
     }
 
     @Override

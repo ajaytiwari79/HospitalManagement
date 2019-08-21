@@ -19,7 +19,7 @@ public interface ActivityConfigurationRepository extends MongoBaseRepository<Act
    @Query("{unitId:?0,presencePlannedTime:{$exists:true}}")
    List<ActivityConfigurationDTO> findPresenceConfigurationByUnitId(Long unitId);
 
-   @Query("{'unitId':?0,'absencePlannedTime':{$exists:true}}")
+   @Query("{unitId:?0,absencePlannedTime:{$exists:true}}")
    List<ActivityConfigurationDTO> findAbsenceConfigurationByUnitId(Long unitId);
 
    @Query("{'absencePlannedTime.phaseId':?1,unitId:?0}")
