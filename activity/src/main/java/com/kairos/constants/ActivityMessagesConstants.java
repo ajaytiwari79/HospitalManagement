@@ -389,6 +389,6 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF = "message.organization.protected.days.off";
     public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
     public static final String FREQUENCY_VALUE_IS_ALWAYS_POSITIVE="frequency.value.is.always.positive";
-    public static final String PLANNED_TIME_NOT_CONFIGURE = "plannedtime.not.configured";
+
 
 }
