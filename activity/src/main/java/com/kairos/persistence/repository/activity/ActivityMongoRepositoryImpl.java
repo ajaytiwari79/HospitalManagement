@@ -640,7 +640,15 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)));
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
+                lookup("time_Type", "balanceSettingsActivityTab.timeTypeId", "_id", "timeType"),
+                lookup("activities", "_id", "childActivityIds", "parentActivity"),
+                project("id","name","generalActivityTab","timeCalculationActivityTab","expertises","employmentTypes","rulesActivityTab","skillActivityTab",
+                        "phaseSettingsActivityTab",
+                        "balanceSettingsActivityTab",
+                        "unitId",
+                        "childActivityIds").and("parentActivity._id").as("parentActivityId").and("timeType.allowChildActivities").arrayElementAt(0).as("allowChildActivities")
+                );
         AggregationResults<ActivityWithCompositeDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWithCompositeDTO.class);
         return result.getMappedResults();
     }
