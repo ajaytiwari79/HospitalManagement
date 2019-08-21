@@ -200,6 +200,20 @@ public class CounterRepository{
 
     }
 
+    public KPICategory getKPICategoryByName(String categoryName, ConfLevel level, Long refId) {
+        String queryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("deleted").is(false).and("name").is(categoryName).regex(Pattern.compile("^" + categoryName + "$", Pattern.CASE_INSENSITIVE)).and(queryField).is(refId).and("level").is(level));
+        return mongoTemplate.findOne(query, KPICategory.class);
+
+    }
+
+    public List<KPICategory> getKPICategoryByRefIds(ConfLevel level, List<Long> refIds,String name) {
+        String queryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("deleted").is(false).and("name").is(name).and(queryField).in(refIds).and("level").is(level));
+        return mongoTemplate.find(query, KPICategory.class);
+
+    }
+
     public List<KPICategoryDTO> getKPICategory(List<BigInteger> categoryIds, ConfLevel level, Long refId) {
         String queryField = getRefQueryField(level);
         Criteria matchCriteria = categoryIds == null ? Criteria.where("deleted").is(false).and(queryField).is(refId) : Criteria.where("deleted").is(false).and("_id").in(categoryIds).and(queryField).is(refId);

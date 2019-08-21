@@ -16,21 +16,31 @@ public interface ActivityConfigurationRepository extends MongoBaseRepository<Act
 
    List<ActivityConfiguration> findAllByUnitIdAndDeletedFalse(Long unitId);
 
-  /* @Query("{unitId:?0,presencePlannedTime:{$exists:false}}")
+   @Query("{unitId:?0,presencePlannedTime:{$exists:true}}")
    List<ActivityConfigurationDTO> findPresenceConfigurationByUnitId(Long unitId);
 
-   @Query("{unitId:?0,absencePlannedTime:{$exists:false}}")
+   @Query("{'unitId':?0,'absencePlannedTime':{$exists:true}}")
    List<ActivityConfigurationDTO> findAbsenceConfigurationByUnitId(Long unitId);
 
-   @Query("{'unitId':?0,'absencePlannedTime.phaseId':?1}")
+   @Query("{'absencePlannedTime.phaseId':?1,unitId:?0}")
    List<ActivityConfiguration> findAllAbsenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
 
-   @Query("{'unitId':?0,'presencePlannedTime.phaseId':?1}")
+   @Query("{'presencePlannedTime.phaseId':?1,unitId:?0}")
    ActivityConfiguration findPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
 
+   @Query("{'presencePlannedTime.phaseId':?1,countryId:?0}")
+   ActivityConfiguration findPresenceConfigurationByCountryIdAndPhaseId(Long countryId, BigInteger phaseId);
+
+   @Query("{'absencePlannedTime.phaseId':?1,countryId:?0}")
+   List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryIdAndPhaseId(Long countryId, BigInteger phaseId);
+
+   @Query("{presencePlannedTime:{$exists:true},'countryId':?0}")
    List<ActivityConfigurationDTO> findPresenceConfigurationByCountryId(Long countryId);
 
-   List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryId(Long unitId);*/
+   @Query("{absencePlannedTime:{$exists:true},'countryId':?0}")
+   List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryId(Long countryId);
+
+
 
 
 }

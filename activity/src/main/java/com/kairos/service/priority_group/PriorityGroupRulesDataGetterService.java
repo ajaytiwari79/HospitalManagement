@@ -157,10 +157,10 @@ public class PriorityGroupRulesDataGetterService {
                         dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
                dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMinutesOfTimeBank() + d.getCtaBonusMinutesOfTimeBank()).sum();
                 DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(planningPeriodInterval,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),
+                timeBank = -1* timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),
                         employmentWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
                 planningPeriodInterval =  planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-                deltaTimeBank =  -1 * timeBankCalculationService.calculateTimeBankForInterval(planningPeriodInterval,new Interval(startDateDeltaWeek,endDateDeltaWeek),
+                deltaTimeBank =  -1 * timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(startDateDeltaWeek,endDateDeltaWeek),
                         employmentWithCtaDetailsDTO,false,dailyTimeBankEntries, false);
                 staffEmploymentQueryResult.setAccumulatedTimeBank(timeBank);
                 staffEmploymentQueryResult.setDeltaWeeklytimeBank(deltaTimeBank);

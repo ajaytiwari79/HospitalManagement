@@ -3,6 +3,7 @@ package com.kairos.service.unit_settings;
 import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -28,6 +29,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -95,12 +97,11 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public PresencePlannedTime updatePresenceActivityConfiguration(Long unitId, PresencePlannedTime presencePlannedTime) {
         ActivityConfiguration activityConfiguration = activityConfigurationRepository.findPresenceConfigurationByUnitIdAndPhaseId(unitId, presencePlannedTime.getPhaseId());
-        if (!Optional.of(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
+        if (!Optional.ofNullable(activityConfiguration).isPresent() || !Optional.ofNullable(activityConfiguration.getPresencePlannedTime()).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_PRESENCEACTIVITYCONFIGURATION_NOTFOUND);
         }
         activityConfiguration.getPresencePlannedTime().setEmploymentWisePlannedTimeConfigurations(presencePlannedTime.getEmploymentWisePlannedTimeConfigurations());
         activityConfiguration.getPresencePlannedTime().setManagementPlannedTimeIds(presencePlannedTime.getManagementPlannedTimeIds());
-
         activityConfigurationRepository.save(activityConfiguration);
         return presencePlannedTime;
     }
@@ -132,15 +133,17 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public List<ActivityConfigurationDTO> getAbsenceActivityConfiguration(Long unitId) {
         List<ActivityConfigurationDTO> activityConfigurationDTOS = activityConfigurationRepository.findAbsenceConfigurationByUnitId(unitId);
+        Map<BigInteger,Integer> phaseMap = phaseService.getPhasesByUnit(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getSequence()));
         List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
-        modifiableList.sort((a1, a2) -> Integer.compare(a1.getPhase().getSequence(), (a2.getPhase().getSequence())));
+        modifiableList.sort((a1, a2) -> Integer.compare(phaseMap.get(a1.getAbsencePlannedTime().getPhaseId()), phaseMap.get(a2.getAbsencePlannedTime().getPhaseId())));
         return modifiableList;
     }
 
     public List<ActivityConfigurationDTO> getPresenceActivityConfiguration(Long unitId) {
         List<ActivityConfigurationDTO> activityConfigurationDTOS = activityConfigurationRepository.findPresenceConfigurationByUnitId(unitId);
+        Map<BigInteger,Integer> phaseMap = phaseService.getPhasesByUnit(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getSequence()));
         List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
-        modifiableList.sort((a1, a2) -> Integer.compare(a1.getPhase().getSequence(), (a2.getPhase().getSequence())));
+        modifiableList.sort((a1, a2) -> Integer.compare(phaseMap.get(a1.getPresencePlannedTime().getPhaseId()), phaseMap.get(a2.getPresencePlannedTime().getPhaseId())));
         return modifiableList;
     }
 
@@ -149,7 +152,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID);
         }
-        List<PhaseResponseDTO> phases = phaseMongoRepository.getAllPlanningPhasesByUnit(unitId);
+        List<PhaseDTO> phases = phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.ASC);
         return getDefaultDataForCountry(phases, countryId);
     }
 
@@ -220,11 +223,11 @@ public class ActivityConfigurationService extends MongoBaseService {
 
 
     public ActivityConfigurationWrapper getDefaultDataForCountry(Long countryId) {
-        List<PhaseResponseDTO> phases = phaseMongoRepository.findPlanningPhasesByCountry(countryId);
+        List<PhaseDTO> phases = phaseMongoRepository.getPhasesByCountryId(countryId, Sort.Direction.ASC);
         return getDefaultDataForCountry(phases, countryId);
     }
 
-    private ActivityConfigurationWrapper getDefaultDataForCountry(List<PhaseResponseDTO> phases, Long countryId) {
+    private ActivityConfigurationWrapper getDefaultDataForCountry(List<PhaseDTO> phases, Long countryId) {
         List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByCountry(countryId);
         List<TimeTypeDTO> topLevelTimeType = timeTypeMongoRepository.getTopLevelTimeTypeIds(countryId);
         List<BigInteger> topLevelTimeTypeIds = topLevelTimeType.stream().map(TimeTypeDTO::getId).collect(Collectors.toList());
@@ -236,7 +239,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     public void addPlannedTimeInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrappers, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
         List<PlannedTime> plannedTimeList = shift.getActivities().stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
-        Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
+        Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().filter(distinctByKey(plannedTime -> new DateTimeInterval(plannedTime.getStartDate(), plannedTime.getEndDate()))).collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             List<BigInteger> plannedTimeIds = addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
             BigInteger plannedTimeId = plannedTimeIds.get(0);
@@ -250,11 +253,11 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public List<BigInteger> addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
-        return (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())) ? getAbsencePlannedTime(unitId, phaseId, staffAdditionalInfoDTO, activity)
+        return (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())) ? getAbsencePlannedTime(unitId, phaseId, activity)
                 : getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
     }
 
-    private List<BigInteger> getAbsencePlannedTime(Long unitId, BigInteger phaseId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Activity activity) {
+    private List<BigInteger> getAbsencePlannedTime(Long unitId, BigInteger phaseId, Activity activity) {
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId, phaseId);
         List<BigInteger> plannedTimeIds = null;
         for (ActivityConfiguration activityConfiguration : activityConfigurations) {
@@ -360,15 +363,11 @@ public class ActivityConfigurationService extends MongoBaseService {
         return activityConfigurationRepository.findAllAbsenceConfigurationByUnitIdAndPhaseId(unitId,phaseId);
     }
 
-    public ActivityConfiguration findPresenceConfigurationByCountryIdAndPhaseId(Long countryId, BigInteger phaseId){
-        return activityConfigurationRepository.findPresenceConfigurationByCountryIdAndPhaseId(countryId, phaseId);
+    public ActivityConfiguration findPresenceConfigurationByCountryIdAndPhaseId(Long countryId,BigInteger phaseId){
+        return activityConfigurationRepository.findPresenceConfigurationByCountryIdAndPhaseId(countryId,phaseId);
     }
 
-    public List<ActivityConfigurationDTO> findPresenceConfigurationByCountryId(Long countryId){
-        return activityConfigurationRepository.findPresenceConfigurationByCountryId(countryId);
-    }
-
-    public List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryId(Long unitId){
-        return activityConfigurationRepository.findAbsenceConfigurationByCountryId(unitId);
+    public List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryIdAndPhaseId(Long unitId,BigInteger phaseId){
+        return activityConfigurationRepository.findAbsenceConfigurationByCountryIdAndPhaseId(unitId,phaseId);
     }
 }

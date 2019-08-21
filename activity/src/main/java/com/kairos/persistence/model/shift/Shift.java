@@ -84,7 +84,7 @@ public class Shift extends MongoBaseEntity {
     }
 
     public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks,@NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities,@NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, Long employmentId) {
+                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, Long employmentId) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -101,17 +101,18 @@ public class Shift extends MongoBaseEntity {
         this.employmentId = employmentId;
 
     }
+
     // This is used in absance shift
-    public Shift(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty")List<ShiftActivity> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
+    public Shift(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.staffId = staffId;
         this.activities = activities;
         this.employmentId = employmentId;
-        this.unitId=unitId;
-        this.sickShift=true;
-        this.phaseId=phaseId;
-        this.planningPeriodId=planningPeriodId;
+        this.unitId = unitId;
+        this.sickShift = true;
+        this.phaseId = phaseId;
+        this.planningPeriodId = planningPeriodId;
 
     }
 
@@ -128,14 +129,14 @@ public class Shift extends MongoBaseEntity {
         this.copiedFromShiftId = copiedFromShiftId;
         this.scheduledMinutes = scheduledMinutes;
         this.durationMinutes = durationMinutes;
-        this.phaseId=phaseId;
-        this.planningPeriodId=planningPeriodId;
-        this.staffUserId=staffUserId;
-        this.shiftType=shiftType;
+        this.phaseId = phaseId;
+        this.planningPeriodId = planningPeriodId;
+        this.staffUserId = staffUserId;
+        this.shiftType = shiftType;
     }
 
     public void setBreakActivities(List<ShiftActivity> breakActivities) {
-        this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
+        this.breakActivities = isNullOrElse(breakActivities, new ArrayList<>());
     }
 
     public void setActivities(List<ShiftActivity> activities) {
@@ -147,16 +148,31 @@ public class Shift extends MongoBaseEntity {
 
     public int getMinutes() {
         DateTimeInterval interval = getInterval();
-        return isNotNull(interval) ? (int)interval.getMinutes() : 0;
+        return isNotNull(interval) ? (int) interval.getMinutes() : 0;
     }
 
     @IgnoreLogging
     public DateTimeInterval getInterval() {
-        if(isCollectionNotEmpty(this.activities)) {
+        if (isCollectionNotEmpty(this.activities)) {
             return new DateTimeInterval(this.getActivities().get(0).getStartDate().getTime(), getActivities().get(getActivities().size() - 1).getEndDate().getTime());
         }
         return null;
     }
+
+    public boolean isShiftUpdated(Shift shift) {
+        if (this.getActivities().size() != shift.getActivities().size()) {
+            return true;
+        }
+        for (int i = 0; i < shift.getActivities().size(); i++) {
+            ShiftActivity thisShiftActivity=this.getActivities().get(i);
+            ShiftActivity shiftActivity=shift.getActivities().get(i);
+            if(thisShiftActivity.isShiftActivityChanged(shiftActivity)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public String toString() {

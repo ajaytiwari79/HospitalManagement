@@ -199,7 +199,7 @@ public class RestingHoursCalculationService implements CounterService {
     public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
         KPIResponseDTO kpiResponseDTO = new KPIResponseDTO();
         Map<Long, Integer> restingHoursMap =  getStaffAndWithRestingHour(filterBasedCriteria, organizationId, applicableKPI);
-        Map<Long, Double> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v-> DateUtils.getHoursFromTotalMilliSeconds(v.getValue().longValue())));
+        Map<Long, Double> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v-> v.getValue().doubleValue()));
         kpiResponseDTO.setKpiName(kpi.getTitle());
         kpiResponseDTO.setKpiId(kpi.getId());
         kpiResponseDTO.setStaffKPIValue(staffAndRestingHoursMap);
