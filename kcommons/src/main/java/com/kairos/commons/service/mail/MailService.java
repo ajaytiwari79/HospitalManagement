@@ -157,7 +157,7 @@ public class MailService {
     //Todo Please don't use this method for sending any Custom exception
     public void sendMailToBackendOnException(Exception ex){
        //TODO commented below as we using free account for of send grid which limits 100 emails per day
-         if(envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE) || envConfigCommon.getCurrentProfile().equals(QA_PROFILE)){
+         //if(envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE) || envConfigCommon.getCurrentProfile().equals(QA_PROFILE)){
             StringBuffer body = new StringBuffer("");
             for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
                 //if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
@@ -165,7 +165,7 @@ public class MailService {
                 //}
             }
             sendMailWithSendGrid(null,null,body.toString(),"Exception in Activity | "+envConfigCommon.getCurrentProfile(),KAIROS_BACKEND_MAIL_IDS);
-        }
+        //}
     }
 
 }
