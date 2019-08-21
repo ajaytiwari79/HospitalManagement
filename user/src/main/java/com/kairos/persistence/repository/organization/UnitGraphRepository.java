@@ -161,7 +161,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<OpeningHours> getOpeningHours(Long organizationId);
 
 
-    @Query("MATCH (org:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} \n" +
+    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:false})-[:" + BELONGS_TO + "]->(c:Country)  WHERE id(c)={0} \n" +
             "OPTIONAL MATCH (org)-[:" + TYPE_OF + "]->(ot:OrganizationType) WITH org,ot\n" +
             "OPTIONAL MATCH (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH COLLECT(id(subType)) as organizationSubTypeIds,org,ot\n" +
             "OPTIONAL MATCH (org)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH organizationSubTypeIds,org,ot,zipCode\n" +
@@ -632,11 +632,11 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (organizations:Unit{deleted:false,isEnable:true}) WHERE id (organizations) IN {0}  RETURN organizations")
     List<Unit> findOrganizationsByIdsIn(List<Long> orgIds);
 
-    @Query("MATCH(organization:Unit),(hub:Unit) WHERE id(organization)={0} AND id(hub)={1} " +
+    @Query("MATCH(organization:Organization),(hub:Organization) WHERE id(organization)={0} AND id(hub)={1} " +
             "CREATE UNIQUE(hub)-[r:"+HAS_SUB_ORGANIZATION+"]->(organization)  ")
     void linkOrganizationToHub(Long organizationId,Long hubId);
 
-    @Query("MATCH(organization:Unit) WHERE organization.isKairosHub=true AND organization.organizationLevel='COUNTRY' RETURN id(organization) as id, organization.name as name, organization.organizationLevel as organizationLevel")
+    @Query("MATCH(organization:Organization) WHERE organization.isKairosHub=true AND organization.organizationLevel='COUNTRY' RETURN id(organization) as id, organization.name as name, organization.organizationLevel as organizationLevel")
     List<OrganizationWrapper> getAllHubByCountryId(Long countryId);
 
     @Query("MATCH(organization:Unit)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Unit) WHERE id(organization)={0}  RETURN id(hub)")
