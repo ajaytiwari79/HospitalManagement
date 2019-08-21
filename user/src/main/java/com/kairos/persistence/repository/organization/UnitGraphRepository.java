@@ -34,7 +34,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Unit findByExternalId(String externalId);
 
     @Query("MATCH(n) WHERE id(n)={0} AND n.deleted=false RETURN n")
-    Object findOneById(Long id);
+    OrganizationBaseEntity findOneById(Long id);
 
 
     @Query("MATCH (o:Organization {isEnable:true} ),(unit:Unit) WHERE id(o)={0} AND id(unit)={1} create (o)-[:HAS_UNIT]->(o1) RETURN o1")
@@ -487,7 +487,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Country getCountry(Long organizationId);
 
     @Query("MATCH (organization:Unit)  WHERE id(organization)={0} \n" +
-            " MATCH(organization)<-[:HAS_SUB_ORGANIZATION*]-(parentOrganization:Unit{isKairosHub:false}) \n" +
+            " MATCH(organization)<-[:HAS_UNIT]-(parentOrganization:Organization{isKairosHub:false}) \n" +
             " MATCH(parentOrganization)-[r:BELONGS_TO] -> (country:Country)\n" +
             " RETURN country limit 1")
     Country getCountryByParentOrganization(Long organizationId);

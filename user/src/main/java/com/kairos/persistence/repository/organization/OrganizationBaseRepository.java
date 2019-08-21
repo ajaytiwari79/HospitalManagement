@@ -17,6 +17,6 @@ public interface OrganizationBaseRepository extends Neo4jBaseRepository<Organiza
     OrganizationBaseEntity findOne(Long id);
 
     @Query("MATCH(n{deleted:false}) where id(n)={0} " +
-            "OPTIONAL MATCH(n)-[r:"+BELONGS_TO+"]-(country:Country) n,r,country")
+            "OPTIONAL MATCH(n)-[r:"+BELONGS_TO+"]-(country:Country) RETURN n,r,country")
     OrganizationBaseEntity findOneById(Long id);
 }

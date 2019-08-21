@@ -266,7 +266,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             " RETURN accessPage.name as name,accessPage.moduleId as moduleId, collect(DISTINCT subPages) as child ORDER BY accessPage.moduleId")
     List<KPIAccessPageQueryResult> getKPITabsListForCountry(Long countryId);
 
-    @Query("MATCH (user:User) ,(org:Unit)  where id(org)={0}\n" +
+    @Query("MATCH (user:User) ,(org)  where id(org)={0}\n" +
             "AND id(user)={1}\n" +
             "MATCH (user)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(org)\n" +
             "MATCH(up)-[:"+HAS_ACCESS_GROUP+"]-(accessgroup:AccessGroup{deleted: false,enabled:true})-[r:"+HAS_ACCESS_OF_TABS+"{read:true}]->(accessPage:AccessPage{isModule:true,active:true}) where id(accessgroup)=id(accessgroup)\n" +

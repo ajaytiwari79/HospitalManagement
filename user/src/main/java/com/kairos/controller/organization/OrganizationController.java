@@ -967,4 +967,11 @@ public class OrganizationController {
     public ResponseEntity<Map<String, Object>> isChild(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.isUnit(unitId));
     }
+
+    @ApiOperation(value = "Get Organization's country Id")
+    @GetMapping(UNIT_URL + "/countryId")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getCountryIdOfOrganization(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, countryService.getCountryIdByUnitId(unitId));
+    }
 }
