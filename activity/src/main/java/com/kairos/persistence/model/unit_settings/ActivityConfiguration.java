@@ -3,8 +3,11 @@ package com.kairos.persistence.model.unit_settings;
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
 import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
-
+@Getter
+@Setter
 public class ActivityConfiguration extends MongoBaseEntity {
     @Indexed
     private Long unitId;
@@ -15,40 +18,6 @@ public class ActivityConfiguration extends MongoBaseEntity {
 
     public ActivityConfiguration() {
         // dc
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public PresencePlannedTime getPresencePlannedTime() {
-        return presencePlannedTime;
-    }
-
-    public void setPresencePlannedTime(PresencePlannedTime presencePlannedTime) {
-        this.presencePlannedTime = presencePlannedTime;
-    }
-
-    public AbsencePlannedTime getAbsencePlannedTime() {
-        return absencePlannedTime;
-    }
-
-
-    public void setAbsencePlannedTime(AbsencePlannedTime absencePlannedTime) {
-
-        this.absencePlannedTime = absencePlannedTime;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
     public ActivityConfiguration(PresencePlannedTime presencePlannedTime, Long countryId) {

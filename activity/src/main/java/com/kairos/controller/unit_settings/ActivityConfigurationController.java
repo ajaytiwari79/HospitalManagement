@@ -47,13 +47,13 @@ public class ActivityConfigurationController {
     }
 
 
-    @ApiOperation("CREATE Activity Configuration ")
+    /*@ApiOperation("CREATE Activity Configuration ")
     @PostMapping(value = UNIT_ACTIVITY_CONFIGURATION)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createDefaultSettings(@PathVariable Long unitId, @RequestParam("countryId") Long countryId) {
         activityConfigurationService.createDefaultSettings(unitId, countryId, null);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-    }
+    }*/
 
     @ApiOperation("Get presence Activity Configuration")
     @GetMapping(value = UNIT_ACTIVITY_CONFIGURATION+"/presence")

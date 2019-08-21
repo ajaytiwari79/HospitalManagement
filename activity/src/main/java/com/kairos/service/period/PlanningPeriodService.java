@@ -1,5 +1,6 @@
 package com.kairos.service.period;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
@@ -170,7 +171,6 @@ public class PlanningPeriodService extends MongoBaseService {
     public FlippingDateDTO setFlippingDateAndTime(PeriodPhaseDTO flippingDateTime) {
         return (Optional.ofNullable(flippingDateTime.getFlippingDate()).isPresent()) ? new FlippingDateDTO(flippingDateTime.getFlippingDate(), flippingDateTime.getFlippingTime().getHour(), flippingDateTime.getFlippingTime().getMinute(), flippingDateTime.getFlippingTime().getSecond()) : null;
     }
-
 
     /// API END Point
     public List<PlanningPeriodDTO> migratePlanningPeriods(Long unitId, PlanningPeriodDTO planningPeriodDTO) {
@@ -794,5 +794,56 @@ public class PlanningPeriodService extends MongoBaseService {
             timeBankService.updateDailyTimeBankEntriesForStaffs(shifts,planningPeriod);
             LOGGER.info("successfully publish shift after flipping planning period contruction to draft phase");
         }
+    }
+
+    public DateTimeInterval getPlanningPeriodIntervalByUnitId(Long unitId){
+        PlanningPeriodDTO planningPeriodDTO = planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        return new DateTimeInterval(planningPeriodDTO.getStartDate(),planningPeriodDTO.getEndDate());
+    }
+
+    public List<PlanningPeriodDTO> findAllPeriodsOfUnit(Long unitId){
+        return planningPeriodMongoRepository.findAllPeriodsOfUnit(unitId);
+    }
+    public List<PlanningPeriodDTO> findPeriodsOfUnitByStartAndEndDate(Long unitId, LocalDate startDate, LocalDate endDate){
+        return planningPeriodMongoRepository.findPeriodsOfUnitByStartAndEndDate(unitId, startDate, endDate);
+    }
+    public PlanningPeriod getPlanningPeriodContainsDate(Long unitId, LocalDate dateLiesInPeriod){
+        return planningPeriodMongoRepository.getPlanningPeriodContainsDate(unitId, dateLiesInPeriod);
+    }
+    public PlanningPeriod getFirstPlanningPeriod(Long unitId){
+        return planningPeriodMongoRepository.getFirstPlanningPeriod(unitId);
+    }
+    public PlanningPeriod getLastPlanningPeriod(Long unitId){
+        return planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
+    }
+    public PlanningPeriod findLastPlaningPeriodEndDate(Long unitId){
+        return planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
+    }
+    public List<PlanningPeriod> findAllPeriodsOfUnitByRequestPhaseId(Long unitId, String requestPhaseName){
+        return planningPeriodMongoRepository.findAllPeriodsOfUnitByRequestPhaseId(unitId, requestPhaseName);
+    }
+    public List<PeriodDTO> findAllPeriodsByStartDateAndLastDate(Long unitId, LocalDate startDate, LocalDate endDate){
+        return planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, startDate, endDate);
+    }
+    public PlanningPeriod findCurrentDatePlanningPeriod(Long unitId, LocalDate startLocalDate, LocalDate endLocalDate){
+        return planningPeriodMongoRepository.findCurrentDatePlanningPeriod(unitId, startLocalDate, endLocalDate);
+    }
+    public Phase getCurrentPhaseByDateUsingPlanningPeriod(Long unitId, LocalDate date){
+        return planningPeriodMongoRepository.getCurrentPhaseByDateUsingPlanningPeriod(unitId, date);
+    }
+    public PlanningPeriodDTO findStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId){
+        return planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+    }
+    public List<PlanningPeriod> findAllPeriodsByUnitIdAndDates(Long unitId, Set<LocalDate> localDates){
+        return planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId, localDates);
+    }
+    public List<PlanningPeriodDTO> findAllPlanningPeriodBetweenDatesAndUnitId(Long unitId, Date requestedStartDate, Date requestedEndDate){
+        return planningPeriodMongoRepository.findAllPlanningPeriodBetweenDatesAndUnitId(unitId, requestedStartDate, requestedEndDate);
+    }
+    public List<PlanningPeriod> findLastPlanningPeriodOfAllUnits(){
+        return planningPeriodMongoRepository.findLastPlanningPeriodOfAllUnits();
+    }
+    public PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId){
+        return planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
     }
 }

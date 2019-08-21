@@ -217,7 +217,7 @@ public class RuletemplateUtils {
         if (!isValid) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation;
             if (PhaseDefaultName.TIME_ATTENDANCE.equals(infoWrapper.getPhaseEnum())){
-                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), counterCount, true, true,totalCounter,unitType,unitValue);
+                workTimeAgreementRuleViolation = new WorkTimeAgreementRuleViolation(wtaBaseRuleTemplate.getId(), wtaBaseRuleTemplate.getName(), counterCount, true, false,totalCounter,unitType,unitValue);
             }else if (counterCount != null) {
                 int counterValue = counterCount - 1;
                 boolean canBeIgnore = true;
