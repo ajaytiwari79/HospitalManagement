@@ -538,36 +538,34 @@ public class CompanyCreationService {
         return unitType;
     }
 
-    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrgaziationId) {
-        Optional<OrganizationBaseEntity> organization=organizationBaseRepository.findById(organizationId,2);
-        if(!organization.isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
-        }
+    public QueryResult onBoardOrganization(Long countryId, Long organizationId, Long parentOrganizationId) {
+        OrganizationBaseEntity organization=organizationBaseRepository.findById(organizationId,2).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId)));
         Organization parent=null;
-        Unit unit=null;
-        if(organization.get() instanceof Organization){
-            parent=((Organization) organization.get());
-        }
-        else if(organization.get() instanceof Unit){
-            unit =((Unit) organization.get());
-        }
+        //Unit unit=null;
+//        if(organization.get() instanceof Organization){
+//            parent=((Organization) organization.get());
+//        }
+//        else if(organization.get() instanceof Unit){
+//            unit =((Unit) organization.get());
+//        }
 
         // If it has any error then it will throw exception
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
         //or parent has any missing required details
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
         List<Long> unitIds = new ArrayList<>();
-        List<Unit> units = new ArrayList<>();
-        units.addAll(parent.getUnits());
-        if(unit!=null) units.add(unit);
+        List<OrganizationBaseEntity> units = new ArrayList<>();
+        units.add(organization);
+        if(organization instanceof Organization) {
+            parent = (Organization) organization;
+            units.addAll(parent.getUnits());
+        }
+
         validateBasicDetails(units, exceptionService);
-        if(parentOrgaziationId==null && CollectionUtils.isNotEmpty(parent.getUnits())) {
+        if(parentOrganizationId==null && CollectionUtils.isNotEmpty(parent.getUnits())) {
             unitIds = parent.getUnits().stream().map(Unit::getId).collect(Collectors.toList());
             staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
             unitIds.add(organizationId);
-            //            if (staffPersonalDetailDTOS.size() != unitIds.size()) {
-            //                exceptionService.invalidRequestException("error.Organization.unitmanager.accessgroupid.notnull");
-            //            }
             parent.getUnits().forEach(currentOrg -> currentOrg.setBoardingCompleted(true));
         } else {
             unitIds.add(organizationId);
@@ -576,29 +574,29 @@ public class CompanyCreationService {
         validateUserDetails(staffPersonalDetailDTOS, exceptionService);
         List<OrganizationContactAddress> organizationContactAddresses = unitGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
-        unit.setBoardingCompleted(true);
-        unitGraphRepository.save(unit);
+        organization.setBoardingCompleted(true);
+        organizationBaseRepository.save(organization);
         try {
             List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
-            SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(days, LocalTime.of(23, 59), JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING, String.valueOf(unit.getTimeZone()));
+            SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(days, LocalTime.of(23, 59), JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING, String.valueOf(organization.getTimeZone()));
             // create job for auto clock out and create realtime/draft shiftstate
-            schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), unit.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+            schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
             });
         } catch (Exception e) {
             LOGGER.info("schedular is not running , unable to create job");
         }
         addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
-        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(unit.getId());
+        Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(parent.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
-        List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(unit.getOrganizationType().getId(), orgSubTypeIds, countryId, unit.isParentOrganization());
-        if(parentOrgaziationId == null) {
+        List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, organization.isParentOrganization());
+        if(parentOrganizationId == null) {
             companyDefaultDataService.createDefaultDataForParentOrganization(parent, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
-            companyDefaultDataService.createDefaultDataInUnit(unit.getId(), parent.getUnits(), countryId, timeSlots);
+            companyDefaultDataService.createDefaultDataInUnit(organization.getId(), parent.getUnits(), countryId, timeSlots);
         } else {
-            companyDefaultDataService.createDefaultDataInUnit(parentOrgaziationId, Arrays.asList(unit), countryId, timeSlots);
+            companyDefaultDataService.createDefaultDataInUnit(parentOrganizationId, Arrays.asList((Unit) organization), countryId, timeSlots);
         }
-        QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(unit, QueryResult.class);
+        QueryResult organizationQueryResult = ObjectMapperUtils.copyPropertiesByMapper(organization, QueryResult.class);
         List<QueryResult> childQueryResults = new ArrayList<>();
         for (Unit childUnits : parent.getUnits()) {
             QueryResult childUnit = ObjectMapperUtils.copyPropertiesByMapper(childUnits, QueryResult.class);

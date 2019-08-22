@@ -368,7 +368,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
     OrganizationContactAddress getContactAddressOfOrg(long unitId);
 
-    @Query("MATCH (organization:Unit) WHERE id(organization)={0} WITH organization " +
+    @Query("MATCH (organization:Organization) WHERE id(organization)={0} WITH organization " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,zipCode,contactAddress\n" +
@@ -551,7 +551,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<Map<String, Object>> getUnitAndParentOrganizationAndCountryIds();
 
 
-    @Query("MATCH (org:Unit)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Unit) WHERE id(org)={0} \n" +
+    @Query("MATCH (org:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) WHERE id(org)={0} \n" +
             "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]->(companyCategory:CompanyCategory) WITH companyCategory, org,hub \n" +
             "OPTIONAL MATCH (org)-[:" + HAS_ACCOUNT_TYPE + "]->(accountType:AccountType) WITH companyCategory,accountType, org,hub \n" +
             "OPTIONAL MATCH (org)-[:" + BUSINESS_TYPE + "]-(businessType:BusinessType) WITH COLLECT(id(businessType)) as businessTypeIds,org,companyCategory,accountType,hub \n" +

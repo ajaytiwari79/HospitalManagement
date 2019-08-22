@@ -61,7 +61,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "return id(organizationType) as id, organizationType.name as name , CASE WHEN organizationSubType IS NOT NULL THEN collect({id:id(organizationSubType),name:organizationSubType.name}) ELSE [] END as children \n")
     List<OrganizationTypeAndSubType> getAllOrganizationTypeAndSubType(long countryId);
 
-    @Query("Match (organization:Unit) where id(organization)={0} \n" +
+    @Query("Match (organization:Organization) where id(organization)={0} \n" +
             "OPTIONAL Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType) with organizationType,organization\n" +
             "OPTIONAL match (subType:OrganizationType)<-[:"+SUB_TYPE_OF+"]-(organization) with subType,organizationType,organization\n" +
             "OPTIONAL Match (organization)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false}) \n" +

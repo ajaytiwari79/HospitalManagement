@@ -2,6 +2,7 @@ package com.kairos.utils.validator.company;
 
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.user.organization.CompanyType;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
@@ -16,7 +17,7 @@ import static com.kairos.constants.UserMessagesConstants.*;
  * CreatedBy vipulpandey on 22/8/18
  **/
 public class OrganizationDetailsValidator {
-    public static void validateBasicDetails(List<Unit> units, ExceptionService exceptionService) {
+    public static void validateBasicDetails(List<OrganizationBaseEntity> units, ExceptionService exceptionService) {
         units.forEach(organization -> {
             if (!Optional.ofNullable(organization.getDesiredUrl()).isPresent()) {
                 exceptionService.invalidRequestException(ERROR_ORGANIZATION_DESIREDURL_NOTNULL, organization.getName());
@@ -34,7 +35,7 @@ public class OrganizationDetailsValidator {
         });
     }
 
-    private static void validateTypeDetails(ExceptionService exceptionService, Unit unit) {
+    private static void validateTypeDetails(ExceptionService exceptionService, OrganizationBaseEntity unit) {
         if (!Optional.ofNullable(unit.getOrganizationType()).isPresent()) {
             exceptionService.invalidRequestException(ERROR_ORGANIZATION_ORGTYPE_NOTNULL, unit.getName());
         }

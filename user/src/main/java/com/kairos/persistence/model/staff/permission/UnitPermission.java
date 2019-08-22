@@ -32,7 +32,7 @@ public class UnitPermission extends UserBaseEntity {
     @Relationship(type = APPLICABLE_IN_UNIT)
     private Unit unit;
 
-    @Relationship(type = APPLICABLE_IN_ORGANIZATION)
+    @Relationship(type = APPLICABLE_IN_UNIT)
     private Organization organization;
 
     @Relationship(type = HAS_ACCESS_GROUP)
