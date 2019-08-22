@@ -227,7 +227,7 @@ public class ShiftService extends MongoBaseService {
             todoService.createOrUpdateTodo(mainShift, TodoType.APPROVAL_REQUIRED, staffAdditionalInfoDTO.getUserAccessRoleDTO(), isNotNull(shiftDTO.getId()));
             if (!ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
                 payOutService.updatePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
-                shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
+                //shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
             }
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(isNotNull(mainShift.getDraftShift()) ? mainShift.getDraftShift() : mainShift, ShiftDTO.class);
             shiftDTO.setId(mainShift.getId());
