@@ -21,3 +21,26 @@ db.phaseSettings.find({"sequence":0}).forEach( function (phaseSetting) {
     }
     db.getCollection('phaseSettings').update({ "_id" : phaseSetting._id},{"$set":{"sequence" : NumberInt(sequenceValue) }});
 });
+
+db.activityConfiguration.find({"presencePlannedTime":{$exists:true}}).forEach(function(ac){
+    ac.presencePlannedTime.employmentWisePlannedTimeConfigurations = [];
+    var staffPlannedTimeIds = [];
+    staffPlannedTimeIds.push(ac.presencePlannedTime.staffPlannedTimeId);
+    ac.presencePlannedTime.staffPlannedTimeId = null;
+    ac.presencePlannedTime.employmentWisePlannedTimeConfigurations.push({employmentTypeId:14044,staffPlannedTimeIds:staffPlannedTimeIds});
+    ac.presencePlannedTime.employmentWisePlannedTimeConfigurations.push({employmentTypeId:20605,staffPlannedTimeIds:staffPlannedTimeIds});
+    ac.presencePlannedTime.employmentWisePlannedTimeConfigurations.push({employmentTypeId:14045,staffPlannedTimeIds:staffPlannedTimeIds});
+    ac.presencePlannedTime.employmentWisePlannedTimeConfigurations.push({employmentTypeId:20604,staffPlannedTimeIds:staffPlannedTimeIds});
+    ac.presencePlannedTime.employmentWisePlannedTimeConfigurations.push({employmentTypeId:14046,staffPlannedTimeIds:staffPlannedTimeIds});
+    ac.presencePlannedTime.managementPlannedTimeIds=[];
+    ac.presencePlannedTime.managementPlannedTimeIds.push(ac.presencePlannedTime.managementPlannedTimeId);
+    ac.presencePlannedTime.managementPlannedTimeId = null;
+    db.activityConfiguration.save(ac);
+});
+
+db.activityConfiguration.find({"absencePlannedTime":{$exists:true}}).forEach(function(ac){
+    ac.absencePlannedTime.plannedTimeIds = [];
+    ac.absencePlannedTime.plannedTimeIds.push(ac.absencePlannedTime.plannedTimeId);
+    ac.absencePlannedTime.plannedTimeId = null;
+    db.activityConfiguration.save(ac);
+});

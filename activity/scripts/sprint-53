@@ -30,6 +30,7 @@ db.getCollection('applicableKPI').insert({
     "deleted" : false,
     "frequencyType" : "DAYS",
     "interval" : "LAST",
+    "title" : "Planned hours vs timebank"
     "kpiRepresentation" : "REPRESENT_PER_INTERVAL",
     "value" : 2.0,
     "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
