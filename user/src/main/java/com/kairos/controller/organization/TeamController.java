@@ -12,9 +12,7 @@
 
     import javax.inject.Inject;
     import java.math.BigInteger;
-    import java.util.List;
-    import java.util.Map;
-    import java.util.Set;
+    import java.util.*;
 
     import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
     import static com.kairos.constants.AppConstants.TEAM;

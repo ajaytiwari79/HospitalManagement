@@ -11,9 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_NOOPENSHIFTINTERVALFOUND;
 import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_OVERLAP_INTERVAL;

@@ -7,13 +7,18 @@ package com.kairos.persistence.model.wta.templates.template_types;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class BreakWTATemplate extends WTABaseRuleTemplate {
 
     private short breakGapMinutes;
@@ -26,23 +31,7 @@ public class BreakWTATemplate extends WTABaseRuleTemplate {
     }
 
     public BreakWTATemplate() {
-        //Default Constructor
-    }
-
-    public short getBreakGapMinutes() {
-        return breakGapMinutes;
-    }
-
-    public void setBreakGapMinutes(short breakGapMinutes) {
-        this.breakGapMinutes = breakGapMinutes;
-    }
-
-    public Set<BreakAvailabilitySettings> getBreakAvailability() {
-        return breakAvailability;
-    }
-
-    public void setBreakAvailability(Set<BreakAvailabilitySettings> breakAvailability) {
-        this.breakAvailability = breakAvailability;
+        this.wtaTemplateType = WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT;
     }
 
     @Override

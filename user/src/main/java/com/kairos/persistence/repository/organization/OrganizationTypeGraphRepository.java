@@ -8,9 +8,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -28,7 +26,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     List<OrganizationType> findByIdIn(List<Long> ids);
 
     @Query("MATCH (ot:OrganizationType{isEnable:true})-[:" + BELONGS_TO + "]->(c:Country) WHERE id(c)= {0}\n" +
-            "Optional Match (ot)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false}) return ot.name as name,id(ot) as id,collect(level) as levels")
+            "Optional Match (ot)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false,isEnabled:true}) return ot.name as name,id(ot) as id,collect(level) as levels")
     List<OrgTypeLevelWrapper> getOrganizationTypeByCountryId(Long countryId);
 
     OrganizationType findByName(OrganizationType.OrganizationTypeEnum name);
@@ -38,6 +36,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
     @Query("Match (o:OrganizationType)-[rel:ORGANIZATION_TYPE_HAS_SERVICES]->(os:OrganizationService) where id(o)={0}  AND  id(os)={1} return SIGN(COUNT(rel))")
     int checkIfServiceExistsWithOrganizationType(long orgTypeId, long serviceId);
+
 
     @Query("Match (o:OrganizationType)-[rel:ORGANIZATION_TYPE_HAS_SERVICES]->(os:OrganizationService) where id(o)={0}  AND  id(os)={1} DELETE rel ")
     void deleteService(long orgTypeId, long serviceId);

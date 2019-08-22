@@ -1,4 +1,5 @@
 package com.kairos.dto.activity.staffing_level.presence;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.staffing_level.StaffingLevelSetting;
@@ -6,9 +7,7 @@ import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 //import com.kairos.util.validator.ExistingStaffingLevel;
 //import org.springframework.format.annotation.DateTimeFormat;

@@ -1,11 +1,8 @@
 package com.kairos.enums;
 
-
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by prerna on 26/2/18.

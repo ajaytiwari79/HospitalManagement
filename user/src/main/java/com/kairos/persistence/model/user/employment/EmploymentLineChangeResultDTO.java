@@ -3,9 +3,7 @@ package com.kairos.persistence.model.user.employment;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * CreatedBy vipulpandey on 3/10/18

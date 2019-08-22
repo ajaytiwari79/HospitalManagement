@@ -7,6 +7,8 @@ import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -19,30 +21,11 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.ALWAYS)
+@Getter
+@Setter
 public class TimeBankWTATemplate extends WTABaseRuleTemplate {
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
-
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
 
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
@@ -54,12 +37,11 @@ public class TimeBankWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        String exception = "";
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)){
+        if(!isDisabled() && this.minMaxSetting.equals(MinMaxSetting.MAXIMUM) && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)){
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
-            boolean isValid = isValid(minMaxSetting, limitAndCounter[0], infoWrapper.getTotalTimeBank()/60);
+            boolean isValid = isValid(minMaxSetting, limitAndCounter[0]*60, (int)infoWrapper.getTotalTimeBank());
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                    limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0],this.name));
+                    limitAndCounter[2], DurationType.HOURS,getHoursByMinutes(limitAndCounter[0]*60,this.name));
         }
     }
 

@@ -29,6 +29,7 @@ public class CommonsExceptionUtil {
         throw new DataNotFoundByIdException(convertMessage(message, params));
     }
 
+
    public void actionNotPermittedException(String message, Object... params) {
         throw new ActionNotPermittedException(convertMessage(message, params));
     }
@@ -72,5 +73,4 @@ public class CommonsExceptionUtil {
     public void userNotFoundInRedis(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
     }
-
 }

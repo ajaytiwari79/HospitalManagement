@@ -4,13 +4,12 @@ package com.kairos.service.counter;
  *
  */
 
-
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
+import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
@@ -31,10 +30,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
-
-
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,6 +40,7 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class KPISetService {
@@ -145,12 +144,12 @@ public class KPISetService {
     }
 
 
-    public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, Date startDate) {
+    public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, LocalDate startDate) {
         List<KPISetResponseDTO> kpiSetResponseDTOList = new ArrayList<>();
-        List<ApplicableKPI>  applicableKPIS =new ArrayList<>();
+        List<ApplicableKPI>  applicableKPIS;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, startDate,
-                asDate(asLocalDate(startDate).atTime(LocalTime.MAX)));
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, DateUtils.asDate(startDate),
+                asDate(startDate.atTime(LocalTime.MAX)));
         if (isNotNull(phase)) {
             List<KPISetDTO> kpiSetDTOList = kpiSetRepository.findByPhaseIdAndReferenceIdAndConfLevel(phase.getId(),
                     unitId,ConfLevel.UNIT);
@@ -158,25 +157,34 @@ public class KPISetService {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
                     KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
                     List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
+                    Map<BigInteger,KPIResponseDTO> kpiResponseDTOMap = new HashMap<>();
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
                         kpiSetResponseDTO.setKpiSetName(kpiSet.getName());
                         kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
-                        applicableKPIS = counterRepository.getKPIByKPIIds(kpiSet.getKpiIds().stream().collect(Collectors.toList()), accessGroupPermissionCounterDTO.getStaffId(), ConfLevel.STAFF);
+                        List<BigInteger> kpiIds = kpiSet.getKpiIds().stream().collect(Collectors.toList());
+                        if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
+                            applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.COUNTRY, accessGroupPermissionCounterDTO.getCountryId());
+                        } else {
+                            applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
+                        }
                         for (ApplicableKPI applicableKPI : applicableKPIS) {
                             if(isNotNull(applicableKPI)) {
                                 applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
-                                FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
-                                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                                FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(),accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
+                                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId(),startDate);
                                 if (isNotNull(kpiResponseDTO)) {
-                                    kpiResponseDTOList.add(kpiResponseDTO);
+                                    kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(),kpiResponseDTO);
                                 }
                             }
                         }
+                        kpiResponseDTOList=kpiResponseDTOMap.values().stream().collect(Collectors.toList());
                     }
                     if(isCollectionNotEmpty(kpiResponseDTOList)) {
                         kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
                     }
-                    kpiSetResponseDTOList.add(kpiSetResponseDTO);
+                    if(isCollectionNotEmpty(kpiSetResponseDTO.getKpiData())) {
+                        kpiSetResponseDTOList.add(kpiSetResponseDTO);
+                    }
                 }
             }
         }

@@ -16,14 +16,10 @@ import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDT
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
+import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
-import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository;
-import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
-import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
+import com.kairos.persistence.repository.user.skill.*;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.SkillServiceTemplateClient;
 import com.kairos.rest_client.TaskDemandRestClient;

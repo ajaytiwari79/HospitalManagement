@@ -1,6 +1,7 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -29,6 +30,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,6 +46,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
@@ -77,7 +80,12 @@ public class ShiftSickService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
-    @Inject private TimeBankRepository timeBankRepository;
+    @Inject
+    private TimeBankRepository timeBankRepository;
+    @Inject
+    private TimeBankService timeBankService;
+    @Inject
+    private ShiftBreakService shiftBreakService;
 
 
     public Map<String, Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId, Duration duration) {
@@ -165,9 +173,7 @@ public class ShiftSickService extends MongoBaseService {
             Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);
             //shiftMongoRepository.saveEntities(shifts);
 
-            List<BigInteger> activityIds = shifts.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toList());
-            List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
-            Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+            Map<BigInteger, ActivityWrapper> activityWrapperMap = shiftService.getActivityWrapperMap(shifts,null);
             for (Shift shift : shifts) {
                 staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()),shifts.get(0).getStaffId(), StringUtils.capitalize(ORGANIZATION), shifts.get(0).getEmploymentId(),Collections.emptySet());
                 WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
@@ -177,10 +183,8 @@ public class ShiftSickService extends MongoBaseService {
                 }
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                List<ShiftActivity> breakActivities = shiftService.updateBreakInShift(shift,false,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
-                if (!breakActivities.isEmpty()) {
-                    shift.setActivities(breakActivities);
-                }
+                List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shift,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
+                shift.setBreakActivities(breakActivities);
                 shiftService.saveShiftWithActivity( activityWrapperMap, shift, staffAdditionalInfoDTO,false,null ,phaseListByDate.get(shift.getStartDate()),null);
             }
 
@@ -241,8 +245,8 @@ public class ShiftSickService extends MongoBaseService {
                 shiftActivity.setDurationMinutes(shiftDurationInMinute);
                 shiftActivity.setScheduledMinutes(scheduledMinutes);
                 break;
-            case FULL_DAY_CALCULATION:
-            case FULL_WEEK:
+            case CommonConstants.FULL_DAY_CALCULATION:
+            case CommonConstants.FULL_WEEK:
                 weeklyMinutes = (TimeCalaculationType.FULL_TIME_WEEKLY_HOURS_TYPE.equals(timeCalculationActivityTab.getFullDayCalculationType()))
                         ? employment.getFullTimeWeeklyMinutes() : employment.getTotalWeeklyMinutes();
                 int shiftEndHour = weeklyMinutes / employment.getWorkingDaysInWeek();

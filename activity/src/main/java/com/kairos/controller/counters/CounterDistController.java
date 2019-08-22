@@ -3,20 +3,13 @@ package com.kairos.controller.counters;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.*;
 import com.kairos.dto.activity.counter.distribution.category.CategoryKPIsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
+import com.kairos.dto.activity.counter.distribution.tab.*;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.service.counter.CounterDataService;
-import com.kairos.service.counter.CounterDistService;
-import com.kairos.service.counter.DynamicTabService;
-import com.kairos.service.counter.RestingHoursCalculationService;
+import com.kairos.service.counter.*;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -298,12 +291,12 @@ public class CounterDistController {
     }
 
     @PostMapping(UNIT_URL + KPI_URL + "/preview_kpi")
-    public ResponseEntity<Map<String, Object>> kpiPreviewDataOfUnit(@PathVariable BigInteger kpiId, @PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria) {
+    public ResponseEntity<Map<String, Object>> kpiPreviewDataOfUnit(@PathVariable BigInteger kpiId, @PathVariable Long unitId, @Valid @RequestBody FilterCriteriaDTO filterCriteria) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiPreviewWithFilter(kpiId, unitId, filterCriteria, ConfLevel.UNIT));
     }
 
     @PostMapping(COUNTRY_URL + KPI_URL + "/preview_kpi")
-    public ResponseEntity<Map<String, Object>> kpiPreviewDataOfCountry(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria) {
+    public ResponseEntity<Map<String, Object>> kpiPreviewDataOfCountry(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @Valid @RequestBody FilterCriteriaDTO filterCriteria) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiPreviewWithFilter(kpiId, countryId, filterCriteria, ConfLevel.COUNTRY));
     }
 
@@ -315,5 +308,10 @@ public class CounterDistController {
     @PostMapping(COUNTRY_URL + KPI_URL + "/kpi_data")
     public ResponseEntity<Map<String, Object>> kpiDataOfCountryByInterval(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria ,@RequestParam(required = false) Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiDataByInterval(kpiId, countryId, filterCriteria, ConfLevel.COUNTRY,staffId));
+    }
+
+    @PostMapping(COUNTRY_URL+"/create_default_category")
+    public ResponseEntity<Map<String, Object>> createDefaultCategory(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterManagementService.createDefaultCategories(countryId));
     }
 }

@@ -3,6 +3,7 @@ package com.kairos.commons.service.audit_logging;
 import com.kairos.commons.repository.audit_logging.AuditLoggingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -19,5 +20,10 @@ public class AuditLoggingService {
     public List<Map> getAuditLoggingByType(String auditLogType){
         return auditLoggingRepository.getAuditLoggingByType(auditLogType);
     }
+    public List<Map>getAuditLogOfStaff(Long staffId ,LocalDate startDate,LocalDate endDate)
+    {
+        return auditLoggingRepository.getAuditLogOfStaff(staffId,startDate,endDate);
+    }
+
 
 }

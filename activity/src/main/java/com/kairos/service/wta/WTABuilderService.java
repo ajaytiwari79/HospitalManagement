@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.constants.AppConstants.COPY_OF;
 
@@ -163,11 +161,13 @@ public class WTABuilderService extends MongoBaseService {
             default:
                 throw new DataNotFoundByIdException("Invalid TEMPLATE");
         }
-        wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategoryId());
-        if (isIdnull) {
-            wtaBaseRuleTemplate.setId(null);
-            wtaBaseRuleTemplate.setCountryId(null);
-        }
+
+            wtaBaseRuleTemplate.setRuleTemplateCategoryId(ruleTemplate.getRuleTemplateCategoryId());
+            if (isIdnull) {
+                wtaBaseRuleTemplate.setId(null);
+                wtaBaseRuleTemplate.setCountryId(null);
+            }
+
         return wtaBaseRuleTemplate;
     }
 

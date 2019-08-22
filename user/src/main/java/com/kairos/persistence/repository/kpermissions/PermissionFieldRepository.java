@@ -1,9 +1,7 @@
 package com.kairos.persistence.repository.kpermissions;
 
 import com.kairos.enums.kpermissions.FieldLevelPermission;
-import com.kairos.persistence.model.kpermissions.KPermissionField;
-import com.kairos.persistence.model.kpermissions.KPermissionFieldQueryResult;
-import com.kairos.persistence.model.kpermissions.KPermissionSubModelFieldQueryResult;
+import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 

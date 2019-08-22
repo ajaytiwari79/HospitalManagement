@@ -12,10 +12,7 @@ import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.activity.counter.enums.CounterType;
-import com.kairos.dto.activity.counter.enums.KPIValidity;
-import com.kairos.dto.activity.counter.enums.ModuleType;
+import com.kairos.dto.activity.counter.enums.*;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -32,24 +29,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
-import org.springframework.data.mongodb.core.query.BasicQuery;
-import org.springframework.data.mongodb.core.query.BasicUpdate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -207,6 +196,20 @@ public class CounterRepository{
     public List<KPICategory> getKPICategoryByIds(List<BigInteger> categoryIds, ConfLevel level, Long refId) {
         String queryField = getRefQueryField(level);
         Query query = new Query(Criteria.where("deleted").is(false).and("_id").in(categoryIds).and(queryField).is(refId).and("level").is(level));
+        return mongoTemplate.find(query, KPICategory.class);
+
+    }
+
+    public KPICategory getKPICategoryByName(String categoryName, ConfLevel level, Long refId) {
+        String queryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("deleted").is(false).and("name").is(categoryName).regex(Pattern.compile("^" + categoryName + "$", Pattern.CASE_INSENSITIVE)).and(queryField).is(refId).and("level").is(level));
+        return mongoTemplate.findOne(query, KPICategory.class);
+
+    }
+
+    public List<KPICategory> getKPICategoryByRefIds(ConfLevel level, List<Long> refIds,String name) {
+        String queryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("deleted").is(false).and("name").is(name).and(queryField).in(refIds).and("level").is(level));
         return mongoTemplate.find(query, KPICategory.class);
 
     }

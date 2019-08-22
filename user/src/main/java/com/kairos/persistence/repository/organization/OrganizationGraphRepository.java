@@ -7,9 +7,7 @@ import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.union.UnionDataQueryResult;
-import com.kairos.persistence.model.organization.union.UnionQueryResult;
-import com.kairos.persistence.model.organization.union.UnionResponseDTO;
+import com.kairos.persistence.model.organization.union.*;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
@@ -17,9 +15,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -203,7 +199,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (bt:BusinessType{isEnabled:true})-[:" + BELONGS_TO + "]->(country) WITH COLLECT(bt) as bt,country \n" +
             "OPTIONAL MATCH (cc:CompanyCategory{deleted:false})-[:" + BELONGS_TO + "]->(country) WITH  cc,bt,country \n" +
             "OPTIONAL MATCH (ot:OrganizationType{isEnable:true})-[:" + BELONGS_TO + "]->(country) WITH COLLECT(cc) as cc,bt,country,ot\n" +
-            "OPTIONAL MATCH (ot)-[r:" + HAS_LEVEL + "]->(level:Level{deleted:false}) " +
+            "OPTIONAL MATCH (ot)-[r:" + HAS_LEVEL + "]->(level:Level{deleted:false,isEnabled:true}) " +
             "  WITH ot,bt,cc,country, case when r is null then [] else COLLECT({id:id(level),name:level.name}) end as levels \n" +
             "OPTIONAL MATCH (ot)-[:" + HAS_SUB_TYPE + "]->(ost:OrganizationType{isEnable:true}) " +
             "WITH {children: case when ost is NULL then [] else COLLECT({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot),levels:levels} as orgTypes,bt,cc,country " +

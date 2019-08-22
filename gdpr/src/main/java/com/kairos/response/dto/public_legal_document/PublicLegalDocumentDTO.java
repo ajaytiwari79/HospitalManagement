@@ -1,11 +1,14 @@
 package com.kairos.response.dto.public_legal_document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.annotation.EnableStringTrimer;
+import com.kairos.constants.GdprMessagesConstants;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Range;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -15,13 +18,15 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
+@EnableStringTrimer
 public class PublicLegalDocumentDTO {
+
     private Long id;
 
-    @NotNull(message = "Public Legal Document Name Required")
+    @Valid
+    @NotEmpty(message = GdprMessagesConstants.MESSAGE_ENTER_VALID_DATA)
     private String name;
 
-    @NotNull(message = "Public Legal Document Body Content Required")
     private String bodyContentInHtml;
 
     private String publicLegalDocumentLogo;
@@ -31,5 +36,11 @@ public class PublicLegalDocumentDTO {
         this.name=name;
         this.publicLegalDocumentLogo=publicLegalDocumentLogo;
         this.bodyContentInHtml=bodyContentInHtml;
+    }
+
+
+    @Override
+    public String toString(){
+        return this.name;
     }
 }

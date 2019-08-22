@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -165,14 +164,16 @@ public class OrganizationActivityController {
     }
 
 
+/*
     @ApiOperation("Update compositeShifts Tab of Activity")
     @PutMapping(value = "/activity/{activityId}/allowed_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignCompositeActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody List<CompositeShiftActivityDTO> compositeShiftActivityDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.assignCompositeActivitiesInActivity(activityId, compositeShiftActivityDTO));
     }
+*/
 
-    @ApiOperation("Update compositeShifts Tab of Activity")
+    @ApiOperation("Update child Activivty of Activity")
     @PutMapping(value = "/activity/{activityId}/child_activities")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> assignChildActivitiesInActivity(@PathVariable BigInteger activityId, @RequestBody Set<BigInteger> childActivitiesIds) {

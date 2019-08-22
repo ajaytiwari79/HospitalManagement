@@ -1,6 +1,5 @@
 package com.kairos.service.data_subject_management;
 
-
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
 import com.kairos.dto.gdpr.OrganizationTypeDTO;
@@ -18,9 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class DataSubjectService {

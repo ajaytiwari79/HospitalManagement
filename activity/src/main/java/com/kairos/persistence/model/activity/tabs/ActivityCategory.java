@@ -1,12 +1,9 @@
 package com.kairos.persistence.model.activity.tabs;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;

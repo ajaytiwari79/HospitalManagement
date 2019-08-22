@@ -1,10 +1,7 @@
 package com.kairos.utils.service_util;
 
 import com.kairos.custom_exception.InvalidRequestException;
-import com.kairos.dto.activity.staffing_level.Duration;
-import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
-import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.dto.activity.staffing_level.StaffingLevelTimeSlotDTO;
+import com.kairos.dto.activity.staffing_level.*;
 import com.kairos.dto.activity.staffing_level.absence.AbsenceStaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.presence.PresenceStaffingLevelDto;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
@@ -157,12 +154,13 @@ public class StaffingLevelUtil {
         for (StaffingLevelTimeSlotDTO staffingLevelTimeSlotDTO : presenceStaffingLevelDto.getPresenceStaffingLevelInterval()) {
             Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap = staffingLevelTimeSlotDTO.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId, Function.identity()));
             StaffingLevelActivity staffingLevelActivities[] = new StaffingLevelActivity[staffingLevelTimeSlotDTO.getStaffingLevelActivities().size()];
-            if (activitiesRankMap != null) {
+            //TODO as discuss with sakshi we need to change rank functionality in staffing level
+            /*if (activitiesRankMap != null) {
                 activitiesRankMap.forEach((activityId, rank) -> {
                     staffingLevelActivities[rank - 1] = staffingLevelActivityMap.get(activityId);
                 });
                 staffingLevelTimeSlotDTO.setStaffingLevelActivities(new LinkedHashSet<>(Arrays.asList(staffingLevelActivities)));
-            }
+            }*/
 
         }
 

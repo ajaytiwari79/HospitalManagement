@@ -1,13 +1,11 @@
 package com.kairos.persistence.model.task_type;
+
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by oodles on 15/6/17.

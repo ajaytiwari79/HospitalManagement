@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.TimeTypeEnum.*;
-import static com.kairos.enums.constraint.ConstraintSubType.*;
 import static com.kairos.enums.constraint.ConstraintSubType.TIME_BANK;
+import static com.kairos.enums.constraint.ConstraintSubType.*;
 import static com.kairos.enums.constraint.ConstraintType.*;
 
 @Service

@@ -1,9 +1,6 @@
 package com.kairos.persistence.model.kpermissions;
 
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.neo4j.annotation.QueryResult;
 @Getter
 @Setter

@@ -1,9 +1,7 @@
 package com.kairos.persistence.model.clause_tag;
 
 import com.kairos.persistence.model.common.BaseEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;

@@ -5,7 +5,7 @@ package com.kairos.service.counter;
  * @dated: Jun/27/2018
  */
 
-import com.google.api.client.util.ArrayMap;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -29,7 +29,6 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
-import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.counter.ApplicableFilter;
@@ -53,6 +52,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -60,11 +60,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.FilterType.STAFF_IDS;
+import static com.kairos.utils.counter.KPIUtils.getDateTimeInterval;
 import static java.util.stream.Collectors.toList;
 
 
@@ -125,7 +124,7 @@ public class CounterDataService extends MongoBaseService {
         List<CommonRepresentationData> kpisData = new ArrayList();
         for (Future<CommonRepresentationData> data : kpiResults) {
             try {
-                kpisData.add(data.get());
+                if(isNotNull(data))kpisData.add(data.get());
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             } catch (ExecutionException ex) {
@@ -198,6 +197,7 @@ public class CounterDataService extends MongoBaseService {
         kpiDTO.setTitle(applicableKPI.getTitle());
         kpiDTO.setValue(applicableKPI.getValue());
         kpiDTO.setFrequencyType(applicableKPI.getFrequencyType());
+
         kpiDTO.setInterval(applicableKPI.getInterval());
         kpiDTO.setKpiRepresentation(applicableKPI.getKpiRepresentation());
         if (isNotNull(applicableKPI.getApplicableFilter())) {
@@ -222,6 +222,12 @@ public class CounterDataService extends MongoBaseService {
             getStaffDefaultData(criteriaList, defaultKpiDataDTO);
         }
         if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_STATUS)) {
+            getActivityStatusDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(STAFF_IDS)) {
+            getActivityStatusDefaultData(criteriaList);
+        }
+        if (kpi.getFilterTypes().contains(FilterType.UNIT_NAME)) {
             getActivityStatusDefaultData(criteriaList);
         }
         if (kpi.getFilterTypes().contains(FilterType.DAYS_OF_WEEK)) {
@@ -342,6 +348,7 @@ public class CounterDataService extends MongoBaseService {
         applicableKPIS.addAll(updateApplicableKPI);
         save(applicableKPIS);
         save(kpi);
+
         kpi.setTitle(counterDTO.getTitle());
         return getTabKpiData(kpi, counterDTO, accessGroupPermissionCounterDTO);
     }
@@ -409,7 +416,8 @@ public class CounterDataService extends MongoBaseService {
         filterCriteria.setKpiIds(Arrays.asList(kpiId));
         refId = ConfLevel.UNIT.equals(level) ? refId : UserContext.getUserDetails().getLastSelectedOrganizationId();
         Map<BigInteger, CommonRepresentationData> data = generateKPIData(filterCriteria, refId, accessGroupPermissionCounterDTO.getStaffId());
-        tabKPIDTO.setData(data.get(kpiId));
+
+            tabKPIDTO.setData(data.get(kpiId));
         return tabKPIDTO;
 
     }
@@ -429,7 +437,7 @@ public class CounterDataService extends MongoBaseService {
         return tabKPIDTO;
     }
 
-    public  KPIResponseDTO generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
+    public  KPIResponseDTO generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId, LocalDate startDate) {
         Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));

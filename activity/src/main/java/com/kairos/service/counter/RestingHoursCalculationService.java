@@ -2,8 +2,6 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.kpi.KPIResponseDTO;
-import com.kairos.utils.counter.KPIUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
@@ -11,19 +9,15 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
-import com.kairos.dto.activity.kpi.KPISetResponseDTO;
-import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
+import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import org.apache.commons.collections.map.HashedMap;
@@ -37,10 +31,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
 import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
+import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
 
 @Service
@@ -57,11 +49,12 @@ public class RestingHoursCalculationService implements CounterService {
     public double getTotalRestingHours(List<Shift> shifts, LocalDate startDate, LocalDate endDate) {
         //all shifts should be sorted on startDate
         DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
-        long totalrestingMinutes = dateTimeInterval.getMilliSeconds();
+        long totalrestingMinutes = dateTimeInterval.getMilliSeconds()/3600000;
         for (Shift shift : shifts) {
             DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
             if (dateTimeInterval.overlaps(shiftInterval)) {
-                totalrestingMinutes -= (int)dateTimeInterval.overlap(shiftInterval).getMinutes();
+                totalrestingMinutes -= (int)(dateTimeInterval.overlap(shiftInterval).getMinutes()/60);
+
             }
         }
         return totalrestingMinutes;
@@ -206,7 +199,7 @@ public class RestingHoursCalculationService implements CounterService {
     public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
         KPIResponseDTO kpiResponseDTO = new KPIResponseDTO();
         Map<Long, Integer> restingHoursMap =  getStaffAndWithRestingHour(filterBasedCriteria, organizationId, applicableKPI);
-        Map<Long, Double> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v-> DateUtils.getHoursFromTotalMilliSeconds(v.getValue().longValue())));
+        Map<Long, Double> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v-> v.getValue().doubleValue()));
         kpiResponseDTO.setKpiName(kpi.getTitle());
         kpiResponseDTO.setKpiId(kpi.getId());
         kpiResponseDTO.setStaffKPIValue(staffAndRestingHoursMap);
