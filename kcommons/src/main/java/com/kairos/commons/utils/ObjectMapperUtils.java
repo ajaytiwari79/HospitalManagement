@@ -61,6 +61,19 @@ public class ObjectMapperUtils {
         return null;
     }
 
+    public static <T extends Object,E extends Object> Set<E> copyPropertiesOfSetByMapper(Set<T> objects, Class className) {
+        try {
+            return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
+                    Set.class, className));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
+
     public static <E extends Object,T extends Object> T copyPropertiesByMapper(E object,Class<T> valueType){
         try {
             String json = mapper.writeValueAsString(object);
