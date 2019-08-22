@@ -3,14 +3,16 @@ package com.kairos.dto.user.staff;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.enums.FilterType;
 import lombok.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.enums.FilterType.*;
 
 /**
  * Created by Jasgeet on 13/10/17.
@@ -36,8 +38,9 @@ public class StaffFilterDTO {
 
     public boolean isValidFilterForShift(){
         boolean isValidFilterForShift = false;
+        Set<FilterType> filterTypeSet = newHashSet(TIME_TYPE,ACTIVITY_TIMECALCULATION_TYPE,ACTIVITY_STATUS,TIME_SLOT);
         for (FilterSelectionDTO filterSelectionDTO : this.getFiltersData()) {
-            isValidFilterForShift = isCollectionNotEmpty(filterSelectionDTO.getValue());
+            isValidFilterForShift = isCollectionNotEmpty(filterSelectionDTO.getValue()) && filterTypeSet.contains(filterSelectionDTO.getName());
             if(isValidFilterForShift){
                 break;
             }

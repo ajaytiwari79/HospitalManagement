@@ -99,6 +99,7 @@ public class PlanningPeriodController {
 //        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.setShiftsDataToInitialDataOfShiftIds(shiftIds,phaseId,unitId));
 //
 //    }
+
     @ApiOperation(value = "Migrate Planning Period")
     @PostMapping(value="/migrate_planning_period")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")

@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EmploymentWithCtaDetailsDTO {
 
@@ -171,7 +173,7 @@ public class EmploymentWithCtaDetailsDTO {
     }
 
     public List<CTARuleTemplateDTO> getCtaRuleTemplates() {
-        return ctaRuleTemplates;
+        return isNullOrElse(ctaRuleTemplates,new ArrayList<>());
     }
 
     public void setCtaRuleTemplates(List<CTARuleTemplateDTO> ctaRuleTemplates) {
