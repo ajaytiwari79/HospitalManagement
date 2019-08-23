@@ -245,7 +245,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             List<BigInteger> plannedTimeIds = addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
             BigInteger plannedTimeId = null;
-            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
+            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) && plannedTimeIds.contains(shiftActivity.getPlannedTimeId())){
                 plannedTimeId = shiftActivity.getPlannedTimeId();
             }else {
                 plannedTimeId = plannedTimeIds.get(0);
