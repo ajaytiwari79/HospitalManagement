@@ -146,7 +146,6 @@ public class EmploymentTypeService {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
-
         }
         return countryGraphRepository.getEmploymentTypeByCountry(countryId, isDeleted);
     }

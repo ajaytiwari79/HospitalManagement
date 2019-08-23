@@ -51,7 +51,7 @@ public class ObjectMapperUtils {
     }
 */
 
-    public static <T extends Object,E extends Object> List<E> copyPropertiesOfListByMapper(List<T> objects, Class className) {
+    public static <T extends Object,E extends Object> List<E> copyPropertiesOfListByMapper(Collection<T> objects, Class className) {
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
                     List.class, className));

@@ -692,6 +692,7 @@ public class EmploymentService {
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAAndAccumulatedTimebankByEmployment(employmentLinesMap, unitId);
         employmentQueryResults.forEach(employment -> {
             employment.setEmploymentLines(employmentLinesMap.get(employment.getId()));
+            employment.setTotalShifts(activityIntegrationService.shiftCountWithEmploymentId(employment.getId()));
             employment.getEmploymentLines().forEach(employmentLine -> {
                 BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
                 employmentLine.setHourlyCost(hourlyCost);

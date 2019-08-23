@@ -16,6 +16,7 @@ import com.kairos.persistence.repository.priority_group.PriorityGroupRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.wrapper.priority_group.PriorityGroupRuleDataDTO;
 import org.joda.time.Interval;
@@ -49,6 +50,7 @@ public class PriorityGroupRulesDataGetterService {
     private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject private PlanningPeriodService planningPeriodService;
 
 
     public PriorityGroupRuleDataDTO getData(PriorityGroupDTO priorityGroupDTO) {
@@ -154,11 +156,11 @@ public class PriorityGroupRulesDataGetterService {
                 plannedHoursWeekly = dailyTimeBankEntries.stream().filter(dailyTimeBankEntry -> dailyTimeBankEntry.getDate().isAfter(startDatePlanned)||
                         dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
                dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMinutesOfTimeBank() + d.getCtaBonusMinutesOfTimeBank()).sum();
-                Set<DateTimeInterval> planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId,DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())),DateUtils.getDate(endDate));
-                timeBank = -1* timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),
+                DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
+                timeBank = -1* timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),
                         employmentWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
-                planningPeriodIntervals = timeBankCalculationService.getPlanningPeriodIntervals(unitId,DateUtils.getDate(startDateDeltaWeek),DateUtils.getDate(endDateDeltaWeek));
-                deltaTimeBank =  -1 * timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervals,new Interval(startDateDeltaWeek,endDateDeltaWeek),
+                planningPeriodInterval =  planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
+                deltaTimeBank =  -1 * timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(startDateDeltaWeek,endDateDeltaWeek),
                         employmentWithCtaDetailsDTO,false,dailyTimeBankEntries, false);
                 staffEmploymentQueryResult.setAccumulatedTimeBank(timeBank);
                 staffEmploymentQueryResult.setDeltaWeeklytimeBank(deltaTimeBank);

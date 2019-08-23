@@ -324,7 +324,7 @@ public class StaffFilterService {
         List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId);
         staffs = staffs.stream().filter(distinctByKey(a -> a.get("id"))).collect(Collectors.toList());
         staffEmploymentTypeWrapper.setStaffList(staffs);
-        List<Long> staffIds = (List<Long>) staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
+        List<Long> staffIds = staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
         staffFilterDTO.setStaffIds(staffIds);
         Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO,unitId,startDate,endDate);
         List<Map> staffList = new ArrayList<>();

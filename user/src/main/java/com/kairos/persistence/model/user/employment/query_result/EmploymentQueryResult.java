@@ -23,6 +23,7 @@ import java.util.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class EmploymentQueryResult {
     private Expertise expertise;
     private LocalDate startDate;
@@ -45,10 +46,13 @@ public class EmploymentQueryResult {
     private float taxDeductionPercentage;
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
+    private long totalShifts;
 
-    public EmploymentQueryResult() {
-        //Default Constructor
-    }
+
+    /**
+     *  Please do not use in backend its just only for FE compactibility
+     */
+    private WTAResponseDTO workingTimeAgreement;
 
     public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Boolean published, Long parentUnitId) {
         this.expertise = expertise;
@@ -90,15 +94,9 @@ public class EmploymentQueryResult {
         return unitInfo;
     }
 
-    /**
-     *  Please do not use in backend its just only for FE compactibility
-     */
-    private WTAResponseDTO workingTimeAgreement;
-
-
-
     public List<EmploymentLinesQueryResult> getEmploymentLines() {
         return Optional.ofNullable(employmentLines).orElse(new ArrayList<>());
     }
+
 
 }

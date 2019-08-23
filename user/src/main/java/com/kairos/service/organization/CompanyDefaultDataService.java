@@ -3,12 +3,14 @@ package com.kairos.service.organization;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
+import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.service.client.VRPClientService;
+import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.integration.GdprIntegrationService;
@@ -43,10 +45,13 @@ public class CompanyDefaultDataService {
     private ReasonCodeService reasonCodeService;
     @Inject
     private GdprIntegrationService gdprIntegrationService;
+    @Inject private EmploymentTypeService employmentTypeService;
 
 
     public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId, List<TimeSlot> timeSlots) {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
+        List<EmploymentType> employmentTypes = employmentTypeService.getEmploymentTypeList(countryId,false);
+        List<Long> employmentTypeIds = employmentTypes.stream().map(employmentType -> employmentType.getId()).collect(Collectors.toList());
         units.forEach(unit -> {
             orgTypeAndSubTypeDTO.setOrganizationTypeId(unit.getOrganizationType().getId());
             orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()));
@@ -54,6 +59,7 @@ public class CompanyDefaultDataService {
             orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
             orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setParentOrganization(unit.isParentOrganization());
+            orgTypeAndSubTypeDTO.setEmploymentTypeIds(employmentTypeIds);
             activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
             activityIntegrationService.createDefaultKPISetting(
                     new DefaultKPISettingDTO(unit.getOrganizationSubTypes().stream().map(organizationType -> organizationType.getId()).collect(Collectors.toList()),

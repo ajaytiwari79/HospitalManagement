@@ -10,6 +10,7 @@ import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
@@ -22,6 +23,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
@@ -55,20 +57,9 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private PlannedHoursCalculationService plannedHoursCalculationService;
+    @Inject private PlanningPeriodService planningPeriodService;
     @Inject
     private CounterHelperService counterHelperService;
-
-
-    private Map<Long, Set<DateTimeInterval>> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate) {
-        Map<Long, Set<DateTimeInterval>> unitAndDateTimeIntervalMap = new HashMap<>();
-        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdsAndBetweenDates(unitIds, startDate, endDate);
-        Map<Long, List<PlanningPeriod>> unitAndPlanningPeriodMap = planningPeriods.stream().collect(Collectors.groupingBy(PlanningPeriod::getUnitId, Collectors.toList()));
-        unitIds.forEach(unitId -> {
-            Set<DateTimeInterval>  dateTimeIntervals = unitAndPlanningPeriodMap.getOrDefault(unitId , new ArrayList<>()).stream().map(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()), asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
-            unitAndDateTimeIntervalMap.put(unitId, dateTimeIntervals);
-        });
-        return unitAndDateTimeIntervalMap;
-    }
 
     private List<CommonKpiDataUnit> getContractualAndPlannedHoursKpiDate(Long organizationId, Map<FilterType, List> filterBasedCriteria ,ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> kpiDataUnits ;
@@ -91,28 +82,28 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         return kpiDataUnits;
     }
     /**
-     * @param unitIdAndPlanningPeriodIntervalMap
      * @param interval
      * @param staffKpiFilterDTOS
      * @return
      */
-    public Map<Object, Double> calculateContractualHoursForStaff(Map<Long, Set<DateTimeInterval>> unitIdAndPlanningPeriodIntervalMap, Interval interval, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
+    public Map<Object, Double> calculateContractualHoursForStaff(Interval interval, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         Map<Object, Double> staffAndContractualHourMap = new HashMap<>();
         for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
             Long contractualMinutes = 0l;
-            contractualMinutes = getaContratualMinutes(unitIdAndPlanningPeriodIntervalMap, interval, staffKpiFilterDTO, contractualMinutes);
+            contractualMinutes = getaContratualMinutes(interval, staffKpiFilterDTO, contractualMinutes);
             staffAndContractualHourMap.put(staffKpiFilterDTO.getId(), DateUtils.getHoursByMinutes(contractualMinutes.doubleValue()));
 
         }
         return staffAndContractualHourMap;
     }
 
-    private Long getaContratualMinutes(Map<Long, Set<DateTimeInterval>> unitIdAndPlanningPeriodIntervalMap, Interval interval, StaffKpiFilterDTO staffKpiFilterDTO, Long contractualMinutes) {
+    private Long getaContratualMinutes(Interval interval, StaffKpiFilterDTO staffKpiFilterDTO, Long contractualMinutes) {
+        DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
         for (EmploymentWithCtaDetailsDTO positionWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
             if (interval != null) {
                 DateTime startDate = interval.getStart();
                 while (startDate.isBefore(interval.getEnd())) {
-                    contractualMinutes += timeBankCalculationService.getContractualMinutesByDate(unitIdAndPlanningPeriodIntervalMap.get(staffKpiFilterDTO.getUnitId()), DateUtils.asLocalDate(startDate), positionWithCtaDetailsDTO.getEmploymentLines());
+                    contractualMinutes += timeBankCalculationService.getContractualMinutesByDate(planningPeriodInterval, DateUtils.asLocalDate(startDate), positionWithCtaDetailsDTO.getEmploymentLines());
                     startDate = startDate.plusDays(1);
                 }
             }
@@ -120,13 +111,13 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         return contractualMinutes;
     }
 
-    public Map<Object, Double> calculateContractualHoursPerInterval(Map<Long, Set<DateTimeInterval>> unitIdAndPlanningPeriodIntervalMap, List<StaffKpiFilterDTO> staffKpiFilterDTOS ,List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType) {
+    public Map<Object, Double> calculateContractualHoursPerInterval(List<StaffKpiFilterDTO> staffKpiFilterDTOS ,List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType) {
         Map<Object, Double> dateTimeIntervalAndContractualHourMap = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             Long contractualMinutes = 0l;
             Interval interval=new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()),DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate()));
         for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
-            contractualMinutes = getaContratualMinutes(unitIdAndPlanningPeriodIntervalMap, interval, staffKpiFilterDTO, contractualMinutes);
+            contractualMinutes = getaContratualMinutes(interval, staffKpiFilterDTO, contractualMinutes);
             }
             dateTimeIntervalAndContractualHourMap.put(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), DateUtils.getHoursByMinutes(contractualMinutes.doubleValue()));
 
@@ -134,11 +125,11 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         return dateTimeIntervalAndContractualHourMap;
     }
 
-    public Map<Object, Double> calculateContractualHoursTotalData(Map<Long, Set<DateTimeInterval>> unitIdAndPlanningPeriodIntervalMap, Interval interval, List<StaffKpiFilterDTO> staffKpiFilterDTOS ,List<DateTimeInterval> dateTimeIntervals) {
+    public Map<Object, Double> calculateContractualHoursTotalData(Interval interval, List<StaffKpiFilterDTO> staffKpiFilterDTOS ,List<DateTimeInterval> dateTimeIntervals) {
         Map<Object, Double> dateTimeIntervalAndContractualHourMap = new HashMap<>();
             Long contractualMinutes = 0l;
             for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
-                contractualMinutes = getaContratualMinutes(unitIdAndPlanningPeriodIntervalMap, interval, staffKpiFilterDTO, contractualMinutes);
+                contractualMinutes = getaContratualMinutes(interval, staffKpiFilterDTO, contractualMinutes);
                 }
             dateTimeIntervalAndContractualHourMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), DateUtils.getHoursByMinutes(contractualMinutes.doubleValue()));
 
@@ -173,16 +164,15 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
 
     private Map<Object, Double> calculateDataByKpiRepresentation(List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<Long> unitIds,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
         Map<Object, Double> staffContratualHours ;
-        Map<Long, Set<DateTimeInterval>> planningPeriodIntervel = getPlanningPeriodIntervals(unitIds, dateTimeIntervals.get(0).getStartDate(),dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndDate());
         switch (applicableKPI.getKpiRepresentation()) {
             case REPRESENT_PER_STAFF:
-                staffContratualHours = calculateContractualHoursForStaff(planningPeriodIntervel,new Interval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate())),staffKpiFilterDTOS);
+                staffContratualHours = calculateContractualHoursForStaff(new Interval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate())),staffKpiFilterDTOS);
                 break;
             case REPRESENT_TOTAL_DATA:
-                staffContratualHours = calculateContractualHoursTotalData(planningPeriodIntervel,new Interval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate())),staffKpiFilterDTOS,dateTimeIntervals);
+                staffContratualHours = calculateContractualHoursTotalData(new Interval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate())),staffKpiFilterDTOS,dateTimeIntervals);
                 break;
             default:
-                staffContratualHours = calculateContractualHoursPerInterval(planningPeriodIntervel,staffKpiFilterDTOS,dateTimeIntervals, applicableKPI.getFrequencyType());
+                staffContratualHours = calculateContractualHoursPerInterval(staffKpiFilterDTOS,dateTimeIntervals, applicableKPI.getFrequencyType());
                 break;
         }
         return verifyKPIResponseData(staffContratualHours) ? staffContratualHours : new HashMap<>();

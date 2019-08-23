@@ -244,7 +244,7 @@ public class RuleTemplateService{
 
         //
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = copyRuleTemplatesToDTO(templateList);
-        assignCategoryToRuleTemplate(categoryList, wtaBaseRuleTemplateDTOS);
+        assignCategoryToRuleTemplate(countryId, wtaBaseRuleTemplateDTOS);
         RuleTemplateWrapper wrapper = new RuleTemplateWrapper();
         wrapper.setCategoryList(categoryList);
         wrapper.setTemplateList(wtaBaseRuleTemplateDTOS);
@@ -256,19 +256,22 @@ public class RuleTemplateService{
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID);
         }
-        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(organization.getCountryId());
         List<WTABaseRuleTemplate> templateList = wtaBaseRuleTemplateMongoRepository.getWTABaseRuleTemplateByCountryId(organization.getCountryId());
         List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS = copyRuleTemplatesToDTO(templateList);
         RuleTemplateWrapper ruleTemplateWrapper = new RuleTemplateWrapper();
-        assignCategoryToRuleTemplate(categoryList, wtaBaseRuleTemplateDTOS);
+        assignCategoryToRuleTemplate(organization.getCountryId(), wtaBaseRuleTemplateDTOS);
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(organization.getCountryId());
         ruleTemplateWrapper.setCategoryList(categoryList);
         ruleTemplateWrapper.setTemplateList(wtaBaseRuleTemplateDTOS);
-
         return ruleTemplateWrapper;
 
     }
 
-    public void assignCategoryToRuleTemplate(List<RuleTemplateCategoryTagDTO> categoryList, List<WTABaseRuleTemplateDTO> templateList) {
+    public void assignCategoryToRuleTemplate(Long countryId,List<WTABaseRuleTemplateDTO> templateList) {
+        List<RuleTemplateCategoryTagDTO> categoryList = ruleTemplateCategoryMongoRepository.findAllUsingCountryId(countryId);
+        if (categoryList == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_CATEGORY_NULL_LIST);
+        }
         for (RuleTemplateCategoryTagDTO ruleTemplateCategoryTagDTO : categoryList) {
             for (WTABaseRuleTemplateDTO ruleTemplateResponseDTO : templateList) {
                 if (ruleTemplateCategoryTagDTO.getId() != null && ruleTemplateResponseDTO != null && ruleTemplateCategoryTagDTO.getId().equals(ruleTemplateResponseDTO.getRuleTemplateCategoryId())) {

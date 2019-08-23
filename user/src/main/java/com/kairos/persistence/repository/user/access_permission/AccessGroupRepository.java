@@ -324,6 +324,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "RETURN\n" +
             "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
     AccessGroupStaffQueryResult getAccessGroupDayTypesAndStaffId(Long unitId, Long staffId);
+
+    @Query("MATCH(ag:AccessGroup)-[r:" + DAY_TYPES + "]->(dayType:DayType) WHERE id(ag)={0} DETACH DELETE r\n")
+    void unlinkDayTypes(Long accessGroupId);
 }
 
 
