@@ -117,7 +117,7 @@ public class ShiftReminderService{
             LOGGER.info("Unable to find shift by id {}", jobDetails.getEntityId());
         }
         Optional<ShiftActivity> shiftActivity = shift.getActivities().stream().filter(currentShiftActivity ->
-                currentShiftActivity.getId().equals(jobDetails.getEntityId())).findAny();
+                currentShiftActivity.getId().equals(jobDetails.getFilterId())).findAny();
         if (!shiftActivity.isPresent()) {
             LOGGER.info("Unable to find current shift Activity by id {}", jobDetails.getEntityId());
         }
