@@ -72,7 +72,8 @@ body {
 
 .back-to-home a {
         text-decoration: none;
-        color: #007bff;
+        color: #fff;
+        font-size: 25px;
 }
 
 /*.banner-content::before {
