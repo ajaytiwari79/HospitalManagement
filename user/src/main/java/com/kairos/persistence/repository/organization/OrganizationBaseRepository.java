@@ -19,4 +19,10 @@ public interface OrganizationBaseRepository extends Neo4jBaseRepository<Organiza
     @Query("MATCH(n{deleted:false}) where id(n)={0} " +
             "OPTIONAL MATCH(n)-[r:"+BELONGS_TO+"]-(country:Country) RETURN n,r,country")
     OrganizationBaseEntity findOneById(Long id);
+
+
+    @Query("MATCH(n{deleted:false}) where id(n)={0}\n" +
+            "OPTIONAL MATCH(n)<-[:HAS_UNIT]-(org) \n" +
+            "RETURN CASE WHEN 'Organization' in labels(n) THEN id(n) ELSE id(org) end as parentOrgId")
+    Long findParentOrgId(Long id);
 }

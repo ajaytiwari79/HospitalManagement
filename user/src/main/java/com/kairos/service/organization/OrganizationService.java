@@ -207,7 +207,7 @@ public class OrganizationService {
         timeSlotService.createDefaultTimeSlots(organization, TimeSlotType.TASK_PLANNING);
         if(!baseOrganization) {
             accessGroupService.createDefaultAccessGroups(organization);
-            unitGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
+            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
         }
         return organization;
     }
@@ -665,11 +665,8 @@ public class OrganizationService {
     }
 
     public Organization fetchParentOrganization(Long unitId) {
-        OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOneById(unitId);
-        if(organizationBaseEntity instanceof Organization)
-            return (Organization) organizationBaseEntity;
-        else
-            return unitGraphRepository.getParentOfOrganization(unitId);
+        Long parentOrgId=organizationBaseRepository.findParentOrgId(unitId);
+        return organizationGraphRepository.findOne(parentOrgId);
     }
 
     public OrganizationMappingDTO getEmploymentTypeWithExpertise(Long unitId) {

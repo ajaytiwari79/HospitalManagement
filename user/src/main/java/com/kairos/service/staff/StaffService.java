@@ -681,8 +681,9 @@ public class StaffService {
     }
 
     public void setUserAndPosition(OrganizationBaseEntity organizationBaseEntity, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
-        Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organizationBaseEntity.getId(), user.getId());
         Organization organization=organizationService.fetchParentOrganization(organizationBaseEntity.getId());
+        Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organization.getId(), user.getId());
+
         if (isNull(position)) {
 
             Staff staff = new Staff(user.getEmail(), user.getUserName(), user.getFirstName(), user.getLastName(), user.getFirstName(), StaffStatusEnum.ACTIVE, null, user.getCprNumber());
@@ -700,7 +701,7 @@ public class StaffService {
             organizationGraphRepository.save(organization);
             user.setCountryId(organization.getCountry().getId());
 
-        UnitPermission unitPermission = new UnitPermission();
+        UnitPermission unitPermission =unitPermissionGraphRepository.checkUnitPermissionOfUser(organization.getId(),user.getId(),organizationBaseEntity.getId()).orElse(new UnitPermission());
         if(organizationBaseEntity instanceof Organization){
             unitPermission.setOrganization((Organization) organizationBaseEntity);
         } else {

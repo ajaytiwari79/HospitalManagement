@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -47,7 +48,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
     @Query("MATCH (organization:Organization),(staff:Staff) WHERE id(organization)={0} AND id(staff)={2} WITH organization,staff \n" +
             "MATCH (organization)-[:"+ HAS_POSITIONS +"]->(position:Position)-[:"+BELONGS_TO+"]->(staff)  \n" +
             "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)\n" +
-            "MATCH(unitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(co:Unit) WHERE id(co)={1}\n" +
+            "MATCH(unitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(co) WHERE id(co)={1}\n" +
             "RETURN  unitPermission")
     UnitPermission checkUnitPermissionOfStaff(Long parentOrganizationId, Long organizationId, Long staffId, Long accessGroupId);
 
@@ -56,11 +57,10 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
 
     // for parent organization
     @Query("MATCH (organization:Organization),(user:User) WHERE id(organization)={0} AND id(user) ={1}\n" +
-            "MATCH(organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(parent:Organization)\n" +
-            " MATCH (parent)-[:"+ HAS_POSITIONS +"]->(position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user)  \n" +
-            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization)\n" +
+            " MATCH (organization)-[:"+ HAS_POSITIONS +"]->(position:Position)-[:"+BELONGS_TO+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user)  \n" +
+            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(co) WHERE id(co)={2} \n" +
             "RETURN  unitPermission")
-    UnitPermission checkUnitPermissionOfUser(Long organizationId, Long userId);
+    Optional<UnitPermission> checkUnitPermissionOfUser(Long organizationId, Long userId, Long orgId);
 
     @Query("MATCH (staff:Staff) WHERE  id(staff)={0} " +
             "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position) " +

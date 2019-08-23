@@ -337,56 +337,7 @@ public class TimeSlotService {
             unitGraphRepository.save((Unit) organization);
     }
 
-    /*private void validateTimeSlot(long unitId,OrganizationTimeSlotRelationship objToCreate,TimeSlot.TimeSlotMode timeSlotMode){
 
-        Calendar startSlot = Calendar.getInstance();
-        startSlot.set(Calendar.HOUR_OF_DAY,objToCreate.getStartHour());
-        startSlot.set(Calendar.MINUTE,objToCreate.getStartMinute());
-
-        Calendar endSlot = Calendar.getInstance();
-        endSlot.set(Calendar.HOUR_OF_DAY,objToCreate.getEndHour());
-        endSlot.set(Calendar.MINUTE,objToCreate.getEndMinute());
-
-        if(objToCreate.getStartHour() > objToCreate.getEndHour()){
-            endSlot.add(Calendar.DATE,1);
-        }
-        long diff = endSlot.getTime().getTime() - startSlot.getTime().getTime();
-        long diffHours = diff / (60 * 60 * 1000) % 24;
-        long diffSeconds = diff / 1000 % 60;
-        long diffMinutes = diff / (60 * 1000) % 60;
-
-        long totalDiff = diffHours * 60 * 60 + diffMinutes * 60 + diffSeconds;
-
-        List<Map<String,Object>> organizationTimeSlotRelationships = organizationTimeSlotGraphRepository.getOrganizationTimeSlots(unitId, timeSlotMode);
-        ObjectMapper objectMapperForQueryResult = new ObjectMapper();
-        OrganizationTimeSlotRelationship  queryResult;
-        Calendar dbObjStartSlot;
-        Calendar dbObjEndSlot;
-        for(Map<String,Object> map : organizationTimeSlotRelationships){
-            queryResult = objectMapperForQueryResult.convertValue(map.get("data"),OrganizationTimeSlotRelationship.class);
-
-            if(!queryResult.getId().equals(objToCreate.getId())){
-                dbObjStartSlot = Calendar.getInstance();
-                dbObjStartSlot.set(Calendar.HOUR_OF_DAY,queryResult.getStartHour());
-                dbObjStartSlot.set(Calendar.MINUTE,queryResult.getStartMinute());
-
-                dbObjEndSlot = Calendar.getInstance();
-                dbObjEndSlot.set(Calendar.HOUR_OF_DAY,queryResult.getEndHour());
-                dbObjEndSlot.set(Calendar.MINUTE,queryResult.getEndMinute());
-                if(queryResult.getStartHour() > queryResult.getEndHour()){
-                    dbObjEndSlot.add(Calendar.DATE,1);
-                }
-                long diffInTime = dbObjEndSlot.getTime().getTime() - dbObjStartSlot.getTime().getTime();
-                long diffHoursOfQueryObj = diffInTime / (60 * 60 * 1000) % 24;
-                long diffSecondsOfQueryObj = diffInTime / 1000 % 60;
-                long diffMinutesOfQueryObj = diffInTime / (60 * 1000) % 60;
-                totalDiff = totalDiff + diffHoursOfQueryObj * 60 * 60 + diffMinutesOfQueryObj * 60 + diffSecondsOfQueryObj;
-            }
-        }
-        if(totalDiff > 86400){
-            throw new InvalidTimeSlotException("Time slot cannot grater then 24");
-        }
-    }*/
 
     /**
      * @param unitId

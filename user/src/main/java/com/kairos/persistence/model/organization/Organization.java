@@ -124,13 +124,7 @@ public class Organization extends OrganizationBaseEntity {
         return java.util.Optional.ofNullable(positions).orElse(new ArrayList<>());
     }
 
-    public List<BusinessType> getBusinessTypes() {
-        return Optional.fromNullable(businessTypes).or(Lists.newArrayList());
-    }
 
-    public List<OrganizationType> getOrganizationSubTypes() {
-        return Optional.fromNullable(organizationSubTypes).or(Lists.newArrayList());
-    }
 
 
 

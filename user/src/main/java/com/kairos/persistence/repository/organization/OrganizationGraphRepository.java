@@ -47,4 +47,17 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH(union)-[:" + HAS_LOCATION + "]-(location:Location{deleted:false})" +
             "RETURN union,country,address,zipCode,sectors,municipality,collect(location) as locations ")
     List<UnionDataQueryResult> getUnionCompleteById(Long unionId, String name);
+
+    @Query("MATCH (n:Organization) WHERE id(n)={0}\n" +
+            "MATCH (n)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH subType,n\n" +
+            "MATCH (subType)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(organizationService:OrganizationService) WITH organizationService,n\n" +
+            "create unique (n)-[:" + PROVIDE_SERVICE + "{isEnabled:true,creationDate:{1},lastModificationDate:{2}}]->(organizationService) ")
+    void assignDefaultServicesToOrg(long orgId, long creationDate, long lastModificationDate);
+
+
+    @Query("MATCH (organization:Organization) WHERE id(organization)={0} \n" +
+            "MATCH (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) \n" +
+            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "]->(skill:Skill) WITH skill,organization\n" +
+            "create unique (organization)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{1},lastModificationDate:{2},isEnabled:true,customName:skill.name}]->(skill)")
+    void assignDefaultSkillsToOrg(long orgId, long creationDate, long lastModificationDate);
 }

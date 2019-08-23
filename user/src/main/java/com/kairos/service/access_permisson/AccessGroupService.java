@@ -786,7 +786,8 @@ public class AccessGroupService {
 
     // Method to fetch list of Management access group of Organization
     public List<AccessGroupQueryResult> getOrganizationManagementAccessGroups(Long organizationId, AccessGroupRole role) {
-        return accessGroupRepository.getOrganizationAccessGroupByRole(organizationId, role.toString());
+        Organization organization=organizationService.fetchParentOrganization(organizationId);
+        return accessGroupRepository.getOrganizationAccessGroupByRole(organization.getId(), role.toString());
     }
 
 

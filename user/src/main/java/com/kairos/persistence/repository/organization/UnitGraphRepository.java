@@ -37,15 +37,15 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     OrganizationBaseEntity findOneById(Long id);
 
 
-    @Query("MATCH (o:Organization {isEnable:true} ),(unit:Unit) WHERE id(o)={0} AND id(unit)={1} create (o)-[:HAS_UNIT]->(o1) RETURN o1")
-    Unit createChildOrganization(long parentOrganizationId, long childOrganizationId);
+    @Query("MATCH (org:Organization {isEnable:true} ),(unit:Unit) WHERE id(org)={0} AND id(unit)={1} CREATE UNIQUE(org)-[:"+HAS_UNIT+"]->(unit)")
+    void createChildOrganization(long parentOrganizationId, long childOrganizationId);
 
     @Query("MATCH(unit:Unit{deleted:false,union:true}) WHERE  unit.name=~{0} RETURN count(unit)>0")
     boolean existsByName(String name);
 
     @Query("MATCH (n:Unit) WHERE id(n)={0} WITH n " +
-            "MATCH (n)<-[:"+HAS_UNIT+"*]-(org:Organization{isParentOrganization:true,isKairosHub:false}) " +
-            "MATCH (country:Country)<-[r:"+BELONGS_TO+" ]-(org) RETURN org,r, country    limit 1")
+            "MATCH (n)<-[unitRel:"+HAS_UNIT+"]-(org:Organization{isParentOrganization:true,isKairosHub:false}) " +
+            "MATCH (country:Country)<-[r:"+BELONGS_TO+" ]-(org) RETURN org,r, country,unitRel,n ")
     Organization getParentOfOrganization(Long organizationId);
 
     @Query("MATCH (organization:Organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
@@ -170,7 +170,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY org.name")
     List<OrganizationBasicResponse> getAllParentOrganizationOfCountry(Long countryId);
 
-    @Query("MATCH (organization:Unit)-[:" + HAS_SUB_ORGANIZATION + "]->(org:Unit{union:false,deleted:false}) WHERE id(organization)={0}  \n" +
+    @Query("MATCH (organization:Organization)-[:" + HAS_UNIT + "]->(org:Unit{deleted:false}) WHERE id(organization)={0}  \n" +
             "OPTIONAL MATCH (org)-[:" + HAS_COMPANY_CATEGORY + "]-(companyCategory:CompanyCategory) WITH companyCategory, org\n" +
             "OPTIONAL Match (org)-[:" + HAS_LEVEL + "]->(level:Level{deleted:false}) WITH companyCategory, org, level \n"+
             "OPTIONAL MATCH (org)-[:" + HAS_UNIT_TYPE + "]-(unitType:UnitType) WITH companyCategory, org,unitType, level\n" +
@@ -214,7 +214,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<Map<String, Object>> getAllClientsOfOrganization(long organizationId);
 
 
-    @Query("MATCH (cityLevel:Unit),(regionLevel:Unit{organizationLevel:'REGION'}) WHERE id(cityLevel)={0} " +
+    @Query("MATCH (cityLevel:Organization),(regionLevel:Organization{organizationLevel:'REGION'}) WHERE id(cityLevel)={0} " +
             "CREATE UNIQUE (regionLevel)-[r:" + HAS_SUB_ORGANIZATION + "]->(cityLevel) RETURN count(r)")
     int linkWithRegionLevelOrganization(long organizationId);
 
@@ -396,17 +396,6 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:case when r is null or r.customName is null then skill.name else r.customName end,description:skill.description,isSelected:case when r is null then false else true end, customName:case when r is null or r.customName is null then skill.name else r.customName end, isEdited:true,staff:staff.staff,tags:ctags+otags})} as data")
     List<Map<String, Object>> getAssignedSkillsOfStaffByOrganization(long unitId, List<Long> staffId);
 
-    @Query("MATCH (organization:Unit) WHERE id(organization)={0} \n" +
-            "MATCH (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) \n" +
-            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "]->(skill:Skill) WITH skill,organization\n" +
-            "create unique (organization)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{1},lastModificationDate:{2},isEnabled:true,customName:skill.name}]->(skill)")
-    void assignDefaultSkillsToOrg(long orgId, long creationDate, long lastModificationDate);
-
-    @Query("MATCH (n:Unit) WHERE id(n)={0}\n" +
-            "MATCH (n)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH subType,n\n" +
-            "MATCH (subType)-[:" + ORGANIZATION_TYPE_HAS_SERVICES + "]->(organizationService:OrganizationService) WITH organizationService,n\n" +
-            "create unique (n)-[:" + PROVIDE_SERVICE + "{isEnabled:true,creationDate:{1},lastModificationDate:{2}}]->(organizationService) ")
-    void assignDefaultServicesToOrg(long orgId, long creationDate, long lastModificationDate);
 
     @Query("MATCH (unit:Unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WHERE id(unit)={0} WITH skill,unit,r\n" +
             "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH  unit,skill,skillCategory,r\n" +

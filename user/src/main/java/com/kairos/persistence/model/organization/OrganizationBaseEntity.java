@@ -3,8 +3,11 @@ package com.kairos.persistence.model.organization;/*
  *
  */
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.CompanyUnitType;
+import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -20,9 +23,11 @@ import com.kairos.utils.ZoneIdStringConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 import org.neo4j.ogm.annotation.typeconversion.DateString;
+import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
 
@@ -141,7 +146,19 @@ public class OrganizationBaseEntity extends UserBaseEntity {
 
     @Relationship(type = HAS_UNIT_TYPE)
     private UnitType unitType;
+
+    @Property(name = "organizationLevel")
+    @EnumString(OrganizationLevel.class)
+    private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
     private transient Country country;
-    String str=new String();
+
+    public List<BusinessType> getBusinessTypes() {
+        return Optional.fromNullable(businessTypes).or(Lists.newArrayList());
+    }
+
+    public List<OrganizationType> getOrganizationSubTypes() {
+        return Optional.fromNullable(organizationSubTypes).or(Lists.newArrayList());
+    }
+
 
 }

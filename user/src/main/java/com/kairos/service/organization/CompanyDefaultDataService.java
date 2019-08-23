@@ -6,6 +6,7 @@ import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.ReasonCodeService;
@@ -36,6 +37,8 @@ public class CompanyDefaultDataService {
     private VRPClientService vrpClientService;
     @Inject
     private UnitGraphRepository unitGraphRepository;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private ReasonCodeService reasonCodeService;
     @Inject
@@ -73,8 +76,8 @@ public class CompanyDefaultDataService {
             unitGraphRepository.linkWithRegionLevelOrganization(organization.getId());
             activityIntegrationService.createDefaultKPISetting(new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(), organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId());
             timeSlotService.createDefaultTimeSlots(organization, timeSlots);
-            unitGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
-            unitGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
+            organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
+            organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             //gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
     }
 }
