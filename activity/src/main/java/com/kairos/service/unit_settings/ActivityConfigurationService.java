@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.CommonMessageConstants.PLANNED_TIME_CANNOT_EMPTY;
 import static com.kairos.constants.CommonMessageConstants.PLANNED_TIME_NOT_CONFIGURE;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static java.util.Comparator.comparing;
@@ -243,9 +244,14 @@ public class ActivityConfigurationService extends MongoBaseService {
         Map<DateTimeInterval, PlannedTime> plannedTimeMap = plannedTimeList.stream().filter(distinctByKey(plannedTime -> new DateTimeInterval(plannedTime.getStartDate(), plannedTime.getEndDate()))).collect(toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()), Function.identity()));
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             List<BigInteger> plannedTimeIds = addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
-            BigInteger plannedTimeId = plannedTimeIds.get(0);
+            BigInteger plannedTimeId = null;
             if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
                 plannedTimeId = shiftActivity.getPlannedTimeId();
+            }else {
+                plannedTimeId = plannedTimeIds.get(0);
+            }
+            if(isNull(plannedTimeId)){
+                exceptionService.dataNotFoundByIdException(PLANNED_TIME_CANNOT_EMPTY);
             }
             List<PlannedTime> plannedTimes = isNull(shift.getId()) ? newArrayList(new PlannedTime(plannedTimeId, shiftActivity.getStartDate(), shiftActivity.getEndDate())) : filterPlannedTimes(shiftActivity.getStartDate(), shiftActivity.getEndDate(), plannedTimeMap, plannedTimeId);
             shiftActivity.setPlannedTimes(plannedTimes);
