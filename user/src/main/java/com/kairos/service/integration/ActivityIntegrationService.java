@@ -183,9 +183,8 @@ public class ActivityIntegrationService {
     }
 
     public boolean isStaffNightWorker(Long unitId, Long staffId) {
-        NightWorkerGeneralResponseDTO nightWorkerGeneralResponseDTO = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/staff/{staffId}/night_worker_general", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<NightWorkerGeneralResponseDTO>>() {
-        },staffId);
-        return nightWorkerGeneralResponseDTO.isNightWorker();
+        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/staff/{staffId}/night_worker_general", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<NightWorkerGeneralResponseDTO>>() {
+        },staffId).isNightWorker();
     }
 }
 
