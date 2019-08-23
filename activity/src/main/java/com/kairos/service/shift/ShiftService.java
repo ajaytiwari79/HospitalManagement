@@ -578,9 +578,7 @@ public class ShiftService extends MongoBaseService {
             }
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
             shiftDTO.setShiftType(ShiftType.PRESENCE);
-            List<PlannedTime> plannedTimeList = shift.getActivities().stream().flatMap(k -> k.getPlannedTimes().stream()).collect(Collectors.toList());
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
-            shift.getActivities().get(0).setPlannedTimes(plannedTimeList);
             shift.setPhaseId(phase.getId());
             if (byTAndAView) {
                 shift.setId(shiftDTO.getShiftId());
