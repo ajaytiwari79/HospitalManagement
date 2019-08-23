@@ -349,7 +349,7 @@ public class ShiftService extends MongoBaseService {
     }
 
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, String type, Boolean validatedByStaff, boolean updateShiftState, Long unitId,ShiftActionType shiftActionType, TodoType todoType) {
-        Boolean updateWTACounterFlag=true;
+        boolean updateWTACounterFlag=true;
         List<ShiftDTO> responseShiftDTOS=new ArrayList<>();
         for(ShiftDTO shiftDTO : shiftWithViolatedInfo.getShifts()) {
             Long functionId = shiftDTO.getFunctionId();

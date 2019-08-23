@@ -192,7 +192,7 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public AbsencePlannedTime updateAbsenceActivityConfigurationForCountry(BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
         Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
-        if (!Optional.of(activityConfiguration).isPresent()) {
+        if (!Optional.ofNullable(activityConfiguration).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND);
         }
         if (Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
