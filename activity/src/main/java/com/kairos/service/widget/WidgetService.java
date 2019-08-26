@@ -41,6 +41,7 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.REALTIME_DURATION_NOT_CONFIGURED;
 import static com.kairos.enums.widget.WidgetFilterType.*;
+import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static java.util.Comparator.comparing;
 
 /**
@@ -162,11 +163,18 @@ public class WidgetService {
         for (Long staffId : staffIdAndShiftMap.keySet()) {
             List<ShiftWithActivityDTO> shifts = staffIdAndShiftMap.get(staffId);
             shifts.sort(comparing(ShiftDTO::getStartDate));
-            for (int i = 0; i < shifts.size(); i++) {
-                if (i < shifts.size()-1) {
-                    Long minutes = DateUtils.getMinutesBetweenDate(shifts.get(i).getEndDate(), shifts.get(i + 1).getStartDate());
-                    if (shifts.get(i).getRestingMinutes() > minutes) {
-                        shifts.get(i).setRestingMinutes(minutes.intValue());
+            for (int i = 1; i < shifts.size(); i++) {
+                ShiftWithActivityDTO previousShift = shifts.get(i - 1);
+                ShiftWithActivityDTO currentShift = null;
+                if(previousShift.isPresence()){
+                    currentShift = shifts.stream().filter(shiftWithActivityDTO -> previousShift.getEndDate().before(shiftWithActivityDTO.getStartDate()) && (shiftWithActivityDTO.isPresence() || shiftWithActivityDTO.isAbsence())).findFirst().orElse(null);
+                }else if(previousShift.isAbsence()){
+                    currentShift = shifts.stream().filter(shiftWithActivityDTO -> previousShift.getEndDate().before(shiftWithActivityDTO.getStartDate()) && (shiftWithActivityDTO.isPresence())).findFirst().orElse(null);
+                }
+                if(isNotNull(currentShift)) {
+                    Long minutes = DateUtils.getMinutesBetweenDate(previousShift.getEndDate(), currentShift.getStartDate());
+                    if (previousShift.getRestingMinutes() > minutes) {
+                        previousShift.setRestingMinutes(minutes.intValue());
                     }
                 }
             }
