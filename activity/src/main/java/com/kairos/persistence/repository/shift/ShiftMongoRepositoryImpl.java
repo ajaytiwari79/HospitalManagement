@@ -80,6 +80,20 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
     }
 
+    @Override
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdNotEqualShiftIds(Long employmentId, Date startDate, Date endDate,List<BigInteger> shiftIds) {
+        Criteria criteria;
+        if (Optional.ofNullable(endDate).isPresent()) {
+            criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
+                    .and("startDate").gte(startDate).lt(endDate);
+        } else {
+            criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
+                    .and("startDate").gte(startDate);
+        }
+        criteria.and("_id").nin(shiftIds);
+        return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
+    }
+
 
     @Override
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists){

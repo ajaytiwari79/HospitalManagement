@@ -11,14 +11,13 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.basic_details.*;
-import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
-import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
@@ -46,6 +45,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,8 +69,8 @@ import static java.util.stream.Collectors.toMap;
 
 @Transactional
 @Service
-public class WTAService extends MongoBaseService {
-    private static final Logger logger = LoggerFactory.getLogger(WTAService.class);
+public class WorkTimeAgreementService extends MongoBaseService {
+    private static final Logger logger = LoggerFactory.getLogger(WorkTimeAgreementService.class);
     @Inject
     private WorkingTimeAgreementMongoRepository wtaRepository;
     @Inject
@@ -328,7 +328,7 @@ public class WTAService extends MongoBaseService {
         return true;
     }
 
-    public List<WTAResponseDTO> getAllWTAByCountryId(long countryId) {
+    public List<WTAResponseDTO> getWTAByCountryId(long countryId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByCountryId(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
@@ -346,7 +346,7 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTOS;
     }
 
-    public List<WTAResponseDTO> getAllWTAWithOrganization(long countryId) {
+    public List<WTAResponseDTO> getAllWTAWithOrganizationByCountryId(long countryId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithOrganization(countryId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
@@ -355,7 +355,7 @@ public class WTAService extends MongoBaseService {
         return wtaResponseDTOS;
     }
 
-    public List<WTAResponseDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId) {
+    public List<WTAResponseDTO> getAllWTAWithWTAIdAndCountryId(long countryId, BigInteger wtaId) {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAWithWTAId(countryId, wtaId);
         List<WTAResponseDTO> wtaResponseDTOS = new ArrayList<>();
         wtaQueryResultDTOS.forEach(wta -> {
@@ -881,6 +881,134 @@ public class WTAService extends MongoBaseService {
             }
         }
         return true;
+    }
+
+    public boolean getWtaByName(String wtaName, Long countryId){
+        return wtaRepository.getWtaByName(wtaName, countryId);
+    }
+
+    public WorkingTimeAgreement getWTAByCountryId(long countryId, BigInteger wtaId){
+        return wtaRepository.getWTAByCountryId(countryId, wtaId);
+    }
+
+    public boolean isWTAExistWithSameOrgTypeAndSubType(Long orgType,Long orgSubType, String name){
+        return wtaRepository.isWTAExistWithSameOrgTypeAndSubType(orgType, orgSubType, name);
+    }
+
+    public List<WorkingTimeAgreement> findWTAByUnitIdsAndName(List<Long> organizationIds, String name){
+        return wtaRepository.findWTAByUnitIdsAndName(organizationIds, name);
+    }
+
+    public boolean isWTAExistByOrganizationIdAndName(long organizationId, String wtaName){
+        return wtaRepository.isWTAExistByOrganizationIdAndName(organizationId, wtaName);
+    }
+
+    public List<WorkingTimeAgreement> findWTAofOrganization(){
+        return wtaRepository.findWTAofOrganization();
+    }
+
+    public List<WorkingTimeAgreement> findWTAOfEmployments(){
+        return wtaRepository.findWTAOfEmployments();
+    }
+
+    public List<WTAQueryResultDTO> getWtaByOrganization(Long organizationId){
+        return wtaRepository.getWtaByOrganization(organizationId);
+    }
+
+    public WTAQueryResultDTO getOne(BigInteger wtaId){
+        return wtaRepository.getOne(wtaId);
+    }
+
+    public List<WTAQueryResultDTO> getAllWTAByCountryId(long countryId){
+        return wtaRepository.getAllWTAByCountryId(countryId);
+    }
+
+    public List<WTAQueryResultDTO> getAllWTAByOrganizationSubTypeIdAndCountryId(long organizationSubTypeId, long countryId){
+        return wtaRepository.getAllWTAByOrganizationSubTypeIdAndCountryId(organizationSubTypeId, countryId);
+    }
+
+    public List<WTAQueryResultDTO> getAllWTABySubType(List<Long> subTypeIds, Long countryId){
+        return wtaRepository.getAllWTABySubType(subTypeIds, countryId);
+    }
+
+    public List<WTAQueryResultDTO> getAllWTAWithOrganization(long countryId){
+        return wtaRepository.getAllWTAWithOrganization(countryId);
+    }
+
+    public List<WTAQueryResultDTO> getAllWTAWithWTAId(long countryId, BigInteger wtaId){
+        return wtaRepository.getAllWTAWithWTAId(countryId, wtaId);
+    }
+
+    public List<WTAQueryResultDTO> getAllWtaOfOrganizationByExpertise(Long unitId, Long expertiseId,LocalDate selectedDate){
+        return wtaRepository.getAllWtaOfOrganizationByExpertise(unitId, expertiseId, selectedDate);
+    }
+
+    public List<WTAQueryResultDTO> getAllWtaOfEmploymentIdAndDate(Long employmentId,LocalDate selectedDate){
+        return wtaRepository.getAllWtaOfEmploymentIdAndDate(employmentId, selectedDate);
+    }
+
+    public List<WTAQueryResultDTO> getAllWtaByIds(List<BigInteger> ids){
+        return wtaRepository.getAllWtaByIds(ids);
+    }
+
+    public WorkingTimeAgreement getWtaByNameExcludingCurrent(String wtaName, Long countryId, BigInteger wtaId, Long organizationTypeId, Long subOrganizationTypeId){
+        return wtaRepository.getWtaByNameExcludingCurrent(wtaName, countryId, wtaId, organizationTypeId, subOrganizationTypeId);
+    }
+
+    public WorkingTimeAgreement checkUniqueWTANameInOrganization(String name, Long unitId, BigInteger wtaId){
+        return wtaRepository.checkUniqueWTANameInOrganization(name, unitId, wtaId);
+    }
+
+    public List<WTAQueryResultDTO> getAllWTAByUpIds(Set<Long> upIds, Date date){
+        return wtaRepository.getAllWTAByUpIds(upIds, date);
+    }
+
+    public List<WTAQueryResultDTO> getAllParentWTAByIds(List<Long> employmentIds){
+        return wtaRepository.getAllParentWTAByIds(employmentIds);
+    }
+
+    public List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> employmentIds){
+        return wtaRepository.getWTAWithVersionIds(employmentIds);
+    }
+
+    public WTAQueryResultDTO getWTAByEmploymentIdAndDate(Long employmentId, Date date){
+        return wtaRepository.getWTAByEmploymentIdAndDate(employmentId, date);
+    }
+
+    public List<WTAQueryResultDTO> getWTAByEmploymentIds(List<Long> employmentIds, Date date){
+        return wtaRepository.getWTAByEmploymentIds(employmentIds, date);
+    }
+
+    public List<WTAQueryResultDTO> getWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate){
+        return wtaRepository.getWTAByEmploymentIdsAndDates(employmentIds, startDate, endDate);
+    }
+
+    public WorkingTimeAgreement getWTABasicByEmploymentAndDate(Long employmentId, Date date){
+        return wtaRepository.getWTABasicByEmploymentAndDate(employmentId, date);
+    }
+
+    public void disableOldWta(BigInteger oldwtaId, LocalDate endDate){
+        wtaRepository.disableOldWta(oldwtaId, endDate);
+    }
+
+    public void setEndDateToWTAOfEmployment(Long employmentId, LocalDate endDate){
+        wtaRepository.setEndDateToWTAOfEmployment(employmentId, endDate);
+    }
+
+    public boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long employmentId, Date startDate, Date endDate){
+        return wtaRepository.wtaExistsByEmploymentIdAndDatesAndNotEqualToId(wtaId, employmentId, startDate, endDate);
+    }
+
+    public List<WTAQueryResultDTO> getWTAByEmploymentIdAndDates(Long employmentId, Date startDate, Date endDate){
+        return wtaRepository.getWTAByEmploymentIdAndDates(employmentId, startDate, endDate);
+    }
+
+    public List<WTAQueryResultDTO> getWTAByEmploymentIdAndDatesWithRuleTemplateType(Long employmentId, Date startDate, Date endDate, WTATemplateType templateType){
+        return wtaRepository.getWTAByEmploymentIdAndDatesWithRuleTemplateType(employmentId, startDate, endDate, templateType);
+    }
+
+    public List<WTAQueryResultDTO> getAllWTAByEmploymentIds(Collection<Long> employmentIds){
+        return wtaRepository.getAllWTAByEmploymentIds(employmentIds);
     }
 
 }

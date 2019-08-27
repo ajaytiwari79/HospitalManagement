@@ -5,16 +5,23 @@ import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author pradeep
  * @date - 30/8/18
  */
 @Document
+@Getter
+@Setter
+@NoArgsConstructor
 public class ShiftViolatedRules extends MongoBaseEntity {
 
     //TODO We need proper discussion it should be per phase
@@ -24,35 +31,9 @@ public class ShiftViolatedRules extends MongoBaseEntity {
     private Set<ShiftEscalationReason> escalationReasons;
     private boolean escalationResolved;
     private boolean draft;
-    public ShiftViolatedRules() {
-    }
 
     public ShiftViolatedRules(BigInteger shiftId) {
         this.shiftId = shiftId;
-    }
-
-    public BigInteger getShiftId() {
-        return shiftId;
-    }
-
-    public void setShiftId(BigInteger shiftId) {
-        this.shiftId = shiftId;
-    }
-
-    public List<WorkTimeAgreementRuleViolation> getWorkTimeAgreements() {
-        return workTimeAgreements;
-    }
-
-    public void setWorkTimeAgreements(List<WorkTimeAgreementRuleViolation> workTimeAgreements) {
-        this.workTimeAgreements = workTimeAgreements;
-    }
-
-    public List<ActivityRuleViolation> getActivities() {
-        return activities;
-    }
-
-    public void setActivities(List<ActivityRuleViolation> activities) {
-        this.activities = activities;
     }
 
     public Set<ShiftEscalationReason> getEscalationReasons() {
@@ -60,26 +41,10 @@ public class ShiftViolatedRules extends MongoBaseEntity {
     }
 
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {
-        if (ObjectUtils.isCollectionEmpty(escalationReasons)) {
-            this.escalationReasons = new HashSet<>();
-        } else
-
-            this.escalationReasons = escalationReasons;
+        this.escalationReasons = ObjectUtils.isCollectionEmpty(escalationReasons) ? new HashSet<>() : escalationReasons;
     }
 
-    public boolean isEscalationResolved() {
-        return escalationResolved;
-    }
-
-    public void setEscalationResolved(boolean escalationResolved) {
-        this.escalationResolved = escalationResolved;
-    }
-
-    public boolean isDraft() {
-        return draft;
-    }
-
-    public void setDraft(boolean draft) {
-        this.draft = draft;
+    public Set<BigInteger> getBreakedRuleTemplateIds(){
+        return getWorkTimeAgreements().stream().map(workTimeAgreementRuleViolation -> workTimeAgreementRuleViolation.getRuleTemplateId()).collect(Collectors.toSet());
     }
 }
