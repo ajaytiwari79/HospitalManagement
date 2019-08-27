@@ -80,27 +80,15 @@ public class PhaseService extends MongoBaseService {
      *@Author vipul
      */
     public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
-        if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         return phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.DESC);
     }
 
 
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
-        if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         return phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
     }
 
     public Map<String, List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
-        if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         List<PhaseDTO> phases = getPhasesByUnit(unitId);
         Map<String, List<PhaseDTO>> phasesData = new HashMap<>(2);
         phasesData.put("planningPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(PhaseType.PLANNING)).collect(Collectors.toList()));

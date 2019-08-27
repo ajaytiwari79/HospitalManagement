@@ -18,13 +18,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Long> {
 
-    @Query("MATCH (organization:Unit),(staff:Staff) WHERE id(organization)={0} AND id(staff)={1}\n" +
+    @Query("MATCH (organization:Organization),(staff:Staff) WHERE id(organization)={0} AND id(staff)={1}\n" +
             "MATCH (organization)-[:"+ HAS_POSITIONS +"]->(position:Position)-[BELONGS_TO]->(staff) RETURN position")
     Position findPosition(long organizationId, long staffId);
 
-    @Query("MATCH (organization:Unit),(accessGroup:AccessGroup),(staff:Staff) WHERE id(organization)={1} AND id(accessGroup)={2} AND id(staff) ={0} WITH organization,accessGroup,staff\n" +
+    @Query("MATCH (organization),(accessGroup:AccessGroup),(staff:Staff) WHERE id(organization)={1} AND id(accessGroup)={2} AND id(staff) ={0} WITH organization,accessGroup,staff\n" +
             "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitPermission:UnitPermission) WITH unitPermission,organization,accessGroup\n" +
-            "MATCH (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) WITH DISTINCT unitPermission,organization\n" +
+            "MATCH (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup) WITH DISTINCT unitPermission,organization\n" +
             "RETURN {id:id(unitPermission),startDate:unitPermission.startDate,endDate:unitPermission.endDate,organizationId:id(organization),status:unitPermission.employmentStatus} AS data")
     Map<String,Object> getPositionOfParticularRole(long staffId, long organizationId, long accessGroupId);
 

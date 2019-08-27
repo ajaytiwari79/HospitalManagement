@@ -143,7 +143,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (o:Unit)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.isEnabled=false")
     void removeServiceFromOrganization(long unitId, long serviceId);
 
-    @Query("MATCH (o:Unit)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
+    @Query("MATCH (o)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
     void updateServiceFromOrganization(long unitId, long serviceId);
 
     @Query("MATCH (o:Unit)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
@@ -201,8 +201,8 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN organizationTypes,bt as businessTypes,cc as companyCategories,serviceTypes,accountTypes,unitTypes")
     OrganizationCreationData getOrganizationCreationData(long countryId);
 
-    @Query("MATCH (org:Unit) WHERE id(org)={0} WITH org " +
-            "MATCH path=(org)-[:HAS_SUB_ORGANIZATION]->(child:Unit{isEnable:true,boardingCompleted:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
+    @Query("MATCH (org:Organization) WHERE id(org)={0} WITH org " +
+            "MATCH path=(org)-[:"+HAS_UNIT+"]->(child:Unit{isEnable:true,boardingCompleted:true}) WITH NODES(path) AS np WITH REDUCE(s=[], i IN RANGE(0, LENGTH(np)-2, 1) | s + {p:np[i], c:np[i+1]}) AS cpairs UNWIND cpairs AS pairs WITH DISTINCT pairs AS ps RETURN {parent:{name:ps.p.name,id:id(ps.p)},child:{name:ps.c.name,id:id(ps.c)}} as data")
     List<Map<String, Object>> getSubOrgHierarchy(long organizationId);
 
     @Query("MATCH (c:Client{healthStatus:'ALIVE'})-[r:GET_SERVICE_FROM]-(o:Unit) WHERE id(o)= {0}  WITH c,r\n" +
@@ -340,7 +340,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (unit:Unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) set r.creationDate={2},r.lastModificationDate={3},r.isEnabled=true")
     void updateSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (unit:Unit),(organizationService:OrganizationService) WHERE id(unit)={0} AND id(organizationService) IN {1} create unique (unit)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService)")
+    @Query("MATCH (org),(organizationService:OrganizationService) WHERE id(org)={0} AND id(organizationService) IN {1} create unique (org)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService)")
     void addOrganizationServiceInUnit(long unitId, List<Long> organizationServiceId, long creationDate, long lastModificationDate);
 
     @Query("MATCH (o:Unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(os:Skill) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
@@ -355,7 +355,11 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Map<String, Object> getBillingAddress(long unitId);
 
 
-    @Query("MATCH (organization:Unit) WHERE id(organization)={0} MATCH (organization)-[:CONTACT_ADDRESS]->(contactAddress:ContactAddress) MATCH (contactAddress)-[:ZIP_CODE]->(zipCode:ZipCode) MATCH (contactAddress)-[:MUNICIPALITY]->(municipality:Municipality) RETURN organization,contactAddress,zipCode,municipality")
+    @Query("MATCH (unit:Unit) WHERE id(unit)={0} " +
+            "MATCH (unit)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress) " +
+            "MATCH (contactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) " +
+            "MATCH (contactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) " +
+            "RETURN unit,contactAddress,zipCode,municipality")
     OrganizationContactAddress getOrganizationByOrganizationId(long organizationId);
 
     @Query("MATCH (organization:Unit)-[:" + HAS_TEAMS + "]->(team:Team) WHERE id(team)={0} RETURN organization")
@@ -453,7 +457,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("MATCH (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os:OrganizationService)\n" +
             "WHERE id(os)={0} WITH organizationService\n" +
-            "MATCH (org:Unit) WHERE id(org)={1} WITH org, organizationService\n" +
+            "MATCH (org) WHERE id(org)={1} WITH org, organizationService\n" +
             "CREATE UNIQUE (org)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name RETURN true")
     Boolean addCustomNameOfServiceForOrganization(Long subServiceId, Long organizationId);
 

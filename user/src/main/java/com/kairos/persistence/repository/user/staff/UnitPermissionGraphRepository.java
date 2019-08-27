@@ -39,7 +39,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
     @Query("MATCH (organization:Organization),(staff:Staff) WHERE id(organization)={0} AND id(staff)={2} WITH organization,staff\n" +
             "MATCH (organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:"+BELONGS_TO+"]->(staff) WITH position\n" +
             "MATCH (position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission) WITH unitPermission\n" +
-            "MATCH (unitPermission)-[r:" + APPLICABLE_IN_UNIT + "]->(unit:Unit) WHERE id(unit)={1} WITH unitPermission\n" +
+            "MATCH (unitPermission)-[r:" + APPLICABLE_IN_UNIT + "]->(unit) WHERE id(unit)={1} WITH unitPermission\n" +
             "OPTIONAL MATCH (unitPermission)-[customPermission:" +HAS_CUSTOMIZED_PERMISSION+ "]-(ap:AccessPage) WHERE customPermission.accessGroupId={3} WITH unitPermission,customPermission " +
             "MATCH (unitPermission)-[r:"+ HAS_ACCESS_GROUP +"]->(accessGroup:AccessGroup) WHERE id(accessGroup)={3}  delete r,customPermission ")
     void updateUnitPermission(long organizationId, long unitId, long staffId, long accessGroupId, boolean isEnabled);

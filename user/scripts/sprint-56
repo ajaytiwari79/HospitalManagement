@@ -1,0 +1,16 @@
+MATCH (org:Organization{isParentOrganization:false})
+REMOVE org:Organization
+SET org:Unit
+
+
+MATCH(unit:Unit)-[r:HAS_SUB_ORGANIZATION]-(org:Organization)
+delete r
+CREATE UNIQUE(org)-[r1:HAS_UNIT]->(unit)
+
+MATCH(u:Organization)
+set u:OrganizationBaseEntity
+return labels(u)
+
+MATCH(u:Unit)
+set u:OrganizationBaseEntity
+return labels(u)

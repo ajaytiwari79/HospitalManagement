@@ -1,17 +1,6 @@
 
 MATCH(f:FunctionalPayment{deleted:false}) set f.oneTimeUpdatedAfterPublish=false;
 
-MATCH (org:Organization{isParentOrganization:false})
-REMOVE org:Organization
-SET org:Unit
-
-
-MATCH(unit:Unit)-[r:HAS_SUB_ORGANIZATION]-(org:Organization)
-delete r
-CREATE UNIQUE(org)-[r1:HAS_UNIT]->(unit)
-
-
-
 Match(ap:AccessPage) where ap.moduleId="module_3" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Optaplanner Configurations",isModule:false,moduleId:"tab_426",active:true});
 
 Match(ap:AccessPage) where ap.moduleId="tab_426" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Shift Planning",isModule:false,moduleId:"tab_427",active:true});

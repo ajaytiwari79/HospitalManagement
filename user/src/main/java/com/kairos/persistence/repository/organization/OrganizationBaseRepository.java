@@ -10,6 +10,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT;
 
 @Repository
 public interface OrganizationBaseRepository extends Neo4jBaseRepository<OrganizationBaseEntity,Long> {
@@ -22,7 +23,7 @@ public interface OrganizationBaseRepository extends Neo4jBaseRepository<Organiza
 
 
     @Query("MATCH(n{deleted:false}) where id(n)={0}\n" +
-            "OPTIONAL MATCH(n)<-[:HAS_UNIT]-(org) \n" +
+            "OPTIONAL MATCH(n)<-[:"+HAS_UNIT+"]-(org) \n" +
             "RETURN CASE WHEN 'Organization' in labels(n) THEN id(n) ELSE id(org) end as parentOrgId")
     Long findParentOrgId(Long id);
 }

@@ -790,11 +790,11 @@ public class OrganizationService {
     }
 
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfoByUnitId(Long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        Long countryId = unit.getCountryId();
+        Long countryId=countryGraphRepository.getCountryIdByUnitId(unitId);
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
         List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
+        Unit unit=unitGraphRepository.findOne(unitId);
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(unit);
         List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p -> new PresenceTypeDTO(p.getName(), p.getId())).collect(Collectors.toList());
         dayTypes.forEach(dayType -> {
@@ -925,6 +925,6 @@ public class OrganizationService {
     }
 
     public boolean isUnit(Long unitId){
-        return !organizationGraphRepository.findOne(unitId).isParentOrganization();
+        return unitGraphRepository.findOne(unitId)!=null;
     }
 }

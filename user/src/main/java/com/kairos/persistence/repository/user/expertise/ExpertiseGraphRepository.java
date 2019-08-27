@@ -205,7 +205,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1}\n" +
             "WITH expertise,level,Collect(orgService) as services \n" +
             "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) \n" +
-            "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Unit)\n" +
+            "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
             "MATCH(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable)" +
             "OPTIONAL MATCH(expertise)-[:" + HAS_SENIOR_DAYS + "]->(seniorDays:CareDays) \n " +
             "OPTIONAL MATCH(expertise)-[:" + HAS_CHILD_CARE_DAYS + "]->(childCareDays:CareDays) \n" +
@@ -224,7 +224,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "WITH expertise,Collect(orgService) as services \n" +
             "MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level) " +
             "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) \n" +
-            "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Unit)\n" +
+            "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
             "MATCH(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[rel:" + HAS_BASE_PAY_GRADE + "]->(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable)" +
             "OPTIONAL MATCH(expertise)-[:" + HAS_SENIOR_DAYS + "]->(seniorDays:CareDays) \n " +
             "OPTIONAL MATCH(expertise)-[:" + HAS_CHILD_CARE_DAYS + "]->(childCareDays:CareDays) \n" +

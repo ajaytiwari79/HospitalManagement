@@ -308,7 +308,7 @@ public class StaffFilterService {
     }
 
     public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId,LocalDate startDate,LocalDate endDate) {
-        Organization organization=UserContext.getUserDetails().getConfLevel().equals(ConfLevel.ORGANIZATION)?organizationGraphRepository.findByIdAndDeletedFalse(unitId):unitGraphRepository.getParentOfOrganization(unitId);
+        Organization organization=organizationService.fetchParentOrganization(unitId);
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
                 !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_FILTER_SETTING_NOTFOUND);
@@ -343,7 +343,8 @@ public class StaffFilterService {
     private List<Map> filterStaffByRoles(List<Map> staffList, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
         List<Map> staffListByRole = new ArrayList<>();
-        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(organization.getId(), userId);
         if (staffAtHub != null) {
             staffListByRole = staffList;
         } else {

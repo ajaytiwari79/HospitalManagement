@@ -64,7 +64,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     @Query("MATCH (et:EmploymentType{deleted:false}) WHERE id(et) IN {0}  return et")
     List<EmploymentType> getEmploymentTypeByIds(Set<Long> employmentTypeIds);
 
-    @Query("MATCH (n:Unit) - [:" + BELONGS_TO + "] -> (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
+    @Query("MATCH (n:Organization) - [:" + BELONGS_TO + "] -> (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(n)={0} AND et.deleted={1} return et")
     List<EmploymentType> getAllEmploymentTypeByOrganization(Long organizationId, Boolean isDeleted);
 

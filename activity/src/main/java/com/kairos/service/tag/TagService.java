@@ -144,7 +144,7 @@ public class TagService extends MongoBaseService {
         if(type.equalsIgnoreCase("team")){
             organizationId = userIntegrationService.getOrganizationIdByTeam(organizationId);
         }
-        if ( !userIntegrationService.isExistOrganization(organizationId)) {
+        if ( !userIntegrationService.isUnit(organizationId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID,organizationId);
         }
 

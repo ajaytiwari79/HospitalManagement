@@ -40,12 +40,13 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "ELSE c END as n")
     AccessGroup findAccessGroupByName(long organizationId, String name);
 
-    @Query("Match (organization:Unit) where id(organization)={0}\n" +
+    @Query("Match (organization:Organization) where id(organization)={0}\n" +
             "Match (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') return accessGroup")
     List<AccessGroup> getAccessGroups(long unitId);
 
     @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
-            "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false})-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) " +
+            "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false}) " +
+            "OPTIONAL MATCH(accessGroup)-["+HAS_PARENT_ACCESS_GROUP+"]->(pag:AccessGroup) " +
             "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]-(dayType:DayType) WHERE NOT (accessGroup.name='" + SUPER_ADMIN + "') " +
             "RETURN id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, collect(id(dayType)) AS dayTypeIds,accessGroup.allowedDayTypes AS allowedDayTypes,pag as parentAccessGroup ORDER BY accessGroup.name")
     List<AccessGroupQueryResult> getAccessGroupsForUnit(Long refId);

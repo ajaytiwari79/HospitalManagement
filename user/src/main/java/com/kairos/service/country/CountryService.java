@@ -589,11 +589,7 @@ public class CountryService {
     }
 
     public Long getCountryIdByUnitId(Long unitId) {
-        OrganizationBaseEntity entity=unitGraphRepository.findOneById(unitId);
-        if(entity instanceof Unit){
-            return ((Unit) entity).getCountryId();
-        }
-        return ((Organization) entity).getCountry().getId();
+       return countryGraphRepository.getCountryIdByUnitId(unitId);
     }
 
     public List<Long> getAllUnits(long countryId) {
