@@ -264,15 +264,14 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     List<AccessGroupQueryResult> getCountryAccessGroupByAccountTypeId(Long countryId, Long accountTypeId, List<String> role);
 
 
-    @Query("MATCH (staff:Staff),(org:Unit) WHERE id(staff)={0} AND id(org)={1} WITH org,staff " +
-            "MATCH(org)<-[:HAS_SUB_ORGANIZATION*]-(parentOrganization:Unit) WITH org,parentOrganization,staff  " +
-            "MATCH(parentOrganization)-[:" + BELONGS_TO + "] -> (country:Country) WITH org,staff,country " +
-            "MATCH (staff)-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]-(up:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(org) WITH up,country  " +
-            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag) RETURN Collect(DISTINCT id(ag)) AS accessGroupIds ,id(country) AS countryId")
+    @Query("MATCH (staff:Staff),(org) WHERE id(staff)={0} AND id(org)={1} WITH org,staff " +
+            "MATCH (staff)-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]-(up:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(org) " +
+            "MATCH(position)<-[:"+HAS_POSITIONS+"]-(organization:Organization)-["+BELONGS_TO+"]-(country:Country)" +
+            "MATCH (up)-[:"+HAS_ACCESS_GROUP+"]-(ag) RETURN Collect(DISTINCT id(ag)) AS accessGroupIds ,id(country) AS countryId")
     StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long staffId, Long unitId);
 
 
-    @Query("MATCH (organization:Unit) WHERE id(organization)={0}\n" +
+    @Query("MATCH (organization:Organization) WHERE id(organization)={0}\n" +
             "MATCH (organization)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]->(accessGroup:AccessGroup{deleted:false}) WHERE id(accessGroup)={1}" +
             "OPTIONAL MATCH (accessGroup)-[:" + DAY_TYPES + "]-(dayType:DayType)   " +
             "RETURN id(accessGroup) AS id, accessGroup.name AS name, accessGroup.description AS description, accessGroup.typeOfTaskGiver AS typeOfTaskGiver, accessGroup.deleted AS deleted, accessGroup.role AS role, accessGroup.enabled AS enabled,accessGroup.startDate AS startDate, accessGroup.endDate AS endDate, collect(dayType) AS dayTypes,accessGroup.allowedDayTypes AS allowedDayTypes")

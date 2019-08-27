@@ -252,6 +252,7 @@ public class OrganizationHierarchyService {
             u.setUnion(false);
             u.setHubId(18743l);
             u.setHasPermission(countryAdmin ? true : unitPermissionMap.get(u.getId()));
+            u.setEnabled(countryAdmin ? true : unitPermissionMap.get(u.getId()));
 
         });
         return units;

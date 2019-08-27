@@ -24,7 +24,7 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
     @Query("MATCH (organization:Organization),(staff:Staff) WHERE id(organization)={1} AND id(staff)={0} WITH organization,staff\n" +
             "MATCH (organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]->(staff) WITH position\n" +
             "MATCH (position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + HAS_ACCESS_PERMISSION + "{isEnabled:true}]->(accessPermission:AccessPermission) WITH unitPermission\n" +
-            "OPTIONAL MATCH (unitPermission)-[r:" + APPLICABLE_IN_UNIT + "]->(unit:Unit) WHERE id(unit)={2} WITH r,unitPermission\n" +
+            "OPTIONAL MATCH (unitPermission)-[r:" + APPLICABLE_IN_UNIT + "]->(unit) WHERE id(unit)={2} WITH r,unitPermission\n" +
             "RETURN {id:id(unitPermission),startDate:unitPermission.startDate,endDate:unitPermission.endDate,weeklyHours:unitPermission.weeklyHours,fullTime:unitPermission.fullTime,employmentType:unitPermission.employmentType,employmentType:unitPermission.employmentType,employmentNo:unitPermission.employmentNumber,isHistory:case when r is NULL then false else true end} as data")
     List<Map<String, Object>> getUnitPermissionsInAllUnits(long staffId, long parentOrganizationId, long childOrganizationId);
 

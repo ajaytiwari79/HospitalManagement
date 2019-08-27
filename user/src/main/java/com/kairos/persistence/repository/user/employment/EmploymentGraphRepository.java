@@ -80,8 +80,8 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
 
 
     @Query("MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff) where id(user)={0}\n" +
-            "MATCH(staff)<-[:"+BELONGS_TO+"]-(position:Position)<-[:"+ HAS_POSITIONS +"]-(org:Unit) \n" +
-            "MATCH(org)-[:"+HAS_SUB_ORGANIZATION+"*]->(subOrg:Unit)  \n" +
+            "MATCH(staff)<-[:"+BELONGS_TO+"]-(position:Position)<-[:"+ HAS_POSITIONS +"]-(org:Organization) \n" +
+            "MATCH(org)-[:"+HAS_UNIT+"]->(subOrg:Unit)  \n" +
             "OPTIONAL MATCH(subOrg)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) WITH employment,org,subOrg,staff,position \n" +
             "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) \n" +
             "OPTIONAL MATCH (employment)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
@@ -89,19 +89,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN expertise as expertise,unionData as union, id(employment) as id,\n" +
             " employment.startDate as startDate,employment.employmentSubType as employmentSubType,employment.taxDeductionPercentage as taxDeductionPercentage, employment.endDate as endDate, \n" +
             "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,employment.history as history,employment.editable as editable,employment.published as published, \n" +
-            "employment.lastWorkingDate as lastWorkingDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo " +
-            "UNION " +
-            "MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff) where id(user)={0} \n" +
-            "MATCH(staff)<-[:"+BELONGS_TO+"]-(position:Position)<-[:"+ HAS_POSITIONS +"]-(org:Unit) \n" +
-            "MATCH(org)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff)  \n" +
-            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise) WHERE expertise.startDateMillis <= TIMESTAMP() AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= TIMESTAMP())\n" +
-            "OPTIONAL MATCH (employment)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
-            "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Unit{isEnable:true,union:true}) \n" +
-            "RETURN expertise as expertise,employment.employmentSubType as employmentSubType,employment.taxDeductionPercentage as taxDeductionPercentage,unionData as union, id(employment) as id,\n" +
-            " employment.startDate as startDate, employment.endDate as endDate, \n" +
-            "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,employment.history as history,employment.editable as editable,employment.published as published, \n" +
-            "employment.lastWorkingDate as lastWorkingDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,id(org) as parentUnitId,id(org) as unitId,\n" +
-            "{id:id(org),name:org.name} as unitInfo ORDER BY employment.startDate")
+            "employment.lastWorkingDate as lastWorkingDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ")
     List<EmploymentQueryResult> getAllEmploymentsByUser(long userId);
 //Date is not supported as a return type in Bolt protocol version 1.
 // Please make sure driver supports at least protocol version 2.
@@ -115,7 +103,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(employment:Employment)-[:" + IN_UNIT + "]->(subOrg:Unit) where id(employment)={0} " +
             "MATCH(employment)<-[:" + BELONGS_TO_STAFF + "]-(staff:Staff) " +
             "MATCH(staff)<-[:" + BELONGS_TO + "]-(position:Position) " +
-            "MATCH(position)<-[:" + HAS_POSITIONS + "]-(org:Unit) " +
+            "MATCH(position)<-[:" + HAS_POSITIONS + "]-(org:Organization) " +
             "RETURN id(subOrg) as unitId,id(org) as parentUnitId")
     EmploymentQueryResult getUnitIdAndParentUnitIdByEmploymentId(Long employmentId);
 
@@ -154,17 +142,11 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     List<Map<Long, Long>> getMapOfEmploymentAndExpertiseId(Long unitId);
 
 
-    @Query("MATCH (user:User)-[:BELONGS_TO]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Unit) where id(user)={0}\n" +
-            "MATCH(org)-[:"+HAS_SUB_ORGANIZATION+"*]->(subOrg:Unit)\n" +
+    @Query("MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Organization) where id(user)={0}\n" +
+            "MATCH(org)-[:"+HAS_UNIT+"]->(subOrg:Unit)\n" +
             "MATCH(subOrg)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false,published:true})<-[:"+BELONGS_TO_STAFF+"]-(staff)\n" +
             "return  id(employment) as id,employment.history as history, \n" +
-            "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY employment.creationDate" +
-            " UNION " +
-            "MATCH (user:User)-[:"+BELONGS_TO+"]-(staff:Staff) where id(user)={0}\n" +
-            "MATCH(staff)<-[:"+BELONGS_TO+"]-(position:Position)<-[:"+HAS_POSITIONS+"]-(org:Unit) \n" +
-            "MATCH(org)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false,published:true})<-[:"+BELONGS_TO_STAFF+"]-(staff)  \n" +
-            "return id(employment) as id, employment.history as history,\n" +
-            "id(org) as parentUnitId,id(org) as unitId,{id:id(org),name:org.name} as unitInfo ORDER BY employment.creationDate")
+            "id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ORDER BY employment.creationDate")
     List<EmploymentQueryResult> getAllEmploymentsBasicDetailsAndWTAByUser(long userId);
 
 

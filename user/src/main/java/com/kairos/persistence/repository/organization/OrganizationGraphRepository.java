@@ -34,7 +34,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN o,org,orgRel,unitRel,u,orgUnitRel,un")
     List<OrganizationBaseEntity> generateHierarchy(Collection<Long> ids);
 
-    @Query("MATCH (union:Unit{union:true,isEnable:true}) WHERE id (union)={0}  RETURN union")
+    @Query("MATCH (union:Organization{union:true,isEnable:true}) WHERE id (union)={0}  RETURN union")
     Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);
 
     @Query("MATCH(union:Unit{deleted:false,union:true}) WHERE id(union)<>{1} AND union.name=~{0} RETURN count(union)>0")

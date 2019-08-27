@@ -232,13 +232,8 @@ public class OrganizationService {
     }
 
 
-    public Map<String, Object> getGeneralDetails(long id, String type) {
+    public Map<String, Object> getGeneralDetails(long id) {
         Map<String, Object> response = new HashMap<>();
-        if(ORGANIZATION.equalsIgnoreCase(type)) {
-            Unit unit = unitGraphRepository.findOne(id, 0);
-            if(unit == null) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, id);
-            }
             Map<String, Object> metaData = null;
             Long countryId = countryGraphRepository.getCountryIdByUnitId(id);
             List<Map<String, Object>> data = unitGraphRepository.getGeneralTabMetaData(countryId);
@@ -249,23 +244,13 @@ public class OrganizationService {
             OrganizationContactAddress organizationContactAddress = unitGraphRepository.getContactAddressOfOrg(id);
             ZipCode zipCode = organizationContactAddress.getZipCode();
             List<Municipality> municipalities = (zipCode == null) ? Collections.emptyList() : municipalityGraphRepository.getMunicipalitiesByZipCode(zipCode.getId());
-            Map<String, Object> generalTabQueryResult = unitGraphRepository.getGeneralTabInfo(unit.getId());
+            Map<String, Object> generalTabQueryResult = unitGraphRepository.getGeneralTabInfo(id);
             HashMap<String, Object> generalTabInfo = new HashMap<>(generalTabQueryResult);
             generalTabInfo.put("clientSince", (generalTabInfo.get("clientSince") == null ? null : getDate((long) generalTabInfo.get("clientSince"))));
             cloneMap.put("municipalities", municipalities);
             response.put("generalTabInfo", generalTabInfo);
             response.put("otherData", cloneMap);
-        } else if(TEAM.equalsIgnoreCase(type)) {
-            Team team = teamGraphRepository.findOne(id);
-            if(team == null) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_TEAM_ID_NOTFOUND);
-            }
-            Map<String, Object> teamInfo = new HashMap<>();
-            teamInfo.put("name", team.getName());
-            teamInfo.put("id", team.getId());
-            response.put("generalTabInfo", teamInfo);
-            response.put("otherData", Collections.emptyMap());
-        }
+
         return response;
     }
 

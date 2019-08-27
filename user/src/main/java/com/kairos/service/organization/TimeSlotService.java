@@ -12,6 +12,7 @@ import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSetTimeSlotRelationship;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
@@ -43,6 +44,8 @@ public class TimeSlotService {
     private UnitGraphRepository unitGraphRepository;
     @Inject
     private TimeSlotGraphRepository timeSlotGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private TimeSlotSetRepository timeSlotSetRepository;
     @Inject
@@ -354,7 +357,7 @@ public class TimeSlotService {
     }
 
     public List<TimeSlotDTO> getUnitTimeSlot(Long unitId){
-        Organization unit = organizationGraphRepository.findOne(unitId, 0);
+        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
         }

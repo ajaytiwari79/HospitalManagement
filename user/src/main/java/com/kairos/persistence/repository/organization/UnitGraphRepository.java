@@ -273,7 +273,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN {ownershipTypes:case when ownerships[0].id is null then [] else ownerships end,industryTypes:case when industryTypes[0].id is null then [] else industryTypes end,employeeLimits:case when employeeLimits[0].id is null then [] else employeeLimits end,vatTypes:case when vatTypes[0].id is null then [] else vatTypes end,contractTypes:case when contractTypes[0].id is null then [] else contractTypes end,organizationTypes:case when organizationTypes is null then [] else COLLECT(organizationTypes) end,kairosStatusList:case when kairosStatus[0].id is null then [] else kairosStatus end,businessTypes:case when businessTypes[0].id is null then [] else businessTypes end} as data")
     List<Map<String, Object>> getGeneralTabMetaData(long countryId);
 
-    @Query("MATCH (n:Unit) WHERE id(n)={0}\n" +
+    @Query("MATCH (n) WHERE id(n)={0}\n" +
             "OPTIONAL MATCH (n)-[:" + TYPE_OF + "]->(orgType:OrganizationType) WITH id(orgType) as orgId,n\n" +
             "OPTIONAL MATCH (n)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH COLLECT(distinct id(subType)) as subTypeId,orgId,n\n" +
             "OPTIONAL MATCH (n)-[:" + BUSINESS_TYPE + "]->(businessType:BusinessType) WITH subTypeId,orgId,n,COLLECT(distinct id(businessType)) as businessTypeId\n" +
@@ -365,7 +365,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (organization:Unit)-[:" + HAS_TEAMS + "]->(team:Team) WHERE id(team)={0} RETURN organization")
     Unit getOrganizationByTeamId(long groupId);
 
-    @Query("MATCH (organization:Unit) WHERE id(organization)={0} WITH organization " +
+    @Query("MATCH (organization) WHERE id(organization)={0} WITH organization " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,zipCode,contactAddress\n" +
@@ -379,7 +379,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN {houseNumber:contactAddress.houseNumber,municipalityName: municipality.name, id:id(contactAddress),floorNumber:contactAddress.floorNumber,city:contactAddress.city,zipCodeId:id(zipCode),regionName:contactAddress.regionName,province:contactAddress.province,municipalityName:contactAddress.municipalityName,isAddressProtected:contactAddress.isAddressProtected,longitude:contactAddress.longitude,latitude:contactAddress.latitude,street:contactAddress.street,municipalityId:id(municipality)} as contactAddress")
     Map<String, Object> getContactAddressOfParentOrganization(Long unitId);
 
-    @Query("MATCH (organization:Unit) WHERE id(organization) IN {0}  " +
+    @Query("MATCH (organization) WHERE id(organization) IN {0}  " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH contactAddress ,organization\n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress,organization \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) WITH municipality,zipCode,contactAddress,organization \n" +
@@ -486,17 +486,17 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Country getCountryByParentOrganization(Long organizationId);
 
 
-    @Query("MATCH (org:Unit{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(subType) IN {0} " +
+    @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(subType) IN {0} " +
             "RETURN  id(org) as id,org.name as name")
     List<UnionResponseDTO> getAllUnionsByOrganizationSubType(List<Long> organizationSubTypesId);
 
 
-    @Query("MATCH(o:Unit)-[:" + HAS_SUB_ORGANIZATION + "*]->(s:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n" +
+    @Query("MATCH(o:Organization)-[:" + HAS_UNIT + "*]->(s:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n" +
             "RETURN s.name as name ,id(s) as id")
     List<OrganizationBasicResponse> getOrganizationHierarchy(Long parentOrganizationId);
 
-    @Query("MATCH(o:Unit)-[:"+HAS_SUB_ORGANIZATION+"]-(parentOrganization:Unit{isEnable:true,isKairosHub:false,union:false,boardingCompleted:true}) WHERE id(o)={0} \n"
-            + "MATCH(parentOrganization)-[:" + HAS_SUB_ORGANIZATION + "]-(units:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) " +
+    @Query("MATCH(o:Unit)-[:"+HAS_UNIT+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,boardingCompleted:true}) WHERE id(o)={0} \n"
+            + "MATCH(parentOrganization)-[:" + HAS_UNIT + "]-(units:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) " +
             " WITH parentOrganization ,COLLECT (units)  as data " +
             " RETURN parentOrganization as parent,data as childUnits")
     OrganizationHierarchyData getChildHierarchyByChildUnit(Long childUnitId);

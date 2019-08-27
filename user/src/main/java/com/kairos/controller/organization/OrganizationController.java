@@ -263,8 +263,8 @@ public class OrganizationController {
     @GetMapping(UNIT_URL + "/general")
     @ApiOperation("Get general details of Client")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getGeneralDetails(@PathVariable long unitId, @RequestParam("type") String type) {
-        Map<String, Object> objectMap = organizationService.getGeneralDetails(unitId, type);
+    public ResponseEntity<Map<String, Object>> getGeneralDetails(@PathVariable long unitId) {
+        Map<String, Object> objectMap = organizationService.getGeneralDetails(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, objectMap);
     }
 
