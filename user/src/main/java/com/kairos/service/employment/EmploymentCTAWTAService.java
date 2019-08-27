@@ -6,10 +6,12 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Unit;
@@ -43,6 +45,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -108,6 +111,12 @@ public class EmploymentCTAWTAService {
         }
         if (employment.getEndDate() != null && updateDTO.getStartDate().isAfter(employment.getEndDate())) {
             exceptionService.actionNotPermittedException(START_DATE_FROM_END_DATE);
+        }
+        if(!activityIntegrationService.isStaffNightWorker(unitId,employment.getStaff().getId())) {
+            List<WTABaseRuleTemplateDTO> wtaBaseRuleTemplateDTOS=updateDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplateDTO -> WTATemplateType.DAYS_OFF_AFTER_A_SERIES.equals(wtaBaseRuleTemplateDTO.getWtaTemplateType()) && !wtaBaseRuleTemplateDTO.isDisabled()).collect(Collectors.toList());
+            if(isCollectionNotEmpty(wtaBaseRuleTemplateDTOS)){
+                exceptionService.actionNotPermittedException(MESSAGE_STAFF_NOT_NIGHT_WORKER);
+            }
         }
         updateDTO.setId(wtaId);
         updateDTO.setEmploymentEndDate(employment.getEndDate());
