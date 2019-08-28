@@ -4,29 +4,20 @@ package com.kairos.service.counter;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
-import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.enums.DurationType;
+import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
-import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.todo.TodoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 
 @Service
 public class AbsencePlanningKPIService {
@@ -35,28 +26,10 @@ public class AbsencePlanningKPIService {
     @Inject
     private CounterHelperService counterHelperService;
     @Inject
-    private ShiftMongoRepository shiftMongoRepository;
+    private TodoRepository todoRepository;
     @Inject
     private UserIntegrationService userIntegrationService;
 
-    private Map<Long, Set<DateTimeInterval>> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate) {
-        Map<Long, Set<DateTimeInterval>> unitAndDateTimeIntervalMap = new HashMap<>();
-        List<PlanningPeriod> planningPeriods = planningPeriodMongoRepository.findAllByUnitIdsAndBetweenDates(unitIds, startDate, endDate);
-        Map<Long, List<PlanningPeriod>> unitAndPlanningPeriodMap = planningPeriods.stream().collect(Collectors.groupingBy(PlanningPeriod::getUnitId, Collectors.toList()));
-        unitIds.forEach(unitId -> {
-            Set<DateTimeInterval> dateTimeIntervals = unitAndPlanningPeriodMap.getOrDefault(unitId, new ArrayList<>()).stream().map(planningPeriod -> new DateTimeInterval(asDate(planningPeriod.getStartDate()), asDate(planningPeriod.getEndDate()))).collect(Collectors.toSet());
-            unitAndDateTimeIntervalMap.put(unitId, dateTimeIntervals);
-        });
-        return unitAndDateTimeIntervalMap;
-    }
-
-    public List<ShiftStatus> getActivityStatus(List<Shift> shifts) {
-        List<ShiftStatus> shiftStatuses = new ArrayList<>();
-        shifts.forEach(shift -> {
-            shiftStatuses.addAll(shift.getActivities().stream().map(x -> x.getStatus()).flatMap(x -> x.stream()).collect(Collectors.toList()));
-        });
-        return shiftStatuses;
-    }
 
     private List<CommonKpiDataUnit> getAbsencePlanningKpiData(Long organizationId, Map<FilterType, List> filterBasedCriteria, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> kpiDataUnits;
@@ -64,101 +37,40 @@ public class AbsencePlanningKPIService {
         List<Long> staffIds = (List<Long>) filterCriteria[0];
         List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
         List<Long> unitIds = (List<Long>) filterCriteria[2];
-        List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
-        List<String> shiftActivityStatus = (filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) != null) ? filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) : new ArrayList<>();
+        Collection<String> todoStatus =(List<String>)filterCriteria[5];
         if (CollectionUtils.isEmpty(unitIds)) {
             unitIds.add(organizationId);
         }
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, new ArrayList<>(), unitIds, organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];
-        List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFiltersWithActivityStatus(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-        Map<ShiftStatus, Long> absencePlanningActivityStatus = getAbsencePlanningActivityStatus(shifts);
-        kpiDataUnits = null;
-        sortKpiDataByDateTimeInterval(kpiDataUnits);
-        return kpiDataUnits;
+        List<TodoDTO> todos = todoRepository.findAllByKpiFilter(unitIds.get(0),dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),staffIds, todoStatus);
+        return new ArrayList<>();
     }
 
-    public Map<ShiftStatus, Long> getAbsencePlanningActivityStatus(List<Shift> shifts) {
-        List<ShiftStatus> shiftStatuses = getActivityStatus(shifts);
-        return shiftStatuses.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-    }
-
-    public Map<Object, Map<ShiftStatus, Long>> getAbsencePlanningActivityStatusForStaff(List<Shift> shifts, List<Long> staffIds) {
-
-        Map<ShiftStatus, Long> shiftActivityStatus;
-        Map<Object, Map<ShiftStatus, Long>> staffActivityStatusMap = new HashMap<>();
-        Map<Long, List<Shift>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
-        for (Long staffId : staffIds) {
-            shiftActivityStatus = getAbsencePlanningActivityStatus(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()));
-            staffActivityStatusMap.put(staffId, shiftActivityStatus);
-
-        }
-
-        return staffActivityStatusMap;
-    }
-
-    public Map<Object, Map<ShiftStatus, Long>> getAbsencePlanningActivityStatusForPerInterval(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType) {
-        Map<ShiftStatus, Long> shiftActivityStatus;
-        Map<Object, Map<ShiftStatus, Long>> staffActivityStatusMap = new HashMap<>();
-        Map<Long, List<Shift>> staffShiftMapping;
-        Map<DateTimeInterval, Map<Long, List<Shift>>> dateTimeIntervalAndShiftMap = new HashedMap();
-        dateTimeIntervalListMap.keySet().stream().forEach(dateTimeInterval -> dateTimeIntervalAndShiftMap.put(dateTimeInterval, dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()))));
-        for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-            shiftActivityStatus = new HashMap<>();
-            staffShiftMapping = dateTimeIntervalAndShiftMap.get(dateTimeInterval);
-            for (Long staffId : staffIds) {
-                shiftActivityStatus = getAbsencePlanningActivityStatus(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()));
-            }
-            staffActivityStatusMap.put(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), shiftActivityStatus);
-        }
-
-        return staffActivityStatusMap;
-    }
-
-    public Map<Object, Map<ShiftStatus, Long>> getAbsencePlanningActivityStatusForTotalData(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<Shift> shifts, Map<ShiftStatus, Long> shiftActivityStatus) {
-        Map<Object, Map<ShiftStatus, Long>> staffWithActivityStatus = new HashMap<>();
-        Map<Long, List<Shift>> staffShiftMapping;
-        staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(Shift::getStaffId, Collectors.toList()));
-        for (Long staffId : staffIds) {
-            shiftActivityStatus = getAbsencePlanningActivityStatus(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()));
-        }
-        staffWithActivityStatus.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), shiftActivityStatus);
-        return staffWithActivityStatus;
-
-    }
-
-    public Map<Object,Map<ShiftStatus,Long>> getActivityStatusForTimeSlot(Long unitId)
-    {
-        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
-        Map<Object,ShiftStatus> activityStatusTimeSlotMap;
 
 
-     
-        return null;
-    }
+
+
 
     private Map<Object,Map<ShiftStatus,Long>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<Shift>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<Shift> shifts) {
-        Map<Object, Map<ShiftStatus,Long>> staffWithActivityStatus;
         Map<ShiftStatus,Long>  shiftActivityStatus = new HashMap<>() ;
         switch (applicableKPI.getKpiRepresentation()) {
             case REPRESENT_PER_STAFF:
-                staffWithActivityStatus = getAbsencePlanningActivityStatusForStaff(shifts,staffIds);
+
                 break;
             case REPRESENT_TOTAL_DATA:
-                staffWithActivityStatus = getAbsencePlanningActivityStatusForTotalData(staffIds, dateTimeIntervals, shifts, shiftActivityStatus);
+
                 break;
             case REPRESENT_PER_INTERVAL:
-                staffWithActivityStatus = getAbsencePlanningActivityStatusForPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI.getFrequencyType());
+
                 break;
             default:
-                staffWithActivityStatus = getAbsencePlanningActivityStatusForPerInterval(staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI.getFrequencyType());
+
                 break;
         }
-        return staffWithActivityStatus;
+        return new HashMap<>();
     }
-
 
 }
