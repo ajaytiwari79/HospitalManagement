@@ -74,25 +74,6 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByCountryId(countryId));
     }
 
-    /*
-     * get all available expertise by org Sub type Id
-     * Created by vipul on 12 sept 2017
-     */
-
-/*    @ApiOperation(value = "Get all expertise which are not unlinked with this subOrg type of country")
-    @GetMapping(value = COUNTRY_URL + "/{organizationSubTypeId}/expertises")
-    public ResponseEntity<Map<String, Object>> getAllAvailableExpertise(@PathVariable long organizationSubTypeId, @PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllAvailableExpertise(organizationSubTypeId, countryId));
-    }*/
-
-    //TODO need to refactor URL pattern
-
-    /**
-     * get all WTA by organizationSubType by using Id
-     *
-     * @Author vipul
-     * @Date 11 august 2017
-     */
 
     @ApiOperation(value = "Get WTA by Organization sub type  by using sub type Id")
     @RequestMapping(value =  COUNTRY_URL + "/organization_type/{organizationSubTypeId}/wta/OrganizationSubType", method = RequestMethod.GET)

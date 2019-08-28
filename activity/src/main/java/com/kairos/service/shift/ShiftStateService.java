@@ -156,6 +156,7 @@ public class ShiftStateService {
 
     public ShiftDTO updateShiftStateAfterValidatingWtaRule(ShiftDTO shiftDTO, BigInteger shiftStateId, BigInteger shiftStatePhaseId) {
         shiftDTO.setShiftStatePhaseId(shiftStatePhaseId);
+        shiftDTO.setShiftId(shiftStateId);
         ShiftState shiftState = shiftStateMongoRepository.findOne(shiftStateId);
         if (shiftState != null) {
             shiftDTO.setId(shiftState.getId());

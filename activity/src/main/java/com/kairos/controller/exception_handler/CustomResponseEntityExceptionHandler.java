@@ -381,7 +381,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         errorMessage.setData(ex.getMessage());
         errorMessage.setPath(httprequest.getRequestURL().toString());
-        mailService.sendMailToBackendOnException(ex);
+        //mailService.sendMailToBackendOnException(ex);
         logger.info("exception {}", ex.getCause());
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
