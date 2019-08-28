@@ -5,14 +5,22 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.*;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupKPIConfDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupMappingDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
+import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.category.*;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
-import com.kairos.dto.activity.counter.distribution.org_type.*;
-import com.kairos.dto.activity.counter.distribution.tab.*;
-import com.kairos.dto.activity.counter.enums.*;
+import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
+import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeKPIConfDTO;
+import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeMappingDTO;
+import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
+import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
+import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.KPIValidity;
+import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
-import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -29,6 +37,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -519,6 +528,9 @@ public class CounterDistService extends MongoBaseService {
         unitIds.forEach(unitId -> unitIdKpiMap.put(unitId, new HashMap<BigInteger, BigInteger>()));
         List<ApplicableKPI> applicableKPISForUnit = counterRepository.getApplicableKPIByReferenceId(orgTypeMappingDTOS.stream().map(OrgTypeMappingDTO::getKpiId).collect(toList()), unitIds, ConfLevel.UNIT);
         applicableKPISForUnit.forEach(applicableKPI -> unitIdKpiMap.get(applicableKPI.getUnitId()).put(applicableKPI.getBaseKpiId(), applicableKPI.getBaseKpiId()));
+        List<CategoryKPIConf> categoryKPIConfs=new ArrayList<>();
+        List<KPICategory> kpiCategories=counterRepository.getKPICategoryByRefIds(ConfLevel.UNIT,unitIds,UNCATEGORIZED);
+        Map<Long,KPICategory> kpiCategoryUnitWiseMap=kpiCategories.stream().collect(Collectors.toMap(k->k.getUnitId(),Function.identity()));
         unitIds.forEach(unitId -> orgTypeKPIConf.getKpiIds().forEach(kpiId -> {
             if (unitIdKpiMap.get(unitId).get(kpiId) == null) {
                 ApplicableFilter applicableFilter = null;
@@ -531,6 +543,12 @@ public class CounterDistService extends MongoBaseService {
         }));
         if (!applicableKPISToSave.isEmpty()) {
             save(applicableKPISToSave);
+            applicableKPISToSave.forEach(applicableKPI -> {
+                if(isNotNull(kpiCategoryUnitWiseMap.get(applicableKPI.getUnitId()))) {
+                    categoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategoryUnitWiseMap.get(applicableKPI.getUnitId()).getId(), null, applicableKPI.getUnitId(), ConfLevel.UNIT));
+                }
+            });
+            save(categoryKPIConfs);
         }
     }
 
@@ -705,6 +723,12 @@ public class CounterDistService extends MongoBaseService {
     public void createDefaultCategory(Long unitId){
         KPICategory kpiCategory = new KPICategory(UNCATEGORIZED,null,unitId,ConfLevel.UNIT);
         counterRepository.save(kpiCategory);
+        List<CategoryKPIConf> newCategoryKPIConfs=new ArrayList<>();
+        List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPI(null,ConfLevel.UNIT,unitId);
+        applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategory.getId(), null, unitId, ConfLevel.UNIT)));
+        if (!newCategoryKPIConfs.isEmpty()) {
+            save(newCategoryKPIConfs);
+        }
     }
 
     public boolean createDefaultCategories(Long countryId){
@@ -712,6 +736,12 @@ public class CounterDistService extends MongoBaseService {
         units.forEach(unit->createDefaultCategory(unit));
         KPICategory kpiCategory = new KPICategory(UNCATEGORIZED,countryId,null,ConfLevel.COUNTRY);
         counterRepository.save(kpiCategory);
+        List<CategoryKPIConf> newCategoryKPIConfs=new ArrayList<>();
+        List<ApplicableKPI> applicableKPIS=counterRepository.getApplicableKPI(null,ConfLevel.COUNTRY,countryId);
+        applicableKPIS.parallelStream().forEach(applicableKPI -> newCategoryKPIConfs.add(new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategory.getId(), countryId, null, ConfLevel.COUNTRY)));
+        if (!newCategoryKPIConfs.isEmpty()) {
+            save(newCategoryKPIConfs);
+        }
         return true;
     }
 

@@ -5,10 +5,14 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.phase.PhaseWeeklyDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.ShiftTemplateDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -16,6 +20,8 @@ import java.util.*;
 /**
  * Created by vipul on 19/9/17.
  */
+@Getter
+@Setter
 public class PhaseActivityDTO {
     private List<ActivityWithCompositeDTO> activities;
     private List<PhaseWeeklyDTO> phases;
@@ -31,6 +37,7 @@ public class PhaseActivityDTO {
     private LocalDate firstRequestPhasePlanningPeriodEndDate;
     private List<PresenceTypeDTO> plannedTimes;
     private List<PhaseSettingsActivityTab> phaseSettingsActivityTab;
+    private List<ActivityConfigurationDTO> activityConfigurations;
 
     public PhaseActivityDTO() {
         //Default Constructor
@@ -38,7 +45,7 @@ public class PhaseActivityDTO {
 
     public PhaseActivityDTO(List<ActivityWithCompositeDTO> activities,List<PhaseWeeklyDTO> phases, List<DayType> dayTypes,
                             UserAccessRoleDTO staffAccessRole, List<ShiftTemplateDTO> shiftTemplates, List<PhaseDTO> applicablePhases, List<PhaseDTO> actualPhases,List<ReasonCodeDTO> reasonCodes,LocalDate planningPeriodStartDate,LocalDate planningPeriodEndDate,List<Map<String,Object>> publicHolidays,
-                            LocalDate firstRequestPhasePlanningPeriodEndDate,List<PresenceTypeDTO> plannedTimes,List<PhaseSettingsActivityTab> phaseSettingsActivityTab) {
+                            LocalDate firstRequestPhasePlanningPeriodEndDate,List<PresenceTypeDTO> plannedTimes,List<PhaseSettingsActivityTab> phaseSettingsActivityTab,List<ActivityConfigurationDTO> activityConfigurations) {
         this.activities=activities;
         this.phases = phases;
         this.dayTypes = dayTypes;
@@ -53,115 +60,7 @@ public class PhaseActivityDTO {
         this.firstRequestPhasePlanningPeriodEndDate = firstRequestPhasePlanningPeriodEndDate;
         this.plannedTimes = plannedTimes;
         this.phaseSettingsActivityTab = phaseSettingsActivityTab;
-    }
-
-    public List<Map<String, Object>> getPublicHolidays() { return publicHolidays; }
-
-    public void setPublicHolidays(List<Map<String, Object>> publicHolidays) {
-        this.publicHolidays = publicHolidays;
-    }
-
-    public List<ActivityWithCompositeDTO> getActivities() {
-        return activities;
-    }
-
-    public void setActivities(List<ActivityWithCompositeDTO> activities) {
-        this.activities = activities;
-    }
-
-    public List<PhaseWeeklyDTO> getPhases() {
-        return phases;
-    }
-
-    public void setPhases(List<PhaseWeeklyDTO> phases) {
-        this.phases = phases;
-    }
-
-    public List<PhaseDTO> getApplicablePhases() {
-        return applicablePhases;
-    }
-
-    public void setApplicablePhases(List<PhaseDTO> applicablePhases) {
-        this.applicablePhases = applicablePhases;
-    }
-
-    public List<DayType> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<DayType> dayTypes) {
-        this.dayTypes = dayTypes;
-    }
-
-    public UserAccessRoleDTO getStaffAccessRole() {
-        return staffAccessRole;
-    }
-
-    public void setStaffAccessRole(UserAccessRoleDTO staffAccessRole) {
-        this.staffAccessRole = staffAccessRole;
-    }
-
-    public List<PhaseDTO> getActualPhases() {
-        return actualPhases;
-    }
-
-    public void setActualPhases(List<PhaseDTO> actualPhases) {
-        this.actualPhases = actualPhases;
-    }
-
-    public List<ShiftTemplateDTO> getShiftTemplates() {
-        return shiftTemplates;
-    }
-
-    public void setShiftTemplates(List<ShiftTemplateDTO> shiftTemplates) {
-        this.shiftTemplates = shiftTemplates;
-    }
-
-    public List<ReasonCodeDTO> getReasonCodes() {
-        return reasonCodes;
-    }
-
-    public void setReasonCodes(List<ReasonCodeDTO> reasonCodes) {
-        this.reasonCodes = reasonCodes;
-    }
-
-    public LocalDate getPlanningPeriodStartDate() {
-        return planningPeriodStartDate;
-    }
-
-    public void setPlanningPeriodStartDate(LocalDate planningPeriodStartDate) {
-        this.planningPeriodStartDate = planningPeriodStartDate;
-    }
-
-    public LocalDate getPlanningPeriodEndDate() {
-        return planningPeriodEndDate;
-    }
-
-    public void setPlanningPeriodEndDate(LocalDate planningPeriodEndDate) {
-        this.planningPeriodEndDate = planningPeriodEndDate;
-    }
-
-    public LocalDate getFirstRequestPhasePlanningPeriodEndDate() {
-        return firstRequestPhasePlanningPeriodEndDate;
-    }
-
-    public void setFirstRequestPhasePlanningPeriodEndDate(LocalDate firstRequestPhasePlanningPeriodEndDate) {
-        this.firstRequestPhasePlanningPeriodEndDate = firstRequestPhasePlanningPeriodEndDate;
-    }
-
-    public List<PresenceTypeDTO> getPlannedTimes() {
-        return plannedTimes;
-    }
-
-    public void setPlannedTimes(List<PresenceTypeDTO> plannedTimes) {
-        this.plannedTimes = plannedTimes;
-    }
-    public List<PhaseSettingsActivityTab> getPhaseSettingsActivityTab() {
-        return phaseSettingsActivityTab;
-    }
-
-    public void setPhaseSettingsActivityTab(List<PhaseSettingsActivityTab> phaseSettingsActivityTab) {
-        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
+        this.activityConfigurations = activityConfigurations;
     }
 }
 

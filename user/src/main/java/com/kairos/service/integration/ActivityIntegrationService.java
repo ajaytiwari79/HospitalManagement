@@ -2,6 +2,7 @@ package com.kairos.service.integration;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.*;
@@ -181,5 +182,9 @@ public class ActivityIntegrationService {
          return genericRestClient.publishRequest(null, employmentId, true, IntegrationOperation.GET, "/employment/{employmentId}/shift_count", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>(){}, employmentId);
     }
 
+    public boolean isStaffNightWorker(Long unitId, Long staffId) {
+        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/staff/{staffId}/night_worker_general", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<NightWorkerGeneralResponseDTO>>() {
+        },staffId).isNightWorker();
+    }
 }
 

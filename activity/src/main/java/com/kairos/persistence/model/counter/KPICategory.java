@@ -14,6 +14,7 @@ public class KPICategory extends MongoBaseEntity {
     private Long countryId;
     private Long unitId;
     private ConfLevel level;
+
     public KPICategory(){}
 
     public KPICategory(String name, Long countryId, Long unitId, ConfLevel level) {

@@ -18,6 +18,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.common.MongoSequence;
 import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 import com.kairos.utils.user_context.UserContext;
@@ -106,7 +107,9 @@ public class CounterRepository{
     //removal of counters
     public void removeAll(String fieldName, List values, Class claz, ConfLevel level) {
         Query query = new Query(Criteria.where("deleted").is(false).and("level").is(level).and(fieldName).in(values));
-        mongoTemplate.remove(query, claz);
+        Update update = new Update();
+        update.set("deleted", true);
+        mongoTemplate.updateMulti(query, update, claz);
     }
 
     //get item by Id
@@ -200,6 +203,20 @@ public class CounterRepository{
 
     }
 
+    public KPICategory getKPICategoryByName(String categoryName, ConfLevel level, Long refId) {
+        String queryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("deleted").is(false).and("name").is(categoryName).regex(Pattern.compile("^" + categoryName + "$", Pattern.CASE_INSENSITIVE)).and(queryField).is(refId).and("level").is(level));
+        return mongoTemplate.findOne(query, KPICategory.class);
+
+    }
+
+    public List<KPICategory> getKPICategoryByRefIds(ConfLevel level, List<Long> refIds,String name) {
+        String queryField = getRefQueryField(level);
+        Query query = new Query(Criteria.where("deleted").is(false).and("name").is(name).and(queryField).in(refIds).and("level").is(level));
+        return mongoTemplate.find(query, KPICategory.class);
+
+    }
+
     public List<KPICategoryDTO> getKPICategory(List<BigInteger> categoryIds, ConfLevel level, Long refId) {
         String queryField = getRefQueryField(level);
         Criteria matchCriteria = categoryIds == null ? Criteria.where("deleted").is(false).and(queryField).is(refId) : Criteria.where("deleted").is(false).and("_id").in(categoryIds).and(queryField).is(refId);
@@ -216,7 +233,15 @@ public class CounterRepository{
     //CategoryKPI distribution
 
     public List<CategoryKPIConf> getCategoryKPIConfs(List<BigInteger> kpiIds, List<BigInteger> categoryIds) {
-        Query query = new Query(Criteria.where("deleted").is(false).and("kpiId").in(kpiIds).and("categoryId").in(categoryIds));
+        Criteria criteria=Criteria.where("deleted").is(false);
+        if(isCollectionNotEmpty(kpiIds)){
+            criteria.and("kpiId").in(kpiIds);
+        }
+        if(isCollectionNotEmpty(categoryIds))
+        {
+            criteria.and("categoryId").in(categoryIds);
+        }
+        Query query = new Query(criteria);
         return mongoTemplate.find(query, CategoryKPIConf.class);
     }
 

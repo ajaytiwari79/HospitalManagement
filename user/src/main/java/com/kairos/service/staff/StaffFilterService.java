@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.shift.ShiftStatus.*;
 
 /**
  * Created by prerna on 1/5/18.
@@ -161,7 +162,8 @@ public class StaffFilterService {
     }
 
     private List<FilterSelectionQueryResult> getStatusFilter(){
-        return Arrays.stream(ShiftStatus.values()).map(shiftStatus -> new FilterSelectionQueryResult(shiftStatus.toString(),StringUtils.capitalize(shiftStatus.name().toLowerCase()))).collect(Collectors.toList());
+        Set<ShiftStatus> shiftStatuses = newHashSet(UNPUBLISH,UNLOCK,UNFIX,DISAPPROVE,LOCK,REJECT);
+        return Arrays.stream(ShiftStatus.values()).filter(shiftStatus -> !shiftStatuses.contains(shiftStatus)).map(shiftStatus -> new FilterSelectionQueryResult(shiftStatus.toString(),StringUtils.capitalize(shiftStatus.name().toLowerCase()))).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getAllTimeType(Long countryId){
@@ -313,7 +315,7 @@ public class StaffFilterService {
         List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId);
         staffs = staffs.stream().filter(distinctByKey(a -> a.get("id"))).collect(Collectors.toList());
         staffEmploymentTypeWrapper.setStaffList(staffs);
-        List<Long> staffIds = (List<Long>) staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
+        List<Long> staffIds = staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
         staffFilterDTO.setStaffIds(staffIds);
         Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO,unitId,startDate,endDate);
         List<Map> staffList = new ArrayList<>();

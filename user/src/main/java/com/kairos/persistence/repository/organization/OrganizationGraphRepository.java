@@ -199,7 +199,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH (bt:BusinessType{isEnabled:true})-[:" + BELONGS_TO + "]->(country) WITH COLLECT(bt) as bt,country \n" +
             "OPTIONAL MATCH (cc:CompanyCategory{deleted:false})-[:" + BELONGS_TO + "]->(country) WITH  cc,bt,country \n" +
             "OPTIONAL MATCH (ot:OrganizationType{isEnable:true})-[:" + BELONGS_TO + "]->(country) WITH COLLECT(cc) as cc,bt,country,ot\n" +
-            "OPTIONAL MATCH (ot)-[r:" + HAS_LEVEL + "]->(level:Level{deleted:false}) " +
+            "OPTIONAL MATCH (ot)-[r:" + HAS_LEVEL + "]->(level:Level{deleted:false,isEnabled:true}) " +
             "  WITH ot,bt,cc,country, case when r is null then [] else COLLECT({id:id(level),name:level.name}) end as levels \n" +
             "OPTIONAL MATCH (ot)-[:" + HAS_SUB_TYPE + "]->(ost:OrganizationType{isEnable:true}) " +
             "WITH {children: case when ost is NULL then [] else COLLECT({name:ost.name,id:id(ost)}) end,name:ot.name,id:id(ot),levels:levels} as orgTypes,bt,cc,country " +

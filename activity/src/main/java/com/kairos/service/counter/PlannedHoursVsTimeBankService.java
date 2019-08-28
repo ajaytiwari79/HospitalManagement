@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.BarLineChartKPiDateUnit;
-import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.BarLineChartKPIRepresentationData;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
@@ -14,9 +13,6 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.system_setting.UnitTypeDTO;
-import com.kairos.dto.user.employment.EmploymentLinesDTO;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
@@ -26,22 +22,20 @@ import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
@@ -49,7 +43,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.*;
 
 @Service
@@ -68,6 +61,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     private UserIntegrationService userIntegrationService;
     @Inject
     private TimeBankRepository timeBankRepository;
+    @Inject private PlanningPeriodService planningPeriodService;
 
     private Map<Long, Set<DateTimeInterval>> getPlanningPeriodIntervals(List<Long> unitIds, Date startDate, Date endDate) {
         Map<Long, Set<DateTimeInterval>> unitAndDateTimeIntervalMap = new HashMap<>();
@@ -101,10 +95,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
        List<Long> unitIds =(List<Long>)filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
-        List<String> StaffList =filterBasedCriteria.getOrDefault(FilterType.STAFF_IDS,new ArrayList());
-        List<String> unitName =filterBasedCriteria.getOrDefault(FilterType.UNIT_NAME,new ArrayList());
-
-        List<DateTimeInterval> dateTimeIntervals =getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates);
+        List<DateTimeInterval> dateTimeIntervals =getDateTimeIntervals(applicableKPI.getInterval(), applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates,null);
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiDefaultData(staffEmploymentTypeDTO);
         List<Long> dayTypeIds = filterBasedCriteria.containsKey(FilterType.DAY_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.DAY_TYPE)) ? KPIUtils.getLongValue(filterBasedCriteria.get(FilterType.DAY_TYPE)) : defaultKpiDataDTO.getDayTypeDTOS().stream().map(DayTypeDTO::getId).collect(Collectors.toList());
@@ -169,7 +160,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
                 Long totalDeltaTimeBankOfUnit = 0l;
                 StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
                 DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate()));
-                totalDeltaTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, staffAndDailyTimeBankMap, dateTimeInterval, staffKpiFilterDTO.getUnitId(), totalDeltaTimeBankOfUnit, staffKpiFilterDTO);
+                totalDeltaTimeBankOfUnit = getTotalTimeBank(staffAndDailyTimeBankMap, dateTimeInterval, staffKpiFilterDTO.getUnitId(), totalDeltaTimeBankOfUnit, staffKpiFilterDTO);
                 staffIdAndDeltaTimeBankMap.put(staffIdAndNameMap.get(staffId), DateUtils.getHoursByMinutes(totalDeltaTimeBankOfUnit.doubleValue()));
             }
 
@@ -185,7 +176,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
         for (Long unitId : unitIds) {
             for (StaffKpiFilterDTO staffKpiFilterDTO : unitAndStaffKpiFilterMap.get(unitId)) {
                 DateTimeInterval dateTimeInterval=new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate()));
-                totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, longListMap, dateTimeInterval, unitId, totalTimeBankOfUnit, staffKpiFilterDTO);
+                totalTimeBankOfUnit = getTotalTimeBank(longListMap, dateTimeInterval, unitId, totalTimeBankOfUnit, staffKpiFilterDTO);
             }
         }
         staffIdAndDeltaTimeBankMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), DateUtils.getHoursByMinutes(totalTimeBankOfUnit.doubleValue()));
@@ -203,7 +194,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
 
                 if(isCollectionNotEmpty(unitAndStaffKpiFilterMap.get(unitId))){
                     for (StaffKpiFilterDTO staffKpiFilterDTO : unitAndStaffKpiFilterMap.get(unitId)) {
-                        totalTimeBankOfUnit = getTotalTimeBank(planningPeriodIntervel, longListMap, dateTimeInterval, unitId, totalTimeBankOfUnit, staffKpiFilterDTO);
+                        totalTimeBankOfUnit = getTotalTimeBank(longListMap, dateTimeInterval, unitId, totalTimeBankOfUnit, staffKpiFilterDTO);
                     }
                 }
 
@@ -223,10 +214,11 @@ public class PlannedHoursVsTimeBankService implements CounterService {
     }
 
 
-    private Long getTotalTimeBank(Map<Long, Set<DateTimeInterval>> planningPeriodIntervel, Map<Long, List<DailyTimeBankEntry>> longListMap, DateTimeInterval dateTimeInterval, Long unitId, Long totalDeltaTimeBankOfUnit, StaffKpiFilterDTO staffKpiFilterDTO) {
+    private Long getTotalTimeBank(Map<Long, List<DailyTimeBankEntry>> longListMap, DateTimeInterval dateTimeInterval, Long unitId, Long totalDeltaTimeBankOfUnit, StaffKpiFilterDTO staffKpiFilterDTO) {
+        DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
         for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
             List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
-            int timeBankOfInterval = timeBankCalculationService.calculateTimeBankForInterval(planningPeriodIntervel.get(unitId), new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
+            int timeBankOfInterval = timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
             int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(DailyTimeBankEntry::getDeltaTimeBankMinutes).sum();
             int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
             totalDeltaTimeBankOfUnit += totalTimeBank;

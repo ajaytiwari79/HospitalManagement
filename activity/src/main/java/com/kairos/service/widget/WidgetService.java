@@ -1,7 +1,9 @@
 package com.kairos.service.widget;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.widget.DashboardWidgetDTO;
@@ -13,6 +15,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.widget.DashboardWidget;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +41,7 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.REALTIME_DURATION_NOT_CONFIGURED;
 import static com.kairos.enums.widget.WidgetFilterType.*;
+import static java.util.Comparator.comparing;
 
 /**
  * pradeep
@@ -55,9 +60,12 @@ public class WidgetService {
     private WidgetMongoRepository widgetMongoRepository;
     @Inject
     private PhaseMongoRepository phaseMongoRepository;
-    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
-    @Inject private TimeTypeService timeTypeService;
-    @Inject private ExceptionService exceptionService;
+    @Inject
+    private TimeTypeMongoRepository timeTypeMongoRepository;
+    @Inject
+    private TimeTypeService timeTypeService;
+    @Inject
+    private ExceptionService exceptionService;
 
     public DashboardWidgetDTO getWidgetData(Long unitId) {
         DashboardWidgetDTO dashBoardWidgetDTO = null;
@@ -73,12 +81,12 @@ public class WidgetService {
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
         Phase realTimePhase = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.REALTIME.toString());
-        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null,organizationDTO.getCountryId());
-        if(isNull(realTimePhase) || isNull(realTimePhase.getRealtimeDuration())){
+        List<TimeTypeDTO> timeTypeDTOS = timeTypeService.getAllTimeType(null, organizationDTO.getCountryId());
+        if (isNull(realTimePhase) || isNull(realTimePhase.getRealtimeDuration())) {
             exceptionService.dataNotFoundException(REALTIME_DURATION_NOT_CONFIGURED);
         }
-        dashBoardWidgetDTO = new DashboardWidgetDTO(null, shiftDTOs, new HashMap<>(), realTimePhase.getRealtimeDuration(),timeTypeDTOS);
-        if(isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
+        dashBoardWidgetDTO = new DashboardWidgetDTO(null, shiftDTOs, new HashMap<>(), realTimePhase.getRealtimeDuration(), timeTypeDTOS);
+        if (isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
             Map<Long, StaffAdditionalInfoDTO> idAndStaffMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getId())).collect(Collectors.toMap(StaffAdditionalInfoDTO::getId, v -> v));
             Map<Long, List<ShiftWithActivityDTO>> employementIdAndStaffMap = shiftDTOs.stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getEmploymentId, Collectors.toList()));
             UserAccessRoleDTO userAccessRoleDTO = staffAdditionalInfoDTOS.get(0).getUserAccessRoleDTO();
@@ -86,12 +94,13 @@ public class WidgetService {
             TimeSlotDTO nightTimeSlot = ObjectMapperUtils.copyPropertiesByMapper(nightTimeSlotWrapper, TimeSlotDTO.class);
             employementIdAndStaffMap.forEach((aLong, shiftDTOS) -> wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO));
             updateTimeTypeDetails(shiftDTOs);
+            updateRestingHoursInShift(shiftDTOs);
             dashBoardWidgetDTO.setNightTimeSlot(nightTimeSlot);
             dashBoardWidgetDTO.setStaffIdAndstaffInfoMap(idAndStaffMap);
         }
         DashboardWidget dashboardWidget = widgetMongoRepository.findDashboardWidgetByUserId(UserContext.getUserDetails().getId());
-        if(isNull(dashboardWidget)){
-            dashboardWidget = new DashboardWidget(new HashSet<>(), newHashSet(CURRENTLY_WORKING,UPCOMING_SHIFTS,ON_LEAVE,RESTING,SLEEPING));
+        if (isNull(dashboardWidget)) {
+            dashboardWidget = new DashboardWidget(new HashSet<>(), newHashSet(CURRENTLY_WORKING, UPCOMING_SHIFTS, ON_LEAVE, RESTING, SLEEPING));
             dashboardWidget.setUserId(UserContext.getUserDetails().getId());
             widgetMongoRepository.save(dashboardWidget);
         }
@@ -113,7 +122,7 @@ public class WidgetService {
     public DashboardWidgetDTO saveOrUpdateWidget(DashboardWidgetDTO dashBoardWidgetDTO) {
         Long userId = UserContext.getUserDetails().getId();
         DashboardWidget dashboardWidget = widgetMongoRepository.findDashboardWidgetByUserId(userId);
-        if(isNull(dashboardWidget)) {
+        if (isNull(dashboardWidget)) {
             dashboardWidget = new DashboardWidget(dashBoardWidgetDTO.getTimeTypeIds(), dashBoardWidgetDTO.getWidgetFilterTypes());
             dashboardWidget.setUserId(userId);
         } else {
@@ -124,27 +133,43 @@ public class WidgetService {
         return dashBoardWidgetDTO;
     }
 
-    private void updateTimeTypeDetails(List<ShiftWithActivityDTO> shiftDTOs){
+    private void updateTimeTypeDetails(List<ShiftWithActivityDTO> shiftDTOs) {
         List<TimeTypeDTO> timeTypeDTOS = timeTypeMongoRepository.findTimeTypeWithItsParent();
-        Map<BigInteger,TimeTypeDTO> timeTypeDTOMap = timeTypeDTOS.stream().collect(Collectors.toMap(TimeTypeDTO::getId,v->v));
+        Map<BigInteger, TimeTypeDTO> timeTypeDTOMap = timeTypeDTOS.stream().collect(Collectors.toMap(TimeTypeDTO::getId, v -> v));
         for (ShiftWithActivityDTO shiftDTO : shiftDTOs) {
             ShiftActivityDTO shiftActivityDTO = shiftDTO.getActivities().get(0);
             BigInteger timeTypeId = shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId();
             TimeTypeDTO timeType = timeTypeDTOMap.get(timeTypeId);
             shiftActivityDTO.setSecondLevelType(timeType.getSecondLevelType());
-            if(timeType.getParent().size()==2){
+            if (timeType.getParent().size() == 2) {
                 TimeTypeDTO thirdLevelTimeType = timeType.getParent().stream().filter(timeTypeDTO -> timeTypeDTO.getId().equals(timeType.getUpperLevelTimeTypeId())).findFirst().get();
                 shiftActivityDTO.setThirdLevelTimeTypeId(thirdLevelTimeType.getId());
                 TimeTypeDTO secondLevelTimeType = timeType.getParent().stream().filter(timeTypeDTO -> timeTypeDTO.getId().equals(thirdLevelTimeType.getUpperLevelTimeTypeId())).findFirst().get();
                 shiftActivityDTO.setSecondLevelTimeTypeId(secondLevelTimeType.getId());
                 shiftActivityDTO.setFourthLevelTimeTypeId(timeTypeId);
-            }else if(timeType.getParent().size()==1){
+            } else if (timeType.getParent().size() == 1) {
                 shiftActivityDTO.setThirdLevelTimeTypeId(timeTypeId);
                 shiftActivityDTO.setSecondLevelTimeTypeId(timeType.getParent().get(0).getId());
-            }else {
+            } else {
                 shiftActivityDTO.setSecondLevelTimeTypeId(timeTypeId);
             }
         }
 
+    }
+
+    private void updateRestingHoursInShift(List<ShiftWithActivityDTO> shiftDTOs) {
+        Map<Long, List<ShiftWithActivityDTO>> staffIdAndShiftMap = shiftDTOs.stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
+        for (Long staffId : staffIdAndShiftMap.keySet()) {
+            List<ShiftWithActivityDTO> shifts = staffIdAndShiftMap.get(staffId);
+            shifts.sort(comparing(ShiftDTO::getStartDate));
+            for (int i = 0; i < shifts.size(); i++) {
+                if (i < shifts.size()-1) {
+                    Long minutes = DateUtils.getMinutesBetweenDate(shifts.get(i).getEndDate(), shifts.get(i + 1).getStartDate());
+                    if (shifts.get(i).getRestingMinutes() > minutes) {
+                        shifts.get(i).setRestingMinutes(minutes.intValue());
+                    }
+                }
+            }
+        }
     }
 }

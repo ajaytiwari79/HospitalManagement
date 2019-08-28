@@ -23,7 +23,7 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
     private static final Logger logger = LoggerFactory.getLogger(ActivityConfigurationRepositoryImpl.class);
     @Inject
     private MongoTemplate mongoTemplate;
-
+/*
     public ActivityConfiguration findPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId) {
         Query query = new Query(Criteria.where("unitId").is(unitId).and("presencePlannedTime.phaseId").is(phaseId));
         return mongoTemplate.findOne(query, ActivityConfiguration.class);
@@ -32,36 +32,14 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
 
     public List<ActivityConfigurationDTO> findPresenceConfigurationByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("presencePlannedTime").exists(true)),
-                project().and("presencePlannedTime.phaseId").as("phaseId")
-                        .and("presencePlannedTime.staffPlannedTimeId").as("staffPlannedTimeId")
-                        .and("presencePlannedTime.managementPlannedTimeId").as("managementPlannedTimeId"),
-                lookup("phases", "phaseId", "_id", "phases"),
-                lookup("plannedTimeType", "managementPlannedTimeId", "_id", "managementPlannedTimes"),
-                lookup("plannedTimeType", "staffPlannedTimeId", "_id", "staffPlannedTimes"),
-                project().and("phases").arrayElementAt(0).as("phase")
-                        .and("staffPlannedTimes").arrayElementAt(0).as("staffPlannedTime")
-                        .and("managementPlannedTimes").arrayElementAt(0).as("managementPlannedTime")
-
-        );
+                match(Criteria.where("unitId").is(unitId).and("presencePlannedTime").exists(true)));
         AggregationResults<ActivityConfigurationDTO> result = mongoTemplate.aggregate(aggregation, ActivityConfiguration.class, ActivityConfigurationDTO.class);
         return result.getMappedResults();
     }
 
     public List<ActivityConfigurationDTO> findAbsenceConfigurationByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("absencePlannedTime").exists(true)),
-                project().and("absencePlannedTime.phaseId").as("phaseId")
-                        .and("absencePlannedTime.exception").as("exception")
-                        .and("absencePlannedTime.plannedTimeId").as("plannedTimeId")
-                        .and("absencePlannedTime.timeTypeId").as("timeTypeId"),
-                lookup("phases", "phaseId", "_id", "phases"),
-                lookup("plannedTimeType", "plannedTimeId", "_id", "plannedTimes"),
-                lookup("time_Type", "timeTypeId", "_id", "timeTypes"),
-                project("exception")
-                        .and("phases").arrayElementAt(0).as("phase")
-                        .and("timeTypes").arrayElementAt(0).as("timeType")
-                        .and("plannedTimes").arrayElementAt(0).as("plannedTime"));
+                match(Criteria.where("unitId").is(unitId).and("absencePlannedTime").exists(true)));
         AggregationResults<ActivityConfigurationDTO> result = mongoTemplate.aggregate(aggregation, ActivityConfiguration.class, ActivityConfigurationDTO.class);
         return result.getMappedResults();
     }
@@ -79,39 +57,16 @@ public class ActivityConfigurationRepositoryImpl implements CustomActivityConfig
 
     public List<ActivityConfigurationDTO> findPresenceConfigurationByCountryId(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").is(countryId).and("presencePlannedTime").exists(true)),
-                project().and("presencePlannedTime.phaseId").as("phaseId")
-                        .and("presencePlannedTime.staffPlannedTimeId").as("staffPlannedTimeId")
-                        .and("presencePlannedTime.managementPlannedTimeId").as("managementPlannedTimeId"),
-                lookup("phases", "phaseId", "_id", "phases"),
-                lookup("plannedTimeType", "managementPlannedTimeId", "_id", "managementPlannedTimes"),
-                lookup("plannedTimeType", "staffPlannedTimeId", "_id", "staffPlannedTimes"),
-                project().and("phases").arrayElementAt(0).as("phase")
-                        .and("staffPlannedTimes").arrayElementAt(0).as("staffPlannedTime")
-                        .and("managementPlannedTimes").arrayElementAt(0).as("managementPlannedTime")
-
-        );
+                match(Criteria.where("countryId").is(countryId).and("presencePlannedTime").exists(true)));
         AggregationResults<ActivityConfigurationDTO> result = mongoTemplate.aggregate(aggregation, ActivityConfiguration.class, ActivityConfigurationDTO.class);
         return result.getMappedResults();
     }
 
     public List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryId(Long countryId) {
-        Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").is(countryId).and("absencePlannedTime").exists(true)),
-                project().and("absencePlannedTime.phaseId").as("phaseId")
-                        .and("absencePlannedTime.exception").as("exception")
-                        .and("absencePlannedTime.plannedTimeId").as("plannedTimeId")
-                        .and("absencePlannedTime.timeTypeId").as("timeTypeId"),
-                lookup("phases", "phaseId", "_id", "phases"),
-                lookup("plannedTimeType", "plannedTimeId", "_id", "plannedTimes"),
-                lookup("time_Type", "timeTypeId", "_id", "timeTypes"),
-                project("exception")
-                        .and("phases").arrayElementAt(0).as("phase")
-                        .and("timeTypes").arrayElementAt(0).as("timeType")
-                        .and("plannedTimes").arrayElementAt(0).as("plannedTime"));
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where("countryId").is(countryId).and("absencePlannedTime").exists(true)));
         AggregationResults<ActivityConfigurationDTO> result = mongoTemplate.aggregate(aggregation, ActivityConfiguration.class, ActivityConfigurationDTO.class);
         return result.getMappedResults();
-    }
+    }*/
 
 }
 

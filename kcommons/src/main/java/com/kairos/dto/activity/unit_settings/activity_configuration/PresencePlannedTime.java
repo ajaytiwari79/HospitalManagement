@@ -1,44 +1,27 @@
 package com.kairos.dto.activity.unit_settings.activity_configuration;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Set;
 
+import static com.kairos.constants.CommonMessageConstants.PLANNED_TIME_CANNOT_EMPTY;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PresencePlannedTime {
     private BigInteger phaseId;
-    private BigInteger staffPlannedTimeId;
-    private BigInteger managementPlannedTimeId;
+    @Valid
+    private List<EmploymentWisePlannedTimeConfiguration> employmentWisePlannedTimeConfigurations;
+    @NotEmpty(message = PLANNED_TIME_CANNOT_EMPTY)
+    private List<BigInteger> managementPlannedTimeIds;
 
-    public PresencePlannedTime() {
-        // DC
-    }
-
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-    public BigInteger getStaffPlannedTimeId() {
-        return staffPlannedTimeId;
-    }
-
-    public void setStaffPlannedTimeId(BigInteger staffPlannedTimeId) {
-        this.staffPlannedTimeId = staffPlannedTimeId;
-    }
-
-    public BigInteger getManagementPlannedTimeId() {
-        return managementPlannedTimeId;
-    }
-
-    public void setManagementPlannedTimeId(BigInteger managementPlannedTimeId) {
-        this.managementPlannedTimeId = managementPlannedTimeId;
-    }
-
-    public PresencePlannedTime(BigInteger phaseId, BigInteger staffPlannedTimeId, BigInteger managementPlannedTimeId) {
-        this.phaseId = phaseId;
-        this.staffPlannedTimeId = staffPlannedTimeId;
-        this.managementPlannedTimeId = managementPlannedTimeId;
-    }
 }

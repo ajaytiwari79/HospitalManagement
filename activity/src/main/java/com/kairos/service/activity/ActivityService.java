@@ -17,6 +17,7 @@ import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeWithTimeTypeDTO;
 import com.kairos.dto.activity.shift.ShiftTemplateDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConfigurationDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
@@ -31,6 +32,7 @@ import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.activity.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.open_shift.OpenShiftIntervalRepository;
@@ -49,6 +51,7 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
+import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
 import com.kairos.utils.user_context.UserContext;
@@ -74,6 +77,7 @@ import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfListByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
@@ -125,6 +129,7 @@ public class ActivityService {
     @Inject private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject private ActivityPriorityMongoRepository activityPriorityMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private ActivityConfigurationService activityConfigurationService;
 
     private static final  Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
@@ -335,7 +340,7 @@ public class ActivityService {
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
         }
-        if(!activity.getGeneralActivityTab().getBackgroundColor().equals(timeType.getBackgroundColor())){
+        if(!timeType.getBackgroundColor().equals(activity.getGeneralActivityTab().getBackgroundColor())){
             List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(activity.getId()),null,null,null);
             shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
                 if(shiftActivity.getActivityId().equals(activity.getId())){
@@ -407,40 +412,6 @@ public class ActivityService {
                     }
                 }
         return timeCalculationActivityDTO;
-    }
-
-    public List<CompositeShiftActivityDTO> assignCompositeActivitiesInActivity(BigInteger activityId, List<CompositeShiftActivityDTO> compositeShiftActivityDTOs) {
-        /*Activity activity = activityMongoRepository.findById(activityId).orElse(null);
-        if (activity == null) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
-        }
-        Set<BigInteger> compositeShiftIds = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> compositeShiftActivityDTO.getActivityId()).collect(Collectors.toSet());
-        List<ActivityWrapper> activityMatched = activityMongoRepository.findActivityAndTimeTypeByActivityIdsAndNotFullDayAndFullWeek(compositeShiftIds);
-        if (activityMatched.size() != compositeShiftIds.size()) {
-            exceptionService.illegalArgumentException(MESSAGE_ACTIVITY_NOTALLOW);
-        }
-        List<Activity> activityList = activityMongoRepository.findAllActivitiesByIds(activityMatched.stream().map(k -> k.getActivity().getId()).collect(Collectors.toSet()));
-        Set<CompositeActivity> compositeActivities = compositeShiftActivityDTOs.stream().map(compositeShiftActivityDTO -> new CompositeActivity(compositeShiftActivityDTO.getActivityId(), compositeShiftActivityDTO.isAllowedBefore(), compositeShiftActivityDTO.isAllowedAfter())).collect(Collectors.toSet());
-        activity.setCompositeActivities(compositeActivities);
-        updateCompositeActivity(activityList, activity, compositeActivities);
-        activityMongoRepository.save(activity);*/
-        return compositeShiftActivityDTOs;
-    }
-
-    private void updateCompositeActivity(List<Activity> activityList, Activity activity, Set<CompositeActivity> compositeActivities) {
-       /* Map<BigInteger, Activity> activityMap = activityList.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-        for (CompositeActivity compositeActivity : compositeActivities) {
-            Activity composedActivity = activityMap.get(compositeActivity.getActivityId());
-            Optional<CompositeActivity> optionalCompositeActivity = composedActivity.getCompositeActivities().stream().filter(a -> a.getActivityId().equals(activity.getId())).findFirst();
-            if (optionalCompositeActivity.isPresent()) {
-                CompositeActivity compositeActivityOfAnotherActivity = optionalCompositeActivity.get();
-                compositeActivityOfAnotherActivity.setAllowedBefore(compositeActivity.isAllowedAfter());
-                compositeActivityOfAnotherActivity.setAllowedAfter(compositeActivity.isAllowedBefore());
-            }
-        }
-        if (isCollectionNotEmpty(activityList)) {
-            activityMongoRepository.saveEntities(activityList);
-        }*/
     }
 
     public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds) {
@@ -778,8 +749,9 @@ public class ActivityService {
         }
         LocalDate firstRequestPhasePlanningPeriodEndDate = planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId).getEndDate();
         List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        List<ActivityConfiguration> activityConfigurations = activityConfigurationService.findAllByUnitIdAndDeletedFalse(unitId);
         return new PhaseActivityDTO(activities, phaseWeeklyDTOS, dayTypes, reasonCodeWrapper.getUserAccessRoleDTO(), shiftTemplates, phaseDTOs, phaseService.getActualPhasesByOrganizationId(unitId), reasonCodeWrapper.getReasonCodes(), planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate(),
-                publicHolidayDayTypeWrapper.getPublicHolidays(),firstRequestPhasePlanningPeriodEndDate,plannedTimes,phaseSettingsActivityTab);
+                publicHolidayDayTypeWrapper.getPublicHolidays(),firstRequestPhasePlanningPeriodEndDate,plannedTimes,phaseSettingsActivityTab,copyPropertiesOfListByMapper(activityConfigurations, ActivityConfigurationDTO.class));
 
     }
 
