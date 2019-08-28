@@ -33,6 +33,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
     private List<PartOfDay> partOfDays = Arrays.asList(PartOfDay.NIGHT);
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
+    private ShiftLengthAndAverageSetting shiftLengthAndAverageSetting = ShiftLengthAndAverageSetting.DIFFERENCE_BETWEEN_START_END_TIME;
 
     public ShiftLengthWTATemplate(String name, String description, long timeLimit) {
         super(name, description);
@@ -54,7 +55,7 @@ public class ShiftLengthWTATemplate extends WTABaseRuleTemplate {
                 if (isValidShift && isValidForDay(dayTypeIds, infoWrapper)) {
                     ShiftWithActivityDTO shift = infoWrapper.getShift();
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, phaseTemplateValues, this);
-                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], shift.getMinutes());
+                    boolean isValid = isValid(minMaxSetting, limitAndCounter[0], getValueAccordingShiftLengthAndAverageSetting(shiftLengthAndAverageSetting, shift));
                     brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
                             limitAndCounter[2],DurationType.HOURS,getHoursByMinutes(limitAndCounter[0],this.name));
 
