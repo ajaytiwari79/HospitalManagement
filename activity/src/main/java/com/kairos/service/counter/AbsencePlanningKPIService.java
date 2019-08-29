@@ -45,7 +45,7 @@ public class AbsencePlanningKPIService {
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];
-        List<TodoDTO> todos = todoRepository.findAllByKpiFilter(unitIds.get(0),dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),staffIds, todoStatus);
+        List<TodoDTO> todoDTOS = todoRepository.findAllByKpiFilter(unitIds.get(0),dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),staffIds, todoStatus);
         return new ArrayList<>();
     }
 
