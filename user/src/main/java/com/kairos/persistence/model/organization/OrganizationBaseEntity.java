@@ -56,13 +56,15 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     protected String costCenterName;
     protected String shortName;
     protected String webSiteUrl;
+    //fixme
     protected Long clientSince;
     protected String cvrNumber;
     protected String pNumber;
     @Relationship(type = KAIROS_STATUS)
     protected KairosStatus kairosStatus;
-
+    //Fixme move to activity micro service
     protected TimeSlotMode timeSlotMode = STANDARD;
+    //fixme remove
     protected boolean isParentOrganization;
 
     @Relationship(type = TYPE_OF)
@@ -79,11 +81,13 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     @Relationship(type = HAS_COMPANY_CATEGORY)
     protected CompanyCategory companyCategory;
     protected String kairosCompanyId;
+    //fixme move to organization domain
     protected CompanyType companyType;
 
     protected String vatId;
-
+    //fixme remove
     protected boolean costCenter;
+    //fixme remove
     protected Integer costCenterId;
     protected CompanyUnitType companyUnitType;
 
@@ -91,21 +95,27 @@ public class OrganizationBaseEntity extends UserBaseEntity {
 
     protected String description;
     protected String externalId; //timeCare External Id
+    //fixme move to task/shift planning
     protected String estimoteAppId;
+    //fixme move to task/shift planning
     protected String estimoteAppToken;
+    //fixme move to shift planning
     protected int endTimeDeduction = 5; //in percentage
 
     protected String kmdExternalId; //kmd External Id
-
+    //fixme move to shift planning
     protected int dayShiftTimeDeduction = 4; //in percentage
-
+    //fixme move to shift planning
     protected int nightShiftTimeDeduction = 7; //in percentage
+    //fixme move to shift planning and use method to check
     protected boolean phaseGenerated = true;
     protected Boolean showCountryTags = true;
     @Convert(ZoneIdStringConverter.class)
     protected ZoneId timeZone;
+    //fixme remove
     @DateString("HH:mm")
     protected Date nightStartTimeFrom;
+    //fixme remove
     @DateString("HH:mm")
     protected Date nightEndTimeTo;
     @Relationship(type = ORGANIZATION_HAS_TAG)
@@ -123,15 +133,18 @@ public class OrganizationBaseEntity extends UserBaseEntity {
 
     @Relationship(type = CONTACT_ADDRESS)
     protected ContactAddress contactAddress;
-
+    //fixme remove
     @Relationship(type = ZIP_CODE)
     protected ZipCode zipCode;
     @Relationship(type = BUSINESS_TYPE)
     protected List<BusinessType> businessTypes;
+    //fixme review
     @Relationship(type = OWNERSHIP_TYPE)
     protected OwnershipType ownershipType;
+    //fixme review
     @Relationship(type = INDUSTRY_TYPE)
     protected IndustryType industryType;
+    //fixme review
     @Relationship(type = CONTRACT_TYPE)
     protected ContractType contractType;
     @Relationship(type = VAT_TYPE)
@@ -143,13 +156,14 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     @Relationship(type = HAS_TIME_SLOT_SET)
     protected List<TimeSlotSet> timeSlotSets = new ArrayList<>();
 
+    //fixme review
     @Relationship(type = HAS_UNIT_TYPE)
     private UnitType unitType;
 
+    //fixme remove
     @Property(name = "organizationLevel")
     @EnumString(OrganizationLevel.class)
     private OrganizationLevel organizationLevel = OrganizationLevel.CITY;
-    private transient Country country;
 
     public List<BusinessType> getBusinessTypes() {
         return Optional.fromNullable(businessTypes).or(Lists.newArrayList());
