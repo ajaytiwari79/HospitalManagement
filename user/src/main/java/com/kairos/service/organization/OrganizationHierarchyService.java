@@ -48,11 +48,12 @@ public class OrganizationHierarchyService {
     @Inject
     private OrganizationService organizationService;
 
-    public QueryResult generateHierarchy() {
+    public List<QueryResult> generateHierarchy() {
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
 
         OrganizationBaseEntity hierarchy = organizationGraphRepository.generateHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList())).get(0);
-        return setUnitPermission(hierarchy, accessPageService.isHubMember(UserContext.getUserDetails().getId()));
+        QueryResult orgHierarchy = setUnitPermission(hierarchy, accessPageService.isHubMember(UserContext.getUserDetails().getId()));
+        return Collections.singletonList(orgHierarchy);
     }
 
 
@@ -168,7 +169,8 @@ public class OrganizationHierarchyService {
         List<StaffAccessGroupQueryResult> staffAccessGroupQueryResults = accessPageService.getAccessPermission(UserContext.getUserDetails().getId(), getAllUnitIds(organizationHierarchy, organizationIds));
         Map<Long, Boolean> unitPermissionMap = staffAccessGroupQueryResults.stream().collect(Collectors.toMap(StaffAccessGroupQueryResult::getUnitId, StaffAccessGroupQueryResult::isHasPermission));
         QueryResult data = ObjectMapperUtils.copyPropertiesByMapper(organizationHierarchy, QueryResult.class);
-        setPermission(data, unitPermissionMap, countryAdmin);
+        boolean hub = ((organizationHierarchy instanceof Organization) && ((Organization) organizationHierarchy).isKairosHub());
+        setPermission(data, unitPermissionMap, countryAdmin, hub ? 0 : 1);
 //        List<QueryResult> units = null;
 //        if (organizationHierarchy instanceof Organization){
 //            units = addUnits(unitPermissionMap, countryAdmin, ((Organization) organizationHierarchy));
@@ -222,20 +224,20 @@ public class OrganizationHierarchyService {
         return organizationIds;
     }
 
-    private void setPermission(QueryResult queryResult, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin) {
+    private void setPermission(QueryResult queryResult, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin, int hubCount) {
         queryResult.setAccessable(true);
-        int counter = 0;
-        queryResult.setKairosHub((countryAdmin && ++counter == 1) ? true : false);
+        queryResult.setKairosHub((++hubCount == 1));
         queryResult.setUnion(queryResult.isUnion());
         queryResult.setHubId(18743l);
         queryResult.setHasPermission(countryAdmin ? true : unitPermissionMap.get(queryResult.getId()));
         queryResult.setEnabled(countryAdmin ? true : unitPermissionMap.get(queryResult.getId()));
-        queryResult.getChildren().forEach(org -> {
-            setPermission(org, unitPermissionMap, countryAdmin);
-            queryResult.getUnits().forEach(unit -> {
-                setPermission(unit, unitPermissionMap, countryAdmin);
-            });
-        });
+        for (QueryResult unit : queryResult.getUnits()) {
+            setPermission(unit, unitPermissionMap, countryAdmin, hubCount);
+        }
+        for (QueryResult organization : queryResult.getChildren()) {
+            setPermission(organization, unitPermissionMap, countryAdmin, hubCount);
+        }
+
 
     }
 

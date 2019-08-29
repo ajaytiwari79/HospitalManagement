@@ -372,7 +372,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:" + HAS_POSITIONS + "]-(organization:Organization) WHERE id(user)={0} AND id(organization)={1}  RETURN id(staff)")
     Long findStaffIdByUserId(Long userId, Long unitId);
 
-    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:" + HAS_POSITIONS + "]-(organization:Unit{isKairosHub:true})-[:" + HAS_SUB_ORGANIZATION + "]-(org:Unit) WHERE id(user)={0} AND id(org)={1}  RETURN id(staff)")
+    @Query("MATCH(user:User)<-[:" + BELONGS_TO + "]-(staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)<-[:" + HAS_POSITIONS + "]-(organization:Organization{isKairosHub:true})-[:" + HAS_SUB_ORGANIZATION + "]-(org:Organization) WHERE id(user)={0} AND id(org)={1}  RETURN id(staff)")
     Long findHubStaffIdByUserId(Long userId, Long unitId);
 
     @Query("MATCH (user:User)-[:" + BELONGS_TO + "]-(staff:Staff) WHERE id(user)={0} WITH staff\n" +
