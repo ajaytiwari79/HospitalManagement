@@ -495,7 +495,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN s.name as name ,id(s) as id")
     List<OrganizationBasicResponse> getOrganizationHierarchy(Long parentOrganizationId);
 
-    @Query("MATCH(o:Unit)-[:"+HAS_UNIT+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,boardingCompleted:true}) WHERE id(o)={0} \n"
+    @Query("MATCH(o:Unit)<-[:"+HAS_UNIT+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,boardingCompleted:true}) WHERE id(o)={0} \n"
             + "MATCH(parentOrganization)-[:" + HAS_UNIT + "]-(units:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) " +
             " WITH parentOrganization ,COLLECT (units)  as data " +
             " RETURN parentOrganization as parent,data as childUnits")

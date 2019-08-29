@@ -1,6 +1,7 @@
 package com.kairos.service.unit_settings;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.*;
@@ -95,21 +96,21 @@ public class UnitSettingService extends MongoBaseService {
             phases = ObjectMapperUtils.copyPropertiesOfListByMapper(phaseService.getPhasesByUnit(unitId), Phase.class);
         }
         List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
-        if (openShiftPhaseSettings.size() > 0) {
-            exceptionService.actionNotPermittedException(OPENSHIFT_ALREADY_EXIST, unitId);
+        if (ObjectUtils.isCollectionEmpty(openShiftPhaseSettings)) {
+            if (Optional.ofNullable(phases).isPresent()) {
+                List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
+                phases.forEach(phase -> {
+                    OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false,phase.getSequence());
+                    openShiftPhases.add(openShiftPhase);
+                });
+                OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);
+                UnitSetting unitSetting = new UnitSetting(openShiftPhaseSetting, unitId);
+                save(unitSetting);
+                return true;
+            }
         }
 
-        if (Optional.ofNullable(phases).isPresent()) {
-            List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
-            phases.forEach(phase -> {
-                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false,phase.getSequence());
-                openShiftPhases.add(openShiftPhase);
-            });
-            OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);
-            UnitSetting unitSetting = new UnitSetting(openShiftPhaseSetting, unitId);
-            save(unitSetting);
-            return true;
-        }
+
         return false;
 
     }

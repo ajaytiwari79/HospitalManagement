@@ -3,6 +3,7 @@ package com.kairos.dto.user.organization;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -17,7 +18,7 @@ public class OrgTypeAndSubTypeDTO {
     private Long parentOrganizationId;
     private boolean workcentre;
     private boolean isParentOrganization;
-    private List<Long> employmentTypeIds;
+    private List<Long> employmentTypeIds=new ArrayList<>();
 
     public OrgTypeAndSubTypeDTO() {
         //Default Constructor

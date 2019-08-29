@@ -19,5 +19,5 @@ public interface CustomUnitGraphRepository {
     List<Map> getStaffWithFilters(Long unitId, Long parentOrganizationId, String moduleId,
                                   Map<FilterType, Set<String>> filters, String searchText, String imagePath);
 
-    OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
+    List<Map<String, Object>> getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
 }

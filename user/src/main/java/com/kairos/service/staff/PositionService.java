@@ -1,13 +1,16 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
@@ -46,8 +49,11 @@ import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.service.tree_structure.TreeStructureService;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -204,12 +210,8 @@ public class PositionService {
         UnitPermission unitPermission = null;
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         if (created) {
-
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentUnit.getId(), unitId, staffId, accessGroupId);
-            if (Optional.ofNullable(unitPermission).isPresent() && unitPermissionGraphRepository.checkUnitPermissionLinkedWithAccessGroup(unitPermission.getId(), accessGroupId)) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_UNITPERMISSION_ALREADYEXIST);
-
-            } else if (!Optional.ofNullable(unitPermission).isPresent()) {
+            if (!Optional.ofNullable(unitPermission).isPresent()) {
                 unitPermission = new UnitPermission();
                 if (unit instanceof Organization) {
                     unitPermission.setOrganization((Organization) unit);
@@ -217,10 +219,14 @@ public class PositionService {
                     unitPermission.setUnit((Unit) unit);
                 }
                 unitPermission.setStartDate(DateUtils.getCurrentDate().getTime());
+                unitPermission.setAccessGroup(accessGroup);
+                position.getUnitPermissions().add(unitPermission);
+                positionGraphRepository.save(position, 2);
+            }else{
+                unitPermissionGraphRepository.createPermission(accessGroupId,unitPermission.getId());
             }
-            unitPermission.setAccessGroup(accessGroup);
-            position.getUnitPermissions().add(unitPermission);
-            positionGraphRepository.save(position, 2);
+
+
             LOGGER.info(" Currently created Unit Permission ");
             response.put("startDate", getDate(unitPermission.getStartDate()));
             response.put("endDate", getDate(unitPermission.getEndDate()));
@@ -236,11 +242,11 @@ public class PositionService {
             }
             unitPermissionGraphRepository.updateUnitPermission(parentUnit.getId(), unitId, staffId, accessGroupId, false);
         }
-//        accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
-//        accessGroupPermissionCounterDTO.setStaffId(staffId);
-//        List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created", created + ""));
-//        genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
-//        }, accessGroupId);
+        accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
+        accessGroupPermissionCounterDTO.setStaffId(staffId);
+        List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created", created + ""));
+        genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
+        }, accessGroupId);
 
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);

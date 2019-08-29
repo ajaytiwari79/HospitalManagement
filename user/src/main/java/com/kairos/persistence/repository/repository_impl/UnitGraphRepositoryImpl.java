@@ -5,6 +5,7 @@ import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.enums.Employment;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.repository.organization.CustomUnitGraphRepository;
 import org.apache.commons.collections.CollectionUtils;
@@ -218,7 +219,7 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
     }
 
     //@Override
-    public OrganizationBaseEntity getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
+    public List<Map<String, Object>> getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO) {
         String filterQuery = "";
         final String SUB_ORGANIZATIONS = "subOrganizations";
         Map<String, Object> queryParameters = new HashMap<>();
@@ -252,11 +253,16 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
         }
 
         String query = "MATCH(o{isEnable:true,boardingCompleted: true}) where id(o)={parentOrganizationId}\n" + filterQuery +
-                "OPTIONAL MATCH(o)-[orgRel:HAS_SUB_ORGANIZATION*]->(org:Organization{isEnable:true,boardingCompleted: true})\n" + filterQuery +
-                "OPTIONAL MATCH(o)-[unitRel:HAS_UNIT]->(u:Unit{isEnable:true,boardingCompleted: true})\n" + filterQuery +
-                "OPTIONAL MATCH(org)-[orgUnitRel:HAS_UNIT]->(un:Unit{isEnable:true,boardingCompleted: true})\n" +
+                "OPTIONAL MATCH(o)-[orgRel:"+HAS_SUB_ORGANIZATION+"*]->(org:Organization{isEnable:true,boardingCompleted: true})\n" + filterQuery +
+                "OPTIONAL MATCH(o)-[unitRel:"+HAS_UNIT+"]->(u:Unit{isEnable:true,boardingCompleted: true})\n" + filterQuery +
+                "OPTIONAL MATCH(org)-[orgUnitRel:"+HAS_UNIT+"]->(un:Unit{isEnable:true,boardingCompleted: true})\n" +
                 "RETURN o,org,orgRel,unitRel,u,orgUnitRel,un";
 
-        return session.queryForObject(OrganizationBaseEntity.class, query, queryParameters);
+        Iterator<Map> mapIterator = session.query(Map.class, query, queryParameters).iterator();
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        while (mapIterator.hasNext()) {
+            mapList.add(mapIterator.next());
+        }
+        return mapList;
     }
 }

@@ -408,15 +408,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (organization:Unit)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff) WHERE id(organization)={0} \n" +
             "MATCH (staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) WHERE id(expertise) ={1} AND rel.unionRepresentative\n" +
-            "SET rel.unionRepresentative=false " +
-            "RETURN count(rel)")
-    int removePreviousUnionRepresentativeOfExpertiseInUnit(Long unitId, Long expertiseId);
+            "SET rel.unionRepresentative=false ")
+    void removePreviousUnionRepresentativeOfExpertiseInUnit(Long unitId, Long expertiseId);
 
     @Query("MATCH (staff:Staff),(expertise:Expertise) WHERE id(staff)={0} AND id(expertise) ={1} \n" +
             "MATCH (staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise)\n" +
-            "SET rel.unionRepresentative=true " +
-            "RETURN count(rel) ")
-    int assignStaffAsUnionRepresentativeOfExpertise(Long staffId, Long expertiseId);
+            "SET rel.unionRepresentative=true")
+    void assignStaffAsUnionRepresentativeOfExpertise(Long staffId, Long expertiseId);
 
     @Query("MATCH (organization:Unit),(expertise:Expertise) WHERE id(organization)={1} AND id(expertise) IN {0} " +
             "MATCH (organization)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "{unionRepresentative:true}]->(expertise) \n" +

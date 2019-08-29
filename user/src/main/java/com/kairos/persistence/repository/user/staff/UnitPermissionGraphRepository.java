@@ -69,6 +69,10 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
             "RETURN count(r)")
     int getAccessGroupRelationShipCountOfStaff(Long staffId);
 
+    @Query("MATCH(ag:AccessGroup),(up:UnitPermission) WHERE id(ag)={0} AND id(up)={1}  " +
+            "CREATE UNIQUE(up)-[r:"+HAS_ACCESS_GROUP+"]->(ag) ")
+    void createPermission(Long accessGroupId,Long unitPermissionId);
+
 
 
 }
