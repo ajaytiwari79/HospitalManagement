@@ -1,10 +1,14 @@
 package com.kairos.persistence.model.auth;
 
-import com.kairos.annotations.*;
+import com.kairos.annotations.KPermissionRelatedModel;
+import com.kairos.annotations.KPermissionRelationshipFrom;
+import com.kairos.annotations.KPermissionRelationshipTo;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.skill.Skill;
-import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.EndNode;
+import org.neo4j.ogm.annotation.RelationshipEntity;
+import org.neo4j.ogm.annotation.StartNode;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF_HAS_SKILLS;
 

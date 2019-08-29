@@ -4,17 +4,23 @@ import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
-import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeTypeEnum;
-import com.kairos.enums.shift.*;
+import com.kairos.enums.shift.ShiftActionType;
+import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.*;
+import com.kairos.persistence.model.shift.RequestAbsence;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -34,9 +40,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
-import static com.kairos.enums.shift.TodoStatus.APPROVE;
 import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
 import static org.apache.commons.collections.CollectionUtils.containsAny;
 
@@ -111,7 +115,7 @@ public class RequestAbsenceService {
                 return (T)shiftAndActivtyStatusDTO;
             }
             ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), ORGANIZATION, shift.getEmploymentId(), new HashSet<>());
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), shift.getEmploymentId(), new HashSet<>());
             if(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
                 Date startDate = getStartOfDay(shift.getStartDate());
                 Date endDate = CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? asDate(asZoneDateTime(shift.getStartDate()).plusWeeks(1).plusDays(1).truncatedTo(ChronoUnit.DAYS)) : asDate(asZoneDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
@@ -182,7 +186,7 @@ public class RequestAbsenceService {
         shift.setActivities(shiftActivityList);
         ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift,ShiftDTO.class);
         shiftDTO.setShiftDate(asLocalDate(shift.getStartDate()));
-        return shiftService.updateShift(shiftDTO,ORGANIZATION,false,false,null);
+        return shiftService.updateShift(shiftDTO,false,false,null);
     }
 
     private List<ShiftActivity> updateShiftActivity(ActivityWrapper activityWrapper,DateTimeInterval dateTimeInterval, List<ShiftActivity> shiftActivities, ShiftActivity shiftActivity) {

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
@@ -14,7 +13,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by vipul on 28/3/18.

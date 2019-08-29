@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -195,12 +196,7 @@ public class FunctionService {
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsAtUnit(Long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-        }
-        Long countryId = countryService.getCountryIdByUnitId(unitId);
-
+        Long countryId = UserContext.getUserDetails().getCountryId();
         return functionGraphRepository.findFunctionsByCountry(countryId);
     }
 

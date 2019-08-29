@@ -1,12 +1,16 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
-import com.kairos.persistence.model.organization.services.*;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
+import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -50,8 +54,8 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
     @Query("MATCH (os:OrganizationService{imported:false})-[r:"+LINK_WITH_EXTERNAL_SERVICE+"]->(es:OrganizationService{hasMapped:true}) where id(es)={0}  delete r ")
     OrganizationExternalServiceRelationship removeOrganizationExternalServiceRelationship(Long organizationId);
 
-    @Query("MATCH (o:Unit)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(o)={0}" +
-            "optional match(o)-[:"+HAS_LEVEL+"]-(l:Level) " +
+    @Query("MATCH (org)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) where id(org)={0}" +
+            "optional match(org)-[:"+HAS_LEVEL+"]-(l:Level) " +
             "return collect(id(os)) as servicesId ,id(l) as levelId")
     OrganizationServicesAndLevelQueryResult getOrganizationServiceIdsByOrganizationId(Long organizationId);
 

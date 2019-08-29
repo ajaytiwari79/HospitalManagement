@@ -14,7 +14,6 @@ import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.OrganizationCategory;
-import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
@@ -26,7 +25,6 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.model.organization.UnitManagerDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;

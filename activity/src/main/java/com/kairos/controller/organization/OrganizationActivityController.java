@@ -49,8 +49,8 @@ public class OrganizationActivityController {
     @ApiOperation("Get all activity based on unitId")
     @GetMapping(value = "/activity_mapping")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityMappingDetails(@PathVariable Long unitId, @RequestParam("type") String type) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivityMappingDetails(unitId, type));
+    public ResponseEntity<Map<String, Object>> getActivityMappingDetails(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getActivityMappingDetails(unitId));
     }
 
     @ApiOperation("Get all activity based on unitId")
@@ -361,16 +361,16 @@ public class OrganizationActivityController {
     @ApiOperation(value = "Get All Activities by unitId")
     @GetMapping(value = "/activity")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
+    public ResponseEntity<Map<String, Object>> getActivityByUnitId( @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                activityService.getActivityByUnitId(unitId, type));
+                activityService.getActivityByUnitId(unitId));
     }
 
     @ApiOperation(value = "Get All Activities and Phases by unitId")
     @GetMapping(value = "/activity_with_phase")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId(@RequestParam("type") String type, @PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId, type));
+    public ResponseEntity<Map<String, Object>> getActivityAndPhaseByUnitId( @PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivityAndPhaseByUnitId(unitId));
     }
 
     @ApiOperation("Get all unit activities with categories ")

@@ -60,4 +60,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "]->(skill:Skill) WITH skill,organization\n" +
             "create unique (organization)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{1},lastModificationDate:{2},isEnabled:true,customName:skill.name}]->(skill)")
     void assignDefaultSkillsToOrg(long orgId, long creationDate, long lastModificationDate);
+
+    @Query("MATCH(org:Organization{union:false,deleted:false,isEnable:true}) WHERE id(org) IN {0} RETURN COUNT(org)=2")
+    boolean verifyOrganization(List<Long> orgIds);
+
+    @Query("MATCH(org:Organization{union:false,deleted:false,isEnable:true}),(newOrg:Organization{union:false,deleted:false,isEnable:true})<-[hubRelationShip:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization{isKairosHub: true,isParentOrganization: true}) WHERE id(org)={0} AND id(newOrg)={1} " +
+            "CREATE UNIQUE(org)-[:"+HAS_SUB_ORGANIZATION+"]->(newOrg)  DETACH DELETE  hubRelationShip ")
+    void mergeTwoOrganizations(Long orgId,Long newOrgId);
 }

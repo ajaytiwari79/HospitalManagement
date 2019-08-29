@@ -1,17 +1,13 @@
 package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
-import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
@@ -26,7 +22,9 @@ import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.PartialLeave;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
-import com.kairos.persistence.model.staff.permission.*;
+import com.kairos.persistence.model.staff.permission.AccessPermission;
+import com.kairos.persistence.model.staff.permission.UnitPermission;
+import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.*;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
@@ -48,17 +46,13 @@ import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -68,7 +62,7 @@ import java.util.stream.Stream;
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
@@ -217,16 +211,16 @@ public class PositionService {
 
             } else if (!Optional.ofNullable(unitPermission).isPresent()) {
                 unitPermission = new UnitPermission();
-                if(unit instanceof Organization){
+                if (unit instanceof Organization) {
                     unitPermission.setOrganization((Organization) unit);
-                }else {
+                } else {
                     unitPermission.setUnit((Unit) unit);
                 }
                 unitPermission.setStartDate(DateUtils.getCurrentDate().getTime());
             }
             unitPermission.setAccessGroup(accessGroup);
             position.getUnitPermissions().add(unitPermission);
-            positionGraphRepository.save(position,2);
+            positionGraphRepository.save(position, 2);
             LOGGER.info(" Currently created Unit Permission ");
             response.put("startDate", getDate(unitPermission.getStartDate()));
             response.put("endDate", getDate(unitPermission.getEndDate()));
@@ -254,21 +248,10 @@ public class PositionService {
     }
 
 
-    public List<Map<String, Object>> getPositions(long staffId, long unitId, String type) {
+    public List<Map<String, Object>> getPositions(long staffId, long unitId) {
 
-        Unit unit = null;
-
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = unitGraphRepository.findOne(unitId);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = unitGraphRepository.getOrganizationByTeamId(unitId);
-        } else {
-            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
-
-        }
-
-        Organization parent = organizationService.fetchParentOrganization(unitId);
-
+        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId);
+        Organization parent = unit.isParentOrganization() ? (Organization) unit : organizationService.fetchParentOrganization(unitId);
         List<Map<String, Object>> list = new ArrayList<>();
 
         if (parent == null) {
@@ -315,12 +298,12 @@ public class PositionService {
     }
 
 
-    public List<Map<String, Object>> getWorkPlaces(long staffId, long unitId, String type) {
+    public List<Map<String, Object>> getWorkPlaces(long staffId, long unitId) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             return null;
         }
-        OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
+        OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
 
@@ -422,23 +405,15 @@ public class PositionService {
         return staffGraphRepository.editStaffWorkPlaces(staffId, teamId);
     }
 
-    public Map<String, Object> addPartialLeave(long staffId, long id, String type, PartialLeaveDTO partialLeaveDTO) throws ParseException {
+    public Map<String, Object> addPartialLeave(long staffId, long id, PartialLeaveDTO partialLeaveDTO) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
-        Unit unit = null;
+        Unit unit = unitGraphRepository.findOne(id);
 
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = unitGraphRepository.findOne(id);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = unitGraphRepository.getOrganizationByTeamId(id);
-        } else {
-            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
-
-        }
         PartialLeave partialLeave;
         if (partialLeaveDTO.getId() != null) {
             partialLeave = partialLeaveGraphRepository.findOne(partialLeaveDTO.getId());
@@ -479,12 +454,11 @@ public class PositionService {
     /**
      * @param staffId
      * @param id      {id of unit or team decided by paramter of type}
-     * @param type    {type can be an organization or team}
      * @return list of partial leaves
      * @author prabjot
      * to get partial leaves for particular unit
      */
-    public Map<String, Object> getPartialLeaves(long staffId, long id, String type) {
+    public Map<String, Object> getPartialLeaves(long staffId, long id) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
@@ -494,14 +468,8 @@ public class PositionService {
 
         Unit unit = null;
 
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = unitGraphRepository.findOne(id);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = unitGraphRepository.getOrganizationByTeamId(id);
-        } else {
-            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
+        unit = unitGraphRepository.findOne(id);
 
-        }
         List<PartialLeave> partialLeaves = staffGraphRepository.getPartialLeaves(unit.getId(), staffId);
         List<Map<String, Object>> response = new ArrayList<>(partialLeaves.size());
         for (PartialLeave partialLeave : partialLeaves) {

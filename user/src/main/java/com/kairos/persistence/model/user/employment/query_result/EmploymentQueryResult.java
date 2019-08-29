@@ -5,7 +5,6 @@ import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,10 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by vipul on 10/8/17.

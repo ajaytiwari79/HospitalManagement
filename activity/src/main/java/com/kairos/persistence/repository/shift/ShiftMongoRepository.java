@@ -4,14 +4,16 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.apache.poi.ss.formula.functions.Count;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 30/8/17.

@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.shift;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.Date;

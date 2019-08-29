@@ -525,14 +525,14 @@ public class UnionService {
         }
     }
 
-    public StaffUnionWrapper getEmploymentDefaultData(Long unitId, String type, Long staffId) {
+    public StaffUnionWrapper getEmploymentDefaultData(Long unitId, Long staffId) {
         Optional<Staff> staff = staffGraphRepository.findById(staffId);
         if (!staff.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
         List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, unitId);
-        Unit unit = organizationService.getOrganizationDetail(unitId, type);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (!Optional.ofNullable(unit).isPresent() || !Optional.ofNullable(unit.getOrganizationSubTypes()).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_NOTFOUND);
 

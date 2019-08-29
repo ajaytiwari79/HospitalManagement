@@ -8,7 +8,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
-import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
@@ -37,10 +36,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class KPISetService {

@@ -1,6 +1,8 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.*;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
@@ -16,19 +18,21 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.TimeTypes;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
-import com.kairos.persistence.model.activity.*;
-import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
-
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.*;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftState;
+import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelActivityRank;
@@ -42,25 +46,23 @@ import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettin
 import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
-import com.kairos.persistence.repository.shift.*;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelActivityRankRepository;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
-import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.unit_settings.PhaseSettingsRepository;
-import com.kairos.persistence.repository.unit_settings.TimeAttendanceGracePeriodRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
 import com.kairos.rule_validator.activity.*;
-import com.kairos.rule_validator.activity.specification.StaffingLevelAndRankSpecification;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.staffing_level.StaffingLevelService;
-import com.kairos.service.time_bank.TimeBankCalculationService;
-import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
@@ -79,8 +81,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.TimeTypes.NON_WORKING_TYPE;
@@ -695,7 +697,7 @@ public class ShiftValidatorService {
         return shiftActivities;
     }
 
-    public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId, String type) {
+    public ShiftWithViolatedInfoDTO validateShift(ShiftDTO shiftDTO, Boolean validatedByStaff, Long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         if (!userAccessRoleDTO.getStaff() && validatedByStaff) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_VALIDATION_ACCESS);
@@ -703,7 +705,7 @@ public class ShiftValidatorService {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_VALIDATION_ACCESS);
         }
         Phase actualPhases = phaseMongoRepository.findByUnitIdAndPhaseEnum(unitId, PhaseDefaultName.TIME_ATTENDANCE.toString());
-        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.updateShift(shiftDTO, type, true, !validatedByStaff, null);
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.updateShift(shiftDTO, true, !validatedByStaff, null);
         shiftDTO = validateShiftStateAfterValidatingWtaRule(shiftDTO, validatedByStaff, actualPhases);
         shiftDTO.setEscalationReasons(shiftWithViolatedInfoDTO.getShifts().get(0).getEscalationReasons());
         shiftDTO.setRestingMinutes(shiftWithViolatedInfoDTO.getShifts().get(0).getRestingMinutes());

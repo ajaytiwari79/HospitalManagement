@@ -2,45 +2,24 @@ package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.CompanyUnitType;
-import com.kairos.enums.UnionState;
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.client.ContactDetail;
-import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.team.Team;
-import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
-import com.kairos.persistence.model.organization.union.Location;
-import com.kairos.persistence.model.organization.union.Sector;
-import com.kairos.persistence.model.staff.position.Position;
-import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResources;
-import com.kairos.persistence.model.user.region.LocalAreaTag;
-import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.model.user.resources.Resource;
-import com.kairos.utils.ZoneIdStringConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.Convert;
-import org.neo4j.ogm.annotation.typeconversion.DateString;
 
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_CONTACTADDRESS_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 

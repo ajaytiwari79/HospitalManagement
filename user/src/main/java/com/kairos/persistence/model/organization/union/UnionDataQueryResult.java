@@ -3,7 +3,6 @@ package com.kairos.persistence.model.organization.union;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import lombok.Getter;

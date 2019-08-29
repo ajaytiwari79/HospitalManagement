@@ -1,7 +1,6 @@
 package com.kairos.service.staff;
 
 import com.kairos.dto.user.organization.AddressDTO;
-import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -19,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
-
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_UNIT_NOTFOUND;
 
 /**
  * Created by prabjot on 19/5/17.

@@ -1,11 +1,12 @@
 package com.kairos.service.wta;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.CurrentUserDetails;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import com.kairos.dto.activity.wta.rule_template_category.*;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryTagDTO;
+import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateWrapper;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.country.basic_details.CountryDTO;

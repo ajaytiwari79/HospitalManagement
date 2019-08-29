@@ -5,7 +5,9 @@ import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by oodles on 26/10/17.

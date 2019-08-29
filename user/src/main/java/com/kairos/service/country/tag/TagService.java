@@ -4,10 +4,12 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
@@ -36,6 +38,9 @@ public class TagService {
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
+
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
 
     @Inject
     private UnitGraphRepository unitGraphRepository;
@@ -122,10 +127,7 @@ public class TagService {
     }
 
 
-    public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO, String type) {
-        if (type.equalsIgnoreCase("team")) {
-            organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
-        }
+    public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
         Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
@@ -145,10 +147,7 @@ public class TagService {
         return tag;
     }
 
-    public Tag updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO, String type) {
-        if (type.equalsIgnoreCase("team")) {
-            organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
-        }
+    public Tag updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO) {
         Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
@@ -168,10 +167,7 @@ public class TagService {
         return tag;
     }
 
-    public Boolean deleteOrganizationTag(Long orgId, Long tagId, String type) {
-        if (type.equalsIgnoreCase("team")) {
-            orgId = teamGraphRepository.getOrganizationIdByTeam(orgId);
-        }
+    public Boolean deleteOrganizationTag(Long orgId, Long tagId) {
         Unit unit = unitGraphRepository.findOne(orgId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, orgId);
@@ -187,19 +183,11 @@ public class TagService {
         return true;
     }
 
-    public HashMap<String, Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType, String type) {
-        if (type.equalsIgnoreCase("team")) {
-            organizationId = teamGraphRepository.getOrganizationIdByTeam(organizationId);
-        }
-        Unit unit = unitGraphRepository.findOne(organizationId, 0);
-        if (unit == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
-
-        }
+    public Map<String, Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType) {
         if (filterText == null) {
             filterText = "";
         }
-        HashMap<String, Object> tagsData = new HashMap<>();
+        Map<String, Object> tagsData = new HashMap<>();
         if (masterDataType == null) {
             tagsData.put("tags", tagGraphRepository.getListOfOrganizationTags(organizationId, false, filterText));
         } else {
@@ -272,15 +260,14 @@ public class TagService {
         return tagCategoryData;
     }
 
-    public HashMap<String, Object> getListOfMasterDataType(Long orgId) {
-        Unit unit = unitGraphRepository.findOne(orgId);
-        if (unit == null) {
+    public Map<String, Object> getListOfMasterDataType(Long orgId) {
+        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(orgId);
+        if (organizationBaseEntity == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, orgId);
-
         }
-        HashMap<String, Object> tagCategoryData = new HashMap<>();
+        Map<String, Object> tagCategoryData = new HashMap<>();
         tagCategoryData.put("tagCategories", MasterDataTypeEnum.getListOfMasterDataType());
-        tagCategoryData.put("showCountryTags", unit.getShowCountryTags() != null ? unit.getShowCountryTags() : false);
+        tagCategoryData.put("showCountryTags", organizationBaseEntity.getShowCountryTags() != null ? organizationBaseEntity.getShowCountryTags() : false);
         return tagCategoryData;
     }
 

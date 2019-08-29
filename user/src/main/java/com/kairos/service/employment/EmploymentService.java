@@ -6,7 +6,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
@@ -20,14 +19,20 @@ import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.staff.position.*;
+import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.PositionQueryResult;
+import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
 import com.kairos.persistence.model.user.employment.*;
-import com.kairos.persistence.model.user.employment.query_result.*;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
+import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
@@ -38,11 +43,15 @@ import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
-import com.kairos.persistence.repository.user.employment.*;
+import com.kairos.persistence.repository.user.employment.EmploymentAndEmploymentTypeRelationShipGraphRepository;
+import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
+import com.kairos.persistence.repository.user.employment.EmploymentLineFunctionRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
-import com.kairos.persistence.repository.user.staff.*;
+import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.WorkingTimeAgreementRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.AsynchronousService;
@@ -71,7 +80,10 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -152,7 +164,7 @@ public class EmploymentService {
 
 
 
-    public PositionWrapper createEmployment(Long id, String type, EmploymentDTO employmentDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
+    public PositionWrapper createEmployment(Long id, EmploymentDTO employmentDTO, Boolean createFromTimeCare, Boolean saveAsDraft) throws Exception {
         Unit unit = unitGraphRepository.findOne(employmentDTO.getUnitId());
         Organization parentUnit = organizationService.fetchParentOrganization(unit.getId());
 
@@ -388,9 +400,9 @@ public class EmploymentService {
     }
 
 
-    public PositionWrapper updateEmployment(long employmentId, EmploymentDTO employmentDTO, Long unitId, String type, Boolean saveAsDraft) throws Exception {
+    public PositionWrapper updateEmployment(long employmentId, EmploymentDTO employmentDTO, Long unitId, Boolean saveAsDraft) throws Exception {
 
-        Unit unit = organizationService.getOrganizationDetail(unitId, type);
+        Unit unit = unitGraphRepository.findOne(unitId);
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(employmentDTO.getStaffId());
         if (clientMinimumDTO.size() > 0) {
             return new PositionWrapper(clientMinimumDTO);
@@ -524,7 +536,7 @@ public class EmploymentService {
      * @param unitId
      */
     private void updateTimeBank(BigInteger ctaId, long employmentId, LocalDate employmentLineStartDate, LocalDate employmentLineEndDate, Long unitId) {
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(employmentLineStartDate, employmentGraphRepository.getStaffIdFromEmployment(employmentId), employmentId, unitId, ORGANIZATION, Collections.emptySet());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(employmentLineStartDate, employmentGraphRepository.getStaffIdFromEmployment(employmentId), employmentId, unitId, Collections.emptySet());
         activityIntegrationService.updateTimeBankOnEmploymentUpdation(ctaId, employmentId, employmentLineStartDate, employmentLineEndDate, staffAdditionalInfoDTO);
     }
 
@@ -773,7 +785,7 @@ public class EmploymentService {
 
     }
 
-    public List<com.kairos.dto.activity.shift.StaffEmploymentDetails> getEmploymentDetails(List<Long> employmentIds, Unit unit, Long countryId) {
+    public List<com.kairos.dto.activity.shift.StaffEmploymentDetails> getEmploymentDetails(List<Long> employmentIds, OrganizationBaseEntity organizationBaseEntity, Long countryId) {
         List<EmploymentQueryResult> employments = employmentGraphRepository.getEmploymentByIds(employmentIds);
         List<com.kairos.dto.activity.shift.StaffEmploymentDetails> employmentDetailsList = new ArrayList<>();
         employments.forEach(employment -> {
@@ -782,7 +794,7 @@ public class EmploymentService {
             Map<Long, BigDecimal> hourlyCostMap = employmentLinesQueryResults.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
             employmentDetail.setStaffId(employment.getStaffId());
             employmentDetail.setCountryId(countryId);
-            employmentDetail.setUnitTimeZone(unit.getTimeZone());
+            employmentDetail.setUnitTimeZone(organizationBaseEntity.getTimeZone());
             EmploymentLinesQueryResult employmentLinesQueryResult = ObjectMapperUtils.copyPropertiesByMapper(employment.getEmploymentLines().get(0), EmploymentLinesQueryResult.class);
             BigDecimal hourlyCost = employmentLinesQueryResult.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLinesQueryResult.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLinesQueryResult.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
             employmentDetail.setHourlyCost(hourlyCost);
@@ -857,7 +869,7 @@ public class EmploymentService {
                 exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EXTERNALID_NOTEXIST, timeCareEmploymentDTO.getPersonID());
             }
             EmploymentDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId(), ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId(), unit.getId());
-            createEmployment(unit.getId(), "Organization", unitEmploymentPosition, true, true);
+            createEmployment(unit.getId(),  unitEmploymentPosition, true, true);
         }
         return true;
     }
@@ -925,7 +937,7 @@ public class EmploymentService {
     }
 
     public StaffEmploymentUnitDataWrapper getStaffsEmployment(Long unitId, Long expertiseId, List<Long> staffIds) {
-        Unit unit = organizationService.getOrganizationDetail(unitId, ORGANIZATION);
+        Unit unit = unitGraphRepository.findOne(unitId);
         Long countryId =countryService.getCountryIdByUnitId(unitId);
         // TODO MIght We dont need these details I(vipul) will verify and remove
         List<StaffAdditionalInfoQueryResult> staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffIds(unit.getId(), staffIds, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());

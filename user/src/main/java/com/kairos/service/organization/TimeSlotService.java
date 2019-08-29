@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
@@ -71,14 +72,14 @@ public class TimeSlotService {
     }
 
     public Map<String, Object> getTimeSlotSets(Long unitId) {
-        Unit unit = unitGraphRepository.findOne(unitId, 0);
+        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
         }
         List<TimeSlotSet> timeSlotSets = timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, unit.getTimeSlotMode(), TimeSlotType.TASK_PLANNING);
         Map<String, Object> timeSlotSetData = new HashMap<>();
         timeSlotSetData.put("timeSlotSets", timeSlotSets);
-        timeSlotSetData.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()) ? true : false);
+        timeSlotSetData.put("standardTimeSlot", STANDARD.equals(unit.getTimeSlotMode()));
         return timeSlotSetData;
     }
 
@@ -424,11 +425,7 @@ public class TimeSlotService {
 
 
     public List<TimeSlotSet> getShiftPlanningTimeSlotSetsByUnit(Long unitId) {
-        Unit unit = unitGraphRepository.findById(unitId, 0).get();
-        if (!Optional.ofNullable(unit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
-
-        }
+        OrganizationBaseEntity unit = unitGraphRepository.findById(unitId, 0).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANISATION_NOTFOUND)));
         return timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unitId, unit.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
     }
 
@@ -436,14 +433,14 @@ public class TimeSlotService {
         return timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSetId);
     }
 
-    public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(Unit unit) {
+    public List<TimeSlotDTO> getShiftPlanningTimeSlotByUnit(OrganizationBaseEntity organizationBaseEntity) {
         List<TimeSlotDTO> timeSlotDTOS=new ArrayList<>();
-        List<TimeSlotSet> timeSlotSets= timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(unit.getId(), unit.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
+        List<TimeSlotSet> timeSlotSets= timeSlotGraphRepository.findTimeSlotSetsByOrganizationId(organizationBaseEntity.getId(), organizationBaseEntity.getTimeSlotMode(), TimeSlotType.SHIFT_PLANNING);
         if(isNotEmpty(timeSlotSets)) {
             List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.findTimeSlotsByTimeSlotSet(timeSlotSets.get(0).getId());
             timeSlotDTOS= ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, TimeSlotDTO.class);
         }else{
-            logger.info("Time Slot is not present for organization "+ unit.getName());
+            logger.info("Time Slot is not present for organization {}", organizationBaseEntity.getName());
         }
         return timeSlotDTOS;
     }

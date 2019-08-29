@@ -1,6 +1,8 @@
 package com.kairos.planning.utils;
 
-import com.kairos.planning.domain.*;
+import com.kairos.planning.domain.AvailabilityRequest;
+import com.kairos.planning.domain.Employee;
+import com.kairos.planning.domain.Task;
 import com.kairos.planning.solution.TaskPlanningSolution;
 import org.drools.core.base.DefaultKnowledgeHelper;
 import org.drools.core.common.InternalFactHandle;
@@ -15,7 +17,10 @@ import org.optaplanner.core.impl.score.director.drools.LegacyDroolsScoreDirector
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public class TaskPlanningUtility {
     public static long TASK_ID_SEQUENCE=2000000000l;

@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.country;
 
-import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -29,21 +28,21 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType")
     List<TagQueryResult> getListOfCountryTagsByMasterDataType(Long countryId, boolean deleted, String searchTextRegex, String masterDataType);
 
-    @Query("Match (org:Unit)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
+    @Query("Match (org)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
             "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n" +
             "UNION\n" +
-            "MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o:Unit) where id(o)={0} AND o.showCountryTags=true\n" +
+            "MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o) where id(o)={0} AND o.showCountryTags=true\n" +
             "Match (country:Country)-[r:" + COUNTRY_HAS_TAG + "]->(tag:Tag {countryTag:true})\n" +
             "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n")
     List<TagQueryResult> getListOfOrganizationTags(Long orgId, boolean deleted, String searchTextRegex);
 
-    @Query("Match (org:Unit)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
+    @Query("Match (org)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
             "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n" +
             "UNION\n" +
-            "MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o:Unit) where id(o)={0} AND o.showCountryTags=true\n" +
+            "MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o) where id(o)={0} AND o.showCountryTags=true\n" +
             "Match (country:Country)-[r:" + COUNTRY_HAS_TAG + "]->(tag:Tag {countryTag:true})\n" +
             "WHERE tag.deleted= {1} AND lower(tag.name) contains lower({2}) AND tag.masterDataType ={3}\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n")

@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.user.staff;
 
-import com.kairos.persistence.model.staff.*;
+import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
+import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
+import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

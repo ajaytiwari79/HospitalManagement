@@ -1,9 +1,13 @@
 package com.kairos.utils.worktimeagreement;
 
-import com.kairos.commons.utils.*;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -25,7 +29,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -35,7 +41,6 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.enums.wta.WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 

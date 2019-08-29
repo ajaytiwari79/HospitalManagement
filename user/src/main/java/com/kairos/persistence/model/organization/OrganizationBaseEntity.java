@@ -30,7 +30,6 @@ import org.neo4j.ogm.annotation.typeconversion.DateString;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
-
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;

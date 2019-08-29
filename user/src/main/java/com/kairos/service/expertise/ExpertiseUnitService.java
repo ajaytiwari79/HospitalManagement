@@ -2,7 +2,6 @@ package com.kairos.service.expertise;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
@@ -25,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_ID_NOTFOUND;
 
 /**
  * CreatedBy vipulpandey on 19/11/18

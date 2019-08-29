@@ -140,13 +140,13 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<Map<String, Object>> getClientsByClintIdList(List<Long> clientIds);
 
 
-    @Query("MATCH (o:Unit)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.isEnabled=false")
+    @Query("MATCH (org)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(org)={0} AND id(os)={1} SET r.isEnabled=false")
     void removeServiceFromOrganization(long unitId, long serviceId);
 
-    @Query("MATCH (o)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
+    @Query("MATCH (org)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(org)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
     void updateServiceFromOrganization(long unitId, long serviceId);
 
-    @Query("MATCH (o:Unit)-[r:PROVIDE_SERVICE]->(os:OrganizationService) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
+    @Query("MATCH (org)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(org)={0} AND id(os)={1} RETURN count(r) as countOfRel")
     int isServiceAlreadyExist(long unitId, long serviceId);
 
     @Query("MATCH (o:Unit)-[:" + HAS_SUB_ORGANIZATION + "*..4]-(co:Unit) WHERE id(o)={0}  RETURN " +
@@ -389,22 +389,22 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "contactAddress.latitude as latitude,contactAddress.street as street,id(municipality) as municipalityId,municipality.name as municipalityName")
     List<Map<String, Object>> getContactAddressOfParentOrganization(List<Long> unitId);
 
-    @Query("MATCH (unit:Unit)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(unit)={0} \n" +
-            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill) WITH distinct skill,unit\n" +
-            "MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH skill,r,unit\n" +
-            "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH unit,skillCategory,skill,r\n" +
-            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE tag.countryTag=unit.showCountryTags WITH DISTINCT  r,skill,skillCategory,unit,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(unit) WITH  r,skill,unit,skillCategory,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+    @Query("MATCH (org)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(org)={0} \n" +
+            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill) WITH distinct skill,org\n" +
+            "MATCH (org)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH skill,r,org\n" +
+            "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH org,skillCategory,skill,r\n" +
+            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + COUNTRY_HAS_TAG + "]-(c:Country) WHERE tag.countryTag=org.showCountryTags WITH DISTINCT  r,skill,skillCategory,org,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(org) WITH  r,skill,org,skillCategory,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "OPTIONAL MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(staff) IN {1}\n" +
             "WITH {staff:case when staffSkillRel is null then [] else COLLECT(id(staff)) end} as staff,skillCategory,skill,r,otags,ctags\n" +
             "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:case when r is null or r.customName is null then skill.name else r.customName end,description:skill.description,isSelected:case when r is null then false else true end, customName:case when r is null or r.customName is null then skill.name else r.customName end, isEdited:true,staff:staff.staff,tags:ctags+otags})} as data")
     List<Map<String, Object>> getAssignedSkillsOfStaffByOrganization(long unitId, List<Long> staffId);
 
 
-    @Query("MATCH (unit:Unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WHERE id(unit)={0} WITH skill,unit,r\n" +
-            "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH  unit,skill,skillCategory,r\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags WITH  unit,skill,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(unit) WITH skill,skillCategory,r,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+    @Query("MATCH (org)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WHERE id(org)={0} WITH skill,org,r\n" +
+            "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH  org,skill,skillCategory,r\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=org.showCountryTags WITH  org,skill,skillCategory,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:HAS_TAG]-(tag:Tag)<-[ORGANIZATION_HAS_TAG]-(org) WITH skill,skillCategory,r,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,skills:COLLECT(distinct {id:id(skill),name:skill.name,visitourId:skill.visitourId,description:skill.description,customName:r.customName,isEdited:true, tags:ctags+otags})} as data")
     List<Map<String, Object>> getSkillsOfOrganization(long unitId);
 
@@ -528,7 +528,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithName(String name);
 
-    @Query("MATCH (org:Unit)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) WHERE id(org)={0} RETURN orgSetting")
+    @Query("MATCH (org)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) WHERE id(org)={0} RETURN orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
     @Query("MATCH (org:Unit)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +

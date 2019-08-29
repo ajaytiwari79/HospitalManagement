@@ -6,7 +6,10 @@ import com.kairos.enums.constraint.ConstraintLevel;
 import com.kairos.enums.constraint.ConstraintType;
 import com.kairos.shiftplanning.dto.ShiftDTO;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
-import org.joda.time.*;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.Interval;
 import org.junit.Ignore;
 import org.junit.Test;
 

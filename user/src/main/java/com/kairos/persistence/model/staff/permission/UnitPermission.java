@@ -10,7 +10,8 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.APPLICABLE_IN_UNIT;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_GROUP;
 
 
 /**

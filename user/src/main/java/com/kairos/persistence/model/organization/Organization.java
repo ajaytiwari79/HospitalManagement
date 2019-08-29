@@ -3,8 +3,6 @@ package com.kairos.persistence.model.organization;/*
  *
  */
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.enums.UnionState;

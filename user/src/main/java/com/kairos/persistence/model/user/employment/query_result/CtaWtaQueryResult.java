@@ -3,7 +3,6 @@ package com.kairos.persistence.model.user.employment.query_result;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import lombok.Getter;

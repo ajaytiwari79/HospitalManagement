@@ -1,13 +1,20 @@
 package com.kairos.service.shift;
 
-import com.google.common.base.Stopwatch;
-import com.kairos.commons.utils.*;
-import com.kairos.dto.activity.shift.*;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.phase.PhaseDefaultName;
-import com.kairos.enums.shift.*;
-import com.kairos.persistence.model.activity.*;
+import com.kairos.enums.shift.ShiftActionType;
+import com.kairos.enums.shift.ShiftType;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -23,21 +30,20 @@ import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_NOTFOUND;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
-import static org.springframework.transaction.annotation.Isolation.REPEATABLE_READ;
 
 @Service
 public class AbsenceShiftService {

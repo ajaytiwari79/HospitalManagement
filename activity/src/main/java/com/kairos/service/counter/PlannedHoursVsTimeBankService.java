@@ -42,8 +42,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.utils.counter.KPIUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.utils.counter.KPIUtils.getDateTimeIntervals;
+import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 
 @Service
 public class PlannedHoursVsTimeBankService implements CounterService {

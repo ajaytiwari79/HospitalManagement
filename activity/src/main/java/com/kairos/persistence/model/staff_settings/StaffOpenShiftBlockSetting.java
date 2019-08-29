@@ -7,7 +7,9 @@ import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class StaffOpenShiftBlockSetting extends MongoBaseEntity {
     private Long staffId;

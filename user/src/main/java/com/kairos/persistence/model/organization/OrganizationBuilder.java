@@ -6,7 +6,8 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 
 import java.time.ZoneId;

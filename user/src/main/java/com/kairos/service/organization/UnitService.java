@@ -6,13 +6,16 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.*;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
@@ -43,6 +46,8 @@ public class UnitService {
     private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private OrganizationService organizationService;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -82,13 +87,10 @@ public class UnitService {
 
     public Map<String, Object> getManageHierarchyData(long organizationId) {
 
-        Unit unit = unitGraphRepository.findOne(organizationId);
-
-        if (!Optional.ofNullable(unit).isPresent()) {
+        Organization organization = organizationGraphRepository.findOne(organizationId);
+        if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
         }
-
-        Organization organization = organizationService.fetchParentOrganization(organizationId);
         Long countryId = UserContext.getUserDetails().getCountryId();
         if (!Optional.ofNullable(countryId).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);

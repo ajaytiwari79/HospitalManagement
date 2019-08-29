@@ -5,19 +5,18 @@ import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.enums.FilterType.ACTIVITY_TIMECALCULATION_TYPE;
-import static com.kairos.enums.FilterType.TIME_TYPE;
 
 /**
  * Created by pradeep

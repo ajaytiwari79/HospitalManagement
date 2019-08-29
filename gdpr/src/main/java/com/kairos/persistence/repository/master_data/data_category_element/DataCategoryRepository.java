@@ -1,7 +1,9 @@
 package com.kairos.persistence.repository.master_data.data_category_element;
 
 import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;

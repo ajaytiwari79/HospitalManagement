@@ -26,4 +26,7 @@ public interface OrganizationBaseRepository extends Neo4jBaseRepository<Organiza
             "OPTIONAL MATCH(n)<-[:"+HAS_UNIT+"]-(org) \n" +
             "RETURN CASE WHEN 'Organization' in labels(n) THEN id(n) ELSE id(org) end as parentOrgId")
     Long findParentOrgId(Long id);
+
+    @Query("MATCH(org) where id(org)={0} RETURN org.showCountryTags ")
+    boolean showCountryTags(Long orgId);
 }

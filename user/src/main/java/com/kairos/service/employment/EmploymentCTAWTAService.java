@@ -14,13 +14,14 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
-import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.query_result.CtaWtaQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
@@ -42,7 +43,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -61,6 +65,8 @@ public class EmploymentCTAWTAService {
     private EmploymentService employmentService;
     @Inject
     private EmploymentGraphRepository employmentGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private CountryService countryService;
     @Inject
@@ -128,13 +134,13 @@ public class EmploymentCTAWTAService {
         StaffEmploymentDetails employmentDetails = null;
         if (Optional.ofNullable(employment).isPresent()) {
             Long countryId = countryService.getCountryIdByUnitId(unitId);
-            Optional<Unit> organization = unitGraphRepository.findById(unitId, 0);
+            OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(unitId);
             employmentDetails = convertEmploymentObject(employment);
             employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
             employmentDetails.setCountryId(countryId);
 
             employmentDetails.setCountryId(countryId);
-            employmentDetails.setUnitTimeZone(organization.get().getTimeZone());
+            employmentDetails.setUnitTimeZone(organizationBaseEntity.getTimeZone());
         }
         return employmentDetails;
 

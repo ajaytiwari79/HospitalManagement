@@ -19,8 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import javax.xml.bind.*;
-import java.io.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;

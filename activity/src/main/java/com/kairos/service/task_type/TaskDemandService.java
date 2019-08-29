@@ -5,7 +5,9 @@ import com.kairos.dto.user.staff.client.ClientFilterDTO;
 import com.kairos.dto.user.visitation.RepetitionType;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.client_exception.ClientExceptionType;
-import com.kairos.persistence.model.task_demand.*;
+import com.kairos.persistence.model.task_demand.MonthlyFrequency;
+import com.kairos.persistence.model.task_demand.TaskDemand;
+import com.kairos.persistence.model.task_demand.TaskDemandVisit;
 import com.kairos.persistence.model.task_type.TaskType;
 import com.kairos.persistence.repository.client_aggregator.ClientAggregatorMongoRepository;
 import com.kairos.persistence.repository.client_exception.ClientExceptionTypeMongoRepository;
@@ -32,7 +34,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.*;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.util.*;
 

@@ -1,8 +1,12 @@
 package com.kairos.dto.gdpr.agreement_template;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Getter @Setter @NoArgsConstructor
 public class AgreementTemplateDTO {

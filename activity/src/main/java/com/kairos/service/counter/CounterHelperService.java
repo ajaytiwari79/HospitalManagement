@@ -2,16 +2,11 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
-import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.OrganizationActivityDTO;
-import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.system_setting.UnitTypeDTO;
 import com.kairos.enums.Day;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.utils.counter.KPIUtils;

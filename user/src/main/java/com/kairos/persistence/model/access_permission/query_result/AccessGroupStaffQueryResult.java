@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.access_permission.query_result;
 
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
-import com.kairos.persistence.model.organization.Unit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

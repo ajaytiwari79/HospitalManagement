@@ -5,7 +5,9 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.*;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.unit_settings.*;
+import com.kairos.persistence.model.unit_settings.FlexibleTimeSettings;
+import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
+import com.kairos.persistence.model.unit_settings.UnitSetting;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -18,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
 

@@ -3,23 +3,28 @@ package com.kairos.service.external_citizen_import;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.task.order.OrderGrant;
 import com.kairos.dto.user.organization.ImportTimeSlotListDTO;
-import com.kairos.dto.user.patient.*;
-import com.kairos.dto.user.staff.*;
+import com.kairos.dto.user.patient.CurrentElements;
+import com.kairos.dto.user.patient.PatientGrant;
+import com.kairos.dto.user.patient.PatientRelative;
+import com.kairos.dto.user.patient.PatientWrapper;
+import com.kairos.dto.user.staff.AvailableContacts;
+import com.kairos.dto.user.staff.ColumnResource;
+import com.kairos.dto.user.staff.ImportShiftDTO;
+import com.kairos.dto.user.staff.RelativeContacts;
 import com.kairos.dto.user.staff.client.CitizenSupplier;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.visitation.RepetitionType;
-import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.OrganizationBuilder;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.time_slot.TimeSlotGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
@@ -30,7 +35,9 @@ import com.kairos.rest_client.TaskDemandRestClient;
 import com.kairos.rest_client.TaskServiceRestClient;
 import com.kairos.service.client.ExternalClientService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.organization.*;
+import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.OrganizationServiceService;
+import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.system_setting.SystemLanguageService;
@@ -39,8 +46,13 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.http.converter.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +62,6 @@ import javax.inject.Inject;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectMapperUtils.jsonStringToObject;
-import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_CITIZEN_STAFF_ALREADYEXIST;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_ID_NOTFOUND;
 
@@ -242,7 +253,7 @@ public class CitizenService {
                                             if(subServiceOptional.isPresent()) subService.setKmdExternalId(subPatientPathway.get("pathwayTypeId").toString());
                                             subService.setImported(true);
                                             subService = organizationServiceService.addSubService(service.getId(), subService);
-                                            organizationServiceService.updateServiceToOrganization(unit.getId(), subService.getId(), true, ORGANIZATION);
+                                            organizationServiceService.updateServiceToOrganization(unit.getId(), subService.getId(), true);
                                         }
                                         JSONArray subPatientPathwayChildren = subPatientPathway.getJSONArray("children");
                                         for (int sPPC = 0; sPPC < subPatientPathwayChildren.length(); sPPC++) {
@@ -403,7 +414,7 @@ public class CitizenService {
                     subService.setKmdExternalId(service.getKmdExternalId());
                     subService.setImported(true);
                     subService = organizationServiceService.addSubService(service.getId(), subService);
-                    organizationServiceService.updateServiceToOrganization(unit.getId(), subService.getId(), true, ORGANIZATION);
+                    organizationServiceService.updateServiceToOrganization(unit.getId(), subService.getId(), true);
                 }
             }
 

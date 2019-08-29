@@ -2,12 +2,13 @@ package com.kairos.persistence.repository.user.access_permission;
 
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.AppConstants.ACCESS_PAGE_HAS_LANGUAGE;
 import static com.kairos.constants.AppConstants.HAS_ACCESS_OF_TABS;

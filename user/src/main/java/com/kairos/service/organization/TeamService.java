@@ -203,7 +203,7 @@ public class TeamService {
     }
 
 
-    public boolean addStaffInTeam(long teamId, long staffId, boolean isAssigned, long unitId) {
+    public boolean addStaffInTeam(long teamId, long staffId, boolean isAssigned) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         Team team = teamGraphRepository.findOne(teamId, 0);

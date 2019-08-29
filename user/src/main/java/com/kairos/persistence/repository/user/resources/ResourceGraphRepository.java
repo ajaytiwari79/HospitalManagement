@@ -4,7 +4,9 @@ package com.kairos.persistence.repository.user.resources;
  * Created by oodles on 17/10/16.
  */
 
-import com.kairos.persistence.model.user.resources.*;
+import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.persistence.model.user.resources.ResourceUnAvailability;
+import com.kairos.persistence.model.user.resources.ResourceWrapper;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -12,8 +14,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.UNIT_HAS_RESOURCE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.UNAVAILABLE_ON;
+import static com.kairos.persistence.model.constants.RelationshipConstants.UNIT_HAS_RESOURCE;
 
 
 /**

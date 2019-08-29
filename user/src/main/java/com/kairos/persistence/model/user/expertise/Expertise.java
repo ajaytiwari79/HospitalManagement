@@ -8,7 +8,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
 import lombok.Getter;

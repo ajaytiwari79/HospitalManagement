@@ -6,18 +6,24 @@ import com.kairos.commons.annotation.IgnoreStringTrimer;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
-import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.client.NextToKinDTO;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
 import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;

@@ -3,7 +3,9 @@ package com.planner.domain.query_results.staff;
 import com.planner.domain.query_results.expertise.ExpertiseQueryResult;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 @QueryResult
 public class StaffQueryResult {
