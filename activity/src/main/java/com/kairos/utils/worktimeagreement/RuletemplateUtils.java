@@ -14,6 +14,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.activity.Activity;
@@ -35,7 +36,6 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.enums.wta.WTATemplateType.DAYS_OFF_AFTER_A_SERIES;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
@@ -575,5 +575,18 @@ public class RuletemplateUtils {
         return String.valueOf(hours+"."+minutes);
     }
 
+    public static int getValueAccordingShiftLengthAndAverageSetting(ShiftLengthAndAverageSetting shiftLengthAndAverageSetting, ShiftWithActivityDTO shift){
+        int returnValue;
+        switch (shiftLengthAndAverageSetting){
+            case DURATION:returnValue = shift.getDurationMinutes();
+                break;
+            case SCHEDULED_HOURS:returnValue = shift.getScheduledMinutes();
+                break;
+            case PLANNED_HOURS:returnValue = shift.getPlannedMinutesOfTimebank();
+                break;
+            default:returnValue = shift.getMinutes();
+        }
+        return returnValue;
+    }
 
 }
