@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
@@ -104,17 +106,24 @@ public class ShiftStateService {
 
     private void getShiftStateLists(List<ShiftState> shiftStates, List<Shift> shifts, BigInteger phaseId, Map<BigInteger, ShiftState> shiftStateMap) {
         ShiftState shiftState;
+        boolean shiftUpdated =false;
         for (Shift shift:shifts) {
             if (!DateUtils.asLocalDate(shift.getStartDate()).isAfter(DateUtils.getCurrentLocalDate())) {
-                shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
-                shiftState.setId((shiftStateMap.containsKey(shift.getId()))?shiftStateMap.get(shift.getId()).getId():null);
-                shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
-                shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size()-1).getEndDate());
+                ShiftState oldshiftState=shiftStateMap.get(shift.getId());
+                if(isNotNull(oldshiftState)){
+                    shiftUpdated = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesByMapper(oldshiftState, Shift.class));
+                }
+                if(isNull(oldshiftState) || shiftUpdated) {
+                    shiftState = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftState.class);
+                    shiftState.setId((shiftStateMap.containsKey(shift.getId())) ? shiftStateMap.get(shift.getId()).getId() : null);
+                    shiftState.setStartDate(shiftState.getActivities().get(0).getStartDate());
+                    shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
                     shiftState.setShiftId(shift.getId());
                     shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                     shiftState.setShiftStatePhaseId(phaseId);
-                shiftState.setDraftShift(null);
-                shiftStates.add(shiftState);
+                    shiftState.setDraftShift(null);
+                    shiftStates.add(shiftState);
+                }
             }
         }
     }

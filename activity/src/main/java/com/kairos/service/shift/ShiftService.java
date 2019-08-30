@@ -600,7 +600,7 @@ public class ShiftService extends MongoBaseService {
                     timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
                     shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
                     shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
-                    shiftStateService.createShiftState(Arrays.asList(shift),false,shift.getUnitId());
+                    shiftStateService.createShiftState(Arrays.asList(shift),true,shift.getUnitId());
                 }
                 // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
                 //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
