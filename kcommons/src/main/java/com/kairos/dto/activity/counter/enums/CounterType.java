@@ -28,7 +28,8 @@ public enum CounterType {
     TOTAL_KM_DRIVEN_PER_STAFF("Total Distance Driven Per Staff"),
     TASK_EFFICIENCY("Task Efficiency"),
     WORKING_HOUR_PER_SHIFT("Working Time"),
-    PLANNED_HOURS_VS_TIMEBANK("Planned Hours And TimeBank")
+    PLANNED_HOURS_VS_TIMEBANK("Planned Hours And TimeBank"),
+    ABSENCES_PER_INTERVAL("Absences Per Interval")
     //COMPLETED
 
     ;
