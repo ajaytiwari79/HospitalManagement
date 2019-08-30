@@ -13,8 +13,6 @@ public interface AbsenceTypesRepository extends Neo4jBaseRepository<AbsenceTypes
 
     AbsenceTypes findByATVTID(Long ATVTID);
 
-    AbsenceTypes findAllByOrganizationId(Long organizationId);
-
     AbsenceTypes findByName(String name);
 
 

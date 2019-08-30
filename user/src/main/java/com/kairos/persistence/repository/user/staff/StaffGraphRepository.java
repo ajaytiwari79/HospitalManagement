@@ -266,8 +266,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (staff:Staff)-[:LANGUAGE]->(language:Language) WHERE id(staff)={0} RETURN id(language)")
     Long getLanguageId(Long staffId);
 
-    @Query("MATCH (team:Team)-[:TEAM_HAS_MEMBER]->(staff:Staff) WHERE id(staff)= {1} AND id(team)={0}  RETURN staff ")
-    Staff getTeamStaff(Long teamId, Long staffId);
 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]-(position:Position)-[:"+BELONGS_TO+"]->(staff:Staff{externalId:{0}}) RETURN count(staff)>0")
     Boolean staffAlreadyInUnit(Long externalId, Long unitId);

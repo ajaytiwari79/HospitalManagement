@@ -72,7 +72,7 @@ public class Unit extends OrganizationBaseEntity {
 
     public Unit(Long id, String name, String description, Long  countryId, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
-                        CompanyCategory companyCategory, ZoneId timeZone,  AccountType accountType, boolean boardingCompleted) {
+                        CompanyCategory companyCategory, ZoneId timeZone,  AccountType accountType, boolean boardingCompleted,boolean workcentre) {
         this.name = name;
         this.description = description;
         this.countryId=countryId;
@@ -90,6 +90,7 @@ public class Unit extends OrganizationBaseEntity {
         this.id = id;
         this.accountType = accountType;
         this.boardingCompleted = boardingCompleted;
+        this.workcentre=workcentre;
 
     }
 

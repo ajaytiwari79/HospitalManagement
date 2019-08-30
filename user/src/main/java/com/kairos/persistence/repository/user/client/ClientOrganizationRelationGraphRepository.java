@@ -12,9 +12,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.GET_S
  */
 @Repository
 public interface ClientOrganizationRelationGraphRepository extends Neo4jBaseRepository<ClientOrganizationRelation,Long>{
-
-    ClientOrganizationRelation findByClient();
-
     @Query("MATCH (c:Client),(o:Unit) where id(c)={0} AND id(o)={1} CREATE (c)-[r:"+GET_SERVICE_FROM+"]->(o) SET r.joinDate={2}  SET r.employmentId={3}")
     void createClientRelationWithOrganization(Long createdClientId, Long unitId, Long joiningDate, String employmentId);
 

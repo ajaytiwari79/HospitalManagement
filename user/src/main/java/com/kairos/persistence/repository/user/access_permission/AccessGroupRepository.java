@@ -232,13 +232,6 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MERGE(org)-[:ORGANIZATION_HAS_ACCESS_GROUPS]-(ag)")
     void createAccessGroupUnitRelation(List<Long> orgIds, Long accessGroupId);
 
-    @Query("MATCH (org:Unit) WHERE id(org)={0} WITH org\n" +
-            "MATCH (org)-[:"+HAS_POSITIONS+"]-(position:Position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]->(user:User) WHERE id(user)={3} WITH position\n" +
-            "MATCH (position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit:Unit) WHERE id(unit)={1} \n" +
-            "MATCH (up)-[:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup) WHERE ag.role={2} RETURN count(ag) > 0")
-    Boolean checkIfUserHasAccessByRoleInUnit(Long parentOrgId, Long unitId, String role, Long userId);
-
-
     @Query("MATCH (c:Country)-[r:HAS_ACCESS_GROUP]->(ag:AccessGroup{deleted:false, enabled:true}) WHERE id(c)={0} AND r.organizationCategory={1} AND ag.role={2} AND (ag.endDate IS NULL OR date(ag.endDate) >= date()) \n" +
             "RETURN id(ag) AS id, ag.name AS name, ag.description AS description, ag.typeOfTaskGiver AS typeOfTaskGiver, ag.deleted AS deleted, ag.role AS role,ag.allowedDayTypes AS allowedDayTypes")
     List<AccessGroupQueryResult> getCountryAccessGroupByOrgCategoryAndRole(Long countryId, String orgCategory, String role);

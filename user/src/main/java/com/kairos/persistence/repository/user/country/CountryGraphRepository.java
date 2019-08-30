@@ -84,10 +84,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "MATCH (c:Country)-[:"+ HAS_ORGANIZATION_SERVICES +"]->(os) RETURN c limit 1")
     Country getCountryByOrganizationService(long subServiceId);
 
-    @Query("MATCH (team:Team) where id(team)={0} with team  MATCH(team)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode)-[:"+MUNICIPALITY+"]->(muncipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
-            "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN id(country)")
-    Long getCountryOfTeam(long teamId);
-
     @Query("MATCH (c:Country)-[:"+ HAS_HOLIDAY +"]-(ch:CountryHolidayCalender) " +
             "where id(c) = {0}   AND date(ch.holidayDate) >={1} AND  date(ch.holidayDate) <={2}  " +
             "AND ch.isEnabled = true WITH  ch as ch  " +

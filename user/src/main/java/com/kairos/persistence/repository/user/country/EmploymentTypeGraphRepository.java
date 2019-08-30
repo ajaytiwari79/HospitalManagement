@@ -22,10 +22,6 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
 
     List<EmploymentType> findAll();
 
-    @Query("MATCH (n:Unit) - [r:" + BELONGS_TO + "] -> (c:Country)-[r1:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
-            "WHERE id(n)={0} AND id(et)={1} AND et.deleted={2} return et")
-    EmploymentType getEmploymentTypeByOrganization(Long organizationId, Long employmentTypeId, Boolean isDeleted);
-
     @Query("Match (o:Unit),(et:EmploymentType) where id(o) = {0} AND id(et) = {1}\n" +
             "MERGE (o)-[r:" + EMPLOYMENT_TYPE_SETTINGS + "]->(et)\n" +
             "ON CREATE SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.creationDate = {6},r.lastModificationDate = {7}\n" +
@@ -54,15 +50,6 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
             "CASE WHEN r IS null THEN et.allowedForFlexPool ELSE r.allowedForFlexPool  END AS allowedForFlexPool")
     List<EmploymentTypeDTO> getEmploymentTypeSettingsForOrganization(long countryId, long organizationId, boolean isDeleted, List<Long> excludeEmploymentTypeIds);
 
-    @Query("MATCH (n:Unit) - [r:" + BELONGS_TO + "] -> (c:Country)-[r1:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
-            "WHERE id(n)={0} AND id(et)={1} AND et.deleted={2} return count(et) > 0 as etExists")
-    Boolean isEmploymentTypeExistInOrganization(Long organizationId, Long employmentTypeId, Boolean isDeleted);
-
-    @Query("MATCH (et:EmploymentType) WHERE id(et) IN {0} AND et.deleted={1} return et")
-    List<EmploymentType> getEmploymentTypeByIds(List<Long> employmentTypeIds, Boolean isDeleted);
-
-    @Query("MATCH (et:EmploymentType{deleted:false}) WHERE id(et) IN {0}  return et")
-    List<EmploymentType> getEmploymentTypeByIds(Set<Long> employmentTypeIds);
 
     @Query("MATCH (n:Organization) - [:" + BELONGS_TO + "] -> (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(n)={0} AND et.deleted={1} return et")

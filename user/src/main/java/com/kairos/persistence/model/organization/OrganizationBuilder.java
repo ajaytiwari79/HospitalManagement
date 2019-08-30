@@ -39,6 +39,7 @@ public class OrganizationBuilder {
     private String email;
     private ContactDetail contact;
     private ContactAddress contactAddress;
+    private boolean workcentre;
 
     public OrganizationBuilder setName(String name) {
         this.name = name;
@@ -69,7 +70,10 @@ public class OrganizationBuilder {
         this.companyType = companyType;
         return this;
     }
-
+    public OrganizationBuilder setWorkCentre(boolean workcentre) {
+        this.workcentre = workcentre;
+        return this;
+    }
     public OrganizationBuilder setBoardingCompleted(boolean boardingCompleted) {
         this.boardingCompleted = boardingCompleted;
         return this;
@@ -278,7 +282,7 @@ public class OrganizationBuilder {
     public Unit createUnit(){
         return new Unit(id,name,description,country.getId(),desiredUrl,shortCompanyName,kairosCompanyId,companyType,
                 vatId,businessTypes,organizationType,organizationSubTypes,companyUnitType,
-                companyCategory,timeZone,accountType,boardingCompleted);
+                companyCategory,timeZone,accountType,boardingCompleted,workcentre);
     }
 
 }

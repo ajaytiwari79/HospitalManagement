@@ -46,17 +46,6 @@ public interface ResourceGraphRepository extends Neo4jBaseRepository<Resource,Lo
             "} as resourceList ")
     List<Map<String,Object>> getResourceByOrganizationId(Long organizationId);
 
-    /*
-    *  Get the list of resources to assigned a beacon
-    *  @Param unitID, resource type(need only these types of resource) and resourceId(already assigned resource)
-    *  Return the available resources to assigned beacons
-    * */
-    @Query("MATCH(o:Unit)-[:UNIT_HAS_RESOURCE]->(r:Resource)  where id(o)={0} AND (r.name IN {1}) AND NOT (id(r) IN {2})  return r")
-    List<Resource> getUnassignedResourceWithBeacon(Long unit, String[] resourceTypes, long[] resourceIds);
-
-    @Query("MATCH(o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(r:Resource)  where id(o)={0} AND r.deleted=false  return r")
-    List<Resource> getByUnitId(Long organizationId);
-
     @Query("MATCH (o:Unit)-[:"+ UNIT_HAS_RESOURCE +"]->(r:Resource{deleted:false})-[:VEHICLE_TYPE]->(vehicle:Vehicle) where id(o)={0}\n" +
             "return id(r) as id,r.registrationNumber as registrationNumber,r.number as number,r.modelDescription as modelDescription,r.costPerKM as costPerKM,r.fuelType as fuelType," +
             "vehicle as vehicleType,r.creationDate as creationDate,r.decommissionDate as decommissionDate,case when r.decommissionDate is null then false else true end as isDecommision")

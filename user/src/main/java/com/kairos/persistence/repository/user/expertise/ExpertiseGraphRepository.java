@@ -62,9 +62,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN collect({id:id(skillCategory),name:skillCategory.name,children:skill}) as skills")
     ExpertiseSkillQueryResult getExpertiseSkills(long expertiseId, long countryId);
 
-    @Query("MATCH (e:Expertise{deleted:false}) WHERE id(e) in {0} \n" +
-            "RETURN count (e) as totalMatched")
-    Long findAllExpertiseCountMatchedByIds(List<Long> ids);
+
 
     @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} AND id(e) = {1} RETURN e")
     Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);

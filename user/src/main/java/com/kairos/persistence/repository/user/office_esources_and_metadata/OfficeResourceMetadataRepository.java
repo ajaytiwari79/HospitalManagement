@@ -11,6 +11,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OfficeResourceMetadataRepository extends Neo4jBaseRepository<OfficeResourceTypeMetadata,Long>{
 
-    @Query("MATCH (n:OfficeResourceTypeMetadata) RETURN n LIMIT 1")
-    OfficeResourceTypeMetadata getFirstNode();
+
 }

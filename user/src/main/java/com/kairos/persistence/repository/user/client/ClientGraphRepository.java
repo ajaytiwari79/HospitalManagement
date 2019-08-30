@@ -148,12 +148,6 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
             "            return  DISTINCT { id:id(staff), staffType:served_by_staff.type, lastName:staff.lastName , firstName:staff.firstName, profilePic: {2} + staff.profilePic, gender:user.gender, isDisabled:staff.isDisabled,  skillList: collect ({name: orgSkillRelation.customName,level:r.skillLevel})  }as staffList")
     List<Map<String, Object>> getTeamMembers(Long teamID, Long clientId, String imageUrl, Long unitId);
 
-
-
-    /*@Query("MATCH (c:Client)-[:"+PEOPLE_IN_HOUSEHOLD_LIST+"]-(ps:Client) where id(c)={0}  return id(ps) as id, ps.firstName
-    as firstName,ps.lastName as lastName,ps.firstName +' '+ ps.lastName as name,ps.cprNumber as cprNumber")
-    List<ClientMinimumDTO> getPeopleInHouseholdList(Long id);*/
-
     @Query("MATCH (c:Client)-[r:HAS_HOME_ADDRESS]->(ca:ContactAddress) WHERE   id(c)  = {0} WITH ca \n" +
             "MATCH (c1:Client)-[r1:HAS_HOME_ADDRESS]->(ca) WHERE NOT id(c1) = {0}  \n" +
             "return id(c1) as id, c1.firstName as firstName,c1.lastName as lastName,c1.firstName +' '+ c1.lastName as name,c1.cprNumber as cprNumber")
@@ -223,9 +217,6 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
     @Query("MATCH (c:Client)-[r:CIVILIAN_STATUS]->(cs:CitizenStatus) where id(c)= {0}  return cs")
     CitizenStatus findCitizenCivilianStatus(long citizenId);
 
-    @Query("MATCH (c:Client)-[:NEXT_TO_KIN]->(n:Client) where id(c)={0}  return n")
-    Client getNextToKin(Long id);
-
     @Query("MATCH (c:Client{citizenDead:false})-[r:" + GET_SERVICE_FROM + "]-(o:Unit) where id(o)= {0} return id(c) as id")
     List<Long> getCitizenIds(long unitId);
 
@@ -262,23 +253,6 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
 
     @Query("Match (c:Client)-[r:" + NEXT_TO_KIN + "]->(nextToKin:User{cprNumber:{1}}) where id(c)={0} return count(r)>0")
     Boolean citizenInNextToKinList(Long clientId, String cprNumber);
-
-    @Query("Match (client:Client) where id(client)={0} with client\n" +
-            "Match (houseHoldPeople:Client) where id(houseHoldPeople)={1} with client,houseHoldPeople\n" +
-            "Merge (client)-[r:" + PEOPLE_IN_HOUSEHOLD_LIST + "]-(houseHoldPeople)\n" +
-            "ON CREATE SET r.creationDate={2},r.lastModificationDate={3}\n" +
-            "ON MATCH SET r.lastModificationDate={3} return true")
-    void createHouseHoldRelationship(long clientId, long houseHoldPeopleId, long creationDate, long lastModificationDate);
-
-    @Query("Match (client:Client) where id(client)={0}\n" +
-            "Match (client)-[:HAS_HOME_ADDRESS]->(clientHomeAddress:ContactAddress)-[:ZIP_CODE]->(clientZipCode:ZipCode)\n" +
-            "Match (clientHomeAddress)-[:MUNICIPALITY]->(clientMunicipality:Municipality)\n" +
-            "Match (houseHold:Client)-[r:PEOPLE_IN_HOUSEHOLD_LIST]-(n:Client) where id(houseHold)={1}\n" +
-            "Match (houseHold)-[houseHoldHomeAddressRel:HAS_HOME_ADDRESS]->(houseHoldAddress:ContactAddress)-[:ZIP_CODE]->(zipCode:ZipCode)\n" +
-            "Match (homeAddress)-[:MUNICIPALITY]->(Municipality:Municipality)\n" +
-            "where not (zipCode.zipCode=clientZipCode.zipCode AND  houseHoldAddress.street1=~clientHomeAddress.street1 AND houseHoldAddress.houseNumber=clientHomeAddress.houseNumber)\n" +
-            "delete houseHoldHomeAddressRel,r")
-    void deleteHouseHoldWhoseAddressNotSame(Long clientId, Long houseHoldId);
 
     @Query("MATCH (citizen:Client{citizenDead:false})-[:GET_SERVICE_FROM]->(o:Unit)  where id(o)= {0} with citizen\n" +
             "OPTIONAL MATCH (c)-[:HAS_LOCAL_AREA_TAG]->(lat:LocalAreaTag) with lat,citizen\n" +
@@ -320,31 +294,12 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
             "return citizenId, organizationId")
     List<ClientOrganizationIdsDTO> getCitizenIdsByUnitIds(List<Long> unitIds);
 
-    @Query("MATCH (c:Client)-[r:" + SERVED_BY_STAFF + "]->(s:Staff) WHERE id(c)={0} AND r.type='PREFERRED' " +
-            "RETURN " +
-            " DISTINCT{ " +
-            "id:id(s), " +
-            "clientId:id(c), " +
-            " firstName:s.firstName, " +
-            " lastName:s.lastName, " +
-            "type:r.type " +
-            "} As result ")
-    List<Map<String, Object>> findClientStaff(Long id);
-
-    @Query("Match (client:Client)-[:" + CLIENT_CONTACT_PERSON_RELATION_TYPE + "{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client) in {0} with clientContactPerson\n" +
-            "MATCH (clientContactPerson)-[r1:" + CLIENT_CONTACT_PERSON_STAFF + "]->(staff:Staff) with r1,clientContactPerson \n" +
-            "MATCH (clientContactPerson)-[r2:" + CLIENT_CONTACT_PERSON_SERVICE + "]->(organizationService:OrganizationService) where id(organizationService)={2} delete r1,r2 \n")
-    void removeClientContactPersonRelations(List<Long> clientIds, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, Long serviceId);
-
     @Query("Match (client:Client)-[r:" + CLIENT_CONTACT_PERSON_RELATION_TYPE + "]->(clientContactPerson:ClientContactPerson) where id(client) in {0} AND id(clientContactPerson)={1} delete  r")
     void removeClientContactPersonRelationship(List<Long> clientIds, Long clientContactPersonId);
 
     @Query("Match (client:Client)-[r:" + CLIENT_CONTACT_PERSON_RELATION_TYPE + "{contactPersonRelationType:{1}}]->(clientContactPerson:ClientContactPerson) where id(client)={0} \n" +
             "MATCH (clientContactPerson)-[:" + CLIENT_CONTACT_PERSON_SERVICE + "]->(organizationService:OrganizationService) where id(organizationService)={2}  return clientContactPerson")
     ClientContactPerson getClientContactPerson(Long clientId, ClientContactPersonRelationship.ContactPersonRelationType contactPersonRelationType, Long serviceId);
-
-    @Query("Match (clientContactPerson:ClientContactPerson) where id(clientContactPerson)={0} delete clientContactPerson")
-    void removeClientContactPerson(Long clientContactPersonId);
 
     @Query("MATCH (c:Client)-[:" + PEOPLE_IN_HOUSEHOLD_LIST + "]-(ps:Client) where id(c)={0}  return id(ps)")
     List<Long> getPeopleInHouseholdIdList(Long id);
@@ -365,9 +320,6 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
     @Query("MATCH (clientContactPerson:ClientContactPerson)-[r:" + CLIENT_CONTACT_PERSON_STAFF + "]->(staff:Staff) where id(clientContactPerson)={0}  delete r")
     void removeClientContactPersonStaffRelation(Long clientContactPersonId);
 
-    @Query("MATCH (clientContactPerson:ClientContactPerson)-[r:" + CLIENT_CONTACT_PERSON_SERVICE + "]->(organisationService:OrganizationService) where id(clientContactPerson)={0}  delete r")
-    void removeClientContactPersonServiceRelation(Long clientContactPersonId);
-
     @Query("Match (n:Client)-[:" + CLIENT_CONTACT_PERSON_RELATION_TYPE + "]->(clientContactPerson:ClientContactPerson)-[:" + CLIENT_CONTACT_PERSON_SERVICE + "]->(os:OrganizationService) where id(os)={0} AND id(n)={1}\n" +
             "detach delete clientContactPerson")
     void deleteContactPersonForService(Long organizationId, Long clientId);
@@ -379,12 +331,6 @@ public interface ClientGraphRepository extends Neo4jBaseRepository<Client, Long>
     // TO check if home address exists for client
     @Query("Match  (c:Client) WHERE id(c) = {0}  RETURN EXISTS((c)-[:" + HAS_HOME_ADDRESS + "]->(:ContactAddress))")
     boolean isHomeAddressExists(long clientId);
-
-    /*@Query("MATCH (c:Client)-[r:"+HAS_HOME_ADDRESS+"]->(ca:ContactAddress) WHERE id(c) = {0} AND id(ca) = {1} DELETE r RETURN true")
-    boolean detachHomeAddressRelationOfClient(long clientId, long contactAddressId);*/
-
-   /* @Query("MATCH (c1:Client)-[r:"+PEOPLE_IN_HOUSEHOLD_LIST+"]->(c2:Client) WHERE id(c1)={0} DELETE r RETURN true")
-    boolean detachHouseholdRelationOfClient(long clientId);*/
 
     @Query("MATCH (c:Client)-[r:" + HAS_HOME_ADDRESS + "]->(ca:ContactAddress) WHERE id(ca)={0} return id(c)")
     List<Long> getIdsOfAllHouseHoldMembers(long contactAddressId);

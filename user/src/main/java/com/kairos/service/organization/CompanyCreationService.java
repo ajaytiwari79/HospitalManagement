@@ -428,7 +428,7 @@ public class CompanyCreationService {
         Country country=countryGraphRepository.getCountryByUnitId(parentOrganizationId);
         String kairosCompanyId = validateNameAndDesiredUrlOfOrganization(organizationBasicDTO);
         Unit unit = new OrganizationBuilder().setName(WordUtils.capitalize(organizationBasicDTO.getName())).setDescription(organizationBasicDTO.getDescription())
-                .setCountry(country).setDesiredUrl(organizationBasicDTO.getDesiredUrl()).setShortCompanyName(organizationBasicDTO.getShortCompanyName()).setCompanyType(organizationBasicDTO.getCompanyType()).setVatId(organizationBasicDTO.getVatId()).setTimeZone(ZoneId.of(TIMEZONE_UTC)).setKairosCompanyId(kairosCompanyId).createUnit();
+                .setCountry(country).setDesiredUrl(organizationBasicDTO.getDesiredUrl()).setShortCompanyName(organizationBasicDTO.getShortCompanyName()).setWorkCentre(organizationBasicDTO.isWorkcentre()).setCompanyType(organizationBasicDTO.getCompanyType()).setVatId(organizationBasicDTO.getVatId()).setTimeZone(ZoneId.of(TIMEZONE_UTC)).setKairosCompanyId(kairosCompanyId).createUnit();
         setDefaultDataFromParentOrganization(unit, parentUnit, organizationBasicDTO);
         ContactAddress contactAddress = new ContactAddress();
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
@@ -552,14 +552,9 @@ public class CompanyCreationService {
         OrganizationBaseEntity organization=organizationBaseRepository.findById(organizationId,2).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId)));
         Organization parent=organizationService.fetchParentOrganization(organization.getId());
         List<Long> allUnitIds=parent.getUnits().stream().map(Unit::getId).collect(Collectors.toList());
-        parent.setUnits(unitGraphRepository.findAllById(allUnitIds));
-        //Unit unit=null;
-//        if(organization.get() instanceof Organization){
-//            parent=((Organization) organization.get());
-//        }
-//        else if(organization.get() instanceof Unit){
-//            unit =((Unit) organization.get());
-//        }
+        List<Unit> unitList=unitGraphRepository.findAllById(allUnitIds);
+        Map<Long,Boolean> unitAndParentOrgMap=unitList.stream().collect(Collectors.toMap(k->k.getId(),v->v.isWorkcentre()));
+        parent.setUnits(unitList);
 
         // If it has any error then it will throw exception
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
@@ -580,7 +575,7 @@ public class CompanyCreationService {
         } else {
             unitIds.add(organizationId);
         }
-        staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
+        staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, parent.getId());
         validateUserDetails(staffPersonalDetailDTOS, exceptionService);
         List<OrganizationContactAddress> organizationContactAddresses = unitGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
@@ -599,7 +594,7 @@ public class CompanyCreationService {
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(parent.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, organization.isParentOrganization());
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, unitAndParentOrgMap.get(organizationId));
         if(parentOrganizationId == null) {
             companyDefaultDataService.createDefaultDataForParentOrganization(parent, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
             companyDefaultDataService.createDefaultDataInUnit(organization.getId(), parent.getUnits(), countryId, timeSlots);

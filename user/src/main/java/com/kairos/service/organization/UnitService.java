@@ -91,10 +91,7 @@ public class UnitService {
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
         }
-        Long countryId = UserContext.getUserDetails().getCountryId();
-        if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
+        Long countryId = organization.getCountry().getId();
 
         Map<String, Object> response = new HashMap<>(2);
         response.put("parentInfo", parentOrgDefaultDetails(organization));
@@ -130,7 +127,7 @@ public class UnitService {
         } else {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }
-        Country country = unitGraphRepository.getCountry(parentOrgaziationId);
+        Country country = countryGraphRepository.getCountryByUnitId(parentOrgaziationId);
         companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(), parentOrgaziationId);
         organizationBasicDTO.setBoardingCompleted(true);
         return organizationBasicDTO;
