@@ -20,7 +20,7 @@ import java.util.List;
  * Created at 25/6/19
  **/
 @Repository
-public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger> {
+public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger>,CustomTodoRepository {
 
     @Query(value = "{unitId:?0,deleted:false,status:{$in:?1}}")
     List<TodoDTO> findAllByNotApproved(Long unitId, Collection<TodoStatus> statuses);

@@ -25,6 +25,7 @@ public class TodoDTO {
     private BigInteger subEntityId;
     private TodoStatus status;
     private LocalDate shiftDate;
+    private LocalDateTime shiftDateTime;
     private String description;
     private Long staffId;
     private Long employmentId;

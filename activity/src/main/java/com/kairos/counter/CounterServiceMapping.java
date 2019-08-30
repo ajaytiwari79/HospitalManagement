@@ -63,16 +63,16 @@ public class CounterServiceMapping {
         this.counters.put(CounterType.FIBONACCI, fibonacciKPIService);
     }
 
-//    @Inject
-//    public void comparePlannedHoursVsTimeBank(PlannedHoursVsTimeBankService plannedHoursVsTimeBankService) {
-//        LOGGER.info("Enum mapping for planned hours and time bank : "+this.counters);
-//        this.counters.put(CounterType.PLANNED_HOURS_VS_TIMEBANK, plannedHoursVsTimeBankService);
-//    }
+    @Inject
+    public void comparePlannedHoursVsTimeBank(PlannedHoursVsTimeBankService plannedHoursVsTimeBankService) {
+        LOGGER.info("Enum mapping for planned hours and time bank : "+this.counters);
+        this.counters.put(CounterType.PLANNED_HOURS_VS_TIMEBANK, plannedHoursVsTimeBankService);
+    }
 
     @Inject
     public void setAbsencePlanningKPIService(AbsencePlanningKPIService absencePlanningKPIService) {
         LOGGER.info("Enum mapping for absences per interval : "+this.counters);
-        this.counters.put(CounterType.PLANNED_HOURS_VS_TIMEBANK, absencePlanningKPIService);
+        this.counters.put(CounterType.ABSENCES_PER_INTERVAL, absencePlanningKPIService);
     }
 
     public CounterService getService(CounterType counterType){
