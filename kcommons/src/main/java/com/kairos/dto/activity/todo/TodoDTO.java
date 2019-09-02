@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Created by pradeep
@@ -25,7 +26,7 @@ public class TodoDTO {
     private BigInteger subEntityId;
     private TodoStatus status;
     private LocalDate shiftDate;
-    private LocalDateTime shiftDateTime;
+    private Date shiftDateTime;
     private String description;
     private Long staffId;
     private Long employmentId;

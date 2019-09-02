@@ -29,6 +29,7 @@ import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.counter.ApplicableFilter;
 import com.kairos.persistence.model.counter.ApplicableKPI;
@@ -62,6 +63,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.dto.activity.counter.enums.CounterType.ABSENCES_PER_INTERVAL;
 import static com.kairos.enums.FilterType.STAFF_IDS;
 import static java.util.stream.Collectors.toList;
 
@@ -174,7 +176,7 @@ public class CounterDataService extends MongoBaseService {
         if (!accessGroupPermissionCounterDTO.isManagement()) {
             exceptionService.actionNotPermittedException(MESSAGE_KPI_PERMISSION);
         }
-        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+        if (isNotNull(tabId) && !accessGroupPermissionCounterDTO.isCountryAdmin() && !accessGroupPermissionCounterDTO.isManagement()) {
             level = ConfLevel.STAFF;
             applicableKPIS = counterRepository.getApplicableKPI(Arrays.asList(kpiId), level, accessGroupPermissionCounterDTO.getStaffId());
         } else {
@@ -221,7 +223,11 @@ public class CounterDataService extends MongoBaseService {
             getStaffDefaultData(criteriaList, defaultKpiDataDTO);
         }
         if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_STATUS)) {
-            getActivityStatusDefaultData(criteriaList);
+            if(ABSENCES_PER_INTERVAL.equals(kpi.getType())){
+                getTodoStatusDefaultData(criteriaList);
+            }else {
+                getActivityStatusDefaultData(criteriaList);
+            }
         }
         if (kpi.getFilterTypes().contains(FilterType.DAYS_OF_WEEK)) {
             getDayOfWeekDefaultData(criteriaList);
@@ -271,6 +277,13 @@ public class CounterDataService extends MongoBaseService {
 
     private void getActivityStatusDefaultData(List<FilterCriteria> criteriaList) {
         List<ShiftStatus> activityStatus = Arrays.asList(ShiftStatus.values());
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        activityStatus.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toString())));
+        criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_STATUS.value, FilterType.ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getTodoStatusDefaultData(List<FilterCriteria> criteriaList) {
+        List<TodoStatus> activityStatus = TodoStatus.getAllStatusExceptViewed();
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         activityStatus.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toString())));
         criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_STATUS.value, FilterType.ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));

@@ -1,9 +1,9 @@
 package com.kairos.persistence.repository.todo;
 
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.todo.TodoDTO;
+import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoType;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.todo.Todo;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -21,16 +21,26 @@ public class TodoRepositoryImpl implements CustomTodoRepository {
     MongoTemplate mongoTemplate;
 
 
-//    @Override
-//    public List<TodoDTO> findAllByKpiFilter(Long unit, Date startDate, Date endDate, List<Long> staffIds, Collection<String> statuses) {
-//        Aggregation aggregation=Aggregation.newAggregation(
-//            Aggregation.match(Criteria.where("unitId").is(unit).and("type").is(TodoType.APPROVAL_REQUIRED).and("staffId").in(staffIds).and("status").in(statuses).and("shiftDate").gte(startDate).lte(endDate)),
-//             Aggregation.lookup("shifts","entityId","_id","shifts"),
-//             Aggregation.project("_id","status").and("shifts").arrayElementAt(0).as("shift"),
-//                Aggregation.project("_id","status").and("shift.startDate.").as("shiftDateTime")
-//        );
-//        AggregationResults<TodoDTO> result = mongoTemplate.aggregate(aggregation, Todo.class, TodoDTO.class);
-//        return result.getMappedResults();
-//
-//    }
+    @Override
+    public List<TodoDTO> findAllByKpiFilter(Long unit, Date startDate, Date endDate, List<Long> staffIds, Collection<String> statuses) {
+        Criteria criteria=Criteria.where("unitId").is(unit).and("type").is(TodoType.APPROVAL_REQUIRED).and("shiftDate").gte(startDate).lte(endDate);
+        if(ObjectUtils.isCollectionNotEmpty(staffIds)){
+            criteria.and("staffId").in(staffIds);
+        }
+        if (ObjectUtils.isCollectionNotEmpty(statuses)) {
+            criteria.and("status").in(statuses);
+        }
+        if(statuses.contains(TodoStatus.DISAPPROVE)){
+            criteria.orOperator(Criteria.where("deleted").is("false"),criteria);
+        }
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(criteria),
+             Aggregation.lookup("shifts","entityId","_id","shifts"),
+             Aggregation.project("id","status","staffId").and("shifts").arrayElementAt(0).as("shift"),
+                Aggregation.project("id","status","staffId").and("shift.startDate").as("shiftDateTime")
+        );
+        AggregationResults<TodoDTO> result = mongoTemplate.aggregate(aggregation, Todo.class, TodoDTO.class);
+        return result.getMappedResults();
+
+    }
 }
