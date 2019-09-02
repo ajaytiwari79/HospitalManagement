@@ -3,3 +3,10 @@ Match(ap:AccessPage) where ap.moduleId="module_12" merge (ap)-[:SUB_PAGE]-(acces
 Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
 Match (ap:AccessPage)
 CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);
+
+
+Match(ap:AccessPage) where ap.moduleId="tab_205" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Public Legal Documents",isModule:false,moduleId:"tab_421",active:true});
+
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+Match (ap:AccessPage)
+CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);

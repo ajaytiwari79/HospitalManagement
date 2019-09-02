@@ -181,7 +181,11 @@ public class FibonacciKPIService implements CounterService{
                     applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(fibonacciKPIConfigMap.keySet()),UNIT,organizationId);
                 }else if(STAFF.equals(level)){
                     AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
-                    applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(fibonacciKPIConfigMap.keySet()),STAFF,accessGroupPermissionCounterDTO.getStaffId());
+                    if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
+                        applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(fibonacciKPIConfigMap.keySet()), ConfLevel.COUNTRY, accessGroupPermissionCounterDTO.getCountryId());
+                    } else {
+                        applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(fibonacciKPIConfigMap.keySet()), ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
+                    }
                 }
         for (ApplicableKPI applicableKPI : applicableKPIS) {
             updatedFibonacciKPIConfigs.add(fibonacciKPIConfigMap.get(applicableKPI.getActiveKpiId()));

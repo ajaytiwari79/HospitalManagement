@@ -464,48 +464,8 @@ public class OrganizationActivityService extends MongoBaseService {
             List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
             phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
             unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
-            activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases);
-            List<Activity> existingActivities;
-            if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
-                existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
-            } else {
-                existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
-            }
-
-            if (!existingActivities.isEmpty()) {
-                Set<Long> parentAccessGroupIds = existingActivities.stream().flatMap(a -> a.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(b -> b.getActivityShiftStatusSettings().stream().flatMap(c -> c.getAccessGroupIds().stream()))).collect(Collectors.toSet());
-                Map<Long, Long> accessGroupIdsMap = userIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
-                List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
-                for (Activity activity : existingActivities) {
-                    logger.info("I am act {}", activity.getName());
-                    List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-                    for (int i = 0; i < phases.size(); i++) {
-                        List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
-                        List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
-                        Set<Long> agIds = new HashSet<>();
-                        PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
-                                activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
-                                activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
-                        for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
-                            List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
-                            accessGroupIds.forEach(a -> {
-                                if (accessGroupIdsMap.get(a) != null) {
-                                    agIds.add(accessGroupIdsMap.get(a));
-                                }
-                            });
-                            activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(), agIds));
-                        }
-                        phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
-                        phaseTemplateValues.add(phaseTemplateValue);
-                    }
-                    activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
-                    activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
-                }
-                save(activityCopiedList);
-                costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
-                wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
-                updateCompositeActivitiesIds(activityCopiedList);
-            }
+            activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases,orgTypeAndSubTypeDTO.getEmploymentTypeIds());
+            createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
             TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
             timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         }
@@ -517,6 +477,50 @@ public class OrganizationActivityService extends MongoBaseService {
         protectedDaysOffService.saveProtectedDaysOff(unitId, ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);
         counterDistService.createDefaultCategory(unitId);
         return true;
+    }
+
+    private void createActivityforOrganisation(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, List<Phase> phases) {
+        List<Activity> existingActivities;
+        if (orgTypeAndSubTypeDTO.getParentOrganizationId() == null) {
+            existingActivities = activityMongoRepository.findAllActivitiesByOrganizationTypeOrSubTypeOrBreakTypes(orgTypeAndSubTypeDTO.getOrganizationTypeId(), orgTypeAndSubTypeDTO.getSubTypeId());
+        } else {
+            existingActivities = activityMongoRepository.findAllByUnitIdAndDeletedFalse(orgTypeAndSubTypeDTO.getParentOrganizationId());
+        }
+
+        if (!existingActivities.isEmpty()) {
+            Set<Long> parentAccessGroupIds = existingActivities.stream().flatMap(a -> a.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(b -> b.getActivityShiftStatusSettings().stream().flatMap(c -> c.getAccessGroupIds().stream()))).collect(Collectors.toSet());
+            Map<Long, Long> accessGroupIdsMap = userIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
+            List<Activity> activityCopiedList = new ArrayList<>(existingActivities.size());
+            for (Activity activity : existingActivities) {
+                logger.info("I am act {}", activity.getName());
+                List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
+                for (int i = 0; i < phases.size(); i++) {
+                    List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
+                    List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
+                    Set<Long> agIds = new HashSet<>();
+                    PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
+                            activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
+                            activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
+                    for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
+                        List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
+                        accessGroupIds.forEach(a -> {
+                            if (accessGroupIdsMap.get(a) != null) {
+                                agIds.add(accessGroupIdsMap.get(a));
+                            }
+                        });
+                        activityShiftStatusSettings.add(new ActivityShiftStatusSettings(existingActivityShiftStatusSettings.get(j).getShiftStatus(), agIds));
+                    }
+                    phaseTemplateValue.setActivityShiftStatusSettings(activityShiftStatusSettings);
+                    phaseTemplateValues.add(phaseTemplateValue);
+                }
+                activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
+                activityCopiedList.add(copyAllActivitySettingsInUnit(activity, unitId));
+            }
+            save(activityCopiedList);
+            costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
+            wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
+            updateCompositeActivitiesIds(activityCopiedList);
+        }
     }
 
     /**

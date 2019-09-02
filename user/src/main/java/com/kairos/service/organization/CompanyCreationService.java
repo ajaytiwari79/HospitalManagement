@@ -131,6 +131,8 @@ public class CompanyCreationService {
     private AccessGroupRepository accessGroupRepository;
     @Inject
     private StaffCreationService staffCreationService;
+    @Inject
+    private EmploymentTypeGraphRepository employmentTypeGraphRepository;
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -578,7 +580,9 @@ public class CompanyCreationService {
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(organization.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, organization.isParentOrganization());
+        List<Long> employmentIds=employmentTypeGraphRepository.getEmploymentTypeIdsByCountryId(countryId);
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, organization.isParentOrganization(),employmentIds);
+
         if(parentOrgaziationId == null) {
             companyDefaultDataService.createDefaultDataForParentOrganization(organization, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
             companyDefaultDataService.createDefaultDataInUnit(organization.getId(), organization.getChildren(), countryId, timeSlots);

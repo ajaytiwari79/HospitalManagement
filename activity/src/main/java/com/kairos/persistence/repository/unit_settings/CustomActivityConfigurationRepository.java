@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CustomActivityConfigurationRepository {
 
-    ActivityConfiguration findPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
+    /*ActivityConfiguration findPresenceConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
 
     List<ActivityConfigurationDTO> findPresenceConfigurationByUnitId(Long unitId);
 
@@ -20,7 +20,7 @@ public interface CustomActivityConfigurationRepository {
 
     List<ActivityConfigurationDTO> findPresenceConfigurationByCountryId(Long countryId);
 
-    List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryId(Long unitId);
+    List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryId(Long unitId);*/
 
 
 }

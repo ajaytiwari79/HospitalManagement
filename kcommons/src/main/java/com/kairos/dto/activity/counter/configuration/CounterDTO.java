@@ -18,7 +18,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.constants.MessageConstants.FREQUENCY_VALUE_IS_NOT_POSITIVE;
+import static com.kairos.constants.CommonMessageConstants.FREQUENCY_VALUE_IS_NOT_POSITIVE;
 
 @Getter
 @Setter

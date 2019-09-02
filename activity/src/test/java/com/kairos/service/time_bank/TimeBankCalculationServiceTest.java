@@ -56,7 +56,7 @@ public class TimeBankCalculationServiceTest {
     private List<ShiftWithActivityDTO> shiftWithActivityDTOS;
     private List<Shift> shifts;
     private Map<String, DailyTimeBankEntry> dailyTimeBankEntryMap;
-    private Set<DateTimeInterval> planningPeriodIntervals;
+    private DateTimeInterval planningPeriodInterval;
     private List<DayTypeDTO> dayTypeDTOS;
     private boolean validatedByPlanner;
     private Activity activity;
@@ -76,7 +76,7 @@ public class TimeBankCalculationServiceTest {
         interval = new DateTimeInterval(1555718400000l,1555804800000l);
         shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(SHIFT_FOR_TIMEBANK_CALCULATION),ShiftWithActivityDTO.class);;
         dailyTimeBankEntryMap = new HashMap<>();
-        planningPeriodIntervals = newHashSet(new DateTimeInterval(1555286400000l, 1555804800000l));
+        planningPeriodInterval = new DateTimeInterval(1555286400000l, 1555804800000l);
         dayTypeDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(DAYTYPE), DayTypeDTO.class);
         activity = ObjectMapperUtils.jsonStringToObject(getFileDataAsString(ACTIVITY_FOR_TIMEBANK_CALCULATION), Activity.class);
         shifts = ObjectMapperUtils.JsonStringToList(getFileDataAsString(JsonConstaints.SHIFT), Shift.class);
@@ -88,7 +88,7 @@ public class TimeBankCalculationServiceTest {
         todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
-        DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
+        DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodInterval, dayTypeDTOS, validatedByPlanner);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
         ctaDistributionCalculation.put(new BigInteger("3061"), 480);
         ctaDistributionCalculation.put(new BigInteger("3062"), 0);
@@ -119,7 +119,7 @@ public class TimeBankCalculationServiceTest {
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
         shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(NIGHT_SHIFT_FOR_TIMEBANK_CALCULATION), ShiftWithActivityDTO.class);
-        DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodIntervals, dayTypeDTOS, validatedByPlanner);
+        DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodInterval, dayTypeDTOS, validatedByPlanner);
         LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
         ctaDistributionCalculation.put(new BigInteger("3061"), 480);

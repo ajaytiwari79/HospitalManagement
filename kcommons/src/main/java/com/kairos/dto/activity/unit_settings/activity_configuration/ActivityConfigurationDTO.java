@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 
@@ -12,12 +13,11 @@ import java.math.BigInteger;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityConfigurationDTO {
     private BigInteger id;
-    private PhaseResponseDTO phase;
-    private PresenceTypeDTO managementPlannedTime;
-    private PresenceTypeDTO staffPlannedTime;
-    private PresenceTypeDTO plannedTime; // for activity.
-    private TimeTypeResponseDTO timeType;
-    private Boolean exception;
+    private Long unitId;
+    private PresencePlannedTime presencePlannedTime;
+    private AbsencePlannedTime absencePlannedTime;
+    @Indexed
+    private Long countryId;
 
     public ActivityConfigurationDTO() {
         //dc
@@ -31,52 +31,36 @@ public class ActivityConfigurationDTO {
         this.id = id;
     }
 
-    public PhaseResponseDTO getPhase() {
-        return phase;
+    public Long getUnitId() {
+        return unitId;
     }
 
-    public void setPhase(PhaseResponseDTO phase) {
-        this.phase = phase;
+    public void setUnitId(Long unitId) {
+        this.unitId = unitId;
     }
 
-    public PresenceTypeDTO getManagementPlannedTime() {
-        return managementPlannedTime;
+    public PresencePlannedTime getPresencePlannedTime() {
+        return presencePlannedTime;
     }
 
-    public void setManagementPlannedTime(PresenceTypeDTO managementPlannedTime) {
-        this.managementPlannedTime = managementPlannedTime;
+    public void setPresencePlannedTime(PresencePlannedTime presencePlannedTime) {
+        this.presencePlannedTime = presencePlannedTime;
     }
 
-    public PresenceTypeDTO getStaffPlannedTime() {
-        return staffPlannedTime;
+    public AbsencePlannedTime getAbsencePlannedTime() {
+        return absencePlannedTime;
     }
 
-    public void setStaffPlannedTime(PresenceTypeDTO staffPlannedTime) {
-        this.staffPlannedTime = staffPlannedTime;
+    public void setAbsencePlannedTime(AbsencePlannedTime absencePlannedTime) {
+        this.absencePlannedTime = absencePlannedTime;
     }
 
-    public PresenceTypeDTO getPlannedTime() {
-        return plannedTime;
+    public Long getCountryId() {
+        return countryId;
     }
 
-    public void setPlannedTime(PresenceTypeDTO plannedTime) {
-        this.plannedTime = plannedTime;
-    }
-
-    public TimeTypeResponseDTO getTimeType() {
-        return timeType;
-    }
-
-    public void setTimeType(TimeTypeResponseDTO timeType) {
-        this.timeType = timeType;
-    }
-
-    public Boolean getException() {
-        return exception;
-    }
-
-    public void setException(Boolean exception) {
-        this.exception = exception;
+    public void setCountryId(Long countryId) {
+        this.countryId = countryId;
     }
 }
 

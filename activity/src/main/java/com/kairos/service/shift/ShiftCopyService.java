@@ -292,60 +292,6 @@ public class ShiftCopyService extends MongoBaseService {
         shift.setDurationMinutes(durationMinutes);
     }
 
-    private BigInteger addPlannedTimeInShift(BigInteger phaseId, Activity activity, StaffEmploymentDetails staffAdditionalInfoDTO, StaffEmploymentUnitDataWrapper dataWrapper, List<ActivityConfiguration> activityConfigurations) {
-        /**
-         * This is used for checking the activity is for presence type
-         **/
-        Boolean managementPerson = Optional.ofNullable(dataWrapper.getUser()).isPresent() && dataWrapper.getUser().getManagement();
-
-       /* return (activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_DAY_CALCULATION)
-                || activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(FULL_WEEK))
-                ? getAbsencePlannedTime(phaseId, staffAdditionalInfoDTO, activityConfigurations)
-                : getPresencePlannedTime(phaseId, managementPerson, staffAdditionalInfoDTO, activityConfigurations);*/
-
-
-        return (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())
-                ? getAbsencePlannedTime(phaseId, staffAdditionalInfoDTO, activityConfigurations)
-                : getPresencePlannedTime(phaseId, managementPerson, staffAdditionalInfoDTO, activityConfigurations));
-    }
-
-    private BigInteger getAbsencePlannedTime(BigInteger phaseId, StaffEmploymentDetails staffAdditionalInfoDTO, List<ActivityConfiguration> activityConfigurations) {
-        BigInteger plannedTimeId = null;
-        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
-            if (activityConfiguration.getAbsencePlannedTime() != null && activityConfiguration.getAbsencePlannedTime().getPhaseId().equals(phaseId)) {
-                plannedTimeId = activityConfiguration.getAbsencePlannedTime().getPlannedTimeId();
-                if (activityConfiguration.getAbsencePlannedTime().isException()) {
-                    break; // if anyone is of exception type then we need to break and don't need to search in next entries
-                }
-            }
-        }
-        // checking weather this is allowed to staff or not
-        if (Optional.ofNullable(staffAdditionalInfoDTO.getIncludedPlannedTime()).isPresent() && plannedTimeId.equals(staffAdditionalInfoDTO.getExcludedPlannedTime())) {
-            plannedTimeId = staffAdditionalInfoDTO.getIncludedPlannedTime();
-        }
-        return plannedTimeId;
-    }
-
-    private BigInteger getPresencePlannedTime(BigInteger phaseId, Boolean managementPerson, StaffEmploymentDetails staffAdditionalInfoDTO, List<ActivityConfiguration> activityConfigurations) {
-        ActivityConfiguration appliedActivityConfiguration = null;
-        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
-            if (activityConfiguration.getPresencePlannedTime() != null && activityConfiguration.getPresencePlannedTime().getPhaseId().equals(phaseId)) {
-                appliedActivityConfiguration = activityConfiguration;
-            }
-
-        }
-        return (managementPerson) ? getApplicablePlannedType(staffAdditionalInfoDTO, appliedActivityConfiguration.getPresencePlannedTime().getManagementPlannedTimeId())
-                : getApplicablePlannedType(staffAdditionalInfoDTO, appliedActivityConfiguration.getPresencePlannedTime().getStaffPlannedTimeId());
-    }
-
-    private BigInteger getApplicablePlannedType(StaffEmploymentDetails staffEmploymentDetails, BigInteger plannedTypeId) {
-        if (Optional.ofNullable(staffEmploymentDetails.getIncludedPlannedTime()).isPresent()) {
-            plannedTypeId = plannedTypeId.equals(staffEmploymentDetails.getExcludedPlannedTime()) ? staffEmploymentDetails.getIncludedPlannedTime() : plannedTypeId;
-        }
-        return plannedTypeId;
-
-    }
-
     private String validateShiftExistanceBetweenDuration(LocalDate shiftCreationStartDate, Shift sourceShift, List<Shift> currentStaffPreviousShifts) {
         String response = null;
         if (currentStaffPreviousShifts != null) {
