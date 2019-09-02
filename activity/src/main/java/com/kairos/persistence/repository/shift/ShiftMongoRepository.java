@@ -95,4 +95,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query(value = "{'deleted':false, 'disabled':false, 'employmentId':?0}",count = true)
     Long countShiftsByEmploymentId(Long EmploymentId);
+
+    @Query("{deleted:false,employmentId:?0, 'disabled':false, startDate:{$gte:?1,$lt:?2}}")
+    List<Shift> findAllShiftsByEmploymentId(Long employmentId, Date startDate, Date endDate);
 }
