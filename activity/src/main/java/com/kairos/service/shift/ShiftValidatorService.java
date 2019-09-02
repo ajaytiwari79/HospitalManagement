@@ -7,6 +7,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
@@ -150,6 +151,9 @@ public class ShiftValidatorService {
 
     private static ExceptionService exceptionService;
 
+    @Inject
+    private TimeBankCalculationService timeBankCalculationService;
+
     @Autowired
     public void setExceptionService(ExceptionService exceptionService) {
         this.exceptionService = exceptionService;
@@ -201,10 +205,16 @@ public class ShiftValidatorService {
         if (planningPeriod == null) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PLANNING_PERIOD_EXITS, shift.getStartDate());
         }
+        shift.setPhaseId(phase.getId());
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(planningPeriod, phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
+        updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO, activityWrapperMap);
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate().getTime(), shift.getEndDate().getTime());
+        Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        TimeBankCalculationService.CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, newArrayList(shift), false, false, dayTypeDTOMap).calculate();
+        shift.setPlannedMinutesOfTimebank(calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes());
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills(), ruleTemplateSpecificInfo, exceptionService);
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getEmployment().getExpertise(), ruleTemplateSpecificInfo);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
@@ -222,7 +232,6 @@ public class ShiftValidatorService {
         }
         List<Long> dayTypeIds = shift.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getActivity().getRulesActivityTab().getDayTypes().stream()).collect(Collectors.toList());
         if (isCollectionNotEmpty(dayTypeIds)) {
-            Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
             Set<DayOfWeek> validDays = getValidDays(dayTypeDTOMap, dayTypeIds);
             Specification<ShiftWithActivityDTO> activityDayTypeSpec = new DayTypeSpecification(validDays, shift.getStartDate());
             activitySpecification = activitySpecification.and(activityDayTypeSpec);
@@ -230,6 +239,21 @@ public class ShiftValidatorService {
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
         activitySpecification.validateRules(shift);
         return new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
+    }
+
+    private void updateScheduledAndDurationMinutesInShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        int scheduledMinutes = 0;
+        int durationMinutes = 0;
+        for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
+            ShiftActivity shiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivityDTO,ShiftActivity.class);
+            timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), staffAdditionalInfoDTO.getEmployment());
+            shiftActivityDTO.setScheduledMinutes(shiftActivity.getScheduledMinutes());
+            shiftActivityDTO.setDurationMinutes(shiftActivity.getDurationMinutes());
+            scheduledMinutes+=shiftActivity.getScheduledMinutes();
+            durationMinutes+=shiftActivity.getDurationMinutes();
+        }
+        shift.setScheduledMinutes(scheduledMinutes);
+        shift.setDurationMinutes(durationMinutes);
     }
 
     private void validateAbsenceReasonCodeRule(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shift, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {

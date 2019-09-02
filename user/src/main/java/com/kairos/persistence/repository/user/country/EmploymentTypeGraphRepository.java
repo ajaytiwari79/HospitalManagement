@@ -26,10 +26,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
             "MERGE (o)-[r:" + EMPLOYMENT_TYPE_SETTINGS + "]->(et)\n" +
             "ON CREATE SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.creationDate = {6},r.lastModificationDate = {7}\n" +
             "ON MATCH SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.lastModificationDate = {7} return true")
-    Boolean setEmploymentTypeSettingsForOrganization(Long organizationId, Long employmentTypeId,
-                                                     Boolean allowedForContactPerson,
-                                                     boolean allowedForShiftPlan,
-                                                     boolean allowedForFlexPool, PaidOutFrequencyEnum paymentFrequency, long creationDate, long lastModificationDate);
+    Boolean setEmploymentTypeSettingsForOrganization(Long organizationId, Long employmentTypeId, Boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, PaidOutFrequencyEnum paymentFrequency, long creationDate, long lastModificationDate);
 
     @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND et.deleted={2}  with et\n" +
             "MATCH (o:Unit)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
@@ -70,6 +67,10 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     @Query("MATCH  (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(c)={0} AND et.deleted={1} return id(et) as id,et.name as name")
     List<EmploymentTypeQueryResult> getEmploymentTypeByCountry(Long countryId, Boolean isDeleted);
+
+    @Query("MATCH  (c:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType{deleted:false}) " +
+            "WHERE id(c)={0} return id(et) ")
+    List<Long> getEmploymentTypeIdsByCountryId(Long countryId);
 
 
 

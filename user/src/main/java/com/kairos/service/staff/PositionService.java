@@ -555,22 +555,17 @@ public class PositionService {
     private Long getMaxEmploymentEndDate(Long staffId) {
         Long positionEndDate = null;
         List<String> employmentsEndDate = employmentGraphRepository.getAllEmploymentsByStaffId(staffId);
-        if (!employmentsEndDate.isEmpty()) {
+        if (!employmentsEndDate.isEmpty() && !employmentsEndDate.contains(null)) {
             //java.lang.ClassCastException: java.lang.String cannot be cast to java.time.LocalDate
             LocalDate maxEndDate = LocalDate.parse(employmentsEndDate.get(0));
-            boolean isEndDateBlank = false;
             //TODO Get employments with date more than the sent employment's end date at query level itself
             for (String employmentEndDateString : employmentsEndDate) {
-                LocalDate employmentEndDate = employmentEndDateString == null ? null : LocalDate.parse(employmentEndDateString);
-                if (!Optional.ofNullable(employmentEndDate).isPresent()) {
-                    isEndDateBlank = true;
-                    break;
-                }
+                LocalDate employmentEndDate = LocalDate.parse(employmentEndDateString);
                 if (maxEndDate.isBefore(employmentEndDate)) {
                     maxEndDate = employmentEndDate;
                 }
             }
-            positionEndDate = isEndDateBlank ? null : DateUtils.getLongFromLocalDate(maxEndDate);
+            positionEndDate =  DateUtils.getLongFromLocalDate(maxEndDate);
         }
         return positionEndDate;
 

@@ -154,4 +154,5 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
             "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN country")
     Country getCountryByUnitId(long unitId);
+
 }

@@ -87,9 +87,7 @@ public class ShiftStatusService {
         Shift currentShift = shiftMongoRepository.findOne(shiftPublishDTO.getShifts().get(0).getShiftId());
         Activity activity = activityMongoRepository.findOne(currentShift.getActivities().get(0).getActivityId());
         if(CommonConstants.FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())){
-            ZonedDateTime startDate = asZoneDateTime(currentShift.getStartDate()).with(TemporalAdjusters.previousOrSame(activity.getTimeCalculationActivityTab().getFullWeekStart())).truncatedTo(ChronoUnit.DAYS);
-            ZonedDateTime endDate = startDate.plusDays(7);
-            List<Shift> shifts= shiftMongoRepository.findAllShiftsByStaffId(currentShift.getStaffId(),asDate(startDate),asDate(endDate));
+            List<Shift> shifts = shiftService.getFullWeekShiftsByDate(currentShift.getStartDate(),currentShift.getEmploymentId(), activity);
             shiftPublishDTO.getShifts().clear();
             shifts.forEach(shift -> {
                 shiftPublishDTO.getShifts().add(new ShiftActivitiesIdDTO(shift.getId(),shift.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));

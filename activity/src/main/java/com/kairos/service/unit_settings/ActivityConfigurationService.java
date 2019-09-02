@@ -32,10 +32,12 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
@@ -243,7 +245,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             List<BigInteger> plannedTimeIds = addPlannedTimeInShift(shift.getUnitId(), phase.getId(), activityWrappers.get(shiftActivity.getActivityId()).getActivity(), staffAdditionalInfoDTO);
             BigInteger plannedTimeId = null;
-            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) && plannedTimeIds.contains(shiftActivity.getPlannedTimeId())){
+            if(!asLocalDate(shiftActivity.getStartDate()).isAfter(LocalDate.now()) && plannedTimeIds.contains(shiftActivity.getPlannedTimeId())){
                 plannedTimeId = shiftActivity.getPlannedTimeId();
             }else {
                 plannedTimeId = plannedTimeIds.get(0);

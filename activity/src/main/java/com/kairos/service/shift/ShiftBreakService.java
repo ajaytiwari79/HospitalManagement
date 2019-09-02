@@ -65,39 +65,42 @@ public class ShiftBreakService {
 
 
     public List<ShiftActivity> updateBreakInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO  staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
-        BreakSettingsDTO breakSetting = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(staffAdditionalInfoDTO.getEmployment().getExpertise().getId()).get(0);
-        activityWrapperMap.putAll(getBreakActivities(breakSetting, shift.getUnitId()));
-        boolean placeBreakAnyWhereInShift = true;
-        ShiftActivity breakActivity = null;
-        DateTimeInterval eligibleBreakInterval = new DateTimeInterval(shift.getStartDate(),shift.getEndDate());
-        Date placeBreakAfterThisDate = shift.getStartDate();
+        List<BreakSettingsDTO> breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
         List<ShiftActivity> breakActivities = new ArrayList<>();
-        if(isNotNull(breakSetting) && shift.getMinutes()>=breakSetting.getShiftDurationInMinute()) {
-            if(isCollectionEmpty(shift.getBreakActivities())){
-                if (isNotNull(breakWTATemplate)) {
-                    BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
-                    if(isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage()==0 || breakAvailabilitySettings.getShiftPercentage()==100)){
-                        exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE,breakAvailabilitySettings.getShiftPercentage());
+        if(isCollectionNotEmpty(breakSettings)) {
+            BreakSettingsDTO breakSetting = breakSettings.get(0);
+            activityWrapperMap.putAll(getBreakActivities(breakSetting, shift.getUnitId()));
+            boolean placeBreakAnyWhereInShift = true;
+            ShiftActivity breakActivity = null;
+            DateTimeInterval eligibleBreakInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
+            Date placeBreakAfterThisDate = shift.getStartDate();
+            if (isNotNull(breakSetting) && shift.getMinutes() >= breakSetting.getShiftDurationInMinute()) {
+                if (isCollectionEmpty(shift.getBreakActivities())) {
+                    if (isNotNull(breakWTATemplate)) {
+                        BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
+                        if (isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage() == 0 || breakAvailabilitySettings.getShiftPercentage() == 100)) {
+                            exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE, breakAvailabilitySettings.getShiftPercentage());
+                        }
+                        placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
+                        eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings);
+                        placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSetting.getBreakDurationInMinute();
+                        placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? eligibleBreakInterval.getStartDate() : placeBreakAfterThisDate;
                     }
-                    placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
-                    eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings);
-                    placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSetting.getBreakDurationInMinute();
-                    placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? eligibleBreakInterval.getStartDate() : placeBreakAfterThisDate;
+                    breakActivity = getBreakByShiftActivity(shift, activityWrapperMap, staffAdditionalInfoDTO, breakSetting, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
+                    if (isNull(breakActivity)) {
+                        Date breakEndDate = asDate(asZoneDateTime(placeBreakAfterThisDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
+                        breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSetting, staffAdditionalInfoDTO, activityWrapperMap);
+                        breakActivity.setBreakNotHeld(true);
+                    }
+                } else {
+                    breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate);
                 }
-                breakActivity = getBreakByShiftActivity(shift, activityWrapperMap, staffAdditionalInfoDTO, breakSetting, placeBreakAnyWhereInShift, breakActivity, placeBreakAfterThisDate);
-                if (isNull(breakActivity)) {
-                    Date breakEndDate = asDate(asZoneDateTime(placeBreakAfterThisDate).plusMinutes(breakSetting.getBreakDurationInMinute()));
-                    breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSetting, staffAdditionalInfoDTO, activityWrapperMap);
-                    breakActivity.setBreakNotHeld(true);
+                if (isNotNull(breakActivity)) {
+                    if (breakActivity.getId() == null) {
+                        breakActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
+                    }
+                    breakActivities.add(breakActivity);
                 }
-            }else {
-                breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate);
-            }
-            if(isNotNull(breakActivity)) {
-                if (breakActivity.getId() == null) {
-                    breakActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
-                }
-                breakActivities.add(breakActivity);
             }
         }
         return breakActivities;

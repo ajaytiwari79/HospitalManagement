@@ -45,10 +45,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
     private Set<PartOfDay> partOfDays = new HashSet<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MAXIMUM;
-
-
-
-
+    private ShiftLengthAndAverageSetting shiftLengthAndAverageSetting = ShiftLengthAndAverageSetting.DIFFERENCE_BETWEEN_START_END_TIME;
 
     public AverageScheduledTimeWTATemplate(String name, boolean disabled,
                                            String description, long intervalLength,String intervalUnit) {
@@ -58,17 +55,6 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         this.description = description;
         this.intervalUnit=intervalUnit;
         wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
-
-    }
-
-
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
     }
 
     public AverageScheduledTimeWTATemplate() {
@@ -92,7 +78,7 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
                     int totalMin = 0;
                     for (ShiftWithActivityDTO shift : shifts) {
                         if (dateTimeInterval.overlaps(shift.getDateTimeInterval())) {
-                            totalMin += (int) dateTimeInterval.overlap(shift.getDateTimeInterval()).getMinutes();
+                            totalMin += getValueAccordingShiftLengthAndAverageSetting(shiftLengthAndAverageSetting, shift);
                         }
                     }
                     boolean isValid = isValid(minMaxSetting, limitAndCounter[0], totalMin/(int)intervalLength);

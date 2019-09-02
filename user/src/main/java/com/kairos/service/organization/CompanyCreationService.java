@@ -5,8 +5,8 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.UnitManagerDTO;
+import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
@@ -20,8 +20,8 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
@@ -41,6 +41,7 @@ import com.kairos.persistence.repository.user.client.ContactAddressGraphReposito
 import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.LevelGraphRepository;
@@ -148,6 +149,8 @@ public class CompanyCreationService {
     private AccessGroupRepository accessGroupRepository;
     @Inject
     private StaffCreationService staffCreationService;
+    @Inject
+    private EmploymentTypeGraphRepository employmentTypeGraphRepository;
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -594,7 +597,9 @@ public class CompanyCreationService {
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(parent.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
-        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, organization instanceof Organization);
+        List<Long> employmentIds=employmentTypeGraphRepository.getEmploymentTypeIdsByCountryId(countryId);
+        OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(organization.getOrganizationType().getId(), orgSubTypeIds, countryId, organization instanceof Organization,employmentIds);
+
         if(parentOrganizationId == null) {
             companyDefaultDataService.createDefaultDataForParentOrganization(parent, countryAndOrgAccessGroupIdsMap, timeSlots, orgTypeAndSubTypeDTO, countryId);
             companyDefaultDataService.createDefaultDataInUnit(organization.getId(), parent.getUnits(), countryId, timeSlots);

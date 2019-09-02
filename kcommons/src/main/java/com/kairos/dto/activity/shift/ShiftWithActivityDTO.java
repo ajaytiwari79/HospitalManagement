@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -85,6 +86,14 @@ public class ShiftWithActivityDTO extends ShiftDTO{
 
     public int getMinutes() {
         return ((int) (this.activities.get(activities.size() - 1).getEndDate().getTime() - this.activities.get(0).getStartDate().getTime()) / 60000);
+    }
+
+    public boolean isPresence(){
+        return this.getActivities().stream().anyMatch(shiftActivityDTO -> TimeTypeEnum.PRESENCE.equals(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType()));
+    }
+
+    public boolean isAbsence(){
+        return this.getActivities().stream().allMatch(shiftActivityDTO -> TimeTypeEnum.ABSENCE.equals(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType()));
     }
 
     @JsonIgnore
