@@ -533,9 +533,9 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
 
 
-    @Query("MATCH(parentOrg:Unit{isEnable:true,boardingCompleted: true}) WHERE id(parentOrg)={0}\n" +
-            "OPTIONAL MATCH (parentOrg)-[:HAS_SUB_ORGANIZATION*]->(subOrg:Unit{isEnable:true,boardingCompleted: true}) \n" +
-            "OPTIONAL MATCH(parentOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizationType:OrganizationType{deleted:false})\n" +
+    @Query("MATCH(parentOrg:Organization{isEnable:true,boardingCompleted: true}) WHERE id(parentOrg)={0}\n" +
+            "OPTIONAL MATCH (parentOrg)-[:"+HAS_UNIT+"]->(subOrg:Unit{isEnable:true,boardingCompleted: true}) \n" +
+            "OPTIONAL MATCH(parentOrganizationType:OrganizationType{deleted:false})<-[:"+TYPE_OF+"]-(parentOrg)-[:SUB_TYPE_OF]->(parentSubOrganizationType:OrganizationType{deleted:false})\n" +
             "OPTIONAL MATCH(childOrganizationType:OrganizationType{deleted:false})<-[:TYPE_OF]-(subOrg)-[:SUB_TYPE_OF]->(childSubOrganizationType:OrganizationType{deleted:false})\n" +
             "OPTIONAL MATCH(parentOrganizationService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(parentOrg)-[:PROVIDE_SERVICE]->(parentSubOrganizationService:OrganizationService{deleted:false})\n" +
             "OPTIONAL MATCH(childOrganizationService:OrganizationService{deleted:false})<-[:HAS_CUSTOM_SERVICE_NAME_FOR]-(subOrg)-[:PROVIDE_SERVICE]->(childSubOrganizationService:OrganizationService{deleted:false})\n" +

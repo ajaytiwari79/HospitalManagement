@@ -32,7 +32,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "OPTIONAL MATCH(o)-[unitRel:"+HAS_UNIT+"]->(u:Unit{isEnable:true,boardingCompleted: true}) " +
             "OPTIONAL MATCH(org)-[orgUnitRel:"+HAS_UNIT+"]->(un:Unit{isEnable:true,boardingCompleted: true}) " +
             "RETURN o,org,orgRel,unitRel,u,orgUnitRel,un")
-    List<OrganizationBaseEntity> generateHierarchy(Collection<Long> ids);
+    OrganizationBaseEntity generateHierarchy(Collection<Long> ids);
 
     @Query("MATCH (union:Organization{union:true,isEnable:true}) WHERE id (union)={0}  RETURN union")
     Organization findByIdAndUnionTrueAndIsEnableTrue(Long unionId);

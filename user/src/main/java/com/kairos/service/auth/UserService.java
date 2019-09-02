@@ -34,6 +34,7 @@ import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
@@ -108,6 +109,8 @@ public class UserService {
     private OrganizationService organizationService;
     @Inject
     private RedisService redisService;
+    @Inject
+    private CountryService countryService;
     private TokenExtractor tokenExtractor = new BearerTokenExtractor();
     @Inject
     private TokenStore tokenStore;
@@ -481,16 +484,7 @@ public class UserService {
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (currentUser.getLastSelectedOrganizationId() != organizationId) {
-            OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOneById(organizationId);
-            Long countryId=null;
-            if(organizationBaseEntity instanceof Unit) {
-                countryId = ((Unit) organizationBaseEntity).getCountryId();
-                currentUser.setConfLevel(ConfLevel.UNIT);
-            }
-            else if(organizationBaseEntity instanceof Organization) {
-                countryId = ((Organization) organizationBaseEntity).getCountry().getId();
-                currentUser.setConfLevel(ConfLevel.UNIT);
-            }
+            Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
             currentUser.setCountryId(countryId);
             userGraphRepository.save(currentUser);
