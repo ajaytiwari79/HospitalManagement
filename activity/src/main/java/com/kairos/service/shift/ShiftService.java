@@ -839,7 +839,7 @@ public class ShiftService extends MongoBaseService {
     public List<Shift> getFullWeekShiftsByDate(Date shiftStartDate,Long employmentId, Activity activity) {
         ZonedDateTime startDate = asZoneDateTime(shiftStartDate).with(TemporalAdjusters.previousOrSame(activity.getTimeCalculationActivityTab().getFullWeekStart())).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = startDate.plusDays(7);
-        return shiftMongoRepository.findAllShiftsByEmploymentId(employmentId,asDate(startDate),asDate(endDate));
+        return shiftMongoRepository.findAllShiftsByEmploymentIdBetweenDate(employmentId,asDate(startDate),asDate(endDate));
     }
 
     public ShiftDTO deleteShift(BigInteger shiftId) {
