@@ -261,25 +261,23 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Map<String, Object> getGeneralTabInfo(long organizationId);
 
 
-    @Query("MATCH (organization) WHERE id(organization)={0} " +
-            "WITH organization MATCH (organization)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) " +
-            "WITH organizationType,organization MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) " +
-            "WITH os,organization " +
+    @Query("MATCH (organization) WHERE id(organization)={0} WITH organization " +
+            "MATCH (organization)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,organization " +
+            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) WITH os,organization " +
             "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) \n" +
-            "WITH {children: case when os is NULL then [] else COLLECT(distinct {id:id(os),name:os.name,description:os.description}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as availableServices RETURN {availableServices:COLLECT(availableServices)} as data\n" +
+            "WITH {children: case when os is NULL then [] else COLLECT(distinct {id:id(os),name:os.name,description:os.description}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as availableServices " +
+            "RETURN {availableServices:COLLECT(availableServices)} as data\n" +
             "UNION\n" +
-            "MATCH (organization:Organization)-[:"+HAS_UNIT+"]-(unit:Unit) WHERE id(organization)={0} " +
-            "WITH unit " +
-            "MATCH (unit)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) " +
-            "WITH organizationType,unit \n" +
-            "MATCH (organizationType)-[r:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) " +
-            "WITH DISTINCT os, r, unit " +
-            "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) " +
-            "WITH os, r, unit, organizationService\n" +
-            "OPTIONAL MATCH (unit)-[orgServiceCustomNameRelation:"+HAS_CUSTOM_SERVICE_NAME_FOR+"]-(organizationService:OrganizationService) \n" +
+            "MATCH (organization) WHERE id(organization)={0} WITH organization " +
+            "MATCH (organization)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,organization \n" +
+            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) WITH distinct os,organization \n" +
+            "MATCH (organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os) WITH os, r, organization " +
+            "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) WITH os, r, organization, organizationService\n" +
+            "OPTIONAL MATCH (organization)-[orgServiceCustomNameRelation:"+HAS_CUSTOM_SERVICE_NAME_FOR+"]-(organizationService:OrganizationService) \n" +
             "WITH {children: case when os is NULL then [] else COLLECT({id:id(os),name:os.name,\n" +
             "customName:CASE WHEN r.customName IS null THEN os.name ELSE r.customName END,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description,\n" +
-            "customName:CASE WHEN orgServiceCustomNameRelation IS null THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END} as selectedServices RETURN {selectedServices:COLLECT(selectedServices)} as data")
+            "customName:CASE WHEN orgServiceCustomNameRelation IS null THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END} as selectedServices" +
+            " RETURN {selectedServices:COLLECT(selectedServices)} as data")
     List<Map<String, Object>> getServicesForParent(long organizationId);
 
     @Query("MATCH (unit:Unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:skill.name}]->(skill)")
@@ -419,12 +417,12 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<UnionResponseDTO> getAllUnionsByOrganizationSubType(List<Long> organizationSubTypesId);
 
 
-    @Query("MATCH(o:Organization)-[:" + HAS_UNIT + "*]->(s:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n" +
+    @Query("MATCH(o:Organization)-[:" + HAS_UNIT + "]->(s:Unit{isEnable:true,workcentre:true,boardingCompleted:true}) WHERE id(o)={0} \n" +
             "RETURN s.name as name ,id(s) as id")
     List<OrganizationBasicResponse> getOrganizationHierarchy(Long parentOrganizationId);
 
     @Query("MATCH(o:Unit)<-[:"+HAS_UNIT+"]-(parentOrganization:Organization{isEnable:true,isKairosHub:false,union:false,boardingCompleted:true}) WHERE id(o)={0} \n"
-            + "MATCH(parentOrganization)-[:" + HAS_UNIT + "]-(units:Unit{isEnable:true,isKairosHub:false,union:false,workcentre:true,boardingCompleted:true}) " +
+            + "MATCH(parentOrganization)-[:" + HAS_UNIT + "]-(units:Unit{isEnable:true,workcentre:true,boardingCompleted:true}) " +
             " WITH parentOrganization ,COLLECT (units)  as data " +
             " RETURN parentOrganization as parent,data as childUnits")
     OrganizationHierarchyData getChildHierarchyByChildUnit(Long childUnitId);

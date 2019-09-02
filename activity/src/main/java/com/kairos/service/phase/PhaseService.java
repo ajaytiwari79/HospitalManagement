@@ -113,10 +113,6 @@ public class PhaseService extends MongoBaseService {
         LocalDate currentDate = LocalDate.now();
         LocalDate proposedDate = DateUtils.getLocalDateFromDate(date);
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
-        OrganizationDTO unitOrganization = userIntegrationService.getOrganization();
-        if (!Optional.ofNullable(unitOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         List<PhaseDTO> phaseDTOS = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.ASC);
         int weekCount = 0;
         if (weekDifference < 0) {    // Week has passed so FINAL will be the object returned
