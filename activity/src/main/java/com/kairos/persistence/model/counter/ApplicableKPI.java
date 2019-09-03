@@ -22,6 +22,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     private ApplicableFilter applicableFilter;
     private List<FibonacciKPIConfig> fibonacciKPIConfigs;
     private KPIRepresentation kpiRepresentation;
+
     private DurationType frequencyType;
     // frequency value
     private int value;
@@ -29,7 +30,6 @@ public class ApplicableKPI extends MongoBaseEntity {
     private boolean fibonacciKPI;
     // use for country admin and unit manager if they create copy kpi from bottom instrument of kpi
     private boolean copy;
-
     public ApplicableKPI() {
         //Default Constructor
     }
@@ -195,5 +195,11 @@ public class ApplicableKPI extends MongoBaseEntity {
 
     public void setInterval(IntervalUnit interval) {
         this.interval = interval;
+    }
+
+    private enum GraphType {
+        DATA_PER_TIMESLOT,STACKED,COLUMN
+
+
     }
 }
