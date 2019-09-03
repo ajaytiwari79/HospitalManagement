@@ -86,6 +86,7 @@ public class User extends UserBaseEntity {
 
     private Long countryId;
 
+    //define for personal google calender
     private String googleCalenderTokenId;
     private String googleCalenderAccessToken;
 
