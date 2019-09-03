@@ -88,6 +88,7 @@ public class User extends UserBaseEntity {
 
     //define for personal google calender
     private String googleCalenderTokenId;
+    //define for personal google calender
     private String googleCalenderAccessToken;
 
     public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
