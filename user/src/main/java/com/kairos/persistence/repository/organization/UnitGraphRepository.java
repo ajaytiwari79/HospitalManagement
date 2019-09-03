@@ -131,13 +131,13 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<Map<String, Object>> getClientsByClintIdList(List<Long> clientIds);
 
 
-    @Query("MATCH (org)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(org)={0} AND id(os)={1} SET r.isEnabled=false")
+    @Query("MATCH (unit:Unit)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(unit)={0} AND id(os)={1} SET r.isEnabled=false")
     void removeServiceFromOrganization(long unitId, long serviceId);
 
-    @Query("MATCH (org)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(org)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
+    @Query("MATCH (unit:Unit)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(unit)={0} AND id(os)={1} SET r.customName=os.name, r.isEnabled=true")
     void updateServiceFromOrganization(long unitId, long serviceId);
 
-    @Query("MATCH (org)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(org)={0} AND id(os)={1} RETURN count(r) as countOfRel")
+    @Query("MATCH (unit:Unit)-[r:"+PROVIDE_SERVICE+"]->(os:OrganizationService) WHERE id(unit)={0} AND id(os)={1} RETURN count(r) as countOfRel")
     int isServiceAlreadyExist(long unitId, long serviceId);
 
     @Query("MATCH (o:Unit)-[:" + HAS_SUB_ORGANIZATION + "*..4]-(co:Unit) WHERE id(o)={0}  RETURN " +
@@ -261,24 +261,42 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Map<String, Object> getGeneralTabInfo(long organizationId);
 
 
-    @Query("MATCH (organization) WHERE id(organization)={0} WITH organization " +
-            "MATCH (organization)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,organization " +
-            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) WITH os,organization " +
+    @Query("MATCH (unit:Unit) WHERE id(unit) IN {0}  " +
+            "MATCH (unit)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) " +
+            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) " +
             "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) \n" +
             "WITH {children: case when os is NULL then [] else COLLECT(distinct {id:id(os),name:os.name,description:os.description}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as availableServices " +
             "RETURN {availableServices:COLLECT(availableServices)} as data\n" +
             "UNION\n" +
-            "MATCH (organization) WHERE id(organization)={0} WITH organization " +
-            "MATCH (organization)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) WITH organizationType,organization \n" +
-            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) WITH distinct os,organization \n" +
-            "MATCH (organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os) WITH os, r, organization " +
-            "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) WITH os, r, organization, organizationService\n" +
-            "OPTIONAL MATCH (organization)-[orgServiceCustomNameRelation:"+HAS_CUSTOM_SERVICE_NAME_FOR+"]-(organizationService:OrganizationService) \n" +
+            "MATCH (unit) WHERE id(unit) IN {0}  " +
+            "MATCH (unit)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true})\n" +
+            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true})\n" +
+            "MATCH (unit)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os) \n" +
+            "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) \n" +
+            "with distinct os,organizationService\n" +
+            "WITH  { children: case when os is NULL then [] else COLLECT({id:id(os),name:os.name,description:os.description}) END," +
+            "id:id(organizationService),name:organizationService.name,description:organizationService.description} as selectedServices " +
+            "RETURN {selectedServices:COLLECT(selectedServices)} as data")
+    List<Map<String, Object>> getServicesForUnits(List<Long> unitIds);
+
+    @Query("MATCH (unit:Unit) WHERE id(unit) = {0}  " +
+            "MATCH (unit)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) " +
+            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true}) " +
+            "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) \n" +
+            "WITH {children: case when os is NULL then [] else COLLECT(distinct {id:id(os),name:os.name,description:os.description}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description} as availableServices " +
+            "RETURN {availableServices:COLLECT(availableServices)} as data\n" +
+            "UNION\n" +
+            "MATCH (unit) WHERE id(unit) IN {0}  " +
+            "MATCH (unit)-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true})  \n" +
+            "MATCH (organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService{isEnabled:true})  \n" +
+            "MATCH (unit)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os)  " +
+            "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) \n" +
+            "OPTIONAL MATCH (unit)-[orgServiceCustomNameRelation:"+HAS_CUSTOM_SERVICE_NAME_FOR+"]-(organizationService:OrganizationService) \n" +
             "WITH {children: case when os is NULL then [] else COLLECT({id:id(os),name:os.name,\n" +
             "customName:CASE WHEN r.customName IS null THEN os.name ELSE r.customName END,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),name:organizationService.name,description:organizationService.description,\n" +
             "customName:CASE WHEN orgServiceCustomNameRelation IS null THEN organizationService.name ELSE orgServiceCustomNameRelation.customName END} as selectedServices" +
             " RETURN {selectedServices:COLLECT(selectedServices)} as data")
-    List<Map<String, Object>> getServicesForParent(long organizationId);
+    List<Map<String, Object>> getServicesForUnit(Long unitId);
 
     @Query("MATCH (unit:Unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:skill.name}]->(skill)")
     void addSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
@@ -286,7 +304,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (unit:Unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) set r.creationDate={2},r.lastModificationDate={3},r.isEnabled=true")
     void updateSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (org),(organizationService:OrganizationService) WHERE id(org)={0} AND id(organizationService) IN {1} create unique (org)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService)")
+    @Query("MATCH (unit:Unit),(organizationService:OrganizationService) WHERE id(unit)={0} AND id(organizationService) IN {1} create unique (unit)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService)")
     void addOrganizationServiceInUnit(long unitId, List<Long> organizationServiceId, long creationDate, long lastModificationDate);
 
     @Query("MATCH (o:Unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(os:Skill) WHERE id(o)={0} AND id(os)={1} RETURN count(r) as countOfRel")
@@ -395,8 +413,8 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("MATCH (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os:OrganizationService)\n" +
             "WHERE id(os)={0} WITH organizationService\n" +
-            "MATCH (org) WHERE id(org)={1} WITH org, organizationService\n" +
-            "CREATE UNIQUE (org)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name RETURN true")
+            "MATCH (unit:Unit) WHERE id(unit)={1} WITH unit, organizationService\n" +
+            "CREATE UNIQUE (unit)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name RETURN true")
     Boolean addCustomNameOfServiceForOrganization(Long subServiceId, Long organizationId);
 
     //    @Query("MATCH (o:Unit)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(os:OrganizationService) WHERE id(os)={0} AND id(o) ={1} SET r.customName={2} RETURN os")

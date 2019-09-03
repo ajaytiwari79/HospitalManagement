@@ -33,7 +33,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
 
     OrganizationType findByName(OrganizationType.OrganizationTypeEnum name);
 
-    @Query("Match (o:OrganizationType)-[rel:ORGANIZATION_TYPE_HAS_SERVICES]->(os:OrganizationService) where id(o)={0}  AND  id(os)={1} return SIGN(COUNT(rel))")
+    @Query("Match (o:OrganizationType)-[rel:"+ORGANIZATION_TYPE_HAS_SERVICES+"]->(os:OrganizationService) where id(o)={0}  AND  id(os)={1} return SIGN(COUNT(rel))")
     int checkIfServiceExistsWithOrganizationType(long orgTypeId, long serviceId);
 
 

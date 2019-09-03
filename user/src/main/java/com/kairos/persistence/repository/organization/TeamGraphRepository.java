@@ -110,11 +110,6 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")
     OrganizationServiceQueryResult addCustomNameOfSubServiceForTeam(Long teamId, Long organizationServiceId, String customName);
 
-    @Query("MATCH (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os:OrganizationService)\n" +
-            "WHERE id(os)={0} WITH organizationService\n" +
-            "MATCH (team:Team) WHERE id(team)={1} WITH team, organizationService\n" +
-            "CREATE UNIQUE (team)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name RETURN true")
-    Boolean addCustomNameOfServiceForTeam(Long subServiceId, Long teamId);
 
     @Query("MATCH (organization:Unit)-[:"+ HAS_TEAMS +"]->(team:Team) WHERE id(organization)={0} RETURN team")
     List<Team> getTeamsByOrganization(long organizationId);

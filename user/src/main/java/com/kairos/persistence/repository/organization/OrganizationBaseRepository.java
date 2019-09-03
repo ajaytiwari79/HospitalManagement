@@ -9,8 +9,9 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_UNIT;
+import java.util.List;
+
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @Repository
 public interface OrganizationBaseRepository extends Neo4jBaseRepository<OrganizationBaseEntity,Long> {
@@ -29,4 +30,14 @@ public interface OrganizationBaseRepository extends Neo4jBaseRepository<Organiza
 
     @Query("MATCH(org) where id(org)={0} RETURN org.showCountryTags ")
     boolean showCountryTags(Long orgId);
+
+    @Query("MATCH(o{isEnable:true,boardingCompleted: true}) where id(o)={0}\n" +
+            "OPTIONAL MATCH(o)-[orgRel:HAS_SUB_ORGANIZATION*]->(org:Organization{isEnable:true,boardingCompleted: true}) \n" +
+            "OPTIONAL MATCH(o)-[unitRel:HAS_UNIT]->(u:Unit{isEnable:true,boardingCompleted: true}) \n" +
+            "OPTIONAL MATCH(org)-[orgUnitRel:HAS_UNIT]->(un:Unit{isEnable:true,boardingCompleted: true}) \n" +
+            "WITH collect(id(u)) as unit,collect(id(un)) as uis,CASE WHEN 'Unit' IN labels(o) THEN collect(id(o)) ELSE [] END as data\n" +
+            "WITH unit+uis+data as t\n" +
+            "unwind t as x with distinct x\n" +
+            "Return x")
+    List<Long> fetchAllUnitIds(Long orgId);
 }

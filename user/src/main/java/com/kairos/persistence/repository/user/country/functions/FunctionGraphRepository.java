@@ -21,7 +21,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(function:Function{deleted:false}) where id(country)={0} " +
             "OPTIONAL MATCH(function)-[:" + HAS_ORGANIZATION_LEVEL + "]->(level:Level) " +
-            "OPTIONAL MATCH(function)-[:" + HAS_UNION + "]->(union:Unit{union:true}) " +
+            "OPTIONAL MATCH(function)-[:" + HAS_UNION + "]->(union:Organization{union:true}) " +
             "with country,function, collect(DISTINCT level) as organizationLevels, collect(DISTINCT union) as unions   " +
             "RETURN id(function) as id,function.name as name,function.description as description," +
             "function.startDate as startDate,function.endDate as endDate,unions,organizationLevels,function.icon as icon ORDER BY function.creationDate  DESC")

@@ -1,11 +1,9 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.organization.OrganizationBaseEntity;
-import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
-import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.repository.organization.*;
@@ -50,7 +48,7 @@ public class OrganizationServiceService {
     @Inject
     private ExceptionService exceptionService;
 
-    private static final Logger logger = LoggerFactory.getLogger(OrganizationServiceService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
 
     public Map<String, Object> updateOrganizationService(long id, String name, String description, Long countryId) {
@@ -104,7 +102,7 @@ public class OrganizationServiceService {
 
         String name = "(?i)" + subService.getName();
         if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(), name) != null) {
-            logger.info("Can't create duplicate sub service in same category");
+            LOGGER.info("Can't create duplicate sub service in same category");
             return null;
         }
 
@@ -121,7 +119,7 @@ public class OrganizationServiceService {
         response.put("id", subService.getId());
         response.put("name", subService.getName());
         response.put("description", subService.getDescription());
-        logger.info("Sending Response: " + response);
+        LOGGER.info("Sending Response: " + response);
 
         return subService;
 
@@ -140,7 +138,7 @@ public class OrganizationServiceService {
 
         }
 
-        logger.info("Creating : " + subService.getName() + " In " + organizationService.getName());
+        LOGGER.info("Creating : " + subService.getName() + " In " + organizationService.getName());
         List<OrganizationService> subServicesList = organizationService.getOrganizationSubService();
 
         if (subServicesList != null) {
@@ -170,19 +168,14 @@ public class OrganizationServiceService {
         return unitGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
     }
 
-    private Boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId) {
-        return teamGraphRepository.addCustomNameOfServiceForTeam(subOrganizationServiceId, teamId);
-    }
-
     public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected) {
-
+        Unit unit=unitGraphRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND,"Unit",id)));
         OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
         if (organizationService == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND);
-
         }
         if (isSelected) {
-            logger.info("check if already exist-------> " + unitGraphRepository.isServiceAlreadyExist(id, organizationService.getId()));
+            LOGGER.info("check if already exist-------> ");
             if (unitGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
                 unitGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
             } else {
@@ -214,7 +207,7 @@ public class OrganizationServiceService {
         List<Object> objectList = new ArrayList<>();
         if (organizationType != null) {
             if (checkIfServiceExistsWithOrganizationType(orgTypeId, serviceId) != 0) {
-                logger.info("Already Selected now Deselecting ");
+                LOGGER.info("Already Selected now Deselecting ");
                 organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
                 List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
                 for (Map<String, Object> map : mapList) {
@@ -224,7 +217,7 @@ public class OrganizationServiceService {
                 }
                 return objectList;
             } else {
-                logger.info("Not  Selected now Selecting ");
+                LOGGER.info("Not  Selected now Selecting ");
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
                 List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
                 for (Map<String, Object> map : mapList) {
@@ -262,19 +255,15 @@ public class OrganizationServiceService {
     }
 
     public Map<String, Object> organizationServiceData(long id) {
-        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(id, 0);
-        if (organizationBaseEntity == null) {
-            return null;
-        }
-
-        return filterSkillData(unitGraphRepository.getServicesForParent(id));
+        List<Long> allUnitIds=organizationBaseRepository.fetchAllUnitIds(id);
+        List<Map<String, Object>> services=(allUnitIds.size()==1 && allUnitIds.get(0).equals(id))?unitGraphRepository.getServicesForUnit(id):unitGraphRepository.getServicesForUnits(allUnitIds);
+        return filterSkillData(services);
 
     }
 
     private Map<String, Object> filterSkillData(List<Map<String, Object>> skillData) {
         Map<String, Object> response = new HashMap<>();
         for (Map<String, Object> map : skillData) {
-
             if (((Map<String, Object>) map.get("data")).get("availableServices") != null) {
                 response.put("availableServices", ((Map<String, Object>) map.get("data")).get("availableServices"));
             }

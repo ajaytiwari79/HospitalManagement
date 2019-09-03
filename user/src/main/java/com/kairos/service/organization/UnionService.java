@@ -431,13 +431,13 @@ public class UnionService {
     public UnionGlobalDataDTO getUnionData(Long countryId) {
 
         List<UnionDataQueryResult> unionDataObjects = unitGraphRepository.getUnionData(countryId);
-        List<Long> locationIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getLocations().stream().map(location -> location.getId())).collect(
+        List<Long> locationIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getLocations().stream().map(Location::getId)).collect(
                 Collectors.toList());
         Set<Long> municipalityIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getMunicipalities().stream().map(
-                municipality -> municipality.getId())).collect(Collectors.toSet());
+                Municipality::getId)).collect(Collectors.toSet());
         List<LocationDataQueryResult> locationDataObjects = locationGraphRepository.getLocationData(locationIds);
         municipalityIds.addAll(locationDataObjects.stream().flatMap(locationDataQueryResult -> locationDataQueryResult.getMunicipalities().stream().map(
-                municipality -> municipality.getId())).collect(Collectors.toSet()));
+                Municipality::getId)).collect(Collectors.toSet()));
         List<MunicipalityQueryResult> municipalityQueryResults = municipalityGraphRepository.findMunicipalityRegionAndProvince(municipalityIds);
         Map<Long, MunicipalityQueryResult> municipalityMap = municipalityQueryResults.stream().collect(Collectors.toMap(municipalityQueryResult -> municipalityQueryResult.getMunicipality().getId(), v -> v));
         ZipCodeSectorQueryResult zipCodesSectors = zipCodeGraphRepository.getZipCodesAndSectors(countryId);
