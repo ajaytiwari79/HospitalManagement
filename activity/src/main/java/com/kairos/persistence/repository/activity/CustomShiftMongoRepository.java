@@ -73,6 +73,7 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId,Long unitId,List<Long> staffIds ,List<ShiftStatus> shiftStatus);
 
+    List<Shift> findAllPublishShiftByEmploymentId(Long employmentId);
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);
 

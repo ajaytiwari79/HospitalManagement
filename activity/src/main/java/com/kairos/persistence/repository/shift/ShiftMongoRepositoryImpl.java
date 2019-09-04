@@ -586,6 +586,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
+    public List<Shift> findAllPublishShiftByEmploymentId(Long employmentId){
+        Query query = new Query(where("deleted").is(false).and("employmentId").is(employmentId).and("draft").is(false)
+                .and("activities.status").is(ShiftStatus.PUBLISH));
+        return mongoTemplate.find(query, Shift.class);
+    }
+
+    @Override
     public boolean absenceShiftExistsByDate(Long unitId, Date startDate, Date endDate, Long staffId) {
         Criteria criteria = where("unitId").is(unitId).and("deleted").is(false).and("staffId").is(staffId).and("startDate").lt(endDate).and("endDate").gt(startDate);
         Aggregation aggregation = Aggregation.newAggregation(
