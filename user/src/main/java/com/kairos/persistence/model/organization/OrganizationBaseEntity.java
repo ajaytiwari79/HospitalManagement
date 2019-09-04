@@ -12,7 +12,6 @@ import com.kairos.enums.time_slot.TimeSlotMode;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.country.tag.Tag;

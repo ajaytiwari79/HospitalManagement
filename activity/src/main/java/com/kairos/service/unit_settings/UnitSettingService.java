@@ -26,7 +26,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_AGESETTING_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_SETTING_NOTFOUND;
 
 @Service
 @Transactional

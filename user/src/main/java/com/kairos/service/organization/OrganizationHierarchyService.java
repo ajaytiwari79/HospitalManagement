@@ -1,6 +1,5 @@
 package com.kairos.service.organization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.filter.FilterAndFavouriteFilterDTO;
 import com.kairos.dto.gdpr.filter.FilterAttributes;
@@ -226,9 +225,16 @@ public class OrganizationHierarchyService {
         queryResult.setUnion(queryResult.isUnion());
         queryResult.setHubId(18743l);
         queryResult.setHasPermission(countryAdmin ? true : unitPermissionMap.get(queryResult.getId()));
-        queryResult.setEnabled(countryAdmin ? true : unitPermissionMap.get(queryResult.getId()));
-        for (QueryResult unit : queryResult.getUnits()) {
-            setPermission(unit, unitPermissionMap, countryAdmin, hubCount);
+        queryResult.setEnabled(true);
+        Iterator iterator=queryResult.getUnits().iterator();
+        while (iterator.hasNext()){
+            QueryResult unit= (QueryResult) iterator.next();
+            if(!unitPermissionMap.get(unit.getId())){
+                iterator.remove();
+            } else {
+                setPermission(unit, unitPermissionMap, countryAdmin, hubCount);
+            }
+
         }
         for (QueryResult organization : queryResult.getChildren()) {
             setPermission(organization, unitPermissionMap, countryAdmin, hubCount);

@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.user.country;
 
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.default_data.EngineerTypeDTO;
-import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;

@@ -39,7 +39,6 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.REALTIME_DURATION_NOT_CONFIGURED;
 import static com.kairos.enums.widget.WidgetFilterType.*;
-import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static java.util.Comparator.comparing;
 
 /**
