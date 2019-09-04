@@ -163,6 +163,7 @@ public class ShiftService extends MongoBaseService {
 
 
     public ShiftWithViolatedInfoDTO createShift(Long unitId, ShiftDTO shiftDTO, String type, ShiftActionType shiftActionType) {
+        shiftDTO.setUnitId(unitId);
         Set<Long> reasonCodeIds = shiftDTO.getActivities().stream().filter(shiftActivity -> shiftActivity.getAbsenceReasonCodeId() != null).map(ShiftActivityDTO::getAbsenceReasonCodeId).collect(Collectors.toSet());
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(shiftDTO.getShiftDate(), shiftDTO.getStaffId(), type, shiftDTO.getEmploymentId(), reasonCodeIds);
         ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(shiftDTO.getActivities().get(0).getActivityId());
@@ -397,7 +398,7 @@ public class ShiftService extends MongoBaseService {
                     updateWTACounterFlag=false;
                 }
                 shift.setPlanningPeriodId(planningPeriod.getId());
-                shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, false, functionId, phase, shiftActionType);
+                shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, isNotNull(shift.getId()), functionId, phase, shiftActionType);
                 if (isNotNull(todoType)) {
                     Todo todo = todoRepository.findByEntityIdAndType(shift.getId(), TodoType.REQUEST_ABSENCE);
                     todo.setStatus(TodoStatus.APPROVE);
@@ -421,7 +422,8 @@ public class ShiftService extends MongoBaseService {
             } else {
                 shiftWithViolatedInfo = updatedShiftWithViolatedInfo;
             }
-            responseShiftDTOS.addAll(shiftDTOS);
+            shiftDTO=shiftDTOS.get(0);
+            responseShiftDTOS.addAll(Arrays.asList(isNotNull(shiftDTO.getDraftShift()) ? shiftDTO.getDraftShift() : shiftDTO));
         }
         shiftWithViolatedInfo.setShifts(responseShiftDTOS);
         return shiftWithViolatedInfo;
