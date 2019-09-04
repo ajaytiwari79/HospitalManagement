@@ -69,7 +69,11 @@ public class CounterServiceMapping {
         this.counters.put(CounterType.PLANNED_HOURS_VS_TIMEBANK, plannedHoursVsTimeBankService);
     }
 
-
+    @Inject
+    public void setAbsencePlanningKPIService(AbsencePlanningKPIService absencePlanningKPIService) {
+        LOGGER.info("Enum mapping for absences per interval : "+this.counters);
+        this.counters.put(CounterType.ABSENCES_PER_INTERVAL, absencePlanningKPIService);
+    }
 
     public CounterService getService(CounterType counterType){
         return (CounterService) this.counters.get(counterType);

@@ -1,5 +1,9 @@
 package com.kairos.utils.user_context;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -8,7 +12,9 @@ import java.time.Period;
 import java.util.List;
 
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class User implements Serializable{
     protected Long id;
 
@@ -36,97 +42,8 @@ public class User implements Serializable{
     //define, first time password changed or not
     private boolean isPasswordUpdated;
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getOtp() {
-        return otp;
-    }
-
-    public void setOtp(int otp) {
-        this.otp = otp;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    /**
-     * For Jackson parsing
-     */
-    public User() {
-        //default constructor
-    }
-
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
-
-    public String getCprNumber() {
-        return cprNumber;
-    }
-
-    public void setCprNumber(String cprNumber) {
-        this.cprNumber = cprNumber;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    /**
-     * getAccessToken
-     *
-     * @return
-     */
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    /**
-     * setAccessToken
-     *
-     * @param accessToken
-     */
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
+    private String googleCalenderTokenId;
+    private String googleCalenderAccessToken;
     /**
      * getUserName
      *
@@ -148,44 +65,6 @@ public class User implements Serializable{
     public void setUserName(String userName) {
         this.userName = userName.toLowerCase();
     }
-
-
-    /**
-     * getEmail
-     *
-     * @return
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * setEmail
-     *
-     * @param email
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
-     * getPassword
-     *
-     * @return
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * setPassword
-     *
-     * @param password
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
 
     public int getAge() {
         int age = 0;
@@ -240,15 +119,6 @@ public class User implements Serializable{
         }
         return this.age;
     }
-
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-
-
-
     /**
      * User Constructor
      *
@@ -266,22 +136,6 @@ public class User implements Serializable{
         this.email = email;
         this.password = password;
         this.age = age;
-    }
-
-    public String getTimeCareExternalId() {
-        return timeCareExternalId;
-    }
-
-    public void setTimeCareExternalId(String timeCareExternalId) {
-        this.timeCareExternalId = timeCareExternalId;
-    }
-
-    public boolean isPasswordUpdated() {
-        return isPasswordUpdated;
-    }
-
-    public void setPasswordUpdated(boolean passwordUpdated) {
-        isPasswordUpdated = passwordUpdated;
     }
 
     @Override

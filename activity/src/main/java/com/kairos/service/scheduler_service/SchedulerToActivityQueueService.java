@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.Arrays;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.DateUtils.getStartOfDay;
+
 @Service
 public class SchedulerToActivityQueueService implements JobQueueExecutor {
 
@@ -50,7 +53,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case ATTENDANCE_SETTING:
                 logger.info("Job to update clock out time");
-                timeAndAttendanceService.checkOutBySchedulerJob(job.getUnitId());
+                timeAndAttendanceService.checkOutBySchedulerJob(job.getUnitId(), getStartOfDay(getDate()), getDate());
                 break;
             case ADD_PAYROLL_PERIOD:
                 logger.info("Job to create MONTHLY and FORTNIGHTLY  payroll period ");

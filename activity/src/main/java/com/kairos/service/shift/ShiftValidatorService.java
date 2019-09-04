@@ -5,6 +5,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
@@ -209,6 +210,7 @@ public class ShiftValidatorService {
         if (planningPeriod == null) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PLANNING_PERIOD_EXITS, shift.getStartDate());
         }
+        shift.setPhaseId(phase.getId());
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(planningPeriod, phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
