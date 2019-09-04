@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftStateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.attendence_setting.TimeAndAttendanceService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.time_bank.TimeBankService;
 import org.apache.commons.collections.CollectionUtils;
@@ -64,13 +65,13 @@ public class ShiftStateService {
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private ShiftService shiftService;
+    @Inject private TimeAndAttendanceService timeAndAttendanceService;
 
-    public boolean createShiftState(Long unitId, Date startDate, Date endDate){
+    public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate, Date endDate){
         if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
             exceptionService.actionNotPermittedException(PAST_DATE_ALLOWED);
         }
-        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
-        createShiftState(shifts,false,unitId);
+        timeAndAttendanceService.checkOutBySchedulerJob(unitId, startDate, endDate);
         return true;
     }
 

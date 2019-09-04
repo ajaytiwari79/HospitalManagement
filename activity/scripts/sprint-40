@@ -1,7 +1,7 @@
 //add kpi for country
 
 db.getCollection('counter').insert({
-    "_id" : "20",nextsequence
+    "_id" : "32",nextsequence
     "type" : "DAYTYPE_AND_TIMESLOT",
     "title" : "DatType And TimeSlot",
     "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),

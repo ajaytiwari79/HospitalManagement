@@ -167,10 +167,10 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftDetailsService.updateRemarkInShiftActivity(shiftActivityId, shiftActivityDTO));
     }
 
-    @ApiOperation("create shift state")
-    @PostMapping("/shift/create_state")
-    public ResponseEntity<Map<String, Object>> createShiftState(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStateService.createShiftState(unitId, startDate, endDate));
+    @ApiOperation("send shift in time and attendance phase")
+    @PostMapping("/shift/send_shift_in_time_and_attendance_phase")
+    public ResponseEntity<Map<String, Object>> sendShiftInTimeAndAttendancePhase(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStateService.sendShiftInTimeAndAttendancePhase(unitId, startDate, endDate));
     }
 
     @ApiOperation("Get shifts by staff/unit/expertise/date ")

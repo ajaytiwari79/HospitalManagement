@@ -6,7 +6,7 @@ package com.kairos.persistence.enums.counter;
  */
 
 public enum ChartType {
-    PIE("Pie-Chart"), BAR("Bar-Chart");
+    PIE("Pie-Chart"), BAR("Bar-Chart"),STACKED_CHART("stacked-chart");
 
     private String type;
 

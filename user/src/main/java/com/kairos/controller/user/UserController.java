@@ -1,5 +1,6 @@
 package com.kairos.controller.user;
 
+import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.service.access_permisson.AccessGroupService;
@@ -181,5 +182,11 @@ public class UserController {
     @ApiOperation("update password")
     public ResponseEntity<Map<String, Object>> updatePassword(@Valid @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.updatePassword(passwordUpdateDTO));
+    }
+
+    @PutMapping(UNIT_URL+"/updateGoogleCalenderToken")
+    @ApiOperation("update google calender token of log")
+    public ResponseEntity<Map<String, Object>> updateGoogleCalenderToken(@RequestBody GoogleCalenderTokenDTO googleCalenderTokenDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateGoogleCalenderToken(googleCalenderTokenDTO));
     }
 }

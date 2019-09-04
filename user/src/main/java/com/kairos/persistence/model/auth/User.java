@@ -14,6 +14,9 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -35,11 +38,11 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
  */
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
-@EnableStringTrimer
+@Getter
+@Setter
+@NoArgsConstructor
 public class User extends UserBaseEntity {
     protected String cprNumber;
-
-    @IgnoreStringTrimer
     private String userName;
     protected String nickName;
     protected String firstName;
@@ -93,11 +96,10 @@ public class User extends UserBaseEntity {
 
     private Long countryId;
 
-    /**
-     * For Jackson parsing
-     */
-    public User() {
-    }
+    //define for personal google calender
+    private String googleCalenderTokenId;
+    //define for personal google calender
+    private String googleCalenderAccessToken;
 
     public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;
@@ -132,211 +134,11 @@ public class User extends UserBaseEntity {
         this.password = password;
     }
 
-    public int getOtp() {
-        return otp;
-    }
-
-    public void setOtp(int otp) {
-        this.otp = otp;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public ContactDetail getContactDetail() {
-        return contactDetail;
-    }
-
-    public void setContactDetail(ContactDetail contactDetail) {
-        this.contactDetail = contactDetail;
-    }
-
-    public ContactAddress getHomeAddress() {
-        return homeAddress;
-    }
-
-    public void setHomeAddress(ContactAddress homeAddress) {
-        this.homeAddress = homeAddress;
-    }
-
-    public List<String> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
-    }
-
-    public List<Country> getCountryList() {
-        return countryList;
-    }
-
-    public void setCountryList(List<Country> countryList) {
-        this.countryList = countryList;
-    }
-
-    public Profile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(Profile profile) {
-        this.profile = profile;
-    }
-
-    public String getCprNumber() {
-        return cprNumber;
-    }
-
-    public void setCprNumber(String cprNumber) {
-        this.cprNumber = cprNumber;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public Long getKmdExternalId() {
-        return kmdExternalId;
-    }
-
-    public void setKmdExternalId(Long kmdExternalId) {
-        this.kmdExternalId = kmdExternalId;
-    }
-
-    public LocalDateTime getForgotTokenRequestTime() {
-        return forgotTokenRequestTime;
-    }
-
-    public void setForgotTokenRequestTime(LocalDateTime forgotTokenRequestTime) {
-        this.forgotTokenRequestTime = forgotTokenRequestTime;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public Long getLastSelectedOrganizationId() {
-        return lastSelectedOrganizationId;
-    }
-
-    public void setLastSelectedOrganizationId(Long lastSelectedOrganizationId) {
-        this.lastSelectedOrganizationId = lastSelectedOrganizationId;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getForgotPasswordToken() {
-        return forgotPasswordToken;
-    }
-
-    public void setForgotPasswordToken(String forgotPasswordToken) {
-        this.forgotPasswordToken = forgotPasswordToken;
-    }
-
     public String getUserName() {
         if(userName != null) {
             userName.toLowerCase();
         }
         return userName;
-    }
-
-    public void setUserName(String userName) {
-        if(userName != null) this.userName = userName.toLowerCase();
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public UserPersonalizedSettings getUserPersonalizedSettings() {
-        return userPersonalizedSettings;
-    }
-
-    public void setUserPersonalizedSettings(UserPersonalizedSettings userPersonalizedSettings) {
-        this.userPersonalizedSettings = userPersonalizedSettings;
-    }
-
-    public boolean isPasswordUpdated() {
-        return isPasswordUpdated;
-    }
-
-    public void setPasswordUpdated(boolean passwordUpdated) {
-        isPasswordUpdated = passwordUpdated;
-    }
-
-    public Boolean getHubMember() {
-        return hubMember;
-    }
-
-    public void setHubMember(Boolean hubMember) {
-        this.hubMember = hubMember;
-    }
-
-    public boolean isPregnant() {
-        return pregnant;
-    }
-
-    public void setPregnant(boolean pregnant) {
-        this.pregnant = pregnant;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public SystemLanguage getUserLanguage() {
-        return userLanguage;
-    }
-
-    public void setUserLanguage(SystemLanguage userLanguage) {
-        this.userLanguage = userLanguage;
     }
 
     public void setBasicDetail(NextToKinDTO nextToKinDTO) {
@@ -348,24 +150,8 @@ public class User extends UserBaseEntity {
         this.setGender((ageVariable % 2 == 0) ? Gender.FEMALE : Gender.MALE);
     }
 
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
-
     public String getFullName() {
         return StringUtils.capitalize(this.firstName) + " " + StringUtils.capitalize(this.lastName);
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
     }
 
     public int getAge() {
@@ -414,22 +200,6 @@ public class User extends UserBaseEntity {
         age = period.getYears();
         this.age = age;
         return this.age;
-    }
-
-    public boolean isUserNameUpdated() {
-        return userNameUpdated;
-    }
-
-    public void setUserNameUpdated(boolean isUserNameUpdated) {
-        this.userNameUpdated = isUserNameUpdated;
-    }
-
-    public ConfLevel getConfLevel() {
-        return confLevel;
-    }
-
-    public void setConfLevel(ConfLevel confLevel) {
-        this.confLevel = confLevel;
     }
 
     @Override

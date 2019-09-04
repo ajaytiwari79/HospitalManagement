@@ -70,31 +70,7 @@ public class KPIUtils {
         return dateTimeIntervals;
     }
 
-    public static DateTimeInterval getDateTimeInterval(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates,LocalDate localDate) {
-        DateTimeInterval dateTimeInterval = null;
-        if(isCollectionNotEmpty(filterDates)){
-            return new DateTimeInterval(asLocalDate(filterDates.get(0).toString()),asLocalDate(filterDates.get(1).toString()));
-        }
-        if(isNull(localDate)){
-            localDate = DateUtils.getCurrentLocalDate();
-        }
-        switch (interval) {
-            case LAST:
-                localDate = localDate.minusDays(1);
-                dateTimeInterval = new DateTimeInterval(getPriviousLocaDateByDurationType(localDate, frequencyType,1),localDate);
-                break;
-            case CURRENT:
-                dateTimeInterval = new DateTimeInterval(getFirstLocalDateByDurationType(localDate, frequencyType),getLastLocaDateByDurationType(localDate, frequencyType));
-                break;
-            case NEXT:
-                localDate=localDate.plusDays(1);
-                dateTimeInterval = new DateTimeInterval(localDate,getNextLocaDateByDurationType(localDate, frequencyType,value));
-                break;
-            default:
-                break;
-        }
-        return dateTimeInterval;
-    }
+
 
     public static LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals ) {
         LocalDate currentDate = date;
