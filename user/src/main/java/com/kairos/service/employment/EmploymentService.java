@@ -843,8 +843,7 @@ public class EmploymentService {
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EMPLOYMENT_ORGANIZATION_EXTERNALID, unitExternalId);
         }
-        Organization parentUnit = organizationService.fetchParentOrganization(unit.getId());
-        Long countryId = unit.getCountryId();
+        Long countryId = countryService.getCountryIdByUnitId(new Long(unitExternalId));
         EmploymentType employmentType = employmentTypeGraphRepository.getOneEmploymentTypeByCountryId(countryId, false);
 
         Expertise expertise;

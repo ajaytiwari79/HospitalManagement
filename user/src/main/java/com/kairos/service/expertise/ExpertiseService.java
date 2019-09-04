@@ -932,7 +932,8 @@ public class ExpertiseService {
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        return getPlannedTimeAndEmploymentType(unit.getCountryId());
+        Long countryId= countryService.getCountryIdByUnitId(unitId);
+        return getPlannedTimeAndEmploymentType(countryId);
     }
 
     //register a job for unassign expertise from activity and this method call when set enddate of publish expertise

@@ -38,7 +38,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class Unit extends OrganizationBaseEntity {
 
     private boolean showPersonNames;
-    private Long countryId;
 
     // Relationships
     @Relationship(type = HAS_TEAMS)
@@ -70,12 +69,11 @@ public class Unit extends OrganizationBaseEntity {
         this.resourceList = resourceList;
     }
 
-    public Unit(Long id, String name, String description, Long  countryId, String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
+    public Unit(Long id, String name, String description,  String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
                         CompanyCategory companyCategory, ZoneId timeZone,  AccountType accountType, boolean boardingCompleted,boolean workcentre) {
         this.name = name;
         this.description = description;
-        this.countryId=countryId;
         this.desiredUrl = desiredUrl;
         this.shortCompanyName = shortCompanyName;
         this.kairosCompanyId = kairosCompanyId;

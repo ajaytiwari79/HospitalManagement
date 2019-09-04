@@ -389,7 +389,8 @@ public class CitizenService {
             Optional supplierOptional = Optional.ofNullable(supplier);
             if (!supplierOptional.isPresent()) {
                 supplier = new OrganizationBuilder().setName(citizenSupplier.getName()).createOrganization();
-                supplier.setCountry(countryGraphRepository.findOne(unit.getCountryId()));
+                Long countryId=countryGraphRepository.getCountryIdByUnitId(unit.getId());
+                supplier.setCountry(countryGraphRepository.findOne(countryId));
                 supplier.setKmdExternalId(citizenSupplier.getId());
             }
             if (citizenSupplier.getType().equals("external")) {

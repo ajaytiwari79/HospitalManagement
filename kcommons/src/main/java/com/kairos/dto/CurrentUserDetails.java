@@ -23,7 +23,6 @@ public class CurrentUserDetails {
     private boolean hubMember;
     private Long languageId;
     private Long lastSelectedOrganizationId;
-    private ConfLevel confLevel;
 
 
     public CurrentUserDetails(Long id, String userName, String nickName,

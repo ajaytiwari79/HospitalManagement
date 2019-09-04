@@ -6,8 +6,10 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.country.equipment.EquipmentQueryResult;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.resources.Resource;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
@@ -47,6 +49,9 @@ public class EquipmentService{
 
     @Inject
     private EquipmentGraphRepository equipmentGraphRepository;
+
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
 
     @Inject
     private ResourceGraphRepository resourceGraphRepository;
@@ -165,13 +170,13 @@ public class EquipmentService{
     }
 
     public Map<String,List<EquipmentQueryResult>> getEquipmentsForResource(Long organizationId, Long resourceId){
-        Unit unit = unitGraphRepository.findOne(organizationId,1);
-        if (unit == null) {
+        Organization organization = organizationGraphRepository.findOne(organizationId,1);
+        if (organization == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,organizationId);
 
         }
         HashMap<String, List<EquipmentQueryResult>> featuresData = new HashMap<>();
-        featuresData.put("availableEquipments",equipmentGraphRepository.getListOfEquipment(unit.getCountryId(), false, ""));
+        featuresData.put("availableEquipments",equipmentGraphRepository.getListOfEquipment(organization.getCountry().getId(), false, ""));
         featuresData.put("selectedEquipments",fetchSelectedEquipmentsOfResources(organizationId,resourceId));
         return featuresData;
     }
@@ -182,12 +187,12 @@ public class EquipmentService{
             exceptionService.dataNotFoundByIdException(MESSAGE_EQUIPMENT_RESOURCE_ID_NOTFOUND,resourceId);
 
         }
-        Unit unit = unitGraphRepository.findOne(organizationId,1);
-        if (unit == null) {
+        Organization organization = organizationGraphRepository.findOne(organizationId,1);
+        if (organization == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,organizationId);
 
         }
-        List<Equipment> equipments = equipmentGraphRepository.getListOfEquipmentByIds(unit.getCountryId(), false, vehicleEquipmentDTO.getEquipments());
+        List<Equipment> equipments = equipmentGraphRepository.getListOfEquipmentByIds(organization.getCountry().getId(), false, vehicleEquipmentDTO.getEquipments());
         equipmentGraphRepository.detachResourceEquipments(resourceId);
         resource.setEquipments(equipments);
         resourceGraphRepository.save(resource);
