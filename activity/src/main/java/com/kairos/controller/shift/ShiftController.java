@@ -229,7 +229,7 @@ public class ShiftController {
 
     @ApiOperation("get shift count")
     @GetMapping("employment/{employmentId}/shift_count")
-    public ResponseEntity<Map<String, Object>> getShiftCount(@PathVariable Long employmentId){
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getShiftCount(employmentId));
+    public ResponseEntity<Map<String, Object>> getPublishShiftCount(@PathVariable Long employmentId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getPublishShiftCount(employmentId));
     }
 }
