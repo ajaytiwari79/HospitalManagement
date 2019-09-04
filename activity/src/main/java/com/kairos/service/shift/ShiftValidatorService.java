@@ -399,7 +399,6 @@ public class ShiftValidatorService {
             shifts = shifts.stream().filter(shiftWithActivityDTO -> !shiftWithActivityDTO.getId().equals(shiftId)).collect(Collectors.toList());
         }
         shifts = updateFullDayAndFullWeekActivityShift(shifts);
-        shifts = updateDraftShifts(shifts,null,staffAdditionalInfoDTO.getUserAccessRoleDTO());
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = staffAdditionalInfoDTO.getTimeSlotSets().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
@@ -415,18 +414,6 @@ public class ShiftValidatorService {
         staffAdditionalInfoDTO.setStaffAge(getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(), asLocalDate(shift.getStartDate())));
         return new RuleTemplateSpecificInfo(new ArrayList<>(shifts), shift, timeSlotWrapperMap, phase.getId(), new DateTimeInterval(DateUtils.asDate(planningPeriod.getStartDate()).getTime(), DateUtils.asDate(planningPeriod.getEndDate()).getTime()), staffWTACounterMap, dayTypeDTOMap, staffAdditionalInfoDTO.getUserAccessRoleDTO(), expectedTimebank, activityWrapperMap, staffAdditionalInfoDTO.getStaffAge(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), lastPlanningPeriod.getEndDate(), expertiseNightWorkerSetting, isNotNull(nightWorker) ? nightWorker.isNightWorker() : false, phase.getPhaseEnum());
     }
-
-    private List<ShiftWithActivityDTO> updateDraftShifts(List<ShiftWithActivityDTO> shifts,ShiftActionType shiftActionType,UserAccessRoleDTO userAccessRoleDTO) {
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = new ArrayList<>();
-        if (ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType) && userAccessRoleDTO.getManagement()) {
-            for (ShiftWithActivityDTO shift : shifts) {
-                shift = shift.getDraftShift();
-                shiftWithActivityDTOS.add(shift);
-            }
-        }
-        return shiftWithActivityDTOS;
-    }
-
 
     private RuleTemplateSpecificInfo getRuleTemplateSpecificInfo(PlanningPeriodDTO planningPeriod, ShiftWithActivityDTO shift, WTAQueryResultDTO wtaQueryResultDTO, StaffEmploymentDetails staffEmploymentDetails, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffEmploymentUnitDataWrapper dataWrapper, List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs) {
         logger.info("Current phase is " + planningPeriod.getCurrentPhase() + " for date " + new DateTime(shift.getStartDate()));
@@ -1012,7 +999,7 @@ public class ShiftValidatorService {
 
     public List<ShiftWithActivityDTO> updateFullDayAndFullWeekActivityShift(List<ShiftWithActivityDTO> shifts) {
         for (ShiftWithActivityDTO shift : shifts) {
-            if (isNotNull(shift) && isNotNull(shift.getActivities().get(0).getActivity()) && isFullDayOrFullWeekActivity(shift.getActivities().get(0).getActivity())) {
+            if (isNotNull(shift) && isNotNull(shift.getActivities().get(0).getActivity()) && shift.getActivities().get(0).getActivity().isFullDayOrFullWeekActivity()) {
                 Date startDate = getStartOfDay(shift.getStartDate());
                 Date endDate = getMidNightOfDay(shift.getEndDate());
                 shift.getActivities().get(0).setStartDate(startDate);
@@ -1023,10 +1010,6 @@ public class ShiftValidatorService {
         }
         return shifts;
     }
-
-    private boolean isFullDayOrFullWeekActivity(ActivityDTO activityDTO) {
-        return (CommonConstants.FULL_WEEK).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(activityDTO.getTimeCalculationActivityTab().getMethodForCalculatingTime()); }
-
 
     private boolean isShiftOverlap(List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval shiftInterval) {
         boolean shiftOverlap = false;

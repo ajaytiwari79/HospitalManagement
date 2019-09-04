@@ -22,6 +22,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
@@ -881,6 +882,14 @@ public class WorkTimeAgreementService extends MongoBaseService {
             }
         }
         return true;
+    }
+
+    public WTAQueryResultDTO getWtaQueryResultDTOByDateAndEmploymentId(Long employmentId,Date startDate) {
+        WTAQueryResultDTO wtaQueryResultDTO = getWTAByEmploymentIdAndDate(employmentId, startDate);
+        if (!Optional.ofNullable(wtaQueryResultDTO).isPresent()) {
+            exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
+        }
+        return wtaQueryResultDTO;
     }
 
     public boolean getWtaByName(String wtaName, Long countryId){

@@ -229,7 +229,7 @@ public class ShiftCopyService extends MongoBaseService {
             copiedShift.setBreakActivities(breakActivities);
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffEmployment, planningPeriod, activityConfigurations);
-            copiedShift.setShiftType(shiftService.updateShiftType(activityWrapperMap, shift));
+            copiedShift.setShiftType(sourceShift.getShiftType());
             newShifts.add(copiedShift);
 
             return new ShiftResponse(sourceShift.getId(), sourceShift.getActivities().get(0).getActivityName(), Collections.singletonList(NO_CONFLICTS), true, asLocalDate(startDate));

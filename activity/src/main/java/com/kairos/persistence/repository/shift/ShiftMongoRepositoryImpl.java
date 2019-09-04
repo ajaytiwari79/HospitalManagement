@@ -72,10 +72,10 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
-                    .and("startDate").gte(startDate).lt(endDate);
+                    .and("startDate").gte(startDate).lt(endDate).and("draft").is(false);
         } else {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
-                    .and("startDate").gte(startDate);
+                    .and("startDate").gte(startDate).and("draft").is(false);
         }
         return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
     }
