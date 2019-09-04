@@ -226,4 +226,9 @@ public class ShiftStateService {
         timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, shifts, activityWrapperMap, startDate, endDate);
 
     }
+
+
+    public List<BigInteger> findAllByShiftIdsByAccessgroupRole(Set<BigInteger> shiftIds, Set<String> accessGroupRole){
+        return shiftStateMongoRepository.findAllByShiftIdsByAccessgroupRole(shiftIds,accessGroupRole);
+    }
 }

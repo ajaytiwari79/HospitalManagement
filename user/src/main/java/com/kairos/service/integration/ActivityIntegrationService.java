@@ -3,6 +3,7 @@ package com.kairos.service.integration;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.*;
@@ -183,6 +184,10 @@ public class ActivityIntegrationService {
         });
     }
 
+    public List<PresenceTypeDTO> getAllPlannedTimeType(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/plannedTimeType", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>>() {
+        });
+    }
 
     public Long shiftCountWithEmploymentId(Long employmentId){
          return genericRestClient.publishRequest(null, employmentId, true, IntegrationOperation.GET, "/employment/{employmentId}/shift_count", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>(){}, employmentId);

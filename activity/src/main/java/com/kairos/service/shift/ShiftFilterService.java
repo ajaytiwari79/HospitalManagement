@@ -46,7 +46,9 @@ public class ShiftFilterService {
         ShiftFilter activityStatusFilter = new ActivityStatusFilter(filterTypeMap);
         ShiftFilter timeSlotFilter = new TimeSlotFilter(filterTypeMap,timeSlotDTOS);
         ShiftFilter activityFilter = new ActivityFilter(filterTypeMap);
-        ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter);
+        ShiftFilter plannedTimeTypeFilter=new PlannedTimeTypeFilter(filterTypeMap);
+        ShiftFilter TimeAndAttendanceFilter=new TimeAndAttendanceFilter((filterTypeMap));
+        ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
 }

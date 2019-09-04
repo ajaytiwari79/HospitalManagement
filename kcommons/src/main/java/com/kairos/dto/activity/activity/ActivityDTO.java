@@ -18,7 +18,7 @@ import java.util.*;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ActivityDTO {
+public class ActivityDTO  {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")
     private String name;
