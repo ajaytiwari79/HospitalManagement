@@ -67,4 +67,8 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(org:Organization{union:false,deleted:false,isEnable:true}),(newOrg:Organization{union:false,deleted:false,isEnable:true})<-[hubRelationShip:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization{isKairosHub: true,isParentOrganization: true}) WHERE id(org)={0} AND id(newOrg)={1} " +
             "CREATE UNIQUE(org)-[:"+HAS_SUB_ORGANIZATION+"]->(newOrg)  DETACH DELETE  hubRelationShip ")
     void mergeTwoOrganizations(Long orgId,Long newOrgId);
+
+    @Query("MATCH(organization:Organization),(hub:Organization) WHERE id(organization)={0} AND id(hub)={1} " +
+            "CREATE UNIQUE(hub)-[r:"+HAS_SUB_ORGANIZATION+"]->(organization)  ")
+    void linkOrganizationToHub(Long organizationId,Long hubId);
 }

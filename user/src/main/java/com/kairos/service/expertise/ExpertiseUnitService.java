@@ -1,5 +1,6 @@
 package com.kairos.service.expertise;
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
@@ -7,6 +8,7 @@ import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
@@ -49,16 +51,17 @@ public class ExpertiseUnitService {
     private CountryService countryService;
     @Inject
     private OrganizationPersonalizeLocationRelationShipGraphRepository organizationLocationRelationShipGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
 
 
     public List<ExpertiseQueryResult> findAllExpertise(Long unitId) {
-        Long countryId= countryService.getCountryIdByUnitId(unitId);
-        OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(unitId);
-        List<ExpertiseQueryResult> expertises = new ArrayList<>();
-        if (Optional.ofNullable(servicesAndLevel).isPresent() && Optional.ofNullable(servicesAndLevel.getLevelId()).isPresent()) {
-            expertises = expertiseGraphRepository.findExpertiseByOrganizationServicesAndLevelForUnit(countryId, servicesAndLevel.getServicesId(), servicesAndLevel.getLevelId());
-        } else if (Optional.ofNullable(servicesAndLevel).isPresent()) {
-            expertises = expertiseGraphRepository.findExpertiseByOrganizationServicesForUnit(countryId, servicesAndLevel.getServicesId());
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
+        List<Long> allUnitIds = organizationBaseRepository.fetchAllUnitIds(unitId);
+        OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(allUnitIds);
+        List<ExpertiseQueryResult> expertises=new ArrayList<>();
+        if(ObjectUtils.isNotNull(servicesAndLevel)){
+            expertises  = expertiseGraphRepository.findExpertiseByOrganizationServicesForUnit(countryId, servicesAndLevel.getServicesId());
         }
         if (CollectionUtils.isNotEmpty(expertises)) {
             List<Long> expertiseIds = expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
@@ -78,7 +81,7 @@ public class ExpertiseUnitService {
 
     public Map<String, Object> getStaffListOfExpertise(Long expertiseId, Long unitId) {
         Map<String, Object> response = new HashMap<>();
-        Organization organization=organizationService.fetchParentOrganization(unitId);
+        Organization organization = organizationService.fetchParentOrganization(unitId);
         List<StaffPersonalDetailDTO> staffs = staffGraphRepository.getAllStaffByUnitIdAndExpertiseId(organization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), expertiseId);
         List<Location> locations = expertiseGraphRepository.findAllLocationsOfUnionInExpertise(expertiseId);
 
@@ -89,7 +92,7 @@ public class ExpertiseUnitService {
 
     public boolean updateExpertiseAtUnit(Long unitId, Long staffId, Long expertiseId, Long locationId) {
         organizationLocationRelationShipGraphRepository.setLocationInOrganizationForExpertise(expertiseId, unitId, locationId);
-        staffGraphRepository.removePreviousUnionRepresentativeOfExpertiseInUnit(unitGraphRepository.findOne(unitId).isParentOrganization()?unitId:organizationService.fetchParentOrganization(unitId).getId(), expertiseId);
+        staffGraphRepository.removePreviousUnionRepresentativeOfExpertiseInUnit(unitGraphRepository.findOne(unitId).isParentOrganization() ? unitId : organizationService.fetchParentOrganization(unitId).getId(), expertiseId);
         staffGraphRepository.assignStaffAsUnionRepresentativeOfExpertise(staffId, expertiseId);
         return true;
     }

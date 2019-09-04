@@ -12,6 +12,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -162,7 +163,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) WHERE id(country) = {0} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())\n" +
             "MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1}\n" +
             "RETURN expertise order by expertise.creationDate")
-    List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, List<Long> organizationServicesIds);
+    List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, Set<Long> organizationServicesIds);
 
 
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) WHERE id(country) = {0} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp()) \n" +
@@ -236,7 +237,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "services as organizationService,level as organizationLevel,payTable as payTable,union as union,sector as sector,"
             + " CASE WHEN seniorityLevel IS NULL THEN [] ELSE COLLECT({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             "freeChoiceToPension:seniorityLevel.freeChoiceToPension, to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels ,seniorDays,childCareDays order by expertise.name")
-    List<ExpertiseQueryResult> findExpertiseByOrganizationServicesForUnit(Long countryId, List<Long> organizationServicesIds);
+    List<ExpertiseQueryResult> findExpertiseByOrganizationServicesForUnit(Long countryId, Set<Long> organizationServicesIds);
 
     @Query("MATCH (expertise:Expertise{deleted:false}) WHERE id(expertise) = {0}" +
             "MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  RETURN location as name ORDER BY location.name ASC" )

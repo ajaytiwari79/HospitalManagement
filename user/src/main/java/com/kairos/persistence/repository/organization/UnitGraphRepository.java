@@ -569,18 +569,14 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (organizations:Unit{deleted:false,isEnable:true}) WHERE id (organizations) IN {0}  RETURN organizations")
     List<Unit> findOrganizationsByIdsIn(List<Long> orgIds);
 
-    @Query("MATCH(organization:Organization),(hub:Organization) WHERE id(organization)={0} AND id(hub)={1} " +
-            "CREATE UNIQUE(hub)-[r:"+HAS_SUB_ORGANIZATION+"]->(organization)  ")
-    void linkOrganizationToHub(Long organizationId,Long hubId);
-
     @Query("MATCH(organization:Organization) WHERE organization.isKairosHub=true AND organization.organizationLevel='COUNTRY' RETURN id(organization) as id, organization.name as name, organization.organizationLevel as organizationLevel")
     List<OrganizationWrapper> getAllHubByCountryId(Long countryId);
 
-    @Query("MATCH(organization:Unit)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Unit) WHERE id(organization)={0}  RETURN id(hub)")
+    @Query("MATCH(organization:Organization)<-[:"+HAS_SUB_ORGANIZATION+"]-(hub:Organization) WHERE id(organization)={0}  RETURN id(hub)")
     Long getHubIdByOrganizationId(Long organizationId);
 
 
-    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(organization:Unit) where id(staff)={0} RETURN id(organization) as id,organization.name as name")
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit:Unit) where id(staff)={0} RETURN id(unit) as id,unit.name as name")
     List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
 
 }

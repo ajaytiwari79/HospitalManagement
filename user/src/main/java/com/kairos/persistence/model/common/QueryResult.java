@@ -33,6 +33,7 @@ public class QueryResult {
     private OrganizationLevel organizationLevel;
     private Long hubId;
     private boolean hasPermission;
+    private boolean unit;
 
     public QueryResult(String name, long id, List<QueryResult> children) {
         this.name = name;
@@ -40,20 +41,7 @@ public class QueryResult {
         this.children = children;
     }
 
-    public QueryResult(String name, long id, List<QueryResult> children, List<QueryResult> units, boolean isAccessable, boolean kairosHub,
-                       boolean isEnabled, boolean isParentOrganization, String timeZone, boolean union, Long hubId, boolean hasPermission) {
-        this.name = name;
-        this.id = id;
-        this.children = children;
-        this.units = units;
-        this.isAccessable = isAccessable;
-        this.kairosHub = kairosHub;
-        this.isEnabled = isEnabled;
-        this.timeZone = timeZone;
-        this.union = union;
-        this.hubId = hubId;
-        this.hasPermission = hasPermission;
-    }
+
 
     public static QueryResult getInstance(){
         return new QueryResult();

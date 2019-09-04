@@ -173,13 +173,13 @@ public class CompanyCreationService {
         organization.setCompanyCategory(getCompanyCategory(orgDetails.getCompanyCategoryId()));
         organization.setBusinessTypes(getBusinessTypes(orgDetails.getBusinessTypeIds()));
         organization.setUnitType(getUnitType(orgDetails.getUnitTypeId()));
-        Organization hubToBeLinked = organizationGraphRepository.findOne(orgDetails.getHubId(), 0);
-        if(hubToBeLinked == null) {
+        Organization hubOrOrgToBeLinked = organizationGraphRepository.findOne(orgDetails.getHubId(), 0);
+        if(hubOrOrgToBeLinked == null) {
             exceptionService.dataNotFoundByIdException("message.hub.notFound", orgDetails.getHubId());
         }
         organizationGraphRepository.save(organization);
-        //Linking organization to the selected hub
-        unitGraphRepository.linkOrganizationToHub(organization.getId(), hubToBeLinked.getId());
+        //Linking organization to the selected hub/organization
+        organizationGraphRepository.linkOrganizationToHub(organization.getId(),hubOrOrgToBeLinked.getId());
         orgDetails.setId(organization.getId());
         orgDetails.setKairosCompanyId(kairosCompanyId);
         return orgDetails;
