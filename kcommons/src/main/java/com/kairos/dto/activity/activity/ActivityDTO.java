@@ -53,6 +53,9 @@ public class ActivityDTO {
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;
     private BigInteger activityPriorityId;
+    private int activitySequence;
+
+
 
     public ActivityDTO() {
         //default constructor
@@ -307,6 +310,13 @@ public class ActivityDTO {
         this.childActivityIds = childActivityIds;
     }
 
+    public int getActivitySequence() {
+        return activitySequence;
+    }
+
+    public void setActivitySequence(int activitySequence) {
+        this.activitySequence = activitySequence;
+    }
 
     public List<ShiftStatus> getActivityStatus() {
         return activityStatus;

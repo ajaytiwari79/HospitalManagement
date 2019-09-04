@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -13,11 +14,13 @@ import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
@@ -88,6 +91,8 @@ public class StaffFilterService {
     private AccessPageRepository accessPageRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private TeamGraphRepository teamGraphRepository;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
@@ -146,12 +151,23 @@ public class StaffFilterService {
                 return getStatusFilter();
             case TIME_SLOT:
                 return getTimeSlots();
+            case ABSENCE_ACTIVITY:
+                return getAnsenceActivity(unitId);
+            case TEAM:
+                return teamGraphRepository.getTeamsByUnitIdForFilters(unitId);
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
         }
         return null;
     }
+
+
+    private List<FilterSelectionQueryResult> getAnsenceActivity(Long unitId){
+        List<ActivityDTO> activityDTOS = activityIntegrationService.getAllAbsenceActivity(unitId);
+        return activityDTOS.stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
+    }
+
 
     private List<FilterSelectionQueryResult> getTimeSlots(){
         List<FilterSelectionQueryResult> filterSelectionQueryResults = new ArrayList<>();

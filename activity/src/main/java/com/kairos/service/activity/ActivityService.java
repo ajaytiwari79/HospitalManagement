@@ -358,7 +358,6 @@ public class ActivityService {
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
-        activity.getBalanceSettingsActivityTab().setTimeType(timeType.getSecondLevelType());
         Long countryId = activity.getCountryId();
         if (countryId == null) {
             countryId = userIntegrationService.getCountryIdOfOrganization(activity.getUnitId());
@@ -1022,5 +1021,12 @@ public class ActivityService {
         activityMongoRepository.unassignExpertiseFromActivitiesByExpertiesId(expertiseId.longValue());
         LOGGER.info("successfully remove expertise from activities by job");
         return true;
+    }
+
+
+    public List<ActivityDTO> getAllAbsenceActivity(Long unitId){
+        List<ActivityDTO> activityDTOS=new ArrayList<>(activityMongoRepository.findAbsenceActivityByUnitId(unitId));
+         activityDTOS.sort(Comparator.comparing(ActivityDTO :: getActivitySequence));
+         return activityDTOS;
     }
 }
