@@ -152,7 +152,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> getShiftAndActivityByRepresentTotalData(List<DateTimeInterval> dateTimeIntervals, List<ShiftWithActivityDTO> shifts, Map<String, Integer> activityNameAndTotalDurationMinutesMap, Integer shiftDurationMinutes, Map<String, String> activityNameAndColorCodeMap) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndShiftAndActivityDurationMap = new HashedMap();
-        staffIdAndShiftAndActivityDurationMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes,shifts));
+        staffIdAndShiftAndActivityDurationMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), getShiftAndActivityDurationMap(activityNameAndColorCodeMap, activityNameAndTotalDurationMinutesMap, shiftDurationMinutes,shifts));
         return staffIdAndShiftAndActivityDurationMap;
     }
 
