@@ -176,7 +176,7 @@ public class StaffFilterService {
 
 
     private List<FilterSelectionQueryResult> getTAStatus(){
-        return Arrays.stream(AccessGroupRole.values()).map(accessGroupRole -> new FilterSelectionQueryResult(accessGroupRole.name(),accessGroupRole.toValue())).collect(Collectors.toList());
+        return Arrays.stream(AccessGroupRole.values()).map(accessGroupRole -> new FilterSelectionQueryResult(accessGroupRole.name(),accessGroupRole.toString())).collect(Collectors.toList());
     }
 
     private  List<FilterSelectionQueryResult> getAllFunctions(Long countryId){
