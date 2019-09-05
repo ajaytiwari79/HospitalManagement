@@ -414,6 +414,15 @@ public class TimeBankService{
         return shifts;
     }
 
+    public void updateTimeBankForProtectedDaysOff(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner) {
+        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asDate(LocalDate.now()));
+        staffAdditionalInfoDTO.getEmployment().setStaffId(shift.getStaffId());
+        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner,false);
+        if(isNotNull(dailyTimeBankEntry)) {
+            timeBankRepository.save(dailyTimeBankEntry);
+        }
+    }
+
     private void updateBonusHoursOfTimeBankInShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<Shift> shifts) {
         if(CollectionUtils.isNotEmpty(shifts)) {
             Map<String, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getActivityId()+"_"+k.getStartDate(), v -> v));
