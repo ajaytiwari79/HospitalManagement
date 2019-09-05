@@ -163,7 +163,7 @@ public class StaffFilterService {
              return getPlannedTimeType(countryId);
             case FUNCTIONS:
                 return getAllFunctions(countryId);
-            case TA_STATUS:
+            case VALIDATED_BY:
                 return getTAStatus();
             case TEAM:
                 return teamGraphRepository.getTeamsByUnitIdForFilters(unitId);
@@ -176,7 +176,7 @@ public class StaffFilterService {
 
 
     private List<FilterSelectionQueryResult> getTAStatus(){
-        return Arrays.stream(AccessGroupRole.values()).map(accessGroupRole -> new FilterSelectionQueryResult(accessGroupRole.name(),AccessGroupRole.STAFF.equals(accessGroupRole)?AppConstants.STAFF_VALIDATED:AppConstants.PLANNER_VALIDATED)).collect(Collectors.toList());
+        return Arrays.stream(AccessGroupRole.values()).map(accessGroupRole -> new FilterSelectionQueryResult(accessGroupRole.name(),accessGroupRole.toString())).collect(Collectors.toList());
     }
 
     private  List<FilterSelectionQueryResult> getAllFunctions(Long countryId){

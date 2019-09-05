@@ -226,9 +226,8 @@ public class AppConstants {
     public static final String AUTHORIZATION = "Authorization";
 
 
-    //ta status filter
-    public static final String STAFF_VALIDATED = "Staff Validated";
-    public static final String PLANNER_VALIDATED = "Planner Validated";
+
+
 
 
 }
