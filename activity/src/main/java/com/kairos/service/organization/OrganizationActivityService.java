@@ -57,7 +57,7 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.unit_settings.*;
-import com.kairos.service.wta.WTAService;
+import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -123,7 +123,7 @@ public class OrganizationActivityService extends MongoBaseService {
     @Inject
     private CounterRepository counterRepository;
     @Inject
-    private WTAService wtaService;
+    private WorkTimeAgreementService workTimeAgreementService;
     @Inject
     private CostTimeAgreementService costTimeAgreementService;
     @Inject
@@ -529,7 +529,7 @@ public class OrganizationActivityService extends MongoBaseService {
             }
             save(activityCopiedList);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
-            wtaService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
+            workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
             updateCompositeActivitiesIds(activityCopiedList);
         }
     }

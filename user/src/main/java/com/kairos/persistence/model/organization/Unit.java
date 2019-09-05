@@ -69,7 +69,7 @@ public class Unit extends OrganizationBaseEntity {
         this.resourceList = resourceList;
     }
 
-    public Unit(Long id, String name, String description,  String desiredUrl, String shortCompanyName, String kairosCompanyId, CompanyType companyType,
+    public Unit(Long id, String name, String description,  String desiredUrl, String shortCompanyName, String kairosCompanyId,
                         String vatId, List<BusinessType> businessTypes, OrganizationType organizationType, List<OrganizationType> organizationSubTypes, CompanyUnitType companyUnitType,
                         CompanyCategory companyCategory, ZoneId timeZone,  AccountType accountType, boolean boardingCompleted,boolean workcentre) {
         this.name = name;
@@ -81,7 +81,6 @@ public class Unit extends OrganizationBaseEntity {
         this.businessTypes = businessTypes;
         this.organizationSubTypes = organizationSubTypes;
         this.organizationType = organizationType;
-        this.companyType = companyType;
         this.companyCategory = companyCategory;
         this.companyUnitType = companyUnitType;
         this.timeZone = timeZone;

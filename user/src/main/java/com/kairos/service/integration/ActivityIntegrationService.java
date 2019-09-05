@@ -177,7 +177,7 @@ public class ActivityIntegrationService {
         });
     }
 
-    public Long shiftCountWithEmploymentId(Long employmentId){
+    public Long publishShiftCountWithEmploymentId(Long employmentId){
          return genericRestClient.publishRequest(null, employmentId, true, IntegrationOperation.GET, "/employment/{employmentId}/shift_count", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>(){}, employmentId);
     }
 

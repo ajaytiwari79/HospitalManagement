@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.wta.WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT;
 
 /**
@@ -182,6 +184,10 @@ public class WTAQueryResultDTO {
 
     public void setOrganization(OrganizationDTO organization) {
         this.organization = organization;
+    }
+
+    public boolean isValidWorkTimeAgreement(LocalDate localDate){
+        return (isNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate)) || (isNotNull(this.getEndDate()) && !this.getStartDate().isAfter(localDate) && !this.getEndDate().isBefore(localDate));
     }
 
     public BreakWTATemplate getBreakRule(){

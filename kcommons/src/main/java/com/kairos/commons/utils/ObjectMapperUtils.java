@@ -135,39 +135,6 @@ public class ObjectMapperUtils {
         return mapper;
     }
 
-    public static <T extends Object,E extends Object> List<E> copyObjectPropertiesUsingIgnorePropList(List<T> objects, Class className, String... ignoreProperties) {
-        List objectListwithCopiedData = new ArrayList<>();
-         objects.forEach(t -> {
-             try {
-             Object copiedObject = className.newInstance();
-             BeanUtils.copyProperties(t, copiedObject, ignoreProperties);
-                 objectListwithCopiedData.add(copiedObject);
-             }catch (Exception ex){
-                 ex.printStackTrace();
-             }
-         });
-
-        return objectListwithCopiedData;
-    }
-
-    public static <T extends Object, E extends Object>  List<E> copyObjectSpecificPropertiesOfListByMapper(List<T> src, Class className, List<String> props) {
-        List objectListwithCopiedData = new ArrayList();
-        src.forEach(t -> {
-            BeanWrapper targetWrapper = null;
-            try {
-                BeanWrapper srcWrappper = PropertyAccessorFactory.forBeanPropertyAccess(t);
-                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(className.newInstance());
-                for (String prop : props) {
-                    targetWrapper.setPropertyValue(prop, srcWrappper.getPropertyValue(prop));
-                }
-                objectListwithCopiedData.add(targetWrapper.getWrappedInstance());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-        return objectListwithCopiedData;
-    }
-
     public static <E extends Object>  E copyObjectSpecificPropertiesByMapper(Object src, Object target, List<KPermissionModelFieldDTO> accessibleFieldsWithModelName, Class baseClass) {
         if (src != null) {
             BeanWrapper targetWrapper = null;

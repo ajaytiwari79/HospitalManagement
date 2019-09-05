@@ -81,4 +81,8 @@ public class RuleTemplateSpecificInfo {
         this.violatedRules = violatedRules;
     }
 
+    public boolean isWTARuletemplateBroken(BigInteger wtaRuletemplateId){
+        return violatedRules.getWorkTimeAgreements().stream().anyMatch(workTimeAgreementRuleViolation -> workTimeAgreementRuleViolation.getRuleTemplateId().equals(wtaRuletemplateId) && workTimeAgreementRuleViolation.isBroken());
+    }
+
 }

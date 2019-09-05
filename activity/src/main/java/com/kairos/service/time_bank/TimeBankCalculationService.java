@@ -256,8 +256,8 @@ public class TimeBankCalculationService {
             default:
                 break;
         }
-        shiftActivity.setDurationMinutes(duration);
         if(TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType())) {
+            shiftActivity.setDurationMinutes(duration);
             shiftActivity.setScheduledMinutes(scheduledMinutes);
         }
     }

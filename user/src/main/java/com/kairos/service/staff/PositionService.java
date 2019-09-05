@@ -257,7 +257,7 @@ public class PositionService {
     public List<Map<String, Object>> getPositions(long staffId, long unitId) {
 
         OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId);
-        Organization parent = unit.isParentOrganization() ? (Organization) unit : organizationService.fetchParentOrganization(unitId);
+        Organization parent = unit instanceof Organization ? (Organization) unit : organizationService.fetchParentOrganization(unitId);
         List<Map<String, Object>> list = new ArrayList<>();
 
         if (parent == null) {

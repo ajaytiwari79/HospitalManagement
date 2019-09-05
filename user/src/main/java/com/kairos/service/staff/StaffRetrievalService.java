@@ -618,8 +618,6 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setSeniorAndChildCareDays(seniorAndChildCareDaysDTO);
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
             staffAdditionalInfoDTO.setUnitId(unit.getId());
-            staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(unit.getNightEndTimeTo());
-            staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(unit.getNightStartTimeFrom());
             staffAdditionalInfoDTO.setEmployment(employment);
         }
         return staffAdditionalInfoDTO;
@@ -642,8 +640,6 @@ public class StaffRetrievalService {
         staffEmploymentUnitDataWrapper.setSeniorAndChildCareDays(seniorAndChildCareDaysDTO);
         staffEmploymentUnitDataWrapper.setUser(userAccessRoleDTO);
         staffEmploymentUnitDataWrapper.setUnitId(unit.getId());
-        staffEmploymentUnitDataWrapper.setOrganizationNightEndTimeTo(unit.getNightEndTimeTo());
-        staffEmploymentUnitDataWrapper.setOrganizationNightStartTimeFrom(unit.getNightStartTimeFrom());
     }
 
     public StaffAdditionalInfoDTO getStaffEmploymentData(Long employmentId, Long unitId) {
@@ -687,9 +683,7 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setDayTypes(dayTypeDTOS);
 
             staffAdditionalInfoDTO.setUnitId(organizationBaseEntity.getId());
-            staffAdditionalInfoDTO.setOrganizationNightEndTimeTo(organizationBaseEntity.getNightEndTimeTo());
             staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
-            staffAdditionalInfoDTO.setOrganizationNightStartTimeFrom(organizationBaseEntity.getNightStartTimeFrom());
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         });
         Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoDTOMap = staffAdditionalInfoDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));

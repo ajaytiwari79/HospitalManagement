@@ -211,7 +211,6 @@ public class CompanyCreationService {
             }
         }
         unit.setName(orgDetails.getName());
-        unit.setCompanyType(orgDetails.getCompanyType());
         unit.setVatId(orgDetails.getVatId());
         unit.setShortCompanyName(orgDetails.getShortCompanyName());
         unit.setDesiredUrl(orgDetails.getDesiredUrl());

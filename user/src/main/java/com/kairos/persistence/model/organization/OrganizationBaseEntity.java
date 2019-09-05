@@ -55,7 +55,7 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     protected String costCenterName;
     protected String shortName;
     protected String webSiteUrl;
-    //fixme
+    //fixme review
     protected Long clientSince;
     protected String cvrNumber;
     protected String pNumber;
@@ -63,8 +63,6 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     protected KairosStatus kairosStatus;
     //Fixme move to activity micro service
     protected TimeSlotMode timeSlotMode = STANDARD;
-    //fixme remove
-    protected boolean isParentOrganization;
 
     @Relationship(type = TYPE_OF)
     protected OrganizationType organizationType;
@@ -80,14 +78,9 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     @Relationship(type = HAS_COMPANY_CATEGORY)
     protected CompanyCategory companyCategory;
     protected String kairosCompanyId;
-    //fixme move to organization domain
-    protected CompanyType companyType;
+
 
     protected String vatId;
-    //fixme remove
-    protected boolean costCenter;
-    //fixme remove
-    protected Integer costCenterId;
     protected CompanyUnitType companyUnitType;
 
     protected boolean boardingCompleted;
@@ -111,12 +104,6 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     protected Boolean showCountryTags = true;
     @Convert(ZoneIdStringConverter.class)
     protected ZoneId timeZone;
-    //fixme remove
-    @DateString("HH:mm")
-    protected Date nightStartTimeFrom;
-    //fixme remove
-    @DateString("HH:mm")
-    protected Date nightEndTimeTo;
     @Relationship(type = ORGANIZATION_HAS_TAG)
     protected List<Tag> tags;
 
@@ -132,9 +119,7 @@ public class OrganizationBaseEntity extends UserBaseEntity {
 
     @Relationship(type = CONTACT_ADDRESS)
     protected ContactAddress contactAddress;
-    //fixme remove
-    @Relationship(type = ZIP_CODE)
-    protected ZipCode zipCode;
+
     @Relationship(type = BUSINESS_TYPE)
     protected List<BusinessType> businessTypes;
     //fixme review

@@ -38,6 +38,7 @@ public class Organization extends OrganizationBaseEntity {
     private boolean isKairosHub;
     @Relationship(type = KAIROS_STATUS)
     private KairosStatus kairosStatus;
+    //fixme need to remove
     private boolean isParentOrganization;
 
     // Relationships
@@ -67,6 +68,8 @@ public class Organization extends OrganizationBaseEntity {
 
     @Relationship(type=HAS_SECTOR)
     private List<Sector> sectors = new ArrayList<>();
+
+    protected CompanyType companyType;
 
 
     //set o.nightStartTimeFrom="22:15",o.nightEndTimeTo="07:15"

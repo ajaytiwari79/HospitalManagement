@@ -58,7 +58,7 @@ public class CompanyDefaultDataService {
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
             orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
             orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
-            orgTypeAndSubTypeDTO.setParentOrganization(unit.isParentOrganization());
+            orgTypeAndSubTypeDTO.setParentOrganization(false);
             orgTypeAndSubTypeDTO.setEmploymentTypeIds(employmentTypeIds);
             activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
             activityIntegrationService.createDefaultKPISetting(

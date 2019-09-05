@@ -75,11 +75,25 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
+                    .and("startDate").gte(startDate).lt(endDate).and("draft").is(false);
+        } else {
+            criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
+                    .and("startDate").gte(startDate).and("draft").is(false);
+        }
+        return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
+    }
+
+    @Override
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdNotEqualShiftIds(Long employmentId, Date startDate, Date endDate,List<BigInteger> shiftIds) {
+        Criteria criteria;
+        if (Optional.ofNullable(endDate).isPresent()) {
+            criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate).lt(endDate);
         } else {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate);
         }
+        criteria.and("_id").nin(shiftIds);
         return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
     }
 
@@ -586,6 +600,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 .and("activities").elemMatch(where("status").nin(shiftStatus)));
         return mongoTemplate.find(query, Shift.class);
 
+    }
+
+    @Override
+    public List<Shift> findAllPublishShiftByEmploymentId(Long employmentId){
+        Query query = new Query(where("deleted").is(false).and("employmentId").is(employmentId).and("draft").is(false)
+                .and("activities.status").is(ShiftStatus.PUBLISH));
+        return mongoTemplate.find(query, Shift.class);
     }
 
     @Override

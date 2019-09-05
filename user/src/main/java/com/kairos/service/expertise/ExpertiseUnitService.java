@@ -92,7 +92,8 @@ public class ExpertiseUnitService {
 
     public boolean updateExpertiseAtUnit(Long unitId, Long staffId, Long expertiseId, Long locationId) {
         organizationLocationRelationShipGraphRepository.setLocationInOrganizationForExpertise(expertiseId, unitId, locationId);
-        staffGraphRepository.removePreviousUnionRepresentativeOfExpertiseInUnit(unitGraphRepository.findOne(unitId).isParentOrganization() ? unitId : organizationService.fetchParentOrganization(unitId).getId(), expertiseId);
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        staffGraphRepository.removePreviousUnionRepresentativeOfExpertiseInUnit(organization.getId(), expertiseId);
         staffGraphRepository.assignStaffAsUnionRepresentativeOfExpertise(staffId, expertiseId);
         return true;
     }

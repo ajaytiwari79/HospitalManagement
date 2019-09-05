@@ -186,7 +186,7 @@ public class OrganizationService {
         OrganizationBaseEntity unit = organizationBaseRepository.findOne(id);
         OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(unit, OrganizationDTO.class);
         organizationDTO.setCountryId(countryGraphRepository.getCountryIdByUnitId(id));
-        organizationDTO.setParentOrganization(unit.isParentOrganization());
+        organizationDTO.setParentOrganization(unit instanceof Organization);
         return organizationDTO;
     }
 
@@ -499,7 +499,7 @@ public class OrganizationService {
     public OrganizationTypeAndSubTypeDTO getOrganizationTypeAndSubTypes(Long id) {
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(id);
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = new OrganizationTypeAndSubTypeDTO();
-        if (!organizationBaseEntity.isParentOrganization()) {
+        if (organizationBaseEntity instanceof Unit) {
             Organization organization = fetchParentOrganization(id);
             organizationTypeAndSubTypeDTO.setParentOrganizationId(organization.getId());
             organizationTypeAndSubTypeDTO.setParent(false);

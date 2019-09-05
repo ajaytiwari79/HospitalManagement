@@ -280,7 +280,7 @@ public class OrganizationBuilder {
     }
 
     public Unit createUnit(){
-        return new Unit(id,name,description,desiredUrl,shortCompanyName,kairosCompanyId,companyType,
+        return new Unit(id,name,description,desiredUrl,shortCompanyName,kairosCompanyId,
                 vatId,businessTypes,organizationType,organizationSubTypes,companyUnitType,
                 companyCategory,timeZone,accountType,boardingCompleted,workcentre);
     }

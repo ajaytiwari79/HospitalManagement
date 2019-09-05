@@ -2,6 +2,7 @@ package com.kairos.utils.validator.company;
 
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.user.organization.CompanyType;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
@@ -25,7 +26,7 @@ public class OrganizationDetailsValidator {
                 exceptionService.invalidRequestException(ERROR_ORGANIZATION_COMPANYCATEGORY_NOTNULL, organization.getName());
             }
             validateTypeDetails(exceptionService, organization);
-            if (CompanyType.COMPANY.equals(organization.getCompanyType()) && !Optional.ofNullable(organization.getAccountType()).isPresent()) {
+            if (organization instanceof Organization && !Optional.ofNullable(organization.getAccountType()).isPresent()) {
                 exceptionService.invalidRequestException(ERROR_ORGANIZATION_ACCOUNTTYPE_NOTNULL, organization.getName());
             }
             if (!Optional.ofNullable(organization.getKairosCompanyId()).isPresent()) {

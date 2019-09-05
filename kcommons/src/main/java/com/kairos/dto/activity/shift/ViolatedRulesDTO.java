@@ -26,7 +26,7 @@ public class ViolatedRulesDTO {
     }
 
     public List<ActivityRuleViolation> getActivities() {
-        return activities;
+        return Optional.ofNullable(activities).orElse(new ArrayList<>());
     }
 
     public void setActivities(List<ActivityRuleViolation> activities) {

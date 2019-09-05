@@ -14,6 +14,9 @@ public interface ShiftViolatedRulesMongoRepository extends MongoBaseRepository<S
     @Query(value = "{'shiftId':{'$in':?0},draft:?1}")
     List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds,boolean draft);
 
+    @Query(value = "{'shiftId':{'$in':?0},draft:?1,workTimeAgreements:{$ne:[]}}")
+    List<ShiftViolatedRules> findAllViolatedRulesByShiftIdsAndWorkTimeAgreement(List<BigInteger> shiftIds,boolean draft);
+
     @Query(value = "{'shiftId':{'$in':?0}}")
     List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds);
 

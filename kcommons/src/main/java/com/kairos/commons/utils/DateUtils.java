@@ -73,7 +73,6 @@ public  class DateUtils {
     public static Date getStartOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
         LocalDateTime startOfDay = localDateTime.with(LocalTime.MIN);
-
         return localDateTimeToDate(startOfDay);
     }
 

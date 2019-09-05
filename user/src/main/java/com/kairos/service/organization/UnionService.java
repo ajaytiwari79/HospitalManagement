@@ -15,15 +15,13 @@ import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationBasicResponse;
-import com.kairos.persistence.model.organization.OrganizationHierarchyData;
-import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.union.*;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.LocationGraphRepository;
@@ -82,6 +80,8 @@ public class UnionService {
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private StaffRetrievalService staffRetrievalService;
     @Inject
@@ -532,25 +532,25 @@ public class UnionService {
 
         }
         List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, unitId);
-        Unit unit = unitGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(unit).isPresent() || !Optional.ofNullable(unit.getOrganizationSubTypes()).isPresent()) {
+        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(unitId);
+        if (!Optional.ofNullable(organizationBaseEntity).isPresent() || !Optional.ofNullable(organizationBaseEntity.getOrganizationSubTypes()).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_NOTFOUND);
 
         }
-        List<Long> organizationSubTypeIds = unit.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
+        List<Long> organizationSubTypeIds = organizationBaseEntity.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
         List<UnionResponseDTO> unions = unitGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
         List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
-        if (unit.isParentOrganization()) {
-            organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(unit.getId());
+        if (organizationBaseEntity instanceof Organization) {
+            organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(organizationBaseEntity.getId());
         } else {
-            OrganizationHierarchyData data = unitGraphRepository.getChildHierarchyByChildUnit(unit.getId());
+            OrganizationHierarchyData data = unitGraphRepository.getChildHierarchyByChildUnit(organizationBaseEntity.getId());
             Iterator itr = data.getChildUnits().listIterator();
             while (itr.hasNext()) {
                 Unit thisUnit = (Unit) itr.next();
                 organizationHierarchy.add(new OrganizationBasicResponse(thisUnit.getId(), thisUnit.getName()));
             }
         }
-        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unit.getId(), ReasonCodeType.EMPLOYMENT);
+        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organizationBaseEntity.getId(), ReasonCodeType.EMPLOYMENT);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
     }
 }
