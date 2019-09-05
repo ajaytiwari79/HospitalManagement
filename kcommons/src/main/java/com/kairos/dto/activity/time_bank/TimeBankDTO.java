@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 
 /*
 * Created By Pradeep singh rajawat
@@ -57,6 +59,8 @@ public class TimeBankDTO {
     private float hourlyCost;
     private long totalPlannedMinutes;
     private long actualTimebankMinutes;
+    private LocalDate planningPeriodStartDate;
+    private LocalDate planningPeriodEndDate;
 
     public TimeBankDTO(Long employmentId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
