@@ -431,7 +431,6 @@ public class ShiftValidatorService {
         }
         shifts = updateFullDayAndFullWeekActivityShift(shifts);
         Map<BigInteger, Integer> staffWTACounterMap = staffWTACounters.stream().collect(Collectors.toMap(StaffWTACounter::getRuleTemplateId, StaffWTACounter::getCount));
-        Map<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = timeBankService.getAccumulatedTimebankAndDelta(staffEmploymentDetails.getId(),shift.getUnitId(),null);
         Map<String, TimeSlotWrapper> timeSlotWrapperMap = dataWrapper.getTimeSlotWrappers().stream().collect(Collectors.toMap(TimeSlotWrapper::getName, v -> v));
         Map<Long, DayTypeDTO> dayTypeDTOMap = dataWrapper.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         shift = updateFullDayAndFullWeekActivityShift(newArrayList(shift)).get(0);
@@ -440,8 +439,7 @@ public class ShiftValidatorService {
         if (expertiseNightWorkerSetting == null) {
             expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndDeletedFalseAndCountryIdExistsTrue(staffEmploymentDetails.getExpertise().getId());
         }
-        DailyTimeBankEntry dailyTimeBankEntry = timeBankService.renewDailyTimeBank(new StaffAdditionalInfoDTO(staffEmploymentDetails, dataWrapper.getDayTypes()), ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class), false, false);
-        long expectedTimebank = timeBankByDateDTOMap.get(asLocalDate(shift.getStartDate())).getExpectedTimebankMinutes() + dailyTimeBankEntry.getDeltaTimeBankMinutes();
+        long expectedTimebank = timeBankService.getExpectedTimebankByDate(shift, new StaffAdditionalInfoDTO(staffEmploymentDetails, dataWrapper.getDayTypes()));
         dataWrapper.setStaffAge(getAgeByCPRNumberAndStartDate(dataWrapper.getCprNumber(), asLocalDate(shift.getStartDate())));
         NightWorker nightWorker = nightWorkerMongoRepository.findByStaffId(shift.getStaffId());
         Phase phase = phaseMongoRepository.findOne(planningPeriod.getCurrentPhaseId());

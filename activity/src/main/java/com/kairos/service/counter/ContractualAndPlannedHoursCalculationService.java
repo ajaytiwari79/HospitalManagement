@@ -131,7 +131,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
             for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
                 contractualMinutes = getaContratualMinutes(interval, staffKpiFilterDTO, contractualMinutes);
                 }
-            dateTimeIntervalAndContractualHourMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), DateUtils.getHoursByMinutes(contractualMinutes.doubleValue()));
+            dateTimeIntervalAndContractualHourMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), DateUtils.getHoursByMinutes(contractualMinutes.doubleValue()));
 
         return dateTimeIntervalAndContractualHourMap;
     }

@@ -165,7 +165,7 @@ public class PlannedHoursCalculationService implements CounterService {
         for (Long staffId : staffIds) {
             plannedHours += getPlannedHoursOfStaff(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()));
         }
-        staffplannedHours.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), plannedHours);
+        staffplannedHours.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), plannedHours);
         return staffplannedHours;
     }
 
