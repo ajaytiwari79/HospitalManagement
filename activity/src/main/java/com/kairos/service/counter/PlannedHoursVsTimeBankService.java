@@ -179,7 +179,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
                 totalTimeBankOfUnit = getTotalTimeBank(longListMap, dateTimeInterval, unitId, totalTimeBankOfUnit, staffKpiFilterDTO);
             }
         }
-        staffIdAndDeltaTimeBankMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), DateUtils.getHoursByMinutes(totalTimeBankOfUnit.doubleValue()));
+        staffIdAndDeltaTimeBankMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), DateUtils.getHoursByMinutes(totalTimeBankOfUnit.doubleValue()));
        return  staffIdAndDeltaTimeBankMap;
     }
 
