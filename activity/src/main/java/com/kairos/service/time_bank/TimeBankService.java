@@ -688,15 +688,6 @@ public class TimeBankService{
         return dailyTimeBankEntry;
     }
 
-    public void updateTimeBankForProtectedDaysOff(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, boolean validatedByPlanner) {
-        CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), asDate(LocalDate.now()));
-        staffAdditionalInfoDTO.getEmployment().setStaffId(shift.getStaffId());
-        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner,false);
-        if(isNotNull(dailyTimeBankEntry)) {
-            timeBankRepository.save(dailyTimeBankEntry);
-        }
-    }
-
     public long getExpectedTimebankByDate(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class), false, false);
         Map<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),null);
