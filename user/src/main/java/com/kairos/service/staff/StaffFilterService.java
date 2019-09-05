@@ -360,8 +360,8 @@ public class StaffFilterService {
         staffEmploymentTypeWrapper.setStaffList(staffs);
         List<Long> staffIds = staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
         staffFilterDTO.setStaffIds(staffIds);
-        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO,unitId,startDate,endDate);
-        List<Map> staffList = new ArrayList<>();
+        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = new HashMap<>();//activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
+        List<Map> staffList = staffs;//new ArrayList<>();
         for (Map staffUndModifiable : staffs) {
             if(staffIdAndNightWorkerDetailsMap.containsKey(staffUndModifiable.get("id"))) {
                 Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffUndModifiable, HashedMap.class);
