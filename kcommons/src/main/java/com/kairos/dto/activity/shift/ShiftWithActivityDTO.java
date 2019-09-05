@@ -88,11 +88,11 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     }
 
     public boolean isPresence(){
-        return this.getActivities().stream().anyMatch(shiftActivityDTO -> TimeTypeEnum.PRESENCE.equals(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType()));
+        return this.getActivities().stream().anyMatch(shiftActivityDTO -> isNotNull(shiftActivityDTO.getActivity()) && TimeTypeEnum.PRESENCE.equals(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType()));
     }
 
     public boolean isAbsence(){
-        return this.getActivities().stream().allMatch(shiftActivityDTO -> TimeTypeEnum.ABSENCE.equals(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType()));
+        return this.getActivities().stream().allMatch(shiftActivityDTO -> isNotNull(shiftActivityDTO.getActivity()) && TimeTypeEnum.ABSENCE.equals(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType()));
     }
 
     @JsonIgnore

@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -18,5 +19,8 @@ public interface StaffWTACounterRepository extends MongoBaseRepository<StaffWTAC
 
     @Query("{employmentId:?0,startDate:?1,endDate:?2,userHasStaffRole:?3}")
     List<StaffWTACounter> getStaffWTACounterByDate(Long employmentId,Date startDate,Date endDate,boolean userHasStaffRole);
+
+    @Query("{employmentId:?0,startDate:{$gte:?1},endDate:{$lte:?2},userHasStaffRole:?3}")
+    List<StaffWTACounter> getStaffWTACounterBetweenDate(Long employmentId, LocalDate startDate, LocalDate endDate, boolean userHasStaffRole);
 
 }
