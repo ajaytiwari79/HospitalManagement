@@ -6,6 +6,7 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.HttpHostConnectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
+import java.net.ConnectException;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -60,10 +62,13 @@ public class SchedulerServiceRestClient {
                 exceptionService.internalError(response.getMessage());
             }
             responseData =  response.getData();
-        } catch (HttpClientErrorException e) {
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
-            exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
+        } catch (Exception exception) {
+            if(exception instanceof HttpClientErrorException){
+                HttpClientErrorException httpClientErrorException = (HttpClientErrorException)exception;
+                logger.info("status {}", httpClientErrorException.getStatusCode());
+                logger.info("response {}", httpClientErrorException.getResponseBodyAsString());
+                exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(httpClientErrorException.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
+            }
         }
         return responseData;
     }

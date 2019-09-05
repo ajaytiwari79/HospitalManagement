@@ -686,4 +686,14 @@ public class TimeBankService{
             timeBankRepository.save(dailyTimeBankEntry);
         }
     }
+
+    public long getExpectedTimebankByDate(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO, ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class), false, false);
+        Map<LocalDate, TimeBankIntervalDTO> timeBankByDateDTOMap = getAccumulatedTimebankAndDelta(staffAdditionalInfoDTO.getEmployment().getId(),shift.getUnitId(),null);
+        long expectedTimebank = timeBankByDateDTOMap.get(asLocalDate(shift.getStartDate())).getExpectedTimebankMinutes();
+        if (isNotNull(dailyTimeBankEntry)) {
+            expectedTimebank += dailyTimeBankEntry.getDeltaTimeBankMinutes();
+        }
+        return expectedTimebank;
+    }
 }

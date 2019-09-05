@@ -380,4 +380,11 @@ public class OrganizationActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getActivitiesWithCategories(unitId));
     }
 
+    @ApiOperation("Get all absence activity")
+    @GetMapping(value = "/absence-activities")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getAllAbsenceActivity(unitId));
+    }
+
 }

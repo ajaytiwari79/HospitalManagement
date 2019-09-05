@@ -8,6 +8,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
+import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.access_permission.*;
@@ -570,5 +571,13 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public GoogleCalenderTokenDTO updateGoogleCalenderToken(GoogleCalenderTokenDTO googleCalenderTokenDTO) {
+        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        currentUser.setGoogleCalenderTokenId(googleCalenderTokenDTO.getGoogleCalenderTokenId());
+        currentUser.setGoogleCalenderAccessToken(googleCalenderTokenDTO.getGoogleCalenderAccessToken());
+        userGraphRepository.save(currentUser);
+        return googleCalenderTokenDTO;
     }
 }

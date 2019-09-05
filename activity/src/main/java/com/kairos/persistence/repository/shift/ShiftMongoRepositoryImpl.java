@@ -72,11 +72,25 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
+                    .and("startDate").gte(startDate).lt(endDate).and("draft").is(false);
+        } else {
+            criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
+                    .and("startDate").gte(startDate).and("draft").is(false);
+        }
+        return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
+    }
+
+    @Override
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdNotEqualShiftIds(Long employmentId, Date startDate, Date endDate,List<BigInteger> shiftIds) {
+        Criteria criteria;
+        if (Optional.ofNullable(endDate).isPresent()) {
+            criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate).lt(endDate);
         } else {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
                     .and("startDate").gte(startDate);
         }
+        criteria.and("_id").nin(shiftIds);
         return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
     }
 
@@ -429,6 +443,25 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
 
     @Override
+    public List<Shift> findShiftsByKpiFiltersWithActivityStatus(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Date startDate, Date endDate) {
+        Criteria criteria = where("staffId").in(staffIds).and("unitId").in(unitIds).and("deleted").is(false).and("disabled").is(false)
+                .and("startDate").gte(startDate).lte(endDate);
+        List<AggregationOperation> aggregationOperation = new ArrayList<AggregationOperation>();
+        aggregationOperation.add(new MatchOperation(criteria));
+        aggregationOperation.add(unwind("activities"));
+        if (CollectionUtils.isNotEmpty(shiftActivityStatus)) {
+            aggregationOperation.add(match(where("activities.status").in(shiftActivityStatus)));
+        }
+
+        aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
+//        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
+        AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
+        return result.getMappedResults();
+    }
+
+
+    @Override
     public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate) {
         Criteria criteria = where("staffId").in(staffIds).and("unitId").in(unitIds).and("deleted").is(false).and("disabled").is(false)
                 .and("startDate").gte(startDate).lte(endDate);
@@ -564,6 +597,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 .and("activities").elemMatch(where("status").nin(shiftStatus)));
         return mongoTemplate.find(query, Shift.class);
 
+    }
+
+    @Override
+    public List<Shift> findAllPublishShiftByEmploymentId(Long employmentId){
+        Query query = new Query(where("deleted").is(false).and("employmentId").is(employmentId).and("draft").is(false)
+                .and("activities.status").is(ShiftStatus.PUBLISH));
+        return mongoTemplate.find(query, Shift.class);
     }
 
     @Override

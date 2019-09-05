@@ -19,7 +19,7 @@ public class AndShiftFilter implements ShiftFilter {
         this.secondCriteria = secondCriteria;
     }
 
-    public ShiftFilter and(ShiftFilter shiftFilter){
+    public AndShiftFilter and(ShiftFilter shiftFilter){
         return new AndShiftFilter(this,shiftFilter);
     }
 

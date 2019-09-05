@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.unit_settings.activity_configuration;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.Valid;
@@ -13,6 +15,8 @@ import static com.kairos.constants.CommonMessageConstants.PLANNED_TIME_CANNOT_EM
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PresencePlannedTime {
     private BigInteger phaseId;
     @Valid
@@ -20,13 +24,4 @@ public class PresencePlannedTime {
     @NotEmpty(message = PLANNED_TIME_CANNOT_EMPTY)
     private List<BigInteger> managementPlannedTimeIds;
 
-    public PresencePlannedTime() {
-        // DC
-    }
-
-    public PresencePlannedTime(BigInteger phaseId, List<EmploymentWisePlannedTimeConfiguration> employmentWisePlannedTimeConfigurations, List<BigInteger> managementPlannedTimeIds) {
-        this.phaseId = phaseId;
-        this.employmentWisePlannedTimeConfigurations = employmentWisePlannedTimeConfigurations;
-        this.managementPlannedTimeIds = managementPlannedTimeIds;
-    }
 }

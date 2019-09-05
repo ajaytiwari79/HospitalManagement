@@ -2,6 +2,7 @@ package com.kairos.dto.activity.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.enums.shift.ShiftStatus;
@@ -12,13 +13,15 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 
 /**
  * Created by prerna on 6/12/17.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ActivityDTO {
+public class ActivityDTO  {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")
     private String name;
@@ -53,6 +56,9 @@ public class ActivityDTO {
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;
     private BigInteger activityPriorityId;
+    private int activitySequence;
+
+
 
     public ActivityDTO() {
         //default constructor
@@ -307,6 +313,13 @@ public class ActivityDTO {
         this.childActivityIds = childActivityIds;
     }
 
+    public int getActivitySequence() {
+        return activitySequence;
+    }
+
+    public void setActivitySequence(int activitySequence) {
+        this.activitySequence = activitySequence;
+    }
 
     public List<ShiftStatus> getActivityStatus() {
         return activityStatus;
@@ -324,4 +337,8 @@ public class ActivityDTO {
         this.activityPriorityId = activityPriorityId;
 
     }
+
+    public boolean isFullDayOrFullWeekActivity() {
+        return isNotNull(this.getTimeCalculationActivityTab()) && ((CommonConstants.FULL_WEEK).equals(this.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getTimeCalculationActivityTab().getMethodForCalculatingTime())); }
+
 }

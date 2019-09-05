@@ -4,7 +4,7 @@ import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.service.wta.WTAOrganizationService;
-import com.kairos.service.wta.WTAService;
+import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,33 +33,33 @@ public class WTAController {
 
 
     @Inject
-    private WTAService wtaService;
+    private WorkTimeAgreementService workTimeAgreementService;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value =   COUNTRY_URL + "/wta")
     public ResponseEntity<Map<String, Object>> createWta(@PathVariable long countryId, @RequestBody @Valid WTADTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(countryId, wta, true,false));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, workTimeAgreementService.createWta(countryId, wta, true,false));
     }
 
     @ApiOperation(value = "Update WTA")
     @PutMapping(value =  COUNTRY_URL + "/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> updateWta(@PathVariable long countryId, @PathVariable BigInteger wtaId, @RequestBody @Valid WTADTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfCountry(countryId, wtaId, wta));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updateWtaOfCountry(countryId, wtaId, wta));
     }
 
 
     @ApiOperation(value = "Get WTA")
     @GetMapping(value =  COUNTRY_URL + "/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> getWta(@PathVariable BigInteger wtaId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWta(wtaId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWta(wtaId));
     }
 
     @ApiOperation(value = "Remove WTA")
     @DeleteMapping(value =  COUNTRY_URL + "/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> deleteWta(@PathVariable BigInteger wtaId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.removeWta(wtaId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.removeWta(wtaId));
     }
 
 
@@ -71,14 +71,14 @@ public class WTAController {
     @ApiOperation(value = "Get WTA by CountryId ID")
     @RequestMapping(value =  COUNTRY_URL + "/wta/ByCountry", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAByCountryId(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByCountryId(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWTAByCountryId(countryId));
     }
 
 
     @ApiOperation(value = "Get WTA by Organization sub type  by using sub type Id")
     @RequestMapping(value =  COUNTRY_URL + "/organization_type/{organizationSubTypeId}/wta/OrganizationSubType", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAByOrganizationSubType(@PathVariable long countryId,@PathVariable long organizationSubTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAByOrganizationSubType(organizationSubTypeId,countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getAllWTAByOrganizationSubType(organizationSubTypeId,countryId));
     }
 
     /**
@@ -88,7 +88,7 @@ public class WTAController {
     @ApiOperation(value = "Get All organization and sub-organization based on CountryId")
     @RequestMapping(value =  COUNTRY_URL + "/OrganizationType", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAWithOrganization(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAWithOrganization(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getAllWTAWithOrganizationByCountryId(countryId));
     }
 
     /**
@@ -99,13 +99,13 @@ public class WTAController {
     @ApiOperation(value = "Get All organization and sub organization based on wtaId")
     @RequestMapping(value =  COUNTRY_URL + "/organization_type/{organizationTypeId}/wta/{wtaId}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getAllWTAWithWTAId(@PathVariable BigInteger wtaId, @PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getAllWTAWithWTAId(countryId, wtaId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getAllWTAWithWTAIdAndCountryId(countryId, wtaId));
     }
 
     @ApiOperation(value = "link unlink wta with org Type")
     @PutMapping(value =  COUNTRY_URL + "/organization_type/{organizationSubTypeId}/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> setWtaWithOrganizationType(@PathVariable long countryId, @PathVariable BigInteger wtaId, @PathVariable long organizationSubTypeId, @RequestParam(value = "checked") boolean checked) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setWtaWithOrganizationType(countryId, wtaId, organizationSubTypeId, checked));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.setWtaWithOrganizationType(countryId, wtaId, organizationSubTypeId, checked));
     }
 
 
@@ -125,7 +125,7 @@ public class WTAController {
     @ApiOperation(value = "Remove WTA from organization ")
     @DeleteMapping(value =  UNIT_URL + "/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> deleteWtaFromOrganization(@PathVariable BigInteger wtaId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.removeWta(wtaId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.removeWta(wtaId));
     }
 
     @ApiOperation(value = "Update WTA")
@@ -144,26 +144,26 @@ public class WTAController {
     @ApiOperation(value = "Update WTA of Employment")
     @PutMapping(value =  UNIT_URL + "/wta")
     public ResponseEntity<Map<String, Object>> updateWtaOfEmployment(@PathVariable long unitId, @RequestBody @Valid WTADTO wtadto, @RequestParam Boolean employmentPublished) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updateWtaOfEmployment(unitId, wtadto, employmentPublished));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updateWtaOfEmployment(unitId, wtadto, employmentPublished));
     }
 
 
     @ApiOperation(value = "get default WTA info of country")
     @GetMapping(value =  COUNTRY_URL + "/getDefaultWtaInfo")
     public ResponseEntity<Map<String, Object>> getDefaultWtaInfo(@PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfo(countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getDefaultWtaInfo(countryId));
     }
 
     @ApiOperation(value = "get default WTA info of Unit")
     @GetMapping(value =  UNIT_URL + "/getDefaultWtaInfoForUnit")
     public ResponseEntity<Map<String, Object>> getDefaultWtaInfoForUnit(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getDefaultWtaInfoForUnit(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getDefaultWtaInfoForUnit(unitId));
     }
 
     @ApiOperation(value = "get Wta By Ids")
     @GetMapping(value =  UNIT_URL + "/employment_cta_wta")
     public ResponseEntity<Map<String, Object>> getWTAByIds(@RequestParam Set<Long> employmentIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByEmploymentIds(employmentIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWTACTAByEmploymentIds(employmentIds));
     }
 
 
@@ -171,48 +171,48 @@ public class WTAController {
     @PostMapping(value =  UNIT_URL + "/employment/{employmentId}/wta/{wtaId}/cta/{ctaId}")
     public ResponseEntity<Map<String, Object>> assignCTAWTAToEmployment(@PathVariable Long employmentId,@PathVariable Long unitId, @PathVariable BigInteger wtaId, @PathVariable BigInteger ctaId,
                                                                         @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,unitId,wtaId,ctaId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.assignCTAWTAToEmployment(employmentId,unitId,wtaId,ctaId,startDate));
     }
 
     @ApiOperation(value = "get wta of employment")
     @GetMapping(value =  UNIT_URL + "/wta/employment/{employmentId}")
     public ResponseEntity<Map<String, Object>> getWTAOfEmployment(@PathVariable Long employmentId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAOfEmployment(employmentId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWTAOfEmployment(employmentId));
     }
 
     @ApiOperation(value = "get Wta By Id")
     @GetMapping(value =  UNIT_URL + "/wta/{wtaId}")
     public ResponseEntity<Map<String, Object>> getWTAById(@PathVariable BigInteger wtaId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWta(wtaId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWta(wtaId));
     }
 
     @ApiOperation(value = "get Wta By Ids")
     @PostMapping(value = COUNTRY_URL + "/wta/organization/{unitId}")
     public ResponseEntity<Map<String, Object>> assignWTAToOrganization(@RequestBody List<Long> subTypeIds, @PathVariable Long unitId, @PathVariable Long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignWTAToNewOrganization(subTypeIds, unitId, countryId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.assignWTAToNewOrganization(subTypeIds, unitId, countryId));
     }
 
     @ApiOperation(value = "get Wta with versions By Ids")
     @GetMapping(value =  UNIT_URL + "/wta/versions")
     public ResponseEntity<Map<String, Object>> getWTAWithVersionIds(@PathVariable Long unitId, @RequestParam List<Long> employmentIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTAWithVersionIds(unitId, employmentIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWTAWithVersionIds(unitId, employmentIds));
     }
 
     @ApiOperation(value = "copy cta wta to new employment")
     @PostMapping(value = "/copy_wta_cta")
     public ResponseEntity<Map<String, Object>> copyCTAWTAForEmploymentId(@RequestBody List<EmploymentIdDTO> employmentIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.copyWtaCTA(employmentIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.copyWtaCTA(employmentIds));
     }
     @ApiOperation(value = "get Wta rule template By wta Id")
     @GetMapping(value =  UNIT_URL + "/wta/{wtaId}/rule_templates")
     public ResponseEntity<Map<String, Object>> getwtaRuletemplates(@PathVariable Long unitId,@PathVariable BigInteger wtaId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getwtaRuletemplates(unitId,wtaId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getwtaRuletemplates(unitId,wtaId));
     }
 
     @ApiOperation(value = "get current cta and wta applicable on employment")
     @GetMapping(value =  UNIT_URL + "/applicable-cta-wta")
     public ResponseEntity<Map<String, Object>> getWTACTAByOfEmployment(@RequestParam(value = "employmentId") Long employmentId, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWTACTAByEmployment(employmentId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWTACTAByEmployment(employmentId,startDate));
     }
 
 
@@ -224,7 +224,7 @@ public class WTAController {
                                                                         @RequestParam(value = "ctaId",required = false)   BigInteger ctaId,
                                                                         @RequestParam(value = "oldctaId",required = false)   BigInteger oldctaId,
                                                                         @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.assignCTAWTAToEmployment(employmentId,unitId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.assignCTAWTAToEmployment(employmentId,unitId,wtaId,oldwtaId,ctaId,oldctaId,startDate));
     }
 
 
@@ -233,20 +233,20 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> setEndCTAWTAOfEmployment(@PathVariable Long employmentId,
                                                                         @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.setEndCTAWTAOfEmployment(employmentId,endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.setEndCTAWTAOfEmployment(employmentId,endDate));
     }
 
 
     @ApiOperation(value = "Create a New WTA at Organization")
     @PostMapping(value =  UNIT_URL+ "/wta")
     public ResponseEntity<Map<String, Object>> createWtaAtOrganization(@PathVariable long unitId,@RequestBody @Valid WTADTO wta) {
-        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, wtaService.createWta(unitId, wta, false,false));
+        return ResponseHandler.generateResponse(HttpStatus.CREATED, true, workTimeAgreementService.createWta(unitId, wta, false,false));
     }
 
     @ApiOperation(value = "Get employment cta wta and accumulated timebank")
     @PostMapping(value =  UNIT_URL+ "/employment_cta_wta_and_accumulated_timebank")
     public ResponseEntity<Map<String, Object>> getEmploymentCtaWtaAndAccumulatedTimebank(@PathVariable long unitId , @RequestBody Map<Long, List<EmploymentLinesDTO>> employmentLinesMap) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getEmploymentCtaWtaAndAccumulatedTimebank(unitId, employmentLinesMap));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getEmploymentCtaWtaAndAccumulatedTimebank(unitId, employmentLinesMap));
     }
 
 
@@ -256,13 +256,13 @@ public class WTAController {
                                                                            @RequestParam Long employmentId,
                                                                            @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate startDate,
                                                                            @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.getWorktimeAgreementBalance(unitId, employmentId,startDate,endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWorktimeAgreementBalance(unitId, employmentId,startDate,endDate));
     }
 
     @ApiOperation(value = "Update Phases in Ruletemplates")
     @GetMapping(value =  UNIT_URL+ "/update_phases_in_ruletemplate")
     public ResponseEntity<Map<String, Object>> updatePhasesInRuletemplate(@PathVariable long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, wtaService.updatePhasesInRuletemplate());
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.updatePhasesInRuletemplate());
     }
 
 

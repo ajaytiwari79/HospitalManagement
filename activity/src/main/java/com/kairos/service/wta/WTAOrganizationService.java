@@ -60,7 +60,7 @@ public class WTAOrganizationService extends MongoBaseService {
     @Inject
     private CostTimeAgreementRepository costTimeAgreementRepository;
     @Inject
-    private WTAService wtaService;
+    private WorkTimeAgreementService workTimeAgreementService;
     @Inject
     private TagMongoRepository tagMongoRepository;
 
@@ -130,7 +130,7 @@ public class WTAOrganizationService extends MongoBaseService {
         if (isCollectionNotEmpty(updateDTO.getRuleTemplates())) {
             ruleTemplates = wtaBuilderService.copyRuleTemplates(updateDTO.getRuleTemplates(), true);
             for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
-                wtaService.updateExistingPhaseIdOfWTA(ruleTemplate.getPhaseTemplateValues(), organization.getId(), organization.getCountryId(), true);
+                workTimeAgreementService.updateExistingPhaseIdOfWTA(ruleTemplate.getPhaseTemplateValues(), organization.getId(), organization.getCountryId(), true);
             }
             save(ruleTemplates);
             List<BigInteger> ruleTemplatesIds = ruleTemplates.stream().map(ruleTemplate -> ruleTemplate.getId()).collect(Collectors.toList());

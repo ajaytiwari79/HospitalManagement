@@ -68,7 +68,8 @@ public class UserPrincipal implements UserDetails, Authentication {
     public Object getDetails() {
 
         CurrentUserDetails details = new CurrentUserDetails(this.user.getId(), this.user.getUserName(), this.user.nickName,
-                this.user.firstName, this.user.getLastName(), this.user.getEmail(), this.user.isPasswordUpdated());
+                this.user.firstName, this.user.getLastName(), this.user.getEmail(), this.user.isPasswordUpdated(),
+                this.user.getGoogleCalenderTokenId(), this.user.getGoogleCalenderAccessToken());
         details.setAge(this.user.getAge());
         details.setLastSelectedOrganizationId(this.getUser().getLastSelectedOrganizationId());
         details.setCountryId(this.getUser().getCountryId());

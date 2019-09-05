@@ -836,7 +836,10 @@ public class AccessGroupService {
         Long userId = UserContext.getUserDetails().getId();
         //Todo Yatharth please check and verify our code
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(unitId, userId);
-        UserAccessRoleDTO userAccessRoleDTO=null;
+
+        UserAccessRoleDTO userAccessRoleDTO = null;
+
+
         if (staffAtHub != null) {
             userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
         } else if(isNull(staffAtHub)){

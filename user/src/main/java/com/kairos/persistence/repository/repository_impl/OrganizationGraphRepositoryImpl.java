@@ -116,7 +116,10 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
             queryParameters.put("expertiseIds",
                     convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
         }
-
+        if (Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
+            queryParameters.put("teamIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
+        }
         if (StringUtils.isNotBlank(searchText)) {
             queryParameters.put("searchText", searchText);
         }
@@ -126,6 +129,10 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
         if (ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
+            if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
+                query += "Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} " +
+                        " WITH user, staff, employment,organization ";
+            }
         } else if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT)).isPresent() && filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITH_EMPLOYMENT.name()) && !filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
@@ -136,7 +143,8 @@ public class OrganizationGraphRepositoryImpl implements CustomOrganizationGraphR
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User)  " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) +
                     " OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment)" +
                     " WITH user, staff, employment,organization ";
-        } else {
+        }
+        else {
             query += " MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff) where id(organization)={parentOrganizationId} " +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User)  " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) +
                     " with user, staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Organization) where id(organization)={unitId} with user, staff, employment,organization ";

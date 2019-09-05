@@ -14,7 +14,6 @@ import java.util.Date;
 @NoArgsConstructor
 public class PlannedTime {
     private BigInteger plannedTimeId;
-    //private short plannedTimeInMinutes;
     private Date startDate;
     private Date endDate;
 

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -12,12 +14,15 @@ import com.kairos.enums.*;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
@@ -27,6 +32,7 @@ import com.kairos.persistence.repository.user.staff.StaffFavouriteFilterGraphRep
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
+import com.kairos.service.country.FunctionService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
@@ -88,6 +94,10 @@ public class StaffFilterService {
     private AccessPageRepository accessPageRepository;
     @Inject
     private ActivityIntegrationService activityIntegrationService;
+    @Inject
+    private TeamGraphRepository teamGraphRepository;
+    @Inject
+    private FunctionService functionService;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
@@ -120,6 +130,7 @@ public class StaffFilterService {
         return queryResults;
     }
 
+    //todo send single call for get activity data
     private List<FilterSelectionQueryResult> getFilterDetailsByFilterType(FilterType filterType, Long countryId, Long unitId) {
         ObjectMapper objectMapper = new ObjectMapper();
         switch (filterType) {
@@ -146,12 +157,44 @@ public class StaffFilterService {
                 return getStatusFilter();
             case TIME_SLOT:
                 return getTimeSlots();
+            case ABSENCE_ACTIVITY:
+                return getAnsenceActivity(unitId);
+            case  PLANNED_TIME_TYPE:
+             return getPlannedTimeType(countryId);
+            case FUNCTIONS:
+                return getAllFunctions(countryId);
+            case VALIDATED_BY:
+                return getTAStatus();
+            case TEAM:
+                return teamGraphRepository.getTeamsByUnitIdForFilters(unitId);
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
         }
         return null;
     }
+
+
+    private List<FilterSelectionQueryResult> getTAStatus(){
+        return Arrays.stream(AccessGroupRole.values()).map(accessGroupRole -> new FilterSelectionQueryResult(accessGroupRole.name(),accessGroupRole.toString())).collect(Collectors.toList());
+    }
+
+    private  List<FilterSelectionQueryResult> getAllFunctions(Long countryId){
+        List<FunctionDTO> functionDTOS=functionService.getFunctionsByCountry(countryId);
+        return functionDTOS.stream().map(functionDTO  -> new FilterSelectionQueryResult(functionDTO.getId().toString(),functionDTO.getName())).collect(Collectors.toList());
+    }
+
+    private List<FilterSelectionQueryResult> getPlannedTimeType(Long countryId){
+        List<PresenceTypeDTO>  presenceTypeDTOS = activityIntegrationService.getAllPlannedTimeType(countryId);
+        return presenceTypeDTOS.stream().map(presenceTypeDTO -> new FilterSelectionQueryResult(presenceTypeDTO.getId().toString(),presenceTypeDTO.getName())).collect(Collectors.toList());
+    }
+
+
+    private List<FilterSelectionQueryResult> getAnsenceActivity(Long unitId){
+        List<ActivityDTO> activityDTOS = activityIntegrationService.getAllAbsenceActivity(unitId);
+        return activityDTOS.stream().map(activityDTO -> new FilterSelectionQueryResult(activityDTO.getId().toString(),activityDTO.getName())).collect(Collectors.toList());
+    }
+
 
     private List<FilterSelectionQueryResult> getTimeSlots(){
         List<FilterSelectionQueryResult> filterSelectionQueryResults = new ArrayList<>();
@@ -168,7 +211,7 @@ public class StaffFilterService {
 
     private List<FilterSelectionQueryResult> getAllTimeType(Long countryId){
         List<TimeTypeDTO> timeTypeDTOS = activityIntegrationService.getAllTimeType(countryId);
-        return timeTypeDTOS.stream().flatMap(timeTypeDTO -> timeTypeDTO.getChildren().stream()).filter(timeTypeDTO -> "Presence".equals(timeTypeDTO.getLabel()) || "Absence".equals(timeTypeDTO.getLabel())).map(timeTypeDTO -> new FilterSelectionQueryResult(timeTypeDTO.getSecondLevelType().toString(),timeTypeDTO.getLabel())).collect(Collectors.toList());
+        return timeTypeDTOS.stream().flatMap(timeTypeDTO -> timeTypeDTO.getChildren().stream()).map(timeTypeDTO -> new FilterSelectionQueryResult(timeTypeDTO.getSecondLevelType().toString(),timeTypeDTO.getLabel())).collect(Collectors.toList());
     }
 
     private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {
