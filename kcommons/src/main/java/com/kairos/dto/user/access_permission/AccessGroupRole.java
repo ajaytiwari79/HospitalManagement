@@ -1,7 +1,5 @@
 package com.kairos.dto.user.access_permission;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import java.util.*;
 
 /**
@@ -12,15 +10,12 @@ public enum AccessGroupRole {
     STAFF("Staff"), MANAGEMENT("Management");
     private String accessGroupRole;
 
+    AccessGroupRole() {
 
+    }
 
     AccessGroupRole(String accessGroupRole) {
         this.accessGroupRole = accessGroupRole;
-    }
-
-    @JsonValue
-    public String toValue() {
-        return accessGroupRole;
     }
 
     public static Set<AccessGroupRole> getAllRoles() {
