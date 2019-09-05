@@ -1,6 +1,7 @@
 package com.kairos.service.organization;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
@@ -249,10 +250,7 @@ public class OrganizationService {
     }
 
     public boolean updateOrganizationGeneralDetails(OrganizationGeneral organizationGeneral, long unitId) {
-        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(unitId);
-        if (organizationBaseEntity == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
-        }
+        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findById(unitId).orElseThrow(()-> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_UNIT_ID_NOTFOUND, unitId)));
         OwnershipType ownershipType = null;
         ContractType contractType = null;
         IndustryType industryType = null;
