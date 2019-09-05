@@ -188,7 +188,7 @@ public class CounterDataService extends MongoBaseService {
         List<FilterCriteria> criteriaList = new ArrayList<>();
         KPIDTO kpi = ObjectMapperUtils.copyPropertiesByMapper(counterRepository.getKPIByid(kpiId), KPIDTO.class);
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiFilterDefaultData(ConfLevel.COUNTRY.equals(level) ? UserContext.getUserDetails().getLastSelectedOrganizationId() : refId);
-        getSelectedFilterDefaultData(level, criteriaList, kpi, defaultKpiDataDTO);
+        getSelectedFilterDefaultData(!(accessGroupPermissionCounterDTO.isCountryAdmin())?ConfLevel.UNIT:level, criteriaList, kpi, defaultKpiDataDTO);
         setKpiProperty(applicableKPIS.get(0), criteriaList, kpi);
         return kpi;
     }
