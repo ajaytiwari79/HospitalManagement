@@ -79,7 +79,7 @@ public class ShiftDTO {
     private Set<BigInteger> escalationFreeShiftIds;
     private boolean escalationResolved;
     private boolean deleted;
-    private ShiftDTO draftShift;
+    private ShiftWithActivityDTO draftShift;
     private boolean draft;
     private RequestAbsenceDTO requestAbsence;
     private List<ShiftActivityDTO> breakActivities;
