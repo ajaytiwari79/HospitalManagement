@@ -2,9 +2,6 @@ package com.kairos.dto.activity.unit_settings.activity_configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;

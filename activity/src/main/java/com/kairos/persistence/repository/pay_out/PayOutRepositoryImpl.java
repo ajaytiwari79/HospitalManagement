@@ -3,7 +3,9 @@ package com.kairos.persistence.repository.pay_out;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.*;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import javax.inject.Inject;
 import java.util.Date;

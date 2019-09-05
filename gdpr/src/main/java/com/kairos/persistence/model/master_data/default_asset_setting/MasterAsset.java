@@ -2,10 +2,18 @@ package com.kairos.persistence.model.master_data.default_asset_setting;
 
 import com.kairos.enums.gdpr.SuggestedDataStatus;
 import com.kairos.persistence.model.common.BaseEntity;
-import com.kairos.persistence.model.embeddables.*;
-import lombok.*;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
+import com.kairos.persistence.model.embeddables.ServiceCategory;
+import com.kairos.persistence.model.embeddables.SubServiceCategory;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;

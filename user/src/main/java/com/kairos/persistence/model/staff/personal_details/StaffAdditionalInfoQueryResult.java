@@ -7,7 +7,10 @@ import com.kairos.persistence.model.user.employment.query_result.StaffEmployment
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by prabjot on 17/5/17.

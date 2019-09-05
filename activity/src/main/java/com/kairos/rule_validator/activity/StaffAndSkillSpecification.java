@@ -1,12 +1,16 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.ActivityRuleViolation;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import org.apache.commons.collections.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_SKILL_MATCH;
 

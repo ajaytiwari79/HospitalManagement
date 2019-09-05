@@ -6,7 +6,9 @@ import org.springframework.security.access.expression.method.MethodSecurityExpre
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.provider.expression.*;
+import org.springframework.security.oauth2.provider.expression.OAuth2ExpressionParser;
+import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
+import org.springframework.security.oauth2.provider.expression.OAuth2SecurityExpressionMethods;
 public class CustomOAuth2WebSecurityExpressionHandler extends OAuth2MethodSecurityExpressionHandler {
     private AuthenticationTrustResolver trustResolver =
             new AuthenticationTrustResolverImpl();

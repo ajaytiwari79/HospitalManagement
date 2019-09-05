@@ -2,7 +2,9 @@ package com.kairos.response.dto.policy_agreement;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;

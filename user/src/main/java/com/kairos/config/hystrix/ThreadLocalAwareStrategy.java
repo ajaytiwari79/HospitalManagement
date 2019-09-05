@@ -2,10 +2,15 @@ package com.kairos.config.hystrix;
 
 import com.kairos.utils.user_context.UserContextHolder;
 import com.netflix.hystrix.HystrixThreadPoolKey;
-import com.netflix.hystrix.strategy.concurrency.*;
+import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
+import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariable;
+import com.netflix.hystrix.strategy.concurrency.HystrixRequestVariableLifecycle;
 import com.netflix.hystrix.strategy.properties.HystrixProperty;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 public class ThreadLocalAwareStrategy extends HystrixConcurrencyStrategy{

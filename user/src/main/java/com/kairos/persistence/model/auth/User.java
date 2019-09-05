@@ -1,9 +1,14 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.commons.annotation.EnableStringTrimer;
+import com.kairos.commons.annotation.IgnoreStringTrimer;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
-import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.client.NextToKinDTO;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
@@ -13,11 +18,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
-import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
@@ -34,7 +43,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NoArgsConstructor
 public class User extends UserBaseEntity {
     protected String cprNumber;
-
     private String userName;
     protected String nickName;
     protected String firstName;
@@ -42,6 +50,7 @@ public class User extends UserBaseEntity {
     protected Gender gender;
     private boolean pregnant;
     private String email;
+    private ConfLevel confLevel;
     private Long lastSelectedOrganizationId;
     private LocalDate dateOfBirth;
     @NotNull(message = ERROR_USER_PASSCODE_NOTNULL)
@@ -53,6 +62,7 @@ public class User extends UserBaseEntity {
     private List<String> roles;
     private ContactDetail contactDetail;
     private ContactAddress homeAddress;
+
 
     @Relationship(type = ADMINS_COUNTRY)
     private List<Country> countryList;

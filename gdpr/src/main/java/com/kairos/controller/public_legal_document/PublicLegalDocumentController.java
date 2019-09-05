@@ -7,14 +7,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 
-import static com.kairos.constants.ApiConstant.*;
+import static com.kairos.constants.ApiConstant.API_ORGANIZATION_COUNTRY_URL;
 
 /**
  * Created By G.P.Ranjan on 26/6/19

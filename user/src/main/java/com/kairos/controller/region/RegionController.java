@@ -1,7 +1,12 @@
 package com.kairos.controller.region;
 
-import com.kairos.persistence.model.user.region.*;
-import com.kairos.service.region.*;
+import com.kairos.persistence.model.user.region.Municipality;
+import com.kairos.persistence.model.user.region.Province;
+import com.kairos.persistence.model.user.region.Region;
+import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.service.region.MunicipalityService;
+import com.kairos.service.region.ProvinceService;
+import com.kairos.service.region.RegionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

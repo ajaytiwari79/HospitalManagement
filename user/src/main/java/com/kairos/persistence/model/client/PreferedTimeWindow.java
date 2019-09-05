@@ -2,7 +2,7 @@ package com.kairos.persistence.model.client;
 
 import com.kairos.config.neo4j.converter.LocalTimeConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
@@ -24,7 +24,7 @@ public class PreferedTimeWindow extends UserBaseEntity {
     @Convert(LocalTimeConverter.class)
     private LocalTime toTime;
     @Relationship(type = BELONGS_TO)
-    private Organization organization;
+    private Unit unit;
 
 
 
@@ -38,21 +38,21 @@ public class PreferedTimeWindow extends UserBaseEntity {
         this.name = name;
     }
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public PreferedTimeWindow() {
     }
 
-    public PreferedTimeWindow(LocalTime fromTime, LocalTime toTime, Organization organization, String name) {
+    public PreferedTimeWindow(LocalTime fromTime, LocalTime toTime, Unit unit, String name) {
         this.fromTime = fromTime;
         this.toTime = toTime;
-        this.organization = organization;
+        this.unit = unit;
         this.name = name;
     }
 

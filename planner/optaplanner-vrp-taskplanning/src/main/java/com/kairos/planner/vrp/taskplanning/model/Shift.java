@@ -11,7 +11,9 @@ import org.optaplanner.core.api.domain.variable.PlanningVariableReference;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @PlanningEntity
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -26,7 +26,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     public List<StaffEmploymentQueryResult> getStaffByPriorityGroupStaffIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId) {
 
 
-        String staffFilterQuery = "Match (employment:Employment)-[:" + IN_UNIT + "]-(org:Organization) where id(org)={unitId} and (employment.startDateMillis<{maxDate} and (employment.endDateMillis is null or employment.endateMillis>{maxDate}))" +
+        String staffFilterQuery = "Match (employment:Employment)-[:" + IN_UNIT + "]-(org:Unit) where id(org)={unitId} and (employment.startDateMillis<{maxDate} and (employment.endDateMillis is null or employment.endateMillis>{maxDate}))" +
                 " Match(employment)-[:" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) where id(expertise) in {expertiseIds}";
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -61,7 +61,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
     public List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitIds, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds,boolean parentOrganization) {
         Map<String, Object> queryParameters = new HashMap<>();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("MATCH (org:Organization)");
+        stringBuilder.append("MATCH (org:Unit)");
         if(CollectionUtils.isNotEmpty(unitIds)){
             stringBuilder.append(" WHERE id(org) IN {unitIds}");
             queryParameters.put("unitIds", unitIds);

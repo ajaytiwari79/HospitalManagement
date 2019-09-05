@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.user.office_esources_and_metadata;
 
 import com.kairos.persistence.model.user.office_esources_and_metadata.OfficeResourceTypeMetadata;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
-import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -11,6 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OfficeResourceMetadataRepository extends Neo4jBaseRepository<OfficeResourceTypeMetadata,Long>{
 
-    @Query("MATCH (n:OfficeResourceTypeMetadata) RETURN n LIMIT 1")
-    OfficeResourceTypeMetadata getFirstNode();
+
 }

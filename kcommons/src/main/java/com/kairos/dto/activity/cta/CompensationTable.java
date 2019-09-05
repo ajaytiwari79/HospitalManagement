@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.cta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class CompensationTable {
     private int granularityLevel;

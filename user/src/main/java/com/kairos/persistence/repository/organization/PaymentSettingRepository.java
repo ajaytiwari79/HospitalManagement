@@ -13,7 +13,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  */
 @Repository
 public interface PaymentSettingRepository extends Neo4jBaseRepository<PaymentSettings, Long> {
-    @Query("match(paymentSettings:PaymentSettings{deleted:false})<-[" + HAS_PAYMENT_SETTINGS + "]-(unit:Organization) where id(unit)={0}" +
+    @Query("match(paymentSettings:PaymentSettings{deleted:false})<-[" + HAS_PAYMENT_SETTINGS + "]-(unit:Unit) where id(unit)={0}" +
             "return id(paymentSettings) as id," +
             "paymentSettings.weeklyPayDay as weeklyPayDay, " +
             "paymentSettings.fornightlyPayDay as fornightlyPayDay," +
@@ -21,7 +21,7 @@ public interface PaymentSettingRepository extends Neo4jBaseRepository<PaymentSet
             "paymentSettings.monthlyPayDate as monthlyPayDate")
     PaymentSettingsQueryResult getPaymentSettingByUnitId(Long unitId);
 
-    @Query("match(paymentSettings:PaymentSettings{deleted:false})<-[" + HAS_PAYMENT_SETTINGS + "]-(unit:Organization) where id(unit)={0} AND id(paymentSettings)={1}" +
+    @Query("match(paymentSettings:PaymentSettings{deleted:false})<-[" + HAS_PAYMENT_SETTINGS + "]-(unit:Unit) where id(unit)={0} AND id(paymentSettings)={1}" +
             " return paymentSettings")
     PaymentSettings getPaymentSettingByUnitId(Long unitId, Long paymentSettingId);
 

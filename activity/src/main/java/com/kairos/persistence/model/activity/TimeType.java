@@ -1,11 +1,15 @@
 package com.kairos.persistence.model.activity;
 
-import com.kairos.enums.*;
+import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Document(collection = "time_Type")
 public class TimeType extends MongoBaseEntity{

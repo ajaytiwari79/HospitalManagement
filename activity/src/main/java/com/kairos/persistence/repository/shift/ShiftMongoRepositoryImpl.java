@@ -2,9 +2,10 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.ShiftCountDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
@@ -19,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
-import org.springframework.data.mongodb.core.query.*;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigInteger;
 import java.time.LocalDate;

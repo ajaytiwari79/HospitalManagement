@@ -1,7 +1,9 @@
 package com.kairos.persistence.model.organization_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;

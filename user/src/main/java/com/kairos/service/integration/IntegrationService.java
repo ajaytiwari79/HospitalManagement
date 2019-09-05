@@ -1,9 +1,13 @@
 package com.kairos.service.integration;
 
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.user.integration.*;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.integration.*;
+import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.user.integration.TimeCare;
+import com.kairos.persistence.model.user.integration.Twillio;
+import com.kairos.persistence.model.user.integration.Visitour;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.integration.TimeCareGraphRepository;
+import com.kairos.persistence.repository.user.integration.TwillioGraphRepository;
+import com.kairos.persistence.repository.user.integration.VisitourGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
@@ -12,7 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -35,7 +42,7 @@ public class IntegrationService {
     private VisitourGraphRepository visitourGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private OrganizationService organizationService;
@@ -57,9 +64,9 @@ public class IntegrationService {
 
             // TODO Need to remove external ID field from organization domain
             // Set organization's time care ID
-            Organization organization = organizationGraphRepository.findOne(unitId);
-            organization.setExternalId(timeCare.getTimeCareExternalId());
-            organizationGraphRepository.save(organization);
+            Unit unit = unitGraphRepository.findOne(unitId);
+            unit.setExternalId(timeCare.getTimeCareExternalId());
+            unitGraphRepository.save(unit);
 
             return timeCare1;
     }

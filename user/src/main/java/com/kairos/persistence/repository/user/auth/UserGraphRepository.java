@@ -42,7 +42,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     @Query("MATCH (accessPage:AccessPage) WHERE id(accessPage)={0}\n" +
             "MATCH (accessPage)-[:"+SUB_PAGE+"*]->(subPage:AccessPage) WITH subPage\n" +
-            "MATCH (org:Organization),(user:User) WHERE id(org)={1} AND id(user)={2} WITH org,user,subPage\n" +
+            "MATCH (org:Unit),(user:User) WHERE id(org)={1} AND id(user)={2} WITH org,user,subPage\n" +
             "MATCH (org)-[:"+HAS_TEAMS+"]->(team:Team)-[:"+TEAM_HAS_MEMBER+"]->(staff:Staff)-[:"+BELONGS_TO+"]->(user) WITH staff,subPage\n" +
             "MATCH (staff)-[:"+STAFF_HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup)-[r:"+ACCESS_GROUP_HAS_ACCESS_TO_PAGE+"]->(subPage) RETURN {pageId:id(subPage),pageName:subPage.name,read:r.read,write:r.write} AS result")
     List<Map<String, Object>> getPermissionForModuleInOrganization(long accessPageId, long orgId, long userId);
@@ -51,7 +51,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     User findByEmail(String email);
 
     @Query("MATCH (user:User) WHERE user.email=~{0} " +
-            "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) RETURN user")
+            "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Unit{isEnable:true,boardingCompleted: true,deleted:false}) RETURN user")
     User findUserByEmailInAnyOrganization(String email);
 
     User findByKmdExternalId(Long kmdExternalId);
@@ -67,7 +67,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     Long getUserSelectedLanguageId(Long userId);
 
     // This is used to get the very first user of the organization
-    @Query("MATCH (org:Organization) WHERE id(org)={0}" +
+    @Query("MATCH (org) WHERE id(org)={0}" +
             "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
             "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'})-[:"+HAS_PARENT_ACCESS_GROUP+"]-(parentAG:AccessGroup) WITH org,unitPermission,position,r1,ag,parentAG\n" +
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
@@ -82,7 +82,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN  id(org) AS organizationId ,user.email AS email,id(user) AS id,ag.name AS accessGroupName,id(ag) AS accessGroupId, user.firstName AS firstName,user.lastName AS lastName , user.userName AS userName, user.cprNumber AS cprNumber,staff AS staff,user.creationDate AS creationDate " +
             "UNION " +
-            "MATCH (org:Organization),(child:Organization) WHERE id(org) = {1} and id(child) IN {0}\n" +
+            "MATCH (org:Organization),(child) WHERE id(org) = {1} and id(child) IN {0}\n" +
             " OPTIONAL MATCH (org)-[:"+HAS_POSITIONS+"]->(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission) WITH child,position,unitPermission\n" +
             " MATCH (unitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(child) WITH  unitPermission,position,child\n" +
             "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) WITH child,position,ag\n" +
@@ -91,7 +91,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
 
     List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId,Long parentOrganizationId);
 
-    @Query("MATCH (org:Organization) WHERE id(org)={0}" +
+    @Query("MATCH (org) WHERE id(org)={0} " +
             "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH position"+
             " MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN user LIMIT 1 " )

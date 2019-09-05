@@ -1,7 +1,11 @@
 package com.kairos.controller.organization;
 
-import com.kairos.dto.user.organization.*;
-import com.kairos.service.organization.*;
+import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
+import com.kairos.dto.user.organization.UnitManagerDTO;
+import com.kairos.service.organization.CompanyCreationService;
+import com.kairos.service.organization.OrganizationAddressService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,7 +18,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -49,7 +52,7 @@ public class OrganizationDataController {
     @ApiOperation(value = "update address of parent organization")
     @PutMapping(value = COUNTRY_URL + "/parent_organization/{organizationId}/on_boarding_done")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishOrganization(@PathVariable Long countryId,@PathVariable long organizationId) throws InterruptedException, ExecutionException {
+    public ResponseEntity<Map<String, Object>> publishOrganization(@PathVariable Long countryId,@PathVariable long organizationId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
                 companyCreationService.onBoardOrganization(countryId,organizationId,null));
     }

@@ -1,6 +1,8 @@
 package com.kairos.service.todo;
 
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.ShiftActivitiesIdDTO;
+import com.kairos.dto.activity.shift.ShiftAndActivtyStatusDTO;
+import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.enums.shift.ShiftStatus;
@@ -20,14 +22,14 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.RequestAbsenceService;
 import com.kairos.service.shift.ShiftStatusService;
-import jdk.nashorn.internal.runtime.regexp.joni.Option;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;

@@ -4,16 +4,13 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -28,7 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Function;
@@ -80,27 +80,15 @@ public class PhaseService extends MongoBaseService {
      *@Author vipul
      */
     public List<PhaseDTO> getPlanningPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
-        if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         return phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.DESC);
     }
 
 
     public List<PhaseDTO> getPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
-        if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         return phaseMongoRepository.getPhasesByUnit(unitId, Sort.Direction.DESC);
     }
 
     public Map<String, List<PhaseDTO>> getCategorisedPhasesByUnit(Long unitId) {
-        OrganizationDTO unitOrganization = userIntegrationService.getOrganizationWithoutAuth(unitId);
-        if (unitOrganization == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         List<PhaseDTO> phases = getPhasesByUnit(unitId);
         Map<String, List<PhaseDTO>> phasesData = new HashMap<>(2);
         phasesData.put("planningPhases", phases.stream().filter(phaseDTO -> phaseDTO.getPhaseType().equals(PhaseType.PLANNING)).collect(Collectors.toList()));
@@ -125,10 +113,6 @@ public class PhaseService extends MongoBaseService {
         LocalDate currentDate = LocalDate.now();
         LocalDate proposedDate = DateUtils.getLocalDateFromDate(date);
         long weekDifference = currentDate.until(proposedDate, ChronoUnit.WEEKS);
-        OrganizationDTO unitOrganization = userIntegrationService.getOrganization();
-        if (!Optional.ofNullable(unitOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         List<PhaseDTO> phaseDTOS = phaseMongoRepository.getPlanningPhasesByUnit(unitId, Sort.Direction.ASC);
         int weekCount = 0;
         if (weekDifference < 0) {    // Week has passed so FINAL will be the object returned

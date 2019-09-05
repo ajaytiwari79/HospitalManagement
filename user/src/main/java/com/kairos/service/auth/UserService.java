@@ -1,7 +1,10 @@
 package com.kairos.service.auth;
 
 import com.kairos.commons.service.mail.MailService;
-import com.kairos.commons.utils.*;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -11,20 +14,26 @@ import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
-import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessPageDTO;
+import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
@@ -70,13 +79,15 @@ public class UserService {
     @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
+    @Inject
     private UserDetailService userDetailsService;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
     private SmsService smsService;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private AccessPageRepository accessPageRepository;
     @Inject
@@ -97,6 +108,8 @@ public class UserService {
     private OrganizationService organizationService;
     @Inject
     private RedisService redisService;
+    @Inject
+    private CountryService countryService;
     private TokenExtractor tokenExtractor = new BearerTokenExtractor();
     @Inject
     private TokenStore tokenStore;
@@ -323,7 +336,7 @@ public class UserService {
             return null;
         }
         currentUser = generateTokenToUser(currentUser);
-        Organization org = staffGraphRepository.getStaffOrganization(currentUser.getId());
+        Unit org = staffGraphRepository.getStaffOrganization(currentUser.getId());
         if (org == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
@@ -354,7 +367,7 @@ public class UserService {
                 return null;
             }
             currentUser = generateTokenToUser(currentUser);
-            Organization org = staffGraphRepository.getStaffOrganization(currentUser.getId());
+            Unit org = staffGraphRepository.getStaffOrganization(currentUser.getId());
             if (org == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
@@ -470,9 +483,8 @@ public class UserService {
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (currentUser.getLastSelectedOrganizationId() != organizationId) {
+            Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
-            Organization parent = organizationService.fetchParentOrganization(organizationId);
-            Long countryId = organizationGraphRepository.getCountryId(parent.getId());
             currentUser.setCountryId(countryId);
             userGraphRepository.save(currentUser);
         }

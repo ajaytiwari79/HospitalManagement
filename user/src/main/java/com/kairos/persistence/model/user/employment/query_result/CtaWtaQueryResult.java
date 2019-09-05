@@ -5,6 +5,9 @@ import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -12,6 +15,9 @@ import java.util.List;
  * Created by prabjot on 3/1/18.
  */
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class CtaWtaQueryResult {
 
     private List<CTAResponseDTO> cta;
@@ -26,50 +32,6 @@ public class CtaWtaQueryResult {
         this.wta = wta;
         this.expertise = expertise;
         this.applicableSeniorityLevel = applicableSeniorityLevel;
-        this.union = union;
-    }
-
-    public CtaWtaQueryResult() {
-        //Default Constructor
-    }
-
-    public List<CTAResponseDTO> getCta() {
-        return cta;
-    }
-
-    public void setCta(List<CTAResponseDTO> cta) {
-        this.cta = cta;
-    }
-
-    public List<WTAResponseDTO> getWta() {
-        return wta;
-    }
-
-    public void setWta(List<WTAResponseDTO> wta) {
-        this.wta = wta;
-    }
-
-    public Expertise getExpertise() {
-        return expertise;
-    }
-
-    public void setExpertise(Expertise expertise) {
-        this.expertise = expertise;
-    }
-
-    public SeniorityLevelQueryResult getApplicableSeniorityLevel() {
-        return applicableSeniorityLevel;
-    }
-
-    public void setApplicableSeniorityLevel(SeniorityLevelQueryResult applicableSeniorityLevel) {
-        this.applicableSeniorityLevel = applicableSeniorityLevel;
-    }
-
-    public Organization getUnion() {
-        return union;
-    }
-
-    public void setUnion(Organization union) {
         this.union = union;
     }
 }
