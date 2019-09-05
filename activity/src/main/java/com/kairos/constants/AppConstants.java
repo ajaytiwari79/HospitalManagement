@@ -237,10 +237,10 @@ public class AppConstants {
 
 
     //todo status color code
-    public static final String REQUESTED_COLOR_CODE ="#0000FF";
-    public static final String APPROVE_COLOR_CODE="#008000";
-    public static final String DISAPPROVE_COLOR_CODE="#FF0000";
-    public static final String PENDING_COLOR_CODE="#FFFF00";
+    public static final String REQUESTED_COLOR_CODE ="#8ac6d1";
+    public static final String APPROVE_COLOR_CODE="#9cf196";
+    public static final String DISAPPROVE_COLOR_CODE="#ff8080";
+    public static final String PENDING_COLOR_CODE="#fee9b2";
 
 
 }
