@@ -33,6 +33,9 @@ public interface ShiftStateMongoRepository extends MongoBaseRepository<ShiftStat
     @Query("{deleted:false,shiftId:?0,shiftStatePhaseId:?1,accessGroupRole:?2}")
     ShiftState findShiftStateByShiftIdAndActualPhaseAndRole(BigInteger shiftId, BigInteger shiftStatePhaseId, AccessGroupRole role);
 
+    @Query(value = "{deleted:false,shiftId:{$in:?0},accessGroupRole:{$in:?1}}",fields ="{'_id':0,'shiftId':1}")
+    List<ShiftState> findAllByShiftIdsByAccessgroupRole(Set<BigInteger> shiftIds, Set<String> accessGroupRole);
+
     List<ShiftState> findAllByShiftIdInAndAccessGroupRoleAndValidatedNotNull(Set<BigInteger> shiftIds, AccessGroupRole accessGroupRole);
 
 

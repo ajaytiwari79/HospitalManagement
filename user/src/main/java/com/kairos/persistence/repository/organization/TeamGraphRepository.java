@@ -5,6 +5,7 @@ import com.kairos.persistence.model.organization.services.OrganizationServiceQue
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
+import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -105,6 +106,17 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
     @Query("MATCH (org:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN id(team) as id,team.name as name")
     List<TeamDTO> findAllTeamsInOrganization(long organizationId);
+
+
+    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN toString(id(team)) as id,team.name as value")
+    List<FilterSelectionQueryResult> getTeamsByUnitIdForFilters(long organizationId);
+
+    @Query("MATCH (team:Team{isEnabled:true,deleted:false}) WHERE id(team) IN {0} " +
+            "WITH team.activityIds AS activityIds\n" +
+            "UNWIND activityIds AS activities\n" +
+            "RETURN DISTINCT activities")
+    List<BigInteger> getTeamActivityIdsByTeamIds(List<Long> teamIds);
+
 
     @Query("MATCH (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) WHERE id(team)={0} AND id(os)={1} SET r.customName={2} \n"+
             "RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")

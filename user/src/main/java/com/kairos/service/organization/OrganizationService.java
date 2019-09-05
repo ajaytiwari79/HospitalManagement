@@ -9,6 +9,8 @@ import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
 import com.kairos.dto.activity.cta.CTABasicDetailsDTO;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
+import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.activity.wta.basic_details.WTABasicDetailsDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -83,6 +85,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -442,7 +445,6 @@ public class OrganizationService {
         return organizationResult;
     }
 
-
     public Map<String, Object> getTaskDemandSupplierInfo(Long unitId) {
         Map<String, Object> supplierInfo = new HashMap();
         Unit weekdaySupplier = unitGraphRepository.findOne(unitId, 0);
@@ -558,7 +560,6 @@ public class OrganizationService {
         Long countryId = UserContext.getUserDetails().getCountryId();
         return countryGraphRepository.getResourcesWithFeaturesByCountry(countryId);
     }
-
 
     public OrganizationSkillAndOrganizationTypesDTO getOrganizationAvailableSkillsAndOrganizationTypesSubTypes(Long unitId) {
         OrganizationTypeAndSubTypeDTO organizationTypeAndSubTypeDTO = this.getOrganizationTypeAndSubTypes(unitId);
@@ -711,6 +712,7 @@ public class OrganizationService {
         List<Expertise> expertise = new ArrayList<>();
         if (isNotNull(servicesAndLevel)) {
             expertise = expertiseGraphRepository.getExpertiseByCountryAndOrganizationServices(countryId, servicesAndLevel.getServicesId());
+
         } else {
             LOGGER.info("Organization Services or Level is not present for Unit id {}", unitId);
         }
@@ -840,8 +842,7 @@ public class OrganizationService {
         return organizationBasicResponses.stream().collect(Collectors.toMap(OrganizationBasicResponse::getId, OrganizationBasicResponse::getTimezone));
     }
 
-
-    public List<Long> getOrganizationIds(Long unitId) {
+        public List<Long> getOrganizationIds(Long unitId) {
         List<Long> organizationIds = null;
         if (isNull(unitId)) {
             organizationIds = unitGraphRepository.findAllOrganizationIds();
@@ -878,4 +879,12 @@ public class OrganizationService {
     }
 
 
+
+
+    public ShiftFilterDefaultData getFilterDataBySelfRosteringFilter(SelfRosteringFilterDTO selfRosteringFilterDTO) {
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getUnitTimeSlot(selfRosteringFilterDTO.getUnitId());
+        List<BigInteger> teamActivityIds=teamGraphRepository.getTeamActivityIdsByTeamIds(selfRosteringFilterDTO.getTeamIds().stream().map(value->new Long(value)).collect(Collectors.toList()));
+        return new ShiftFilterDefaultData(timeSlotDTOS,teamActivityIds);
+
+    }
 }

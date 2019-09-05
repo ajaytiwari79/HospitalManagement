@@ -64,13 +64,14 @@ public class AbsencePlanningKPIService implements CounterService {
         List<Long> staffIds = (List<Long>) filterCriteria[0];
         List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
         List<Long> unitIds = (List<Long>) filterCriteria[2];
+        List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
         Collection<String> todoStatus = (List<String>) filterCriteria[5];
         if (CollectionUtils.isEmpty(unitIds)) {
             unitIds.add(organizationId);
         }
 
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), isNull(applicableKPI) ? 0 : applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates, null);
-        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, new ArrayList<>(), organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
+        StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
         DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiDefaultData(staffEmploymentTypeDTO);
         staffIds = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
         List<TodoDTO> todoDTOS = todoRepository.findAllByKpiFilter(unitIds.get(0), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), staffIds, todoStatus);
@@ -153,20 +154,27 @@ public class AbsencePlanningKPIService implements CounterService {
         int approve = 0;
         int requested = 0;
         for (TodoDTO todoDTO : todoDTOS) {
-            if (TodoStatus.REQUESTED.equals(todoDTO.getStatus())) {
-                requested++;
-            } else if (TodoStatus.DISAPPROVE.equals(todoDTO.getStatus())) {
-                disapprove++;
-            } else if (TodoStatus.PENDING.equals(todoDTO.getStatus())) {
-                pending++;
-            } else if (TodoStatus.APPROVE.equals(todoDTO.getStatus())) {
-                approve++;
+            switch (todoDTO.getStatus()) {
+                case REQUESTED:
+                    requested++;
+                    break;
+                case DISAPPROVE:
+                    disapprove++;
+                    break;
+                case PENDING:
+                    pending++;
+                    break;
+                case APPROVE:
+                    approve++;
+                    break;
+                default:
+                    break;
             }
         }
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toString(), Double.valueOf(approve)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toString(), Double.valueOf(disapprove)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toString(), Double.valueOf(pending)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toString(), Double.valueOf(requested)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toValue(), AppConstants.REQUESTED_COLOR_CODE, Double.valueOf(requested)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toValue(), AppConstants.PENDING_COLOR_CODE, Double.valueOf(pending)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toValue(), AppConstants.APPROVE_COLOR_CODE, Double.valueOf(approve)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toValue(), AppConstants.DISAPPROVE_COLOR_CODE, Double.valueOf(disapprove)));
         return clusteredBarChartKpiDataUnits;
     }
 
@@ -198,7 +206,7 @@ public class AbsencePlanningKPIService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getAbsencePlanningKpiData(organizationId, filterBasedCriteria, applicableKPI);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(),KPIRepresentation.INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : KPIRepresentation.COLUMN_TIMESLOT.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : ChartType.STACKED_CHART, DisplayUnit.COUNT, RepresentationUnit.NUMBER, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), KPIRepresentation.INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : KPIRepresentation.COLUMN_TIMESLOT.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : ChartType.STACKED_CHART, DisplayUnit.COUNT, RepresentationUnit.NUMBER, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override

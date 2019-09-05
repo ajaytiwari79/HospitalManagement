@@ -235,4 +235,12 @@ public class AppConstants {
 
     public static final String UNCATEGORIZED = "Uncategorized";
 
+
+    //todo status color code
+    public static final String REQUESTED_COLOR_CODE ="#8ac6d1";
+    public static final String APPROVE_COLOR_CODE="#9cf196";
+    public static final String DISAPPROVE_COLOR_CODE="#ff8080";
+    public static final String PENDING_COLOR_CODE="#fee9b2";
+
+
 }

@@ -9,6 +9,7 @@ import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
@@ -40,7 +41,6 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_AND_ACCUMULATED_TIMEBANK_BY_UPIDS;
 import static com.kairos.constants.ApiConstants.GET_CTA_WTA_BY_EXPERTISE;
-
 
 @Service
 @Transactional
@@ -177,7 +177,21 @@ public class ActivityIntegrationService {
         });
     }
 
+
+    public List<ActivityDTO> getAllAbsenceActivity(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/absence-activities/", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<ActivityDTO>>>() {
+        });
+    }
+
+    public List<PresenceTypeDTO> getAllPlannedTimeType(Long countryId) {
+        return genericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, "/plannedTimeType", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<PresenceTypeDTO>>>() {
+        });
+    }
+
+
+
     public Long publishShiftCountWithEmploymentId(Long employmentId){
+
          return genericRestClient.publishRequest(null, employmentId, true, IntegrationOperation.GET, "/employment/{employmentId}/shift_count", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>(){}, employmentId);
     }
 

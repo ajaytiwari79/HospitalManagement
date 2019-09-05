@@ -1,6 +1,7 @@
 package com.kairos.controller.organization;
 
 import com.kairos.dto.activity.activity.OrganizationMappingActivityTypeDTO;
+import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotSetDTO;
@@ -962,6 +963,12 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeSlotService.getUnitTimeSlot(unitId));
     }
 
+    @ApiOperation(value = "Get time slots of organization")
+    @PostMapping(UNIT_URL + "/get_filter_data")
+    public ResponseEntity<Map<String, Object>> getFilterDataBySelfRoasteringFilter(@RequestBody SelfRosteringFilterDTO selfRosteringFilterDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getFilterDataBySelfRosteringFilter(selfRosteringFilterDTO));
+    }
+
     @ApiOperation(value = "check child unit")
     @GetMapping(UNIT_URL + "/is_unit")
     public ResponseEntity<Map<String, Object>> isChild(@PathVariable long unitId) {
@@ -984,3 +991,4 @@ public class OrganizationController {
 
 
 }
+

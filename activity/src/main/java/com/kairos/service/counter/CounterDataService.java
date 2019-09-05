@@ -283,9 +283,9 @@ public class CounterDataService extends MongoBaseService {
     }
 
     private void getTodoStatusDefaultData(List<FilterCriteria> criteriaList) {
-        List<TodoStatus> activityStatus = TodoStatus.getAllStatusExceptViewed();
+        List<TodoStatus> todoStatuses = TodoStatus.getAllStatusExceptViewed();
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
-        activityStatus.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toString())));
+        todoStatuses.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toValue())));
         criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_STATUS.value, FilterType.ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));
     }
 

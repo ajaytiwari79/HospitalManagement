@@ -231,6 +231,7 @@ public class ShiftPlanningUtility {
             @Override
             public int compare(Shift shift1, Shift shift2) {
                 if (shift1.getStart() != null && shift2.getStart() != null && shift1.getEmployee().getId().equals(shift2.getEmployee().getId())) {
+
                     return shift1.getStart().compareTo(shift2.getStart());
                 } else {
                     return -1;

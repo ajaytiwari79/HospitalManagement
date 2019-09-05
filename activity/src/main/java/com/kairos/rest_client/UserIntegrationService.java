@@ -799,6 +799,10 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/get_time_slots",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TimeSlotDTO>>>() {});
     }
 
+    public ShiftFilterDefaultData getShiftFilterDefaultData(SelfRosteringFilterDTO selfRosteringFilterDTO){
+        return genericRestClient.publishRequest(selfRosteringFilterDTO,selfRosteringFilterDTO.getUnitId(),RestClientUrlType.UNIT,HttpMethod.POST, "/get_filter_data",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<ShiftFilterDefaultData>>() {});
+    }
+
     public Boolean isUnit(long unitId){
         return genericRestClient.publishRequest(null,unitId,RestClientUrlType.UNIT,HttpMethod.GET, "/is_unit",null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
     }

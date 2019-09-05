@@ -756,4 +756,18 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<TimeType> result = mongoTemplate.aggregate(aggregation, Activity.class, TimeType.class);
         return result.getMappedResults().get(0).getSecondLevelType();
     }
+
+    @Override
+    public List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId) {
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where("unitId").is(unitId).and("deleted").is(false).and("balanceSettingsActivityTab.timeType").is(TimeTypeEnum.ABSENCE)),
+                lookup("activityPriority", "activityPriorityId", "_id", "activityPriority"),
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab")
+                        .and("activityPriority").arrayElementAt(0).as("activityPriority"),
+                project("name", "description", "unitId", "rulesActivityTab", "parentId", "generalActivityTab")
+                        .and("activityPriority.sequence").as("activitySequence")
+                );
+        AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
+        return result.getMappedResults();
+    }
 }
