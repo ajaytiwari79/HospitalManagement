@@ -22,7 +22,7 @@ class CustomJwtAccessTokenConverter extends JwtAccessTokenConverter {
         final OAuth2Authentication authentication =    super.extractAuthentication(map);
          Map<String, Object> additionalInfo = new HashMap<>();
           ObjectMapper mapper=new ObjectMapper();
-         CurrentUserDetails details=mapper.convertValue(map.get(USER_DETAILS_KEY),CurrentUserDetails.class);
+         CurrentUserDetails details=mapper.convertValue(map.get(USER_DETAILS_KEY), CurrentUserDetails.class);
          authentication.setDetails(details);
          UserContext.setUserDetails(details);
          return authentication;

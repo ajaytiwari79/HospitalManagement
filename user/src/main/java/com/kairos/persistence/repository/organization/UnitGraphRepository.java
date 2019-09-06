@@ -453,24 +453,19 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  WHERE id(country)={0} RETURN id(union) as id, union.name as name")
     List<UnionQueryResult> findAllUnionsByCountryId(Long countryId);
 
-    // This 8 is hardCoded because we only need to get the last Integer value of the organization's company Id
-    // OOD-KAI-01    OOD-KAI-    >>  8
-    @Query("OPTIONAL MATCH (org:Unit{isEnable:true}) WHERE org.desiredUrl=~{0} with org,\n" +
-            "CASE WHEN {0} is NOT NULL THEN \n" +
-            "    CASE WHEN count(org)>0 THEN  TRUE ELSE FALSE  END\n" +
-            "ELSE FALSE END  AS desiredUrl\n" +
-            "OPTIONAL MATCH (org:Unit{isEnable:true}) WHERE org.name =~{1} WITH desiredUrl, case when count(org)>0 THEN  true ELSE false END as name\n" +
-            "OPTIONAL MATCH(org:Unit)" +
-            "RETURN name,desiredUrl,org.kairosCompanyId as kairosCompanyId  ORDER BY subString(org.kairosCompanyId,8,size(org.kairosCompanyId)) DESC LIMIT 1")
-    CompanyValidationQueryResult checkOrgExistWithUrlOrName(String desiredUrl, String name, String first3Char);
-
-    @Query("MATCH (org:Unit{isEnable:true}) WHERE org.desiredUrl={0}\n" +
+    @Query("MATCH (org{isEnable:true}) WHERE org.desiredUrl=~{0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithUrl(String desiredUrl);
 
-    @Query("MATCH (org:Unit{isEnable:true}) WHERE org.name={0}\n" +
+    @Query("MATCH (org{isEnable:true}) WHERE org.name=~{0}\n" +
             "RETURN case when count(org)>0 THEN  true ELSE false END as response")
     Boolean checkOrgExistWithName(String name);
+
+    // This 8 is hardCoded because we only need to get the last Integer value of the organization's company Id
+    // OOD-KAI-01    OOD-KAI-    >>  8
+    @Query("MATCH (org{isEnable:true}) WHERE left(org.name,3)=~{0}\n" +
+            "RETURN org.kairosCompanyId as kairosCompanyId  ORDER BY subString(org.kairosCompanyId,8,size(org.kairosCompanyId)) DESC LIMIT 1")
+    String getkairosCompanyId(String first3Char);
 
     @Query("MATCH (org)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) WHERE id(org)={0} RETURN orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
