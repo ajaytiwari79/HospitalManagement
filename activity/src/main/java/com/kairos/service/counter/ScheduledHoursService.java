@@ -7,7 +7,10 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.persistence.model.counter.*;
+import com.kairos.persistence.model.counter.ApplicableKPI;
+import com.kairos.persistence.model.counter.Counter;
+import com.kairos.persistence.model.counter.FibonacciKPICalculation;
+import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import org.apache.commons.collections.map.HashedMap;
@@ -15,7 +18,9 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 /*
  * @author: mohit.shakya@oodlestechnologies.com

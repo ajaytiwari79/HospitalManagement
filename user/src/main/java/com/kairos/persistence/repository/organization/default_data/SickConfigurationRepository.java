@@ -13,7 +13,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_UN
 @Repository
 public interface SickConfigurationRepository extends Neo4jBaseRepository<SickConfiguration,Long> {
 
-    @Query("MATCH(unit:Organization) where id(unit)={0}" +
+    @Query("MATCH(unit:Unit) where id(unit)={0}" +
             " MATCH(unit)<-["+IN_UNIT+"]-(sickConfiguration:SickConfiguration)" +
             " return sickConfiguration")
     SickConfiguration findSickConfigurationOfUnit(Long unitId);

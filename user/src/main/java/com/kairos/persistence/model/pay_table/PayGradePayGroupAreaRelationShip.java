@@ -2,7 +2,9 @@ package com.kairos.persistence.model.pay_table;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
-import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.EndNode;
+import org.neo4j.ogm.annotation.RelationshipEntity;
+import org.neo4j.ogm.annotation.StartNode;
 
 import java.math.BigDecimal;
 

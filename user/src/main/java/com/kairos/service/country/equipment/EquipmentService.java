@@ -3,12 +3,19 @@ package com.kairos.service.country.equipment;
 import com.kairos.dto.user.equipment.EquipmentDTO;
 import com.kairos.dto.user.equipment.VehicleEquipmentDTO;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.equipment.*;
+import com.kairos.persistence.model.country.equipment.Equipment;
+import com.kairos.persistence.model.country.equipment.EquipmentCategory;
+import com.kairos.persistence.model.country.equipment.EquipmentQueryResult;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.country.*;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
+import com.kairos.persistence.repository.user.country.EquipmentCategoryGraphRepository;
+import com.kairos.persistence.repository.user.country.EquipmentGraphRepository;
 import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.slf4j.Logger;
@@ -19,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -36,15 +44,20 @@ public class EquipmentService{
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
+    @Inject
+    private CountryService countryService;
 
     @Inject
     private EquipmentGraphRepository equipmentGraphRepository;
 
     @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+
+    @Inject
     private ResourceGraphRepository resourceGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private OrganizationService organizationService;
@@ -132,8 +145,8 @@ public class EquipmentService{
         return equipmentsData;
     }
 
-    public HashMap<String,Object> getListOfEquipmentsByUnitId(Long unitId, String filterText){
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+    public Map<String,Object> getListOfEquipmentsByUnitId(Long unitId, String filterText){
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
         Country country = countryGraphRepository.findOne(countryId,0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
@@ -150,21 +163,13 @@ public class EquipmentService{
         return equipmentsData;
     }
 
-    public EquipmentCategory getEquipmentCategoryByName(String name){
-        return equipmentCategoryGraphRepository.getEquipmentCategoryByName(name);
-    }
-
-    public Equipment getEquipmentByName(long countryId, String name){
-        return equipmentGraphRepository.getEquipmentByName(countryId, name, false);
-    }
-
 
 
     public List<EquipmentQueryResult> fetchSelectedEquipmentsOfResources(Long organizationId, Long resourceId){
         return equipmentGraphRepository.getResourcesSelectedEquipments(organizationId, resourceId, false);
     }
 
-    public HashMap<String,List<EquipmentQueryResult>> getEquipmentsForResource(Long organizationId, Long resourceId){
+    public Map<String,List<EquipmentQueryResult>> getEquipmentsForResource(Long organizationId, Long resourceId){
         Organization organization = organizationGraphRepository.findOne(organizationId,1);
         if (organization == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,organizationId);

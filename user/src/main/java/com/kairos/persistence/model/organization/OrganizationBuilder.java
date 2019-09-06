@@ -6,7 +6,8 @@ import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.BusinessType;
+import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 
 import java.time.ZoneId;
@@ -21,7 +22,6 @@ public class OrganizationBuilder {
     private AccountType accountType;
     private CompanyType companyType;
     private boolean boardingCompleted;
-    private boolean workcentre;
     private String description;
     private boolean isPrekairos;
     private String desiredUrl;
@@ -39,8 +39,7 @@ public class OrganizationBuilder {
     private String email;
     private ContactDetail contact;
     private ContactAddress contactAddress;
-    private String childLevel;
-    private UnitType unitType;
+    private boolean workcentre;
 
     public OrganizationBuilder setName(String name) {
         this.name = name;
@@ -71,14 +70,12 @@ public class OrganizationBuilder {
         this.companyType = companyType;
         return this;
     }
-
-    public OrganizationBuilder setBoardingCompleted(boolean boardingCompleted) {
-        this.boardingCompleted = boardingCompleted;
+    public OrganizationBuilder setWorkCentre(boolean workcentre) {
+        this.workcentre = workcentre;
         return this;
     }
-
-    public OrganizationBuilder setWorkcentre(boolean workcentre) {
-        this.workcentre = workcentre;
+    public OrganizationBuilder setBoardingCompleted(boolean boardingCompleted) {
+        this.boardingCompleted = boardingCompleted;
         return this;
     }
 
@@ -164,16 +161,6 @@ public class OrganizationBuilder {
 
     public OrganizationBuilder setContactAddress(ContactAddress contactAddress) {
         this.contactAddress = contactAddress;
-        return this;
-    }
-
-    public OrganizationBuilder setChildLevel(String childLevel) {
-        this.childLevel = childLevel;
-        return this;
-    }
-
-    public OrganizationBuilder setUnitType(UnitType unitType) {
-        this.unitType = unitType;
         return this;
     }
 
@@ -286,22 +273,16 @@ public class OrganizationBuilder {
         return contactAddress;
     }
 
-    public String getChildLevel() {
-        return childLevel;
-    }
-
-    public UnitType getUnitType() {
-        return unitType;
-    }
-
-    public boolean isWorkcentre() {
-        return workcentre;
-    }
-
     public Organization createOrganization() {
-        return new  Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
-                vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,childLevel,
-                parentOrganization, country,accountType,boardingCompleted,children,unitType, workcentre);
+        return new Organization( id,name, description,isPrekairos, desiredUrl, shortCompanyName,kairosCompanyId, companyType,
+                vatId, businessTypes,organizationType, organizationSubTypes,  companyUnitType, companyCategory, timeZone,
+                parentOrganization, country,accountType,boardingCompleted,children);
+    }
+
+    public Unit createUnit(){
+        return new Unit(id,name,description,desiredUrl,shortCompanyName,kairosCompanyId,
+                vatId,businessTypes,organizationType,organizationSubTypes,companyUnitType,
+                companyCategory,timeZone,accountType,boardingCompleted,workcentre);
     }
 
 }

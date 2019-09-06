@@ -1,7 +1,9 @@
 package com.kairos.persistence.repository.user.staff;
 
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.position.*;
+import com.kairos.persistence.model.staff.position.ExpiredPositionsQueryResult;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.PositionReasonCodeQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -22,13 +24,13 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
             "MATCH (organization)-[:"+ HAS_POSITIONS +"]->(position:Position)-[BELONGS_TO]->(staff) RETURN position")
     Position findPosition(long organizationId, long staffId);
 
-    @Query("MATCH (organization:Organization),(accessGroup:AccessGroup),(staff:Staff) WHERE id(organization)={1} AND id(accessGroup)={2} AND id(staff) ={0} WITH organization,accessGroup,staff\n" +
+    @Query("MATCH (organization),(accessGroup:AccessGroup),(staff:Staff) WHERE id(organization)={1} AND id(accessGroup)={2} AND id(staff) ={0} WITH organization,accessGroup,staff\n" +
             "MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitPermission:UnitPermission) WITH unitPermission,organization,accessGroup\n" +
-            "MATCH (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[:HAS_ACCESS_GROUP]->(accessGroup) WITH DISTINCT unitPermission,organization\n" +
+            "MATCH (organization)<-[:"+ APPLICABLE_IN_UNIT +"]-(unitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup) WITH DISTINCT unitPermission,organization\n" +
             "RETURN {id:id(unitPermission),startDate:unitPermission.startDate,endDate:unitPermission.endDate,organizationId:id(organization),status:unitPermission.employmentStatus} AS data")
     Map<String,Object> getPositionOfParticularRole(long staffId, long organizationId, long accessGroupId);
 
-    @Query("MATCH (organization:Organization),(staff:Staff),(unit:Organization) WHERE id(organization)={0} AND id(staff) IN {1} AND id(unit)={2}\n" +
+    @Query("MATCH (organization:Organization),(staff:Staff),(unit) WHERE id(organization)={0} AND id(staff) IN {1} AND id(unit)={2}\n" +
             "create (organization)-[r:"+ HAS_POSITIONS +"]->(position:Position) WITH position,r,staff,organization,unit\n" +
             "create (position)-[r2:"+BELONGS_TO+"]->(staff) " +
             "create (position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit) RETURN r")
@@ -36,7 +38,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
 
 
     @Query("MATCH(position:Position)-[r1:" + BELONGS_TO + "]->(staff:Staff) WHERE id(position) in {0} \n" +
-            "MATCH(position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Organization) RETURN position, \n" +
+            "MATCH(position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Unit) RETURN position, \n" +
             "CASE WHEN org IS NOT NULL THEN COLLECT( DISTINCT org) else[] end AS organizations, \n" +
             "CASE WHEN unitPermission is NOT null THEN COLLECT(DISTINCT unitPermission) else[] end AS unitPermissions")
     List<ExpiredPositionsQueryResult> findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(List<Long> positionIds);
@@ -59,7 +61,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
     @Query("MATCH(staff:Staff)-[:"+BELONGS_TO+"]-(position:Position) WHERE id(position)={0} RETURN staff")
     Staff findStaffByPositionId(Long positionId);
 
-    @Query("MATCH (organization:Organization),(user:User) WHERE id(organization)={0} AND id(user)={1}\n" +
+    @Query("MATCH (organization),(user:User) WHERE id(organization)={0} AND id(user)={1}\n" +
             "Match (organization)<-[:" + HAS_SUB_ORGANIZATION+"*]-(org:Organization{isParentOrganization:true,isKairosHub:false})" +
             "MATCH (user)-[:"+ BELONGS_TO +"]-(staff:Staff)" +
             "MATCH (org)-[:"+ HAS_POSITIONS +"]->(position:Position{deleted:false})-[" + BELONGS_TO + "]->(staff) RETURN position")

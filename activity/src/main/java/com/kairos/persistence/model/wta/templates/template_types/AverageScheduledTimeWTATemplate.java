@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
-import com.kairos.enums.wta.*;
+import com.kairos.enums.wta.MinMaxSetting;
+import com.kairos.enums.wta.PartOfDay;
+import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
@@ -55,9 +58,6 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
     }
 
-    public AverageScheduledTimeWTATemplate() {
-        wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
-    }
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {

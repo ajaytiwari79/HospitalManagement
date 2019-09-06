@@ -8,7 +8,9 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FUNCTION;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SENIORITY_LEVEL;

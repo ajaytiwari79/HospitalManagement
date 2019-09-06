@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.user.country.functions;
 
-import com.kairos.persistence.model.country.functions.*;
+import com.kairos.persistence.model.country.functions.Function;
+import com.kairos.persistence.model.country.functions.FunctionDTO;
+import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -51,7 +53,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "RETURN distinct id(fn) as id ,fn.name as name")
     List<FunctionDTO> getFunctionsByExpertiseId(Long expertiseId);
 
-    @Query("MATCH (unit:Organization) where id(unit)={3} \n" +
+    @Query("MATCH (unit:Unit) where id(unit)={3} \n" +
             "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
             "MATCH(expertise:Expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={0} \n" +
             "MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
@@ -63,7 +65,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
     List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId, String selectedDate, Long seniorityLevelId, Long unitId);
 
 
-    @Query("MATCH (unit:Organization) where id(unit)={0} \n" +
+    @Query("MATCH (unit:Unit) where id(unit)={0} \n" +
             "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
             "MATCH(expertise:Expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={1} \n" +
             "MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
@@ -74,7 +76,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "RETURN distinct function as function,rel.amount as amount,rel.amountEditableAtUnit as amountEditableAtUnit")
     List<FunctionWithAmountQueryResult> getFunctionsByExpertiseAndSeniorityLevelAndIds(Long unitId, Long expertiseId, Long seniorityLevelId, String selectedDate, List<Long> functions);
 
-    @Query("MATCH(o:Organization)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})-[rel:APPLIED_FUNCTION]->(appliedFunction:Function) where id(o)={0} AND " +
+    @Query("MATCH(o:Unit)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})-[rel:APPLIED_FUNCTION]->(appliedFunction:Function) where id(o)={0} AND " +
             "({2} IS NULL AND (employment.endDate IS NULL OR date(employment.endDate) > DATE({1})))\n" +
             "OR \n" +
             "(DATE({2}) IS NOT NULL AND  (DATE({1}) < date(employment.endDate) OR DATE({2})>date(employment.startDate)))\n" +

@@ -1,11 +1,17 @@
 package com.kairos.dto.scheduler.scheduler_panel;
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.enums.scheduler.*;
+import com.kairos.enums.scheduler.JobFrequencyType;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 
 import java.math.BigInteger;
-import java.time.*;
-import java.util.*;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 public class SchedulerPanelDTO {
 

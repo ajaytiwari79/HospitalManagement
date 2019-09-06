@@ -52,7 +52,6 @@ public class TaskTypeSetting extends MongoBaseEntity{
 
     public TaskTypeSetting(BigInteger taskTypeId, Long clientId) {
         this.taskTypeId = taskTypeId;
-        this.efficiency = efficiency;
         this.clientId = clientId;
     }
 

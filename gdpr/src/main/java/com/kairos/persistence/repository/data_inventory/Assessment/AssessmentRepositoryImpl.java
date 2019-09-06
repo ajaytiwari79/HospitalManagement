@@ -6,7 +6,9 @@ import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.Arrays;
 import java.util.List;
 

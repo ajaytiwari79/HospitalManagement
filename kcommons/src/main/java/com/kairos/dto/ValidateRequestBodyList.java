@@ -1,6 +1,8 @@
 package com.kairos.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import java.util.List;

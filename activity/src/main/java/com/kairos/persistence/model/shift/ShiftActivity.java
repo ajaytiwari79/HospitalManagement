@@ -6,10 +6,11 @@ import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigInteger;
-import java.sql.Time;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;

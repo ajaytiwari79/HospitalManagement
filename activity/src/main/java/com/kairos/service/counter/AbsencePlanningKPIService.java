@@ -143,7 +143,7 @@ public class AbsencePlanningKPIService implements CounterService {
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTodoCountByRepresentTotalData(List<DateTimeInterval> dateTimeIntervals, List<TodoDTO> todoDTOS) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndActivityStatusAndCountMap = new HashedMap();
-        staffIdAndActivityStatusAndCountMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getStartDate())), getActivityStatusCount(todoDTOS));
+        staffIdAndActivityStatusAndCountMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), getActivityStatusCount(todoDTOS));
         return staffIdAndActivityStatusAndCountMap;
     }
 
