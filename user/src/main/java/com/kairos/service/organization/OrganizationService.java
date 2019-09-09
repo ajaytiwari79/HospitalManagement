@@ -182,8 +182,8 @@ public class OrganizationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
-    public Organization getOrganizationById(long id) {
-        return organizationGraphRepository.findOne(id);
+    public OrganizationBaseEntity getOrganizationById(long id) {
+        return organizationBaseRepository.findOne(id);
     }
 
     public OrganizationDTO getOrganizationWithCountryId(long id) {
