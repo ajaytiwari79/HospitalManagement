@@ -93,13 +93,13 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
         return listOfString.stream().map(Long::parseLong).collect(Collectors.toList());
     }
 
-    public List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationId, String moduleId,
+    public List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
                                          Map<FilterType, Set<String>> filters, String searchText, String imagePath) {
 
         Map<String, Object> queryParameters = new HashMap<>();
 
         queryParameters.put("unitId", unitId);
-        queryParameters.put("parentOrganizationId", parentOrganizationId);
+        queryParameters.put("parentOrganizationId", parentOrganizationIds);
         if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent()) {
             queryParameters.put("staffStatusList",
                     filters.get(FilterType.STAFF_STATUS));
