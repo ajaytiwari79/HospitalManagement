@@ -78,6 +78,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
@@ -252,18 +253,18 @@ public class CompanyCreationService {
     }
 
     private String validateNameAndDesiredUrlOfOrganization(OrganizationBasicDTO orgDetails) {
-        CompanyValidationQueryResult orgExistWithUrl = unitGraphRepository.checkOrgExistWithUrlOrName("(?i)" + orgDetails.getDesiredUrl(), "(?i)" + orgDetails.getName(), orgDetails.getName().substring(0, 3));
-        if(orgExistWithUrl.getName()) {
+        if(unitGraphRepository.checkOrgExistWithName("(?i)" + orgDetails.getName())) {
             exceptionService.invalidRequestException(ERROR_ORGANIZATION_NAME_DUPLICATE, orgDetails.getName());
         }
-        if(orgDetails.getDesiredUrl() != null && orgExistWithUrl.getDesiredUrl()) {
+        if(unitGraphRepository.checkOrgExistWithName("(?i)" + orgDetails.getDesiredUrl())) {
             exceptionService.invalidRequestException(ERROR_ORGANIZATION_DESIREDURL_DUPLICATE, orgDetails.getDesiredUrl());
         }
         String kairosId;
-        if(orgExistWithUrl.getKairosCompanyId() == null) {
+        String kairosCompanyId=unitGraphRepository.getkairosCompanyId(orgDetails.getName().substring(0,3));
+        if(isNull(kairosCompanyId)) {
             kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + KAI + ONE;
         } else {
-            int lastSuffix = new Integer(orgExistWithUrl.getKairosCompanyId().substring(8, orgExistWithUrl.getKairosCompanyId().length()));
+            int lastSuffix = new Integer(kairosCompanyId.substring(8));
             kairosId = StringUtils.upperCase(orgDetails.getName().substring(0, 3)) + HYPHEN + KAI + (++lastSuffix);
         }
         return kairosId;
