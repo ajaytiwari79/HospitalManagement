@@ -24,6 +24,7 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.utils.user_context.UserContext;
@@ -60,14 +61,16 @@ public class PlannedTimePercentageService implements CounterService {
         List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
         List<Long> unitIds = (List<Long>) filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
-        List<BigInteger> plannedTimeIds=new ArrayList<>();
+        List<BigInteger> plannedTimeIds=(List<BigInteger>) filterCriteria[6];
         Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new ArrayList<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
-        plannedTimeIdAndNameMap=plannedTimes.stream().filter(presenceTypeDTO -> isCollectionNotEmpty(plannedTimeIds) && plannedTimeIds.contains(presenceTypeDTO.getId())).collect(Collectors.toMap(k->k.getId(),v->v.getName()));
+        if(isCollectionNotEmpty(plannedTimeIds)){
+         plannedTimeIdAndNameMap=plannedTimes.stream().filter(presenceTypeDTO -> plannedTimeIds.contains(presenceTypeDTO.getId())).collect(Collectors.toMap(k->k.getId(),v->v.getName()));
+        }
         Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
@@ -96,7 +99,7 @@ public class PlannedTimePercentageService implements CounterService {
 
     private Double getPlannedTimePercentage(Date startDate,Date endDate, Double plannedtimeDiff) {
         Long shiftDiff = getTimeDuration(startDate,endDate);
-        return Double.valueOf( plannedtimeDiff.longValue()*100/shiftDiff);
+        return Double.valueOf( plannedtimeDiff.longValue()/shiftDiff*100);
     }
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalAndShiftListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<ShiftWithActivityDTO> shifts) {
@@ -147,7 +150,7 @@ public class PlannedTimePercentageService implements CounterService {
     private List<ClusteredBarChartKpiDataUnit> getShiftAndPlannedTimePercentageMap(List<ShiftWithActivityDTO> shifts) {
         Map<String, Double> plannedTimeAndPercentageMap = new HashMap<>();
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
-        new ArrayList<>(shifts).sort((a1, a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+        shifts.sort(Comparator.comparing(ShiftWithActivityDTO::getStartDate));
         for (ShiftWithActivityDTO shift : shifts) {
             for (ShiftActivityDTO activity : shift.getActivities()) {
                 for (PlannedTime plannedTime : activity.getPlannedTimes()) {

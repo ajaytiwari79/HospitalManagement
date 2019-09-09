@@ -18,7 +18,8 @@ db.getCollection('counter').insert({
         "STAFF_IDS",
  "TIME_INTERVAL",
 "ACTIVITY_STATUS",
-EMPLOYMENT_TYPE
+"EMPLOYMENT_TYPE",
+"PLANNED_TIME_TYPE"
     ],
     "multiDimensional" : true
 })
