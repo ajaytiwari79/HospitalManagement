@@ -529,27 +529,19 @@ public class UnionService {
         Optional<Staff> staff = staffGraphRepository.findById(staffId);
         if (!staff.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
-
         }
-        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, unitId);
-        OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(unitId);
+        boolean unit = unitGraphRepository.existsById(unitId);
+        Organization organization = organizationGraphRepository.findOrganizationOfStaff(staffId);
+        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, organization.getId());
+        OrganizationBaseEntity organizationBaseEntity = !unit ? organization : organizationBaseRepository.findOne(unitId);
         if (!Optional.ofNullable(organizationBaseEntity).isPresent() || !Optional.ofNullable(organizationBaseEntity.getOrganizationSubTypes()).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_NOTFOUND);
 
         }
         List<Long> organizationSubTypeIds = organizationBaseEntity.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
         List<UnionResponseDTO> unions = unitGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
-        List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
-        if (organizationBaseEntity instanceof Organization) {
-            organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(organizationBaseEntity.getId());
-        } else {
-            OrganizationHierarchyData data = unitGraphRepository.getChildHierarchyByChildUnit(organizationBaseEntity.getId());
-            Iterator itr = data.getChildUnits().listIterator();
-            while (itr.hasNext()) {
-                Unit thisUnit = (Unit) itr.next();
-                organizationHierarchy.add(new OrganizationBasicResponse(thisUnit.getId(), thisUnit.getName()));
-            }
-        }
+        List<OrganizationBasicResponse> organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(organization.getId());
+
         List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organizationBaseEntity.getId(), ReasonCodeType.EMPLOYMENT);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
     }
