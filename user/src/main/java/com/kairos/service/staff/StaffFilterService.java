@@ -236,18 +236,16 @@ public class StaffFilterService {
 
     private List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
-        if (!Optional.ofNullable(filterGroup).isPresent()) {
-            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_FEATURE_NOTENABLED);
+        List<FilterQueryResult> filterDTOs = new ArrayList<>();
+        if (Optional.ofNullable(filterGroup).isPresent()) {
+            filterGroup.getFilterTypes().forEach(filterType -> {
+                FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
+                if (isCollectionNotEmpty(tempFilterQueryResult.getFilterData())) {
+                    filterDTOs.add(getFilterDataByFilterType(filterType, countryId, unitId));
+                }
+            });
 
         }
-        List<FilterQueryResult> filterDTOs = new ArrayList<>();
-
-        filterGroup.getFilterTypes().forEach(filterType -> {
-            FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
-            if (tempFilterQueryResult.getFilterData().size() > 0) {
-                filterDTOs.add(getFilterDataByFilterType(filterType, countryId, unitId));
-            }
-        });
         return filterDTOs;
     }
 
@@ -367,7 +365,7 @@ public class StaffFilterService {
         staffEmploymentTypeWrapper.setStaffList(staffs);
         List<Long> staffIds = staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
         staffFilterDTO.setStaffIds(staffIds);
-        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO,unitId,startDate,endDate);
+        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
         List<Map> staffList = new ArrayList<>();
         for (Map staffUndModifiable : staffs) {
             if(staffIdAndNightWorkerDetailsMap.containsKey(staffUndModifiable.get("id"))) {
