@@ -244,9 +244,10 @@ public class TimeAndAttendanceService extends MongoBaseService {
 
 
     // check out after job run
-    public void checkOutBySchedulerJob(Long unitId, Date startDate, Date endDate){
+    public void checkOutBySchedulerJob(Long unitId, Date startDate, Date endDate,Long staffId){
         //List<TimeAndAttendance> timeAndAttendances = timeAndAttendanceRepository.findAllbyUnitIdAndDate(unitId,startDate);
-        List<Shift> shifts=shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId);
+        List<Shift> shifts=staffId==null?shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId):
+                shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId,startDate,endDate);
              /*Map<BigInteger, Shift> staffIdAndShifts = shifts.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
              timeAndAttendances.forEach(timeAndAttendance -> {
                  if (staffIdAndShifts.get(timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size() - 1).getShiftId()) != null) {
