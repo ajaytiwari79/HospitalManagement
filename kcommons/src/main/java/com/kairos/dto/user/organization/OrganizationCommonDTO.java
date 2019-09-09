@@ -21,8 +21,9 @@ public class OrganizationCommonDTO {
     }
 
     public OrganizationCommonDTO(Long id,String name ) {
-        this.name = name;
         this.id = id;
+        this.name = name;
+
     }
 
     public List<OrganizationCommonDTO> getChildren() {

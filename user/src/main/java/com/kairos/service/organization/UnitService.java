@@ -133,7 +133,7 @@ public class UnitService {
     }
 
     public Map<String, Object> getEligibleUnitsForCtaAndWtaCreation(Long unitId) {
-        OrganizationBaseEntity organization = organizationBaseRepository.findOne(unitId, 2);
+        OrganizationBaseEntity organization = organizationBaseRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
@@ -148,20 +148,15 @@ public class UnitService {
         }
 
 
-        OrganizationCommonDTO organizationCommonDTO;
         List<OrganizationCommonDTO> organizationCommonDTOS = new ArrayList<>();
         if (organization instanceof Organization) {
+            organization=organizationGraphRepository.findOne(unitId);
             for (Unit unit : ((Organization) organization).getUnits()) {
-                organizationCommonDTO = new OrganizationCommonDTO();
-                organizationCommonDTO.setId(unit.getId());
-                organizationCommonDTO.setName(unit.getName());
-                organizationCommonDTOS.add(organizationCommonDTO);
+                organizationCommonDTOS.add(new OrganizationCommonDTO(unit.getId(),unit.getName()));
             }
+        }else {
+            organizationCommonDTOS.add(new OrganizationCommonDTO(organization.getId(),organization.getName()));
         }
-        organizationCommonDTO = new OrganizationCommonDTO();
-        organizationCommonDTO.setId(organization.getId());
-        organizationCommonDTO.setName(organization.getName());
-        organizationCommonDTOS.add(organizationCommonDTO);
 
         Map<String, Object> response = new HashMap<>();
         response.put("eligibleUnits", organizationCommonDTOS);
