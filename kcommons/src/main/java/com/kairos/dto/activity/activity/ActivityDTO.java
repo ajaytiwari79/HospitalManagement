@@ -6,6 +6,8 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.enums.shift.ShiftStatus;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
@@ -21,6 +23,8 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class ActivityDTO  {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")
@@ -57,6 +61,7 @@ public class ActivityDTO  {
     private Set<BigInteger> childActivityIds;
     private BigInteger activityPriorityId;
     private int activitySequence;
+    private BigInteger countryParentId;
 
 
 
@@ -82,260 +87,8 @@ public class ActivityDTO  {
     public ActivityDTO(BigInteger timeTypeId){
         this.balanceSettingsActivityTab = new BalanceSettingActivityTabDTO(timeTypeId);
     }
-
-    public List<Long> getEmploymentTypes() {
-        return employmentTypes;
-    }
-
-    public void setEmploymentTypes(List<Long> employmentTypes) {
-        this.employmentTypes = employmentTypes;
-    }
-
-    public RulesActivityTabDTO getRulesActivityTab() {
-        return rulesActivityTab;
-    }
-
-    public void setRulesActivityTab(RulesActivityTabDTO rulesActivityTab) {
-        this.rulesActivityTab = rulesActivityTab;
-    }
-
-    public BigInteger getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(BigInteger parentId) {
-        this.parentId = parentId;
-    }
-
-
-    public TimeTypeDTO getTimeType() {
-        return timeType;
-    }
-
-    public void setTimeType(TimeTypeDTO timeType) {
-        this.timeType = timeType;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = StringUtils.trim(name);
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = StringUtils.trim(description);
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public BigInteger getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(BigInteger categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public List<BigInteger> getTags() {
-        return this.tags;
-    }
-
-
-    public void setTags(List<BigInteger> tags) {
-        this.tags = tags;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Long getCountryActivityId() {
-        return countryActivityId;
-    }
-
-    public void setCountryActivityId(Long countryActivityId) {
-        this.countryActivityId = countryActivityId;
-    }
-
-    public boolean isParentActivity() {
-        return isParentActivity;
-    }
-
-    public void setParentActivity(boolean parentActivity) {
-        isParentActivity = parentActivity;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public List<Long> getExpertises() {
-        return expertises;
-    }
-
-    public void setExpertises(List<Long> expertises) {
-        this.expertises = expertises;
-    }
-
-    public GeneralActivityTabDTO getGeneralActivityTab() {
-        return generalActivityTab;
-    }
-
-    public void setGeneralActivityTab(GeneralActivityTabDTO generalActivityTab) {
-        this.generalActivityTab = generalActivityTab;
-    }
-
-    public TimeCalculationActivityDTO getTimeCalculationActivityTab() {
-        return timeCalculationActivityTab;
-    }
-
-    public void setTimeCalculationActivityTab(TimeCalculationActivityDTO timeCalculationActivityTab) {
-        this.timeCalculationActivityTab = timeCalculationActivityTab;
-    }
-
-    public BalanceSettingActivityTabDTO getBalanceSettingsActivityTab() {
-        return balanceSettingsActivityTab;
-    }
-
-    public void setBalanceSettingsActivityTab(BalanceSettingActivityTabDTO balanceSettingsActivityTab) {
-        this.balanceSettingsActivityTab = balanceSettingsActivityTab;
-    }
-
-    public PhaseSettingsActivityTab getPhaseSettingsActivityTab() {
-        return phaseSettingsActivityTab;
-    }
-
-    public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
-        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
-    }
-
-    public List<Long> getSkills() {
-        return skills;
-    }
-
-    public void setSkills(List<Long> skills) {
-        this.skills = skills;
-    }
-
-    public SkillActivityDTO getSkillActivityTab() {
-        return skillActivityTab;
-    }
-
-    public void setSkillActivityTab(SkillActivityDTO skillActivityTab) {
-        this.skillActivityTab = skillActivityTab;
-    }
-
-    public Boolean isActivityCanBeCopied() {
-        return activityCanBeCopied;
-    }
-
     public void setActivityCanBeCopied(Boolean activityCanBeCopied) {
         this.activityCanBeCopied = activityCanBeCopied==null?false:activityCanBeCopied;
-    }
-
-    public ActivityPriorityDTO getActivityPriority() {
-        return activityPriority;
-    }
-
-    public void setActivityPriority(ActivityPriorityDTO activityPriority) {
-        this.activityPriority = activityPriority;
-    }
-
-    public Boolean getActivityCanBeCopied() {
-        return activityCanBeCopied;
-    }
-
-    public boolean isAllowChildActivities() {
-        return allowChildActivities;
-    }
-
-    public void setAllowChildActivities(boolean allowChildActivities) {
-        this.allowChildActivities = allowChildActivities;
-    }
-
-    public List<ActivityDTO> getChildActivities() {
-        return childActivities;
-    }
-
-    public void setChildActivities(List<ActivityDTO> childActivities) {
-        this.childActivities = childActivities;
-    }
-
-    public Set<BigInteger> getChildActivityIds() {
-        return childActivityIds;
-    }
-
-    public void setChildActivityIds(Set<BigInteger> childActivityIds) {
-        this.childActivityIds = childActivityIds;
-    }
-
-    public int getActivitySequence() {
-        return activitySequence;
-    }
-
-    public void setActivitySequence(int activitySequence) {
-        this.activitySequence = activitySequence;
-    }
-
-    public List<ShiftStatus> getActivityStatus() {
-        return activityStatus;
-    }
-
-    public void setActivityStatus(List<ShiftStatus> activityStatus) {
-        this.activityStatus = activityStatus;
-    }
-
-    public BigInteger getActivityPriorityId() {
-        return activityPriorityId;
-    }
-
-    public void setActivityPriorityId(BigInteger activityPriorityId) {
-        this.activityPriorityId = activityPriorityId;
-
     }
 
     public boolean isFullDayOrFullWeekActivity() {
