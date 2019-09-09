@@ -42,6 +42,8 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 @Service
 public class ProcessingActivityService {
 
@@ -142,6 +144,11 @@ public class ProcessingActivityService {
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
             processingActivity.setSubProcessingActivities(updateSubProcessingActivities(unitId, processingActivityDTO.getSubProcessingActivities(), processingActivity));
 
+        }
+        if (isCollectionNotEmpty(processingActivityDTO.getDataSubjectList())) {
+            processingActivity.setDataSubjectList(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectList()));
+        }else{
+            processingActivity.setDataSubjectList(new ArrayList<>());
         }
         processingActivityRepository.save(processingActivity);
         return processingActivityDTO;

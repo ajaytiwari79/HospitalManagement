@@ -245,11 +245,6 @@ public class PhaseService extends MongoBaseService {
 
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
         phaseDTO.setOrganizationId(unitId);
-        OrganizationDTO organization = userIntegrationService.getOrganization();
-
-        if (organization == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID, unitId);
-        }
         Phase oldPhase = phaseMongoRepository.findOne(phaseId);
         if (oldPhase == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PHASE_ID_NOTFOUND, phaseDTO.getId());
