@@ -205,7 +205,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE  id(staff)={0}\n" +
             " RETURN staff, position.startDateMillis AS positionStartDate")
-    StaffPositionDTO getStaffAndEmploymentByUnitId(long staffId);
+    StaffPositionDTO getStaffAndEmploymentByStaffId(long staffId);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} WITH unitPermission\n" +
             "MATCH (unitPermission)-[:" + HAS_ACCESS_PERMISSION + "]->(accessPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup{name:\"COUNTRY_ADMIN\"}) WITH unitPermission\n" +

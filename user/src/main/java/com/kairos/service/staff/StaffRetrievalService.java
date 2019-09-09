@@ -166,7 +166,7 @@ public class StaffRetrievalService {
         Staff staff;
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
 
-            staffPositionDTO = staffGraphRepository.getStaffAndEmploymentByUnitId(staffId);
+            staffPositionDTO = staffGraphRepository.getStaffAndEmploymentByStaffId(staffId);
             staff = Optional.ofNullable(staffPositionDTO).isPresent() ? staffPositionDTO.getStaff() : null;
         if (staff == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId);
