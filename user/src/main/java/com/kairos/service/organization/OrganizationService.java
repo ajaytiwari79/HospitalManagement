@@ -182,10 +182,6 @@ public class OrganizationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
-    public OrganizationBaseEntity getOrganizationById(long id) {
-        return organizationBaseRepository.findOne(id);
-    }
-
     public OrganizationDTO getOrganizationWithCountryId(long id) {
         OrganizationBaseEntity unit = organizationBaseRepository.findOne(id);
         OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(unit, OrganizationDTO.class);
@@ -227,6 +223,10 @@ public class OrganizationService {
             success = true;
         }
         return success;
+    }
+
+    public OrganizationBaseEntity getOrganizationById(long id) {
+        return organizationBaseRepository.findOne(id);
     }
 
 
