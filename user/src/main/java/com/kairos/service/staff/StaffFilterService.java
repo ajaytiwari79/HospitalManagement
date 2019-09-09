@@ -240,7 +240,7 @@ public class StaffFilterService {
         if (Optional.ofNullable(filterGroup).isPresent()) {
             filterGroup.getFilterTypes().forEach(filterType -> {
                 FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
-                if (tempFilterQueryResult.getFilterData().size() > 0) {
+                if (isCollectionNotEmpty(tempFilterQueryResult.getFilterData())) {
                     filterDTOs.add(getFilterDataByFilterType(filterType, countryId, unitId));
                 }
             });
