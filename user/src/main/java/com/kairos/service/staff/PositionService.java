@@ -309,13 +309,13 @@ public class PositionService {
         if (staff == null) {
             return null;
         }
+        Organization organization=organizationGraphRepository.findOrganizationOfStaff(staffId);
         OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
 
-        Organization parentOrganization = organizationService.fetchParentOrganization(unitId);
-        accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
-        units = unitGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
+        accessGroups = accessGroupRepository.getAccessGroups(organization.getId());
+        units = unitGraphRepository.getSubOrgHierarchy(organization.getId());
         List<Map<String, Object>> positions;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization

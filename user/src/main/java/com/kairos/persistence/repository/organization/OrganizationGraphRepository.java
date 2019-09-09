@@ -71,4 +71,14 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(organization:Organization),(hub:Organization) WHERE id(organization)={0} AND id(hub)={1} " +
             "CREATE UNIQUE(hub)-[r:"+HAS_SUB_ORGANIZATION+"]->(organization)  ")
     void linkOrganizationToHub(Long organizationId,Long hubId);
+
+    @Query("MATCH(o:Organization) where id(o)={0} \n" +
+            "OPTIONAL MATCH(o)-[:"+HAS_SUB_ORGANIZATION+"*]->(sub:Organization) \n" +
+            "WITH collect(id(sub))+id(o) as orgIds \n" +
+            "unwind orgIds as x \n" +
+            "return x ")
+    List<Long> findAllOrganizationIdsInHierarchy(Long parentOrgId);
+
+    @Query("MATCH (org:Organization)-[:"+HAS_POSITIONS+"]->(position:Position)-[:"+BELONGS_TO+"]->(staff) WHERE id(staff)={0} return org")
+    Organization findOrganizationOfStaff(Long staffId);
 }
