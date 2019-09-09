@@ -256,7 +256,7 @@ public class CompanyCreationService {
         if(unitGraphRepository.checkOrgExistWithName("(?i)" + orgDetails.getName())) {
             exceptionService.invalidRequestException(ERROR_ORGANIZATION_NAME_DUPLICATE, orgDetails.getName());
         }
-        if(unitGraphRepository.checkOrgExistWithName("(?i)" + orgDetails.getDesiredUrl())) {
+        if(unitGraphRepository.checkOrgExistWithUrl("(?i)" + orgDetails.getDesiredUrl())) {
             exceptionService.invalidRequestException(ERROR_ORGANIZATION_DESIREDURL_DUPLICATE, orgDetails.getDesiredUrl());
         }
         String kairosId;
