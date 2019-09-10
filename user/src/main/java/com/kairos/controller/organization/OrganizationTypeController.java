@@ -101,5 +101,10 @@ public class OrganizationTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrgTypesServicesAndSubServicesListByUnitId(unitId));
     }
 
+    @RequestMapping(value = COUNTRY_URL + "/organization_type/organizations", method = RequestMethod.GET)
+    @ApiOperation("Get organizations by organization type ids")
+    public ResponseEntity<Map<String, Object>>  getOrganizationIdsByOrganizationSubTypeIds(@RequestBody List<Long> organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationIdsByOrganizationSubTypeIds(organizationSubTypeId));
+    }
 
 }

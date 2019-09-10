@@ -20,6 +20,8 @@ import com.kairos.persistence.repository.master_data.asset_management.MasterAsse
 import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
 import com.kairos.rest_client.GenericRestClient;
+import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.data_inventory.asset.AssetService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -52,6 +55,12 @@ public class MasterAssetService {
     @Inject
     private AssetTypeRepository assetTypeRepository;
 
+    @Inject
+    private UserIntegrationService userIntegrationService;
+
+    @Inject
+    private AssetService assetService;
+
     /**
      * @param countryId
      * @param masterAssetDto
@@ -69,9 +78,16 @@ public class MasterAssetService {
         addAssetTypeToMasterAsset(countryId, masterAsset, masterAssetDto);
         masterAssetRepository.save(masterAsset);
         masterAssetDto.setId(masterAsset.getId());
+        asignAssetOfAllUnit(countryId, masterAssetDto);
         return masterAssetDto;
     }
 
+    private void asignAssetOfAllUnit(Long countryId, MasterAssetDTO masterAssetDto){
+        List<Long> organizationSubTypeId = masterAssetDto.getOrganizationSubTypes().stream().map(unit -> unit.getId()).collect(Collectors.toList());
+        List<Long> unitIds = userIntegrationService.getUnitIdsByOrgSubTypeId(countryId, organizationSubTypeId);
+        AssetDTO assetDTO = ObjectMapperUtils.copyPropertiesByMapper(masterAssetDto, AssetDTO.class);
+        unitIds.forEach(unitId -> assetService.saveAsset(unitId,assetDTO));
+    }
     /**
      * This method is used to fetch all the metadata related to master asset from DTO like organisationType,
      * organisationSubType, Service Category and Sub Service Category
