@@ -5,10 +5,13 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.IntervalUnit;
+import com.kairos.persistence.model.counter.ApplicableKPI;
 
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -110,5 +113,25 @@ public class KPIUtils {
 
     public static boolean verifyKPIResponseData(Map<Object, Double> objectListMap){
         return  objectListMap.values().stream().anyMatch(value -> !new Double(0.0).equals(value));
+    }
+
+    public static Double getValueWithDecimalFormat(Double value){
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        return  Double.valueOf(decimalFormat.format(value));
+    }
+
+    public static void getKpiDataUnits(Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap, List<CommonKpiDataUnit> kpiDataUnits, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
+        Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
+        for (Map.Entry<Object, List<ClusteredBarChartKpiDataUnit>> entry : objectListMap.entrySet()) {
+            switch (applicableKPI.getKpiRepresentation()) {
+                case REPRESENT_PER_STAFF:
+                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue()));
+                    break;
+                default:
+                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue()));
+                    break;
+
+            }
+        }
     }
 }
