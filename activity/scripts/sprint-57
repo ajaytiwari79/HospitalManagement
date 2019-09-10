@@ -50,3 +50,30 @@ db.getCollection('applicableKPI').insert({
 
 
 db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 1468}})
+
+
+//find
+db.getCollection('kPICategory').find({"countryId":18712,"name":"Uncategorized"})
+
+db.getCollection('kairos_sequence').find({ "sequenceName" : "CategoryKPIConfSequence"})
+
+db.getCollection('kairos_sequence').update({ "sequenceName" : "CategoryKPIConfSequence"},{"$set":{"sequenceNumber" : 613}})
+
+
+db.getCollection('categoryKPIConf').insert({
+    "_id" : "613",
+    "kpiId" : "37",
+    "categoryId" : "71",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2019-08-06T12:48:45.413Z"),
+    "updatedAt" : ISODate("2019-08-06T12:48:45.413Z"),
+    "deleted" : false,
+    "createdBy" : {
+        "_id" : NumberLong(18728),
+        "email" : "ulrik@kairosplanning.com",
+        "fullName" : "Ulrik Rasmussen"
+    },
+    "_class" : "com.kairos.persistence.model.counter.CategoryKPIConf"
+}
+)
