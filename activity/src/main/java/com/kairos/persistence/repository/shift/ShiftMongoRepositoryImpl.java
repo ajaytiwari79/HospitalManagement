@@ -438,30 +438,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperation.add(match(where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
         aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
-//        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
         AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
         return result.getMappedResults();
     }
 
 
-    @Override
-    public List<Shift> findShiftsByKpiFiltersWithActivityStatus(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Date startDate, Date endDate) {
-        Criteria criteria = where("staffId").in(staffIds).and("unitId").in(unitIds).and("deleted").is(false).and("disabled").is(false)
-                .and("startDate").gte(startDate).lte(endDate);
-        List<AggregationOperation> aggregationOperation = new ArrayList<AggregationOperation>();
-        aggregationOperation.add(new MatchOperation(criteria));
-        aggregationOperation.add(unwind("activities"));
-        if (CollectionUtils.isNotEmpty(shiftActivityStatus)) {
-            aggregationOperation.add(match(where("activities.status").in(shiftActivityStatus)));
-        }
 
-        aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
-//        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
-        Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
-        AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
-        return result.getMappedResults();
-    }
 
 
     @Override
@@ -547,6 +530,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.activityId' : 1,\n" +
                 "        'activities.durationMinutes' : 1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.plannedTimes':1,\n" +
                 "        'activities.backgroundColor':{  \n" +
                 "            '$arrayElemAt':[  \n" +
                 "               '$activity.generalActivityTab.backgroundColor',\n" +
