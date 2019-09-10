@@ -276,7 +276,7 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "RETURN unitAccessGroup")
     AccessGroup getAccessGroupByParentAccessGroupId(Long unitId, Long parentId);
 
-    @Query("MATCH(unitAccessGroup:AccessGroup{deleted:false})<-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(org:Unit) WHERE id(org) ={0} AND id(unitAccessGroup) ={1} " +
+    @Query("MATCH(unitAccessGroup:AccessGroup{deleted:false})<-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(org:Organization) WHERE id(org) ={0} AND id(unitAccessGroup) ={1} " +
             "RETURN unitAccessGroup")
     AccessGroup getAccessGroupByParentId(Long unitId, Long parentId);
 
