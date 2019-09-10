@@ -164,13 +164,50 @@ public class Shift extends MongoBaseEntity {
             return true;
         }
         for (int i = 0; i < shift.getActivities().size(); i++) {
-            ShiftActivity thisShiftActivity=this.getActivities().get(i);
-            ShiftActivity shiftActivity=shift.getActivities().get(i);
-            if(thisShiftActivity.isShiftActivityChanged(shiftActivity)){
+            ShiftActivity thisShiftActivity = this.getActivities().get(i);
+            ShiftActivity shiftActivity = shift.getActivities().get(i);
+            if (thisShiftActivity.isShiftActivityChanged(shiftActivity)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public List[] getShiftForValidatingStaffingLevel(Shift shift) {
+        List<ShiftActivity> shiftActivitiesForUnderStaffing = new ArrayList<>(5);
+        List<ShiftActivity> shiftActivitiesForOverStaffing = new ArrayList<>(5);
+        int activitySize = Math.max(this.getActivities().size(), shift.getActivities().size());
+        if (shift == null) {
+            for (int i = 0; i < activitySize - 1; i++) {
+                shiftActivitiesForOverStaffing.add(new ShiftActivity());
+            }
+        } else if (this == shift) {
+            for (int i = 0; i < activitySize - 1; i++) {
+                shiftActivitiesForUnderStaffing.add(new ShiftActivity());
+            }
+        } else {
+
+            for (int i = 0; i < activitySize - 1; i++) {
+                try {
+                    ShiftActivity thisActivity=this.getActivities().get(i);
+                    ShiftActivity shiftActivity=shift.getActivities().get(i);
+                    Date thisActivityStartDate=thisActivity.getStartDate();
+                    Date thisActivityEndDate=thisActivity.getEndDate();
+                    Date shiftActivityStartDate=shiftActivity.getStartDate();
+                    Date shiftActivityEndDate=shiftActivity.getEndDate();
+                    DateTimeInterval thisActivityInterVal=new DateTimeInterval(thisActivityStartDate,thisActivityEndDate);
+                    DateTimeInterval shiftActivityInterVal=new DateTimeInterval(shiftActivityStartDate,shiftActivityEndDate);
+                    if(thisActivityStartDate.before(shiftActivityStartDate) && thisActivityInterVal.overlaps(shiftActivityInterVal)){
+                        shiftActivitiesForUnderStaffing.add(new ShiftActivity(thisActivity.getActivityId(),thisActivityStartDate,shiftActivityStartDate));
+                    }
+                } catch (IndexOutOfBoundsException e) {
+
+                }
+            }
+
+        }
+
+        return new List[] {shiftActivitiesForUnderStaffing,shiftActivitiesForOverStaffing};
     }
 
 

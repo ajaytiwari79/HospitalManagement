@@ -79,6 +79,12 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
         this.activityName = activityName;
     }
 
+    public ShiftActivity(BigInteger activityId, Date startDate,Date endDate) {
+        this.activityId = activityId;
+        this.startDate=startDate;
+        this.endDate=endDate;
+    }
+
     public void setPayoutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions) {
         this.payoutPerShiftCTADistributions = isNullOrElse(payoutPerShiftCTADistributions,new ArrayList<>());
     }
