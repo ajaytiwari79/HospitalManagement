@@ -3,6 +3,7 @@ package com.kairos.persistence.model.shift;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -18,6 +19,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import static com.kairos.commons.utils.DateUtils.addMinutes;
+import static com.kairos.commons.utils.DateUtils.minusMonths;
 import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
@@ -189,28 +192,36 @@ public class Shift extends MongoBaseEntity {
                 shiftActivitiesForUnderStaffing.add(new ShiftActivity());
             }
         } else {
-
-            for (int i = 0; i < activitySize - 1; i++) {
-                try {
-                    ShiftActivity thisActivity=this.getActivities().get(i);
-                    ShiftActivity shiftActivity=shift.getActivities().get(i);
-                    Date thisActivityStartDate=thisActivity.getStartDate();
-                    Date thisActivityEndDate=thisActivity.getEndDate();
-                    Date shiftActivityStartDate=shiftActivity.getStartDate();
-                    Date shiftActivityEndDate=shiftActivity.getEndDate();
-                    DateTimeInterval thisActivityInterVal=new DateTimeInterval(thisActivityStartDate,thisActivityEndDate);
-                    DateTimeInterval shiftActivityInterVal=new DateTimeInterval(shiftActivityStartDate,shiftActivityEndDate);
-                    if(thisActivityStartDate.before(shiftActivityStartDate) && thisActivityInterVal.overlaps(shiftActivityInterVal)){
-                        shiftActivitiesForUnderStaffing.add(new ShiftActivity(thisActivity.getActivityId(),thisActivityStartDate,shiftActivityStartDate));
-                    }
-                } catch (IndexOutOfBoundsException e) {
-
-                }
-            }
-
+            List<ShiftActivityLineInterval> shiftActivityLines=getShiftActivityLineIntervals(shift);
+            List<ShiftActivityLineInterval> currentShiftActivityLines=getShiftActivityLineIntervals(this);
+            shiftActivitiesForUnderStaffing=getActivitiesForUnderStaffing(currentShiftActivityLines,shiftActivityLines);
+            shiftActivitiesForOverStaffing=getActivitiesForUnderStaffing(shiftActivityLines,currentShiftActivityLines);
         }
 
         return new List[] {shiftActivitiesForUnderStaffing,shiftActivitiesForOverStaffing};
+    }
+
+    private List<ShiftActivityLineInterval> getShiftActivityLineIntervals(Shift shift){
+        List<ShiftActivityLineInterval> shiftActivityLineIntervals=new ArrayList<>();
+        for (ShiftActivity shiftActivity:shift.getActivities()) {
+            Date endDate=shiftActivity.getEndDate();
+            while (endDate.equals(shiftActivity.getEndDate())){
+                endDate= addMinutes(endDate,15);
+                shiftActivityLineIntervals.add(new ShiftActivityLineInterval(shiftActivity.getStartDate(),endDate,shiftActivity.getActivityId(),shiftActivity.getActivityName()));
+                shiftActivity.setStartDate(endDate);
+            }
+        }
+        return shiftActivityLineIntervals;
+    }
+
+    private List<ShiftActivity> getActivitiesForUnderStaffing(List<ShiftActivityLineInterval> currentActivityLines,List<ShiftActivityLineInterval> shiftActivityLines){
+        List<ShiftActivity> shiftActivitiesForCheckingStaffingLevel = new ArrayList<>();
+        for (ShiftActivityLineInterval activityLineInterval:currentActivityLines){
+            if(shiftActivityLines.stream().noneMatch(k->k.getStartDate().equals(activityLineInterval.getStartDate()) && k.getActivityId().equals(activityLineInterval.getActivityId()))){
+                shiftActivitiesForCheckingStaffingLevel.add(new ShiftActivity(activityLineInterval.getActivityId(),activityLineInterval.getStartDate(),activityLineInterval.getEndDate()));
+            }
+        }
+        return shiftActivitiesForCheckingStaffingLevel;
     }
 
 
