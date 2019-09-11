@@ -17,6 +17,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @Repository
 public interface PreferedTimeWindowRepository extends Neo4jBaseRepository<PreferedTimeWindow,Long> {
 
-    @Query("MATCH (pre:PreferedTimeWindow{deleted:false})-[:"+BELONGS_TO+"]-(o:Organization) where id(o)={0} return pre")
+    @Query("MATCH (pre:PreferedTimeWindow{deleted:false})-[:"+BELONGS_TO+"]-(o:Unit) where id(o)={0} return pre")
     List<PreferedTimeWindow> getAllByUnitId(Long unitId);
 }

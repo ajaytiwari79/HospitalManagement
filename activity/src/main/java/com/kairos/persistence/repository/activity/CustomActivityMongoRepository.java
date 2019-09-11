@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.activity;
 
-import com.kairos.dto.activity.activity.*;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.CompositeActivityDTO;
+import com.kairos.dto.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ActivityWithCTAWTASettingsDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.time_type.TimeTypeAndActivityIdDTO;
@@ -13,7 +15,9 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public interface CustomActivityMongoRepository {
 

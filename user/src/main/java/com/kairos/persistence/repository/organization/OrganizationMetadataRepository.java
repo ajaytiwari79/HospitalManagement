@@ -15,7 +15,7 @@ import java.util.Map;
 @Repository
 public interface OrganizationMetadataRepository extends Neo4jBaseRepository<LocalAreaTag,Long> {
 
-    @Query("MATCH (org:Organization)-[:HAS_LOCAL_AREA_TAGS]->(lat:LocalAreaTag) where id(org)={0} AND lat.isDeleted=false with lat,org\n" +
+    @Query("MATCH (org:Unit)-[:HAS_LOCAL_AREA_TAGS]->(lat:LocalAreaTag) where id(org)={0} AND lat.isDeleted=false with lat,org\n" +
             "MATCH (lat)-[:LAT_AND_LNG]->(latlng:LatLng) with latlng , lat return  {id:id(lat), name:lat.name, color:lat.color, paths:collect({lat:latlng.lat, lng:latlng.lng, coordOrder:latlng.coordOrder}) } as tags")
     List<Map<String, Object>> findAllByIsDeletedAndUnitId(long unitId);
 }

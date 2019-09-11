@@ -3,7 +3,9 @@ package com.kairos.persistence.model.shift;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class ShiftTemplate extends MongoBaseEntity {
     private String name;

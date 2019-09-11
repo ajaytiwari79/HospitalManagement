@@ -1,6 +1,8 @@
 package com.kairos.controller.integration;
 
-import com.kairos.persistence.model.user.integration.*;
+import com.kairos.persistence.model.user.integration.TimeCare;
+import com.kairos.persistence.model.user.integration.Twillio;
+import com.kairos.persistence.model.user.integration.Visitour;
 import com.kairos.service.integration.IntegrationService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;

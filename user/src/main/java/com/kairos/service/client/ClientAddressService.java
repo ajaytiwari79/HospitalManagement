@@ -2,17 +2,26 @@ package com.kairos.service.client;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.organization.AddressDTO;
-import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.AccessToLocation;
+import com.kairos.persistence.model.client.Client;
+import com.kairos.persistence.model.client.ClientTemporaryAddress;
+import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.query_results.ClientAddressQueryResult;
 import com.kairos.persistence.model.client.query_results.ClientTempAddressQueryResult;
 import com.kairos.persistence.model.country.default_data.HousingType;
 import com.kairos.persistence.model.country.default_data.HousingTypeDTO;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.user.client.*;
+import com.kairos.persistence.repository.user.client.AccessToLocationGraphRepository;
+import com.kairos.persistence.repository.user.client.ClientGraphRepository;
+import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
+import com.kairos.persistence.repository.user.client.TemporaryAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.HousingTypeGraphRepository;
-import com.kairos.persistence.repository.user.region.*;
+import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
+import com.kairos.persistence.repository.user.region.RegionGraphRepository;
+import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.country.HousingTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
@@ -65,6 +74,8 @@ public class ClientAddressService{
     private EnvConfig envConfig;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private CountryService countryService;
 
 
     public Map<String, Object> getAddressDetails(Long clientId, Long unitId) {
@@ -121,8 +132,7 @@ public class ClientAddressService{
         response.put("partnerAddress", partnerAddressInfo);
         response.put("temporaryAddress", temporaryAddressList);
 
-        Long countryId = countryGraphRepository.getCountryIdByUnitId(unitId);
-        logger.info("country id----------> " + countryId);
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
         if (countryId != null) {
             response.put("zipCodeData", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         } else {

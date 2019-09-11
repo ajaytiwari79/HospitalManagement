@@ -3,7 +3,9 @@ package com.kairos.dto.activity.open_shift.priority_group;
 import com.kairos.enums.PriorityGroupName;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class PriorityGroupDTO {
     private BigInteger id;

@@ -10,7 +10,9 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.*;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
@@ -33,7 +35,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
@@ -64,11 +67,11 @@ public class ShiftStateService {
     @Inject private ShiftService shiftService;
     @Inject private TimeAndAttendanceService timeAndAttendanceService;
 
-    public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate, Date endDate){
+    public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate, Date endDate,Long staffId){
         if(!startDate.before(DateUtils.getCurrentDayStart()) || !endDate.before(DateUtils.getCurrentDayStart())){
             exceptionService.actionNotPermittedException(PAST_DATE_ALLOWED);
         }
-        timeAndAttendanceService.checkOutBySchedulerJob(unitId, startDate, endDate);
+        timeAndAttendanceService.checkOutBySchedulerJob(unitId, startDate, endDate,staffId);
         return true;
     }
 

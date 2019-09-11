@@ -4,7 +4,9 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.enums.shift.*;
+import com.kairos.enums.shift.ShiftActionType;
+import com.kairos.enums.shift.ShiftFilterParam;
+import com.kairos.enums.shift.ViewType;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.*;
@@ -20,7 +22,9 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
@@ -55,29 +59,29 @@ public class ShiftController {
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> createShift(@RequestParam("type") String type, @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
+    public ResponseEntity<Map<String, Object>> createShift( @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO, type ,shiftActionType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO ,shiftActionType));
     }
 
 
     @ApiOperation("save Shift after validation")
     @PostMapping(value = "/shift/validated")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long unitId, @RequestParam("type") String type,
+    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long unitId,
                                                                         @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo,
                                                                         @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff,
                                                                         @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState,
                                                                         @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType,
                                                                         @RequestParam(required = false) TodoType todoType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, type, validatedByStaff, updateShiftState, unitId, shiftActionType,todoType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, validatedByStaff, updateShiftState, unitId, shiftActionType,todoType));
     }
 
     @ApiOperation("update a Shift of a staff")
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, type, false, false, shiftActionType));
+    public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, false, false, shiftActionType));
     }
 
     @ApiOperation("delete a Shift of a staff")
@@ -136,15 +140,15 @@ public class ShiftController {
 
     @ApiOperation("update shift by detail view")
     @PutMapping("/shift/update_shift_by_details_view")
-    public ResponseEntity<Map<String, Object>> updateShiftByDetailsView(@PathVariable Long unitId, @RequestParam String type, @RequestBody ShiftDTO shiftDTO, @RequestParam Boolean updatedByStaff) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShiftByTandA(unitId, shiftDTO, type, updatedByStaff));
+    public ResponseEntity<Map<String, Object>> updateShiftByDetailsView(@PathVariable Long unitId, @RequestBody ShiftDTO shiftDTO, @RequestParam Boolean updatedByStaff) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShiftByTandA(unitId, shiftDTO, updatedByStaff));
     }
 
 
     @ApiOperation("validate shift by detail view")
     @PostMapping("/shift/validate_shift_by_details_view")
-    public ResponseEntity<Map<String, Object>> validateShiftByDetailsView(@PathVariable Long unitId, @RequestParam String type, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam Boolean validatedByStaff) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftValidatorService.validateShift(shiftDTO, validatedByStaff, unitId, type));
+    public ResponseEntity<Map<String, Object>> validateShiftByDetailsView(@PathVariable Long unitId,  @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam Boolean validatedByStaff) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftValidatorService.validateShift(shiftDTO, validatedByStaff, unitId));
     }
 
     @ApiOperation("get a Shift detail by id")
@@ -165,8 +169,8 @@ public class ShiftController {
 
     @ApiOperation("send shift in time and attendance phase")
     @PostMapping("/shift/send_shift_in_time_and_attendance_phase")
-    public ResponseEntity<Map<String, Object>> sendShiftInTimeAndAttendancePhase(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStateService.sendShiftInTimeAndAttendancePhase(unitId, startDate, endDate));
+    public ResponseEntity<Map<String, Object>> sendShiftInTimeAndAttendancePhase(@PathVariable Long unitId,@RequestParam(value = "staffId",required = false) Long staffId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStateService.sendShiftInTimeAndAttendancePhase(unitId, startDate, endDate,staffId));
     }
 
     @ApiOperation("Get shifts by staff/unit/expertise/date ")

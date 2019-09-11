@@ -26,6 +26,7 @@ public abstract class RelationshipConstants {
     public static final  String ORGANISATION_HAS_SKILL = "ORGANISATION_HAS_SKILL";
     public static final  String ORGANIZATION_TIME_SLOT = "ORGANIZATION_TIME_SLOT";
     public static final  String HAS_SUB_ORGANIZATION = "HAS_SUB_ORGANIZATION";
+    public static final  String HAS_UNIT = "HAS_UNIT";
     public static final  String PROVIDE_SERVICE = "PROVIDE_SERVICE";
     public static final  String ORGANIZATION_TYPE_HAS_SERVICES = "ORGANIZATION_TYPE_HAS_SERVICES";
     public static final  String HAS_PUBLIC_PHONE_NUMBER = "HAS_PUBLIC_PHONE_NUMBER";
@@ -71,6 +72,7 @@ public abstract class RelationshipConstants {
     public static final  String ACCESS_GROUP_HAS_ACCESS_TO_PAGE = "ACCESS_GROUP_HAS_ACCESS_TO_PAGE";
     public static final  String STAFF_HAS_ACCESS_GROUP = "STAFF_HAS_ACCESS_GROUP";
     public static final  String ORGANIZATION_HAS_ACCESS_GROUPS = "ORGANIZATION_HAS_ACCESS_GROUPS";
+    public static final  String UNIT_HAS_ACCESS_GROUPS = "UNIT_HAS_ACCESS_GROUPS";
 
     //client
     public static final  String GET_SERVICE_FROM = "GET_SERVICE_FROM";
@@ -88,7 +90,7 @@ public abstract class RelationshipConstants {
     public static final  String HAS_DIAGNOSE = "HAS_DIAGNOSE";
     public static final  String HAS_ALLERGY = "HAS_ALLERGY";
 
-    public static final  String ORGANIZATION_HAS_RESOURCE = "ORGANIZATION_HAS_RESOURCE";
+    public static final  String UNIT_HAS_RESOURCE = "UNIT_HAS_RESOURCE";
     public static final  String ORGANIZATION_SUB_SERVICE = "ORGANIZATION_SUB_SERVICE";
     public static final  String LINK_WITH_EXTERNAL_SERVICE = "LINK_WITH_EXTERNAL_SERVICE";
 
@@ -108,6 +110,7 @@ public abstract class RelationshipConstants {
     public static final  String LAT_LNG = "LAT_AND_LNG";
     public static final  String HAS_TIME_WINDOW = "HAS_TIME_WINDOW";
     public static final  String APPLICABLE_IN_UNIT = "APPLICABLE_IN_UNIT";
+    public static final  String APPLICABLE_IN_ORGANIZATION = "APPLICABLE_IN_ORGANIZATION";
     public static final  String HAS_UNIT_PERMISSIONS = "HAS_UNIT_PERMISSIONS";
     public static final  String HAS_PARTIAL_LEAVES= "HAS_PARTIAL_LEAVES";
     public static final  String HAS_ACCESS_PAGE_PERMISSION = "HAS_ACCESS_PAGE_PERMISSION";

@@ -1,7 +1,6 @@
 package com.kairos.commons.controller.audit_logging;
 
 import com.kairos.commons.service.audit_logging.AuditLoggingService;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ResponseHandler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.format.annotation.DateTimeFormat;

@@ -2,13 +2,20 @@ package com.kairos.service.javers;
 
 import com.kairos.response.dto.common.MetaDataCommonResponseDTO;
 import org.javers.core.Javers;
-import org.javers.core.metamodel.object.*;
+import org.javers.core.metamodel.object.CdoSnapshot;
+import org.javers.core.metamodel.object.InstanceId;
+import org.javers.core.metamodel.object.ValueObjectId;
 import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.persistence.*;
-import java.util.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @SuppressWarnings("unchecked")

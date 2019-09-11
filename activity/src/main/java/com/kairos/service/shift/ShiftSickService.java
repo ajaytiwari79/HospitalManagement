@@ -46,9 +46,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.ENTERED_MANUALLY;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
@@ -102,7 +102,7 @@ public class ShiftSickService extends MongoBaseService {
         if (!activity.getRulesActivityTab().isAllowedAutoAbsence()) {
             exceptionService.actionNotPermittedException(ACTIVITY_NOTELIGIBLE_FOR_ABSENCE, activity.getName());
         }
-        StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId, StringUtils.capitalize(ORGANIZATION));
+        StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId);
         if (!Optional.ofNullable(staffEmploymentDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFFEMPLOYMENT_NOTFOUND);
         }
@@ -159,7 +159,7 @@ public class ShiftSickService extends MongoBaseService {
 
     private void addPreviousShiftAndSaveShift(List<Shift> staffOriginalShiftsOfDates, List<Shift> shifts, Set<LocalDate> dates) {
         Map<LocalDate, Long> dateLongMap = new HashMap<>();
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), StringUtils.capitalize(ORGANIZATION), shifts.get(0).getEmploymentId(),Collections.emptySet());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), shifts.get(0).getEmploymentId(),Collections.emptySet());
         if (staffAdditionalInfoDTO.getEmployment().getAppliedFunctions() != null) {
             dateLongMap = userIntegrationService.removeFunctionFromEmploymentByDates(staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getEmployment().getId(), dates);
         }
@@ -175,7 +175,7 @@ public class ShiftSickService extends MongoBaseService {
 
             Map<BigInteger, ActivityWrapper> activityWrapperMap = shiftService.getActivityWrapperMap(shifts,null);
             for (Shift shift : shifts) {
-                staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()),shifts.get(0).getStaffId(), StringUtils.capitalize(ORGANIZATION), shifts.get(0).getEmploymentId(),Collections.emptySet());
+                staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()),shifts.get(0).getStaffId(),  shifts.get(0).getEmploymentId(),Collections.emptySet());
                 WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
                 CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), shifts.get(0).getActivities().get(0).getStartDate());
                 if (!Optional.ofNullable(ctaResponseDTO).isPresent()) {
@@ -267,7 +267,7 @@ public class ShiftSickService extends MongoBaseService {
 //TODO Refactor db queries
     public void disableSicknessShiftsOfStaff(Long staffId, Long unitId) {
 
-        StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId, StringUtils.capitalize(ORGANIZATION));
+        StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId);
         if (!Optional.ofNullable(staffEmploymentDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFFEMPLOYMENT_NOTFOUND);
         }
@@ -298,7 +298,7 @@ public class ShiftSickService extends MongoBaseService {
         }
         if (CollectionUtils.isNotEmpty(shifts)) {
 
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), StringUtils.capitalize(ORGANIZATION), shifts.get(0).getEmploymentId(),Collections.emptySet());
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), shifts.get(0).getEmploymentId(),Collections.emptySet());
             //Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
             //Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dates);
 
@@ -319,7 +319,7 @@ public class ShiftSickService extends MongoBaseService {
                     }
                     staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                     setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                    shiftService.updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
+                    timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
                 }
             }
             //shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);

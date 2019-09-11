@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.staff.position;
 
 import com.kairos.persistence.model.access_permission.AccessGroup;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -15,7 +15,7 @@ public class ExpiredPositionsQueryResult {
 
     private Position position;
     private List<AccessGroup> accessGroups;
-    private List<Organization> organizations;
+    private List<Unit> units;
     private List<UnitPermission> unitPermissions;
 
 
@@ -44,12 +44,12 @@ public class ExpiredPositionsQueryResult {
         this.accessGroups = accessGroups;
     }
 
-    public List<Organization> getOrganizations() {
-        return organizations;
+    public List<Unit> getUnits() {
+        return units;
     }
 
-    public void setOrganizations(List<Organization> organizations) {
-        this.organizations = organizations;
+    public void setUnits(List<Unit> units) {
+        this.units = units;
     }
 
 }

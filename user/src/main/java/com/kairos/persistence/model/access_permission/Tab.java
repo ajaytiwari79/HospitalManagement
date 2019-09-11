@@ -1,7 +1,9 @@
 package com.kairos.persistence.model.access_permission;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.*;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.kairos.persistence.model.deserializer.XmlDeserializer;

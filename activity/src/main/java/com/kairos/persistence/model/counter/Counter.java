@@ -1,7 +1,9 @@
 package com.kairos.persistence.model.counter;
 
 import com.kairos.dto.activity.counter.data.FilterCriteria;
-import com.kairos.dto.activity.counter.enums.*;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterType;
+import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 

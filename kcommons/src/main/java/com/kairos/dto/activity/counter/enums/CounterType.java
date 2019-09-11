@@ -29,7 +29,8 @@ public enum CounterType {
     TASK_EFFICIENCY("Task Efficiency"),
     WORKING_HOUR_PER_SHIFT("Working Time"),
     PLANNED_HOURS_VS_TIMEBANK("Planned Hours And TimeBank"),
-    ABSENCES_PER_INTERVAL("Absences Per Interval")
+    ABSENCES_PER_INTERVAL("Absences Per Interval"),
+    PLANNED_TIME_PERCENTAGE("planned Time Percentage")
     //COMPLETED
 
     ;

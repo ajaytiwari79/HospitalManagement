@@ -192,7 +192,7 @@ public class ShiftTemplateService{
                 shiftActivities.add(shiftActivity);
             });
             newShiftDTO.setActivities(shiftActivities);
-            ShiftWithViolatedInfoDTO result = shiftService.createShift(unitId, newShiftDTO, "Organization",null);
+            ShiftWithViolatedInfoDTO result = shiftService.createShift(unitId, newShiftDTO,null);
             shiftWithViolatedInfoDTO.setShifts(result.getShifts());
 
             if (CollectionUtils.isNotEmpty(result.getViolatedRules().getActivities())) {

@@ -20,7 +20,7 @@ public class ArrayUtilUnitTest {
     ArrayUtil arrayUtil;
 
     @Test
-    public void getUniqueElementWhichIsNotInFirst() throws Exception {
+    public void getUniqueElementWhichIsNotInFirst() {
         List<Long> previousRes = new ArrayList<Long>();
         previousRes.add(1L);
         List<Long> originalRes = new ArrayList<Long>();

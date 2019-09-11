@@ -45,9 +45,6 @@ public interface ZipCodeGraphRepository extends Neo4jBaseRepository<ZipCode,Long
     @Query("MATCH(address:ContactAddress)-[zipCodeRel:"+ZIP_CODE+"]-(zipCode:ZipCode) WHERE id(address)={0} and id(zipCode)={1} delete zipCodeRel")
     void deleteAddressZipcodeRelation(Long addressId, Long zipcodeId);
 
-    @Query("MATCH(address:ContactAddress)-[municipalityRel:"+MUNICIPALITY+"]-(municipality:Municipality) WHERE id(address)={0} and id(municipality)={1} delete municipalityRel")
-    void deleteAddressMunicipalityRelation(Long addressId, Long municiaplityId);
-
     @Query("MATCH(zipCode:ZipCode{deleted:false}) WITH collect(zipCode) as zipCodes " +
             "OPTIONAL MATCH(sector:Sector)-[:"+IN_COUNTRY+"]-(country:Country) WHERE id(country)={0} RETURN collect(sector)as sectors," +
             " zipCodes" )

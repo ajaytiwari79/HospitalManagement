@@ -88,6 +88,12 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
     }
 
+    @ApiOperation("Get CTARultemplate By EmploymentId")
+    @GetMapping("/get_cta_rultemplate_by_employmentId")
+    public ResponseEntity<Map<String,Object>> getCTARultemplateByEmploymentId(@PathVariable Long unitId,@RequestParam Long employmentId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getCTARultemplateByEmploymentId(employmentId));
+    }
+
 
 
 }

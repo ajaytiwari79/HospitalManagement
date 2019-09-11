@@ -11,18 +11,18 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class OrganizationContactAddress {
 
-    private Organization organization;
+    private Unit unit;
     private ContactAddress contactAddress;
     private ZipCode zipCode;
     private Municipality municipality;
 
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public ContactAddress getContactAddress() {

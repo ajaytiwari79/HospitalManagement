@@ -1,7 +1,9 @@
 package com.kairos.controller.access_group;
 
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
-import com.kairos.dto.user.access_permission.*;
+import com.kairos.dto.user.access_permission.AccessGroupPermissionDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.access_permission.AccessPermissionDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -32,13 +36,13 @@ public class AccessGroupController {
     AccessGroupService accessGroupService;
 
 
-    @RequestMapping(value = UNIT_URL+"/access_group", method = RequestMethod.POST)
+    @PostMapping(value = UNIT_URL+"/access_group")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createAccessGroup(@PathVariable long unitId,@Valid @RequestBody AccessGroupDTO accessGroupDTO) {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, accessGroupService.createAccessGroup(unitId, accessGroupDTO));
     }
 
-    @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}", method = RequestMethod.PUT)
+    @PutMapping(value = UNIT_URL+"/access_group/{accessGroupId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateAccessGroup(@PathVariable long unitId, @PathVariable long accessGroupId, @Valid @RequestBody AccessGroupDTO accessGroupDTO) {
         AccessGroupDTO updatedObject = accessGroupService.updateAccessGroup(accessGroupId, unitId, accessGroupDTO);
@@ -48,18 +52,18 @@ public class AccessGroupController {
         return ResponseHandler.generateResponse(HttpStatus.CREATED, true, updatedObject);
     }
 
-    @RequestMapping(value = UNIT_URL+"/access_group/{accessGroupId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = UNIT_URL+"/access_group/{accessGroupId}")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteAccessGroup(@PathVariable long accessGroupId) {
         boolean isObjectDeleted = accessGroupService.deleteAccessGroup(accessGroupId);
         if (isObjectDeleted) {
-            return ResponseHandler.generateResponse(HttpStatus.CREATED, true, isObjectDeleted);
+            return ResponseHandler.generateResponse(HttpStatus.CREATED, true, true);
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, false);
     }
 
 
-    @RequestMapping(value = UNIT_URL+"/access_group", method = RequestMethod.GET)
+    @GetMapping(value = UNIT_URL+"/access_group")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessGroups(@PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, accessGroupService.getAccessGroupsForUnit(unitId));

@@ -1,6 +1,8 @@
 package com.kairos.service.template_type;
 
-import com.kairos.commons.custom_exception.*;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DuplicateDataException;
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.gdpr.master_data.TemplateTypeDTO;
 import com.kairos.persistence.model.template_type.TemplateType;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;

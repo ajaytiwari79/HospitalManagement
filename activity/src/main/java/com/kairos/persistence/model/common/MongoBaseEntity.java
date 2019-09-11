@@ -2,7 +2,9 @@ package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.common.UserInfo;
-import org.springframework.data.annotation.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigInteger;
 import java.util.Date;

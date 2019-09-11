@@ -209,7 +209,7 @@ public class CounterDistService extends MongoBaseService {
         if (!accessGroupPermissionCounterDTO.isCountryAdmin() && CollectionUtils.isEmpty(accessGroupPermissionCounterDTO.getAccessGroupIds())) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
         }
-        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
+        Long countryId = accessGroupPermissionCounterDTO.getCountryId();
         List<BigInteger> kpiIds = new ArrayList<>();
         if (!accessGroupPermissionCounterDTO.isCountryAdmin()) {
             kpiIds = counterRepository.getAccessGroupKPIIds(accessGroupPermissionCounterDTO.getAccessGroupIds(), ConfLevel.UNIT, unitId, accessGroupPermissionCounterDTO.getStaffId());

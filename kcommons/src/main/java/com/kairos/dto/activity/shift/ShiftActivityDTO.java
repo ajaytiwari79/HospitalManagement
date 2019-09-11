@@ -153,4 +153,11 @@ public class ShiftActivityDTO {
     public LocalDate getEndLocalDate(){
         return asLocalDate(this.endDate);
     }
+
+    public void resetTimebankDetails(){
+        this.plannedMinutesOfTimebank = 0;
+        this.timeBankCtaBonusMinutes = 0d;
+        this.timeBankCTADistributions = new ArrayList<>();
+        this.getChildActivities().forEach(shiftActivityDTO -> shiftActivityDTO.resetTimebankDetails());
+    }
 }

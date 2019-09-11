@@ -19,7 +19,4 @@ public interface EquipmentCategoryGraphRepository extends Neo4jBaseRepository<Eq
     @Query("Match (ec:EquipmentCategory) return ec")
     List<EquipmentCategory> getEquipmentCategories();
 
-    @Query("Match (ec:EquipmentCategory) WHERE ec.name={0} return ec")
-    EquipmentCategory getEquipmentCategoryByName(String name);
-
 }

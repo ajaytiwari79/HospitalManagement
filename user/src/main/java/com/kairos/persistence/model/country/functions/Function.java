@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -27,7 +27,7 @@ public class Function extends UserBaseEntity {
     private LocalDate endDate;
 
     @Relationship(type = HAS_UNION)
-    private List<Organization> unions;
+    private List<Unit> unions;
 
     @Relationship(type = HAS_ORGANIZATION_LEVEL)
     private List<Level> organizationLevels;
@@ -44,7 +44,7 @@ public class Function extends UserBaseEntity {
         this.id = id;
     }
 
-    public Function(String name, String description, LocalDate startDate, LocalDate endDate, List<Organization> unions, List<Level> organizationLevels, Country country, String icon) {
+    public Function(String name, String description, LocalDate startDate, LocalDate endDate, List<Unit> unions, List<Level> organizationLevels, Country country, String icon) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;
@@ -87,11 +87,11 @@ public class Function extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public List<Organization> getUnions() {
+    public List<Unit> getUnions() {
         return unions;
     }
 
-    public void setUnions(List<Organization> unions) {
+    public void setUnions(List<Unit> unions) {
         this.unions = unions;
     }
 

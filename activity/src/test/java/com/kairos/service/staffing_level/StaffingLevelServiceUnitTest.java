@@ -4,30 +4,6 @@ package com.kairos.service.staffing_level;
  *
  */
 
-import com.kairos.commons.utils.DateUtils;
-import com.kairos.config.env.EnvConfig;
-import com.kairos.dto.activity.staffing_level.Duration;
-import com.kairos.dto.activity.staffing_level.*;
-import com.kairos.enums.TimeTypes;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.persistence.repository.activity.ActivityMongoRepository;
-import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
-import com.kairos.service.phase.PhaseService;
-import com.kairos.utils.event.ShiftNotificationEvent;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.math.BigInteger;
-import java.time.*;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
-import java.util.*;
-
 //@RunWith(MockitoJUnitRunner.class)
 public class StaffingLevelServiceUnitTest {
   /*  @InjectMocks

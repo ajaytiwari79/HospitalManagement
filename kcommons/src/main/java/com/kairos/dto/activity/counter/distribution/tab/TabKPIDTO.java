@@ -2,7 +2,10 @@ package com.kairos.dto.activity.counter.distribution.tab;
 
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
-import com.kairos.dto.activity.counter.enums.*;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterSize;
+import com.kairos.dto.activity.counter.enums.KPIValidity;
+import com.kairos.dto.activity.counter.enums.LocationType;
 
 import java.math.BigInteger;
 

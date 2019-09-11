@@ -23,6 +23,7 @@ import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
@@ -40,6 +41,7 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
@@ -94,6 +96,8 @@ public class CounterDataService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private CounterDistService counterDistService;
+    @Inject
+    private PlannedTimeTypeService plannedTimeTypeService;
 
     //FIXME: DO NOT REMOVE will be uncommented once representation model confirmed.
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId) {
@@ -232,6 +236,9 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(FilterType.DAYS_OF_WEEK)) {
             getDayOfWeekDefaultData(criteriaList);
         }
+        if (kpi.getFilterTypes().contains(FilterType.PLANNED_TIME_TYPE)) {
+            getPlannedTimeDefaultData(criteriaList);
+        }
         if (kpi.getFilterTypes().contains(FilterType.TIME_TYPE)) {
             getTimeTypesDefaultData(criteriaList, defaultKpiDataDTO);
         }
@@ -273,6 +280,13 @@ public class CounterDataService extends MongoBaseService {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         dayOfWeeks.forEach(dayOfWeek -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(dayOfWeek.toString(), dayOfWeek.toString())));
         criteriaList.add(new FilterCriteria(FilterType.DAYS_OF_WEEK.value, FilterType.DAYS_OF_WEEK, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getPlannedTimeDefaultData(List<FilterCriteria> criteriaList) {
+        List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        plannedTimes.forEach(presenceTypeDTO ->  kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(presenceTypeDTO.getId().toString(), presenceTypeDTO.getName())));
+        criteriaList.add(new FilterCriteria(FilterType.PLANNED_TIME_TYPE.value, FilterType.PLANNED_TIME_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getActivityStatusDefaultData(List<FilterCriteria> criteriaList) {
@@ -384,7 +398,7 @@ public class CounterDataService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         KPI kpi = counterRepository.getKPIByid(kpiId);
-        if (!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula()) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+        if ((isNotNull(kpi.getCalculationFormula()) && !kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
             exceptionService.actionNotPermittedException(MESSAGE_KPI_PERMISSION);
         }
         if (Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {

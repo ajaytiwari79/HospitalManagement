@@ -6,7 +6,9 @@ import com.kairos.dto.user.employment.EmploymentLinesDTO;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
