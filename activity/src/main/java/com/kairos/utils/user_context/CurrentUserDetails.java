@@ -3,6 +3,7 @@ package com.kairos.utils.user_context;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Getter
 @Setter
@@ -35,6 +36,7 @@ public class CurrentUserDetails {
         this.hubMember =  hubMember;
     }
 
+    @JsonIgnore
     public String getFullName(){
         return this.firstName+" "+this.lastName;
     }
