@@ -471,11 +471,7 @@ public class PositionService {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
-
-        Unit unit = null;
-
-        unit = unitGraphRepository.findOne(id);
-
+        OrganizationBaseEntity unit = organizationBaseRepository.findOne(id);
         List<PartialLeave> partialLeaves = staffGraphRepository.getPartialLeaves(unit.getId(), staffId);
         List<Map<String, Object>> response = new ArrayList<>(partialLeaves.size());
         for (PartialLeave partialLeave : partialLeaves) {
