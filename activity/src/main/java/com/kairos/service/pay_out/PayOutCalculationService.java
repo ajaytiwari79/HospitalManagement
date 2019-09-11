@@ -104,26 +104,6 @@ public class PayOutCalculationService {
     }
 
     /**
-     * @param interval
-     * @param startDate
-     * @return DateTimeInterval
-     */
-    private List<DateTimeInterval> getCTAInterval(CompensationTableInterval interval, ZonedDateTime startDate) {
-        List<DateTimeInterval> ctaIntervals = new ArrayList<>(2);
-        if(interval.getFrom().isAfter(interval.getTo())){
-            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS),startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
-            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.truncatedTo(ChronoUnit.DAYS).plusDays(1)));
-        }
-        else if(interval.getFrom().equals(interval.getTo())){
-            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS), startDate.truncatedTo(ChronoUnit.DAYS).plusDays(1)));
-        }
-        else{
-            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
-        }
-        return ctaIntervals;
-    }
-
-    /**
      * @param ctaRuleTemplateCalculatedTimeBankDTOS
      * @param ctaTimeBankMinMap
      * @return List<PayOutPerShiftCTADistribution>s
