@@ -2,7 +2,9 @@ package com.kairos.persistence.repository.agreement_template;
 
 import com.kairos.persistence.model.agreement_template.AgreementSection;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;

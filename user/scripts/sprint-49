@@ -10,3 +10,4 @@ Match(ap:AccessPage) where ap.moduleId="tab_427" merge (ap)-[:SUB_PAGE]-(accessP
 Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
 Match (ap:AccessPage)
 CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);
+

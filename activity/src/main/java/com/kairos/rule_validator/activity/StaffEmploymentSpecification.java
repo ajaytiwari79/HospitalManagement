@@ -8,7 +8,9 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.shift.ShiftValidatorService;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MANAGEMENT_AUTHORITY_PHASE;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_EMPLOYMENTTYPE_ABSENT;

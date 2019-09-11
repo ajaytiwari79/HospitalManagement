@@ -9,5 +9,5 @@ Match(s:Staff) where s.employedSince=0 set s.employedSince= null;
 //KP-2777 query for setting staffFunctions to null
 Match(ctaRuleTemplate:CTARuleTemplate) set ctaRuleTemplate.staffFunctions = null
 //KP-2000
-Match(o:Organization) where o.clientSince=0
+Match(o:Unit) where o.clientSince=0
 set o.clientSince =null;

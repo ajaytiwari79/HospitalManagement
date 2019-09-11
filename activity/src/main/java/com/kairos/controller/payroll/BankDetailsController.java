@@ -4,7 +4,9 @@ package com.kairos.controller.payroll;
  *
  */
 
-import com.kairos.dto.activity.payroll.*;
+import com.kairos.dto.activity.payroll.BankDTO;
+import com.kairos.dto.activity.payroll.OrganizationBankDetailsDTO;
+import com.kairos.dto.activity.payroll.StaffBankAndPensionProviderDetailsDTO;
 import com.kairos.service.payroll.BankService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;

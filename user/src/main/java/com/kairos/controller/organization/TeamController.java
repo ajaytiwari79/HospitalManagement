@@ -12,10 +12,11 @@
 
     import javax.inject.Inject;
     import java.math.BigInteger;
-    import java.util.*;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.Set;
 
     import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
-    import static com.kairos.constants.AppConstants.TEAM;
 
     /**
      * Created by oodles on 18/10/16.
@@ -118,13 +119,10 @@
         @ApiOperation(value = "Add Staff to Team")
         @PostMapping(value = "/team/{teamId}/staff")
         // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-        public ResponseEntity<Map<String, Object>> addStaffInTeam(@PathVariable long unitId,@PathVariable long teamId, @RequestBody Map<String, Object> staffInfo, @RequestParam("type") String type) {
-            if(TEAM.equalsIgnoreCase(type)){
-                unitId = teamService.getOrganizationIdByTeamId(unitId);
-            }
+        public ResponseEntity<Map<String, Object>> addStaffInTeam(@PathVariable long unitId,@PathVariable long teamId, @RequestBody Map<String, Object> staffInfo) {
             long staffId = Long.parseLong((String) staffInfo.get("staffId"));
             boolean isAssigned = (boolean) staffInfo.get("isSelected");
-            boolean isSuccess = teamService.addStaffInTeam(teamId, staffId, isAssigned, unitId);
+            boolean isSuccess = teamService.addStaffInTeam(teamId, staffId, isAssigned );
             if (isSuccess) {
                 return ResponseHandler.generateResponse(HttpStatus.OK, true,
                         true);

@@ -1,6 +1,6 @@
 package com.kairos.utils.user_context;
 
-import com.kairos.config.security.CurrentUserDetails;
+import com.kairos.dto.CurrentUserDetails;
 import org.springframework.stereotype.Component;
 
 @Component

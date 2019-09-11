@@ -1,31 +1,16 @@
 package com.kairos.persistence.model.organization.services;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
+import java.util.Set;
 
 @QueryResult
+@Getter
+@Setter
 public class OrganizationServicesAndLevelQueryResult {
-    private List<Long> servicesId;
+    private Set<Long> servicesId;
     private Long levelId;
-
-    public OrganizationServicesAndLevelQueryResult() {
-        //dc
-    }
-
-    public List<Long> getServicesId() {
-        return servicesId;
-    }
-
-    public void setServicesId(List<Long> servicesId) {
-        this.servicesId = servicesId;
-    }
-
-    public Long getLevelId() {
-        return levelId;
-    }
-
-    public void setLevelId(Long levelId) {
-        this.levelId = levelId;
-    }
 }

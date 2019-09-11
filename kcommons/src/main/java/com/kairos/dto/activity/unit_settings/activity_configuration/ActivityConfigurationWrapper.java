@@ -4,7 +4,6 @@ package com.kairos.dto.activity.unit_settings.activity_configuration;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.PhaseResponseDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import lombok.Getter;
 import lombok.Setter;

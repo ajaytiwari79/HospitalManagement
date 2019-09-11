@@ -1,12 +1,16 @@
 package com.kairos.service.questionnaire_template;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.questionnaire_template.*;
+import com.kairos.dto.gdpr.questionnaire_template.QuestionDTO;
+import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireSectionDTO;
+import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateSectionDTO;
 import com.kairos.enums.gdpr.*;
 import com.kairos.persistence.model.data_inventory.assessment.Assessment;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistence.model.questionnaire_template.*;
+import com.kairos.persistence.model.questionnaire_template.Question;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireSectionRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
@@ -19,7 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 

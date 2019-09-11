@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.client;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.CitizenHealthStatus;
 import com.kairos.enums.client.ClientEnum;
 import com.kairos.persistence.model.auth.User;

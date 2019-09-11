@@ -2,7 +2,9 @@ package com.kairos.persistence.model.system_setting;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.EndNode;
+import org.neo4j.ogm.annotation.RelationshipEntity;
+import org.neo4j.ogm.annotation.StartNode;
 
 import static com.kairos.constants.AppConstants.HAS_SYSTEM_LANGUAGE;
 

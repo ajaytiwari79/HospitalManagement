@@ -1,6 +1,8 @@
 package com.kairos.persistence.model.task_type;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.task_type.TaskTypeDTO;
 import com.kairos.enums.task_type.TaskTypeEnum;

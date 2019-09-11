@@ -2,9 +2,10 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.ShiftCountDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.shift.Shift;
@@ -19,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
-import org.springframework.data.mongodb.core.query.*;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -438,30 +441,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperation.add(match(where("activity.balanceSettingsActivityTab.timeTypeId").in(timeTypeIds)));
         }
         aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
-//        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
         AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
         return result.getMappedResults();
     }
 
 
-    @Override
-    public List<Shift> findShiftsByKpiFiltersWithActivityStatus(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Date startDate, Date endDate) {
-        Criteria criteria = where("staffId").in(staffIds).and("unitId").in(unitIds).and("deleted").is(false).and("disabled").is(false)
-                .and("startDate").gte(startDate).lte(endDate);
-        List<AggregationOperation> aggregationOperation = new ArrayList<AggregationOperation>();
-        aggregationOperation.add(new MatchOperation(criteria));
-        aggregationOperation.add(unwind("activities"));
-        if (CollectionUtils.isNotEmpty(shiftActivityStatus)) {
-            aggregationOperation.add(match(where("activities.status").in(shiftActivityStatus)));
-        }
 
-        aggregationOperation.add(new CustomAggregationOperation(shiftWithActivityGroup()));
-//        aggregationOperation.add(new CustomAggregationOperation(Document.parse(projectionOfShift())));
-        Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
-        AggregationResults<Shift> result = mongoTemplate.aggregate(aggregation, Shift.class, Shift.class);
-        return result.getMappedResults();
-    }
 
 
     @Override
@@ -547,6 +533,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.activityId' : 1,\n" +
                 "        'activities.durationMinutes' : 1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.plannedTimes':1,\n" +
                 "        'activities.backgroundColor':{  \n" +
                 "            '$arrayElemAt':[  \n" +
                 "               '$activity.generalActivityTab.backgroundColor',\n" +

@@ -2,7 +2,9 @@ package com.kairos.wrapper.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.persistence.model.task_demand.*;
+import com.kairos.persistence.model.task_demand.MonthlyFrequency;
+import com.kairos.persistence.model.task_demand.TaskDemand;
+import com.kairos.persistence.model.task_demand.TaskDemandVisit;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Min;

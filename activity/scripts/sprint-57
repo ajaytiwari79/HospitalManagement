@@ -1,0 +1,79 @@
+//kpi script  ABSENCES_PER_INTERVAL
+
+
+db.getCollection('kairos_sequence').find({ "sequenceName" : "KPISequence"})
+
+db.getCollection('counter').insert({
+    "_id" : "37",
+    "type" : "PLANNED_TIME_PERCENTAGE",
+    "title" : "Planned Time Percentage",
+    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.counter.KPI",
+    "counter" : false,
+    "chart" : "BAR",
+    "size" : "SIZE_8X2",
+    "filterTypes" : [
+        "STAFF_IDS",
+ "TIME_INTERVAL",
+"ACTIVITY_STATUS",
+"EMPLOYMENT_TYPE",
+"PLANNED_TIME_TYPE"
+    ],
+    "multiDimensional" : true
+})
+
+
+db.getCollection('kairos_sequence').update({ "sequenceName" : "KPISequence"},{"$set":{"sequenceNumber" : 32}})
+
+
+//
+db.getCollection('kairos_sequence').find({ "sequenceName" : "ApplicableKPISequence"})
+
+db.getCollection('applicableKPI').insert({
+    "_id" : "1466",
+    "activeKpiId" : "37",
+    "baseKpiId" : "37",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "updatedAt" : ISODate("2018-09-03T09:37:10.397Z"),
+    "deleted" : false,
+    "frequencyType" : "DAYS",
+    "interval" : "LAST",
+    "title" : "Absences Per Interval",
+    "kpiRepresentation" : "REPRESENT_PER_INTERVAL",
+    "value" : 2.0,
+    "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
+});
+
+
+db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 1468}})
+
+
+//find
+db.getCollection('kPICategory').find({"countryId":18712,"name":"Uncategorized"})
+
+db.getCollection('kairos_sequence').find({ "sequenceName" : "CategoryKPIConfSequence"})
+
+db.getCollection('kairos_sequence').update({ "sequenceName" : "CategoryKPIConfSequence"},{"$set":{"sequenceNumber" : 613}})
+
+
+db.getCollection('categoryKPIConf').insert({
+    "_id" : "613",
+    "kpiId" : "37",
+    "categoryId" : "71",
+    "countryId" : NumberLong(18712),
+    "level" : "COUNTRY",
+    "createdAt" : ISODate("2019-08-06T12:48:45.413Z"),
+    "updatedAt" : ISODate("2019-08-06T12:48:45.413Z"),
+    "deleted" : false,
+    "createdBy" : {
+        "_id" : NumberLong(18728),
+        "email" : "ulrik@kairosplanning.com",
+        "fullName" : "Ulrik Rasmussen"
+    },
+    "_class" : "com.kairos.persistence.model.counter.CategoryKPIConf"
+}
+)

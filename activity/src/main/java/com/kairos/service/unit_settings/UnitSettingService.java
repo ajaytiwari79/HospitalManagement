@@ -1,11 +1,14 @@
 package com.kairos.service.unit_settings;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.*;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.unit_settings.*;
+import com.kairos.persistence.model.unit_settings.FlexibleTimeSettings;
+import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
+import com.kairos.persistence.model.unit_settings.UnitSetting;
 import com.kairos.persistence.repository.unit_settings.UnitAgeSettingMongoRepository;
 import com.kairos.persistence.repository.unit_settings.UnitSettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -18,9 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
-import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_AGESETTING_NOTFOUND;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_SETTING_NOTFOUND;
 
 @Service
 @Transactional
@@ -90,21 +97,21 @@ public class UnitSettingService extends MongoBaseService {
             phases = ObjectMapperUtils.copyPropertiesOfListByMapper(phaseService.getPhasesByUnit(unitId), Phase.class);
         }
         List<UnitSettingDTO> openShiftPhaseSettings = unitSettingRepository.getOpenShiftPhaseSettings(unitId);
-        if (openShiftPhaseSettings.size() > 0) {
-            exceptionService.actionNotPermittedException(OPENSHIFT_ALREADY_EXIST, unitId);
+        if (ObjectUtils.isCollectionEmpty(openShiftPhaseSettings)) {
+            if (Optional.ofNullable(phases).isPresent()) {
+                List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
+                phases.forEach(phase -> {
+                    OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false,phase.getSequence());
+                    openShiftPhases.add(openShiftPhase);
+                });
+                OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);
+                UnitSetting unitSetting = new UnitSetting(openShiftPhaseSetting, unitId);
+                save(unitSetting);
+                return true;
+            }
         }
 
-        if (Optional.ofNullable(phases).isPresent()) {
-            List<OpenShiftPhase> openShiftPhases = new ArrayList<>();
-            phases.forEach(phase -> {
-                OpenShiftPhase openShiftPhase = new OpenShiftPhase(phase.getId(), phase.getName(), false,phase.getSequence());
-                openShiftPhases.add(openShiftPhase);
-            });
-            OpenShiftPhaseSetting openShiftPhaseSetting = new OpenShiftPhaseSetting(4, openShiftPhases);
-            UnitSetting unitSetting = new UnitSetting(openShiftPhaseSetting, unitId);
-            save(unitSetting);
-            return true;
-        }
+
         return false;
 
     }
