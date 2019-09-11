@@ -67,8 +67,6 @@ public class ShiftDTO {
     protected ShiftType shiftType;
     protected BigInteger shiftStatePhaseId;
     protected int timeBankCtaBonusMinutes;
-    protected int deltaTimeBankMinutes;
-    protected long accumulatedTimeBankMinutes;
     protected int plannedMinutesOfTimebank;
     protected boolean multipleActivity;
     protected BigInteger planningPeriodId;

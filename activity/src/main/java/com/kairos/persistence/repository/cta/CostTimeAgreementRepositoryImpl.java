@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.cta;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import org.bson.Document;
@@ -123,6 +124,21 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
         return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
+    }
+
+    @Override
+    public List<CTARuleTemplateDTO> getCTARultemplateByEmploymentId(Long employmentId) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId);
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
+                unwind("ruleTemplates"),
+                lookup("ruleTemplateCategory", "ruleTemplates.ruleTemplateCategoryId", "_id", "ruleTemplates.ruleTemplateCategory"),
+                project().and("ruleTemplates.name").as("name").and("ruleTemplates._id").as("_id").and("ruleTemplates.ruleTemplateCategory").arrayElementAt(0).as("ruleTemplateCategory"),
+                project("_id","name").and("ruleTemplateCategory._id").as("ruleTemplateCategoryId").and("ruleTemplateCategory.name").as("ruleTemplateCategoryName")
+        );
+        AggregationResults<CTARuleTemplateDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTARuleTemplateDTO.class);
+        return result.getMappedResults();
     }
 
 

@@ -105,4 +105,10 @@ public class ShiftWithActivityDTO extends ShiftDTO{
         return asLocalDate(this.endDate);
     }
 
+    public void resetTimebankDetails(){
+        this.timeBankCtaBonusMinutes = 0;
+        this.plannedMinutesOfTimebank = 0;
+        this.getActivities().forEach(shiftActivityDTO -> shiftActivityDTO.resetTimebankDetails());
+    }
+
 }
