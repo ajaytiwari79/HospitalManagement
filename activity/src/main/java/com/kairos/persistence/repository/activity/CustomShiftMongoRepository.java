@@ -60,7 +60,6 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
 
-    List<Shift> findShiftsByKpiFiltersWithActivityStatus(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Date startDate, Date endDate);
 
     List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate);
 
@@ -76,7 +75,7 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findAllPublishShiftByEmploymentId(Long employmentId);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate,Boolean draftShift);
 
     boolean absenceShiftExistsByDate(Long unitId,Date startDate,Date endDate,Long staffId);
 

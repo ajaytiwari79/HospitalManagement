@@ -162,11 +162,11 @@ public class StaffRetrievalService {
 
     public Map<String, Object> getPersonalInfo(long staffId, long unitId) {
 
-        StaffPositionDTO staffPositionDTO = null;
+        StaffPositionDTO staffPositionDTO;
         Staff staff;
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
 
-            staffPositionDTO = staffGraphRepository.getStaffAndEmploymentByUnitId(parentUnit.getId(), staffId);
+            staffPositionDTO = staffGraphRepository.getStaffAndEmploymentByStaffId(staffId);
             staff = Optional.ofNullable(staffPositionDTO).isPresent() ? staffPositionDTO.getStaff() : null;
         if (staff == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_IDANDUNITID_NOTFOUND, staffId, unitId);

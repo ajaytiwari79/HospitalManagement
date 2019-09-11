@@ -20,6 +20,7 @@ import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
@@ -236,18 +237,16 @@ public class StaffFilterService {
 
     private List<FilterQueryResult> getAllFilters(String moduleId, Long countryId, Long unitId) {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
-        if (!Optional.ofNullable(filterGroup).isPresent()) {
-            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_FEATURE_NOTENABLED);
+        List<FilterQueryResult> filterDTOs = new ArrayList<>();
+        if (Optional.ofNullable(filterGroup).isPresent()) {
+            filterGroup.getFilterTypes().forEach(filterType -> {
+                FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
+                if (isCollectionNotEmpty(tempFilterQueryResult.getFilterData())) {
+                    filterDTOs.add(getFilterDataByFilterType(filterType, countryId, unitId));
+                }
+            });
 
         }
-        List<FilterQueryResult> filterDTOs = new ArrayList<>();
-
-        filterGroup.getFilterTypes().forEach(filterType -> {
-            FilterQueryResult tempFilterQueryResult = getFilterDataByFilterType(filterType, countryId, unitId);
-            if (tempFilterQueryResult.getFilterData().size() > 0) {
-                filterDTOs.add(getFilterDataByFilterType(filterType, countryId, unitId));
-            }
-        });
         return filterDTOs;
     }
 
@@ -349,6 +348,7 @@ public class StaffFilterService {
     }
 
     public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId,LocalDate startDate,LocalDate endDate) {
+        boolean unit=unitGraphRepository.existsById(unitId);
         Organization organization=organizationService.fetchParentOrganization(unitId);
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
                 !filterGroupGraphRepository.checkIfFilterGroupExistsForModuleId(staffFilterDTO.getModuleId())) {
@@ -358,7 +358,8 @@ public class StaffFilterService {
         Long loggedInStaffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
-       staffEmploymentTypeWrapper.setStaffList(unitGraphRepository.getStaffWithFilters(unitId, organization.getId(), moduleId,
+        List<Long> allOrgIds=unit?Arrays.asList(organization.getId()):organizationGraphRepository.findAllOrganizationIdsInHierarchy(organization.getId());
+       staffEmploymentTypeWrapper.setStaffList(unitGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
@@ -367,7 +368,7 @@ public class StaffFilterService {
         staffEmploymentTypeWrapper.setStaffList(staffs);
         List<Long> staffIds = staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
         staffFilterDTO.setStaffIds(staffIds);
-        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO,unitId,startDate,endDate);
+        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
         List<Map> staffList = new ArrayList<>();
         for (Map staffUndModifiable : staffs) {
             if(staffIdAndNightWorkerDetailsMap.containsKey(staffUndModifiable.get("id"))) {

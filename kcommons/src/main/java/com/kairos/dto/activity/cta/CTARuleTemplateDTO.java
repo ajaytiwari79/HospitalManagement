@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.cta;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
@@ -28,6 +29,7 @@ import static com.kairos.dto.user.country.agreement.cta.CalculationFor.FUNCTIONS
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CTARuleTemplateDTO {
 
     private BigInteger id;
