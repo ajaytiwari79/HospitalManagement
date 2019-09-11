@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 public @interface ValidateIgnoreCounter {
 
 
-    String message() default "{javax.validation.constraints.Pattern.message}";
+    String message() default "";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default {};
 }

@@ -1,38 +1,32 @@
 package com.kairos.commons.annotation;
 
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
-import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ValidateIgnoreCounterConfiguration implements ConstraintValidator<ValidateIgnoreCounter, List<WTABaseRuleTemplateDTO>> {
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
+import static com.kairos.enums.wta.WTATemplateType.*;
+
+public class ValidateIgnoreCounterConfiguration implements ConstraintValidator<ValidateIgnoreCounter, WTABaseRuleTemplateDTO> {
+
     @Override
     public void initialize(ValidateIgnoreCounter constraintAnnotation) {
 
     }
 
     @Override
-    public boolean isValid(List<WTABaseRuleTemplateDTO> value, ConstraintValidatorContext context) {
-        List<ObjectError> fieldErrors=new ArrayList<>();
-        WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO=(WTABaseRuleTemplateDTO)value;
-        boolean staffCanIgnore=wtaBaseRuleTemplateDTO.getPhaseTemplateValues().stream().anyMatch(phaseTemplateValue -> phaseTemplateValue.isStaffCanIgnore());
-        boolean plannerIgnore=wtaBaseRuleTemplateDTO.getPhaseTemplateValues().stream().anyMatch(phaseTemplateValue -> phaseTemplateValue.isManagementCanIgnore());
-        if(staffCanIgnore && wtaBaseRuleTemplateDTO.getStaffCanIgnoreCounter()<1){
-         fieldErrors.add(new FieldError("","",wtaBaseRuleTemplateDTO.getName()+"staff counter value"));
+    public boolean isValid(WTABaseRuleTemplateDTO value, ConstraintValidatorContext context) {
+        boolean result=true;
+        boolean staffCanIgnore = value.getPhaseTemplateValues().stream().anyMatch(phaseTemplateValue -> phaseTemplateValue.isStaffCanIgnore());
+        boolean plannerIgnore = value.getPhaseTemplateValues().stream().anyMatch(phaseTemplateValue -> phaseTemplateValue.isManagementCanIgnore());
+        if (newHashSet(CHILD_CARE_DAYS_CHECK, VETO_AND_STOP_BRICKS, SENIOR_DAYS_PER_YEAR, WTA_FOR_CARE_DAYS).contains(value.getWtaTemplateType())) {
+           result=true;
+        }else if(((staffCanIgnore && value.getStaffCanIgnoreCounter() < 1) || (plannerIgnore && value.getManagementCanIgnoreCounter() < 1))) {
+            String message = "Counter can not be zero for Staff and management if Ignore checkbox : " + value.getName();
+            context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+            result =false;
         }
-        if(plannerIgnore && wtaBaseRuleTemplateDTO.getManagementCanIgnoreCounter()<1){
-            fieldErrors.add(new FieldError("","",wtaBaseRuleTemplateDTO.getName()+"management counter value"));
-        }
-        if(!fieldErrors.isEmpty()){
-            throw new MethodArgumentNotValidException();
-        }
-        return true;
+        return result;
     }
 }
