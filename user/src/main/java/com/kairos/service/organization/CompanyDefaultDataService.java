@@ -68,7 +68,7 @@ public class CompanyDefaultDataService {
             vrpClientService.createDefaultPreferredTimeWindow(unit);
             activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
             reasonCodeService.createReasonCodeForUnit(unit, parentId);
-            //gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
+            gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
 
         });
     }
@@ -84,6 +84,6 @@ public class CompanyDefaultDataService {
             timeSlotService.createDefaultTimeSlots(organization, timeSlots);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
-            //gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
+            gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
     }
 }

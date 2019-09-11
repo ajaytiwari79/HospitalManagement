@@ -32,11 +32,12 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getDate;
-import static com.kairos.commons.utils.DateUtils.getStartOfDay;
+import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 
@@ -244,10 +245,12 @@ public class TimeAndAttendanceService extends MongoBaseService {
 
 
     // check out after job run
-    public void checkOutBySchedulerJob(Long unitId, Date startDate, Date endDate,Long staffId){
+    public void checkOutBySchedulerJob(Long unitId, Date startDate,Long staffId){
         //List<TimeAndAttendance> timeAndAttendances = timeAndAttendanceRepository.findAllbyUnitIdAndDate(unitId,startDate);
-        List<Shift> shifts=staffId==null?shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId):
-                shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId,startDate,endDate);
+        ZonedDateTime startZonedDateTime = asZoneDateTime(startDate).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime endZonedDateTime = startZonedDateTime.plusDays(1);
+        List<Shift> shifts = isNotNull(staffId)?shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(asDate(startZonedDateTime),asDate(endZonedDateTime),unitId):
+                shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId,asDate(startZonedDateTime),asDate(endZonedDateTime));
              /*Map<BigInteger, Shift> staffIdAndShifts = shifts.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
              timeAndAttendances.forEach(timeAndAttendance -> {
                  if (staffIdAndShifts.get(timeAndAttendance.getAttendanceTimeSlot().get(timeAndAttendance.getAttendanceTimeSlot().size() - 1).getShiftId()) != null) {

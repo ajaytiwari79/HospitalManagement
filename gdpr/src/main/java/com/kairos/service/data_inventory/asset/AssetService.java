@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstant.IS_SUCCESS;
 
 
@@ -90,34 +91,30 @@ public class AssetService {
     private Javers javers;
 
 
-    public AssetDTO saveAsset(Long unitId, AssetDTO assetDTO) {
+    public AssetDTO saveAsset(Long unitId, AssetDTO assetDTO,boolean copyOfMasterAssets) {
         Asset previousAsset = assetRepository.findByOrganizationIdAndDeletedAndName(unitId, assetDTO.getName());
-        Optional.ofNullable(previousAsset).ifPresent(asset ->
-                {
-                    if (assetDTO.getId() == null || (assetDTO.getId() != null && !asset.getId().equals(assetDTO.getId()))) {
-                        exceptionService.duplicateDataException("message.duplicate", "message.asset", assetDTO.getName());
-
-                    }
-                }
-        );
-        Asset asset = buildAsset(unitId, assetDTO);
-        addAssetTypeAndSubAssetType(unitId, asset, assetDTO);
-        assetRepository.save(asset);
-        assetDTO.setId(asset.getId());
+        if (isNull(previousAsset)) {
+            Asset asset = buildAsset(unitId, assetDTO);
+            addAssetTypeAndSubAssetType(unitId, asset, assetDTO);
+            assetRepository.save(asset);
+            assetDTO.setId(asset.getId());
+        }else if(!copyOfMasterAssets) {
+            exceptionService.duplicateDataException("message.duplicate", "message.asset", assetDTO.getName());
+        }
         return assetDTO;
     }
 
 
     private Asset buildAsset(Long unitId, AssetDTO assetDTO) {
-
         Asset asset;
         if (Optional.ofNullable(assetDTO.getId()).isPresent()) {
             asset = assetRepository.findByIdAndOrganizationIdAndDeletedFalse(assetDTO.getId(), unitId);
             if (!Optional.ofNullable(asset).isPresent()) {
                 exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetDTO.getId());
             }
-        } else
+        } else {
             asset = new Asset();
+        }
         asset.setOrganizationId(unitId);
         asset.setName(assetDTO.getName());
         asset.setDescription(assetDTO.getDescription());
@@ -127,25 +124,36 @@ public class AssetService {
         if (assetDTO.getHostingType() != null) {
             asset.setHostingType(hostingTypeRepository.findByIdAndOrganizationIdAndDeletedFalse(assetDTO.getHostingType(), unitId));
         }
-        if (!assetDTO.getOrgSecurityMeasures().isEmpty()) {
+        if (isCollectionNotEmpty(assetDTO.getOrgSecurityMeasures())) {
             asset.setOrgSecurityMeasures(organizationalSecurityMeasureRepository.findAllByIds(assetDTO.getOrgSecurityMeasures()));
         }
-        if (!assetDTO.getTechnicalSecurityMeasures().isEmpty()) {
+        if (isCollectionNotEmpty(assetDTO.getTechnicalSecurityMeasures())) {
             asset.setTechnicalSecurityMeasures(technicalSecurityMeasureRepository.findAllByIds(assetDTO.getTechnicalSecurityMeasures()));
         }
-        if (!assetDTO.getStorageFormats().isEmpty()) {
+        if (isCollectionNotEmpty(assetDTO.getStorageFormats())) {
             asset.setStorageFormats(storageFormatRepository.findAllByIds(assetDTO.getStorageFormats()));
         }
         if (assetDTO.getDataDisposal() != null) {
             asset.setDataDisposal(dataDisposalRepository.findByIdAndOrganizationIdAndDeletedFalse(assetDTO.getDataDisposal(), unitId));
         }
-        asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
-        asset.setAssetAssessor(assetDTO.getAssetAssessor());
-        asset.setSuggested(assetDTO.isSuggested());
-        asset.setManagingDepartment(new ManagingOrganization(assetDTO.getManagingDepartment().getManagingOrgId(), assetDTO.getManagingDepartment().getManagingOrgName()));
-        asset.setAssetOwner(new Staff(assetDTO.getAssetOwner().getStaffId(), assetDTO.getAssetOwner().getFirstName(), assetDTO.getAssetOwner().getLastName()));
-        asset.setHostingLocation(assetDTO.getHostingLocation());
-        asset.setAssetAssessor(assetDTO.getAssetAssessor());
+        if (isNotNull(assetDTO.getDataRetentionPeriod())) {
+            asset.setDataRetentionPeriod(assetDTO.getDataRetentionPeriod());
+        }
+        if (isNotNull(assetDTO.isSuggested())) {
+            asset.setSuggested(assetDTO.isSuggested());
+        }
+        if (isNotNull(assetDTO.getManagingDepartment())) {
+            asset.setManagingDepartment(new ManagingOrganization(assetDTO.getManagingDepartment().getManagingOrgId(), assetDTO.getManagingDepartment().getManagingOrgName()));
+        }
+        if (isNotNull(assetDTO.getAssetOwner())) {
+            asset.setAssetOwner(new Staff(assetDTO.getAssetOwner().getStaffId(), assetDTO.getAssetOwner().getFirstName(), assetDTO.getAssetOwner().getLastName()));
+        }
+        if (isNotNull(assetDTO.getHostingLocation())) {
+            asset.setHostingLocation(assetDTO.getHostingLocation());
+        }
+        if (isNotNull(assetDTO.getAssetAssessor())) {
+            asset.setAssetAssessor(assetDTO.getAssetAssessor());
+        }
         return asset;
     }
 
@@ -161,7 +169,9 @@ public class AssetService {
             if (assetDTO.getSubAssetType() != null) {
                 if (assetDTO.getSubAssetType().getId() == null) {
                     subAssetType = new AssetType(assetDTO.getSubAssetType().getName(), unitId, true);
-                    linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getSubAssetType().getRisks());
+                    if (isCollectionNotEmpty(assetDTO.getSubAssetType().getRisks())) {
+                        linkRiskWithAssetTypeAndSubType(subAssetType, assetDTO.getSubAssetType().getRisks());
+                    }
                     subAssetType.setAssetType(assetType);
                     assetTypeRepository.save(subAssetType);
                     assetType.getSubAssetTypes().add(subAssetType);
@@ -169,7 +179,9 @@ public class AssetService {
                     for (AssetType assetSubType : assetType.getSubAssetTypes()) {
                         if (assetDTO.getSubAssetType().getId().equals(assetSubType.getId())) {
                             subAssetType = assetSubType;
-                            linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getSubAssetType().getRisks());
+                            if (isCollectionNotEmpty(assetDTO.getSubAssetType().getRisks())) {
+                                linkRiskWithAssetTypeAndSubType(assetSubType, assetDTO.getSubAssetType().getRisks());
+                            }
                             break;
                         }
                     }
@@ -187,7 +199,9 @@ public class AssetService {
                 assetType.setSubAssetTypes(Arrays.asList(subAssetType));
             }
         }
-        linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
+        if (isCollectionNotEmpty(assetDTO.getAssetType().getRisks())) {
+            linkRiskWithAssetTypeAndSubType(assetType, assetDTO.getAssetType().getRisks());
+        }
         assetTypeRepository.save(assetType);
         asset.setAssetType(assetType);
         asset.setSubAssetType(subAssetType);
@@ -366,7 +380,7 @@ public class AssetService {
     public Map<String, AssetDTO> saveAssetAndSuggestToCountryAdmin(Long unitId, Long countryId, AssetDTO assetDTO) {
 
         Map<String, AssetDTO> result = new HashMap<>();
-        assetDTO = saveAsset(unitId, assetDTO);
+        assetDTO = saveAsset(unitId, assetDTO,false);
         AssetDTO masterAsset = masterAssetService.saveSuggestedAssetFromUnit(countryId, unitId, assetDTO);
         result.put("new", assetDTO);
         result.put("SuggestedData", masterAsset);

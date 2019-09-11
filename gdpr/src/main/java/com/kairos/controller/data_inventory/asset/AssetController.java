@@ -37,7 +37,7 @@ class AssetController {
     @PostMapping("/asset")
     public ResponseEntity<Object> createAssetWithBasicDetail(@PathVariable Long unitId, @Valid @RequestBody AssetDTO asset) {
         asset.setSuggested(false);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAsset(unitId, asset));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAsset(unitId, asset,false));
 
     }
 

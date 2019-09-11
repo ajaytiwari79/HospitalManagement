@@ -19,8 +19,8 @@ import com.kairos.persistence.repository.master_data.asset_management.AssetTypeR
 import com.kairos.persistence.repository.master_data.asset_management.MasterAssetRepository;
 import com.kairos.response.dto.common.AssetTypeBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterAssetResponseDTO;
-import com.kairos.rest_client.GenericRestClient;
-import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.rest_client.GDPRGenericRestClient;
+import com.kairos.rest_client.GDPRToUserIntegrationService;
 import com.kairos.service.data_inventory.asset.AssetService;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
@@ -33,6 +33,8 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 
 @Service
@@ -47,7 +49,7 @@ public class MasterAssetService {
     private AssetTypeService assetTypeService;
 
     @Inject
-    private GenericRestClient restClient;
+    private GDPRGenericRestClient restClient;
 
     @Inject
     private MasterAssetRepository masterAssetRepository;
@@ -56,7 +58,7 @@ public class MasterAssetService {
     private AssetTypeRepository assetTypeRepository;
 
     @Inject
-    private UserIntegrationService userIntegrationService;
+    private GDPRToUserIntegrationService gdprToUserIntegrationService;
 
     @Inject
     private AssetService assetService;
@@ -77,16 +79,17 @@ public class MasterAssetService {
         addMetadataOfMasterAsset(masterAssetDto, masterAsset);
         addAssetTypeToMasterAsset(countryId, masterAsset, masterAssetDto);
         masterAssetRepository.save(masterAsset);
+        assignAssetToUnits(countryId, masterAssetDto);
         masterAssetDto.setId(masterAsset.getId());
-        asignAssetOfAllUnit(countryId, masterAssetDto);
         return masterAssetDto;
     }
 
-    private void asignAssetOfAllUnit(Long countryId, MasterAssetDTO masterAssetDto){
-        List<Long> organizationSubTypeId = masterAssetDto.getOrganizationSubTypes().stream().map(unit -> unit.getId()).collect(Collectors.toList());
-        List<Long> unitIds = userIntegrationService.getUnitIdsByOrgSubTypeId(countryId, organizationSubTypeId);
-        AssetDTO assetDTO = ObjectMapperUtils.copyPropertiesByMapper(masterAssetDto, AssetDTO.class);
-        unitIds.forEach(unitId -> assetService.saveAsset(unitId,assetDTO));
+    private void assignAssetToUnits(Long countryId, MasterAssetDTO masterAssetDto){
+        List<Long> organizationSubTypeId = masterAssetDto.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList());
+        List<Long> unitIds = gdprToUserIntegrationService.getUnitIdsByOrgSubTypeId(countryId, organizationSubTypeId);
+        if(isCollectionNotEmpty(unitIds)) {
+            unitIds.forEach(unitId -> assetService.saveAsset(unitId, ObjectMapperUtils.copyPropertiesByMapper(masterAssetDto, AssetDTO.class),true));
+        }
     }
     /**
      * This method is used to fetch all the metadata related to master asset from DTO like organisationType,
