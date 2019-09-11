@@ -1,6 +1,9 @@
 package com.kairos.rule_validator.activity;
 
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.ActivityRuleViolation;
+import com.kairos.dto.activity.shift.Expertise;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 

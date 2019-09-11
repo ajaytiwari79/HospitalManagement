@@ -5,10 +5,13 @@ package com.kairos.service.resources;
  */
 
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.resources.*;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.resources.*;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.resources.ResourceGraphRepository;
+import com.kairos.persistence.repository.user.resources.ResourceUnAvailabilityGraphRepository;
+import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRelationshipRepository;
+import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.user_context.UserContext;
@@ -20,7 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.text.ParseException;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
@@ -38,7 +44,7 @@ public class ResourceService {
     @Inject
     ResourceGraphRepository resourceGraphRepository;
     @Inject
-    OrganizationGraphRepository organizationGraphRepository;
+    UnitGraphRepository unitGraphRepository;
     @Inject
     CountryService countryService;
     @Inject
@@ -95,16 +101,16 @@ public class ResourceService {
      * @return resource
      */
     public Resource addResourceToOrganization(Long organizationId, Resource resource) {
-        Organization currentOrganization = organizationGraphRepository.findOne(organizationId);
+        Unit currentUnit = unitGraphRepository.findOne(organizationId);
 
-        if (currentOrganization.getResourceList() == null) {
-            currentOrganization.setResourceList(Arrays.asList(resourceGraphRepository.save(resource)));
-            organizationGraphRepository.save(currentOrganization);
+        if (currentUnit.getResourceList() == null) {
+            currentUnit.setResourceList(Arrays.asList(resourceGraphRepository.save(resource)));
+            unitGraphRepository.save(currentUnit);
             return resource;
         }
-        List<Resource> resourceList = currentOrganization.getResourceList();
+        List<Resource> resourceList = currentUnit.getResourceList();
         resourceList.add(resource);
-        organizationGraphRepository.save(currentOrganization);
+        unitGraphRepository.save(currentUnit);
         return resource;
     }
 
@@ -143,8 +149,8 @@ public class ResourceService {
 
 
     public Resource addResource(ResourceDTO resourceDTO, Long unitId) throws ParseException {
-        Organization organization = (Optional.ofNullable(unitId).isPresent()) ? organizationGraphRepository.findOne(unitId) : null;
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = (Optional.ofNullable(unitId).isPresent()) ? unitGraphRepository.findOne(unitId) : null;
+        if (!Optional.ofNullable(unit).isPresent()) {
             logger.error("Incorrect unit id " + unitId);
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND,unitId);
 
@@ -170,8 +176,8 @@ public class ResourceService {
                     withHour(0).withMinute(0).withSecond(0).withNano(0);
             resource.setDecommissionDate(decommissionDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         }
-        organization.addResource(resource);
-        organizationGraphRepository.save(organization);
+        unit.addResource(resource);
+        unitGraphRepository.save(unit);
         return resource;
     }
 

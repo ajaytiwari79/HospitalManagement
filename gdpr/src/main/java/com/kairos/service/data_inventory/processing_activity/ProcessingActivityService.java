@@ -4,7 +4,10 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
 import com.kairos.enums.RiskSeverity;
-import com.kairos.persistence.model.data_inventory.processing_activity.*;
+import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
+import com.kairos.persistence.model.data_inventory.processing_activity.RelatedDataCategory;
+import com.kairos.persistence.model.data_inventory.processing_activity.RelatedDataElements;
+import com.kairos.persistence.model.data_inventory.processing_activity.RelatedDataSubject;
 import com.kairos.persistence.model.embeddables.ManagingOrganization;
 import com.kairos.persistence.model.embeddables.Staff;
 import com.kairos.persistence.model.risk_management.Risk;
@@ -18,7 +21,10 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.response.dto.common.*;
-import com.kairos.response.dto.data_inventory.*;
+import com.kairos.response.dto.data_inventory.AssetBasicResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityBasicResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityResponseDTO;
+import com.kairos.response.dto.data_inventory.ProcessingActivityRiskResponseDTO;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.javers.JaversCommonService;
 import com.kairos.service.master_data.processing_activity_masterdata.MasterProcessingActivityService;
@@ -35,6 +41,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 @Service
 public class ProcessingActivityService {
@@ -136,6 +144,11 @@ public class ProcessingActivityService {
         if (CollectionUtils.isNotEmpty(processingActivityDTO.getSubProcessingActivities())) {
             processingActivity.setSubProcessingActivities(updateSubProcessingActivities(unitId, processingActivityDTO.getSubProcessingActivities(), processingActivity));
 
+        }
+        if (isCollectionNotEmpty(processingActivityDTO.getDataSubjectList())) {
+            processingActivity.setDataSubjectList(createRelatedDataProcessingActivity(processingActivityDTO.getDataSubjectList()));
+        }else{
+            processingActivity.setDataSubjectList(new ArrayList<>());
         }
         processingActivityRepository.save(processingActivity);
         return processingActivityDTO;

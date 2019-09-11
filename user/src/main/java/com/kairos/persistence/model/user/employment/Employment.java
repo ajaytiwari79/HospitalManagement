@@ -5,6 +5,7 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import lombok.Getter;
@@ -13,7 +14,9 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -37,7 +40,7 @@ public class Employment extends UserBaseEntity {
     private Organization union;
 
     @Relationship(type = IN_UNIT)
-    private Organization unit;
+    private Unit unit;
 
     @Relationship(type = HAS_REASON_CODE)
     private ReasonCode reasonCode;
@@ -66,7 +69,7 @@ public class Employment extends UserBaseEntity {
         this.endDate = endDate;
     }
 
-    public Employment(Organization unit, LocalDate startDate, Long timeCareExternalId, boolean published, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
+    public Employment(Unit unit, LocalDate startDate, Long timeCareExternalId, boolean published, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.unit = unit;
         this.startDate = startDate;
         this.timeCareExternalId = timeCareExternalId;

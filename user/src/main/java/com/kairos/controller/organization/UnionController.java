@@ -1,6 +1,8 @@
 package com.kairos.controller.organization;
 
-import com.kairos.dto.user.organization.union.*;
+import com.kairos.dto.user.organization.union.LocationDTO;
+import com.kairos.dto.user.organization.union.SectorDTO;
+import com.kairos.dto.user.organization.union.UnionDTO;
 import com.kairos.service.organization.UnionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;

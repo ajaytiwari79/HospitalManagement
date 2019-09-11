@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.organization.union;
 
-import com.kairos.persistence.model.organization.union.*;
+import com.kairos.persistence.model.organization.union.Location;
+import com.kairos.persistence.model.organization.union.LocationDataQueryResult;
+import com.kairos.persistence.model.organization.union.LocationQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -30,9 +32,14 @@ public interface LocationGraphRepository extends Neo4jBaseRepository<Location, L
     @Query("MATCH(location:Location{deleted:false}) WHERE id(location)={0} RETURN location")
     Location findByIdAndDeletedFalse(Long locationId);
 
-    @Query("MATCH(location:Location{deleted:false}) WHERE id(location) IN {0} OPTIONAL MATCH(location)-[:"+LOCATION_HAS_ADDRESS+"]->(address:ContactAddress) OPTIONAL MATCH(address)-" +
-            "[:"+ZIP_CODE+"]->(zipCode:ZipCode) OPTIONAL MATCH(address)-[:"+MUNICIPALITY+"]->(municipality:Municipality) OPTIONAL MATCH(zipCode)-["+MUNICIPALITY+"]->(linkedMunicipality:Municipality)" +
-            " OPTIONAL MATCH(municipality)-[:"+PROVINCE+"]->(province:Province) OPTIONAL MATCH(province)-[:"+REGION+"]-(region:Region) RETURN id(location) AS locationId,address,zipCode,municipality," +
+    @Query("MATCH(location:Location{deleted:false}) WHERE id(location) IN {0} " +
+            "OPTIONAL MATCH(location)-[:"+LOCATION_HAS_ADDRESS+"]->(address:ContactAddress) " +
+            "OPTIONAL MATCH(address)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) " +
+            "OPTIONAL MATCH(address)-[:"+MUNICIPALITY+"]->(municipality:Municipality) " +
+            "OPTIONAL MATCH(zipCode)-["+MUNICIPALITY+"]->(linkedMunicipality:Municipality)" +
+            "OPTIONAL MATCH(municipality)-[:"+PROVINCE+"]->(province:Province) " +
+            "OPTIONAL MATCH(province)-[:"+REGION+"]-(region:Region) " +
+            "RETURN id(location) AS locationId,address,zipCode,municipality," +
             "collect(linkedMunicipality) AS municipalities,province,region")
     List<LocationDataQueryResult> getLocationData(List<Long> locationIds);
 

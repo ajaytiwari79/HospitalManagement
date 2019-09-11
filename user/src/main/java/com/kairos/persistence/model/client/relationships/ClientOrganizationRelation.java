@@ -2,12 +2,15 @@ package com.kairos.persistence.model.client.relationships;
 
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Organization;
-import org.neo4j.ogm.annotation.*;
+import com.kairos.persistence.model.organization.Unit;
+import org.neo4j.ogm.annotation.EndNode;
+import org.neo4j.ogm.annotation.RelationshipEntity;
+import org.neo4j.ogm.annotation.StartNode;
 
 import java.util.UUID;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.GET_SERVICE_FROM;
+
 
 /**
  * Created by oodles on 4/10/16.
@@ -19,7 +22,7 @@ public class ClientOrganizationRelation extends UserBaseEntity {
     Client client;
 
     @EndNode
-    Organization organization;
+    Unit unit;
 
     private Long joinDate;
     private String employmentId = UUID.randomUUID().toString().toUpperCase();
@@ -28,9 +31,9 @@ public class ClientOrganizationRelation extends UserBaseEntity {
     public ClientOrganizationRelation() {
     }
 
-    public ClientOrganizationRelation(Client client, Organization organization, Long joinDate) {
+    public ClientOrganizationRelation(Client client, Unit unit, Long joinDate) {
         this.client = client;
-        this.organization = organization;
+        this.unit = unit;
         this.joinDate = joinDate;
 
     }
@@ -43,12 +46,12 @@ public class ClientOrganizationRelation extends UserBaseEntity {
         this.client = client;
     }
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public Long getJoinDate() {

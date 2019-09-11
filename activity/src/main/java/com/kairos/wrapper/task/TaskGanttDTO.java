@@ -2,7 +2,9 @@ package com.kairos.wrapper.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kairos.persistence.model.task.*;
+import com.kairos.persistence.model.task.SkillExpertise;
+import com.kairos.persistence.model.task.Task;
+import com.kairos.persistence.model.task.TaskStatus;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;

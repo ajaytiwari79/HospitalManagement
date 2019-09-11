@@ -18,7 +18,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByNumberOfWeeks;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.validateVetoAndStopBrickRules;

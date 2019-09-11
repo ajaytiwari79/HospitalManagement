@@ -9,13 +9,14 @@ import com.kairos.dto.activity.unit_settings.activity_configuration.ActivityConf
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
-import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by vipul on 19/9/17.

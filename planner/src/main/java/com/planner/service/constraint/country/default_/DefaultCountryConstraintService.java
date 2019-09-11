@@ -1,6 +1,8 @@
 package com.planner.service.constraint.country.default_;
 
-import com.kairos.enums.constraint.*;
+import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.enums.constraint.ConstraintType;
 import com.planner.domain.constraint.country.CountryConstraint;
 
 import java.math.BigInteger;

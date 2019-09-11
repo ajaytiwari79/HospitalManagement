@@ -6,7 +6,9 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -55,8 +57,6 @@ public interface MunicipalityGraphRepository extends Neo4jBaseRepository<Municip
             "RETURN municipality,region,province")
     List<MunicipalityQueryResult> findMunicipalityRegionAndProvince(Set<Long> municipalityIds);
 
-    @Query("MATCH(municipality:Municipality{deleted:false}) WHERE id(municipality)={0} RETURN municipality")
-    Municipality findByIdDeletedFalse(Long municipalityId);
 
     @Query("MATCH(zipCode:ZipCode)-[:"+MUNICIPALITY+"]-(municipality:Municipality{deleted:false}) WHERE id(municipality)={0} and id(zipCode)={1} RETURN municipality")
     Municipality findByZipCodeIdandIdDeletedFalse(Long municipalityId,Long zipCodeId);

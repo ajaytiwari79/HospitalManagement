@@ -1,5 +1,6 @@
 package com.kairos.scheduler.utils.user_context;
 
+import com.kairos.dto.CurrentUserDetails;
 import org.springframework.stereotype.Component;
 
 @Component

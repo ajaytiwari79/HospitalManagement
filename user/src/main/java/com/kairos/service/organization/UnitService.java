@@ -5,18 +5,23 @@ import com.kairos.dto.user.organization.*;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
-import com.kairos.persistence.repository.user.country.*;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.country.BusinessTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.CompanyCategoryGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.AccountTypeGraphRepository;
 import com.kairos.persistence.repository.user.country.default_data.UnitTypeGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FormatUtil;
-import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,7 +32,6 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANIZATION_ID_NOTFOUND;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
@@ -35,9 +39,13 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 @Transactional
 public class UnitService {
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private OrganizationService organizationService;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private ExceptionService exceptionService;
     @Inject
@@ -67,8 +75,7 @@ public class UnitService {
         response.put("orgType", parentOrg.getOrganizationType());
         response.put("orgSubType", parentOrg.getOrganizationSubTypes());
         response.put("accountType", parentOrg.getAccountType());
-        response.put("accessGroups",accessGroupService.getOrganizationManagementAccessGroups(parentOrg.getId(), AccessGroupRole.MANAGEMENT));
-        //response.put("accessGroups", accountTypeGraphRepository.getAccessGroupsByAccountTypeId(parentOrg.getAccountType().getId()));
+        response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroups(parentOrg.getId(), AccessGroupRole.MANAGEMENT));
         response.put("businessTypes", parentOrg.getBusinessTypes());
         response.put("companyCategory", parentOrg.getCompanyCategory());
         response.put("level", parentOrg.getLevel());
@@ -79,19 +86,13 @@ public class UnitService {
     public Map<String, Object> getManageHierarchyData(long organizationId) {
 
         Organization organization = organizationGraphRepository.findOne(organizationId);
-
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, organizationId);
         }
-
-        Organization parentOrganization = organization.isParentOrganization()? organization : organizationService.fetchParentOrganization(organizationId);
-        Long countryId = UserContext.getUserDetails().getCountryId();
-        if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND,countryId);
-        }
+        Long countryId = organization.getCountry().getId();
 
         Map<String, Object> response = new HashMap<>(2);
-        response.put("parentInfo", parentOrgDefaultDetails(parentOrganization));
+        response.put("parentInfo", parentOrgDefaultDetails(organization));
         List<OrganizationBasicResponse> units = organizationService.getOrganizationGdprAndWorkcenter(organizationId);
         response.put("units", units.size() != 0 ? units : Collections.emptyList());
 
@@ -106,26 +107,25 @@ public class UnitService {
         response.put("companyTypes", CompanyType.getListOfCompanyType());
         response.put("companyUnitTypes", CompanyUnitType.getListOfCompanyUnitType());
         response.put("companyCategories", companyCategoryGraphRepository.findCompanyCategoriesByCountry(countryId));
-        response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroups(organizationId,AccessGroupRole.MANAGEMENT));
+        response.put("accessGroups", accessGroupService.getOrganizationManagementAccessGroups(organizationId, AccessGroupRole.MANAGEMENT));
         return response;
     }
 
     /**
-     *
      * @param organizationBasicDTO
-     * @param parentOrgaziationId is the ID of the Organization in which new Unit is added.
+     * @param parentOrgaziationId  is the ID of the Organization in which new Unit is added.
      * @return
      * @throws InterruptedException
      * @throws ExecutionException
      */
-    public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long parentOrgaziationId) throws InterruptedException, ExecutionException {
+    public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long parentOrgaziationId) {
         if (organizationBasicDTO.getId() == null) {
             companyCreationService.addNewUnit(organizationBasicDTO, parentOrgaziationId);
 
         } else {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }
-        Country country = organizationGraphRepository.getCountry(parentOrgaziationId);
+        Country country = countryGraphRepository.getCountryByUnitId(parentOrgaziationId);
         companyCreationService.onBoardOrganization(country.getId(), organizationBasicDTO.getId(), parentOrgaziationId);
         organizationBasicDTO.setBoardingCompleted(true);
         return organizationBasicDTO;
@@ -133,37 +133,34 @@ public class UnitService {
     }
 
     public Map<String, Object> getEligibleUnitsForCtaAndWtaCreation(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId, 2);
+        OrganizationBaseEntity organization = organizationBaseRepository.findOne(unitId);
         if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO();
-        if(isNotNull(organization.getOrganizationType()) && isNotEmpty(organization.getOrganizationSubTypes())){
+        if (isNotNull(organization.getOrganizationType()) && isNotEmpty(organization.getOrganizationSubTypes())) {
             orgTypeAndSubTypeDTO.setOrganizationTypeId(organization.getOrganizationType().getId());
             orgTypeAndSubTypeDTO.setOrganizationTypeName(organization.getOrganizationType().getName());
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
             orgTypeAndSubTypeDTO.setOrganizationSubTypeName(organization.getOrganizationSubTypes().get(0).getName());
-        }else{
-            logger.info("Organization Type and Organization Sub Type is not present for "+organization.getName());
+        } else {
+            logger.info("Organization Type and Organization Sub Type is not present for {} " , organization.getName());
         }
 
 
-        OrganizationCommonDTO organizationCommonDTO;
         List<OrganizationCommonDTO> organizationCommonDTOS = new ArrayList<>();
-        for(Organization unit : organization.getChildren()){
-            organizationCommonDTO = new OrganizationCommonDTO();
-            organizationCommonDTO.setId(unit.getId());
-            organizationCommonDTO.setName(unit.getName());
-            organizationCommonDTOS.add(organizationCommonDTO);
+        if (organization instanceof Organization) {
+            organization=organizationGraphRepository.findOne(unitId);
+            for (Unit unit : ((Organization) organization).getUnits()) {
+                organizationCommonDTOS.add(new OrganizationCommonDTO(unit.getId(),unit.getName()));
+            }
+        }else {
+            organizationCommonDTOS.add(new OrganizationCommonDTO(organization.getId(),organization.getName()));
         }
-        organizationCommonDTO = new OrganizationCommonDTO();
-        organizationCommonDTO.setId(organization.getId());
-        organizationCommonDTO.setName(organization.getName());
-        organizationCommonDTOS.add(organizationCommonDTO);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("eligibleUnits",organizationCommonDTOS);
-        response.put("orgTypeAndSubTypeDTO",orgTypeAndSubTypeDTO);
+        response.put("eligibleUnits", organizationCommonDTOS);
+        response.put("orgTypeAndSubTypeDTO", orgTypeAndSubTypeDTO);
         return response;
     }
 

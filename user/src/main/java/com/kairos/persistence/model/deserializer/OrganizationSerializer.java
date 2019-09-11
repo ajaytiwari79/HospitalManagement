@@ -4,14 +4,14 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 
 import java.io.IOException;
 
 /**
  * Custom Serializer for Organization domain
  */
-public class OrganizationSerializer extends StdSerializer<Organization>{
+public class OrganizationSerializer extends StdSerializer<Unit>{
 
     /**
      * default constructor
@@ -24,7 +24,7 @@ public class OrganizationSerializer extends StdSerializer<Organization>{
      * Constructor for POJO
      * @param t
      */
-    public OrganizationSerializer(Class<Organization> t) {
+    public OrganizationSerializer(Class<Unit> t) {
         super(t);
     }
 
@@ -37,7 +37,7 @@ public class OrganizationSerializer extends StdSerializer<Organization>{
      * @throws JsonGenerationException
      */
     @Override
-    public void serialize(Organization value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    public void serialize(Unit value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
 
         jgen.writeStartObject();
         jgen.writeNumberField("id", value.getId());

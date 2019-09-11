@@ -3,7 +3,7 @@ package com.kairos.persistence.model.country.functions;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ public class FunctionDTO {
     private LocalDate endDate;
     private boolean amountEditableAtUnit;
     private BigDecimal amount;
-    private List<Organization> unions;
+    private List<Unit> unions;
     private List<Level> organizationLevels;
     private String icon;
     private List<LocalDate> appliedDates;
@@ -36,7 +36,7 @@ public class FunctionDTO {
         //Default Constructor
     }
 
-    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Organization> unions, List<Level> organizationLevels, String icon) {
+    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Unit> unions, List<Level> organizationLevels, String icon) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -87,11 +87,11 @@ public class FunctionDTO {
         this.endDate = endDate;
     }
 
-    public List<Organization> getUnions() {
+    public List<Unit> getUnions() {
         return unions;
     }
 
-    public void setUnions(List<Organization> unions) {
+    public void setUnions(List<Unit> unions) {
         this.unions = unions;
     }
 

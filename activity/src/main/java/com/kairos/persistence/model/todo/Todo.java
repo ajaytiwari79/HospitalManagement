@@ -3,13 +3,13 @@ package com.kairos.persistence.model.todo;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoSubtype;
 import com.kairos.enums.todo.TodoType;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 /**

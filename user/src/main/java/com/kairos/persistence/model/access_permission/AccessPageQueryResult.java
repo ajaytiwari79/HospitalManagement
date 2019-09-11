@@ -2,7 +2,9 @@ package com.kairos.persistence.model.access_permission;
 
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by prabjot on 26/1/17.
