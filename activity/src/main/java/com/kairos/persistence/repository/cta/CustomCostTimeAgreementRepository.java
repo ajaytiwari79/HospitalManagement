@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.cta;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 
 import java.math.BigInteger;
@@ -51,4 +52,5 @@ public interface CustomCostTimeAgreementRepository {
     List<CTAResponseDTO> getCTAByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate);
 
     boolean ctaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger ctaId, Long employmentId, Date startDate, Date endDate);
+    List<CTARuleTemplateDTO> getCTARultemplateByEmploymentId(Long employmentId);
 }

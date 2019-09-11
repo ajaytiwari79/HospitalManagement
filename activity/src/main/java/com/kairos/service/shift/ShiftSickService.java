@@ -319,7 +319,7 @@ public class ShiftSickService extends MongoBaseService {
                     }
                     staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                     setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                    shiftService.updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
+                    timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
                 }
             }
             //shiftService.saveShiftWithActivity(phaseListByDate, shifts, staffAdditionalInfoDTO);

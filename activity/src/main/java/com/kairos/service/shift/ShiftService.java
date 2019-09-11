@@ -240,11 +240,6 @@ public class ShiftService extends MongoBaseService {
         return shiftWithViolatedInfoDTO;
     }
 
-    public void updateTimeBankAndAvailableCountOfStaffingLevel(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
-    }
-
-
     public Shift saveShiftWithActivity(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift,
                                        StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift, Long functionId, Phase phase, ShiftActionType shiftAction) {
         int scheduledMinutes = 0;
@@ -288,9 +283,7 @@ public class ShiftService extends MongoBaseService {
         }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shiftMongoRepository.save(shift);
-        if (!updateShift) {
-            updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO);
-        }
+        timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
         return shift;
     }
 
@@ -355,7 +348,7 @@ public class ShiftService extends MongoBaseService {
             activityConfigurationService.addPlannedTimeInShift(shift,activityWrapperMap,staffAdditionalInfoDTO);
         }
         shiftMongoRepository.saveEntities(shifts);
-        shifts.forEach(shift -> updateTimeBankAndAvailableCountOfStaffingLevel(activityWrapperMap, shift, staffAdditionalInfoDTO));
+        shifts.forEach(shift -> timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false));
         todoService.createOrUpdateTodo(shifts.get(0), TodoType.APPROVAL_REQUIRED,staffAdditionalInfoDTO.getUserAccessRoleDTO(),isNull(shifts.get(0).getId()));
     }
 
@@ -611,13 +604,10 @@ public class ShiftService extends MongoBaseService {
                 wtaRuleTemplateCalculationService.updateWTACounter(shift,staffAdditionalInfoDTO);
                 todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, staffAdditionalInfoDTO.getUserAccessRoleDTO(), true);
                 shiftDTO = staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() ? ObjectMapperUtils.copyPropertiesByMapper(isNotNull(shift.getDraftShift()) ? shift.getDraftShift() : shift, ShiftDTO.class) : ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
-                if (isNull(shift.getDraftShift())) {
-                    payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
-                    timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
-                    shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
-                    shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
-                    shiftStateService.createShiftState(Arrays.asList(shift),true,shift.getUnitId());
-                }
+                payOutService.updatePayOut(staffAdditionalInfoDTO, ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction) ? shift.getDraftShift() : shift, activityWrapperMap);
+                timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
+                shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
+                shiftStateService.createShiftState(Arrays.asList(shift), true, shift.getUnitId());
                 // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
                 //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
                 if (ruleCheckRequired) {

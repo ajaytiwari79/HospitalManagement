@@ -138,7 +138,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private ProtectedDaysOffService protectedDaysOffService;
     @Inject
     private ShiftService shiftService;
-    @Inject private CounterDistService counterDistService;
+    @Inject
+    private CounterDistService counterDistService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -179,16 +180,16 @@ public class OrganizationActivityService extends MongoBaseService {
             activity.getPhaseSettingsActivityTab().setPhaseTemplateValues(phaseTemplateValues);
             activityCopied = copyAllActivitySettingsInUnit(activity, unitId);
         } else {
-            if (!userIntegrationService.isUnit(unitId)){
+            if (!userIntegrationService.isUnit(unitId)) {
                 List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
-                if(activityMongoRepository.existsByParentIdAndDeletedFalse(activityId,childUnitIds)) {
+                if (activityMongoRepository.existsByParentIdAndDeletedFalse(activityId, childUnitIds)) {
                     exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
                 }
             }
             activityCopied = activityMongoRepository.findByParentIdAndDeletedFalseAndUnitId(activityId, unitId);
-            if (!userIntegrationService.isUnit(unitId)){
-                List<Long>  childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
-                if(activityMongoRepository.existsByParentIdAndDeletedFalse(activityCopied.getId(), childUnitIds)) {
+            if (!userIntegrationService.isUnit(unitId)) {
+                List<Long> childUnitIds = userIntegrationService.getAllOrganizationIds(unitId);
+                if (activityMongoRepository.existsByParentIdAndDeletedFalse(activityCopied.getId(), childUnitIds)) {
                     exceptionService.actionNotPermittedException(ACTIVITY_USED_AT_UNIT);
                 }
             }
@@ -196,7 +197,7 @@ public class OrganizationActivityService extends MongoBaseService {
             if (activityCount > 0) {
                 exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE);
             }
-            if(isNotNull(activityCopied)) {
+            if (isNotNull(activityCopied)) {
                 activityCopied.setDeleted(true);
             }
         }
@@ -229,10 +230,10 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
 
-    public Map<String, Object> getAllActivityByUnit(Long unitId,boolean includeTeamActivity) {
+    public Map<String, Object> getAllActivityByUnit(Long unitId, boolean includeTeamActivity) {
         Map<String, Object> response = new HashMap<>();
         OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
-        List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false):activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
+        List<ActivityTagDTO> activities = includeTeamActivity ? activityMongoRepository.findAllActivityByUnitIdAndDeleted(unitId, false) : activityMongoRepository.findAllActivityByUnitIdAndNotPartOfTeam(unitId);
         for (ActivityTagDTO activityTagDTO : activities) {
             boolean activityCanBeCopied = false;
             Set<OrganizationHierarchy> hierarchies = activityTagDTO.getActivityCanBeCopiedForOrganizationHierarchy();
@@ -471,15 +472,14 @@ public class OrganizationActivityService extends MongoBaseService {
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
         logger.info("I am going to create default data or organization " + unitId);
         //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
-        if (orgTypeAndSubTypeDTO.isParentOrganization() || orgTypeAndSubTypeDTO.isWorkcentre()) {
-            List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
-            phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
-            unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
-            activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases,orgTypeAndSubTypeDTO.getEmploymentTypeIds());
-            createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
-            TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
-            timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
-        }
+
+        List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
+        phaseSettingsService.createDefaultPhaseSettings(unitId, phases);
+        unitSettingService.createDefaultOpenShiftPhaseSettings(unitId, phases);
+        activityConfigurationService.createDefaultSettings(unitId, orgTypeAndSubTypeDTO.getCountryId(), phases, orgTypeAndSubTypeDTO.getEmploymentTypeIds());
+        createActivityforOrganisation(unitId, orgTypeAndSubTypeDTO, phases);
+        TAndAGracePeriodSettingDTO tAndAGracePeriodSettingDTO = new TAndAGracePeriodSettingDTO(AppConstants.STAFF_GRACE_PERIOD_DAYS, AppConstants.MANAGEMENT_GRACE_PERIOD_DAYS);
+        timeAttendanceGracePeriodService.updateTAndAGracePeriodSetting(unitId, tAndAGracePeriodSettingDTO);
         activityPriorityService.createActivityPriorityForNewOrganization(unitId, orgTypeAndSubTypeDTO.getCountryId());
         periodSettingsService.createDefaultPeriodSettings(unitId);
         priorityGroupService.copyPriorityGroupsForUnit(unitId, orgTypeAndSubTypeDTO.getCountryId());
