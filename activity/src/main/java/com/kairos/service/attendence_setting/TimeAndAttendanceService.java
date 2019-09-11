@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.getStartOfDay;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 
@@ -246,7 +247,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
     // check out after job run
     public void checkOutBySchedulerJob(Long unitId, Date startDate, Date endDate,Long staffId){
         //List<TimeAndAttendance> timeAndAttendances = timeAndAttendanceRepository.findAllbyUnitIdAndDate(unitId,startDate);
-        List<Shift> shifts=staffId==null?shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId):
+        List<Shift> shifts=isNull(staffId) ? shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(startDate,endDate,unitId):
                 shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId,startDate,endDate);
              /*Map<BigInteger, Shift> staffIdAndShifts = shifts.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
              timeAndAttendances.forEach(timeAndAttendance -> {

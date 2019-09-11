@@ -71,14 +71,17 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate,Boolean draftShift) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
-                    .and("startDate").gte(startDate).lt(endDate).and("draft").is(false);
+                    .and("startDate").gte(startDate).lt(endDate);
         } else {
             criteria = Criteria.where("deleted").is(false).and("employmentId").is(employmentId).and("disabled").is(false)
-                    .and("startDate").gte(startDate).and("draft").is(false);
+                    .and("startDate").gte(startDate);
+        }
+        if(isNotNull(draftShift)){
+            criteria.and("draft").is(draftShift);
         }
         return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
     }
@@ -608,17 +611,33 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         List<T> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),Shift.class ,classType).getMappedResults();
         Set<BigInteger> activityIds = new HashSet<>();
         for (T shift : shiftWithActivityDTOS) {
-            activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
-            activityIds.addAll(shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
+            activityIds.addAll(getActivityIdsByShift(shift));
+            if(isNotNull(shift.getDraftShift())){
+                activityIds.addAll(getActivityIdsByShift(shift.getDraftShift()));
+            }
         }
         Map<BigInteger, ActivityDTO> activityDTOMap = getActivityDTOMap(activityIds);
         shiftWithActivityDTOS.forEach(shift -> {
-            shift.getActivities().forEach(shiftActivityDTO -> {
-                shiftActivityDTO.setActivity(activityDTOMap.get(shiftActivityDTO.getActivityId()));
-                shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> childActivityDTO.setActivity(activityDTOMap.get(childActivityDTO.getActivityId())));
-            });
+            updateActivityInShift(activityDTOMap, shift);
+            if(isNotNull(shift.getDraftShift())){
+                updateActivityInShift(activityDTOMap, shift.getDraftShift());
+            }
         });
         return shiftWithActivityDTOS;
+    }
+
+    private <T extends ShiftDTO> void updateActivityInShift(Map<BigInteger, ActivityDTO> activityDTOMap, T shift) {
+        shift.getActivities().forEach(shiftActivityDTO -> {
+            shiftActivityDTO.setActivity(activityDTOMap.get(shiftActivityDTO.getActivityId()));
+            shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> childActivityDTO.setActivity(activityDTOMap.get(childActivityDTO.getActivityId())));
+        });
+    }
+
+    private <T extends ShiftDTO> Set<BigInteger> getActivityIdsByShift( T shift) {
+        Set<BigInteger> activityIds = new HashSet<>();
+        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
+        activityIds.addAll(shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
+        return activityIds;
     }
 
     private Map<BigInteger, ActivityDTO> getActivityDTOMap(Set<BigInteger> activityIds) {

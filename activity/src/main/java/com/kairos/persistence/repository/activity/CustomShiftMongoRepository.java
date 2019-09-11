@@ -75,7 +75,7 @@ public interface CustomShiftMongoRepository {
 
     List<Shift> findAllPublishShiftByEmploymentId(Long employmentId);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate,Boolean draftShift);
 
     boolean absenceShiftExistsByDate(Long unitId,Date startDate,Date endDate,Long staffId);
 
