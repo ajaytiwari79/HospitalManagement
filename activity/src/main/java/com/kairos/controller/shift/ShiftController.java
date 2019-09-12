@@ -169,7 +169,7 @@ public class ShiftController {
 
     @ApiOperation("send shift in time and attendance phase")
     @PostMapping("/shift/send_shift_in_time_and_attendance_phase")
-    public ResponseEntity<Map<String, Object>> sendShiftInTimeAndAttendancePhase(@PathVariable Long unitId,@RequestParam(value = "staffId",required = false) Long staffId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate) {
+    public ResponseEntity<Map<String, Object>> sendShiftInTimeAndAttendancePhase(@PathVariable Long unitId, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate, @RequestParam(value = "staffId",required = false) Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftStateService.sendShiftInTimeAndAttendancePhase(unitId, startDate, endDate,staffId));
     }
 
