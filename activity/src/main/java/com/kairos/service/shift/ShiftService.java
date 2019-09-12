@@ -607,7 +607,9 @@ public class ShiftService extends MongoBaseService {
                 payOutService.updatePayOut(staffAdditionalInfoDTO, ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction) ? shift.getDraftShift() : shift, activityWrapperMap);
                 timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
                 shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
-                shiftStateService.createShiftState(Arrays.asList(shift), true, shift.getUnitId());
+                if(ShiftActionType.SAVE.equals(shiftAction)) {
+                    shiftStateService.createShiftState(Arrays.asList(shift), true, shift.getUnitId());
+                }
                 // TODO VIPUL WE WILL UNCOMMENTS AFTER FIX mailing servive
                 //shiftReminderService.updateReminderTrigger(activityWrapperMap,shift);
                 if (ruleCheckRequired) {

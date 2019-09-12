@@ -120,7 +120,7 @@ public class ShiftStateService {
         for (Shift shift:shifts) {
             if (!DateUtils.asLocalDate(shift.getStartDate()).isAfter(DateUtils.getCurrentLocalDate())) {
                 ShiftState oldshiftState=shiftStateMap.get(shift.getId());
-                if(isNotNull(oldshiftState) && isRealTime ){
+                if(isNotNull(oldshiftState) && isRealTime && DateUtils.asLocalDate(shift.getEndDate()).equals(DateUtils.getCurrentLocalDate()) ){
                     shiftUpdated = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesByMapper(oldshiftState, Shift.class));
                 }
                 if(isNull(oldshiftState) || shiftUpdated) {
