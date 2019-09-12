@@ -67,7 +67,8 @@ public class ShiftStateService {
     @Inject private ShiftService shiftService;
     @Inject private TimeAndAttendanceService timeAndAttendanceService;
 
-    public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate, Long staffId){
+
+    public boolean sendShiftInTimeAndAttendancePhase(Long unitId, Date startDate,Long staffId){
         if(!startDate.before(DateUtils.getCurrentDayStart())){
             exceptionService.actionNotPermittedException(PAST_DATE_ALLOWED);
         }
