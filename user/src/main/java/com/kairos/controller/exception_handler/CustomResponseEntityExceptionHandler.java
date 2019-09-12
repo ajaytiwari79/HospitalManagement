@@ -15,6 +15,7 @@ import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -75,18 +76,21 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
         //  String error;
         for (FieldError fieldError : fieldErrors) {
-            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(),convertMessage( fieldError.getDefaultMessage()));
-            errors.add(error);
+            if(!StringUtils.isEmpty(fieldError.getDefaultMessage())) {
+                FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(), convertMessage(fieldError.getDefaultMessage()));
+                errors.add(error);
+            }
         }
         for (ObjectError objectError : globalErrors) {
-            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
-            errors.add(error);
+            if(!StringUtils.isEmpty(objectError.getDefaultMessage())) {
+                FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
+                errors.add(error);
+            }
         }
 
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setErrors(errors);
         errorMessage.setSuccess(false);
-
         return new ResponseEntity<Object>(errorMessage, headers, HttpStatus.UNPROCESSABLE_ENTITY);
 
     }

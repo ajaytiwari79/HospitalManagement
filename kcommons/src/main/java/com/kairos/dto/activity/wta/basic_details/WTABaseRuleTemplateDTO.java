@@ -43,7 +43,6 @@ import java.util.List;
         @JsonSubTypes.Type(value = WTAForCareDaysDTO.class,name="WTA_FOR_CARE_DAYS"),
         @JsonSubTypes.Type(value = BreakWTATemplateDTO.class,name="WTA_FOR_BREAKS_IN_SHIFT")
 })
-@ValidateIgnoreCounter
 public class WTABaseRuleTemplateDTO{
     protected BigInteger id;
     protected String name;

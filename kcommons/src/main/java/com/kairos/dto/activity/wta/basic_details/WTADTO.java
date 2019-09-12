@@ -28,6 +28,7 @@ public class WTADTO {
     private Long expiryDate;
     @NotEmpty(message = "message.wta-base-rule-template.null-list")
     @Valid
+    @ValidateIgnoreCounter
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;
