@@ -613,12 +613,12 @@ public class CompanyCreationService {
             childQueryResults.add(childUnit);
         }
         organizationQueryResult.setChildren(childQueryResults);
-        Map<Long, Long> unitAndStaffIdMap = staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k -> k.getOrganizationId(), v -> v.getStaff().getId()));
-        unitIds.stream().forEach(unitId -> {
-            if(unitAndStaffIdMap.containsKey(unitId)) {
-                activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);
-            }
-        });
+        //Map<Long, Long> unitAndStaffIdMap = staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k -> k.getOrganizationId(), v -> v.getStaff().getId()));
+//        unitIds.stream().forEach(unitId -> {
+//            if(unitAndStaffIdMap.containsKey(unitId)) {
+//                activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);
+//            }
+//        });
         organizationQueryResult.setHubId(unitGraphRepository.getHubIdByOrganizationId(organizationId));
         return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
