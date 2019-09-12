@@ -1039,9 +1039,9 @@ public class TimeBankCalculationService {
             int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeInterval, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate) && dateDailyTimeBankEntryMap.get(employmentStartDate).isPublishedSomeActivities()) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                if(deltaTimeBankMinutes!=dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes()) {
+                /*if(deltaTimeBankMinutes!=dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes()) {
                     actualTimebank += deltaTimeBankMinutes;
-                }
+                }*/
                 deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();//-deltaTimeBankMinutes;
                 actualTimebank+=deltaTimeBankMinutes;
                 LOGGER.debug("delta timebank {}",dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
