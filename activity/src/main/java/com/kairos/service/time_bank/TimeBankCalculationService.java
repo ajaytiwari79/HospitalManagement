@@ -1039,17 +1039,14 @@ public class TimeBankCalculationService {
             int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeInterval, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate) && dateDailyTimeBankEntryMap.get(employmentStartDate).isPublishedSomeActivities()) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                if(deltaTimeBankMinutes!=dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes()) {
-                    actualTimebank += deltaTimeBankMinutes;
-                }
                 deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();//-deltaTimeBankMinutes;
                 actualTimebank+=deltaTimeBankMinutes;
-                LOGGER.debug("delta timebank {}",dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
-                LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
+                System.out.println("delta timebank "+dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
+                System.out.println("actual timebank "+actualTimebank+" till date "+employmentStartDate+" phase ="+datePhaseDefaultNameMap.get(employmentStartDate));
             } else if(validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate))) {
                 actualTimebank += deltaTimeBankMinutes;
-                LOGGER.debug("delta timebank {}",deltaTimeBankMinutes);
-                LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
+                System.out.println("delta timebank "+deltaTimeBankMinutes);
+                System.out.println("actual timebank "+actualTimebank+" till date "+employmentStartDate+" phase ="+datePhaseDefaultNameMap.get(employmentStartDate));
             }
             employmentStartDate = employmentStartDate.plusDays(1);
         }
