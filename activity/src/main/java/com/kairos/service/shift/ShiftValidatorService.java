@@ -624,9 +624,9 @@ public class ShiftValidatorService {
     }
 
 
-    public void validateStaffingLevel(Phase phase, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        Date shiftStartDate = shift.getActivities().get(0).getStartDate();
-        Date shiftEndDate = shift.getActivities().get(shift.getActivities().size() - 1).getEndDate();
+    public void validateStaffingLevel(Phase phase, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, StaffAdditionalInfoDTO staffAdditionalInfoDTO,ShiftActivity shiftActivity) {
+        Date shiftStartDate = shiftActivity.getStartDate();
+        Date shiftEndDate = shiftActivity.getEndDate();
         PhaseSettings phaseSettings = phaseSettingsRepository.getPhaseSettingsByUnitIdAndPhaseId(shift.getUnitId(), phase.getId());
         if (!Optional.ofNullable(phaseSettings).isPresent()) {
             exceptionService.dataNotFoundException(MESSAGE_PHASESETTINGS_ABSENT);
@@ -643,13 +643,12 @@ public class ShiftValidatorService {
             List<Shift> shifts = checkOverStaffing ? shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalseAndIdNotEqualTo(shiftStartDate, shiftEndDate, shift.getUnitId(), shift.getId()) : shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(shiftStartDate, shiftEndDate, shift.getUnitId());
             List<ShiftActivity> shiftActivities = shifts.stream().flatMap(curShift -> curShift.getActivities().stream()).collect(Collectors.toList());
             StaffingLevel staffingLevel = staffingLevels.get(0);
-            validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivities, staffingLevel);
+            validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivities, staffingLevel,shiftActivity);
         }
     }
 
-    private void validateUnderAndOverStaffing(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, List<StaffingLevel> staffingLevels, List<ShiftActivity> shiftActivities, StaffingLevel staffingLevel) {
-        for (ShiftActivity shiftActivity : shift.getActivities()) {
-            ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
+    private void validateUnderAndOverStaffing(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, boolean checkOverStaffing, List<StaffingLevel> staffingLevels, List<ShiftActivity> shiftActivities, StaffingLevel staffingLevel,ShiftActivity shiftActivity) {
+           ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
             if (activityWrapper.getActivity().getRulesActivityTab().isEligibleForStaffingLevel()) {
                 int lowerLimit = 0;
                 int upperLimit = 0;
@@ -678,7 +677,7 @@ public class ShiftValidatorService {
                     validateStaffingLevelForAbsenceTypeOfShift(staffingLevel, shiftActivity, checkOverStaffing, shiftActivities);
                 }
             }
-        }
+
     }
 
 
