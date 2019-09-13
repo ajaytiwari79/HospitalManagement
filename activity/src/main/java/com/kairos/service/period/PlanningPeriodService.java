@@ -384,6 +384,8 @@ public class PlanningPeriodService extends MongoBaseService {
                 LOGGER.info("successfully created job of planning period flippng date");
             } catch (Exception e) {
                 e.printStackTrace();
+                planningPeriodMongoRepository.deleteAll(planningPeriods);
+                exceptionService.internalError(INTERNAL_SERVER_ERROR);
             }
             if (isCollectionNotEmpty(schedulerPanelRestDTOS)) {
                 Map<String, SchedulerPanelDTO> schedulerPanelDTOMap = schedulerPanelRestDTOS.stream().collect(Collectors.toMap(schedulerPanelDTO -> schedulerPanelDTO.getEntityId() + "-" + schedulerPanelDTO.getOneTimeTriggerDate(), schedulerPanelDTO -> schedulerPanelDTO));
