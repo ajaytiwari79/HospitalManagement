@@ -18,7 +18,7 @@ public class DefaultDataCreator {
     @Inject
     private ClauseTagRepository clauseTagRepository;
 
-    //@PostConstruct
+    @PostConstruct
     private void createDefaultClauseTag(){
         ClauseTag defaultClauseTag = clauseTagRepository.findDefaultTag();
         if (Optional.ofNullable(defaultClauseTag).isPresent()) {

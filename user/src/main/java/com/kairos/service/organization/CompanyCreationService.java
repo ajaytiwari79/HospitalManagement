@@ -8,6 +8,7 @@ import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -77,8 +78,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.utils.validator.company.OrganizationDetailsValidator.*;
@@ -578,6 +578,7 @@ public class CompanyCreationService {
         } else {
             unitIds.add(organizationId);
         }
+        //todo we don't need to fetch the existing staffs
         staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, parent.getId());
         validateUserDetails(staffPersonalDetailDTOS, exceptionService);
         List<OrganizationContactAddress> organizationContactAddresses = unitGraphRepository.getContactAddressOfOrganizations(unitIds);
@@ -613,12 +614,12 @@ public class CompanyCreationService {
             childQueryResults.add(childUnit);
         }
         organizationQueryResult.setChildren(childQueryResults);
-        //Map<Long, Long> unitAndStaffIdMap = staffPersonalDetailDTOS.stream().collect(Collectors.toMap(k -> k.getOrganizationId(), v -> v.getStaff().getId()));
-//        unitIds.stream().forEach(unitId -> {
-//            if(unitAndStaffIdMap.containsKey(unitId)) {
-//                activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);
-//            }
-//        });
+        Map<Long, Long> unitAndStaffIdMap = staffPersonalDetailDTOS.stream().filter(distinctByKey(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId())).collect(Collectors.toMap(staffPersonalDetailDTO->staffPersonalDetailDTO.getOrganizationId(), v -> v.getStaff().getId()));
+        unitIds.stream().forEach(unitId -> {
+            if(unitAndStaffIdMap.containsKey(unitId)) {
+                activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);
+            }
+        });
         organizationQueryResult.setHubId(unitGraphRepository.getHubIdByOrganizationId(organizationId));
         return treeStructureService.getTreeStructure(Arrays.asList(organizationQueryResult));
     }
