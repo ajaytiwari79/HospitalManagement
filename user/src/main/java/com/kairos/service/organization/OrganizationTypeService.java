@@ -204,5 +204,7 @@ public class OrganizationTypeService{
       return organizationTypeGraphRepository.getOrganizationTypeSubTypesServiceAndSubServices(unitId);
     }
 
-
+    public List<Long> getOrganizationIdsByOrganizationSubTypeIds(List<Long>organizationSubTypeId) {
+        return organizationTypeGraphRepository.getOrganizationByOrganizationSubTypeIds(organizationSubTypeId);
+    }
 }

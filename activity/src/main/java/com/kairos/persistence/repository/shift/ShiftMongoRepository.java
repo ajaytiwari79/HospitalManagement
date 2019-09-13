@@ -77,8 +77,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     List<Shift> findAllByDeletedFalse();
 
-    @Query("{deleted:false,employmentId:?0,disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
-    List<Shift> findAllOverlappedShiftsAndEmploymentId(Long employmentId, Date startDate, Date endDate);
+    @Query("{deleted:false,employmentId:{$in:?0},disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
+    List<Shift> findAllOverlappedShiftsAndEmploymentId(Collection<Long> employmentIds, Date startDate, Date endDate);
 
     @Query(value = "{disabled:false,deleted:false,planningPeriodId:{$exists:false},shiftType:?0}")
     List<Shift> findAllAbsenceShifts(String shiftType);

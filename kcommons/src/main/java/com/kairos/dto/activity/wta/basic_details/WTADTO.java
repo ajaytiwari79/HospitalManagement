@@ -2,6 +2,7 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.annotation.ValidateIgnoreCounter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -27,6 +28,7 @@ public class WTADTO {
     private Long expiryDate;
     @NotEmpty(message = "message.wta-base-rule-template.null-list")
     @Valid
+    @ValidateIgnoreCounter
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
     private Long organizationType;
     private Long organizationSubType;

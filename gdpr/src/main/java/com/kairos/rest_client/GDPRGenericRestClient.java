@@ -23,8 +23,8 @@ import java.util.List;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Service
-public class GenericRestClient {
-    private static final Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
+public class GDPRGenericRestClient {
+    private static final Logger logger = LoggerFactory.getLogger(GDPRGenericRestClient.class);
 
     @Autowired
     private

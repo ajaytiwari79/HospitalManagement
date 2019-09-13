@@ -77,15 +77,15 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
 
     @Query("MATCH (org:Organization) WHERE id(org)  = {1}" +
-            "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
-            "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) WITH org,unitPermission,position,r1,ag\n" +
+            " MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
+            " MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) WITH org,unitPermission,position,r1,ag\n" +
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN  id(org) AS organizationId ,user.email AS email,id(user) AS id,ag.name AS accessGroupName,id(ag) AS accessGroupId, user.firstName AS firstName,user.lastName AS lastName , user.userName AS userName, user.cprNumber AS cprNumber,staff AS staff,user.creationDate AS creationDate " +
             "UNION " +
-            "MATCH (org:Organization),(child) WHERE id(org) = {1} and id(child) IN {0}\n" +
-            " OPTIONAL MATCH (org)-[:"+HAS_POSITIONS+"]->(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission) WITH child,position,unitPermission\n" +
+            "MATCH (org:Organization),(child) WHERE id(org) = {1} and id(child) IN {0}\n " +
+            " MATCH (org)-[:"+HAS_POSITIONS+"]->(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission) WITH child,position,unitPermission\n" +
             " MATCH (unitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(child) WITH  unitPermission,position,child\n" +
-            "OPTIONAL MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) WITH child,position,ag\n" +
+            " MATCH (unitPermission)-[r1:"+HAS_ACCESS_GROUP+"]-(ag:AccessGroup{deleted:false, role:'MANAGEMENT'}) WITH child,position,ag\n" +
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN  id(child) AS organizationId ,user.email AS email,id(user) AS id,ag.name AS accessGroupName,id(ag) AS accessGroupId, user.firstName AS firstName,user.lastName AS lastName, user.userName AS userName, user.cprNumber AS cprNumber,staff AS staff,user.creationDate AS creationDate " )
 

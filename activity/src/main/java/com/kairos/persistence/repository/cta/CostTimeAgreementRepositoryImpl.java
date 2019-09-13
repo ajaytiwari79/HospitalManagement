@@ -137,6 +137,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
                 match(criteria),
                 lookup("cTARuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
                 unwind("ruleTemplates"),
+                match(Criteria.where("ruleTemplates.calculationFor").ne("SCHEDULED_HOURS")),
                 lookup("ruleTemplateCategory", "ruleTemplates.ruleTemplateCategoryId", "_id", "ruleTemplates.ruleTemplateCategory"),
                 project().and("ruleTemplates.name").as("name").and("ruleTemplates._id").as("_id").and("ruleTemplates.ruleTemplateCategory").arrayElementAt(0).as("ruleTemplateCategory"),
                 project("_id","name").and("ruleTemplateCategory._id").as("ruleTemplateCategoryId").and("ruleTemplateCategory.name").as("ruleTemplateCategoryName")

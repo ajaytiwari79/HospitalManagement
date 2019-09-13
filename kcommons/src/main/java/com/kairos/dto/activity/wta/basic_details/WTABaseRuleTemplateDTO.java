@@ -3,9 +3,11 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.kairos.commons.annotation.ValidateIgnoreCounter;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.wta.templates.*;
 import com.kairos.enums.wta.WTATemplateType;
+import lombok.ToString;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -42,7 +44,6 @@ import java.util.List;
         @JsonSubTypes.Type(value = BreakWTATemplateDTO.class,name="WTA_FOR_BREAKS_IN_SHIFT")
 })
 public class WTABaseRuleTemplateDTO{
-
     protected BigInteger id;
     protected String name;
     protected String description;
@@ -50,12 +51,11 @@ public class WTABaseRuleTemplateDTO{
     protected BigInteger ruleTemplateCategoryId;
     protected String lastUpdatedBy;
     protected Long countryId;
-
     protected RuleTemplateCategoryDTO ruleTemplateCategory;
     protected WTATemplateType wtaTemplateType;
-
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
+    protected List<PhaseTemplateValue> phaseTemplateValues;
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
     }
@@ -63,8 +63,6 @@ public class WTABaseRuleTemplateDTO{
     public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
         this.wtaTemplateType = wtaTemplateType;
     }
-
-    protected List<PhaseTemplateValue> phaseTemplateValues;
 
     public RuleTemplateCategoryDTO getRuleTemplateCategory() {
         return ruleTemplateCategory;

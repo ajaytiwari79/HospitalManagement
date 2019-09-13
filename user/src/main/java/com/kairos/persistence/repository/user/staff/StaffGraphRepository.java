@@ -340,7 +340,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     List<StaffPersonalDetailDTO> getAllStaffWithMobileNumber(long unitId);
 
 
-    @Query("MATCH(o:Unit)-[:" + HAS_POSITIONS + "]->" + "(position:Position)-[:" + BELONGS_TO + "]->(s:Staff) WHERE id(o)={0} RETURN s")
+    @Query("MATCH(o:Organization)-[:" + HAS_POSITIONS + "]->" + "(position:Position)-[:" + BELONGS_TO + "]->(s:Staff) WHERE id(o)={0} RETURN s")
     List<Staff> getAllStaffByUnitId(long unitId);
 
     @Query("MATCH(o:Organization)-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]->(s:Staff) WHERE id(o)={0} RETURN id(s)")
