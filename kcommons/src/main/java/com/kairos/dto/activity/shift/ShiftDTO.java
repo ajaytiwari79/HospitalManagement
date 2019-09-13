@@ -70,20 +70,21 @@ public class ShiftDTO {
     protected BigInteger shiftStatePhaseId;
     protected int timeBankCtaBonusMinutes;
     protected int plannedMinutesOfTimebank;
+    protected int plannedMinutesOfPayout;
     protected boolean multipleActivity;
     protected BigInteger planningPeriodId;
     protected BigInteger phaseId;
     protected int restingMinutes;
     protected Set<ShiftEscalationReason> escalationReasons;
     protected Long functionId;
-    private Set<BigInteger> escalationFreeShiftIds;
-    private boolean escalationResolved;
-    private boolean deleted;
-    private ShiftWithActivityDTO draftShift;
-    private boolean draft;
-    private RequestAbsenceDTO requestAbsence;
-    private List<ShiftActivityDTO> breakActivities;
-    private boolean hasOriginalShift;
+    protected Set<BigInteger> escalationFreeShiftIds;
+    protected boolean escalationResolved;
+    protected boolean deleted;
+    protected ShiftWithActivityDTO draftShift;
+    protected boolean draft;
+    protected RequestAbsenceDTO requestAbsence;
+    protected List<ShiftActivityDTO> breakActivities;
+    protected boolean hasOriginalShift;
 
 
     public ShiftDTO() {

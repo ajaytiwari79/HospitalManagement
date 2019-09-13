@@ -226,7 +226,7 @@ public class ShiftStateService {
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             }
         });
-        timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, shifts, activityWrapperMap, startDate, endDate);
+        timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, activityWrapperMap, startDate, endDate);
 
     }
 

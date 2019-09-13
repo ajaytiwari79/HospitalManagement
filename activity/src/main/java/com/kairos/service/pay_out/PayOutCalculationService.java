@@ -99,6 +99,7 @@ public class PayOutCalculationService {
         payOutPerShift.setCtaBonusMinutesOfPayOut(ctaBonusMinutes);
         payOutPerShift.setScheduledMinutes(scheduledMinutesOfPayout);
         payOutPerShift.setTotalPayOutMinutes(ctaBonusMinutes+scheduledMinutesOfPayout);
+        shift.setPlannedMinutesOfPayout(ctaBonusMinutes+scheduledMinutesOfPayout);
         payOutPerShift.setPayOutPerShiftCTADistributions(getCTADistribution(staffEmploymentDetails.getCtaRuleTemplates(), ctaPayoutMinMap));
         return payOutPerShift;
     }

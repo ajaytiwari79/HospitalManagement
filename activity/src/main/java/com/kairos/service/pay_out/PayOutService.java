@@ -15,6 +15,7 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
@@ -55,6 +56,7 @@ public class PayOutService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
 
     /**
@@ -117,8 +119,16 @@ public class PayOutService extends MongoBaseService {
         updateActivityWrapper(shift,activityWrapperMap);
         ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS);
-        PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
         DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
+        updatePayoutByShift(staffAdditionalInfoDTO, shift, activityWrapperMap, interval);
+        if(isNotNull(shift.getDraftShift())){
+            updatePayoutByShift(staffAdditionalInfoDTO, shift.getDraftShift(), activityWrapperMap, interval);
+        }
+        shiftMongoRepository.save(shift);
+    }
+
+    private void updatePayoutByShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval interval) {
+        PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
         payOutPerShift = isNullOrElse(payOutPerShift, new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId()));
         payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
         payOutRepository.save(payOutPerShift);
@@ -128,7 +138,9 @@ public class PayOutService extends MongoBaseService {
         Set<BigInteger> activityIds = new HashSet<>();
         Map<BigInteger, ActivityWrapper> updatedActivityWrapperMap = new HashMap<>();
         activityIds.addAll(getActivityIdsByShift(shift, activityWrapperMap));
-        activityIds.addAll(getActivityIdsByShift(shift.getDraftShift(), activityWrapperMap));
+        if(isNotNull(shift.getDraftShift())) {
+            activityIds.addAll(getActivityIdsByShift(shift.getDraftShift(), activityWrapperMap));
+        }
         if(isCollectionNotEmpty(activityIds)){
             updatedActivityWrapperMap = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds).stream().collect(Collectors.toMap(k->k.getActivity().getId(),v->v));
             activityWrapperMap.putAll(updatedActivityWrapperMap);
