@@ -1,11 +1,10 @@
 package com.kairos.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.dto.activity.counter.enums.ConfLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Getter
 @Setter
