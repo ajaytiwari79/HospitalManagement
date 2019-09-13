@@ -376,4 +376,62 @@ public class ActivityConfigurationService extends MongoBaseService {
     public List<ActivityConfigurationDTO> findAbsenceConfigurationByCountryIdAndPhaseId(Long unitId,BigInteger phaseId){
         return activityConfigurationRepository.findAbsenceConfigurationByCountryIdAndPhaseId(unitId,phaseId);
     }
+
+    public BigInteger createNonWorkingExceptionActivityConfiguration(Long unitId, NonWorkingPlannedTime nonWorkingPlannedTime) {
+        if (!Optional.ofNullable(nonWorkingPlannedTime.getTimeTypeId()).isPresent()) {
+            exceptionService.dataNotFoundByIdException(ERROR_TIMETYPE_UNSELECTED);
+        }
+        ActivityConfiguration activityConfiguration = new ActivityConfiguration(unitId, new NonWorkingPlannedTime(nonWorkingPlannedTime.getPhaseId(), nonWorkingPlannedTime.getTimeTypeId(), nonWorkingPlannedTime.getPlannedTimeIds(), true));
+        activityConfigurationRepository.save(activityConfiguration);
+        return activityConfiguration.getId();
+    }
+
+    public NonWorkingPlannedTime updateNonWorkingActivityConfiguration(BigInteger activityConfigurationId, NonWorkingPlannedTime nonWorkingPlannedTime) {
+        Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
+        if (!Optional.of(activityConfiguration).isPresent()) {
+            exceptionService.dataNotFoundByIdException(ERROR_NONWORKINGACTIVITYCONFIGURATION_NOTFOUND);
+        }
+        if (Optional.ofNullable(nonWorkingPlannedTime.getTimeTypeId()).isPresent()) {
+            activityConfiguration.get().getNonWorkingPlannedTime().setTimeTypeId(nonWorkingPlannedTime.getTimeTypeId());
+            activityConfiguration.get().getNonWorkingPlannedTime().setException(true);
+        }
+        activityConfiguration.get().getNonWorkingPlannedTime().setPlannedTimeIds(nonWorkingPlannedTime.getPlannedTimeIds());
+        activityConfigurationRepository.save(activityConfiguration.get());
+        return nonWorkingPlannedTime;
+    }
+
+    public List<ActivityConfigurationDTO> getNonWorkingActivityConfiguration(Long unitId) {
+        List<ActivityConfigurationDTO> activityConfigurationDTOS = activityConfigurationRepository.findNonWorkingConfigurationByUnitId(unitId);
+        Map<BigInteger,Integer> phaseMap = phaseService.getPhasesByUnit(unitId).stream().collect(Collectors.toMap(k->k.getId(),v->v.getSequence()));
+        List<ActivityConfigurationDTO> modifiableList = new ArrayList<>(activityConfigurationDTOS);
+        modifiableList.sort((a1, a2) -> Integer.compare(phaseMap.get(a1.getNonWorkingPlannedTime().getPhaseId()), phaseMap.get(a2.getNonWorkingPlannedTime().getPhaseId())));
+        return modifiableList;
+    }
+
+    public BigInteger createNonWorkingExceptionActivityConfigurationForCountry(Long countryId, NonWorkingPlannedTime nonWorkingPlannedTime) {
+        if (!Optional.ofNullable(nonWorkingPlannedTime.getTimeTypeId()).isPresent()) {
+            exceptionService.dataNotFoundByIdException(ERROR_TIMETYPE_UNSELECTED);
+        }
+        ActivityConfiguration activityConfiguration = new ActivityConfiguration(new NonWorkingPlannedTime(nonWorkingPlannedTime.getPhaseId(), nonWorkingPlannedTime.getTimeTypeId(), nonWorkingPlannedTime.getPlannedTimeIds(), true), countryId);
+        activityConfigurationRepository.save(activityConfiguration);
+        return activityConfiguration.getId();
+    }
+
+    public NonWorkingPlannedTime updateNonWorkingActivityConfigurationForCountry(BigInteger activityConfigurationId, NonWorkingPlannedTime nonWorkingPlannedTime) {
+        Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
+        if (!Optional.ofNullable(activityConfiguration).isPresent()) {
+            exceptionService.dataNotFoundByIdException(ERROR_NONWORKINGACTIVITYCONFIGURATION_NOTFOUND);
+        }
+        if (Optional.ofNullable(nonWorkingPlannedTime.getTimeTypeId()).isPresent()) {
+            activityConfiguration.get().getNonWorkingPlannedTime().setTimeTypeId(nonWorkingPlannedTime.getTimeTypeId());
+            activityConfiguration.get().getNonWorkingPlannedTime().setException(true);
+        }
+        activityConfiguration.get().getNonWorkingPlannedTime().setPlannedTimeIds(nonWorkingPlannedTime.getPlannedTimeIds());
+        activityConfigurationRepository.save(activityConfiguration.get());
+        return nonWorkingPlannedTime;
+    }
+
+    public List<ActivityConfigurationDTO> getNonWorkingActivityConfigurationForCountry(Long countryId) {
+        return activityConfigurationRepository.findNonWorkingConfigurationByCountryId(countryId);
+    }
 }

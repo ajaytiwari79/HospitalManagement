@@ -1,6 +1,7 @@
 package com.kairos.controller.unit_settings;
 
 import com.kairos.dto.activity.unit_settings.activity_configuration.AbsencePlannedTime;
+import com.kairos.dto.activity.unit_settings.activity_configuration.NonWorkingPlannedTime;
 import com.kairos.dto.activity.unit_settings.activity_configuration.PresencePlannedTime;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.utils.response.ResponseHandler;
@@ -112,14 +113,14 @@ public class ActivityConfigurationController {
     @ApiOperation("Get presence Activity Configuration")
     @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/presence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAbsenceActivityConfigurationForCountry(@PathVariable Long countryId) {
+    public ResponseEntity<Map<String, Object>> getPresenceActivityConfigurationForCountry(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getPresenceActivityConfigurationForCountry(countryId));
     }
 
     @ApiOperation("Get absence Activity Configuration")
     @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/absence")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getPresenceActivityConfigurationForCountry(@PathVariable Long countryId) {
+    public ResponseEntity<Map<String, Object>> getAbsenceActivityConfigurationForCountry(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getAbsenceActivityConfigurationForCountry(countryId));
     }
 
@@ -130,5 +131,46 @@ public class ActivityConfigurationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getDefaultDataForCountry(countryId));
     }
 
+    @ApiOperation("create exception non working Activity Configuration ")
+    @PostMapping(value = UNIT_ACTIVITY_CONFIGURATION+"/non_working")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createNonWorkingExceptionActivityConfiguration(@PathVariable Long unitId, @RequestBody @Valid NonWorkingPlannedTime nonWorkingPlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.createNonWorkingExceptionActivityConfiguration(unitId, nonWorkingPlannedTime));
+    }
+
+    @ApiOperation("Update non working Activity Configuration ")
+    @PutMapping(value = UNIT_ACTIVITY_CONFIGURATION+"/non_working/{activityConfigurationId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateNonWorkingActivityConfiguration(@PathVariable Long unitId, @PathVariable BigInteger activityConfigurationId, @RequestBody @Valid NonWorkingPlannedTime nonWorkingPlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateNonWorkingActivityConfiguration(activityConfigurationId, nonWorkingPlannedTime));
+    }
+
+    @ApiOperation("Get non working Activity Configuration")
+    @GetMapping(value = UNIT_ACTIVITY_CONFIGURATION+"/non_working")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getNonWorkingActivityConfiguration(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getNonWorkingActivityConfiguration(unitId));
+    }
+
+    @ApiOperation("create exception non working Activity Configuration ")
+    @PostMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/non_working")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createNonWorkingExceptionActivityConfigurationForCountry(@PathVariable Long countryId, @RequestBody NonWorkingPlannedTime nonWorkingPlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.createNonWorkingExceptionActivityConfigurationForCountry(countryId, nonWorkingPlannedTime));
+    }
+
+    @ApiOperation("Update non working Activity Configuration ")
+    @PutMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/non_working/{activityConfigurationId}")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateNonWorkingActivityConfigurationForCountry(@PathVariable Long countryId, @PathVariable BigInteger activityConfigurationId, @RequestBody NonWorkingPlannedTime nonWorkingPlannedTime) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.updateNonWorkingActivityConfigurationForCountry(activityConfigurationId, nonWorkingPlannedTime));
+    }
+
+    @ApiOperation("Get non working Activity Configuration")
+    @GetMapping(value = COUNTRY_ACTIVITY_CONFIGURATION+"/non_working")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getNonWorkingActivityConfigurationForCountry(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getNonWorkingActivityConfigurationForCountry(countryId));
+    }
 
 }
