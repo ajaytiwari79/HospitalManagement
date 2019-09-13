@@ -68,7 +68,7 @@ public class PolicyAgreementTemplateService {
     private TemplateTypeRepository templateTypeRepository;
 
     @Inject
-    private GDPRGenericRestClient GDPRGenericRestClient;
+    private GDPRGenericRestClient gDPRGenericRestClient;
 
 
     /**
@@ -286,7 +286,7 @@ public class PolicyAgreementTemplateService {
 
     //get country template by unitId
     public List<TemplateType> getAllTemplateType(Long unitId) {
-        Long countryId = GDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        Long countryId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
         return templateTypeRepository.getAllTemplateType(countryId);
     }
@@ -313,7 +313,7 @@ public class PolicyAgreementTemplateService {
     }
 
     public List<AgreementTemplateDTO> getAllDataHandlerTemplate(Long unitId) {
-        Long countryId = GDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        Long countryId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
         TemplateType templateType = templateTypeRepository.findByCountryIdAndName(countryId,"Data Handler Agreement");
         List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllDataHandlerAgreementTemplateByCountry(countryId,templateType.getId());
         return policyAgreementTemplates.stream().map(policyAgreementTemplate ->
@@ -322,7 +322,7 @@ public class PolicyAgreementTemplateService {
     }
 
     public AgreementTemplateDTO getDataHandlerTemplate(Long referenceId,boolean isCountry, Long agreementTemplateId) {
-        Long countryId = isCountry?referenceId: GDPRGenericRestClient.publishRequest(null, referenceId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        Long countryId = isCountry?referenceId: gDPRGenericRestClient.publishRequest(null, referenceId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
         PolicyAgreementTemplate policyAgreementTemplate=policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, countryId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);

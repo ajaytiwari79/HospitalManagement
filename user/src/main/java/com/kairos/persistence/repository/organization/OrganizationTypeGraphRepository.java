@@ -140,7 +140,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("MATCH (organizationSubType:OrganizationType)<-[:" +HAS_SUB_TYPE + "]-(organizationType:OrganizationType) where id(organizationSubType)={0} return organizationType")
     OrganizationType findOrganizationTypeBySubTypeId(Long organizationSubTypeId);
 
-    @Query("Match (n:Unit{isEnable:true,union:false,boardingCompleted:true,isKairosHub:false,gdprUnit:false})-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType) in {0}  " +
+    @Query("Match (n:OrganizationBaseEntity{isEnable:true,union:false,boardingCompleted:true,isKairosHub:false,gdprUnit:false})-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType) in {0}  " +
             "RETURN distinct id(n)")
     List<Long> getOrganizationByOrganizationSubTypeIds(List<Long> organizationSubTypeId);
 
