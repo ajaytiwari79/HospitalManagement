@@ -249,7 +249,8 @@ public class NightWorkerService {
         Map[] staffAndEmploymentAndExpertiseIdArray = getEmploymentAndExpertiseIdMap(staffAndEmploymentIdMap);
         Map<Long, Long> employmentAndExpertiseIdMap = staffAndEmploymentAndExpertiseIdArray[0];
         Map<Long, Long> employmentIdAndStaffIdMap = staffAndEmploymentAndExpertiseIdArray[1];
-        Map[] nightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
+        Map<Long, Long> employmentIdAndUnitIdMap = staffAndEmploymentAndExpertiseIdArray[2];
+        Map[] nightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,employmentIdAndUnitIdMap);
         Map<Long,Boolean> staffIdAndnightWorkerDetailsMap = nightWorkerDetailsMap[0];
         Map<Long,Boolean> employementIdAndNightWorkerMap = nightWorkerDetailsMap[1];
         updateWTARuleTemplateForNightWorker(employementIdAndNightWorkerMap);
@@ -270,26 +271,28 @@ public class NightWorkerService {
     private Map[] getEmploymentAndExpertiseIdMap(List<Map> staffAndEmploymentIdMap){
         Map<Long, Long> employmentAndExpertiseIdMap = new HashMap<>();
         Map<Long, Long> employmentIdAndStaffIdMap = new HashMap<>();
+        Map<Long, Long> employmentIdAndUnitIdMap = new HashMap<>();
         for (Map<Long,Map<String,Object>> map : staffAndEmploymentIdMap) {
             List<Map> employmentDetails = (List<Map>) map.get("employmentDetails");
             for (Map employmentDetail : employmentDetails) {
                 Long employmentId = ((Integer)employmentDetail.get("id")).longValue();
                 employmentAndExpertiseIdMap.put(employmentId,((Integer) employmentDetail.get("expId")).longValue());
                 employmentIdAndStaffIdMap.put(employmentId,((Integer)((Object)map.get("staffId"))).longValue());
+                employmentIdAndUnitIdMap.put(employmentId,((Integer)((Object)map.get("unitId"))).longValue());
             }
 
         }
-        return new Map[]{employmentAndExpertiseIdMap,employmentIdAndStaffIdMap};
+        return new Map[]{employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,employmentIdAndUnitIdMap};
     }
 
-    public Map[] getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
-        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = getMapOfExpetiseNightWorkerSetting(employmentAndExpertiseIdMap.values());
+    public Map[] getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap,Map<Long, Long> employmentIdAndUnitIdMap) {
+        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = getMapOfExpetiseNightWorkerSetting(employmentAndExpertiseIdMap,employmentIdAndUnitIdMap);
         Map<Long, Boolean> staffIdAndNightWorkerMap = new HashMap<>();
         Map<Long, Boolean> employementIdAndNightWorkerMap = new HashMap<>();
         for (Map.Entry<Long, Long> employmentAndExpertiseIdEntry : employmentAndExpertiseIdMap.entrySet()) {
             boolean nightWorker = false;
-            if (expertiseNightWorkerSettingMap.containsKey(employmentAndExpertiseIdEntry.getValue())) {
-                ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingMap.get(employmentAndExpertiseIdEntry.getValue());
+            if (expertiseNightWorkerSettingMap.containsKey(employmentAndExpertiseIdEntry.getKey())) {
+                ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingMap.get(employmentAndExpertiseIdEntry.getKey());
                 if (isNotNull(expertiseNightWorkerSetting.getIntervalUnitToCheckNightWorker()) && isNotNull(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())) {
                     DateTimeInterval dateTimeInterval = getIntervalByNightWorkerSetting(expertiseNightWorkerSetting);
                     List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllShiftBetweenDuration(employmentAndExpertiseIdEntry.getKey(), dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate());
@@ -308,16 +311,10 @@ public class NightWorkerService {
         return new Map[]{staffIdAndNightWorkerMap,employementIdAndNightWorkerMap};
     }
 
-    private Map<Long,ExpertiseNightWorkerSetting> getMapOfExpetiseNightWorkerSetting(Collection<Long> expertiseIds){
-        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(expertiseIds);
+    private Map<Long,ExpertiseNightWorkerSetting> getMapOfExpetiseNightWorkerSetting(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndUnitIdMap){
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(employmentAndExpertiseIdMap.values());
+
         Map<Long,ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = new HashMap<>();
-        for (ExpertiseNightWorkerSetting expertiseNightWorkerSetting : expertiseNightWorkerSettings) {
-            if(isNotNull(expertiseNightWorkerSetting.getUnitId())){
-                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
-            }else if(!expertiseNightWorkerSettingMap.containsKey(expertiseNightWorkerSetting.getExpertiseId())){
-                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
-            }
-        }
         return expertiseNightWorkerSettingMap;
     }
 
