@@ -5,6 +5,7 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Getter
 @Setter
@@ -36,6 +37,7 @@ public class CurrentUserDetails {
         this.passwordUpdated=passwordUpdated;
     }
 
+    @JsonIgnore
     public String getFullName(){
         return this.firstName+" "+this.lastName;
     }
