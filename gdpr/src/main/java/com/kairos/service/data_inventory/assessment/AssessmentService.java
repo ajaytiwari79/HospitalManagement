@@ -39,7 +39,7 @@ import com.kairos.response.dto.common.MetaDataCommonResponseDTO;
 import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
-import com.kairos.rest_client.GenericRestClient;
+import com.kairos.rest_client.GDPRGenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.utils.user_context.UserContext;
@@ -68,7 +68,7 @@ public class AssessmentService {
     @Inject
     private ObjectMapper objectMapper;
     @Inject
-    private GenericRestClient genericRestClient;
+    private GDPRGenericRestClient gDPRGenericRestClient;
     @Inject
     private AssessmentRepository assessmentRepository;
     @Inject
@@ -632,7 +632,7 @@ public class AssessmentService {
      */
     public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentOfCurrentLoginUser(Long unitId) {
 
-        Long staffId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        Long staffId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
         List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId, assessmentStatusList);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(assessments, AssessmentBasicResponseDTO.class);

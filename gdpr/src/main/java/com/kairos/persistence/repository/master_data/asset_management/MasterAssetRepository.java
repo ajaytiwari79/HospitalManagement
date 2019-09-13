@@ -39,6 +39,8 @@ public interface MasterAssetRepository extends JpaRepository<MasterAsset,Long>{
     @Query(value = "Select MA.name from MasterAsset MA where MA.countryId = ?1 and MA.assetType.id = ?2 and MA.deleted = false")
     List<String> findMasterAssetsLinkedWithAssetType(Long countryId, Long assetTypeId);
 
-    @Query(value = "Select MA from MasterAsset MA JOIN MA.organizationTypes OT JOIN MA.organizationSubTypes OST JOIN MA.organizationServices SC JOIN MA.organizationSubServices SSC where MA.countryId = ?1 and MA.deleted = false and OT.id IN (?2) and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
+    @Query(value = "Select DISTINCT MA from MasterAsset MA JOIN MA.organizationTypes OT JOIN MA.organizationSubTypes OST JOIN MA.organizationServices SC " +
+            "JOIN MA.organizationSubServices SSC where MA.countryId = ?1 and MA.deleted = false and OT.id IN (?2) " +
+            "and OST.id IN (?3) and SC.id IN (?4) and SSC.id IN (?5)")
     List<MasterAsset> findAllByCountryIdAndOrganizationalMetadata(Long countryId, List<Long> organizationTypeIds, List<Long> organizationSubTypeIds, List<Long> organizationServiceCategoryIds, List<Long> organizationSubServiceCategoryTypeIds);
 }
