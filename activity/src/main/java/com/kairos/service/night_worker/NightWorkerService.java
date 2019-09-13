@@ -313,8 +313,14 @@ public class NightWorkerService {
 
     private Map<Long,ExpertiseNightWorkerSetting> getMapOfExpetiseNightWorkerSetting(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndUnitIdMap){
         List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(employmentAndExpertiseIdMap.values());
-
+        Map<Long,ExpertiseNightWorkerSetting> unitAndExpertiseNightWorkerSettingMap=expertiseNightWorkerSettings.stream().collect(Collectors.toMap(k-> k.getUnitId(),v->v));
+        Map<Long,ExpertiseNightWorkerSetting> employmentAndExpertiseNightWorkerSettingMap=new HashMap<>();
         Map<Long,ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = new HashMap<>();
+        for (Long employmentId : employmentIdAndUnitIdMap.keySet()) {
+            if(unitAndExpertiseNightWorkerSettingMap.containsKey(employmentIdAndUnitIdMap.get(employmentId))){
+
+            }
+        }
         return expertiseNightWorkerSettingMap;
     }
 
