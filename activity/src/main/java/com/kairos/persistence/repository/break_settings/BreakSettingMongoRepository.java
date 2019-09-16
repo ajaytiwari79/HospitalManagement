@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.break_settings;
 import com.kairos.dto.activity.break_settings.BreakSettingsDTO;
 import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
@@ -15,10 +16,14 @@ public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSe
 
     BreakSettings findByIdAndDeletedFalse(BigInteger id);
 
-    BreakSettings findByDeletedFalseAndCountryIdAndExpertiseIdAndShiftDurationInMinuteEquals(Long countryId, Long expertiseId, Long shiftDurationInMinute);
+    @Query("{countryId:?0,deleted:false,primary:true,expertiseId:?1}")
+    BreakSettings findByDeletedFalseAndCountryIdAndExpertiseIdAndPrimaryTrue(Long countryId, Long expertiseId);
 
     List<BreakSettings> findAllByDeletedFalseAndExpertiseIdOrderByCreatedAtAsc(Long expertiseId, Long shiftDurationInMinute);
 
     List<BreakSettings> findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(List<Long> expertiseIds);
+
+    @Query("{deleted:false,primary:true,expertiseId:?1}")
+    BreakSettings findAllByDeletedFalseAndExpertiseId(Long expertiseId);
 
 }
