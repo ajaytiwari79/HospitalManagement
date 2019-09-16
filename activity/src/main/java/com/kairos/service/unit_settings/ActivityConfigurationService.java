@@ -259,8 +259,18 @@ public class ActivityConfigurationService extends MongoBaseService {
 
     public List<BigInteger> addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
-        return (TimeTypeEnum.ABSENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType())) ? getAbsencePlannedTime(unitId, phaseId, activity)
-                : getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
+        List<BigInteger> plannedTimes;
+        switch (activity.getBalanceSettingsActivityTab().getTimeType()){
+            case ABSENCE :
+                plannedTimes = getAbsencePlannedTime(unitId, phaseId, activity);
+                break;
+            case PRESENCE:
+                plannedTimes = getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
+                break;
+            default:
+                plannedTimes = getNonWorkingPlannedTime(unitId, phaseId, activity);
+        }
+        return plannedTimes;
     }
 
     private List<BigInteger> getAbsencePlannedTime(Long unitId, BigInteger phaseId, Activity activity) {
@@ -275,6 +285,26 @@ public class ActivityConfigurationService extends MongoBaseService {
                 break;
             } else {
                 plannedTimeIds = activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds();
+            }
+        }
+        if(isCollectionEmpty(plannedTimeIds)){
+            exceptionService.dataNotFoundByIdException(PLANNED_TIME_NOT_CONFIGURE);
+        }
+        return plannedTimeIds;
+    }
+
+    private List<BigInteger> getNonWorkingPlannedTime(Long unitId, BigInteger phaseId, Activity activity) {
+        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllNonWorkingConfigurationByUnitIdAndPhaseId(unitId, phaseId);
+        List<BigInteger> plannedTimeIds = null;
+        for (ActivityConfiguration activityConfiguration : activityConfigurations) {
+            if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
+                exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
+            }
+            if (activityConfiguration.getNonWorkingPlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getNonWorkingPlannedTime().getTimeTypeId())) {
+                plannedTimeIds = activityConfiguration.getNonWorkingPlannedTime().getPlannedTimeIds();
+                break;
+            } else {
+                plannedTimeIds = activityConfiguration.getNonWorkingPlannedTime().getPlannedTimeIds();
             }
         }
         if(isCollectionEmpty(plannedTimeIds)){

@@ -45,4 +45,7 @@ public interface ActivityConfigurationRepository extends MongoBaseRepository<Act
 
    @Query("{nonWorkingPlannedTime:{$exists:true},'countryId':?0}")
    List<ActivityConfigurationDTO> findNonWorkingConfigurationByCountryId(Long countryId);
+
+   @Query("{'nonWorkingPlannedTime.phaseId':?1,unitId:?0}")
+   List<ActivityConfiguration> findAllNonWorkingConfigurationByUnitIdAndPhaseId(Long unitId, BigInteger phaseId);
 }
