@@ -321,7 +321,7 @@ public class StaffFilterService {
         StaffFavouriteFilter staffFavouriteFilter = staffGraphRepository.getStaffFavouriteFiltersOfStaffInOrganizationById(
                 userId, parent.getId(), filterId);
         if (!Optional.ofNullable(staffFavouriteFilter).isPresent()) {
-            exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_FAVOURITEFILTERID_INVALID, filterId);
+            exceptionService.invalidRequestException(MESSAGE_STAFF_FInew HashSetLTER_FAVOURITEFILTERID_INVALID, filterId);
 
         }
         staffFavouriteFilter.setDeleted(true);
