@@ -272,7 +272,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllNonWorkingConfigurationByUnitIdAndPhaseId(unitId, phaseId);
         List<BigInteger> plannedTimeIds = null;
         for (ActivityConfiguration activityConfiguration : activityConfigurations) {
-            if (!Optional.ofNullable(activityConfiguration.getAbsencePlannedTime()).isPresent()) {
+            if (!Optional.ofNullable(activityConfiguration.getNonWorkingPlannedTime()).isPresent()) {
                 exceptionService.dataNotFoundByIdException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
             }
             if (activityConfiguration.getNonWorkingPlannedTime().isException() && activity.getBalanceSettingsActivityTab().getTimeTypeId().equals(activityConfiguration.getNonWorkingPlannedTime().getTimeTypeId())) {
