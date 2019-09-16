@@ -14,8 +14,10 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobSubType;
@@ -604,7 +606,8 @@ public class PlanningPeriodService extends MongoBaseService {
         if (updateCurrentAndNextPhases) {
             Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
             if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum()) ) {
-                Set<Long> employmentTypeIds=new HashSet<>();
+                List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByUnitId(unitId);
+                Set<Long> employmentTypeIds=employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toSet());
                 publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
                 planningPeriod.getPublishEmploymentIds().addAll(employmentTypeIds);
             }

@@ -8,6 +8,7 @@ import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prerna on 10/4/18.
@@ -33,6 +34,7 @@ public class PlanningPeriodDTO {
     private List<PeriodPhaseDTO> phaseFlippingDate;
     private String periodDuration;
     private boolean active=true;
+    private Set<Long> publishEmploymentIds;
     private String color;
     public PlanningPeriodDTO(){
         // default constructor
@@ -188,6 +190,14 @@ public class PlanningPeriodDTO {
 
     public void setCurrentPhaseId(BigInteger currentPhaseId) {
         this.currentPhaseId = currentPhaseId;
+    }
+
+    public Set<Long> getPublishEmploymentIds() {
+        return publishEmploymentIds;
+    }
+
+    public void setPublishEmploymentIds(Set<Long> publishEmploymentIds) {
+        this.publishEmploymentIds = publishEmploymentIds;
     }
 }
 
