@@ -611,7 +611,7 @@ public class ShiftService extends MongoBaseService {
                 todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, staffAdditionalInfoDTO.getUserAccessRoleDTO(), true);
                 shiftDTO = staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() ? ObjectMapperUtils.copyPropertiesByMapper(isNotNull(shift.getDraftShift()) ? shift.getDraftShift() : shift, ShiftDTO.class) : ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
                 payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);
-                timeBankService.updateTimeBank(staffAdditionalInfoDTO,oldStateOfShift,validatedByPlanner);
+                //timeBankService.updateTimeBank(staffAdditionalInfoDTO,oldStateOfShift,validatedByPlanner);
                 timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
                 shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
                 if(ShiftActionType.SAVE.equals(shiftAction)) {
