@@ -656,7 +656,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperations.add(new CustomAggregationOperation(Document.parse("{\n" +
                     "  $addFields: {\n" +
                     "       \"draftShift._id\": \"$_id\",\n" +
-                    "        \"draftShift.draft\": \"$draft\"\n" +
                     "     }}")));
             aggregationOperations.add(replaceRoot("draftShift"));
         }

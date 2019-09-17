@@ -254,9 +254,12 @@ public class ShiftService extends MongoBaseService {
                 updateActivityDetailsInShiftActivity(childActivity, activityWrapperMap, staffAdditionalInfoDTO);
             }
         }
-        if (isCollectionNotEmpty(shift.getBreakActivities()) && UNPAID_BREAK.equals(activityWrapperMap.get(shift.getBreakActivities().get(0).getActivityId()).getTimeType())) {
+        if (isCollectionNotEmpty(shift.getBreakActivities()) && activityWrapperMap.containsKey(shift.getBreakActivities().get(0).getActivityId()) &&  UNPAID_BREAK.equals(activityWrapperMap.get(shift.getBreakActivities().get(0).getActivityId()).getTimeType())) {
             scheduledMinutes -= shift.getBreakActivities().get(0).getInterval().getMinutes();
         }
+
+
+
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
         shiftStatusService.updateStatusOfShiftIfPhaseValid(phase, shift, activityWrapperMap, staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftAction);
