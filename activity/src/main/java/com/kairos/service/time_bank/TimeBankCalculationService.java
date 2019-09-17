@@ -9,6 +9,7 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
@@ -30,6 +31,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
@@ -71,6 +73,8 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 import static com.kairos.enums.phase.PhaseDefaultName.*;
+import static com.kairos.enums.phase.PhaseDefaultName.PAYROLL;
+import static com.kairos.enums.phase.PhaseDefaultName.REALTIME;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.stream.Collectors.toMap;
 
@@ -1031,6 +1035,16 @@ public class TimeBankCalculationService {
         return phaseService.getPhasesByDates(unitId,localDateTimes).entrySet().stream().collect(Collectors.toMap(k->asLocalDate(k.getKey()),v->v.getValue().getPhaseEnum()));
     }
 
+    private Map<java.time.LocalDate, Boolean> getDatePublishPlanningPeriod(java.time.LocalDate startDate,java.time.LocalDate endDate,List<PlanningPeriodDTO> planningPeriodDTOS){
+        Set<LocalDateTime> localDateTimes = new HashSet<>();
+        while (startDate.isBefore(endDate) || startDate.equals(endDate)){
+            localDateTimes.add(startDateTime);
+            startDateTime = startDateTime.plusDays(1);
+        }
+        return new HashMap<>();
+    }
+
+
     public DailyTimeBankEntry updatePublishedBalances(DailyTimeBankEntry dailyTimeBankEntry, List<EmploymentLinesDTO> employmentLines, Long unitId, int deltaAccumulatedTimebankMinutes) {
         DailyTimeBankEntry todayDailyTimeBankEntry = timeBankRepository.findByEmploymentAndDate(dailyTimeBankEntry.getEmploymentId(), java.time.LocalDate.now());
         if(isNull(todayDailyTimeBankEntry)) {
@@ -1046,11 +1060,13 @@ public class TimeBankCalculationService {
     }
 
     public Long calculateActualTimebank(DateTimeInterval dateTimeInterval, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate endDate, java.time.LocalDate employmentStartDate) {
+        List<PlanningPeriodDTO> planningPeriods=planningPeriodService.findAllPlanningPeriodBetweenDatesAndUnitId(employmentWithCtaDetailsDTO.getUnitId(),asDate(employmentStartDate),asDate(endDate));
+        Map<java.time.LocalDate,Boolean> publishPlanningPeriodDateMap=getDatePublishPlanningPeriod(employmentStartDate,endDate,planningPeriods);
         Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(k -> k.getDate(), v -> v));
         Map<java.time.LocalDate, PhaseDefaultName> datePhaseDefaultNameMap = getDatePhaseDefaultName(employmentStartDate, endDate, employmentWithCtaDetailsDTO.getUnitId());
         long actualTimebank = employmentWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
         endDate = isNull(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : endDate.isBefore(employmentWithCtaDetailsDTO.getEndDate()) ? endDate : employmentWithCtaDetailsDTO.getEndDate();
-        Set<PhaseDefaultName> validPhaseForActualTimeBank = newHashSet(DRAFT, PhaseDefaultName.REALTIME, TIME_ATTENDANCE, PhaseDefaultName.TENTATIVE, PhaseDefaultName.PAYROLL);
+        Set<PhaseDefaultName> validPhaseForActualTimeBank = newHashSet( REALTIME, TIME_ATTENDANCE, PAYROLL);
         while (employmentStartDate.isBefore(endDate) || employmentStartDate.equals(endDate)) {
             int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeInterval, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate) && dateDailyTimeBankEntryMap.get(employmentStartDate).isPublishedSomeActivities()) {
@@ -1062,7 +1078,7 @@ public class TimeBankCalculationService {
                 actualTimebank+=deltaTimeBankMinutes;
                 LOGGER.debug("delta timebank {}",dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
                 LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
-            } else if(validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate))) {
+            } else if(validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate)) || publishPlanningPeriodDateMap.get(employmentStartDate)) {
                 actualTimebank += deltaTimeBankMinutes;
                 LOGGER.debug("delta timebank {}",deltaTimeBankMinutes);
                 LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
@@ -1172,4 +1188,6 @@ public class TimeBankCalculationService {
             }
         }
     }
+
+
 }

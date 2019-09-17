@@ -275,14 +275,16 @@ public class ShiftService extends MongoBaseService {
             BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", asLocalDate(shift.getStartDate()).toString());
             userIntegrationService.applyFunction(shift.getUnitId(), shift.getEmploymentId(), null, HttpMethod.DELETE, Arrays.asList(appliedDate));
         }
-        if (updateShift && isNotNull(shiftAction)) {
+        if (updateShift && isNotNull(shiftAction) && !shift.getActivities().stream().anyMatch(shiftActivity -> !shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))) {
             shift = updateShiftAfterPublish(shift, staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftAction);
         }
         if (!updateShift && planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getId()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
-            Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
-            draftShift.setDraft(true);
-            shift.setDraftShift(draftShift);
-            shift.setDraft(true);
+            if(newHashSet(PhaseDefaultName.CONSTRUCTION,PhaseDefaultName.DRAFT,PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
+                Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
+                draftShift.setDraft(true);
+                shift.setDraftShift(draftShift);
+                shift.setDraft(true);
+            }
         }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shiftMongoRepository.save(shift);
