@@ -86,9 +86,7 @@ public class ShiftStatusService {
         if(CommonConstants.FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())){
             List<Shift> shifts = shiftService.getFullWeekShiftsByDate(currentShift.getStartDate(),currentShift.getEmploymentId(), activity);
             shiftPublishDTO.getShifts().clear();
-            shifts.forEach(shift -> {
-                shiftPublishDTO.getShifts().add(new ShiftActivitiesIdDTO(shift.getId(),shift.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
-            });
+            shifts.forEach(shift -> shiftPublishDTO.getShifts().add(new ShiftActivitiesIdDTO(shift.getId(),shift.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList()))));
         }
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         Object[] objects = getActivitiesAndShiftIds(shiftPublishDTO.getShifts());
@@ -110,6 +108,12 @@ public class ShiftStatusService {
                     for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
                         updateStatusOfShiftActivity(shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, childActivity);
                     }
+                }
+                if(FIX.equals(shiftPublishDTO.getStatus())){
+                    if(shift.isDraft()){
+                        exceptionService.actionNotPermittedException(STATUS_NOT_ALLOWED);
+                    }
+                    shift.setDraftShift(null);
                 }
                 if (shift.isDeleted()) {
                     shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()));
