@@ -1045,7 +1045,7 @@ public class TimeBankCalculationService {
             publish = planningPeriodDTO.getPublishEmploymentIds().contains(employmentTypeId);
             startDate = planningPeriodDTO.getStartDate();
             endDate = planningPeriodDTO.getEndDate();
-            while (startDate.isBefore(endDate) || startDate.equals(endDate)) {
+            while (!startDate.isAfter(endDate)) {
                 dateAndPublishPlanningPeriod.put(startDate, publish);
                 startDate = startDate.plusDays(1);
             }
@@ -1079,10 +1079,7 @@ public class TimeBankCalculationService {
             int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeInterval, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
             if (dateDailyTimeBankEntryMap.containsKey(employmentStartDate) && dateDailyTimeBankEntryMap.get(employmentStartDate).isPublishedSomeActivities()) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                /*if(deltaTimeBankMinutes!=dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes()) {
-                    actualTimebank += deltaTimeBankMinutes;
-                }*/
-                deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();//-deltaTimeBankMinutes;
+                deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
                 actualTimebank += deltaTimeBankMinutes;
                 LOGGER.debug("delta timebank {}", dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
                 LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));

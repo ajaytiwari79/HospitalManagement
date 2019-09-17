@@ -278,7 +278,7 @@ public class ShiftService extends MongoBaseService {
         if (updateShift && isNotNull(shiftAction) && !shift.getActivities().stream().anyMatch(shiftActivity -> !shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))) {
             shift = updateShiftAfterPublish(shift, staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftAction);
         }
-        if (!updateShift && planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getId()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
+        if (!updateShift && planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
             if(newHashSet(PhaseDefaultName.CONSTRUCTION,PhaseDefaultName.DRAFT,PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
                 Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
                 draftShift.setDraft(true);

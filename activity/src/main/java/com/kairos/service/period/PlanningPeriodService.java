@@ -526,9 +526,6 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PERIOD_UNIT_ID, periodId);
         }
-        if (!Optional.ofNullable(planningPeriod.getNextPhaseId()).isPresent()) {
-            exceptionService.actionNotPermittedException(MESSAGE_PERIOD_PHASE_LAST);
-        }
         Phase initialNextPhase = phaseMongoRepository.findOne(isNotNull(planningPeriod.getNextPhaseId())?planningPeriod.getNextPhaseId():planningPeriod.getCurrentPhaseId());
         if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum()) && publish) {
             publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
