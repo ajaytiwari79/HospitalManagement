@@ -877,4 +877,16 @@ public  class DateUtils {
         return date;
 
     }
+
+    public static Set<DayOfWeek> getAllDaysBetweenDays(DayOfWeek startDayOfWeek, DayOfWeek endDayOfWeek) {
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        while (true){
+            dayOfWeeks.add(startDayOfWeek);
+            if(startDayOfWeek.equals(endDayOfWeek)){
+                break;
+            }
+            startDayOfWeek=startDayOfWeek.plus(1);
+        }
+        return dayOfWeeks;
+    }
 }
