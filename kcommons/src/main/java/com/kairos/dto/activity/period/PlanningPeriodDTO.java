@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ public class PlanningPeriodDTO {
     private List<PeriodPhaseDTO> phaseFlippingDate;
     private String periodDuration;
     private boolean active=true;
-    private Set<Long> publishEmploymentIds;
+    private Set<Long> publishEmploymentIds=new HashSet<>();
     private String color;
     public PlanningPeriodDTO(){
         // default constructor
