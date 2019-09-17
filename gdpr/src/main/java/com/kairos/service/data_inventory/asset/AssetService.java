@@ -33,6 +33,7 @@ import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -403,8 +404,21 @@ public class AssetService {
         assetMetaDataMap.put("organizationAssetTypeList", organizationAssetTypeService.getAllAssetType(unitId));
         assetMetaDataMap.put("riskLevelList", RiskSeverity.values());
         return assetMetaDataMap;
-
     }
 
+    public AssetDTO updateAssetData(Long unitId, Long assetId, AssetDTO assetDTO) {
+        Asset asset = assetRepository.findByOrganizationIdAndDeletedAndName(unitId, assetDTO.getName());
+        if (Optional.ofNullable(asset).isPresent() && !assetId.equals(asset.getId())) {
+            exceptionService.duplicateDataException("message.duplicate", "Asset", assetDTO.getName());
+        }
+        assetDTO.setId(assetId);
+        asset = buildAsset(unitId,assetDTO);
+        if (!asset.isActive()) {
+            exceptionService.invalidRequestException("message.asset.inactive");
+        }
+        addAssetTypeAndSubAssetType(unitId, asset, assetDTO);
+        assetRepository.save(asset);
+        return assetDTO;
+    }
 
 }
