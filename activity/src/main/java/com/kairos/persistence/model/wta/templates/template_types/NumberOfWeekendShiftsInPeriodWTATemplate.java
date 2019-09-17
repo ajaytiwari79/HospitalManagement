@@ -93,8 +93,12 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         DayOfWeek startDayOfWeek = LocalTime.MIN.equals(fromTime) ? DayOfWeek.valueOf(fromDayOfWeek) : DayOfWeek.valueOf(fromDayOfWeek).plus(1);
         DayOfWeek endDayOfWeek = LocalTime.MAX.equals(toTime) ? DayOfWeek.valueOf(toDayOfWeek) : DayOfWeek.valueOf(toDayOfWeek).minus(1);
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        for (int i = startDayOfWeek.getValue(); i <= endDayOfWeek.getValue(); i++) {
-            dayOfWeeks.add(DayOfWeek.of(i));
+        while (true){
+            dayOfWeeks.add(startDayOfWeek);
+            if(startDayOfWeek.equals(endDayOfWeek)){
+                break;
+            }
+            startDayOfWeek=startDayOfWeek.plus(1);
         }
         while (startDate.isBefore(endDate)) {
             if (dayOfWeeks.contains(startDate.getDayOfWeek())) {
