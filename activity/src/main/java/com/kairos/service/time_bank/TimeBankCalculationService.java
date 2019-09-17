@@ -1036,7 +1036,7 @@ public class TimeBankCalculationService {
     }
 
     private Map<java.time.LocalDate, Boolean> getDatePublishPlanningPeriod(java.time.LocalDate startDate,java.time.LocalDate endDate,List<PlanningPeriodDTO> planningPeriodDTOS){
-        Set<LocalDateTime> localDateTimes = new HashSet<>();
+        Map<LocalDate,Boolean> dataAndPublishPlanningPeriod=new HashMap<>();
         while (startDate.isBefore(endDate) || startDate.equals(endDate)){
             localDateTimes.add(startDateTime);
             startDateTime = startDateTime.plusDays(1);
