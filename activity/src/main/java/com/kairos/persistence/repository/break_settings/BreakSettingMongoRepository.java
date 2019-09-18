@@ -23,7 +23,7 @@ public interface BreakSettingMongoRepository extends MongoBaseRepository<BreakSe
 
     List<BreakSettings> findAllByDeletedFalseAndExpertiseIdInOrderByCreatedAtAsc(List<Long> expertiseIds);
 
-    @Query("{deleted:false,primary:true,expertiseId:?1}")
+    @Query("{deleted:false,primary:true,expertiseId:?0}")
     BreakSettings findAllByDeletedFalseAndExpertiseId(Long expertiseId);
 
 }

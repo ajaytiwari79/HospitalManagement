@@ -2,6 +2,11 @@ package com.kairos.service.pay_out;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -19,6 +24,7 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.shift.ShiftService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,6 +63,7 @@ public class PayOutService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private ShiftService shiftService;
 
 
     /**
@@ -120,14 +127,47 @@ public class PayOutService extends MongoBaseService {
         ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS);
         DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
-        updatePayoutByShift(staffAdditionalInfoDTO, shift, activityWrapperMap, interval);
+        ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shift,activityWrapperMap);
+        updatePayoutByShift(staffAdditionalInfoDTO, shiftWithActivityDTO, activityWrapperMap, interval);
+        updatePayoutDetailInShift(shiftWithActivityDTO,shift);
         if(isNotNull(shift.getDraftShift())){
-            updatePayoutByShift(staffAdditionalInfoDTO, shift.getDraftShift(), activityWrapperMap, interval);
+            ShiftWithActivityDTO draftShiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shift.getDraftShift(),activityWrapperMap);
+            updatePayoutByShift(staffAdditionalInfoDTO, draftShiftWithActivityDTO, activityWrapperMap, interval);
+            updatePayoutDetailInShift(draftShiftWithActivityDTO,shift.getDraftShift());
         }
         shiftMongoRepository.save(shift);
     }
 
-    private void updatePayoutByShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval interval) {
+    private void updatePayoutDetailInShift(ShiftWithActivityDTO shiftWithActivityDTO,Shift shift){
+        for (int index = 0; index < shift.getActivities().size(); index++) {
+            ShiftActivity shiftActivity = shift.getActivities().get(index);
+            ShiftActivityDTO shiftActivityDTO = shiftWithActivityDTO.getActivities().get(index);
+            shiftActivity.setPayoutCtaBonusMinutes(shiftActivityDTO.getPayoutCtaBonusMinutes());
+            shiftActivity.setPlannedMinutesOfPayout(shiftActivityDTO.getPlannedMinutesOfPayout());
+            shiftActivity.setScheduledMinutesOfPayout(shiftActivityDTO.getScheduledMinutesOfPayout());
+        }
+        shift.setPlannedMinutesOfPayout(shiftWithActivityDTO.getPlannedMinutesOfPayout());
+    }
+
+    public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftWithActivityDTO.class);
+        shift.getActivities().forEach(shiftActivityDTO ->
+                shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
+        );
+        shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
+            shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+            shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
+            shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
+                childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+                childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
+            });
+        });
+        shiftWithActivityDTO.setStartDate(shift.getActivities().get(0).getStartDate());
+        shiftWithActivityDTO.setEndDate(shift.getActivities().get(shift.getActivities().size() - 1).getEndDate());
+        return shiftWithActivityDTO;
+    }
+
+    private void updatePayoutByShift(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftWithActivityDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, DateTimeInterval interval) {
         PayOutPerShift payOutPerShift = payOutRepository.findAllByShiftId(shift.getId());
         payOutPerShift = isNullOrElse(payOutPerShift, new PayOutPerShift(shift.getId(), shift.getEmploymentId(), shift.getStaffId(), interval.getStartLocalDate(), shift.getUnitId()));
         payOutPerShift = payOutCalculationService.calculateAndUpdatePayOut(interval, staffAdditionalInfoDTO.getEmployment(), shift, activityWrapperMap, payOutPerShift, staffAdditionalInfoDTO.getDayTypes());
