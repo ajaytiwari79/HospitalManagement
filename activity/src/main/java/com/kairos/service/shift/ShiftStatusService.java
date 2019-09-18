@@ -152,10 +152,7 @@ public class ShiftStatusService {
         boolean validateShiftActivityStatus = validateShiftActivityStatus(shiftPublishDTO.getStatus(), shiftActivity, activityIdAndActivityMap.get(shiftActivity.getActivityId()));
         boolean draftShift=false;
         if(FIX.equals(shiftPublishDTO.getStatus())){
-            if(shift.isDraft()){
-                draftShift=true;
-                exceptionService.actionNotPermittedException(STATUS_NOT_ALLOWED);
-            }
+            draftShift=shift.isDraft();
             shift.setDraftShift(null);
         }
         if (validAccessGroup && validateShiftActivityStatus & !draftShift) {
