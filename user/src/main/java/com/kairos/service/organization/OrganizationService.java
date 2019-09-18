@@ -887,4 +887,8 @@ public class OrganizationService {
         return new ShiftFilterDefaultData(timeSlotDTOS,teamActivityIds);
 
     }
+
+    public List<Long> getAllUnitIdsByCountryId(Long countryId) {
+        return organizationGraphRepository.getAllUnitsByCountryId(countryId);
+    }
 }
