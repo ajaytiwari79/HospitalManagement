@@ -81,4 +81,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
 
     @Query("MATCH (org:Organization)-[:"+HAS_POSITIONS+"]->(position:Position)-[:"+BELONGS_TO+"]->(staff) WHERE id(staff)={0} return org")
     Organization findOrganizationOfStaff(Long staffId);
+
+    @Query("MATCH(u:Unit)-[:HAS_UNIT]-(o:Organization)-[:BELONGS_TO]-(c:Country) where id(c)={0} \n" +
+            "with collect(id(u)) as u, collect(id(o)) as o \n" +
+            "WITH u+o as units \n" +
+            "unwind units as x with distinct x \n" +
+            "RETURN x")
+    List<Long> getAllUnitsByCountryId(Long countryId);
 }

@@ -297,6 +297,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PHASESETTINGS_ABSENT = "message.phaseSettings.absent";
     public static final String ERROR_PRESENCEACTIVITYCONFIGURATION_NOTFOUND = "error.presenceActivityConfiguration.notFound";
     public static final String ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND = "error.absenceActivityConfiguration.notFound";
+    public static final String ERROR_NONWORKINGACTIVITYCONFIGURATION_NOTFOUND = "error.nonWorkingActivityConfiguration.notFound";
     public static final String ERROR_ACTIVITYCONFIGURATION_NOTFOUND = "error.activityConfiguration.notFound";
     public static final String ERROR_TIMETYPE_UNSELECTED = "error.timetype.unselected";
     public static final String MESSAGE_TASKTYPE_NOTEXISTS = "message.taskType.notExists";

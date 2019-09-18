@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.List;
 
-import static com.kairos.constants.ApiConstant.GET_ORGANIZATION_IDS_ORGANIZATION_SUB_TYPE_Id;
+import static com.kairos.constants.ApiConstant.*;
 
 /**
  * Created By G.P.Ranjan on 10/9/19
@@ -24,5 +24,9 @@ public class GDPRToUserIntegrationService {
 
     public List<Long> getUnitIdsByOrgSubTypeId(Long countryId, List<Long> organizationSubTypeId) {
         return gdprGenericRestClient.publishRequest(organizationSubTypeId, countryId, false, IntegrationOperation.CREATE, GET_ORGANIZATION_IDS_ORGANIZATION_SUB_TYPE_Id, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
+    }
+
+    public List<Long> getAllUnitIdsByCountryId(Long countryId) {
+        return gdprGenericRestClient.publishRequest(null, countryId, false, IntegrationOperation.GET, GET_ALL_UNITS_BY_COUNTRY, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
     }
 }
