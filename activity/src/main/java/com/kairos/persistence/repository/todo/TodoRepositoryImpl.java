@@ -23,7 +23,7 @@ public class TodoRepositoryImpl implements CustomTodoRepository {
 
     @Override
     public List<TodoDTO> findAllByKpiFilter(Long unit, Date startDate, Date endDate, List<Long> staffIds, Collection<String> statuses) {
-        Criteria criteria=Criteria.where("unitId").is(unit).and("type").is(TodoType.APPROVAL_REQUIRED).and("shiftDate").gte(startDate).lte(endDate);
+        Criteria criteria=Criteria.where("unitId").is(unit).and("type").is(TodoType.APPROVAL_REQUIRED).and("shiftDate").gte(startDate).lt(endDate);
         if(ObjectUtils.isCollectionNotEmpty(staffIds)){
             criteria.and("staffId").in(staffIds);
         }
@@ -37,7 +37,6 @@ public class TodoRepositoryImpl implements CustomTodoRepository {
                 Aggregation.match(criteria),
              Aggregation.lookup("shifts","entityId","_id","shifts"),
              Aggregation.project("id","status","staffId").and("shifts").arrayElementAt(0).as("shift"),
-                Aggregation.match(new Criteria().and("shift").exists(true)),
                 Aggregation.project("id","status","staffId").and("shift.startDate").as("shiftDateTime")
         );
         AggregationResults<TodoDTO> result = mongoTemplate.aggregate(aggregation, Todo.class, TodoDTO.class);

@@ -526,17 +526,15 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PERIOD_UNIT_ID, periodId);
         }
-        Phase initialNextPhase = phaseMongoRepository.findOne(isNotNull(planningPeriod.getNextPhaseId())?planningPeriod.getNextPhaseId():planningPeriod.getCurrentPhaseId());
+        Phase initialNextPhase = phaseMongoRepository.findOne(isNotNull(planningPeriod.getNextPhaseId()) ? planningPeriod.getNextPhaseId() : planningPeriod.getCurrentPhaseId());
         if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum()) && publish) {
             publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
             planningPeriod.getPublishEmploymentIds().addAll(employmentTypeIds);
         }
-        if(!publish) {
+        if (!publish) {
             flipPlanningPeriodToNextPhase(unitId, periodId, planningPeriod, initialNextPhase);
         }
         save(planningPeriod);
-//        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-//        }, null, null);
         return getPlanningPeriods(unitId, planningPeriod.getStartDate(), planningPeriod.getEndDate()).get(0);
     }
 
@@ -563,6 +561,8 @@ public class PlanningPeriodService extends MongoBaseService {
         Map<Long, Map<Long, Set<LocalDate>>> employmentWithShiftDateFunctionIdMap = getEmploymentIdWithFunctionIdShiftDateMap(shifts);
         createShiftState(shifts, oldPlanningPeriodPhaseId, employmentWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
+//   schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+//        }, null, null);
     }
 
     //TODO test
@@ -602,9 +602,9 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         if (updateCurrentAndNextPhases) {
             Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
-            if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum()) ) {
+            if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
                 List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByUnitId(unitId);
-                Set<Long> employmentTypeIds=employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toSet());
+                Set<Long> employmentTypeIds = employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toSet());
                 publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
                 planningPeriod.getPublishEmploymentIds().addAll(employmentTypeIds);
             }
