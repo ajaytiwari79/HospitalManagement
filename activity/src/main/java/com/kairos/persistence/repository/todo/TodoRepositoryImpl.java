@@ -23,10 +23,7 @@ public class TodoRepositoryImpl implements CustomTodoRepository {
 
     @Override
     public List<TodoDTO> findAllByKpiFilter(Long unit, Date startDate, Date endDate, List<Long> staffIds, Collection<String> statuses) {
-        Criteria criteria=Criteria.where("unitId").is(unit).and("type").is(TodoType.APPROVAL_REQUIRED).and("shiftDate").gte(startDate).lte(endDate);
-        if(ObjectUtils.isCollectionNotEmpty(staffIds)){
-            criteria.and("staffId").in(staffIds);
-        }
+        Criteria criteria=Criteria.where("unitId").is(unit).and("staffId").in(staffIds).and("type").is(TodoType.APPROVAL_REQUIRED).and("shiftDate").gte(startDate).lt(endDate);
         if (ObjectUtils.isCollectionNotEmpty(statuses)) {
             criteria.and("status").in(statuses);
         }

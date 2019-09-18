@@ -857,7 +857,7 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate().minusDays(1),"dd-MM-yyyy");
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
         return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
