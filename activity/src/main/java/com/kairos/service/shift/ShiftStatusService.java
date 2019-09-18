@@ -109,12 +109,6 @@ public class ShiftStatusService {
                         updateStatusOfShiftActivity(shiftPublishDTO, shiftActivitiyIds, shiftActivityResponseDTOS, activityPhaseSettingMap, activityIdAndActivityMap, phaseListByDate, staffAccessGroupDTO, shift, childActivity);
                     }
                 }
-                if(FIX.equals(shiftPublishDTO.getStatus())){
-                    if(shift.isDraft()){
-                        exceptionService.actionNotPermittedException(STATUS_NOT_ALLOWED);
-                    }
-                    shift.setDraftShift(null);
-                }
                 if (shift.isDeleted()) {
                     shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()));
                 } else {
@@ -156,13 +150,24 @@ public class ShiftStatusService {
         boolean validAccessGroup = shiftValidatorService.validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
         boolean validateShiftActivityStatus = validateShiftActivityStatus(shiftPublishDTO.getStatus(), shiftActivity, activityIdAndActivityMap.get(shiftActivity.getActivityId()));
-        if (validAccessGroup && validateShiftActivityStatus) {
+        boolean draftShift=false;
+        if(FIX.equals(shiftPublishDTO.getStatus())){
+            if(shift.isDraft()){
+                draftShift=true;
+                exceptionService.actionNotPermittedException(STATUS_NOT_ALLOWED);
+            }
+            shift.setDraftShift(null);
+        }
+        if (validAccessGroup && validateShiftActivityStatus & !draftShift) {
             removeOppositeStatus(shift, shiftActivity, shiftPublishDTO.getStatus());
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, shiftActivity.getStatus()));
         } else if (validAccessGroup && !validateShiftActivityStatus) {
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID), false));
         } else {
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED), false));
+        }
+        if(draftShift){
+            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(STATUS_NOT_ALLOWED), false));
         }
         return shiftActivityResponseDTO;
     }
