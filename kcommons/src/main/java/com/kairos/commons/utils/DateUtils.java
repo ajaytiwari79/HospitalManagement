@@ -857,7 +857,7 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate().minusDays(1),"dd-MM-yyyy");
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
         return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
@@ -876,5 +876,17 @@ public  class DateUtils {
         String date = dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
         return date;
 
+    }
+
+    public static Set<DayOfWeek> getAllDaysBetweenDays(DayOfWeek startDayOfWeek, DayOfWeek endDayOfWeek) {
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        while (true){
+            dayOfWeeks.add(startDayOfWeek);
+            if(startDayOfWeek.equals(endDayOfWeek)){
+                break;
+            }
+            startDayOfWeek=startDayOfWeek.plus(1);
+        }
+        return dayOfWeeks;
     }
 }

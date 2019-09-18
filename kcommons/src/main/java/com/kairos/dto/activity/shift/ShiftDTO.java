@@ -182,10 +182,6 @@ public class ShiftDTO {
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
     }
 
-    public boolean isHasOriginalShift() {
-        return !draft;
-    }
-
     @Override
     public String toString() {
         return "ShiftDTO{" +

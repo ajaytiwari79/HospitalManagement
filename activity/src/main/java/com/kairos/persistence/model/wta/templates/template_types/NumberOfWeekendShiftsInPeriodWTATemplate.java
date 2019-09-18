@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.getAllDaysBetweenDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
@@ -92,14 +93,7 @@ public class NumberOfWeekendShiftsInPeriodWTATemplate extends WTABaseRuleTemplat
         ZonedDateTime endDate = dateTimeInterval.getEnd();
         DayOfWeek startDayOfWeek = LocalTime.MIN.equals(fromTime) ? DayOfWeek.valueOf(fromDayOfWeek) : DayOfWeek.valueOf(fromDayOfWeek).plus(1);
         DayOfWeek endDayOfWeek = LocalTime.MAX.equals(toTime) ? DayOfWeek.valueOf(toDayOfWeek) : DayOfWeek.valueOf(toDayOfWeek).minus(1);
-        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-        while (true){
-            dayOfWeeks.add(startDayOfWeek);
-            if(startDayOfWeek.equals(endDayOfWeek)){
-                break;
-            }
-            startDayOfWeek=startDayOfWeek.plus(1);
-        }
+        Set<DayOfWeek> dayOfWeeks = getAllDaysBetweenDays(startDayOfWeek, endDayOfWeek);
         while (startDate.isBefore(endDate)) {
             if (dayOfWeeks.contains(startDate.getDayOfWeek())) {
                 intervals.add(new DateTimeInterval(startDate, startDate.plusDays(1)));
