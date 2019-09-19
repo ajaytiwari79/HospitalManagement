@@ -6,7 +6,7 @@ package com.kairos.enums.shift;
  */
 
 public enum ShiftType {
-    PRESENCE,ABSENCE
+    PRESENCE,ABSENCE,NON_WORKING
 
 
 }

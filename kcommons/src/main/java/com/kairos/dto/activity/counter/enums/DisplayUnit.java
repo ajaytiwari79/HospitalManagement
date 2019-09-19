@@ -1,7 +1,7 @@
 package com.kairos.dto.activity.counter.enums;
 
 public enum DisplayUnit {
-    HOURS("Hours");
+    HOURS("Hours"),COUNT("Count");
 
     private String displayValue;
     private DisplayUnit(String displayValue){

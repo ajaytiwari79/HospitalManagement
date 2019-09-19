@@ -37,7 +37,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{staffId:?0,deleted:false, disabled:false,startDate: {$lt: ?2},endDate:{$gt:?1}}")
     List<Shift> findShiftBetweenDurationByStaffId(Long staffId, Date startDate, Date endDate);
 
-    @Query("{'deleted':false,'unitId':?2, 'disabled':false, startDate: {$lte: ?1},endDate:{$gte:?0},draftShift:{$exists:true}}")
+    @Query("{'deleted':false,'unitId':?2, 'disabled':false, startDate: {$lte: ?1},endDate:{$gte:?0},'$or':[{draftShift:{$exists:true}},{draft:true}]}")
     List<Shift> findDraftShiftBetweenDurationAndUnitIdAndDeletedFalse(Date startDate, Date endDate, Long unitId);
 
     @Query("{'deleted':false,'unitId':?2, 'disabled':false, startDate: {$lte: ?1},endDate:{$gte:?0}}")
@@ -54,9 +54,6 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query("{deleted:false,staffId:{$in:?0}, 'disabled':false, startDate:{$gte:?1,$lte:?2}}")
     List<Shift> findAllShiftsByStaffIds(List<Long> staffIds, Date startDate, Date endDate);
-
-    @Query("{deleted:false,staffId:?0, 'disabled':false, startDate:{$gte:?1,$lt:?2}}")
-    List<Shift> findAllShiftsByStaffId(Long staffId, Date startDate, Date endDate);
 
     @Query("{deleted:false,staffId:{$in:?0}, 'disabled':false, 'startDate':{$lt:?2} , 'endDate': {$gt:?1}}")
     List<Shift> findAllShiftsByStaffIdsAndDate(List<Long> staffIds, LocalDateTime startDate, LocalDateTime endDate);
@@ -93,6 +90,6 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query(value = "{employmentId:?0,deleted:false, disabled:false,startDate:{$gt:?1,$lt:?2},'activities.activityId':{'$in':?3}}")
     List<Shift> findAllShiftByActivityIdAndBetweenDuration(Long employmentId, Date startDate, Date endDate,Collection<BigInteger> activityIds);
 
-    @Query(value = "{'deleted':false, 'disabled':false, 'employmentId':?0}",count = true)
-    Long countShiftsByEmploymentId(Long EmploymentId);
+    @Query("{deleted:false,employmentId:?0, 'disabled':false, startDate:{$gte:?1,$lt:?2}}")
+    List<Shift> findAllShiftsByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate);
 }

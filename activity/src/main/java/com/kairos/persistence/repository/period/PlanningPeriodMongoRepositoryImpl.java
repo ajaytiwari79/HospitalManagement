@@ -230,7 +230,9 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 and("current_phase_data._id").as("currentPhaseId");
         Aggregation aggregation = newAggregation(
                 match(Criteria.where("deleted").is(false).and("unitId").is(unitId).and("startDate").lte(requestedEndDate).and("endDate").gte(requestedStartDate)),
-                lookup("phases", "currentPhaseId", "_id", "current_phase_data"), projectionOperation
+                lookup("phases", "currentPhaseId", "_id", "current_phase_data"),
+                sort(Sort.Direction.ASC, "startDate"),
+                projectionOperation
         );
         AggregationResults<PlanningPeriodDTO> results = mongoTemplate.aggregate(aggregation, PlanningPeriod.class, PlanningPeriodDTO.class);
         return results.getMappedResults();

@@ -370,12 +370,6 @@ public class ActivityController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
     }
 
-    @ApiOperation("Get all absence activity")
-    @GetMapping(value = "/absence-activities")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getAllAbsenceActivities(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.findAllActivityByCountry(countryId));
-    }
 
     @ApiOperation("Get all activity based on country")
     @GetMapping(value = "/activities_with_time_types")
