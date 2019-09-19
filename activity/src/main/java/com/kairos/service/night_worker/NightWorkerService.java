@@ -84,7 +84,8 @@ public class NightWorkerService {
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateMongoRepository;
     @Inject
     private SchedulerServiceRestClient schedulerRestClient;
-    @Inject private ShiftFilterService shiftFilterService;
+    @Inject
+    private ShiftFilterService shiftFilterService;
 
     public String prepareNameOfQuestionnaireSet() {
         return AppConstants.QUESTIONNAIE_NAME_PREFIX + " " + DateUtils.getDateString(DateUtils.getDate(), "dd_MMM_yyyy");
@@ -263,76 +264,82 @@ public class NightWorkerService {
         Map[] staffAndEmploymentAndExpertiseIdArray = getEmploymentAndExpertiseIdMap(staffAndEmploymentIdMap);
         Map<Long, Long> employmentAndExpertiseIdMap = staffAndEmploymentAndExpertiseIdArray[0];
         Map<Long, Long> employmentIdAndStaffIdMap = staffAndEmploymentAndExpertiseIdArray[1];
-        Map[] nightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
-        Map<Long,Boolean> staffIdAndnightWorkerDetailsMap = nightWorkerDetailsMap[0];
-        Map<Long,Boolean> employementIdAndNightWorkerMap = nightWorkerDetailsMap[1];
+        Map<Long, Long> employmentIdAndUnitIdMap = staffAndEmploymentAndExpertiseIdArray[2];
+        Map[] nightWorkerDetailsMap = getNightWorkerDetails(employmentAndExpertiseIdMap, employmentIdAndStaffIdMap, employmentIdAndUnitIdMap);
+        Map<Long, Boolean> staffIdAndnightWorkerDetailsMap = nightWorkerDetailsMap[0];
+        Map<Long, Boolean> employementIdAndNightWorkerMap = nightWorkerDetailsMap[1];
         updateWTARuleTemplateForNightWorker(employementIdAndNightWorkerMap);
         List<NightWorker> nightWorkers = nightWorkerMongoRepository.findByStaffIds(employmentIdAndStaffIdMap.values());
-        Map<Long,NightWorker> nightWorkerMap = nightWorkers.stream().collect(Collectors.toMap(NightWorker::getStaffId,v->v));
+        Map<Long, NightWorker> nightWorkerMap = nightWorkers.stream().collect(Collectors.toMap(NightWorker::getStaffId, v -> v));
         List<NightWorker> updateNightWorkers = new ArrayList<>();
         for (Map.Entry<Long, Boolean> staffIdAndNightWorkerEntry : staffIdAndnightWorkerDetailsMap.entrySet()) {
             NightWorker nightWorker;
-            nightWorker = nightWorkerMap.getOrDefault(staffIdAndNightWorkerEntry.getKey(),new NightWorker(false, null, null, 0, staffIdAndNightWorkerEntry.getKey(), null, false));
+            nightWorker = nightWorkerMap.getOrDefault(staffIdAndNightWorkerEntry.getKey(), new NightWorker(false, null, null, 0, staffIdAndNightWorkerEntry.getKey(), null, false));
             nightWorker.setNightWorker(staffIdAndNightWorkerEntry.getValue());
             updateNightWorkers.add(nightWorker);
         }
-        if(isCollectionNotEmpty(updateNightWorkers)){
+        if (isCollectionNotEmpty(updateNightWorkers)) {
             nightWorkerMongoRepository.saveEntities(updateNightWorkers);
         }
     }
 
-    private Map[] getEmploymentAndExpertiseIdMap(List<Map> staffAndEmploymentIdMap){
+    private Map[] getEmploymentAndExpertiseIdMap(List<Map> staffAndEmploymentIdMap) {
         Map<Long, Long> employmentAndExpertiseIdMap = new HashMap<>();
         Map<Long, Long> employmentIdAndStaffIdMap = new HashMap<>();
-        for (Map<Long,Map<String,Object>> map : staffAndEmploymentIdMap) {
+        Map<Long, Long> employmentIdAndUnitIdMap = new HashMap<>();
+        for (Map<Long, Map<String, Object>> map : staffAndEmploymentIdMap) {
             List<Map> employmentDetails = (List<Map>) map.get("employmentDetails");
             for (Map employmentDetail : employmentDetails) {
-                Long employmentId = ((Integer)employmentDetail.get("id")).longValue();
-                employmentAndExpertiseIdMap.put(employmentId,((Integer) employmentDetail.get("expId")).longValue());
-                employmentIdAndStaffIdMap.put(employmentId,((Integer)((Object)map.get("staffId"))).longValue());
+                Long employmentId = ((Integer) employmentDetail.get("id")).longValue();
+                employmentAndExpertiseIdMap.put(employmentId, ((Integer) employmentDetail.get("expId")).longValue());
+                employmentIdAndStaffIdMap.put(employmentId, ((Integer) ((Object) map.get("staffId"))).longValue());
+                employmentIdAndUnitIdMap.put(employmentId, ((Integer)  employmentDetail.get("unitId")).longValue());
             }
 
         }
-        return new Map[]{employmentAndExpertiseIdMap,employmentIdAndStaffIdMap};
+        return new Map[]{employmentAndExpertiseIdMap, employmentIdAndStaffIdMap, employmentIdAndUnitIdMap};
     }
 
-    public Map[] getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap,Map<Long, Long> employmentIdAndStaffIdMap) {
-        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = getMapOfExpetiseNightWorkerSetting(employmentAndExpertiseIdMap.values());
+    public Map[] getNightWorkerDetails(Map<Long, Long> employmentAndExpertiseIdMap, Map<Long, Long> employmentIdAndStaffIdMap, Map<Long, Long> employmentIdAndUnitIdMap) {
+        Map<Long, ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = getMapOfExpetiseNightWorkerSetting(employmentAndExpertiseIdMap, employmentIdAndUnitIdMap);
         Map<Long, Boolean> staffIdAndNightWorkerMap = new HashMap<>();
         Map<Long, Boolean> employementIdAndNightWorkerMap = new HashMap<>();
         for (Map.Entry<Long, Long> employmentAndExpertiseIdEntry : employmentAndExpertiseIdMap.entrySet()) {
             boolean nightWorker = false;
-            if (expertiseNightWorkerSettingMap.containsKey(employmentAndExpertiseIdEntry.getValue())) {
-                ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingMap.get(employmentAndExpertiseIdEntry.getValue());
+            if (expertiseNightWorkerSettingMap.containsKey(employmentAndExpertiseIdEntry.getKey())) {
+                ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingMap.get(employmentAndExpertiseIdEntry.getKey());
                 if (isNotNull(expertiseNightWorkerSetting.getIntervalUnitToCheckNightWorker()) && isNotNull(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())) {
                     DateTimeInterval dateTimeInterval = getIntervalByNightWorkerSetting(expertiseNightWorkerSetting);
                     List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllShiftBetweenDuration(employmentAndExpertiseIdEntry.getKey(), dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate());
                     int minutesOrCount = getNightMinutesOrCount(expertiseNightWorkerSetting, shiftDTOS);
-                    if(isCollectionNotEmpty(shiftDTOS)) {
+                    if (isCollectionNotEmpty(shiftDTOS)) {
                         nightWorker = isNightWorker(expertiseNightWorkerSetting, minutesOrCount, shiftDTOS.size());
                     }
                 }
             }
             Long staffId = employmentIdAndStaffIdMap.get(employmentAndExpertiseIdEntry.getKey());
-            if(!staffIdAndNightWorkerMap.containsKey(staffId) || !staffIdAndNightWorkerMap.get(staffId)) {
+            if (!staffIdAndNightWorkerMap.containsKey(staffId) || !staffIdAndNightWorkerMap.get(staffId)) {
                 staffIdAndNightWorkerMap.put(staffId, nightWorker);
-                employementIdAndNightWorkerMap.put(employmentAndExpertiseIdEntry.getKey(),nightWorker);
+                employementIdAndNightWorkerMap.put(employmentAndExpertiseIdEntry.getKey(), nightWorker);
             }
         }
-        return new Map[]{staffIdAndNightWorkerMap,employementIdAndNightWorkerMap};
+        return new Map[]{staffIdAndNightWorkerMap, employementIdAndNightWorkerMap};
     }
 
-    private Map<Long,ExpertiseNightWorkerSetting> getMapOfExpetiseNightWorkerSetting(Collection<Long> expertiseIds){
-        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettings = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(expertiseIds);
-        Map<Long,ExpertiseNightWorkerSetting> expertiseNightWorkerSettingMap = new HashMap<>();
-        for (ExpertiseNightWorkerSetting expertiseNightWorkerSetting : expertiseNightWorkerSettings) {
-            if(isNotNull(expertiseNightWorkerSetting.getUnitId())){
-                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
-            }else if(!expertiseNightWorkerSettingMap.containsKey(expertiseNightWorkerSetting.getExpertiseId())){
-                expertiseNightWorkerSettingMap.put(expertiseNightWorkerSetting.getExpertiseId(),expertiseNightWorkerSetting);
+    private Map<Long, ExpertiseNightWorkerSetting> getMapOfExpetiseNightWorkerSetting(Map<Long, Long> employmentAndExpertiseIdMap, Map<Long, Long> employmentIdAndUnitIdMap) {
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettingsOfUnits = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(employmentAndExpertiseIdMap.values());
+        List<ExpertiseNightWorkerSetting> expertiseNightWorkerSettingsOfCountry = expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfCountry(employmentAndExpertiseIdMap.values());
+        Map<Long, ExpertiseNightWorkerSetting> countryExpertiseAndExpertiseNightWorkerSettingMap = expertiseNightWorkerSettingsOfCountry.stream().collect(Collectors.toMap(k -> k.getExpertiseId(), v -> v));
+        Map<String, ExpertiseNightWorkerSetting> unitAndExpertiseNightWorkerSettingMap = expertiseNightWorkerSettingsOfUnits.stream().collect(Collectors.toMap(k -> k.getUnitId()+"_"+k.getExpertiseId(), v -> v));
+        Map<Long, ExpertiseNightWorkerSetting> employmentAndExpertiseNightWorkerSettingMap = new HashMap<>();
+        for (Long employmentId : employmentIdAndUnitIdMap.keySet()) {
+            if (unitAndExpertiseNightWorkerSettingMap.containsKey(employmentIdAndUnitIdMap.get(employmentId)+"_"+employmentAndExpertiseIdMap.get(employmentId))) {
+                employmentAndExpertiseNightWorkerSettingMap.put(employmentId,unitAndExpertiseNightWorkerSettingMap.get(employmentIdAndUnitIdMap.get(employmentId)+"_"+employmentAndExpertiseIdMap.get(employmentId)));
+            }else {
+                employmentAndExpertiseNightWorkerSettingMap.put(employmentId,countryExpertiseAndExpertiseNightWorkerSettingMap.get(employmentAndExpertiseIdMap.get(employmentId)));
             }
         }
-        return expertiseNightWorkerSettingMap;
+        return employmentAndExpertiseNightWorkerSettingMap;
     }
 
     private void updateWTARuleTemplateForNightWorker(Map<Long, Boolean> employmentAndNightWorkerMap) {
@@ -346,7 +353,7 @@ public class NightWorkerService {
                 }
             }
         }
-        if(isCollectionNotEmpty(wtaBaseRuleTemplates)){
+        if (isCollectionNotEmpty(wtaBaseRuleTemplates)) {
             wtaBaseRuleTemplateMongoRepository.saveEntities(wtaBaseRuleTemplates);
         }
     }
@@ -385,44 +392,44 @@ public class NightWorkerService {
 
     private DateTimeInterval getIntervalByNightWorkerSetting(ExpertiseNightWorkerSetting expertiseNightWorkerSetting) {
         DateTimeInterval interval = null;
-            LocalDate localDate = LocalDate.now();
-            switch (expertiseNightWorkerSetting.getIntervalUnitToCheckNightWorker()) {
-                case DAYS:
-                    interval = new DateTimeInterval(asDate(localDate.minusDays(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())), getEndOfDayDateFromLocalDate(localDate.plusDays(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())));
-                    break;
-                case WEEKS:
-                    interval = new DateTimeInterval(asDate(localDate.minusWeeks(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())), getEndOfDayDateFromLocalDate(localDate.plusWeeks(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())));
-                    break;
-                case MONTHS:
-                    interval = new DateTimeInterval(asDate(localDate.minusMonths(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())), getEndOfDayDateFromLocalDate(localDate.plusMonths(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())));
-                    break;
-                case YEAR:
-                    interval = new DateTimeInterval(asDate(localDate.minusYears(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())), getEndOfDayDateFromLocalDate(localDate.plusYears(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())));
-                    break;
-                default:
-                    break;
-            }
+        LocalDate localDate = LocalDate.now();
+        switch (expertiseNightWorkerSetting.getIntervalUnitToCheckNightWorker()) {
+            case DAYS:
+                interval = new DateTimeInterval(asDate(localDate.minusDays(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())), getEndOfDayDateFromLocalDate(localDate.plusDays(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())));
+                break;
+            case WEEKS:
+                interval = new DateTimeInterval(asDate(localDate.minusWeeks(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())), getEndOfDayDateFromLocalDate(localDate.plusWeeks(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())));
+                break;
+            case MONTHS:
+                interval = new DateTimeInterval(asDate(localDate.minusMonths(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())), getEndOfDayDateFromLocalDate(localDate.plusMonths(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())));
+                break;
+            case YEAR:
+                interval = new DateTimeInterval(asDate(localDate.minusYears(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())), getEndOfDayDateFromLocalDate(localDate.plusYears(expertiseNightWorkerSetting.getIntervalValueToCheckNightWorker())));
+                break;
+            default:
+                break;
+        }
         return interval;
     }
 
-    public void registerJobForNightWorker(){
+    public void registerJobForNightWorker() {
         SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 1), JobType.SYSTEM, JobSubType.NIGHT_WORKER, ZoneId.systemDefault().toString());
         // create job for auto clock out and create realtime/draft shiftstate
         List<SchedulerPanelDTO> schedulerPanelDTOS = schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
     }
 
-    public Map<Long,Boolean> getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO,LocalDate startDate,LocalDate endDate){
+    public Map<Long, Boolean> getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO, LocalDate startDate, LocalDate endDate) {
         List<Long> staffIds = staffFilterDTO.getStaffIds();
-        if(staffFilterDTO.isValidFilterForShift()) {
-            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds(),startDate,endDate);
+        if (staffFilterDTO.isValidFilterForShift()) {
+            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds(), startDate, endDate);
             shiftDTOS = shiftFilterService.getShiftsByFilters(shiftDTOS, staffFilterDTO);
             staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toList());
         }
         List<NightWorker> nightWorker = nightWorkerMongoRepository.findByStaffIds(staffIds);
-        Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorker.stream().collect(Collectors.toMap(NightWorker::getStaffId,NightWorker::isNightWorker));
+        Map<Long, Boolean> staffIdAndNightWorkerMap = nightWorker.stream().collect(Collectors.toMap(NightWorker::getStaffId, NightWorker::isNightWorker));
         for (Long staffId : staffIds) {
-            if(!staffIdAndNightWorkerMap.containsKey(staffId)) {
+            if (!staffIdAndNightWorkerMap.containsKey(staffId)) {
                 staffIdAndNightWorkerMap.put(staffId, false);
             }
         }
