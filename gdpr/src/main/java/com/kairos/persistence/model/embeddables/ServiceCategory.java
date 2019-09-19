@@ -1,6 +1,9 @@
 package com.kairos.persistence.model.embeddables;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotBlank;

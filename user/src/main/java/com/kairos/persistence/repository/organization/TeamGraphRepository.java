@@ -12,7 +12,9 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -23,7 +25,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Repository
 public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
 
-    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true}) WHERE id(org)={0} with DISTINCT team \n" +
+    @Query("MATCH (org:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true}) WHERE id(org)={0} with DISTINCT team \n" +
             "OPTIONAL MATCH (team)-[rel:"+TEAM_HAS_MEMBER+"]->(teamMembers:Staff) WHERE EXISTS(rel.leaderType) \n" +
             "WITH team,COLLECT(teamMembers) as teamMembers,COLLECT(rel) as rel,\n" +
             "CASE when rel.leaderType='MAIN_LEAD' THEN COLLECT(id(teamMembers)) ELSE NULL END AS mainTeamLeaderIds,\n" +
@@ -87,23 +89,24 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("MATCH (team:Team{isEnabled:true})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} DETACH DELETE staffTeamRel")
     void removeStaffFromAllTeams(long staffId);
 
-    @Query("MATCH (organization:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} AND id(organization)={1} RETURN \n" +
+    @Query("MATCH (organization:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} AND id(organization)={1} RETURN \n" +
             "id(team) as teamId,team.name as name,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType")
     List<StaffTeamDTO> getTeamDetailsOfStaff(Long staffId,Long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
-            "MATCH (team)<-[:"+HAS_TEAMS+"]-(organization:Organization) with organization,team\n" +
+            "MATCH (team)<-[:"+HAS_TEAMS+"]-(organization:Unit) with organization,team\n" +
             "MATCH (position:Position)-[:"+ HAS_UNIT_PERMISSIONS +"]->(unitEmployment)-[:"+ APPLICABLE_IN_UNIT +"]->(organization) with position,team\n" +
             "MATCH (staff:Staff) WHERE (team)-[:"+TEAM_HAS_MEMBER+"]->(staff) OR (position)-[:"+BELONGS_TO+"]->(staff) with staff,team\n" +
             "OPTIONAL MATCH (team)-[r:"+TEAM_HAS_MEMBER+"]->(staff) with r,staff\n" +
             "RETURN DISTINCT {id:id(staff),firstName:staff.firstName+\" \" +staff.lastName,familyName:staff.familyName,cprNumber:staff.cprNumber,isSelected:CASE when r is null THEN false else r.isEnabled end,profilePic: {1} + staff.profilePic} as data order by data.firstName")
     List<Map<String,Object>> getAllStaffByOrganization(long teamId, String imageUrl);
 
-    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN {id:id(team),name:team.name} as data order by data.name")
+    @Query("MATCH (org:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN {id:id(team),name:team.name} as data order by data.name")
     List<Map<String,Object>> getAllTeamsInOrganization(long organizationId);
 
-    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN id(team) as id,team.name as name")
+    @Query("MATCH (org:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN id(team) as id,team.name as name")
     List<TeamDTO> findAllTeamsInOrganization(long organizationId);
+
 
     @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN toString(id(team)) as id,team.name as value")
     List<FilterSelectionQueryResult> getTeamsByUnitIdForFilters(long organizationId);
@@ -114,99 +117,16 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "RETURN DISTINCT activities")
     List<BigInteger> getTeamActivityIdsByTeamIds(List<Long> teamIds);
 
-    @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
-            "MATCH (team)-[:"+TEAM_HAS_LOCATION+"]->(contactAddress:ContactAddress) with contactAddress\n" +
-            "OPTIONAL MATCH (contactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode) with zipCode,contactAddress\n" +
-            "OPTIONAL MATCH (contactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality) with zipCode,contactAddress,municipality\n" +
-            " RETURN {id:id(contactAddress),houseNumber:contactAddress.houseNumber,floorNumber:contactAddress.floorNumber,street1:contactAddress.street1,zipCodeId:id(zipCode),city:contactAddress.city,municipalityName:contactAddress.municipalityName,regionName:contactAddress.regionName,province:contactAddress.province,country:contactAddress.country,latitude:contactAddress.latitude,longitude:contactAddress.longitude,streetUrl:contactAddress.streetUrl,municipalityId:id(municipality)} as data")
-    Map<String,Object> getContactAddressOfTeam(long teamId);
-
-      @Query("MATCH (team:Team) WHERE id(team)={0}\n" +
-            "MATCH (team)<-[:"+HAS_TEAMS+"]-(organization:Organization) with organization\n" +
-            "MATCH (organization)-[r:"+PROVIDE_SERVICE+"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) with os,r\n" +
-            "MATCH (oranizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with {children: CASE when os is NULL THEN [] else COLLECT({id:id(os),name:os.name,description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(oranizationService),name:oranizationService.name,description:oranizationService.description} as availableServices\n" +
-            "RETURN {availableServices:COLLECT(availableServices)} as data\n" +
-            "UNION\n" +
-            "MATCH (team:Team) WHERE id(team)={0} with team\n" +
-            "MATCH (team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService{isEnabled:true}) with r,os,team \n" +
-            "MATCH (organizationService:OrganizationService{isEnabled:true})-[:"+ORGANIZATION_SUB_SERVICE+"]->(os) with organizationService,r,os,team\n" +
-            "OPTIONAL MATCH (team)-[teamServiceCustomNameRelation:"+HAS_CUSTOM_SERVICE_NAME_FOR+"]-(organizationService:OrganizationService)\n" +
-            "with {children: CASE when os is NULL THEN [] else COLLECT({id:id(os),name:os.name, customName:CASE WHEN r IS null THEN os.name ELSE r.customName END, description:os.description,isEnabled:r.isEnabled,created:r.creationDate}) END,id:id(organizationService),customName:CASE WHEN teamServiceCustomNameRelation IS NULL THEN organizationService.name ELSE teamServiceCustomNameRelation.customName END,name:organizationService.name,description:organizationService.description} as selectedServices\n" +
-            "RETURN {selectedServices:COLLECT(selectedServices)} as data")
-    List<Map<String,Object>> getOrganizationServicesOfTeam(long teamId);
-
-    @Query("MATCH (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) WHERE id(team)={0} AND id(os)={1} RETURN COUNT(r) as countOfRel")
-    int countOfServices(long teamId, long organizationServiceId);
-
-    @Query("MATCH (team:Team),(organizationService:OrganizationService) WHERE id(team)={0} AND id(organizationService) IN {1} create unique (team)-[r:"+TEAM_HAS_SERVICES+"{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService) ")
-    void addServiceInTeam(long teamId, long organizationServiceId, long creationDate, long lastModificationDate);
-
-    @Query("MATCH (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) WHERE id(team)={0} AND id(os)={1} SET r.isEnabled={2},r.lastModificationDate={3},r.customName=os.name ")
-    void updateOrganizationService(long teamId, long organizationServiceId, boolean isEnabled, long lastModificationDate);
 
     @Query("MATCH (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) WHERE id(team)={0} AND id(os)={1} SET r.customName={2} \n"+
             "RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")
     OrganizationServiceQueryResult addCustomNameOfSubServiceForTeam(Long teamId, Long organizationServiceId, String customName);
 
-    @Query("MATCH (team:Team),(os:OrganizationService) WHERE id(team)={1} AND id(os)={0} WITH team,os\n" +
-            "MERGE (team)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(os) \n" +
-            "ON CREATE SET r.customName={2}\n" +
-            "ON MATCH SET r.customName={2}\n" +
-            " RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")
-    OrganizationServiceQueryResult addCustomNameOfServiceForTeam(Long serviceId, Long teamId, String customName);
 
-    @Query("MATCH (organizationService:OrganizationService{isEnabled:true})-[:" + ORGANIZATION_SUB_SERVICE + "]->(os:OrganizationService)\n" +
-            "WHERE id(os)={0} WITH organizationService\n" +
-            "MATCH (team:Team) WHERE id(team)={1} WITH team, organizationService\n" +
-            "CREATE UNIQUE (team)-[r:" + HAS_CUSTOM_SERVICE_NAME_FOR + "]->(organizationService) SET r.customName=organizationService.name RETURN true")
-    Boolean addCustomNameOfServiceForTeam(Long subServiceId, Long teamId);
-
-      @Query("MATCH (team:Team) WHERE id(team)={0}\n" +
-            "MATCH (team)<-[:"+ HAS_TEAMS +"]-(organization:Organization)\n" +
-            "MATCH (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) \n" +
-            "MATCH (subType)-[:"+ORG_TYPE_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with DISTINCT skill,organization\n" +
-            "MATCH (organization)-[r:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags            \n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
-            "RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
-            "UNION\n" +
-            "MATCH (team:Team) WHERE id(team)={0} \n" +
-            "MATCH (team)<-[:"+ HAS_TEAMS +"]-(organization:Organization) \n" +
-            "MATCH (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) \n" +
-            "MATCH (subType)-[:"+ORG_TYPE_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with DISTINCT skill,organization,team\n" +
-            "MATCH (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team,organization\n" +
-            "MATCH (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r,organization\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+COUNTRY_HAS_TAG+"]-(c:Country) WHERE tag.countryTag=organization.showCountryTags with  skill,organization,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
-            "OPTIONAL MATCH (skill:Skill)-[:"+HAS_TAG+"]-(tag:Tag)<-["+ORGANIZATION_HAS_TAG+"]-(organization) with  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
-            "MATCH (skill{isEnabled:true})-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true,tags:ctags+otags})} as selectedSkills\n" +
-            "RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
-    List<Map<String,Object>> getSkillsOfTeam(long teamId);
-
-    @Query("MATCH (team:Team),(skill:Skill) WHERE id (team)={0} AND id(skill)={1} with team,skill\n" +
-            "Merge (team)-[r:"+TEAM_HAS_SKILLS+"]->(skill)\n" +
-            "ON CREATE SET r.creationDate={2},r.lastModificationDate={3},r.isEnabled={4}\n" +
-            "ON MATCH SET r.lastModificationDate={2},r.isEnabled={4} ")
-    void addSkillInTeam(long teamId, long skillId, long creationDate, long lastModificationDate, boolean isEnabled);
-
-    @Query("MATCH (organization:Organization)-[:"+ HAS_TEAMS +"]->(team:Team) WHERE id(organization)={0} RETURN team")
+    @Query("MATCH (organization:Unit)-[:"+ HAS_TEAMS +"]->(team:Team) WHERE id(organization)={0} RETURN team")
     List<Team> getTeamsByOrganization(long organizationId);
 
-    @Query("MATCH (team:Team) WHERE id(team)={0}\n" +
-            "MATCH (team)<-[:"+ HAS_TEAMS +"]-(organization:Organization) \n" +
-            "MATCH (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) \n" +
-            "MATCH (subType)-[:"+ORG_TYPE_HAS_SKILL+"{isEnabled:true}]->(skill:Skill{isEnabled:true}) with DISTINCT skill,organization,team\n" +
-            "MATCH (organization)-[:"+ORGANISATION_HAS_SKILL+"{isEnabled:true}]->(skill) with skill,team\n" +
-            "MATCH (team)-[r:"+TEAM_HAS_SKILLS+"{isEnabled:true}]->(skill) with skill,r\n" +
-            "MATCH (skill)-[:"+HAS_CATEGORY+"]->(skillCategory:SkillCategory{isEnabled:true}) with skillCategory,skill,r\n" +
-            "OPTIONAL MATCH (staff:Staff)-[staffSkillRel:"+STAFF_HAS_SKILLS+"{isEnabled:true}]->(skill) WHERE id(staff) IN {1} with {staff:CASE when staffSkillRel is null THEN [] else COLLECT(id(staff)) end} as staff,skillCategory,skill,r\n" +
-            "RETURN {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,isSelected:CASE when r is null THEN false else true end,isEdited:true,staff:staff.staff})} as data")
-    List<Map<String, Object>> getAssignedSkillsOfStaffByTeam(long unitId, List<Long> staffId);
-
-    @Query("MATCH (organization:Organization)-[:" + HAS_TEAMS + "]->(team:Team {isEnabled:true}) WHERE id(team)={0} RETURN id(organization)")
-    Long getOrganizationIdByTeam(Long teamId);
-
-    @Query("MATCH(organization:Organization)-[:" + HAS_TEAMS + "]->(team:Team {isEnabled:true}) WHERE id(organization)={0} AND id(team)<>{1} AND team.name =~{2}  " +
+    @Query("MATCH(organization:Unit)-[:" + HAS_TEAMS + "]->(team:Team {isEnabled:true}) WHERE id(organization)={0} AND id(team)<>{1} AND team.name =~{2}  " +
             " WITH COUNT(team) as totalCount " +
             " RETURN CASE WHEN totalCount>0 THEN TRUE ELSE FALSE END as result")
     Boolean teamExistInOrganizationByName(Long organizationId, Long teamId, String teamName);

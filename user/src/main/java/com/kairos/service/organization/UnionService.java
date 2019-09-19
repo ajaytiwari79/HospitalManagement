@@ -2,7 +2,10 @@ package com.kairos.service.organization;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.user.organization.*;
+import com.kairos.dto.user.organization.MunicipalityDTO;
+import com.kairos.dto.user.organization.ProvinceDTO;
+import com.kairos.dto.user.organization.RegionDTO;
+import com.kairos.dto.user.organization.ZipCodeDTO;
 import com.kairos.dto.user.organization.union.*;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.enums.UnionState;
@@ -18,12 +21,16 @@ import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.LocationGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
-import com.kairos.persistence.repository.user.region.*;
+import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
+import com.kairos.persistence.repository.user.region.RegionGraphRepository;
+import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
@@ -52,6 +59,8 @@ import static com.kairos.constants.UserMessagesConstants.*;
 public class UnionService {
     private final Logger LOGGER = LoggerFactory.getLogger(UnionService.class);
     @Inject
+    private UnitGraphRepository unitGraphRepository;
+    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private ZipCodeGraphRepository zipCodeGraphRepository;
@@ -71,6 +80,8 @@ public class UnionService {
     private MunicipalityGraphRepository municipalityGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private StaffRetrievalService staffRetrievalService;
     @Inject
@@ -316,12 +327,12 @@ public class UnionService {
         sectorIDsToBeCreated.removeAll(sectorIdsDb);
         sectorIdsDb.removeAll(sectorIds);
         if (!sectorIdsDb.isEmpty() && !union.isBoardingCompleted()) {
-            organizationGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
+            unitGraphRepository.deleteUnionSectorRelationShip(new ArrayList<>(sectorIdsDb), unionId);
         } else if (!sectorIdsDb.isEmpty() && union.isBoardingCompleted()) {
             exceptionService.unsupportedOperationException(MESSAGE_SECTOR_UNLINKED);
         }
         if (!sectorIDsToBeCreated.isEmpty()) {
-            organizationGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
+            unitGraphRepository.createUnionSectorRelationShip(sectorIDsToBeCreated, unionId);
         }
         if (!sectorDTOS.isEmpty()) {
             List<Sector> sectors = createSectors(countryId, sectorDTOS);
@@ -419,14 +430,14 @@ public class UnionService {
 
     public UnionGlobalDataDTO getUnionData(Long countryId) {
 
-        List<UnionDataQueryResult> unionDataObjects = organizationGraphRepository.getUnionData(countryId);
-        List<Long> locationIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getLocations().stream().map(location -> location.getId())).collect(
+        List<UnionDataQueryResult> unionDataObjects = unitGraphRepository.getUnionData(countryId);
+        List<Long> locationIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getLocations().stream().map(Location::getId)).collect(
                 Collectors.toList());
         Set<Long> municipalityIds = unionDataObjects.stream().flatMap(unionDataQueryResult -> unionDataQueryResult.getMunicipalities().stream().map(
-                municipality -> municipality.getId())).collect(Collectors.toSet());
+                Municipality::getId)).collect(Collectors.toSet());
         List<LocationDataQueryResult> locationDataObjects = locationGraphRepository.getLocationData(locationIds);
         municipalityIds.addAll(locationDataObjects.stream().flatMap(locationDataQueryResult -> locationDataQueryResult.getMunicipalities().stream().map(
-                municipality -> municipality.getId())).collect(Collectors.toSet()));
+                Municipality::getId)).collect(Collectors.toSet()));
         List<MunicipalityQueryResult> municipalityQueryResults = municipalityGraphRepository.findMunicipalityRegionAndProvince(municipalityIds);
         Map<Long, MunicipalityQueryResult> municipalityMap = municipalityQueryResults.stream().collect(Collectors.toMap(municipalityQueryResult -> municipalityQueryResult.getMunicipality().getId(), v -> v));
         ZipCodeSectorQueryResult zipCodesSectors = zipCodeGraphRepository.getZipCodesAndSectors(countryId);
@@ -514,32 +525,24 @@ public class UnionService {
         }
     }
 
-    public StaffUnionWrapper getEmploymentDefaultData(Long unitId, String type, Long staffId) {
+    public StaffUnionWrapper getEmploymentDefaultData(Long unitId, Long staffId) {
         Optional<Staff> staff = staffGraphRepository.findById(staffId);
         if (!staff.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
-
         }
-        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, unitId);
-        Organization organization = organizationService.getOrganizationDetail(unitId, type);
-        if (!Optional.ofNullable(organization).isPresent() || !Optional.ofNullable(organization.getOrganizationSubTypes()).isPresent()) {
+        boolean unit = unitGraphRepository.existsById(unitId);
+        Organization organization = organizationGraphRepository.findOrganizationOfStaff(staffId);
+        List<StaffExperienceInExpertiseDTO> staffSelectedExpertise = staffRetrievalService.getExpertiseWithExperienceByStaffIdAndUnitId(staffId, organization.getId());
+        OrganizationBaseEntity organizationBaseEntity = !unit ? organization : organizationBaseRepository.findOne(unitId);
+        if (!Optional.ofNullable(organizationBaseEntity).isPresent() || !Optional.ofNullable(organizationBaseEntity.getOrganizationSubTypes()).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_NOTFOUND);
 
         }
-        List<Long> organizationSubTypeIds = organization.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
-        List<UnionResponseDTO> unions = organizationGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
-        List<OrganizationBasicResponse> organizationHierarchy = new ArrayList<>();
-        if (organization.isParentOrganization()) {
-            organizationHierarchy = organizationGraphRepository.getOrganizationHierarchy(organization.getId());
-        } else {
-            OrganizationHierarchyData data = organizationGraphRepository.getChildHierarchyByChildUnit(organization.getId());
-            Iterator itr = data.getChildUnits().listIterator();
-            while (itr.hasNext()) {
-                Organization thisOrganization = (Organization) itr.next();
-                organizationHierarchy.add(new OrganizationBasicResponse(thisOrganization.getId(), thisOrganization.getName()));
-            }
-        }
-        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organization.getId(), ReasonCodeType.EMPLOYMENT);
+        List<Long> organizationSubTypeIds = organizationBaseEntity.getOrganizationSubTypes().parallelStream().map(organizationType -> organizationType.getId()).collect(Collectors.toList());
+        List<UnionResponseDTO> unions = unitGraphRepository.getAllUnionsByOrganizationSubType(organizationSubTypeIds);
+        List<OrganizationBasicResponse> organizationHierarchy = unitGraphRepository.getOrganizationHierarchy(organization.getId());
+
+        List<ReasonCodeResponseDTO> reasonCodeType = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(organizationBaseEntity.getId(), ReasonCodeType.EMPLOYMENT);
         return new StaffUnionWrapper(unions, organizationHierarchy, reasonCodeType, staffSelectedExpertise);
     }
 }

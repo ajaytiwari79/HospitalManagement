@@ -9,7 +9,6 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.*;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.expertise.CareDaysDTO;
@@ -25,24 +24,36 @@ import com.kairos.persistence.model.country.employment_type.EmploymentTypeQueryR
 import com.kairos.persistence.model.country.experties.UnionServiceWrapper;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.expertise.*;
-import com.kairos.persistence.model.user.expertise.Response.*;
+import com.kairos.persistence.model.user.expertise.CareDays;
+import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelationship;
+import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
+import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
+import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
-import com.kairos.persistence.repository.user.expertise.*;
+import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
+import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
+import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
+import com.kairos.service.country.CountryService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
@@ -81,11 +92,13 @@ public class ExpertiseService {
     private
     ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
+    private CountryService countryService;
+    @Inject
     private
     StaffGraphRepository staffGraphRepository;
     @Inject
     private
-    OrganizationGraphRepository organizationGraphRepository;
+    UnitGraphRepository unitGraphRepository;
     @Inject
     private
     OrganizationServiceRepository organizationServiceRepository;
@@ -107,6 +120,8 @@ public class ExpertiseService {
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private FunctionalPaymentGraphRepository functionalPaymentGraphRepository;
     @Inject
@@ -140,7 +155,7 @@ public class ExpertiseService {
                 exceptionService.duplicateDataException(MESSAGE_DUPLICATE, EXPERTISE, expertiseDTO.getName());
             }
             Optional.ofNullable(expertiseDTO.getUnion()).ifPresent(unionIDNameDTO -> {
-                if (expertiseDTO.isPublished() && (!Optional.ofNullable(unionIDNameDTO.getId()).isPresent() || !organizationGraphRepository.isPublishedUnion(unionIDNameDTO.getId()))) {
+                if (expertiseDTO.isPublished() && (!Optional.ofNullable(unionIDNameDTO.getId()).isPresent() || !unitGraphRepository.isPublishedUnion(unionIDNameDTO.getId()))) {
                     exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
                 }
             });
@@ -160,7 +175,7 @@ public class ExpertiseService {
             }
             Optional.ofNullable(expertise.getUnion()).ifPresent(union -> {
                 expertiseResponseDTO.getUnion().setId(expertise.getUnion().getId());
-                organizationGraphRepository.linkUnionSector(expertise.getUnion().getId(), expertise.getSector().getId());
+                unitGraphRepository.linkUnionSector(expertise.getUnion().getId(), expertise.getSector().getId());
             });
             TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
             ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
@@ -370,7 +385,7 @@ public class ExpertiseService {
             expertiseDTO.getSeniorityLevel().setId(seniorityLevel.getId());
             seniorityLevelDTOList.add(expertiseDTO.getSeniorityLevel());
             copiedExpertise.setUnion(getUnion(expertiseDTO.getUnion().getId(), expertiseDTO.getUnion().getName(), country));
-            organizationGraphRepository.linkUnionSector(copiedExpertise.getUnion().getId(), copiedExpertise.getSector().getId());
+            unitGraphRepository.linkUnionSector(copiedExpertise.getUnion().getId(), copiedExpertise.getSector().getId());
             // NOW WE need to add the other seniority level which exists in expertise
             // since we have already
             seniorityLevelDTOList.addAll(copyExistingSeniorityLevelInExpertise(copiedExpertise, currentExpertise.getSeniorityLevel(), seniorityLevelToUpdate.get().getId()));
@@ -407,7 +422,7 @@ public class ExpertiseService {
                 expertiseResponseDTO.getUnion().setId(currentExpertise.getUnion().getId());
             }
             if (currentExpertise.getUnion() != null && currentExpertise.getSector() != null) {
-                organizationGraphRepository.linkUnionSector(currentExpertise.getUnion().getId(), currentExpertise.getSector().getId());
+                unitGraphRepository.linkUnionSector(currentExpertise.getUnion().getId(), currentExpertise.getSector().getId());
             }
 
 
@@ -583,7 +598,7 @@ public class ExpertiseService {
         }
         UnionServiceWrapper unionServiceWrapper = new UnionServiceWrapper();
         unionServiceWrapper.setServices(organizationServiceService.getAllOrganizationService(countryId));
-        unionServiceWrapper.setUnions(organizationGraphRepository.findAllUnionsByCountryId(countryId));
+        unionServiceWrapper.setUnions(unitGraphRepository.findAllUnionsByCountryId(countryId));
         unionServiceWrapper.setOrganizationLevels(countryGraphRepository.getLevelsByCountry(countryId));
         unionServiceWrapper.setSectors(ObjectMapperUtils.copyPropertiesOfListByMapper(sectorGraphRepository.findAllSectorsByCountryAndDeletedFalse(countryId), SectorDTO.class));
         return unionServiceWrapper;
@@ -600,7 +615,7 @@ public class ExpertiseService {
 
         }
         validateExpertiseBeforePublishing(expertise);
-        if (!Optional.ofNullable(expertise.getUnion().getId()).isPresent() || !organizationGraphRepository.isPublishedUnion(expertise.getUnion().getId())) {
+        if (!Optional.ofNullable(expertise.getUnion().getId()).isPresent() || !unitGraphRepository.isPublishedUnion(expertise.getUnion().getId())) {
             exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
         }
         List<Long> seniorityLevelId = new ArrayList<>();
@@ -784,7 +799,7 @@ public class ExpertiseService {
     }
 
     public List<ExpertiseTagDTO> getExpertiseForOrgCTA(long unitId) {
-        Long countryId = organizationService.getCountryIdOfOrganization(unitId);
+        Long countryId = countryService.getCountryIdByUnitId(unitId);
         return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
     }
 
@@ -913,11 +928,12 @@ public class ExpertiseService {
     }
 
     public Map<String, Object> getPlannedTimeAndEmploymentTypeForUnit(Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
+        Unit unit = unitGraphRepository.findOne(unitId);
+        if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
         }
-        return getPlannedTimeAndEmploymentType(organization.getCountry().getId());
+        Long countryId= countryService.getCountryIdByUnitId(unitId);
+        return getPlannedTimeAndEmploymentType(countryId);
     }
 
     //register a job for unassign expertise from activity and this method call when set enddate of publish expertise

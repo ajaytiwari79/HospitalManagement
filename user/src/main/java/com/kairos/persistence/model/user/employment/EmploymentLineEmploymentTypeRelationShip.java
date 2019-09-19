@@ -3,7 +3,10 @@ package com.kairos.persistence.model.user.employment;
 import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
-import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.EndNode;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.RelationshipEntity;
+import org.neo4j.ogm.annotation.StartNode;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_EMPLOYMENT_TYPE;
 

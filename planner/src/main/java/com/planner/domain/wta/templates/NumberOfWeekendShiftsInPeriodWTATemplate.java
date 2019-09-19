@@ -2,7 +2,9 @@ package com.planner.domain.wta.templates;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.wta.*;
+import com.kairos.enums.wta.MinMaxSetting;
+import com.kairos.enums.wta.PartOfDay;
+import com.kairos.enums.wta.WTATemplateType;
 
 import java.time.LocalTime;
 import java.util.ArrayList;

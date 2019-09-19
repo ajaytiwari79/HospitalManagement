@@ -1,7 +1,9 @@
 package com.kairos.service.client;
 
 import com.kairos.dto.user.organization.AddressDTO;
-import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.Client;
+import com.kairos.persistence.model.client.ClientTemporaryAddress;
+import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
@@ -17,7 +19,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;

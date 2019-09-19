@@ -1,7 +1,10 @@
 package com.kairos.dto.activity.counter.configuration;
 
 import com.kairos.dto.activity.counter.data.FilterCriteria;
-import com.kairos.dto.activity.counter.enums.*;
+import com.kairos.dto.activity.counter.enums.ChartType;
+import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterSize;
+import com.kairos.dto.activity.counter.enums.CounterType;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;

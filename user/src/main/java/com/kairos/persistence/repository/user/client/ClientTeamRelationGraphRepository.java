@@ -15,7 +15,4 @@ public interface ClientTeamRelationGraphRepository extends Neo4jBaseRepository<C
     @Query("MATCH (c:Client)-[r:SERVED_BY_TEAM]->(t:Team) where id(c)={0} AND id(t)={1} return r")
     ClientTeamRelation checkRestrictedTeam(Long clientId, long id);
 
-    @Query("MATCH (c:Client)-[r:SERVED_BY_TEAM]->(t:Team) where id(c)={0} AND id(t)={1} return r")
-    ClientTeamRelation checkPreferredTeam(Long clientId, long id);
-
 }

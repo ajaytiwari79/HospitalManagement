@@ -1,6 +1,9 @@
 package com.kairos.service.common;
 
-import com.kairos.dto.gdpr.*;
+import com.kairos.dto.gdpr.OrgTypeSubTypeServiceCategoryVO;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
 import com.kairos.dto.gdpr.data_inventory.OrganizationTypeAndSubTypeIdDTO;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
 import com.kairos.enums.gdpr.QuestionnaireTemplateType;
@@ -10,10 +13,14 @@ import com.kairos.persistence.model.clause_tag.ClauseTag;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistence.model.master_data.data_category_element.*;
+import com.kairos.persistence.model.master_data.data_category_element.DataCategory;
+import com.kairos.persistence.model.master_data.data_category_element.DataElement;
+import com.kairos.persistence.model.master_data.data_category_element.DataSubject;
 import com.kairos.persistence.model.master_data.default_asset_setting.*;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.*;
-import com.kairos.persistence.model.questionnaire_template.*;
+import com.kairos.persistence.model.questionnaire_template.Question;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.clause_tag.ClauseTagRepository;

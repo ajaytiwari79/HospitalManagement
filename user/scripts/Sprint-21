@@ -1,6 +1,6 @@
 1. // TO set unit permission of Admin
 Match (e:Employment) WHERE e.name="working as country admin"   WITH e
-MATCH (o:Organization) WHERE o.organizationLevel="COUNTRY" WITH  o,e
+MATCH (o:Unit) WHERE o.organizationLevel="COUNTRY" WITH  o,e
 MATCH (ag:AccessGroup) WHERE ag.name="AG_COUNTRY_ADMIN" WITH o,e,ag
 CREATE (u:UnitPermission{startDate:timestamp()}) WITH o,e,u,ag
 CREATE unique (u)-[:HAS_ACCESS_GROUP]->(ag) WITH o,e,u
@@ -16,7 +16,7 @@ CREATE UNIQUE (ap)-[:APPLICABLE_FOR]-(fg) return ap,fg;
 
 2.// To create Shift Planning Time slot set for previous organization
 
-Match(o:Organization{isEnable:true})-[:HAS_TIME_SLOT_SET]-(tss:TimeSlotSet)
+Match(o:Unit{isEnable:true})-[:HAS_TIME_SLOT_SET]-(tss:TimeSlotSet)
 where tss.timeSlotType IS NULL
 set tss.timeSlotType='TASK_PLANNING'
 with DISTINCT o

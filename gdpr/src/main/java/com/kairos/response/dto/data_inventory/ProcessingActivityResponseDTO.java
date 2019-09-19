@@ -5,7 +5,9 @@ import com.kairos.dto.gdpr.ManagingOrganization;
 import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.gdpr.data_inventory.RelatedDataSubjectDTO;
 import com.kairos.response.dto.common.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;

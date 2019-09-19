@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.shift;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
@@ -67,23 +69,22 @@ public class ShiftDTO {
     protected ShiftType shiftType;
     protected BigInteger shiftStatePhaseId;
     protected int timeBankCtaBonusMinutes;
-    protected int deltaTimeBankMinutes;
-    protected long accumulatedTimeBankMinutes;
     protected int plannedMinutesOfTimebank;
+    protected int plannedMinutesOfPayout;
     protected boolean multipleActivity;
     protected BigInteger planningPeriodId;
     protected BigInteger phaseId;
     protected int restingMinutes;
     protected Set<ShiftEscalationReason> escalationReasons;
     protected Long functionId;
-    private Set<BigInteger> escalationFreeShiftIds;
-    private boolean escalationResolved;
-    private boolean deleted;
-    private ShiftWithActivityDTO draftShift;
-    private boolean draft;
-    private RequestAbsenceDTO requestAbsence;
-    private List<ShiftActivityDTO> breakActivities;
-    private boolean hasOriginalShift;
+    protected Set<BigInteger> escalationFreeShiftIds;
+    protected boolean escalationResolved;
+    protected boolean deleted;
+    protected ShiftWithActivityDTO draftShift;
+    protected boolean draft;
+    protected RequestAbsenceDTO requestAbsence;
+    protected List<ShiftActivityDTO> breakActivities;
+    protected boolean hasOriginalShift;
 
 
     public ShiftDTO() {
@@ -179,10 +180,6 @@ public class ShiftDTO {
     }
     public Set<BigInteger> getEscalationFreeShiftIds() {
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
-    }
-
-    public boolean isHasOriginalShift() {
-        return !draft;
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.kairos.persistence.model.user.initial_time_bank_log.InitialTimeBankLo
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.initial_time_bank_log.InitialTimeBankLogRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +13,6 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**

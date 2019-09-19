@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
-import com.kairos.enums.wta.*;
+import com.kairos.enums.wta.MinMaxSetting;
+import com.kairos.enums.wta.PartOfDay;
+import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +36,7 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
 
     @Positive(message = "message.ruleTemplate.interval.notNull")
@@ -55,9 +60,6 @@ public class AverageScheduledTimeWTATemplate extends WTABaseRuleTemplate {
         wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
     }
 
-    public AverageScheduledTimeWTATemplate() {
-        wtaTemplateType = WTATemplateType.AVERAGE_SHEDULED_TIME;
-    }
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {

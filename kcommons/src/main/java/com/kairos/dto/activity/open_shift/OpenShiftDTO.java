@@ -1,7 +1,10 @@
 package com.kairos.dto.activity.open_shift;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 public class OpenShiftDTO {
     private BigInteger id;

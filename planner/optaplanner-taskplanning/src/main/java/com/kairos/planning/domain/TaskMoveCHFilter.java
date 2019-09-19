@@ -46,7 +46,6 @@ public class TaskMoveCHFilter implements SelectionFilter<TaskPlanningSolution, C
             }
         }
         if (matches && taskList.contains(task.getId()) && prevTaskList.contains(((Task) prevTaskOrEmployee).getId())) {
-            acceptable=acceptable;
         }
 
 

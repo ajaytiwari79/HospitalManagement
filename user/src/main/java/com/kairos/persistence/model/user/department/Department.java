@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.user.department;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -24,7 +24,7 @@ public class Department extends UserBaseEntity {
     private List<Staff> teams;
 
     @Relationship(type = MANAGE)
-    private List<Organization> organizations;
+    private List<Unit> units;
 
     public Department(String s) {
         this.name = s;
@@ -48,12 +48,12 @@ public class Department extends UserBaseEntity {
         this.teams = teams;
     }
 
-    public List<Organization> getOrganizations() {
-        return organizations;
+    public List<Unit> getUnits() {
+        return units;
     }
 
-    public void setOrganizations(List<Organization> organizations) {
-        this.organizations = organizations;
+    public void setUnits(List<Unit> units) {
+        this.units = units;
     }
 
     public Department() {

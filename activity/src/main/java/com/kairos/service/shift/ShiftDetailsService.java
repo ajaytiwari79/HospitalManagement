@@ -1,17 +1,13 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.phase.PhaseDefaultName;
-import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.shift.*;
+import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
@@ -32,10 +28,8 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.HashSet;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -65,7 +59,10 @@ public class ShiftDetailsService extends MongoBaseService {
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds , boolean showDraft) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS;
         if(showDraft){
+            List<ShiftWithActivityDTO> originalShift=new ArrayList<>(shiftMongoRepository.findAllShiftsByIds(shiftIds));
+            Map<BigInteger,Boolean>  shiftIdAndOriginalShiftMap=originalShift.stream().collect(Collectors.toMap(k->k.getId(),v-> (!v.isDraft() && isNotNull(v.getDraftShift()))));
             shiftWithActivityDTOS  = new ArrayList<>(shiftMongoRepository.findAllDraftShiftsByIds(shiftIds,showDraft));
+            shiftWithActivityDTOS.stream().forEach(shiftWithActivityDTO -> shiftWithActivityDTO.setHasOriginalShift(shiftIdAndOriginalShiftMap.get(shiftWithActivityDTO.getId())));
             List<BigInteger> draftShiftIds=shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList());
             shiftIds.removeAll(draftShiftIds);
             if(isCollectionNotEmpty(shiftIds)){

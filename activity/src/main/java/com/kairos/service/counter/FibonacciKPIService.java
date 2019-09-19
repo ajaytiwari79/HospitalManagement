@@ -10,12 +10,16 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIConfigDTO;
 import com.kairos.dto.activity.counter.fibonacci_kpi.FibonacciKPIDTO;
-import com.kairos.dto.activity.kpi.*;
+import com.kairos.dto.activity.kpi.KPIResponseDTO;
+import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.*;
-import com.kairos.persistence.repository.counter.*;
+import com.kairos.persistence.repository.counter.ApplicableKPIRepository;
+import com.kairos.persistence.repository.counter.CounterRepository;
+import com.kairos.persistence.repository.counter.FibonacciKPIRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.counter.KPIUtils;
@@ -33,9 +37,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.UNCATEGORIZED;
-import static com.kairos.dto.activity.counter.enums.ConfLevel.COUNTRY;
-import static com.kairos.dto.activity.counter.enums.ConfLevel.STAFF;
-import static com.kairos.dto.activity.counter.enums.ConfLevel.UNIT;
+import static com.kairos.dto.activity.counter.enums.ConfLevel.*;
 
 @Service
 public class FibonacciKPIService implements CounterService{

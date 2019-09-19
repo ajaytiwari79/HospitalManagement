@@ -45,17 +45,21 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
-import org.joda.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.*;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -129,6 +133,7 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setScheduledMinutesOfTimeBank(scheduledMinutesOfTimeBank);
         dailyTimeBankEntry.setDeltaTimeBankMinutes(deltaTimeBankMinutes);
         dailyTimeBankEntry.setTimeBankCTADistributionList(getCTADistributionsOfTimebank(staffEmploymentDetails.getCtaRuleTemplates(), ctaTimeBankMinMap));
+        dailyTimeBankEntry.setDraftDailyTimeBankEntry(null);
         return dailyTimeBankEntry;
     }
 
@@ -142,6 +147,7 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setDeltaTimeBankMinutes(-contractualMinutes);
         dailyTimeBankEntry.setPublishedSomeActivities(false);
         dailyTimeBankEntry.setTimeBankCTADistributionList(new ArrayList<>());
+        dailyTimeBankEntry.setDraftDailyTimeBankEntry(null);
     }
 
     private Double calculateBonusAndUpdateShiftActivity(DateTimeInterval dateTimeInterval, Map<BigInteger, Integer> ctaTimeBankMinMap, CTARuleTemplateDTO ruleTemplate, ShiftActivityDTO shiftActivity, DateTimeInterval shiftInterval) {
@@ -948,7 +954,7 @@ public class TimeBankCalculationService {
             Map<String,Integer> ctaRuletemplateNameAndMinutesMap = new HashMap<>();
             if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate)) {
                 dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                totalTimeBankMinutes = userAccessRoleDTO.getManagement() && dailyTimeBankEntry.isAnyShiftInDraft() ? dailyTimeBankEntry.getDraftDeltaTimebankMinutes() : dailyTimeBankEntry.getDeltaTimeBankMinutes();
+                totalTimeBankMinutes = getDeltaTimebankByUserAccessRole(userAccessRoleDTO,dailyTimeBankEntry);
                 publishedBalancesMinutes = dailyTimeBankEntry.getPublishedBalances().values().stream().mapToLong(value -> value).sum();
                 ctaRuletemplateNameAndMinutesMap = dailyTimeBankEntry.getTimeBankCTADistributionList().stream().collect(Collectors.toMap(k->k.getCtaName(),v->v.getMinutes()));
             } else {
@@ -965,6 +971,16 @@ public class TimeBankCalculationService {
             employmentStartDate = employmentStartDate.plusDays(1);
         }
         return localDateTimeBankByDateDTOMap;
+    }
+
+    private int getDeltaTimebankByUserAccessRole(UserAccessRoleDTO userAccessRoleDTO,DailyTimeBankEntry dailyTimeBankEntry){
+        int deltaTimebankMinutes;
+        if(userAccessRoleDTO.getManagement() && isNotNull(dailyTimeBankEntry.getDraftDailyTimeBankEntry())){
+            deltaTimebankMinutes = dailyTimeBankEntry.getDraftDailyTimeBankEntry().getDeltaTimeBankMinutes();
+        }else {
+            deltaTimebankMinutes = dailyTimeBankEntry.getDeltaTimeBankMinutes();
+        }
+        return deltaTimebankMinutes;
     }
 
     private BigDecimal getHourlyCostByDate(List<EmploymentLinesDTO> employmentLines, java.time.LocalDate localDate) {
@@ -1103,7 +1119,7 @@ public class TimeBankCalculationService {
                             shiftActivity.setPlannedMinutesOfTimebank(ctaBonusAndScheduledMinutes);
                             totalDailyPlannedMinutes += ctaBonusAndScheduledMinutes;
                             ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaBonusAndScheduledMinutes);
-                            if (validatedByPlanner || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) {
+                            if ((validatedByPlanner || shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) && !shift.isDraft()) {
                                 totalPublishedDailyPlannedMinutes += ctaBonusAndScheduledMinutes;
                                 anyShiftPublish = true;
                             }

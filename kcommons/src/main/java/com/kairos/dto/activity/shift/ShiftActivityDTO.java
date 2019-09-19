@@ -2,6 +2,8 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
+import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.TimeTypeEnum;
@@ -55,6 +57,7 @@ public class ShiftActivityDTO {
 
     private Double timeBankCtaBonusMinutes;
     private List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
+    private List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions;
     private Map<String, Object> location;// location where this activity needs to perform
     private String description;// this is from activity description and used in shift detail popup
     private List<WorkTimeAgreementRuleViolation> wtaRuleViolations;
@@ -133,7 +136,11 @@ public class ShiftActivityDTO {
     }
 
     public List<TimeBankDistributionDTO> getTimeBankCTADistributions() {
-        return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>(0));
+        return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>());
+    }
+
+    public List<PayOutPerShiftCTADistributionDTO> getPayoutPerShiftCTADistributions() {
+        return Optional.ofNullable(payoutPerShiftCTADistributions).orElse(new ArrayList<>());
     }
 
     public List<PlannedTime> getPlannedTimes() {
@@ -152,5 +159,12 @@ public class ShiftActivityDTO {
     @JsonIgnore
     public LocalDate getEndLocalDate(){
         return asLocalDate(this.endDate);
+    }
+
+    public void resetTimebankDetails(){
+        this.plannedMinutesOfTimebank = 0;
+        this.timeBankCtaBonusMinutes = 0d;
+        this.timeBankCTADistributions = new ArrayList<>();
+        this.getChildActivities().forEach(shiftActivityDTO -> shiftActivityDTO.resetTimebankDetails());
     }
 }

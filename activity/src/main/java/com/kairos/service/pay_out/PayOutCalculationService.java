@@ -5,7 +5,9 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
-import com.kairos.dto.activity.pay_out.*;
+import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
+import com.kairos.dto.activity.pay_out.PayOutDTO;
+import com.kairos.dto.activity.pay_out.PayOutIntervalDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.CTARuletemplateBonus;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
@@ -25,7 +27,6 @@ import org.joda.time.Interval;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.ZonedDateTime;
@@ -98,28 +99,9 @@ public class PayOutCalculationService {
         payOutPerShift.setCtaBonusMinutesOfPayOut(ctaBonusMinutes);
         payOutPerShift.setScheduledMinutes(scheduledMinutesOfPayout);
         payOutPerShift.setTotalPayOutMinutes(ctaBonusMinutes+scheduledMinutesOfPayout);
+        shift.setPlannedMinutesOfPayout(ctaBonusMinutes+scheduledMinutesOfPayout);
         payOutPerShift.setPayOutPerShiftCTADistributions(getCTADistribution(staffEmploymentDetails.getCtaRuleTemplates(), ctaPayoutMinMap));
         return payOutPerShift;
-    }
-
-    /**
-     * @param interval
-     * @param startDate
-     * @return DateTimeInterval
-     */
-    private List<DateTimeInterval> getCTAInterval(CompensationTableInterval interval, ZonedDateTime startDate) {
-        List<DateTimeInterval> ctaIntervals = new ArrayList<>(2);
-        if(interval.getFrom().isAfter(interval.getTo())){
-            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS),startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
-            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.truncatedTo(ChronoUnit.DAYS).plusDays(1)));
-        }
-        else if(interval.getFrom().equals(interval.getTo())){
-            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS), startDate.truncatedTo(ChronoUnit.DAYS).plusDays(1)));
-        }
-        else{
-            ctaIntervals.add(new DateTimeInterval(startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getFrom().get(ChronoField.MINUTE_OF_DAY)), startDate.truncatedTo(ChronoUnit.DAYS).plusMinutes(interval.getTo().get(ChronoField.MINUTE_OF_DAY))));
-        }
-        return ctaIntervals;
     }
 
     /**

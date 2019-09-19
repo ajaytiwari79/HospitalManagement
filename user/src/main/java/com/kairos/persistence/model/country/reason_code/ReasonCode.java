@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -28,7 +28,7 @@ public class ReasonCode extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
     @Relationship(type = BELONGS_TO)
-    private Organization organization;
+    private Unit unit;
     // this is only persist when we create any Absence type reason code
     private BigInteger timeTypeId;
 
@@ -44,12 +44,12 @@ public class ReasonCode extends UserBaseEntity {
         this.timeTypeId=timeTypeId;
     }
 
-    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Organization organization,BigInteger timeTypeId) {
+    public ReasonCode(String name, String code, String description, ReasonCodeType reasonCodeType, Unit unit, BigInteger timeTypeId) {
         this.name = name;
         this.code = code;
         this.description = description;
         this.reasonCodeType = reasonCodeType;
-        this.organization = organization;
+        this.unit = unit;
         this.timeTypeId=timeTypeId;
     }
 
@@ -93,12 +93,12 @@ public class ReasonCode extends UserBaseEntity {
         this.country = country;
     }
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public BigInteger getTimeTypeId() {

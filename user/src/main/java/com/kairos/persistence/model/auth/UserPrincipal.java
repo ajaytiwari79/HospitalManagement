@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.auth;
 
-import com.kairos.config.security.CurrentUserDetails;
+import com.kairos.dto.CurrentUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -68,8 +68,7 @@ public class UserPrincipal implements UserDetails, Authentication {
     public Object getDetails() {
 
         CurrentUserDetails details = new CurrentUserDetails(this.user.getId(), this.user.getUserName(), this.user.nickName,
-                this.user.firstName, this.user.getLastName(), this.user.getEmail(), this.user.isPasswordUpdated(),
-                this.user.getGoogleCalenderTokenId(), this.user.getGoogleCalenderAccessToken());
+                this.user.firstName, this.user.getLastName(), this.user.getEmail(), this.user.isPasswordUpdated());
         details.setAge(this.user.getAge());
         details.setLastSelectedOrganizationId(this.getUser().getLastSelectedOrganizationId());
         details.setCountryId(this.getUser().getCountryId());
