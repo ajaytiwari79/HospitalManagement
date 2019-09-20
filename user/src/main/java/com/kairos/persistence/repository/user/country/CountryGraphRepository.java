@@ -155,4 +155,9 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN country")
     Country getCountryByUnitId(long unitId);
 
+    @Query("MATCH (ch:CountryHolidayCalender{isEnabled:true})-[:"+DAY_TYPE+"]->(dt:DayType{isEnabled:true}) " +
+            "WHERE id(ch) ={0}"  +
+            "RETURN ch.holidayDate as holidayDate, dt as dayType ")
+    CountryHolidayCalendarQueryResult findByCalendarHolidayId(Long calendarHolidayId);
+
 }
