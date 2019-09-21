@@ -854,7 +854,7 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate(),"dd-MM-yyyy");
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate().minusDays(1),"dd-MM-yyyy");
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
         return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
@@ -882,5 +882,16 @@ public  class DateUtils {
     public static Date roundDateByMinutes(Date date,int minutes){
         ZonedDateTime zonedDateTime = asZoneDateTime(date);
         return asDate(zonedDateTime.truncatedTo(ChronoUnit.HOURS).plusMinutes((int)Math.ceil((double)zonedDateTime.get(ChronoField.MINUTE_OF_HOUR)/minutes)*minutes));
+    }
+    public static Set<DayOfWeek> getAllDaysBetweenDays(DayOfWeek startDayOfWeek, DayOfWeek endDayOfWeek) {
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        while (true){
+            dayOfWeeks.add(startDayOfWeek);
+            if(startDayOfWeek.equals(endDayOfWeek)){
+                break;
+            }
+            startDayOfWeek=startDayOfWeek.plus(1);
+        }
+        return dayOfWeeks;
     }
 }
