@@ -15,7 +15,7 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MaximumShiftsInIntervalWTATemplate implements ConstraintHandler {
+public class    MaximumShiftsInIntervalWTATemplate implements ConstraintHandler {
 
     private List<String> balanceType;//multiple check boxes
     private long intervalLength;//
