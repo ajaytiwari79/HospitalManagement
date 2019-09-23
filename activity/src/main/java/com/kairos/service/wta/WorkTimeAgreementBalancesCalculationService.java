@@ -112,6 +112,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
                     activityIds.addAll(wtaForCareDays.getCareDayCounts().stream().map(activityCareDayCount -> activityCareDayCount.getActivityId()).collect(Collectors.toSet()));
                     break;
+                case PROTECTED_DAYS_OFF:
+                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate=(ProtectedDaysOffWTATemplate) ruleTemplate;
+                    activityIds.add(protectedDaysOffWTATemplate.getActivityId());
                 default:
                     break;
             }
@@ -168,7 +171,7 @@ public class WorkTimeAgreementBalancesCalculationService {
                     break;
                 case PROTECTED_DAYS_OFF:
                     ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate=(ProtectedDaysOffWTATemplate) ruleTemplate;
-
+                    workTimeAgreementRuleTemplateBalancesDTO = getProtectedDaysOffBalance(protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, staffAdditionalInfoDTO);
                     break;
                 default:
                     workTimeAgreementRuleTemplateBalancesDTO = null;
@@ -181,6 +184,19 @@ public class WorkTimeAgreementBalancesCalculationService {
         return workTimeAgreementBalance;
     }
 
+
+    private WorkTimeAgreementRuleTemplateBalancesDTO getProtectedDaysOffBalance(ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, LocalDate startDate, LocalDate endDate, Map<BigInteger, TimeType> timeTypeMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        List<IntervalBalance> intervalBalances = new ArrayList<>();
+        WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO = null;
+        //TODO We will remove that when TimeType functionality implement in WTARuletemplate
+        String activityName = "";
+        String timetypeColor = "";
+        CutOffIntervalUnit cutOffIntervalUnit = null;
+        if (isCollectionNotEmpty(intervalBalances)) {
+            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityName, timetypeColor, intervalBalances, cutOffIntervalUnit);
+        }
+        return workTimeAgreementRuleTemplateBalancesDTO;
+    }
 
     private WorkTimeAgreementRuleTemplateBalancesDTO getVetoRuleTemplateBalance(VetoAndStopBricksWTATemplate vetoAndStopBricksWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, LocalDate startDate, LocalDate endDate, Map<BigInteger, TimeType> timeTypeMap, LocalDate planningPeriodEndDate) {
         List<IntervalBalance> intervalBalances = new ArrayList<>();
