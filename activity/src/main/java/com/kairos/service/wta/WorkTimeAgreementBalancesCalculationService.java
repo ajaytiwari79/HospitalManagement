@@ -16,10 +16,7 @@ import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.template_types.ChildCareDaysCheckWTATemplate;
-import com.kairos.persistence.model.wta.templates.template_types.SeniorDaysPerYearWTATemplate;
-import com.kairos.persistence.model.wta.templates.template_types.VetoAndStopBricksWTATemplate;
-import com.kairos.persistence.model.wta.templates.template_types.WTAForCareDays;
+import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -168,6 +165,10 @@ public class WorkTimeAgreementBalancesCalculationService {
                 case WTA_FOR_CARE_DAYS:
                     WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
                     workTimeAgreementRuleTemplateBalancesDTO = getWtaForCareDayRuleTemplateBalance(wtaForCareDays, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, planningPeriod.getEndDate());
+                    break;
+                case PROTECTED_DAYS_OFF:
+                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate=(ProtectedDaysOffWTATemplate) ruleTemplate;
+
                     break;
                 default:
                     workTimeAgreementRuleTemplateBalancesDTO = null;
