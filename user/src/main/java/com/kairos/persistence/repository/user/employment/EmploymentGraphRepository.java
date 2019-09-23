@@ -303,7 +303,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     boolean updateEmploymentLineEndDateByEmploymentIds(Set<Long> employmentIds,String endDate);
 
     @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]-(e:Expertise{deleted:false}) \n" +
-            "MATCH (employment)-[:"+IN_UNIT+"]-(organization:Organization) \n"+
+            "MATCH (employment)-[:"+IN_UNIT+"]-(organization:Unit) \n"+
             "RETURN id(staff) as staffId,COLLECT({id:id(employment),expId:id(e),unitId:id(organization)}) as employmentDetails")
     List<Map> findStaffsWithEmploymentIds();
 
