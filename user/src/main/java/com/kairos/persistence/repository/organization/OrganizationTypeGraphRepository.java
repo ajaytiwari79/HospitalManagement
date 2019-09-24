@@ -147,7 +147,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     /*
     * created by bobby
     * */
-    @Query("Match (organization:Unit{isEnable:true}) where id(organization)={0}\n" +
+    @Query("Match (organization{isEnable:true}) where id(organization)={0}\n" +
             " Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) \n" +
             " optional match(organizationType)-[:"+HAS_SUB_TYPE+"]->(organizationSubType:OrganizationType{isEnable:true})\n" +
             " with DISTINCT organizationType, organizationSubType\n" +
