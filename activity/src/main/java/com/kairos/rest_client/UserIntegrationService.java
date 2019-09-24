@@ -812,6 +812,10 @@ public class UserIntegrationService {
     public List<EmploymentTypeDTO> getEmploymentTypeByCountry(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/employment_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EmploymentTypeDTO>>>() {});
     }
+
+    public List<Date> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
+        return genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Date>>>() {});
+    }
 }
 
 
