@@ -378,7 +378,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public BigInteger createNonWorkingExceptionActivityConfiguration(Long unitOrCountryId, NonWorkingPlannedTime nonWorkingPlannedTime, boolean forCountry) {
-        if (!Optional.ofNullable(nonWorkingPlannedTime.getTimeTypeId()).isPresent()) {
+        if (isNull(nonWorkingPlannedTime.getTimeTypeId()) && !nonWorkingPlannedTime.isException()) {
             exceptionService.dataNotFoundByIdException(ERROR_TIMETYPE_UNSELECTED);
         }
         ActivityConfiguration activityConfiguration = forCountry ? new ActivityConfiguration(new NonWorkingPlannedTime(nonWorkingPlannedTime.getPhaseId(), nonWorkingPlannedTime.getTimeTypeId(), nonWorkingPlannedTime.getPlannedTimeIds(), true), unitOrCountryId)
@@ -412,4 +412,21 @@ public class ActivityConfigurationService extends MongoBaseService {
     public List<ActivityConfigurationDTO> getNonWorkingActivityConfigurationForCountry(Long countryId) {
         return activityConfigurationRepository.findNonWorkingConfigurationByCountryId(countryId);
     }
+
+    //todo this method to copy default NonWorkingActivityConfiguration from AbsenceActivityConfiguration
+    public boolean copyNonWorkingActivityConfigurationFromAbsence() {
+        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfiguration();
+        if(isCollectionNotEmpty(activityConfigurations)){
+            activityConfigurations.forEach(activityConfiguration -> {
+                NonWorkingPlannedTime nonWorkingPlannedTime = new NonWorkingPlannedTime(activityConfiguration.getAbsencePlannedTime().getPhaseId(),activityConfiguration.getAbsencePlannedTime().getTimeTypeId(),activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds(),isNull(activityConfiguration.getAbsencePlannedTime().getTimeTypeId()));
+                if(isNotNull(activityConfiguration.getCountryId())){
+                    createNonWorkingExceptionActivityConfiguration(activityConfiguration.getCountryId(), nonWorkingPlannedTime,true);
+                }else{
+                    createNonWorkingExceptionActivityConfiguration(activityConfiguration.getUnitId(), nonWorkingPlannedTime,false);
+                }
+            });
+        }
+        return true;
+    }
+
 }
