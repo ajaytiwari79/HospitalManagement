@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class ProtectedDaysOffSettingDTO {
+public class ProtectedDaysOffSetting {
     private Long holidayId;
     private LocalDate publicHolidayDate;
     private boolean protechedDaysOff;

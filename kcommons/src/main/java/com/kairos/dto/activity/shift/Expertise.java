@@ -15,7 +15,7 @@ public class Expertise {
     private Long id;
     private String name;
     private BreakPaymentSetting breakPaymentSetting;
-    private List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
 
     public Expertise() {
         //Not in use
@@ -45,11 +45,11 @@ public class Expertise {
         this.breakPaymentSetting = breakPaymentSetting;
     }
 
-    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSettings() {
+    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
         return protectedDaysOffSettings;
     }
 
-    public void setProtectedDaysOffSettings(List<ProtectedDaysOffSettingDTO> protectedDaysOffSettings) {
+    public void setProtectedDaysOffSettings(List<ProtectedDaysOffSetting> protectedDaysOffSettings) {
         this.protectedDaysOffSettings = protectedDaysOffSettings;
     }
 }

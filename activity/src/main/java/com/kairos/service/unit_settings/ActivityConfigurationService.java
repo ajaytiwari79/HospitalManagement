@@ -244,6 +244,8 @@ public class ActivityConfigurationService extends MongoBaseService {
                 break;
             default:
                 plannedTimes = getNonWorkingPlannedTime(unitId, phaseId, activity);
+                plannedTimes = new ArrayList<>();
+                plannedTimes.add(BigInteger.valueOf(2l));
         }
         return plannedTimes;
     }
@@ -278,7 +280,7 @@ public class ActivityConfigurationService extends MongoBaseService {
             plannedTimeIds = activityConfiguration.getNonWorkingPlannedTime().getPlannedTimeIds();
         }
         if(isCollectionEmpty(plannedTimeIds)){
-            exceptionService.dataNotFoundByIdException(PLANNED_TIME_NOT_CONFIGURE);
+           // exceptionService.dataNotFoundByIdException(PLANNED_TIME_NOT_CONFIGURE);
         }
         return plannedTimeIds;
     }

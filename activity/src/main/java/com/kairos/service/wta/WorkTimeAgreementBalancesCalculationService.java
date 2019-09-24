@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
@@ -12,12 +13,12 @@ import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.period.PlanningPeriod;
-import com.kairos.persistence.model.unit_settings.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
@@ -179,7 +180,7 @@ public class WorkTimeAgreementBalancesCalculationService {
                 case PROTECTED_DAYS_OFF:
                     ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate=(ProtectedDaysOffWTATemplate) ruleTemplate;
                     ProtectedDaysOffSettingDTO protectedDaysOffSetting=protectedDaysOffService.getProtectedDaysOffByUnitId(unitId);
-                    workTimeAgreementRuleTemplateBalancesDTO = getProtectedDaysOffBalance(protectedDaysOffSetting,protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, startDate, endDate, timeTypeMap, staffAdditionalInfoDTO);
+                    workTimeAgreementRuleTemplateBalancesDTO = getProtectedDaysOffBalance(protectedDaysOffSetting,protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, timeTypeMap, staffAdditionalInfoDTO);
                     break;
                 default:
                     workTimeAgreementRuleTemplateBalancesDTO = null;
@@ -193,18 +194,25 @@ public class WorkTimeAgreementBalancesCalculationService {
     }
 
 
-    private WorkTimeAgreementRuleTemplateBalancesDTO getProtectedDaysOffBalance(ProtectedDaysOffSettingDTO protectedDaysOffSetting,ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, LocalDate startDate, LocalDate endDate, Map<BigInteger, TimeType> timeTypeMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    private WorkTimeAgreementRuleTemplateBalancesDTO getProtectedDaysOffBalance(ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit,ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<BigInteger, TimeType> timeTypeMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         List<IntervalBalance> intervalBalances = new ArrayList<>();
         ActivityWrapper activityWrapper=activityWrapperMap.get(protectedDaysOffWTATemplate.getActivityId());
         CutOffInterval cutOffIntervals=activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(cutOffInterval -> new DateTimeInterval(cutOffInterval.getStartDate(),cutOffInterval.getEndDate()).contains(DateUtils.getLocalDate())).findFirst().get();
-        startDate=staffAdditionalInfoDTO.getEmployment().getStartDate().isBefore(cutOffIntervals.getStartDate())?staffAdditionalInfoDTO.getEmployment().getStartDate():cutOffIntervals.getStartDate();
-        endDate=cutOffIntervals.getEndDate();
-
+        LocalDate startDate=staffAdditionalInfoDTO.getEmployment().getStartDate().isAfter(cutOffIntervals.getStartDate())?staffAdditionalInfoDTO.getEmployment().getStartDate():cutOffIntervals.getStartDate();
+        LocalDate endDate=cutOffIntervals.getEndDate();
+        if(ProtectedDaysOffUnitSettings.ACTIVITY_CUT_OFF_INTERVAL.equals(protectedDaysOffSettingOfUnit.getProtectedDaysOffUnitSettings())) {
+            endDate = DateUtils.getLocalDate();
+        }
+        DateTimeInterval dateTimeInterval=new DateTimeInterval(startDate,endDate);
+        CutOffIntervalUnit cutOffIntervalUnit = activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervalUnit();
+        List<ProtectedDaysOffSetting> protectedDaysOffSettings =staffAdditionalInfoDTO.getEmployment().getExpertise().getProtectedDaysOffSettings();
+        long count=protectedDaysOffSettings.stream().filter(protectedDaysOffSetting-> protectedDaysOffSetting.isProtechedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
         WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO = null;
         //TODO We will remove that when TimeType functionality implement in WTARuletemplate
         String activityName = activityWrapper.getActivity().getName();
-        String timetypeColor = "";
-        CutOffIntervalUnit cutOffIntervalUnit = null;
+        String timetypeColor  = timeTypeMap.get(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor();;
+        int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS,newHashSet(protectedDaysOffWTATemplate.getActivityId()));
+        intervalBalances.add(new IntervalBalance(count, scheduledAndApproveActivityCount[0], count - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), cutOffIntervals.getEndDate(), scheduledAndApproveActivityCount[1]));
         if (isCollectionNotEmpty(intervalBalances)) {
             workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityName, timetypeColor, intervalBalances, cutOffIntervalUnit);
         }
