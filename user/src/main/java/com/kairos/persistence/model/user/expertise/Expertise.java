@@ -91,8 +91,7 @@ public class Expertise extends UserBaseEntity {
 
 
     public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
-        this.seniorityLevel = Optional.ofNullable(this.seniorityLevel).orElse(new ArrayList<>());
-        this.seniorityLevel.add(seniorityLevel);
+        getSeniorityLevel().add(seniorityLevel);
     }
 
     public List<CareDays> getSeniorDays() {
@@ -112,12 +111,6 @@ public class Expertise extends UserBaseEntity {
 
     public List<CareDays> getChildCareDays() {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
-    }
-
-
-
-    public String getName() {
-        return name;
     }
 
 
