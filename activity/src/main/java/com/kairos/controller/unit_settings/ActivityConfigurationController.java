@@ -172,4 +172,11 @@ public class ActivityConfigurationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.getNonWorkingActivityConfigurationForCountry(countryId));
     }
 
+    @ApiOperation("create exception non working Activity Configuration ")
+    @PostMapping(value = "/copy_non_working_from_absence")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> copyNonWorkingActivityConfigurationFromAbsence() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.copyNonWorkingActivityConfigurationFromAbsence());
+    }
+
 }
