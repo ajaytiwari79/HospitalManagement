@@ -26,4 +26,9 @@ public class NonWorkingPlannedTime {
     private List<BigInteger> plannedTimeIds;
     private boolean exception;
 
+    public NonWorkingPlannedTime(BigInteger phaseId,List<BigInteger> plannedTimeIds, boolean exception) {
+        this.phaseId = phaseId;
+        this.plannedTimeIds = plannedTimeIds;
+        this.exception = exception;
+    }
 }
