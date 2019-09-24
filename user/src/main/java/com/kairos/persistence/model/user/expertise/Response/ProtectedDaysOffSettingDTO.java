@@ -14,6 +14,6 @@ public class ProtectedDaysOffSettingDTO {
     private Long id;
     private Long holidayId;
     private LocalDate publicHolidayDate;
-    private boolean protechedDaysOff;
+    private boolean protectedDaysOff;
     private Long dayTypeId;
 }

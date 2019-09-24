@@ -12,7 +12,7 @@ import java.util.Date;
 public class ProtectedDaysOffSetting extends UserBaseEntity {
     private Long holidayId;
     private LocalDate publicHolidayDate;
-    private boolean protechedDaysOff;
+    private boolean protectedDaysOff;
     private Long dayTypeId;
 
 }
