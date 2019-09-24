@@ -425,7 +425,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfiguration();
         if(isCollectionNotEmpty(activityConfigurations)){
             activityConfigurations.forEach(activityConfiguration -> {
-                NonWorkingPlannedTime nonWorkingPlannedTime = new NonWorkingPlannedTime(activityConfiguration.getAbsencePlannedTime().getPhaseId(),activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds(),activityConfiguration.getAbsencePlannedTime().isException());
+                NonWorkingPlannedTime nonWorkingPlannedTime = new NonWorkingPlannedTime(activityConfiguration.getAbsencePlannedTime().getPhaseId(),activityConfiguration.getAbsencePlannedTime().getTimeTypeId(),activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds(),isNull(activityConfiguration.getAbsencePlannedTime().getTimeTypeId()));
                 if(isNotNull(activityConfiguration.getCountryId())){
                     createNonWorkingExceptionActivityConfiguration(activityConfiguration.getCountryId(), nonWorkingPlannedTime,true);
                 }else{
