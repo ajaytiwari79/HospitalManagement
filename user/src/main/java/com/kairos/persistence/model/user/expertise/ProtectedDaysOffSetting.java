@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class ProtectedDaysOffSetting extends UserBaseEntity implements Comparable<ProtectedDaysOffSetting>{
     private Long holidayId;
     private LocalDate publicHolidayDate;
-    private boolean protechedDaysOff;
+    private boolean protectedDaysOff;
     private Long dayTypeId;
 
     @Override
