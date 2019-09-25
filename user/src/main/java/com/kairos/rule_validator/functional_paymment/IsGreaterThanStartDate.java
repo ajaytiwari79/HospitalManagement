@@ -24,11 +24,11 @@ public class IsGreaterThanStartDate extends AbstractSpecification<FunctionalPaym
 
     @Override
     public boolean isSatisfied(FunctionalPaymentDTO functionalPaymentDTO) {
-        if (expertise.getStartDateMillis().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getStartDate())) {
+        if (expertise.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONALPAYMENTSTARTDATE_GREATER);
         }
-        if ( Optional.ofNullable(expertise.getEndDateMillis()).isPresent() &&  Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() &&
-                expertise.getEndDateMillis().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getEndDate())) {
+        if ( Optional.ofNullable(expertise.getEndDate()).isPresent() &&  Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() &&
+                expertise.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getEndDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_DATE_GREATERTHAN_DATE,FUNCTIONALPAYMENT,EXPERTISE);
         }
 

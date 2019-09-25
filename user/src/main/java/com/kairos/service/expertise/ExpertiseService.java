@@ -15,7 +15,6 @@ import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.country.Country;
@@ -159,15 +158,13 @@ public class ExpertiseService {
                     exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
                 }
             });
-            expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, expertiseDTO.getStartDateMillis(), expertiseDTO.getEndDateMillis(), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
-                    expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false, false, false,
+            expertise = new Expertise(expertiseDTO.getName().trim(), expertiseDTO.getDescription(), country, asLocalDate(expertiseDTO.getStartDateMillis()), asLocalDate(expertiseDTO.getEndDateMillis()), expertiseDTO.getFullTimeWeeklyMinutes() != null ? expertiseDTO.getFullTimeWeeklyMinutes() : FULL_TIME_WEEKLY_MINUTES,
+                    expertiseDTO.getNumberOfWorkingDaysInWeek() != null ? expertiseDTO.getNumberOfWorkingDaysInWeek() : NUMBER_OF_WORKING_DAYS_IN_WEEK, expertiseDTO.getBreakPaymentSetting(), false,
                     getSector(expertiseDTO.getSector(), country));
             prepareExpertise(expertise, expertiseDTO, country, true);
-            expertise.setTags(tagService.getCountryTagsByIdsAndMasterDataType(expertiseDTO.getTags(), MasterDataTypeEnum.EXPERTISE));
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.setFullTimeWeeklyMinutes(expertise.getFullTimeWeeklyMinutes());
             expertiseResponseDTO.setNumberOfWorkingDaysInWeek(expertise.getNumberOfWorkingDaysInWeek());
-            expertiseResponseDTO.setEditable(expertise.isHistory());
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
             expertiseResponseDTO.setSector(expertiseDTO.getSector());
             if (Optional.ofNullable(expertise.getSector()).isPresent()) {
@@ -285,8 +282,8 @@ public class ExpertiseService {
 
     private void prepareExpertise(Expertise expertise, ExpertiseDTO expertiseDTO, Country country, boolean create) {
         expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
-        expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
-        expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
+        expertise.setStartDate(getLocalDate(expertiseDTO.getStartDateMillis()));
+        expertise.setEndDate(expertiseDTO.getEndDateMillis());
         Optional.ofNullable(expertiseDTO.getOrganizationLevelId()).ifPresent(orgLevelId -> {
             Level level = countryGraphRepository.getLevel(country.getId(), orgLevelId);
             if (!Optional.ofNullable(level).isPresent()) {
@@ -458,8 +455,8 @@ public class ExpertiseService {
 
         expertise.setName(expertiseDTO.getName().trim());
         expertise.setDescription(expertiseDTO.getDescription());
-        expertise.setStartDateMillis(expertiseDTO.getStartDateMillis());
-        expertise.setEndDateMillis(expertiseDTO.getEndDateMillis());
+        expertise.setStartDate(expertiseDTO.getStartDateMillis());
+        expertise.setEndDate(expertiseDTO.getEndDateMillis());
         expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
         if (expertiseDTO.getSeniorityLevel() != null) {
             PayGrade payGrade = seniorityLevelGraphRepository.getPayGradeBySeniorityLevelId(expertiseDTO.getSeniorityLevel().getId());
@@ -628,10 +625,10 @@ public class ExpertiseService {
             exceptionService.actionNotPermittedException(MESSAGE_SENIORITYLEVEL_PAYGRADE_MISSING);
         }
         expertise.setPublished(true);
-        expertise.setStartDateMillis(new Date(publishedDateMillis));
+        expertise.setStartDate(new Date(publishedDateMillis));
         expertiseGraphRepository.save(expertise);
         ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
-        if(isNotNull(parentExpertise) && !asLocalDate(expertise.getStartDateMillis()).isAfter(DateUtils.asLocalDate(parentExpertise.getStartDateMillis()))){
+        if(isNotNull(parentExpertise) && !asLocalDate(expertise.getStartDate()).isAfter(DateUtils.asLocalDate(parentExpertise.getStartDateMillis()))){
             //exceptionService.actionNotPermittedException("message.expertise.alreadyPublished");
             exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_PUBLISH_WITH_FUTURE_STARTDATE);
         }
@@ -640,19 +637,19 @@ public class ExpertiseService {
             parentExpertise.setPublished(true);
             parentExpertise.setHistory(true);
             Expertise parentExp = expertiseGraphRepository.findOne(parentExpertise.getId());
-            parentExp.setEndDateMillis(new Date(publishedDateMillis - ONE_DAY));
+            parentExp.setEndDate(new Date(publishedDateMillis - ONE_DAY));
             parentExp.setHasDraftCopy(false);
             parentExp.setHistory(true);
             parentExp.setId(expertise.getId());
             expertiseGraphRepository.save(parentExp);
-            if(isNotNull(parentExp.getEndDateMillis()) && !getLocalDate(publishedDateMillis).isBefore(getLocalDate())) {
+            if(isNotNull(parentExp.getEndDate()) && !getLocalDate(publishedDateMillis).isBefore(getLocalDate())) {
                 schedulerPanelDTOS.add(new SchedulerPanelDTO(JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(getLocalDate(publishedDateMillis)), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
             }
             expertise.setId(parentExpertise.getId());
             expertiseGraphRepository.save(expertise);
         }
-        if(isNotNull(expertise.getEndDateMillis()) && !getLocalDateFromDate(expertise.getEndDateMillis()).isBefore(getLocalDate())){
-            schedulerPanelDTOS.add(new SchedulerPanelDTO( JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(asLocalDate(expertise.getEndDateMillis())), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
+        if(isNotNull(expertise.getEndDate()) && !getLocalDateFromDate(expertise.getEndDate()).isBefore(getLocalDate())){
+            schedulerPanelDTOS.add(new SchedulerPanelDTO( JobType.FUNCTIONAL, JobSubType.UNASSIGN_EXPERTISE_FROM_ACTIVITY, true, getEndOfDayFromLocalDate(asLocalDate(expertise.getEndDate())), BigInteger.valueOf(expertiseId), AppConstants.TIMEZONE_UTC));
         }
 
         // create job for unassign experties from activity
@@ -669,7 +666,7 @@ public class ExpertiseService {
     private void validateExpertiseBeforePublishing(Expertise expertise) {
         if (expertise.isPublished()) {
             exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_ALREADYPUBLISHED);
-        } else if (!Optional.ofNullable(expertise.getStartDateMillis()).isPresent()) {
+        } else if (!Optional.ofNullable(expertise.getStartDate()).isPresent()) {
             exceptionService.invalidRequestException(MESSAGE_STARTDATEMILLIS_NULL);
         } else if (!Optional.ofNullable(expertise.getBreakPaymentSetting()).isPresent()) {
             exceptionService.invalidRequestException(MESSAGE_BREAKPAYMENTTYPE_NULL);
