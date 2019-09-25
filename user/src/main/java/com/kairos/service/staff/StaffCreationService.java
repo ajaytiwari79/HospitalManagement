@@ -268,7 +268,7 @@ public class StaffCreationService {
         }
         User user = userGraphRepository.findUserByCprNumber(payload.getCprNumber());
         if(!Optional.ofNullable(user).isPresent()) {
-            user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User( payload.getFirstName().trim(), payload.getLastName().trim(),payload.getCprNumber(),payload.getPrivateEmail(),payload.getUserName()));
+            user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User( payload.getCprNumber(),payload.getFirstName().trim(), payload.getLastName().trim(),payload.getPrivateEmail(),payload.getUserName()));
         }
         Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
         if(Optional.ofNullable(staff).isPresent()) {
