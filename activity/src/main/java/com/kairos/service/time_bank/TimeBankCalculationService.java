@@ -1118,7 +1118,7 @@ public class TimeBankCalculationService {
                 for (ShiftWithActivityDTO shift : shifts) {
                     List<ShiftActivityDTO> shiftActivities = getShiftActivityByBreak(shift.getActivities(),shift.getBreakActivities());
                     for (ShiftActivityDTO shiftActivity : shiftActivities) {
-                        ShiftActivityDTO shiftActivityDTO = getShiftActivityDTO(shift, shiftActivity);
+                        ShiftActivityDTO shiftActivityDTO = getShiftActivityDTO(shift,shiftActivity);
                         ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getStartDate(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
                         LOGGER.debug("rule template : {} valid {}", ruleTemplate.getId(), ruleTemplateValid);
                         if (ruleTemplateValid) {
@@ -1140,6 +1140,7 @@ public class TimeBankCalculationService {
                             }
                             updateChildActivitiesTimebankCtaBonus(shiftActivity.getChildActivities(), ruleTemplate, dateTimeInterval);
                         }
+
                     }
                 }
                 if (ruleTemplate.getCalculationFor().equals(FUNCTIONS) && ruleTemplateValid) {
@@ -1151,12 +1152,14 @@ public class TimeBankCalculationService {
             return this;
         }
 
-        private ShiftActivityDTO getShiftActivityDTO(ShiftWithActivityDTO shift, ShiftActivityDTO shiftActivity) {
+        public ShiftActivityDTO getShiftActivityDTO(ShiftWithActivityDTO shift, ShiftActivityDTO shiftActivity) {
+            ShiftActivityDTO shiftActivityDTO;
             try {
-                return shift.getActivities().stream().filter(shiftActivityDTO1 -> shiftActivityDTO1.getId().equals(shiftActivity.getId()) || (isCollectionNotEmpty(shift.getBreakActivities()) && shift.getBreakActivities().get(0).getId().equals(shiftActivityDTO1.getId()))).findAny().get();
-            }catch (NoSuchElementException | NullPointerException e){
-                return new ShiftActivityDTO();
+                return shift.getActivities().stream().filter(shiftActivityDTO1 -> shiftActivityDTO1.getId().equals(shiftActivity.getId()) || (isCollectionNotEmpty(shift.getBreakActivities()) && shift.getBreakActivities().get(0).getId().equals(shiftActivityDTO1.getId()))).findAny().orElse(null);
+            }catch (NullPointerException | NoSuchElementException e){
+                shiftActivityDTO = shiftActivity;
             }
+            return shiftActivityDTO;
         }
 
         public List<ShiftActivityDTO> getShiftActivityByBreak(List<ShiftActivityDTO> shiftActivities, List<ShiftActivityDTO> breakActivities){
@@ -1224,7 +1227,7 @@ public class TimeBankCalculationService {
                     }
                 }
             }
-            return (int) Math.round(ctaBonusAndScheduledMinutes);
+            return (int) Math.ceil(ctaBonusAndScheduledMinutes);
         }
 
         private void updateChildActivitiesTimebankCtaBonus(List<ShiftActivityDTO> childActivitiesDTOS, CTARuleTemplateDTO ruleTemplate, DateTimeInterval dateTimeInterval) {

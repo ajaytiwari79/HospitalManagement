@@ -15,6 +15,7 @@ import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
+import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -145,6 +146,7 @@ public class PayOutService extends MongoBaseService {
             shiftActivity.setPayoutCtaBonusMinutes(shiftActivityDTO.getPayoutCtaBonusMinutes());
             shiftActivity.setPlannedMinutesOfPayout(shiftActivityDTO.getPlannedMinutesOfPayout());
             shiftActivity.setScheduledMinutesOfPayout(shiftActivityDTO.getScheduledMinutesOfPayout());
+            shiftActivity.setPayoutPerShiftCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getPayoutPerShiftCTADistributions(), PayOutPerShiftCTADistribution.class));
         }
         shift.setPlannedMinutesOfPayout(shiftWithActivityDTO.getPlannedMinutesOfPayout());
     }
