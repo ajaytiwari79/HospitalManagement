@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.enums.OrganizationLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class QueryResult {
     private Long hubId;
     private boolean hasPermission;
     private boolean unit;
+    private CompanyType type;
 
     public QueryResult(String name, long id, List<QueryResult> children) {
         this.name = name;

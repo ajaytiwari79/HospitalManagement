@@ -63,7 +63,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (organization) where id(organization)={0} with organization  " +
             "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
             "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN id(country)")
-    Long getCountryIdByUnitId(long unitId);
+    Long getCountryIdByUnitId(Long unitId);
 
     @Query("MATCH (c:Country{isEnabled:true}) RETURN { id:id(c),name:c.name ,code:c.code,googleCalendarCode:c.googleCalendarCode} as result")
     List<Map<String,Object>> findAllCountriesMinimum();
