@@ -644,6 +644,8 @@ public class ShiftValidatorService {
             List<ShiftActivity> shiftActivities = shifts.stream().flatMap(curShift -> curShift.getActivities().stream()).collect(Collectors.toList());
             StaffingLevel staffingLevel = staffingLevels.get(0);
             validateUnderAndOverStaffing(shift, activityWrapperMap, checkOverStaffing, staffingLevels, shiftActivities, staffingLevel,shiftActivity);
+            staffingLevelMongoRepository.saveEntities(staffingLevels);
+
         }
     }
 

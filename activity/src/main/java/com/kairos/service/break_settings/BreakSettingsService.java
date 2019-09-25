@@ -43,11 +43,11 @@ public class BreakSettingsService {
     private TimeTypeMongoRepository timeTypeMongoRepository;
 
     public BreakSettingsDTO createBreakSettings(Long countryId, Long expertiseId, BreakSettingsDTO breakSettingsDTO) {
-        BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndShiftDurationInMinuteEquals(countryId, expertiseId, breakSettingsDTO.getShiftDurationInMinute());
+        BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndPrimaryTrue(countryId, expertiseId);
         if (Optional.ofNullable(breakSettings).isPresent()) {
             exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
         }
-        breakSettings = new BreakSettings(countryId, breakSettingsDTO.getShiftDurationInMinute(), breakSettingsDTO.getBreakDurationInMinute(), expertiseId, breakSettingsDTO.getActivityId());
+        breakSettings = new BreakSettings(countryId, breakSettingsDTO.getShiftDurationInMinute(), breakSettingsDTO.getBreakDurationInMinute(), expertiseId, breakSettingsDTO.getActivityId(),breakSettingsDTO.isPrimary(),breakSettingsDTO.isIncludeInPlanning());
         breakSettingMongoRepository.save(breakSettings);
         breakSettingsDTO.setId(breakSettings.getId());
         return breakSettingsDTO;
@@ -77,12 +77,9 @@ public class BreakSettingsService {
         if (!Optional.ofNullable(breakSettings).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_BREAKSETTINGS_NOTFOUND, breakSettingsId);
         }
-        if (!breakSettingsDTO.getShiftDurationInMinute().equals(breakSettings.getShiftDurationInMinute())) {
-            BreakSettings breakSettingsFromDB = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndShiftDurationInMinuteEquals(countryId, expertiseId, breakSettingsDTO.getShiftDurationInMinute());
-            if (Optional.ofNullable(breakSettingsFromDB).isPresent()) {
-                exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
-            }
-
+        BreakSettings breakSettingsFromDB = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndPrimaryTrue(countryId, expertiseId);
+        if (Optional.ofNullable(breakSettingsFromDB).isPresent() && breakSettingsFromDB.getId().equals(breakSettingsId)) {
+            exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
         }
         breakSettings.setBreakDurationInMinute(breakSettingsDTO.getBreakDurationInMinute());
         breakSettings.setActivityId(breakSettingsDTO.getActivityId());
