@@ -50,6 +50,16 @@ public class ExpertiseLine {
         this.seniorityLevel.add(seniorityLevel);
     }
 
+    public ExpertiseLine (ExpertiseLineBuilder expertiseLineBuilder){
+        this.startDate=expertiseLineBuilder.startDate;
+        this.endDate=expertiseLineBuilder.endDate;
+        this.organizationLevel=expertiseLineBuilder.organizationLevel;
+        this.organizationServices=expertiseLineBuilder.organizationServices;
+        this.sector=expertiseLineBuilder.sector;
+        this.seniorityLevel=expertiseLineBuilder.seniorityLevel;
+        this.union=expertiseLineBuilder.union;
+    }
+
 
     public static class ExpertiseLineBuilder{
         private LocalDate startDate;
@@ -96,7 +106,9 @@ public class ExpertiseLine {
             return this;
         }
 
-
+        public ExpertiseLine createLine(){
+            return new ExpertiseLine(this);
+        }
 
 
     }
