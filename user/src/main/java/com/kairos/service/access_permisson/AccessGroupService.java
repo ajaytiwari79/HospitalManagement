@@ -277,7 +277,8 @@ public class AccessGroupService {
     }
 
     public List<AccessGroup> getAccessGroups(long organizationId) {
-        return accessGroupRepository.getAccessGroups(organizationId);
+        Organization organization=organizationService.fetchParentOrganization(organizationId);
+        return accessGroupRepository.getAccessGroups(organization.getId());
     }
 
     public boolean assignAccessGroupToStaff(List<String> accessGroupIds, long staffId) {
