@@ -95,7 +95,7 @@ public class WorkTimeAgreementBalancesCalculationService {
                 case PROTECTED_DAYS_OFF:
                     ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate) ruleTemplate;
                     ProtectedDaysOffSettingDTO protectedDaysOffSetting = protectedDaysOffService.getProtectedDaysOffByUnitId(unitId);
-                    interval = interval.addInterval(getIntervalByProtectedDaysOffRuleTemplate(startDate, protectedDaysOffWTATemplate, activityWrapperMap, protectedDaysOffSetting));
+                    interval = interval.addInterval(getIntervalByProtectedDaysOffRuleTemplate(startDate, protectedDaysOffWTATemplate, activityWrapperMap, protectedDaysOffSetting,planningPeriodEndDate));
                 default:
                     break;
             }
@@ -103,16 +103,9 @@ public class WorkTimeAgreementBalancesCalculationService {
         return interval;
     }
 
-    public static DateTimeInterval getIntervalByProtectedDaysOffRuleTemplate(LocalDate startDate, ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, Map<BigInteger, ActivityWrapper> activityWrapperMap, ProtectedDaysOffSettingDTO protectedDaysOffSetting) {
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(asDate(startDate), asDate(startDate.plusDays(1)));
+    public static DateTimeInterval getIntervalByProtectedDaysOffRuleTemplate(LocalDate startDate, ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, Map<BigInteger, ActivityWrapper> activityWrapperMap, ProtectedDaysOffSettingDTO protectedDaysOffSetting,LocalDate planningPeriodEndDate) {
         ActivityWrapper activityWrapper = activityWrapperMap.get(protectedDaysOffWTATemplate.getActivityId());
-        List<CutOffInterval> cutOffIntervals = activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervals();
-        cutOffIntervals.sort((cutOffInterval, t1) -> cutOffInterval.getStartDate().compareTo(t1.getStartDate()));
-        CutOffInterval cutOffIntervalDate = cutOffIntervals.stream().filter(cutOffInterval -> new DateTimeInterval(cutOffInterval.getStartDate(), cutOffInterval.getEndDate()).contains(DateUtils.getLocalDate())).findFirst().get();
-        dateTimeInterval = new DateTimeInterval(cutOffIntervalDate.getStartDate(), cutOffIntervalDate.getEndDate());
-        if (ProtectedDaysOffUnitSettings.ACTIVITY_CUT_OFF_INTERVAL.equals(protectedDaysOffSetting.getProtectedDaysOffUnitSettings())) {
-            dateTimeInterval = new DateTimeInterval(cutOffIntervals.get(0).getStartDate(), DateUtils.getCurrentLocalDate());
-        }
+        DateTimeInterval dateTimeInterval = getCutoffInterval(activityWrapper.getActivity().getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getActivity().getRulesActivityTab().getCutOffdayValue(), asDate(startDate), ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR.equals(protectedDaysOffSetting.getProtectedDaysOffUnitSettings())?planningPeriodEndDate:DateUtils.getLocalDate());
         return dateTimeInterval;
     }
 
@@ -196,8 +189,7 @@ public class WorkTimeAgreementBalancesCalculationService {
                     break;
                 case PROTECTED_DAYS_OFF:
                     ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate) ruleTemplate;
-                    ProtectedDaysOffSettingDTO protectedDaysOffSetting = protectedDaysOffService.getProtectedDaysOffByUnitId(unitId);
-                    workTimeAgreementRuleTemplateBalancesDTO = getProtectedDaysOffBalance(protectedDaysOffSetting, protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, timeTypeMap, staffAdditionalInfoDTO);
+                    workTimeAgreementRuleTemplateBalancesDTO = getProtectedDaysOffBalance(unitId, protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, timeTypeMap, staffAdditionalInfoDTO,startDate, endDate, planningPeriod.getEndDate());
                     break;
                 default:
                     workTimeAgreementRuleTemplateBalancesDTO = null;
@@ -211,26 +203,27 @@ public class WorkTimeAgreementBalancesCalculationService {
     }
 
 
-    private WorkTimeAgreementRuleTemplateBalancesDTO getProtectedDaysOffBalance(ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit, ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<BigInteger, TimeType> timeTypeMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    public WorkTimeAgreementRuleTemplateBalancesDTO getProtectedDaysOffBalance(Long unitId, ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<BigInteger, TimeType> timeTypeMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO,LocalDate startDate, LocalDate endDate,LocalDate planningPeriodEndDate) {
+        ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit = protectedDaysOffService.getProtectedDaysOffByUnitId(unitId);
+        List<IntervalBalance> intervalBalances=new ArrayList<>();
         WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO = null;
         if (!ProtectedDaysOffUnitSettings.UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR.equals(protectedDaysOffSettingOfUnit.getProtectedDaysOffUnitSettings())) {
-            List<IntervalBalance> intervalBalances = new ArrayList<>();
             ActivityWrapper activityWrapper = activityWrapperMap.get(protectedDaysOffWTATemplate.getActivityId());
-            CutOffInterval cutOffIntervals = activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervals().stream().filter(cutOffInterval -> new DateTimeInterval(cutOffInterval.getStartDate(), cutOffInterval.getEndDate()).contains(DateUtils.getLocalDate())).findFirst().get();
-            LocalDate startDate = staffAdditionalInfoDTO.getEmployment().getStartDate().isAfter(cutOffIntervals.getStartDate()) ? staffAdditionalInfoDTO.getEmployment().getStartDate() : cutOffIntervals.getStartDate();
-            LocalDate endDate = cutOffIntervals.getEndDate();
-            if (ProtectedDaysOffUnitSettings.ACTIVITY_CUT_OFF_INTERVAL.equals(protectedDaysOffSettingOfUnit.getProtectedDaysOffUnitSettings())) {
-                endDate = DateUtils.getLocalDate();
-            }
-            DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
             CutOffIntervalUnit cutOffIntervalUnit = activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervalUnit();
             List<ProtectedDaysOffSetting> protectedDaysOffSettings = staffAdditionalInfoDTO.getEmployment().getExpertise().getProtectedDaysOffSettings();
-            long count = protectedDaysOffSettings.stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtechedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
             String activityName = activityWrapper.getActivity().getName();
-            String timetypeColor = timeTypeMap.get(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor();
-            ;
-            int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, newHashSet(protectedDaysOffWTATemplate.getActivityId()));
-            intervalBalances.add(new IntervalBalance(count, scheduledAndApproveActivityCount[0], count - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), cutOffIntervals.getEndDate(), scheduledAndApproveActivityCount[1]));
+            String timetypeColor = timeTypeMap.containsKey(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeTypeId())?timeTypeMap.get(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor():"";
+            while (startDate.isBefore(endDate) || startDate.equals(endDate)) {
+                if (!containsInInterval(intervalBalances, startDate)) {
+                    DateTimeInterval dateTimeInterval = getCutoffInterval(activityWrapper.getActivity().getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getActivity().getRulesActivityTab().getCutOffdayValue(), asDate(startDate), ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR.equals(protectedDaysOffSettingOfUnit.getProtectedDaysOffUnitSettings())?planningPeriodEndDate:DateUtils.getLocalDate());
+                    if(isNotNull(dateTimeInterval)) {
+                        long count = protectedDaysOffSettings.stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
+                        int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, newHashSet(protectedDaysOffWTATemplate.getActivityId()));
+                        intervalBalances.add(new IntervalBalance(count, scheduledAndApproveActivityCount[0], count - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
+                    }
+                }
+                startDate = startDate.plusDays(1);
+            }
             if (isCollectionNotEmpty(intervalBalances)) {
                 workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityName, timetypeColor, intervalBalances, cutOffIntervalUnit);
             }

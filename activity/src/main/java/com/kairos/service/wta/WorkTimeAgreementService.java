@@ -1,37 +1,43 @@
 package com.kairos.service.wta;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
+import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.activity.wta.basic_details.*;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
-import com.kairos.persistence.model.wta.templates.template_types.ChildCareDaysCheckWTATemplate;
-import com.kairos.persistence.model.wta.templates.template_types.SeniorDaysPerYearWTATemplate;
-import com.kairos.persistence.model.wta.templates.template_types.VetoAndStopBricksWTATemplate;
-import com.kairos.persistence.model.wta.templates.template_types.WTAForCareDays;
+import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.RuleTemplateCategoryRepository;
@@ -63,6 +69,7 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
+import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
 import static java.util.stream.Collectors.toMap;
 
@@ -113,7 +120,10 @@ public class WorkTimeAgreementService extends MongoBaseService {
     private PhaseMongoRepository phaseMongoRepository;
     @Inject
     private TagMongoRepository tagMongoRepository;
-
+    @Inject
+    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
 
@@ -803,6 +813,20 @@ public class WorkTimeAgreementService extends MongoBaseService {
 
     public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId, Long employmentId, LocalDate startDate, LocalDate endDate) {
         return workTimeAgreementBalancesCalculationService.getWorktimeAgreementBalance(unitId, employmentId, startDate, endDate);
+    }
+
+    public WorkTimeAgreementBalance getProtectedDaysOffCount(Long unitId, Long wtaId, Long staffId ,BigInteger activityId) {
+        LocalDate startDate =DateUtils.getCurrentLocalDate();
+        StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.mainUnitEmploymentOfStaff(staffId, unitId);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO=new StaffAdditionalInfoDTO(staffEmploymentDetails);
+        ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = new ProtectedDaysOffWTATemplate(activityId);
+        List<ActivityWrapper> activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(newArrayList(activityId));
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
+        DateTimeInterval dateTimeInterval = workTimeAgreementBalancesCalculationService.getIntervalByRuletemplates(activityWrapperMap, Arrays.asList(protectedDaysOffWTATemplate), startDate, planningPeriod.getEndDate(), unitId);
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentAndActivityIds(staffAdditionalInfoDTO.getEmployment().getId(), dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), newHashSet(activityId));
+        WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO = workTimeAgreementBalancesCalculationService.getProtectedDaysOffBalance(unitId, protectedDaysOffWTATemplate, shiftWithActivityDTOS, activityWrapperMap, new HashMap<>(), staffAdditionalInfoDTO,startDate, startDate, planningPeriod.getEndDate());
+        return new WorkTimeAgreementBalance();
     }
 
     public void updateExistingPhaseIdOfWTA(List<PhaseTemplateValue> phaseTemplateValues, Long unitId, Long referenceId, boolean creatingFromCountry) {

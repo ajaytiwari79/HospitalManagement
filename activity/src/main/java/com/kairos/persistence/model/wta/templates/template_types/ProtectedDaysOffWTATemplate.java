@@ -25,8 +25,7 @@ public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
         this.wtaTemplateType = WTATemplateType.PROTECTED_DAYS_OFF;
     }
 
-    public ProtectedDaysOffWTATemplate(String name, String description,BigInteger activityId) {
-        super(name, description);
+    public ProtectedDaysOffWTATemplate(BigInteger activityId) {
         this.activityId=activityId;
     }
 }

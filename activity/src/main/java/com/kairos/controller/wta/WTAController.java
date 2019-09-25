@@ -261,6 +261,8 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getWorktimeAgreementBalance(unitId, employmentId,startDate,endDate));
     }
 
+
+
     @ApiOperation(value = "Update Phases in Ruletemplates")
     @GetMapping(value =  UNIT_URL+ "/update_phases_in_ruletemplate")
     public ResponseEntity<Map<String, Object>> updatePhasesInRuletemplate(@PathVariable long unitId) {
@@ -268,4 +270,9 @@ public class WTAController {
     }
 
 
+    @ApiOperation(value = "Update Phases in Ruletemplates")
+    @GetMapping(value =  UNIT_URL+ "/get_protected_days_off_count")
+    public ResponseEntity<Map<String, Object>> getProtectedDaysOffCount(@PathVariable long unitId ,@RequestParam Long wtaId,@RequestParam Long staffId,@RequestParam BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getProtectedDaysOffCount(unitId,wtaId,staffId,activityId));
+    }
 }

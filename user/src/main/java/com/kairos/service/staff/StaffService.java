@@ -16,6 +16,7 @@ import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -885,8 +886,20 @@ public class StaffService {
         return staffPersonalDetailList;
     }
 
+    public StaffEmploymentDetails getMainEmploymentOfStaff(long staffId, long unitId) {
+        List<EmploymentQueryResult> employmentQueryResults =  employmentGraphRepository.getAllEmploymentsForCurrentOrganization(staffId, unitId);
+        StaffEmploymentDetails employmentDetails = getStaffEmploymentDetails(unitId, employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().get());
+        return employmentDetails;
+    }
+
+
     public StaffEmploymentDetails getEmploymentOfStaff(long staffId, long unitId) {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentOfStaff(staffId, unitId);
+        StaffEmploymentDetails employmentDetails = getStaffEmploymentDetails(unitId, employment);
+        return employmentDetails;
+    }
+
+    private StaffEmploymentDetails getStaffEmploymentDetails(long unitId, EmploymentQueryResult employment) {
         StaffEmploymentDetails employmentDetails = null;
         if (Optional.ofNullable(employment).isPresent()) {
             employmentDetails = convertEmploymentObject(employment);

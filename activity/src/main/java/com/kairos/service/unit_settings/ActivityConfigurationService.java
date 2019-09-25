@@ -252,7 +252,7 @@ public class ActivityConfigurationService extends MongoBaseService {
             default:
                 plannedTimes = new ArrayList<>();
                 plannedTimes.add(BigInteger.valueOf(2l));
-                plannedTimes = getNonWorkingPlannedTime(unitId, phaseId);
+//                plannedTimes = getNonWorkingPlannedTime(unitId, phaseId);
 
         }
         return plannedTimes;
