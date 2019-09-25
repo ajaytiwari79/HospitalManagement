@@ -1154,7 +1154,7 @@ public class TimeBankCalculationService {
         private ShiftActivityDTO getShiftActivityDTO(ShiftWithActivityDTO shift, ShiftActivityDTO shiftActivity) {
             try {
                 return shift.getActivities().stream().filter(shiftActivityDTO1 -> shiftActivityDTO1.getId().equals(shiftActivity.getId()) || (isCollectionNotEmpty(shift.getBreakActivities()) && shift.getBreakActivities().get(0).getId().equals(shiftActivityDTO1.getId()))).findAny().get();
-            }catch (NullPointerException e){
+            }catch (NoSuchElementException | NullPointerException e){
                 return new ShiftActivityDTO();
             }
         }
