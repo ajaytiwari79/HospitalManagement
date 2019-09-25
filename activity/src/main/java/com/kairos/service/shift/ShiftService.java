@@ -422,6 +422,10 @@ public class ShiftService extends MongoBaseService {
                 shiftWithViolatedInfo = updatedShiftWithViolatedInfo;
             }
             shiftDTO=shiftDTOS.get(0);
+            if(isNotNull(shiftDTO.getDraftShift())){
+                shiftDTO.getDraftShift().setId(shift.getId());
+            }
+
             responseShiftDTOS.addAll(Arrays.asList(isNotNull(shiftDTO.getDraftShift()) ? shiftDTO.getDraftShift() : shiftDTO));
         }
         shiftWithViolatedInfo.setShifts(responseShiftDTOS);

@@ -94,8 +94,7 @@ public class Expertise extends UserBaseEntity {
 
 
     public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
-        this.seniorityLevel = Optional.ofNullable(this.seniorityLevel).orElse(new ArrayList<>());
-        this.seniorityLevel.add(seniorityLevel);
+        getSeniorityLevel().add(seniorityLevel);
     }
 
     public List<CareDays> getSeniorDays() {
@@ -120,12 +119,6 @@ public class Expertise extends UserBaseEntity {
     public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
         return protectedDaysOffSettings = Optional.ofNullable(protectedDaysOffSettings).orElse(new ArrayList<>());
     }
-
-
-    public String getName() {
-        return name;
-    }
-
 
     public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
         this.name = name;
