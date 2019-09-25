@@ -8,6 +8,8 @@ import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.Level;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
+@Getter
+@Setter
 public class OrganizationCreationData {
 
     private List<Map<String,Object>> zipCodes;
@@ -35,101 +39,5 @@ public class OrganizationCreationData {
     private List<AccountType> accountTypes= new ArrayList<>();
     private List<UnitType> unitTypes= new ArrayList<>();
     private List<OrganizationWrapper> hubList;
-
-    public List<Level> getLevels() {
-        return levels;
-    }
-
-    public void setLevels(List<Level> levels) {
-        this.levels = levels;
-    }
-
-    public List<BusinessType> getBusinessTypes() {
-        return businessTypes;
-    }
-
-    public void setBusinessTypes(List<BusinessType> businessTypes) {
-        this.businessTypes = businessTypes;
-    }
-
-    public List<Map<String, Object>> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<Map<String, Object>> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public List<Map<String, Object>> getZipCodes() {
-        return zipCodes;
-    }
-
-    public void setZipCodes(List<Map<String, Object>> zipCodes) {
-        this.zipCodes = zipCodes;
-    }
-
-
-    public List<Map<String, Object>> getServiceTypes() {
-        return serviceTypes;
-    }
-
-    public void setServiceTypes(List<Map<String, Object>> serviceTypes) {
-        this.serviceTypes = serviceTypes;
-    }
-
-    public List<CompanyCategory> getCompanyCategories() {
-        return companyCategories;
-    }
-
-    public void setCompanyCategories(List<CompanyCategory> companyCategories) {
-        this.companyCategories = companyCategories;
-    }
-
-    public List<HashMap<String, String>> getCompanyTypes() {
-        return companyTypes;
-    }
-
-    public void setCompanyTypes(List<HashMap<String, String>> companyTypes) {
-        this.companyTypes = companyTypes;
-    }
-
-    public List<HashMap<String, String>> getCompanyUnitTypes() {
-        return companyUnitTypes;
-    }
-
-    public void setCompanyUnitTypes(List<HashMap<String, String>> companyUnitTypes) {
-        this.companyUnitTypes = companyUnitTypes;
-    }
-
-    public Map<String, List<AccessGroupQueryResult>> getAccessGroups() {
-        return accessGroups;
-    }
-
-    public void setAccessGroups(Map<String, List<AccessGroupQueryResult>> accessGroups) {
-        this.accessGroups = accessGroups;
-    }
-
-    public List<AccountType> getAccountTypes() {
-        return accountTypes;
-    }
-
-    public void setAccountTypes(List<AccountType> accountTypes) {
-        this.accountTypes = accountTypes;
-    }
-
-    public List<UnitType> getUnitTypes() {
-        return unitTypes;
-    }
-
-    public void setUnitTypes(List<UnitType> unitTypes) {
-        this.unitTypes = unitTypes;
-    }
-
-    public List<OrganizationWrapper> getHubList() {
-        return hubList;
-    }
-
-    public void setHubList(List<OrganizationWrapper> hubList) {
-        this.hubList = hubList;
-    }
+    private Long countryId;
 }

@@ -1,0 +1,7 @@
+
+// Used to create Organization tab
+Match(ap:AccessPage) where ap.moduleId="module_3" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Organizations",isModule:false,moduleId:"tab_430",active:true});
+
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+       Match (ap:AccessPage)
+       CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);

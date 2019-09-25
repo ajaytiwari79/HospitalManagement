@@ -574,5 +574,14 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit:Unit) where id(staff)={0} RETURN id(unit) as id,unit.name as name")
     List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
 
+    @Query("MATCH (org:Organization{isEnable:true,union:false})-[:" + HAS_SUB_ORGANIZATION + "*]->(sub:Organization)  WHERE id(org)={0}  \n" +
+            "OPTIONAL MATCH (sub)-[:" + TYPE_OF + "]->(ot:OrganizationType) WITH sub,ot\n" +
+            "OPTIONAL MATCH (sub)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH COLLECT(id(subType)) as organizationSubTypeIds,sub,ot\n" +
+            "OPTIONAL MATCH (sub)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH organizationSubTypeIds,sub,ot,zipCode\n" +
+            "OPTIONAL MATCH (sub)-[:" + HAS_ACCOUNT_TYPE + "]-(accountType:AccountType)\n" +
+            "RETURN id(sub) as id,sub.name as name,sub.description as description,sub.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
+            "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY sub.name")
+    List<OrganizationBasicResponse> getAllOrganizationOfOrganization(Long orgId);
+
 }
 

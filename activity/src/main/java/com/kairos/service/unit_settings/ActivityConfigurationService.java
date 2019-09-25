@@ -2,6 +2,7 @@ package com.kairos.service.unit_settings;
 
 import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -249,7 +250,7 @@ public class ActivityConfigurationService extends MongoBaseService {
                 plannedTimes = getPresencePlannedTime(unitId, phaseId, managementPerson, staffAdditionalInfoDTO);
                 break;
             default:
-                plannedTimes = getNonWorkingPlannedTime(unitId, phaseId, activity);
+                plannedTimes = getNonWorkingPlannedTime(unitId, phaseId);
         }
         return plannedTimes;
     }
@@ -274,7 +275,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         return plannedTimeIds;
     }
 
-    private List<BigInteger> getNonWorkingPlannedTime(Long unitId, BigInteger phaseId, Activity activity) {
+    private List<BigInteger> getNonWorkingPlannedTime(Long unitId, BigInteger phaseId) {
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllNonWorkingConfigurationByUnitIdAndPhaseId(unitId, phaseId);
         List<BigInteger> plannedTimeIds = null;
         for (ActivityConfiguration activityConfiguration : activityConfigurations) {
@@ -434,5 +435,4 @@ public class ActivityConfigurationService extends MongoBaseService {
         }
         return true;
     }
-
 }
