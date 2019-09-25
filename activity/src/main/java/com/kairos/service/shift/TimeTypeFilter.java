@@ -4,6 +4,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -16,11 +17,12 @@ import static com.kairos.enums.FilterType.TIME_TYPE;
  **/
 
 public class TimeTypeFilter implements ShiftFilter{
-
+    List<BigInteger> selectedTimeTypes;
     Map<FilterType, Set<String>> filterCriteriaMap;
 
-    public TimeTypeFilter(Map<FilterType, Set<String>> filterCriteriaMap) {
+    public TimeTypeFilter(Map<FilterType, Set<String>> filterCriteriaMap, List<BigInteger> selectedTimeTypes) {
         this.filterCriteriaMap = filterCriteriaMap;
+        this.selectedTimeTypes = selectedTimeTypes;
     }
 
     @Override
@@ -29,16 +31,15 @@ public class TimeTypeFilter implements ShiftFilter{
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                Set<String> timeTypeEnums = new HashSet<>();
+                List<BigInteger> timeTypeIds = new ArrayList<>();
                 shiftDTO.getActivities().forEach(shiftActivityDTO -> {
-                    timeTypeEnums.add(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType().toString());
-                    shiftActivityDTO.getChildActivities().forEach(childActivityDTO ->  timeTypeEnums.add(childActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeType().toString()));
+                    timeTypeIds.add(shiftActivityDTO.getActivity().getTimeType().getId());
+                    shiftActivityDTO.getChildActivities().forEach(childActivityDTO ->  timeTypeIds.add(childActivityDTO.getActivity().getTimeType().getId()));
                 });
-                if(CollectionUtils.containsAny(filterCriteriaMap.get(TIME_TYPE),timeTypeEnums) || isNotNull(shiftDTO.getRequestAbsence())){
+                if(CollectionUtils.containsAny(selectedTimeTypes,timeTypeIds)){
                     filteredShifts.add((T)shiftDTO);
                 }
             }
-
         }
         return filteredShifts;
     }

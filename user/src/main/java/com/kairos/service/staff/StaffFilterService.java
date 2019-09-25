@@ -232,7 +232,20 @@ public class StaffFilterService {
 
     private List<FilterSelectionQueryResult> getAllTimeType(Long countryId){
         List<TimeTypeDTO> timeTypeDTOS = activityIntegrationService.getAllTimeType(countryId);
-        return timeTypeDTOS.stream().flatMap(timeTypeDTO -> timeTypeDTO.getChildren().stream()).map(timeTypeDTO -> new FilterSelectionQueryResult(timeTypeDTO.getSecondLevelType().toString(),timeTypeDTO.getLabel())).collect(Collectors.toList());
+        List<FilterSelectionQueryResult> filterSelectionQueryResults = new ArrayList<>();
+        convertTimeTypeDTOSToFilterSelectionQueryResult(timeTypeDTOS.get(0).getChildren(), filterSelectionQueryResults);
+        convertTimeTypeDTOSToFilterSelectionQueryResult(timeTypeDTOS.get(1).getChildren(), filterSelectionQueryResults);
+        return filterSelectionQueryResults;
+        //return timeTypeDTOS.stream().flatMap(timeTypeDTO -> timeTypeDTO.getChildren().stream()).map(timeTypeDTO -> new FilterSelectionQueryResult(timeTypeDTO.getSecondLevelType().toString(),timeTypeDTO.getLabel())).collect(Collectors.toList());
+    }
+
+    private void convertTimeTypeDTOSToFilterSelectionQueryResult(List<TimeTypeDTO> timeTypeDTOS, List<FilterSelectionQueryResult> filterSelectionQueryResults){
+        for(TimeTypeDTO timeTypeDTO : timeTypeDTOS) {
+            filterSelectionQueryResults.add(new FilterSelectionQueryResult(timeTypeDTO.getId().toString(),timeTypeDTO.getLabel()));
+            if(isCollectionNotEmpty(timeTypeDTO.getChildren())){
+                convertTimeTypeDTOSToFilterSelectionQueryResult(timeTypeDTO.getChildren(),filterSelectionQueryResults);
+            }
+        }
     }
 
     private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {

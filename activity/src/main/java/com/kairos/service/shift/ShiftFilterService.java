@@ -5,8 +5,10 @@ import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.enums.FilterType.FUNCTIONS;
+import static com.kairos.enums.FilterType.TIME_TYPE;
 
 /**
  * Created by pradeep
@@ -24,13 +27,12 @@ import static com.kairos.enums.FilterType.FUNCTIONS;
  **/
 @Service
 public class ShiftFilterService {
-
     @Inject
     private UserIntegrationService userIntegrationService;
-
     @Inject
     private ShiftStateService shiftStateService;
-
+    @Inject
+    private TimeTypeService timeTypeService;
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
         if (isNull(staffFilterDTO)) {
@@ -44,7 +46,12 @@ public class ShiftFilterService {
 //            teamIds=filterTypeMap.get(TEAM);
 //        }
 //      ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUnitId(),teamIds));
-        ShiftFilter timeTypeFilter = new TimeTypeFilter(filterTypeMap);
+        List<BigInteger> timeTypeIds = new ArrayList<>();
+        if(filterTypeMap.containsKey(TIME_TYPE)) {
+            List<BigInteger> ids = filterTypeMap.get(TIME_TYPE).stream().map(s -> new BigInteger(s)).collect(Collectors.toList());
+            timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), ids);
+        }
+        ShiftFilter timeTypeFilter = new TimeTypeFilter(filterTypeMap, timeTypeIds);
         ShiftFilter activityTimecalculationTypeFilter = new ActivityTimeCalculationTypeFilter(filterTypeMap);
         ShiftFilter activityStatusFilter = new ActivityStatusFilter(filterTypeMap);
         ShiftFilter timeSlotFilter = new TimeSlotFilter(filterTypeMap,timeSlotDTOS);
@@ -52,8 +59,8 @@ public class ShiftFilterService {
         ShiftFilter plannedTimeTypeFilter=new PlannedTimeTypeFilter(filterTypeMap);
         if(filterTypeMap.containsKey(FilterType.VALIDATED_BY)) {
             Set<BigInteger> shiftIds = shiftWithActivityDTOS.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
-           List<ShiftState> shiftStates = shiftStateService.findAllByShiftIdsByAccessgroupRole(shiftIds, filterTypeMap.get(FilterType.VALIDATED_BY));
-           shiftStateIds=shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toList());
+            List<ShiftState> shiftStates = shiftStateService.findAllByShiftIdsByAccessgroupRole(shiftIds, filterTypeMap.get(FilterType.VALIDATED_BY));
+            shiftStateIds=shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toList());
         }
         ShiftFilter TimeAndAttendanceFilter=new TimeAndAttendanceFilter(filterTypeMap,shiftStateIds);
         List<Date> functionDates = new ArrayList<>();
