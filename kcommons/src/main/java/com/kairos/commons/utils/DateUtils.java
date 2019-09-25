@@ -13,10 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.TemporalField;
-import java.time.temporal.WeekFields;
+import java.time.temporal.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -878,6 +875,14 @@ public  class DateUtils {
 
     }
 
+    public static ZonedDateTime roundDateByMinutes(ZonedDateTime zonedDateTime,int minutes){
+        return zonedDateTime.truncatedTo(ChronoUnit.HOURS).plusMinutes((int)Math.ceil((double)zonedDateTime.get(ChronoField.MINUTE_OF_HOUR)/minutes)*minutes);
+    }
+
+    public static Date roundDateByMinutes(Date date,int minutes){
+        ZonedDateTime zonedDateTime = asZoneDateTime(date);
+        return asDate(zonedDateTime.truncatedTo(ChronoUnit.HOURS).plusMinutes((int)Math.ceil((double)zonedDateTime.get(ChronoField.MINUTE_OF_HOUR)/minutes)*minutes));
+    }
     public static Set<DayOfWeek> getAllDaysBetweenDays(DayOfWeek startDayOfWeek, DayOfWeek endDayOfWeek) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         while (true){

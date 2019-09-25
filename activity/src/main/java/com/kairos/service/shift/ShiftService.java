@@ -276,7 +276,7 @@ public class ShiftService extends MongoBaseService {
         if (updateShift && isNotNull(shiftAction)) {
             shift = updateShiftAfterPublish(shift, staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftAction);
         }
-        if (!updateShift && PhaseDefaultName.DRAFT.equals(phase.getPhaseEnum()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
+        if (!updateShift && newHashSet(PhaseDefaultName.DRAFT,PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum()) && ShiftActionType.SAVE_AS_DRAFT.equals(shiftAction)) {
             Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
             draftShift.setDraft(true);
             shift.setDraftShift(draftShift);
@@ -392,7 +392,7 @@ public class ShiftService extends MongoBaseService {
             ShiftWithViolatedInfoDTO updatedShiftWithViolatedInfo = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldShift, activityWrapperMap, isNotNull(shiftWithActivityDTO.getId()), isNull(shiftDTO.getShiftId()),shiftActionType);
             List<ShiftDTO> shiftDTOS = newArrayList(shiftDTO);
             if (isIgnoredAllRuletemplate(shiftWithViolatedInfo, updatedShiftWithViolatedInfo)) {
-                if(updateWTACounterFlag && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)){
+                if(updateWTACounterFlag && !ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)){
                     shiftValidatorService.updateWTACounter(staffAdditionalInfoDTO, updatedShiftWithViolatedInfo, shift);
                     updateWTACounterFlag=false;
                 }
