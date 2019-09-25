@@ -79,7 +79,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         for (Phase phase : phases) {
             createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId,employmentTypeIds,ConfLevel.UNIT);
             createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, unitId, ConfLevel.UNIT);
-
+            createDefaultNonWorkingSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, unitId, ConfLevel.UNIT);
         }
         activityConfigurationRepository.saveEntities(activityConfigurations);
     }
@@ -94,6 +94,11 @@ public class ActivityConfigurationService extends MongoBaseService {
     private void createDefaultAbsenceSettings(BigInteger phaseId, BigInteger applicablePlannedTimeId, List<ActivityConfiguration> activityConfigurations, Long referenceId,ConfLevel confLevel) {
         AbsencePlannedTime absencePlannedTime = new AbsencePlannedTime(phaseId, newArrayList(applicablePlannedTimeId), false);
         activityConfigurations.add(ConfLevel.UNIT.equals(confLevel) ? new ActivityConfiguration(referenceId, absencePlannedTime) : new ActivityConfiguration(absencePlannedTime,referenceId));
+    }
+
+    private void createDefaultNonWorkingSettings(BigInteger phaseId, BigInteger applicablePlannedTimeId, List<ActivityConfiguration> activityConfigurations, Long referenceId,ConfLevel confLevel) {
+        NonWorkingPlannedTime nonWorkingPlannedTime = new NonWorkingPlannedTime(phaseId, newArrayList(applicablePlannedTimeId), false);
+        activityConfigurations.add(ConfLevel.UNIT.equals(confLevel) ? new ActivityConfiguration(referenceId, nonWorkingPlannedTime) : new ActivityConfiguration(nonWorkingPlannedTime,referenceId));
     }
 
     public PresencePlannedTime updatePresenceActivityConfiguration(Long unitId, PresencePlannedTime presencePlannedTime) {
@@ -173,6 +178,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         for (Phase phase : phases) {
             createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, countryId,employmentTypeIds,ConfLevel.UNIT);
             createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.UNIT);
+            createDefaultNonWorkingSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.UNIT);
         }
         activityConfigurationRepository.saveEntities(activityConfigurations);
     }
@@ -378,7 +384,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public BigInteger createNonWorkingExceptionActivityConfiguration(Long unitOrCountryId, NonWorkingPlannedTime nonWorkingPlannedTime, boolean forCountry) {
-        if (!Optional.ofNullable(nonWorkingPlannedTime.getTimeTypeId()).isPresent()) {
+        if (isNull(nonWorkingPlannedTime.getTimeTypeId()) && !nonWorkingPlannedTime.isException()) {
             exceptionService.dataNotFoundByIdException(ERROR_TIMETYPE_UNSELECTED);
         }
         ActivityConfiguration activityConfiguration = forCountry ? new ActivityConfiguration(new NonWorkingPlannedTime(nonWorkingPlannedTime.getPhaseId(), nonWorkingPlannedTime.getTimeTypeId(), nonWorkingPlannedTime.getPlannedTimeIds(), true), unitOrCountryId)
@@ -412,4 +418,21 @@ public class ActivityConfigurationService extends MongoBaseService {
     public List<ActivityConfigurationDTO> getNonWorkingActivityConfigurationForCountry(Long countryId) {
         return activityConfigurationRepository.findNonWorkingConfigurationByCountryId(countryId);
     }
+
+    //todo this method to copy default NonWorkingActivityConfiguration from AbsenceActivityConfiguration
+    public boolean copyNonWorkingActivityConfigurationFromAbsence() {
+        List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfiguration();
+        if(isCollectionNotEmpty(activityConfigurations)){
+            activityConfigurations.forEach(activityConfiguration -> {
+                NonWorkingPlannedTime nonWorkingPlannedTime = new NonWorkingPlannedTime(activityConfiguration.getAbsencePlannedTime().getPhaseId(),activityConfiguration.getAbsencePlannedTime().getTimeTypeId(),activityConfiguration.getAbsencePlannedTime().getPlannedTimeIds(),isNull(activityConfiguration.getAbsencePlannedTime().getTimeTypeId()));
+                if(isNotNull(activityConfiguration.getCountryId())){
+                    createNonWorkingExceptionActivityConfiguration(activityConfiguration.getCountryId(), nonWorkingPlannedTime,true);
+                }else{
+                    createNonWorkingExceptionActivityConfiguration(activityConfiguration.getUnitId(), nonWorkingPlannedTime,false);
+                }
+            });
+        }
+        return true;
+    }
+
 }
