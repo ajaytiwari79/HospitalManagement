@@ -282,8 +282,8 @@ public class ExpertiseService {
 
     private void prepareExpertise(Expertise expertise, ExpertiseDTO expertiseDTO, Country country, boolean create) {
         expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
-        expertise.setStartDate(getLocalDate(expertiseDTO.getStartDateMillis()));
-        expertise.setEndDate(expertiseDTO.getEndDateMillis());
+        expertise.setStartDate(asLocalDate(expertiseDTO.getStartDateMillis()));
+        expertise.setEndDate(asLocalDate(expertiseDTO.getEndDateMillis()));
         Optional.ofNullable(expertiseDTO.getOrganizationLevelId()).ifPresent(orgLevelId -> {
             Level level = countryGraphRepository.getLevel(country.getId(), orgLevelId);
             if (!Optional.ofNullable(level).isPresent()) {

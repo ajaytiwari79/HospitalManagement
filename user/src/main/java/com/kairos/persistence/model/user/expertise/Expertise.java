@@ -57,6 +57,9 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
 
+    @Relationship(type = HAS_EXPERTISE_LINES)
+    private List<ExpertiseLine> expertiseLines;
+
     public Expertise(String name, Country country) {
         this.name = name;
         this.country = country;

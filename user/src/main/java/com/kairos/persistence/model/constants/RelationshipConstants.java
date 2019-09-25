@@ -200,6 +200,7 @@ public abstract class RelationshipConstants {
     public static final  String EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT = "EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT";
     public static final  String HAS_PREFERED_TIME_WINDOW = "HAS_PREFERED_TIME_WINDOW";
     public static final  String BELONGS_TO_SECTOR = "BELONGS_TO_SECTOR";
+    public static final String HAS_EXPERTISE_LINES="HAS_EXPERTISE_LINES";
 
 // System Langugae
 
