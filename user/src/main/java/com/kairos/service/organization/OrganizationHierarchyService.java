@@ -198,7 +198,6 @@ public class OrganizationHierarchyService {
         queryResult.setUnion(queryResult.isUnion());
         queryResult.setHubId(hubId);
         queryResult.setUnit(isUnit);
-        //queryResult.set
         queryResult.setHasPermission(countryAdmin ? true : unitPermissionMap.get(queryResult.getId()));
         queryResult.setEnabled(true);
         Iterator iterator=queryResult.getUnits().iterator();
