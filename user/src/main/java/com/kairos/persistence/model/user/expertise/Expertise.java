@@ -154,7 +154,7 @@ public class Expertise extends UserBaseEntity {
     }
 
     public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap<>(6);
         map.put("id", this.id);
         map.put("name", this.name);
         map.put("description", this.description);

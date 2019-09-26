@@ -284,6 +284,9 @@ public class StaffCreationService {
         SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         user.setUserLanguage(systemLanguage);
         user.setUserName(payload.getUserName());
+        final String password = payload.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH;
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
+        user.setCountryId(organization.getCountry().getId());
         staff = updateStaffDetailsOnCreationOfStaff(organization, payload);
         staff.setUser(user);
         staffService.addStaffInChatServer(staff);

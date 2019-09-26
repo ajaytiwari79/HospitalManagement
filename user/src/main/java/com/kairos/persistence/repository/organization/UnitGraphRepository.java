@@ -394,10 +394,6 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<Long> findAllOrganizationIds();
 
 
-    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o:Unit) WHERE id(o)={0}  RETURN id(country) ")
-    Long getCountryId(Long organizationId);
-
-
     @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(organization)={0} AND et.deleted={1}\n" +
             "RETURN id(et) as id, et.name as name, et.description as description, \n" +
@@ -425,10 +421,6 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             " RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")
     OrganizationServiceQueryResult addCustomNameOfServiceForOrganization(Long serviceId, Long organizationId, String customName);
 
-    @Query("MATCH (organization:Unit) - [r:BELONGS_TO] -> (country:Country)\n" +
-            "WHERE id(organization)={0}\n" +
-            "RETURN country")
-    Country getCountry(Long organizationId);
 
     @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(subType) IN {0} " +
             "RETURN  id(org) as id,org.name as name")
