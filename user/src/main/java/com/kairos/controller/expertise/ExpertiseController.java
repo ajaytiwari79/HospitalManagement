@@ -1,11 +1,9 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.dto.user.country.experties.AgeRangeDTO;
-import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
-import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
-import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.dto.user.country.experties.*;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.Response.ProtectedDaysOffSettingDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -188,6 +186,20 @@ public class ExpertiseController {
     public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO, @PathVariable long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO, countryId));
     }
+
+    @ApiOperation(value = "add proteched days off setting")
+    @PostMapping(value =   "/expertise/{expertiseId}/protected_days_off")
+    public ResponseEntity<Map<String, Object>> addProtechedDaysOffSetting(@PathVariable Long expertiseId, @RequestBody ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.addOrUpdateProtectedDaysOffSetting(expertiseId, protectedDaysOffSettingDTO));
+    }
+
+    @ApiOperation(value = "add proteched days off setting")
+    @GetMapping(value =   "/expertise/{expertiseId}/protected_days_off")
+    public ResponseEntity<Map<String, Object>> getProtechedDaysOffSetting(@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getProtectedDaysOffSetting(expertiseId));
+    }
+
+
 
     @ApiOperation(value = "Get senior Days and child Care days at country")
     @GetMapping(value = "/expertise/{expertiseId}/senior_and_child_care_days")
