@@ -67,6 +67,15 @@ public class StaffEmploymentDetails {
         this.costTimeAgreement = costTimeAgreement;
     }
 
+    public StaffEmploymentDetails(Long id,Expertise expertise, LocalDate endDate, LocalDate startDate, Long unitId, EmploymentSubType employmentSubType) {
+        this.id=id;
+        this.expertise = expertise;
+        this.endDate = endDate;
+        this.StartDate = startDate;
+        this.unitId = unitId;
+        this.employmentSubType = employmentSubType;
+    }
+
     public StaffEmploymentDetails(Long unitId) {
         this.unitId = unitId;
     }
