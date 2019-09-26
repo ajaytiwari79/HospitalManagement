@@ -78,7 +78,7 @@ public class BreakSettingsService {
             exceptionService.dataNotFoundByIdException(ERROR_BREAKSETTINGS_NOTFOUND, breakSettingsId);
         }
         BreakSettings breakSettingsFromDB = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndPrimaryTrue(countryId, expertiseId);
-        if (Optional.ofNullable(breakSettingsFromDB).isPresent() && !breakSettingsFromDB.getId().equals(breakSettingsId)) {
+        if (Optional.ofNullable(breakSettingsFromDB).isPresent() && !breakSettingsFromDB.getId().equals(breakSettingsId) && breakSettingsDTO.isPrimary()) {
             exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
         }
         breakSettings.setIncludeInPlanning(breakSettingsDTO.isIncludeInPlanning());
