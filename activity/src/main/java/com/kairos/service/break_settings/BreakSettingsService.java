@@ -44,8 +44,8 @@ public class BreakSettingsService {
 
     public BreakSettingsDTO createBreakSettings(Long countryId, Long expertiseId, BreakSettingsDTO breakSettingsDTO) {
         BreakSettings breakSettings = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndPrimaryTrue(countryId, expertiseId);
-        if (Optional.ofNullable(breakSettings).isPresent()) {
-            exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
+        if (Optional.ofNullable(breakSettings).isPresent() && breakSettingsDTO.isPrimary()) {
+            exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE);
         }
         breakSettings = new BreakSettings(countryId, breakSettingsDTO.getShiftDurationInMinute(), breakSettingsDTO.getBreakDurationInMinute(), expertiseId, breakSettingsDTO.getActivityId(),breakSettingsDTO.isPrimary(),breakSettingsDTO.isIncludeInPlanning());
         breakSettingMongoRepository.save(breakSettings);
@@ -78,9 +78,11 @@ public class BreakSettingsService {
             exceptionService.dataNotFoundByIdException(ERROR_BREAKSETTINGS_NOTFOUND, breakSettingsId);
         }
         BreakSettings breakSettingsFromDB = breakSettingMongoRepository.findByDeletedFalseAndCountryIdAndExpertiseIdAndPrimaryTrue(countryId, expertiseId);
-        if (Optional.ofNullable(breakSettingsFromDB).isPresent() && breakSettingsFromDB.getId().equals(breakSettingsId)) {
+        if (Optional.ofNullable(breakSettingsFromDB).isPresent() && !breakSettingsFromDB.getId().equals(breakSettingsId)) {
             exceptionService.duplicateDataException(ERROR_BREAKSETTINGS_DUPLICATE, breakSettingsDTO.getShiftDurationInMinute());
         }
+        breakSettings.setIncludeInPlanning(breakSettingsDTO.isIncludeInPlanning());
+        breakSettings.setPrimary(breakSettingsDTO.isPrimary());
         breakSettings.setBreakDurationInMinute(breakSettingsDTO.getBreakDurationInMinute());
         breakSettings.setActivityId(breakSettingsDTO.getActivityId());
         breakSettings.setShiftDurationInMinute(breakSettingsDTO.getShiftDurationInMinute());
