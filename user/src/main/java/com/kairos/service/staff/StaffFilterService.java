@@ -179,7 +179,7 @@ public class StaffFilterService {
             case FUNCTIONS:
                 return getAllFunctions(countryId);
             case SKILLS:
-                return getAllSkills();
+                return getAllSkills(unitId);
             case VALIDATED_BY:
                 return getTAStatus();
             case TEAM:
@@ -201,9 +201,15 @@ public class StaffFilterService {
         return functionDTOS.stream().map(functionDTO  -> new FilterSelectionQueryResult(functionDTO.getId().toString(),functionDTO.getName())).collect(Collectors.toList());
     }
 
-    private  List<FilterSelectionQueryResult> getAllSkills(){
-        List<Skill> skills = skillService.getAllSkill();
-        return skills.stream().map(skill  -> new FilterSelectionQueryResult(skill.getId().toString(),skill.getName())).collect(Collectors.toList());
+    private  List<FilterSelectionQueryResult> getAllSkills(Long unitId){
+        List<Map<String, Object>> skillsMap = skillService.getSkillsOfOrganization(unitId);
+        List<FilterSelectionQueryResult> filterSkillData = new ArrayList<>();
+        for (Map<String, Object> map : skillsMap) {
+
+            filterSkillData.add(new FilterSelectionQueryResult());
+        }
+        return null;
+        //return skillsMap.stream().map(maps-> maps.get("data")skill  -> new FilterSelectionQueryResult(skill.getId().toString(),skill.getName())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getPlannedTimeType(Long countryId){
