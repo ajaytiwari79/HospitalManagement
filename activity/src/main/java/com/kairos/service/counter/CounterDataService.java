@@ -6,6 +6,7 @@ package com.kairos.service.counter;
  */
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
@@ -32,10 +33,7 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.counter.ApplicableFilter;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.TabKPIConf;
+import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -423,10 +421,23 @@ public class CounterDataService extends MongoBaseService {
         }
         applicableKPIS.addAll(applicableKPIs);
         save(applicableKPIS);
+        linkKpiToUncategorized(refId, level, copyKpi);
         TabKPIDTO tabKPIDTO = getTabKpiData(copyKpi, counterDTO, accessGroupPermissionCounterDTO);
         tabKPIDTO.setId((isNotNull(tabKPIConf)) ? tabKPIConf.getId() : null);
         return tabKPIDTO;
     }
+
+    private void linkKpiToUncategorized(Long refId, ConfLevel level, KPI copyKpi) {
+        KPICategory kpiCategory = counterRepository.getKPICategoryByName(AppConstants.UNCATEGORIZED, level, refId);
+        CategoryKPIConf categoryKPIConf=null;
+        if(ConfLevel.UNIT.equals(level)) {
+            categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), null, refId, level);
+        }else if(ConfLevel.COUNTRY.equals(level)) {
+            categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), refId, null, level);
+        }
+        save(categoryKPIConf);
+    }
+
 
     public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level ) {
         AccessGroupPermissionCounterDTO  accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
