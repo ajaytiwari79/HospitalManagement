@@ -429,13 +429,15 @@ public class CounterDataService extends MongoBaseService {
 
     private void linkKpiToUncategorized(Long refId, ConfLevel level, KPI copyKpi) {
         KPICategory kpiCategory = counterRepository.getKPICategoryByName(AppConstants.UNCATEGORIZED, level, refId);
-        CategoryKPIConf categoryKPIConf=null;
-        if(ConfLevel.UNIT.equals(level)) {
-            categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), null, refId, level);
-        }else if(ConfLevel.COUNTRY.equals(level)) {
-            categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), refId, null, level);
+        if(isNotNull(kpiCategory)) {
+            CategoryKPIConf categoryKPIConf = null;
+            if (ConfLevel.UNIT.equals(level)) {
+                categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), null, refId, level);
+            } else if (ConfLevel.COUNTRY.equals(level)) {
+                categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), refId, null, level);
+            }
+            if (isNotNull(categoryKPIConf)) save(categoryKPIConf);
         }
-        save(categoryKPIConf);
     }
 
 
