@@ -376,6 +376,12 @@ public class UserIntegrationService {
         }, staffId);
     }
 
+    public StaffEmploymentDetails mainUnitEmploymentOfStaff(Long staffId, Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, MAIN_UNIT_EMPLOYEMNT_BY_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentDetails>>() {
+        }, staffId);
+    }
+
+
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, Long unitEmploymentId, Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));

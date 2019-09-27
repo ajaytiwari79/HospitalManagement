@@ -84,6 +84,7 @@ public final class ApiConstants {
     public static final String UNIT_MANAGER_IDS_UNIT_ID = "/unit_manager_ids/{unitId}";
     public static final String COUNTRY_ADMINS_IDS_OF_UNIT = "/country_admins_ids/{countryAdminsOfUnitId}";
     public static final String VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID = STAFF_WITH_STAFF_ID + "/verifyUnitEmployment";
+    public static final String MAIN_UNIT_EMPLOYEMNT_BY_STAFF_ID = STAFF_WITH_STAFF_ID + "/get_staff_main_employment";
     public static final String VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID = VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID + "/{unitEmploymentId}";
     public static final String STAFF_CURRENT_USER_ID = "/staff/current_user/{userId}";
     public static final String STAFF_GET_STAFF_BY_EXPERTISES = "/staff/getStaffByExperties";

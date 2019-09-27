@@ -6,6 +6,7 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.staff.Staff;
+import com.kairos.enums.EmploymentSubType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -54,7 +55,7 @@ public class StaffEmploymentDetails {
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
     private CTAResponseDTO costTimeAgreement;
-
+    private EmploymentSubType employmentSubType;
     public StaffEmploymentDetails() {
 
     }
@@ -64,6 +65,15 @@ public class StaffEmploymentDetails {
         this.staffId = staffId;
         this.employmentLines = employmentLines;
         this.costTimeAgreement = costTimeAgreement;
+    }
+
+    public StaffEmploymentDetails(Long id,Expertise expertise, LocalDate endDate, LocalDate startDate, Long unitId, EmploymentSubType employmentSubType) {
+        this.id=id;
+        this.expertise = expertise;
+        this.endDate = endDate;
+        this.StartDate = startDate;
+        this.unitId = unitId;
+        this.employmentSubType = employmentSubType;
     }
 
     public StaffEmploymentDetails(Long unitId) {
@@ -328,5 +338,13 @@ public class StaffEmploymentDetails {
 
     public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
         this.accumulatedTimebankDate = accumulatedTimebankDate;
+    }
+
+    public EmploymentSubType getEmploymentSubType() {
+        return employmentSubType;
+    }
+
+    public void setEmploymentSubType(EmploymentSubType employmentSubType) {
+        this.employmentSubType = employmentSubType;
     }
 }

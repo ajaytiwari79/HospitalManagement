@@ -46,6 +46,10 @@ public class StaffAdditionalInfoDTO {
     public StaffAdditionalInfoDTO() {
     }
 
+    public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
+        this.employment = employment;
+    }
+
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment, List<DayTypeDTO> dayTypes) {
         this.employment = employment;
         this.dayTypes = dayTypes;
