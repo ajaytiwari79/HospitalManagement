@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.brakeRuleTemplateAndUpdateViolationDetails;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getHoursByMinutes;
 
@@ -38,7 +40,7 @@ public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         WorkTimeAgreementService workTimeAgreementService= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementService.class);
-        IntervalBalance intervalBalance =workTimeAgreementService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(),1l,infoWrapper.getShift().getStaffId(),infoWrapper.getShift().getActivityIds().get(0));
+        IntervalBalance intervalBalance =workTimeAgreementService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(),asLocalDate(infoWrapper.getShift().getStartDate()),infoWrapper.getShift().getStaffId(),infoWrapper.getShift().getActivityIds().get(0));
         if(intervalBalance.getAvailable()<1) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, (int) intervalBalance.getTotal(),
