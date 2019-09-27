@@ -468,8 +468,4 @@ public class SkillService {
         }
         return skills;
     }
-
-    public List<Skill> getAllSkill(){
-        return skillGraphRepository.findAll();
-    }
 }
