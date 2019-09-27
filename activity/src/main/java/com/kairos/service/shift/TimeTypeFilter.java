@@ -17,8 +17,8 @@ import static com.kairos.enums.FilterType.TIME_TYPE;
  **/
 
 public class TimeTypeFilter implements ShiftFilter{
-    List<BigInteger> selectedTimeTypes;
-    Map<FilterType, Set<String>> filterCriteriaMap;
+    private List<BigInteger> selectedTimeTypes;
+    private Map<FilterType, Set<String>> filterCriteriaMap;
 
     public TimeTypeFilter(Map<FilterType, Set<String>> filterCriteriaMap, List<BigInteger> selectedTimeTypes) {
         this.filterCriteriaMap = filterCriteriaMap;

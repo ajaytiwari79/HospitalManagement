@@ -109,13 +109,14 @@ public class StaffFilterService {
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
 
-        return getAllAndFavouriteFiltersFromParent(moduleId, organizationService.fetchParentOrganization(unitId).getId());
+        return getAllAndFavouriteFiltersFromParent(moduleId, unitId);
 
     }
 
-    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFiltersFromParent(String moduleId, Long organizationId) {
+    public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFiltersFromParent(String moduleId, Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
         Organization organization;
+        Long organizationId = organizationService.fetchParentOrganization(unitId).getId();
         if (accessPageRepository.isHubMember(userId)) {
             organization = accessPageRepository.fetchParentHub(userId);
         } else {
@@ -131,7 +132,7 @@ public class StaffFilterService {
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
 
         return new FiltersAndFavouriteFiltersDTO(
-                getAllFilters(moduleId, countryId, organizationId),
+                getAllFilters(moduleId, countryId, unitId),
                 getFavouriteFilters(moduleId, staff.getId()));
     }
 
