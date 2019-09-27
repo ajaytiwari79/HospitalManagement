@@ -41,6 +41,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/resources/**", "/configuration/ui", "/swagger-resources/**/**", "/swagger-ui.html", "/v2/api-docs", "/webjars/**").permitAll()
                 .antMatchers("/actuator/**").permitAll()
+                .antMatchers( "/staff/chat_server/register").permitAll()
                 .antMatchers("/**").authenticated()
                 .and().addFilterBefore(getAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);
     }
