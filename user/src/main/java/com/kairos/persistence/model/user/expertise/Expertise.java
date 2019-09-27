@@ -76,6 +76,9 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = HAS_SENIOR_DAYS)
     private List<CareDays> seniorDays;
 
+    @Relationship(type = HAS_PROTECTED_DAYS_OFF_SETTINGS)
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
 
@@ -113,6 +116,9 @@ public class Expertise extends UserBaseEntity {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
     }
 
+    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
+        return protectedDaysOffSettings = Optional.ofNullable(protectedDaysOffSettings).orElse(new ArrayList<>());
+    }
 
     public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
         this.name = name;
@@ -154,7 +160,7 @@ public class Expertise extends UserBaseEntity {
     }
 
     public Map<String, Object> retrieveDetails() {
-        Map<String, Object> map = new HashMap();
+        Map<String, Object> map = new HashMap<>(6);
         map.put("id", this.id);
         map.put("name", this.name);
         map.put("description", this.description);

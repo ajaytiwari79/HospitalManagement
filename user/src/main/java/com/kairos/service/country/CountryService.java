@@ -57,6 +57,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -267,10 +268,12 @@ public class CountryService {
 
 
     public List<Map<String, Object>> getAllCountryAllHolidaysByCountryId(Long countryId) {
-        if (countryId == null) {
-            return null;
-        }
         return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
+
+    }
+
+    public List<Map<String, Object>> getAllUnitAllHolidaysByUnitId(Long unitId) {
+        return FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryGraphRepository.getCountryIdByUnitId(unitId)));
 
     }
 

@@ -420,7 +420,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         return activityConfigurationRepository.findNonWorkingConfigurationByCountryId(countryId);
     }
 
-//todo this method to copy default NonWorkingActivityConfiguration from AbsenceActivityConfiguration
+    //todo this method to copy default NonWorkingActivityConfiguration from AbsenceActivityConfiguration
     public boolean copyNonWorkingActivityConfigurationFromAbsence() {
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllAbsenceConfiguration();
         if(isCollectionNotEmpty(activityConfigurations)){

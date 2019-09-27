@@ -1,6 +1,8 @@
 package com.kairos.service.shift;
 
+import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
@@ -17,9 +19,9 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.enums.FilterType.FUNCTIONS;
-import static com.kairos.enums.FilterType.TIME_TYPE;
+import static com.kairos.enums.FilterType.*;
 
 /**
  * Created by pradeep
@@ -39,13 +41,13 @@ public class ShiftFilterService {
             staffFilterDTO = new StaffFilterDTO();
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
-//        Set<String> teamIds=new HashSet<>();
+        Set<String> teamIds=new HashSet<>();
         List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(UserContext.getUnitId());
         Map<FilterType, Set<String>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
-//        if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
-//            teamIds=filterTypeMap.get(TEAM);
-//        }
-//      ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUnitId(),teamIds));
+        if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
+            teamIds=filterTypeMap.get(TEAM);
+        }
+        ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUnitId(),teamIds));
         List<BigInteger> timeTypeIds = new ArrayList<>();
         if(filterTypeMap.containsKey(TIME_TYPE)) {
             List<BigInteger> ids = filterTypeMap.get(TIME_TYPE).stream().map(s -> new BigInteger(s)).collect(Collectors.toList());
@@ -69,7 +71,11 @@ public class ShiftFilterService {
             functionDates = userIntegrationService.getAllDateByFunctionIds(shiftWithActivityDTOS.get(0).getUnitId(), functionIds);
         }
         ShiftFilter functionsFilter = new FunctionsFilter(filterTypeMap, functionDates);
-        ShiftFilter realTimeStatusFilter=new RealTimeStatusFilter(filterTypeMap);
+        Set<BigInteger> sickConfigurations = new HashSet<>();
+        if(filterTypeMap.containsKey(REAL_TIME_STATUS)) {
+            sickConfigurations = userIntegrationService.getSickSettingsOfUnit(shiftWithActivityDTOS.get(0).getUnitId());
+        }
+        ShiftFilter realTimeStatusFilter=new RealTimeStatusFilter(filterTypeMap, sickConfigurations);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter)
                                     .and(functionsFilter).and(realTimeStatusFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);

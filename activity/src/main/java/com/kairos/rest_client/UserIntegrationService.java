@@ -816,6 +816,10 @@ public class UserIntegrationService {
     public List<Date> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
         return genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Date>>>() {});
     }
+
+    public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/sick_settings/default", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {});
+    }
 }
 
 

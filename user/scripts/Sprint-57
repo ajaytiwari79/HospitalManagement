@@ -1,0 +1,9 @@
+Match(ap:AccessPage) where ap.moduleId="tab_310" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Non working time",isModule:false,moduleId:"tab_428",active:true});
+
+Match(ap:AccessPage) where ap.moduleId="tab_253" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Non working time",isModule:false,moduleId:"tab_429",active:true});
+
+Match(ap:AccessPage) where ap.moduleId="tab_310" set ap.name="Activity Configuration" return ap;
+
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+Match (ap:AccessPage)
+CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);

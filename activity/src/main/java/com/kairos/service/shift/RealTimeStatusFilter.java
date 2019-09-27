@@ -21,9 +21,11 @@ import static com.kairos.enums.FilterType.REAL_TIME_STATUS;
  **/
 public class RealTimeStatusFilter implements ShiftFilter {
     Map<FilterType, Set<String>> filterCriteriaMap;
+    Set<BigInteger> sickConfigurations;
 
-    public RealTimeStatusFilter(Map<FilterType, Set<String>> filterCriteriaMap) {
+    public RealTimeStatusFilter(Map<FilterType, Set<String>> filterCriteriaMap, Set<BigInteger> sickConfigurations) {
         this.filterCriteriaMap = filterCriteriaMap;
+        this.sickConfigurations = sickConfigurations;
     }
 
     @Override
@@ -43,7 +45,9 @@ public class RealTimeStatusFilter implements ShiftFilter {
                     }
                     shiftOnBreak = shiftDTO.getBreakActivities().stream().anyMatch(shiftActivityDTO -> currentOnBreakActivityIds.contains(shiftActivityDTO.getActivityId()));
                 }
+                boolean shiftOnSick = false;
                 if (isCurrentDayShift(shiftDTO) && ((filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_BREAK.toString()) && shiftOnBreak) ||
+                        (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.SICK.toString()) && shiftOnSick)  ||
                         (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.UPCOMING.toString()) && shiftDTO.getStartDate().after(currentDate))  ||
                         (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString()) && !(ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) && (shiftDTO.getStartDate().after(currentDate) || shiftDTO.getEndDate().before(currentDate)))  ||
                         (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_LEAVE.toString()) && ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())))  ||

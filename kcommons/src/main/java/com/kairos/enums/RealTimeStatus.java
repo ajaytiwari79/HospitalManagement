@@ -7,7 +7,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 public enum RealTimeStatus {
-    UPCOMING("Upcoming"), CURRENTLY_WORKING("Currently Working"), ON_BREAK("On Break"), ON_LEAVE("On Leave"), RESTING("Resting");
+    UPCOMING("Upcoming"), CURRENTLY_WORKING("Currently Working"), ON_BREAK("On Break"), ON_LEAVE("On Leave"), RESTING("Resting"), SICK("Sick,");
     public String value;
 
     RealTimeStatus(String value) {
