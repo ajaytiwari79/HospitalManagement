@@ -108,7 +108,7 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     List<TeamDTO> findAllTeamsInOrganization(long organizationId);
 
 
-    @Query("MATCH (org:Organization)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN toString(id(team)) as id,team.name as value")
+    @Query("MATCH (org:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false}) WHERE id(org)={0} RETURN toString(id(team)) as id,team.name as value")
     List<FilterSelectionQueryResult> getTeamsByUnitIdForFilters(long organizationId);
 
     @Query("MATCH (team:Team{isEnabled:true,deleted:false}) WHERE id(team) IN {0} " +
