@@ -202,14 +202,14 @@ public class StaffFilterService {
     }
 
     private  List<FilterSelectionQueryResult> getAllSkills(Long unitId){
-        List<Map<String, Object>> skillsMap = skillService.getSkillsOfOrganization(unitId);
+        List<Map<String, Object>> skillsMaps = skillService.getSkillsOfOrganization(unitId);
         List<FilterSelectionQueryResult> filterSkillData = new ArrayList<>();
-        for (Map<String, Object> map : skillsMap) {
-
-            filterSkillData.add(new FilterSelectionQueryResult());
+        for (Map<String, Object> map : skillsMaps) {
+            for (Map<String, Object> skill : ((List<Map<String, Object>>)((Map<String, Object>) map.get("data")).get("skills"))) {
+                filterSkillData.add(new FilterSelectionQueryResult(skill.get("id").toString(), skill.get("name").toString()));
+            }
         }
-        return null;
-        //return skillsMap.stream().map(maps-> maps.get("data")skill  -> new FilterSelectionQueryResult(skill.getId().toString(),skill.getName())).collect(Collectors.toList());
+        return filterSkillData;
     }
 
     private List<FilterSelectionQueryResult> getPlannedTimeType(Long countryId){
