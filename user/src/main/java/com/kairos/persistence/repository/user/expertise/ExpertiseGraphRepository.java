@@ -150,9 +150,9 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN case when expertiseCount>0 THEN  true ELSE false END as response")
     Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName, Long currentExpertise);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,history:false}) where expertise.name=~{0} with count(expertise) as expertiseCount " +
+    @Query("MATCH(expertise:Expertise{deleted:false}) where expertise.name=~{0} with count(expertise) as expertiseCount " +
             "RETURN case when expertiseCount>0 THEN  true ELSE false END as response")
-    Boolean findExpertiseByUniqueName(String expertiseName);
+    boolean findExpertiseByUniqueName(String expertiseName);
 
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true}) WHERE id(country) = {0} AND (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp()) \n" +
             "MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1}\n" +

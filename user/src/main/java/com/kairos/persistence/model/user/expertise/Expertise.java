@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,7 +46,8 @@ public class Expertise extends UserBaseEntity {
 
     private boolean published;
 
-
+    @Relationship(type = FOR_SENIORITY_LEVEL)
+    private List<SeniorityLevel> seniorityLevel;
 
     @Relationship(type = HAS_SENIOR_DAYS)
     private List<CareDays> seniorDays;
@@ -66,7 +64,18 @@ public class Expertise extends UserBaseEntity {
     }
 
 
-
+    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published, List<SeniorityLevel> seniorityLevel, List<ExpertiseLine> expertiseLines) {
+        this.name = name;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.country = country;
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+        this.published = published;
+        this.seniorityLevel = seniorityLevel;
+        this.expertiseLines = expertiseLines;
+    }
 
     public List<CareDays> getSeniorDays() {
         return seniorDays = Optional.ofNullable(seniorDays).orElse(new ArrayList<>());
@@ -85,6 +94,15 @@ public class Expertise extends UserBaseEntity {
 
     public List<CareDays> getChildCareDays() {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
+    }
+
+    public List<SeniorityLevel> getSeniorityLevel() {
+        return seniorityLevel = Optional.ofNullable(seniorityLevel).orElse(new ArrayList<>());
+    }
+
+    public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
+        this.seniorityLevel = Optional.ofNullable(this.seniorityLevel).orElse(new ArrayList<>());
+        this.seniorityLevel.add(seniorityLevel);
     }
 
     public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description, LocalDate startDate, LocalDate endDate, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {

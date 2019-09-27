@@ -5,11 +5,15 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.DateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +23,9 @@ import java.util.Set;
  * Created by vipul on 30/3/18.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class ExpertiseDTO {
     private Long id;
     @NotBlank(message = "error.Expertise.name.notEmpty")
@@ -33,134 +40,17 @@ public class ExpertiseDTO {
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
     @Valid
     private SeniorityLevelDTO seniorityLevel;
-    private List<Long> tags;
     private boolean published;
     private BreakPaymentSetting breakPaymentSetting;
     private SectorDTO sector;
+    @Valid
+    private List<SeniorityLevelDTO> seniorityLevels;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-
-    public ExpertiseDTO() {
-        //default cons
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(Date startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public Date getEndDateMillis() {
-        return endDateMillis;
-    }
 
     public void setEndDateMillis(Date endDateMillis) {
         this.endDateMillis = endDateMillis == null ? null : DateUtils.getEndOfDay(endDateMillis);
-    }
-
-    public Long getOrganizationLevelId() {
-        return organizationLevelId;
-    }
-
-    public void setOrganizationLevelId(Long organizationLevelId) {
-        this.organizationLevelId = organizationLevelId;
-    }
-
-    public Set<Long> getOrganizationServiceIds() {
-        return organizationServiceIds;
-    }
-
-    public void setOrganizationServiceIds(Set<Long> organizationServiceIds) {
-        this.organizationServiceIds = organizationServiceIds;
-    }
-
-    public Integer getFullTimeWeeklyMinutes() {
-        return fullTimeWeeklyMinutes;
-    }
-
-    public void setFullTimeWeeklyMinutes(Integer fullTimeWeeklyMinutes) {
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-    }
-
-    public Integer getNumberOfWorkingDaysInWeek() {
-        return numberOfWorkingDaysInWeek;
-    }
-
-    public void setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-    }
-
-
-    public SeniorityLevelDTO getSeniorityLevel() {
-        return seniorityLevel;
-    }
-
-    public void setSeniorityLevel(SeniorityLevelDTO seniorityLevel) {
-        this.seniorityLevel = seniorityLevel;
-    }
-
-    public List<Long> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Long> tags) {
-        this.tags = tags;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public BreakPaymentSetting getBreakPaymentSetting() {
-        return breakPaymentSetting;
-    }
-
-    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
-        this.breakPaymentSetting = breakPaymentSetting;
-    }
-    public SectorDTO getSector() {
-        return sector;
-    }
-
-    public void setSector(SectorDTO sector) {
-        this.sector = sector;
-    }
-
-    public UnionIDNameDTO getUnion() {
-        return union;
-    }
-
-    public void setUnion(UnionIDNameDTO union) {
-        this.union = union;
     }
 
     @AssertTrue(message = "message.start_date.less_than.end_date")

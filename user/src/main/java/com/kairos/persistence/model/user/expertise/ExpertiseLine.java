@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.expertise;
 
-import com.kairos.dto.user.organization.OrganizationLevel;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -11,13 +10,9 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
-import static com.kairos.persistence.model.constants.RelationshipConstants.SUPPORTED_BY_UNION;
 
 @NodeEntity
 @Getter
@@ -38,17 +33,7 @@ public class ExpertiseLine {
     @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
 
-    @Relationship(type = FOR_SENIORITY_LEVEL)
-    private List<SeniorityLevel> seniorityLevel;
 
-    public List<SeniorityLevel> getSeniorityLevel() {
-        return seniorityLevel = Optional.ofNullable(seniorityLevel).orElse(new ArrayList<>());
-    }
-
-    public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
-        this.seniorityLevel = Optional.ofNullable(this.seniorityLevel).orElse(new ArrayList<>());
-        this.seniorityLevel.add(seniorityLevel);
-    }
 
     public ExpertiseLine (ExpertiseLineBuilder expertiseLineBuilder){
         this.startDate=expertiseLineBuilder.startDate;
@@ -56,7 +41,6 @@ public class ExpertiseLine {
         this.organizationLevel=expertiseLineBuilder.organizationLevel;
         this.organizationServices=expertiseLineBuilder.organizationServices;
         this.sector=expertiseLineBuilder.sector;
-        this.seniorityLevel=expertiseLineBuilder.seniorityLevel;
         this.union=expertiseLineBuilder.union;
     }
 
@@ -68,7 +52,6 @@ public class ExpertiseLine {
         private Sector sector;
         private Set<OrganizationService> organizationServices;
         private Organization union;
-        private List<SeniorityLevel> seniorityLevel;
 
 
         public ExpertiseLineBuilder setStartDate(LocalDate startDate){
@@ -101,16 +84,9 @@ public class ExpertiseLine {
             return this;
         }
 
-        public ExpertiseLineBuilder setSeniorityLevel(List<SeniorityLevel> seniorityLevels){
-            this.seniorityLevel=seniorityLevels;
-            return this;
-        }
-
         public ExpertiseLine createLine(){
             return new ExpertiseLine(this);
         }
-
-
     }
 
 
