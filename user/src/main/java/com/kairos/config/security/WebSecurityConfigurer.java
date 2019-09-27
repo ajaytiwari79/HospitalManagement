@@ -88,8 +88,7 @@ public class WebSecurityConfigurer extends WebSecurityConfigurerAdapter {
         //web.ignoring().antMatchers(API_V1+SCHEDULER_EXECUTE_JOB);
         web.ignoring().antMatchers(API_KMD_CARE_TIME_SLOTS);
         web.ignoring().antMatchers("/api/v1/unit/{unitId}/client/client_ids_by_unitIds");
-
-
+        web.ignoring().antMatchers("/api/v1/unit/{unitId}/staff/chat_server/register");
         web.ignoring().antMatchers("/api/v1/login");
         web.ignoring().antMatchers("/api/v1/create_permission_schema");
         web.ignoring().antMatchers("/api/v1/forgot");
