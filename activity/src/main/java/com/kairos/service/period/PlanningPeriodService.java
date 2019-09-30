@@ -535,10 +535,8 @@ public class PlanningPeriodService extends MongoBaseService {
         if (PlanningPeriodAction.FLIP.equals(planningPeriodAction)) {
             if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
                 List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByUnitId(unitId);
-                employmentTypeIds = employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toSet());
-                if (!planningPeriod.getPublishEmploymentIds().containsAll(employmentTypeIds)) {
-                    exceptionService.invalidRequestException(MESSAGE_PLANNING_PERIOD_PUBLISH);
-                }
+                employmentTypeIds = isCollectionEmpty(employmentTypeIds) ? employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toSet()):employmentTypeIds;
+                publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
             }
             flipPlanningPeriodToNextPhase(unitId, periodId, planningPeriod, initialNextPhase);
         }
