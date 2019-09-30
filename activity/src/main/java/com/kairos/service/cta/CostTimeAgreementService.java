@@ -472,10 +472,20 @@ public class CostTimeAgreementService {
         this.buildCTARuleTemplate(udpdateCtaRuleTemplate, ctaRuleTemplateDTO, true, countryDTO);
         udpdateCtaRuleTemplate.setId(ctaRuleTemplate.getId());
         udpdateCtaRuleTemplate.setCountryId(countryId);
+        if(!udpdateCtaRuleTemplate.getRuleTemplateCategoryId().equals(ctaRuleTemplate.getRuleTemplateCategoryId())){
+            updateAllCtaRuleTemplateCategoryIdByCtaRuleTemplateName(udpdateCtaRuleTemplate.getName(), udpdateCtaRuleTemplate.getRuleTemplateCategoryId());
+        }
         ctaRuleTemplateRepository.save(udpdateCtaRuleTemplate);
         return ctaRuleTemplateDTO;
     }
 
+    private void updateAllCtaRuleTemplateCategoryIdByCtaRuleTemplateName(String CtaRuleTemplateName, BigInteger ctaRuleTemplateCategoryId){
+        List<CTARuleTemplate> ctaRuleTemplates = ctaRuleTemplateRepository.findAllByNameAndDeletedFalse(CtaRuleTemplateName);
+        if(isNotNull(ctaRuleTemplates)){
+            ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateCategoryId));
+            ctaRuleTemplateRepository.saveAll(ctaRuleTemplates);
+        }
+    }
 
     /**
      * @param unitId
