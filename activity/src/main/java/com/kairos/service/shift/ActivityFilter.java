@@ -12,28 +12,27 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.ABSENCE_ACTIVITY;
+import static com.kairos.enums.FilterType.TEAM;
 
 public class ActivityFilter implements ShiftFilter {
     private Map<FilterType, Set<String>> filterCriteriaMap;
+    private List<BigInteger> selectedActivityIds;
 
-
-    public ActivityFilter(Map<FilterType, Set<String>> filterCriteriaMap) {
+    public ActivityFilter(Map<FilterType, Set<String>> filterCriteriaMap, List<BigInteger> selectedActivityIds) {
         this.filterCriteriaMap = filterCriteriaMap;
-
+        this.selectedActivityIds = selectedActivityIds;
     }
 
 
     @Override
     public <T extends ShiftDTO> List<T> meetCriteria(List<T> shiftDTOS) {
-        boolean validFilter = filterCriteriaMap.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterCriteriaMap.get(ABSENCE_ACTIVITY));
+        boolean validFilter = (filterCriteriaMap.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterCriteriaMap.get(ABSENCE_ACTIVITY))) || (filterCriteriaMap.containsKey(TEAM) && isCollectionNotEmpty(filterCriteriaMap.get(TEAM)));
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
-            List<BigInteger> activityIds=filterCriteriaMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s)).collect(Collectors.toList());
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                if(shiftDTO.getActivities().stream().anyMatch(shiftActivityDTO -> activityIds.contains(shiftActivityDTO.getActivityId())))
-                filteredShifts.add((T)shiftDTO);
+                if(shiftDTO.getActivities().stream().anyMatch(shiftActivityDTO -> selectedActivityIds.contains(shiftActivityDTO.getActivityId())))
+                    filteredShifts.add((T)shiftDTO);
             }
-
         }
         return filteredShifts;
     }
