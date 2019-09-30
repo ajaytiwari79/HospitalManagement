@@ -32,6 +32,7 @@ import java.util.List;
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_SIZE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.utils.CPRUtil.getDateOfBirthFromCPR;
 
 /**
  * User Domain & it's properties
@@ -114,6 +115,7 @@ public class User extends UserBaseEntity {
         this.email = email;
         this.cprNumber = cprNumber;
         this.userName = userName;
+        this.setDateOfBirth(getDateOfBirthFromCPR(cprNumber));
     }
 
     public User(String cprNumber, String firstName, String lastName, String email, String userName, boolean isUserNameUpdated) {

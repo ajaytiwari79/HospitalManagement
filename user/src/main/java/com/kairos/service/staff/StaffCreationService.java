@@ -268,7 +268,7 @@ public class StaffCreationService {
         }
         User user = userGraphRepository.findUserByCprNumber(payload.getCprNumber());
         if(!Optional.ofNullable(user).isPresent()) {
-            user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User());
+            user = Optional.ofNullable(userGraphRepository.findByEmail(payload.getPrivateEmail().trim())).orElse(new User( payload.getCprNumber(),payload.getFirstName().trim(), payload.getLastName().trim(),payload.getPrivateEmail(),payload.getUserName()));
         }
         Staff staff = staffGraphRepository.findByExternalId(payload.getExternalId());
         if(Optional.ofNullable(staff).isPresent()) {
@@ -284,6 +284,9 @@ public class StaffCreationService {
         SystemLanguage systemLanguage = systemLanguageGraphRepository.getSystemLanguageOfCountry(countryId);
         user.setUserLanguage(systemLanguage);
         user.setUserName(payload.getUserName());
+        final String password = payload.getFirstName().replaceAll("\\s+", "") + DEFAULT_PASSPHRASE_ENDS_WITH;
+        user.setPassword(new BCryptPasswordEncoder().encode(password));
+        user.setCountryId(organization.getCountry().getId());
         staff = updateStaffDetailsOnCreationOfStaff(organization, payload);
         staff.setUser(user);
         staffService.addStaffInChatServer(staff);
