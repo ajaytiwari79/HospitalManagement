@@ -273,7 +273,18 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         return result.getMappedResults();
     }
 
+    @Override
+    public List<WTAQueryResultDTO> getProtectedWTAByEmploymentIdsAndDates(List<Long> employmentIds, Date startDate, Date endDate) {
+        Criteria criteria = Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).orOperator(Criteria.where("startDate").lte(endDate).and("endDate").gte(startDate),Criteria.where("endDate").exists(false).and("startDate").lte(endDate));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup("wtaBaseRuleTemplate", "ruleTemplateIds", "_id", "ruleTemplates"),
 
+                project("name", "description", "disabled",  "startDate", "endDate", "expiryDate", "ruleTemplates", "employmentId")
+        );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
+    }
 
     @Override
     public boolean wtaExistsByEmploymentIdAndDatesAndNotEqualToId(BigInteger wtaId, Long employmentId, Date startDate, Date endDate){
