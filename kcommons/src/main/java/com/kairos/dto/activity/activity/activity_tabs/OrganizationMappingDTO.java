@@ -10,7 +10,7 @@ import java.util.List;
  * Created by vipul on 25/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OrganizationMappingActivityDTO {
+public class OrganizationMappingDTO {
     private BigInteger activityId;
     private List<Long> expertises = new ArrayList<>();
     private List<Long> organizationTypes = new ArrayList<>();

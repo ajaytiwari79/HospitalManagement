@@ -8,6 +8,7 @@ public class CompensationTable {
     private int granularityLevel;
     private List<CompensationTableInterval> compensationTableInterval=new ArrayList<>();
 
+
     public CompensationTable() {
     }
 

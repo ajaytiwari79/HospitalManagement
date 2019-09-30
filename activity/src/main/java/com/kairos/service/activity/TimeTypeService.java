@@ -1,11 +1,21 @@
 package com.kairos.service.activity;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.constants.CommonConstants;
+import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
+import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
@@ -13,6 +23,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -23,6 +34,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.TimeTypeEnum.*;
+import static com.kairos.service.activity.ActivityUtil.getCutoffInterval;
 
 @Service
 public class TimeTypeService extends MongoBaseService {
@@ -37,6 +49,7 @@ public class TimeTypeService extends MongoBaseService {
     @Inject
     private UserIntegrationService userIntegrationService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private ActivityService activityService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -78,7 +91,7 @@ public class TimeTypeService extends MongoBaseService {
 
         TimeType timeType = timeTypeMongoRepository.findOneById(timeTypeDTO.getId());
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.timetype.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND);
         }
         List<TimeType> timeTypes = new ArrayList<>();
         List<TimeType> childTimeTypes = timeTypeMongoRepository.findAllChildByParentId(timeType.getId(), countryId);
@@ -100,7 +113,7 @@ public class TimeTypeService extends MongoBaseService {
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
-
+        timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
         Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
         if (isCollectionNotEmpty(activityCanBeCopiedForOrganizationHierarchy)) {
             if (activityCanBeCopiedForOrganizationHierarchy.size() == 1 && activityCanBeCopiedForOrganizationHierarchy.contains(OrganizationHierarchy.UNIT)) { //user cannot allow copy acitivity for Unit, without allowing copy activity for Organization
@@ -205,7 +218,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeTypeDTO> parentOfWorkingTimeType = new ArrayList<>();
         List<TimeTypeDTO> parentOfNonWorkingTimeType = new ArrayList<>();
         for (TimeType timeType : topLevelTimeTypes) {
-            TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts());
+            TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts(),timeType.isBreakNotHeldValid());
             timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
             if ( timeType.getId().equals(timeTypeId)) {
                 timeTypeDTO.setSelected(true);
@@ -274,7 +287,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeTypeDTO> lowerLevelTimeTypeDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> {
             if (timeType.getUpperLevelTimeTypeId().equals(upperlevelTimeTypeId)) {
-                TimeTypeDTO levelTwoTimeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts());
+                TimeTypeDTO levelTwoTimeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts(),timeType.isBreakNotHeldValid());
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     levelTwoTimeTypeDTO.setSelected(true);
                 }
@@ -373,20 +386,153 @@ public class TimeTypeService extends MongoBaseService {
 
     private void updateTimeTypeList(List<BigInteger> resultTimeTypeDTOS, List<TimeTypeDTO> timeTypeDTOS, List<BigInteger> timeTypeIds, boolean addAllLowerLevelChildren){
         for(TimeTypeDTO timeTypeDTO : timeTypeDTOS) {
-           if(timeTypeIds.indexOf(timeTypeDTO.getId())>=0){
-               resultTimeTypeDTOS.add(timeTypeDTO.getId());
-               if(isCollectionNotEmpty(timeTypeDTO.getChildren())){
-                   updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTO.getChildren(), timeTypeIds,true);
-               }
+            if(timeTypeIds.indexOf(timeTypeDTO.getId())>=0){
+                resultTimeTypeDTOS.add(timeTypeDTO.getId());
+                if(isCollectionNotEmpty(timeTypeDTO.getChildren())){
+                    updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTO.getChildren(), timeTypeIds,true);
+                }
             }else if(addAllLowerLevelChildren){
-               if(isCollectionNotEmpty(timeTypeDTO.getChildren())) {
-                   updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, true);
-               }else{
-                   resultTimeTypeDTOS.add(timeTypeDTO.getId());
-               }
+                if(isCollectionNotEmpty(timeTypeDTO.getChildren())) {
+                    updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, true);
+                }else{
+                    resultTimeTypeDTOS.add(timeTypeDTO.getId());
+                }
             }else{
-               updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, false);
-           }
+                updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, false);
+            }
         }
     }
+
+    public TimeCalculationActivityDTO updateTimeCalculationTabOfTimeType(TimeCalculationActivityDTO timeCalculationActivityDTO, BigInteger timeTypeId) {
+        TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab();
+        ObjectMapperUtils.copyProperties(timeCalculationActivityDTO, timeCalculationActivityTab);
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
+        }
+        //timeCalculationActivityDTO = verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
+        if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
+            timeType.setTimeCalculationActivityTab(timeCalculationActivityTab);
+            if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
+                timeCalculationActivityTab.setDayTypes(timeType.getRulesActivityTab().getDayTypes());
+            }
+            timeTypeMongoRepository.save(timeType);
+        }
+        return timeCalculationActivityDTO;
+    }
+
+    public ActivityTabsWrapper getTimeCalculationTabOfTimeType(BigInteger timeTypeId, Long countryId) {
+        List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        TimeCalculationActivityTab timeCalculationActivityTab = timeType.getTimeCalculationActivityTab();
+        List<Long> rulesTabDayTypes = timeType.getRulesActivityTab().getDayTypes();
+        return new ActivityTabsWrapper(timeCalculationActivityTab, dayTypes, rulesTabDayTypes);
+    }
+
+    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,BigInteger timeTypeId) {
+        activityService.validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(), rulesActivityDTO.getLatestStartTime(), rulesActivityDTO.getMaximumEndTime(), rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
+        RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
+        }
+        if (rulesActivityDTO.getCutOffIntervalUnit() != null && rulesActivityDTO.getCutOffStartFrom() != null) {
+            if (CutOffIntervalUnit.DAYS.equals(rulesActivityDTO.getCutOffIntervalUnit()) && rulesActivityDTO.getCutOffdayValue() == 0) {
+                exceptionService.invalidRequestException(ERROR_DAYVALUE_ZERO);
+            }
+            List<CutOffInterval> cutOffIntervals = getCutoffInterval(rulesActivityDTO.getCutOffStartFrom(), rulesActivityDTO.getCutOffIntervalUnit(), rulesActivityDTO.getCutOffdayValue());
+            rulesActivityTab.setCutOffIntervals(cutOffIntervals);
+            rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
+        }
+        timeType.setRulesActivityTab(rulesActivityTab);
+        if (!timeType.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
+            timeType.getTimeCalculationActivityTab().setDayTypes(timeType.getRulesActivityTab().getDayTypes());
+        }
+        timeTypeMongoRepository.save(timeType);
+        return new ActivityTabsWrapper(rulesActivityTab);
+    }
+
+    public ActivityTabsWrapper getPhaseSettingTabOfTimeType(BigInteger timeTypeId, Long countryId) {
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
+        }
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
+        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
+        Set<AccessGroupRole> roles = AccessGroupRole.getAllRoles();
+        PhaseSettingsActivityTab phaseSettingsActivityTab = timeType.getPhaseSettingsActivityTab();
+        return new ActivityTabsWrapper(roles, phaseSettingsActivityTab, dayTypes, employmentTypeDTOS);
+    }
+
+    public PhaseSettingsActivityTab updatePhaseSettingTab(PhaseSettingsActivityTab phaseSettingsActivityTab,BigInteger timeTypeId) {
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, phaseSettingsActivityTab.getActivityId());
+        }
+        timeType.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
+        timeTypeMongoRepository.save(timeType);
+        return phaseSettingsActivityTab;
+    }
+
+    public ActivityTabsWrapper getRulesTabOfTimeType(BigInteger timeTypeId, Long countryId) {
+        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
+        List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
+        List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        RulesActivityTab rulesActivityTab = timeType.getRulesActivityTab();
+        return new ActivityTabsWrapper(rulesActivityTab, dayTypes, employmentTypeDTOS);
+    }
+
+
+    public ActivityTabsWrapper updateSkillTabOfTimeType(SkillActivityDTO skillActivityDTO,BigInteger timeTypeId) {
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, skillActivityDTO.getActivityId());
+        }
+        SkillActivityTab skillActivityTab = new SkillActivityTab(skillActivityDTO.getActivitySkills());
+        timeType.setSkillActivityTab(skillActivityTab);
+        timeTypeMongoRepository.save(timeType);
+        return new ActivityTabsWrapper(skillActivityTab);
+    }
+
+    public ActivityTabsWrapper getSkillTabOfTimeType(BigInteger timeTypeId) {
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        return new ActivityTabsWrapper(timeType.getSkillActivityTab());
+    }
+
+    public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger timeTypeId) {
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
+        }
+        boolean isSuccess = userIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingDTO);
+        if (!isSuccess) {
+            exceptionService.dataNotFoundException(MESSAGE_PARAMETERS_INCORRECT);
+        }
+        timeType.setRegions(organizationMappingDTO.getRegions());
+        timeType.setExpertises(organizationMappingDTO.getExpertises());
+        timeType.setOrganizationSubTypes(organizationMappingDTO.getOrganizationSubTypes());
+        timeType.setOrganizationTypes(organizationMappingDTO.getOrganizationTypes());
+        timeType.setLevels(organizationMappingDTO.getLevel());
+        timeType.setEmploymentTypes(organizationMappingDTO.getEmploymentTypes());
+        timeTypeMongoRepository.save(timeType);
+    }
+
+    public OrganizationMappingDTO getOrgMappingDetailOfTimeType(BigInteger timeTypeId) {
+        TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
+        if (!Optional.ofNullable(timeType).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
+        }
+        OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
+        organizationMappingDTO.setOrganizationSubTypes(timeType.getOrganizationSubTypes());
+        organizationMappingDTO.setExpertises(timeType.getExpertises());
+        organizationMappingDTO.setRegions(timeType.getRegions());
+        organizationMappingDTO.setLevel(timeType.getLevels());
+        organizationMappingDTO.setOrganizationTypes(timeType.getOrganizationTypes());
+        organizationMappingDTO.setEmploymentTypes(timeType.getEmploymentTypes());
+        return organizationMappingDTO;
+
+    }
+
 }

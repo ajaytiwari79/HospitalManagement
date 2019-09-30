@@ -64,7 +64,7 @@ public class ShiftBreakService {
     }
 
 
-    public List<ShiftActivity> updateBreakInShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO  staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
+    public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated,Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO  staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
         BreakSettings breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
         List<ShiftActivity> breakActivities = new ArrayList<>();
         if(isNotNull(breakSettings)) {
@@ -74,10 +74,10 @@ public class ShiftBreakService {
             DateTimeInterval eligibleBreakInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
             Date placeBreakAfterThisDate = shift.getStartDate();
             if (isNotNull(breakSettings) && shift.getMinutes() >= breakSettings.getShiftDurationInMinute()) {
-                if (isCollectionEmpty(shift.getBreakActivities())) {
+                if (isCollectionEmpty(shift.getBreakActivities()) || shiftUpdated) {
                     if (isNotNull(breakWTATemplate)) {
                         BreakAvailabilitySettings breakAvailabilitySettings = findCurrentBreakAvailability(shift.getStartDate(), timeSlot, breakWTATemplate);
-                        if (isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage() == 0 || breakAvailabilitySettings.getShiftPercentage() == 100)) {
+                        if (isNotNull(breakAvailabilitySettings) && (breakAvailabilitySettings.getShiftPercentage() <= 0 || breakAvailabilitySettings.getShiftPercentage() >= 100)) {
                             exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE, breakAvailabilitySettings.getShiftPercentage());
                         }
                         placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
@@ -91,7 +91,7 @@ public class ShiftBreakService {
                         breakActivity = buildBreakActivity(placeBreakAfterThisDate, breakEndDate, breakSettings, staffAdditionalInfoDTO, activityWrapperMap);
                         breakActivity.setBreakNotHeld(true);
                     }
-                } else {
+                } else if(isCollectionNotEmpty(shift.getBreakActivities()) && !shiftUpdated){
                     breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate);
                 }
                 if (isNotNull(breakActivity)) {

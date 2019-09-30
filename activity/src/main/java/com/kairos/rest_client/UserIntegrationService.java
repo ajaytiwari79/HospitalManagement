@@ -2,7 +2,7 @@ package com.kairos.rest_client;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.RestClientUrlUtil;
-import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
@@ -629,8 +629,8 @@ public class UserIntegrationService {
         });
     }
 
-    public boolean verifyOrganizationExpertizeAndRegions(OrganizationMappingActivityDTO organizationMappingActivityDTO) {
-        return genericRestClient.publishRequest(organizationMappingActivityDTO, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, VERIFY_ORGANIZATION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+    public boolean verifyOrganizationExpertizeAndRegions(OrganizationMappingDTO organizationMappingDTO) {
+        return genericRestClient.publishRequest(organizationMappingDTO, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, VERIFY_ORGANIZATION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 
