@@ -1068,7 +1068,9 @@ public class WorkTimeAgreementService extends MongoBaseService {
         Map<Long,DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap=dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getEmploymentId(),v->v));
         List<WTAQueryResultDTO> wtaQueryResultDTOS=wtaRepository.getWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds), startDate, endDate);
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).collect(Collectors.toList());
-        //Map<Long,WTABaseRuleTemplate> employmentAndWTAQueryResultDTOMap=wtaQueryResultDTOS.stream().collect(Collectors.toMap(k->k.getEmploymentId(),v->v));
+        Map<Long,WTAQueryResultDTO> employmentAndWTAQueryResultDTOMap=wtaQueryResultDTOS.stream().collect(Collectors.toMap(k->k.getEmploymentId(),v->v));
+        //Map<Long,WTAQueryResultDTO> employmentAndWTAQueryResultDTOMaps=wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplate -> WTATemplateType.PROTECTED_DAYS_OFF.equals(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toMap(WTAQueryResultDTO::getEmploymentId,v->v)))
+
         Set<BigInteger> activityIds = workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, startDate, endDate, activityIds);
         Map<Long,List<ShiftWithActivityDTO>> employmentIdAndShiftMap=shiftWithActivityDTOS.stream().collect(groupingBy(ShiftWithActivityDTO::getEmploymentId));
