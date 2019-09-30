@@ -116,6 +116,14 @@ public class UserIntegrationService {
 
     }
 
+    public List<StaffEmploymentDetails> getStaffsMainEmployment() {
+
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, STAFF_AND_MAIN_EMPLOYMENTS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffEmploymentDetails>>>() {
+        });
+
+    }
+
+
     public UserAccessRoleDTO getAccessRolesOfStaff(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ACCESS_ROLES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
         });

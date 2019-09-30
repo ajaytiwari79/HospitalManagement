@@ -1,5 +1,7 @@
 package com.kairos.dto.activity.cta;
 
+import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -7,6 +9,9 @@ import java.util.Objects;
 public class CompensationTable {
     private int granularityLevel;
     private List<CompensationTableInterval> compensationTableInterval=new ArrayList<>();
+    //use for protected days off calculation
+    private CompensationMeasurementType unusedDaysOffType;
+    private float unusedDaysOffvalue;
 
     public CompensationTable() {
     }
@@ -36,6 +41,22 @@ public class CompensationTable {
     public void setCompensationTableInterval(List<CompensationTableInterval> compensationTableInterval) {
         this.compensationTableInterval = compensationTableInterval;
     }
+    public CompensationMeasurementType getUnusedDaysOffType() {
+        return unusedDaysOffType;
+    }
+
+    public void setUnusedDaysOffType(CompensationMeasurementType unusedDaysOffType) {
+        this.unusedDaysOffType = unusedDaysOffType;
+    }
+
+    public float getUnusedDaysOffvalue() {
+        return unusedDaysOffvalue;
+    }
+
+    public void setUnusedDaysOffvalue(float unusedDaysOffvalue) {
+        this.unusedDaysOffvalue = unusedDaysOffvalue;
+    }
+
 
     public void addCompensationTableInterval(CompensationTableInterval compensationTableInterval) {
         if (compensationTableInterval == null)

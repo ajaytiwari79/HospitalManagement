@@ -996,6 +996,10 @@ public class EmploymentService {
         Employment employment = employmentGraphRepository.findOne(employmentId);
         return isNotNull(employment) ? isNotNull(employment.getUnit()) ? employment.getUnit().getId() : null : null;
     }
+
+    public List<EmploymentQueryResult> getMainEmploymentOfStaffs(){
+        return employmentGraphRepository.getMainEmploymentOfStaffs(EmploymentSubType.MAIN);
+    }
 }
 
 

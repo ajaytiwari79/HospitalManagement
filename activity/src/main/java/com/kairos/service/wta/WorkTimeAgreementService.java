@@ -11,6 +11,7 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
@@ -30,6 +31,7 @@ import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
@@ -51,6 +53,7 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.table_settings.TableSettingService;
 import com.kairos.service.tag.TagService;
 import com.kairos.service.time_bank.TimeBankService;
+import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,12 +67,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 
 /**
@@ -124,6 +127,8 @@ public class WorkTimeAgreementService extends MongoBaseService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    @Inject
+    private ProtectedDaysOffService protectedDaysOffService;
 
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
@@ -1049,4 +1054,27 @@ public class WorkTimeAgreementService extends MongoBaseService {
         return wtaRepository.getAllWTAByEmploymentIds(employmentIds);
     }
 
+
+    public boolean setProtectedDaysOffHoursViaJob(){
+        Date startDate=asDate(getLocalDate());
+        Date endDate=asDate(getLocalDate());
+        List<StaffEmploymentDetails> staffEmploymentDetails =userIntegrationService.getStaffsMainEmployment();
+        Set<Long> unitIds=staffEmploymentDetails.stream().map(staffEmploymentDetail->staffEmploymentDetail.getUnitId()).collect(Collectors.toSet());
+        List<ProtectedDaysOffSettingDTO> protectedDaysOffSettingOfUnit = protectedDaysOffService.getAllProtectedDaysOffByUnitIds(new ArrayList<>(unitIds));
+        Map<Long,ProtectedDaysOffSettingDTO> unitIdAndProtectedDaysOffSettingDTOMap=protectedDaysOffSettingOfUnit.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
+        Map<Long,List<StaffEmploymentDetails>> unitAndStaffEmploymentDetailsMap=staffEmploymentDetails.stream().collect(groupingBy(StaffEmploymentDetails::getUnitId));
+        Set<Long> employmentIds=staffEmploymentDetails.stream().map(staffEmploymentDetail->staffEmploymentDetail.getId()).collect(toSet());
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankService.findAllByEmploymentIdsAndBetweenDate(employmentIds,startDate,endDate);
+        Map<Long,DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap=dailyTimeBankEntries.stream().collect(Collectors.toMap(k->k.getEmploymentId(),v->v));
+        List<WTAQueryResultDTO> wtaQueryResultDTOS=wtaRepository.getWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds), startDate, endDate);
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).collect(Collectors.toList());
+        Map<Long,WTABaseRuleTemplate> employmentAndWTAQueryResultDTOMap=wtaQueryResultDTOS.stream().collect(Collectors.toMap(k->k.getEmploymentId(),v->v));
+        Set<BigInteger> activityIds = workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, startDate, endDate, activityIds);
+        Map<Long,List<ShiftWithActivityDTO>> employmentIdAndShiftMap=shiftWithActivityDTOS.stream().collect(groupingBy(ShiftWithActivityDTO::getEmploymentId));
+        for (Long unitId : unitIds) {
+
+        }
+        return true;
+    }
 }

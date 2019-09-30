@@ -6,6 +6,7 @@ import com.kairos.dto.activity.cta.CompensationTable;
 import com.kairos.dto.activity.cta.PlannedTimeWithFactor;
 import com.kairos.dto.user.country.agreement.cta.CalculateValueIfPlanned;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
+import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
 import com.kairos.enums.cta.*;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 
@@ -50,6 +51,8 @@ public class CTARuleTemplate extends MongoBaseEntity {
     private boolean calculateScheduledHours;
     private CalculationFor calculationFor;
     private Long countryId;
+
+
 
 
     public CTARuleTemplate() {
@@ -263,6 +266,7 @@ public class CTARuleTemplate extends MongoBaseEntity {
     public void setDayTypeIds(List<Long> dayTypeIds) {
         this.dayTypeIds = isNotNull(dayTypeIds) ? dayTypeIds : new ArrayList<>();
     }
+
 
     public String getRuleTemplateType() {
         return ruleTemplateType;

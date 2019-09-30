@@ -5,6 +5,6 @@ package com.kairos.dto.user.country.agreement.cta;
  */
 public enum CalculationFor {
 
-    SCHEDULED_HOURS, BONUS_HOURS, FUNCTIONS, BALANCE_TYPE
+    SCHEDULED_HOURS, BONUS_HOURS, FUNCTIONS, BALANCE_TYPE ,UNUSED_DAYS_OFF
 
 }

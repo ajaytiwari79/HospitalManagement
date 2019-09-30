@@ -275,4 +275,12 @@ public class WTAController {
     public ResponseEntity<Map<String, Object>> getProtectedDaysOffCount(@PathVariable long unitId ,@RequestParam Long staffId,@RequestParam BigInteger activityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getProtectedDaysOffCount(unitId,null,staffId,activityId));
     }
+
+
+    @ApiOperation("Get CTARultemplate By EmploymentId")
+    @GetMapping("/test")
+    public ResponseEntity<Map<String,Object>> getTest(){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,workTimeAgreementService.setProtectedDaysOffHoursViaJob());
+    }
+
 }

@@ -112,6 +112,9 @@ public class TimeBankService{
     @Inject private PlanningPeriodService planningPeriodService;
 
 
+
+
+
     /**
      * @param staffAdditionalInfoDTO
      * @param shift
@@ -672,5 +675,12 @@ public class TimeBankService{
     public List<CTARuleTemplateDTO> getCTARultemplateByEmploymentId(Long employmentId){
         return costTimeAgreementRepository.getCTARultemplateByEmploymentId(employmentId).stream().filter(distinctByKey(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getName())).collect(toList());
     }
+
+    public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, Date startDate, Date endDate){
+        return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,startDate,endDate);
+    }
+
+
+
 
 }

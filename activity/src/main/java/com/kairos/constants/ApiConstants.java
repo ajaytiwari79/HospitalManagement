@@ -53,6 +53,7 @@ public final class ApiConstants {
     public static final String DAY_TYPES_AND_EMPLOYEMENT_TYPES = "/day_types_and_employment_types";
     public static final String STAFF_ACCESS_ROLES = "/staff/access_roles";
     public static final String STAFF_AND_EMPLOYMENTS_BY_EXPERTISE_ID = "/expertise/{expertiseId}/staff_and_employments";
+    public static final String STAFF_AND_MAIN_EMPLOYMENTS = "/staffs/main_employments";
     public static final String STAFF_EMAILS = "/staff/emails";
     public static final String EMPLOYMENTS_BY_EXPERTISE_ID = "/expertise/{expertiseId}/employments";
     public static final String EMPLOYEMENT_TYPE_AND_EXPERTISE = "/employment_type_and_expertise";
