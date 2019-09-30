@@ -14,10 +14,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by vipul on 30/3/18.
@@ -49,6 +46,9 @@ public class ExpertiseDTO {
     private LocalDate endDate;
     private Long expertiseLineId;
 
+    public List<SeniorityLevelDTO> getSeniorityLevels() {
+        return  Arrays.asList(seniorityLevel);
+    }
 
     public void setEndDateMillis(Date endDateMillis) {
         this.endDateMillis = endDateMillis == null ? null : DateUtils.getEndOfDay(endDateMillis);

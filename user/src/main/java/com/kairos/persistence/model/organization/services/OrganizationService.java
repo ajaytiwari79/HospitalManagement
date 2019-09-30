@@ -2,6 +2,7 @@ package com.kairos.persistence.model.organization.services;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -22,6 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.ORGAN
 @NodeEntity
 @Getter
 @Setter
+@NoArgsConstructor
 public class OrganizationService extends UserBaseEntity {
     @NotBlank(message = ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY)
     private String name;
@@ -39,6 +41,10 @@ public class OrganizationService extends UserBaseEntity {
     private boolean imported = false;
 
     private boolean hasMapped = false;
+
+    public OrganizationService(String name) {
+        this.name = name;
+    }
 
     public Map<String, Object> retrieveDetails() {
         Map<String,Object> map = new HashMap<>(3);

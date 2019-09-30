@@ -24,6 +24,7 @@ public class ExpertiseLineSeniorityLevelRelationship extends UserBaseEntity {
     private ExpertiseLine expertiseLine;
     @EndNode
     private SeniorityLevel seniorityLevel;
+    private Long payGradeId;
     private Long payGradeLevel;
 
     public boolean isUpdated(ExpertiseLineSeniorityLevelRelationship expertiseLineSeniorityLevelRelationship){
