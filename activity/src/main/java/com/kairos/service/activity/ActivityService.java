@@ -624,40 +624,40 @@ public class ActivityService {
         return new ActivityTabsWrapper(activity.getSkillActivityTab());
     }
 
-    public void updateOrgMappingDetailOfActivity(OrganizationMappingActivityDTO organizationMappingActivityDTO, BigInteger activityId) {
+    public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
         }
-        boolean isSuccess = userIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingActivityDTO);
+        boolean isSuccess = userIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingDTO);
         if (!isSuccess) {
             exceptionService.dataNotFoundException(MESSAGE_PARAMETERS_INCORRECT);
         }
-        activity.setRegions(organizationMappingActivityDTO.getRegions());
-        activity.setExpertises(organizationMappingActivityDTO.getExpertises());
-        activity.setOrganizationSubTypes(organizationMappingActivityDTO.getOrganizationSubTypes());
-        activity.setOrganizationTypes(organizationMappingActivityDTO.getOrganizationTypes());
-        activity.setLevels(organizationMappingActivityDTO.getLevel());
-        activity.setEmploymentTypes(organizationMappingActivityDTO.getEmploymentTypes());
+        activity.setRegions(organizationMappingDTO.getRegions());
+        activity.setExpertises(organizationMappingDTO.getExpertises());
+        activity.setOrganizationSubTypes(organizationMappingDTO.getOrganizationSubTypes());
+        activity.setOrganizationTypes(organizationMappingDTO.getOrganizationTypes());
+        activity.setLevels(organizationMappingDTO.getLevel());
+        activity.setEmploymentTypes(organizationMappingDTO.getEmploymentTypes());
         activityMongoRepository.save(activity);
         if (activity.getUnitId() != null) {
             plannerSyncService.publishActivity(activity.getUnitId(), activity, IntegrationOperation.UPDATE);
         }
     }
 
-    public OrganizationMappingActivityDTO getOrgMappingDetailOfActivity(BigInteger activityId) {
+    public OrganizationMappingDTO getOrgMappingDetailOfActivity(BigInteger activityId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
         }
-        OrganizationMappingActivityDTO organizationMappingActivityDTO = new OrganizationMappingActivityDTO();
-        organizationMappingActivityDTO.setOrganizationSubTypes(activity.getOrganizationSubTypes());
-        organizationMappingActivityDTO.setExpertises(activity.getExpertises());
-        organizationMappingActivityDTO.setRegions(activity.getRegions());
-        organizationMappingActivityDTO.setLevel(activity.getLevels());
-        organizationMappingActivityDTO.setOrganizationTypes(activity.getOrganizationTypes());
-        organizationMappingActivityDTO.setEmploymentTypes(activity.getEmploymentTypes());
-        return organizationMappingActivityDTO;
+        OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
+        organizationMappingDTO.setOrganizationSubTypes(activity.getOrganizationSubTypes());
+        organizationMappingDTO.setExpertises(activity.getExpertises());
+        organizationMappingDTO.setRegions(activity.getRegions());
+        organizationMappingDTO.setLevel(activity.getLevels());
+        organizationMappingDTO.setOrganizationTypes(activity.getOrganizationTypes());
+        organizationMappingDTO.setEmploymentTypes(activity.getEmploymentTypes());
+        return organizationMappingDTO;
 
     }
 

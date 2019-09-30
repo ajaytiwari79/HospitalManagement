@@ -43,18 +43,20 @@ public class Activity extends MongoBaseEntity implements Serializable {
     private boolean isParentActivity = true;
     private GeneralActivityTab generalActivityTab;
     private BalanceSettingsActivityTab balanceSettingsActivityTab;
-    private RulesActivityTab rulesActivityTab;
+
     private IndividualPointsActivityTab individualPointsActivityTab;
-    private TimeCalculationActivityTab timeCalculationActivityTab;
+
     private Set<BigInteger> childActivityIds=new HashSet<>();
     private NotesActivityTab notesActivityTab;
     private CommunicationActivityTab communicationActivityTab;
     private BonusActivityTab bonusActivityTab;
+    private RulesActivityTab rulesActivityTab;
+    private TimeCalculationActivityTab timeCalculationActivityTab;
     private SkillActivityTab skillActivityTab;
+    private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private OptaPlannerSettingActivityTab optaPlannerSettingActivityTab;
     private CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab;
     private LocationActivityTab locationActivityTab;
-    private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private BigInteger countryParentId;
     @JsonIgnore
     private boolean disabled;
