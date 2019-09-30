@@ -1221,7 +1221,7 @@ public class TimeBankCalculationService {
                     }
                 }
             }
-            return (int) Math.ceil(ctaBonusAndScheduledMinutes);
+            return (int) Math.round(ctaBonusAndScheduledMinutes);
         }
 
         private void updateChildActivitiesTimebankCtaBonus(List<ShiftActivityDTO> childActivitiesDTOS, CTARuleTemplateDTO ruleTemplate, DateTimeInterval dateTimeInterval) {
