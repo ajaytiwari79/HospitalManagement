@@ -30,9 +30,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.time.LocalDate;
+import java.time.*;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constaints.JsonConstaints.*;

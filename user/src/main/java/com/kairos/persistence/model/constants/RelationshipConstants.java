@@ -44,6 +44,9 @@ public abstract class RelationshipConstants {
 
     public static final  String EMPLOYMENT_TYPE_SETTINGS = "EMPLOYMENT_TYPE_SETTINGS";
 
+    //expertise
+    public static final  String HAS_PROTECTED_DAYS_OFF_SETTINGS = "HAS_PROTECTED_DAYS_OFF_SETTINGS";
+
     // Group
     public static final  String HAS_TEAMS = "HAS_TEAMS";
 

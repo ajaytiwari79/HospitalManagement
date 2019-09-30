@@ -14,6 +14,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
+import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,6 +33,7 @@ import java.util.List;
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_SIZE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.utils.CPRUtil.getDateOfBirthFromCPR;
 
 /**
  * User Domain & it's properties
@@ -114,6 +116,7 @@ public class User extends UserBaseEntity {
         this.email = email;
         this.cprNumber = cprNumber;
         this.userName = userName;
+        this.setDateOfBirth(getDateOfBirthFromCPR(cprNumber));
     }
 
     public User(String cprNumber, String firstName, String lastName, String email, String userName, boolean isUserNameUpdated) {

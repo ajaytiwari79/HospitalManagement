@@ -17,7 +17,7 @@ import static com.kairos.enums.FilterType.ACTIVITY_STATUS;
 
 public class ActivityStatusFilter implements ShiftFilter {
 
-    Map<FilterType, Set<String>> filterCriteriaMap;
+    private Map<FilterType, Set<String>> filterCriteriaMap;
 
     public ActivityStatusFilter(Map<FilterType, Set<String>> filterCriteriaMap) {
         this.filterCriteriaMap = filterCriteriaMap;
