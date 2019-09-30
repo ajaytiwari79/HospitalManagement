@@ -2,6 +2,8 @@ package com.kairos.dto.activity.period;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PeriodDTO {
     private BigInteger id;
@@ -13,6 +15,7 @@ public class PeriodDTO {
     private String nextPhaseName;
     private String phaseColor;
     private String phaseEnum;
+    private Set<Long> publishEmploymentIds=new HashSet<>();
 
     public BigInteger getId() {
         return id;
@@ -84,5 +87,13 @@ public class PeriodDTO {
 
     public void setPhaseEnum(String phaseEnum) {
         this.phaseEnum = phaseEnum;
+    }
+
+    public Set<Long> getPublishEmploymentIds() {
+        return publishEmploymentIds;
+    }
+
+    public void setPublishEmploymentIds(Set<Long> publishEmploymentIds) {
+        this.publishEmploymentIds = publishEmploymentIds;
     }
 }
