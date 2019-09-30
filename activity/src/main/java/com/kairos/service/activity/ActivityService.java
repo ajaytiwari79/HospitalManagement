@@ -377,6 +377,18 @@ public class ActivityService {
                 shiftMongoRepository.saveEntities(shifts);
             }
         }
+        if(isNotNull(generalActivityTabDTO.getTimeTypeId()) && !generalActivityTabDTO.getTimeTypeId().equals(activity.getBalanceSettingsActivityTab().getTimeTypeId())){
+            activity.setPhaseSettingsActivityTab(timeType.getPhaseSettingsActivityTab());
+            activity.setRulesActivityTab(timeType.getRulesActivityTab());
+            activity.setTimeCalculationActivityTab(timeType.getTimeCalculationActivityTab());
+            activity.setEmploymentTypes(timeType.getEmploymentTypes());
+            activity.setExpertises(timeType.getExpertises());
+            activity.setOrganizationSubTypes(timeType.getOrganizationSubTypes());
+            activity.setOrganizationTypes(timeType.getOrganizationTypes());
+            activity.setSkillActivityTab(timeType.getSkillActivityTab());
+            activity.setRegions(timeType.getRegions());
+            activity.setLevels(timeType.getLevels());
+        }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
         Long countryId = activity.getCountryId();
