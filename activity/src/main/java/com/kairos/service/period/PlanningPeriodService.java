@@ -19,6 +19,7 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.planning_period.PlanningPeriodAction;
 import com.kairos.enums.scheduler.JobFrequencyType;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -521,17 +522,24 @@ public class PlanningPeriodService extends MongoBaseService {
         return true;
     }
 
-    public PlanningPeriodDTO setPlanningPeriodPhaseToPublishOrFlip(Long unitId, BigInteger periodId, Set<Long> employmentTypeIds, boolean publish) {
+    public PlanningPeriodDTO setPlanningPeriodPhaseToPublishOrFlip(Long unitId, BigInteger periodId, Set<Long> employmentTypeIds, PlanningPeriodAction planningPeriodAction) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findByIdAndUnitId(periodId, unitId);
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PERIOD_UNIT_ID, periodId);
         }
         Phase initialNextPhase = phaseMongoRepository.findOne(isNotNull(planningPeriod.getNextPhaseId()) ? planningPeriod.getNextPhaseId() : planningPeriod.getCurrentPhaseId());
-        if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum()) && publish) {
+        if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum()) && PlanningPeriodAction.PUBLISH.equals(planningPeriodAction)) {
             publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
             planningPeriod.getPublishEmploymentIds().addAll(employmentTypeIds);
         }
-        if (!publish) {
+        if (PlanningPeriodAction.FLIP.equals(planningPeriodAction)) {
+            if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
+                List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByUnitId(unitId);
+                employmentTypeIds = employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toSet());
+                if (!planningPeriod.getPublishEmploymentIds().containsAll(employmentTypeIds)) {
+                    exceptionService.invalidRequestException(MESSAGE_PLANNING_PERIOD_PUBLISH);
+                }
+            }
             flipPlanningPeriodToNextPhase(unitId, periodId, planningPeriod, initialNextPhase);
         }
         save(planningPeriod);
