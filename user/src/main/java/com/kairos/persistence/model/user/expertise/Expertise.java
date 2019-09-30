@@ -77,6 +77,17 @@ public class Expertise extends UserBaseEntity {
         this.expertiseLines = expertiseLines;
     }
 
+    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek,  boolean published, List<SeniorityLevel> seniorityLevel) {
+        this.name = name;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+        this.published = published;
+        this.seniorityLevel = seniorityLevel;
+    }
+
     public List<CareDays> getSeniorDays() {
         return seniorDays = Optional.ofNullable(seniorDays).orElse(new ArrayList<>());
     }
@@ -126,7 +137,7 @@ public class Expertise extends UserBaseEntity {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.breakPaymentSetting = breakPaymentSetting;
         this.published = published;
-        this.sector = sector;
+        //this.sector = sector;
     }
 
     public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description) {

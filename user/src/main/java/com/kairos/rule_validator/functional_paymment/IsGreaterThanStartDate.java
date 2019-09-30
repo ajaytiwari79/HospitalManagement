@@ -7,7 +7,6 @@ import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.ZoneId;
 import java.util.Optional;
 
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -24,11 +23,11 @@ public class IsGreaterThanStartDate extends AbstractSpecification<FunctionalPaym
 
     @Override
     public boolean isSatisfied(FunctionalPaymentDTO functionalPaymentDTO) {
-        if (expertise.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getStartDate())) {
+        if (expertise.getStartDate().isAfter(functionalPaymentDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONALPAYMENTSTARTDATE_GREATER);
         }
         if ( Optional.ofNullable(expertise.getEndDate()).isPresent() &&  Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() &&
-                expertise.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().isAfter(functionalPaymentDTO.getEndDate())) {
+                expertise.getEndDate().isAfter(functionalPaymentDTO.getEndDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_DATE_GREATERTHAN_DATE,FUNCTIONALPAYMENT,EXPERTISE);
         }
 

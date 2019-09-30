@@ -1,8 +1,8 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
-import com.kairos.dto.user.country.experties.CopyExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
@@ -44,7 +44,7 @@ public class ExpertiseController {
     @Inject
     private FunctionalPaymentService functionalPaymentService;
     @Inject
-    ExpertiseUnitService expertiseUnitService;
+    private ExpertiseUnitService expertiseUnitService;
     @Inject private EmploymentCTAWTAService employmentCTAWTAService;
 
     @ApiOperation(value = "Assign Staff expertise")
@@ -81,6 +81,9 @@ public class ExpertiseController {
     @RequestMapping(value =  UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId,
                                                                   @RequestParam(value = "selectedDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,@RequestParam(name="employmentId",required = false) Long employmentId) throws Exception {
+        if (selectedDate == null) {
+            selectedDate = DateUtils.getCurrentLocalDate();
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate,employmentId));
     }
 
@@ -183,11 +186,11 @@ public class ExpertiseController {
     }
 
 
-    @ApiOperation(value = "copy Expertise")
-    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/copy")
-    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO, @PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO, countryId));
-    }
+//    @ApiOperation(value = "copy Expertise")
+//    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/copy")
+//    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO, @PathVariable long countryId) {
+//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO, countryId));
+//    }
 
     @ApiOperation(value = "Get senior Days and child Care days at country")
     @GetMapping(value = "/expertise/{expertiseId}/senior_and_child_care_days")

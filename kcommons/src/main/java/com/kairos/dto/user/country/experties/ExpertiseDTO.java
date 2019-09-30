@@ -34,7 +34,7 @@ public class ExpertiseDTO {
     private Date startDateMillis;
     private Date endDateMillis;
     private Long organizationLevelId;
-    private Set<Long> organizationServiceIds;
+    private List<Long> organizationServiceIds;
     private UnionIDNameDTO union;
     private Integer fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
@@ -47,6 +47,7 @@ public class ExpertiseDTO {
     private List<SeniorityLevelDTO> seniorityLevels;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Long expertiseLineId;
 
 
     public void setEndDateMillis(Date endDateMillis) {

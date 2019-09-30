@@ -60,7 +60,7 @@ public interface OrganizationServiceRepository extends Neo4jBaseRepository<Organ
 
     @Query("MATCH (organizationService:OrganizationService{isEnabled:true}) where id(organizationService) IN {0}" +
             " return organizationService")
-    Set<OrganizationService> findAllOrganizationServicesByIds(Set<Long> organizationServicesIds);
+    List<OrganizationService> findAllOrganizationServicesByIds(List<Long> organizationServicesIds);
 
 /*created by bobby
 * */
