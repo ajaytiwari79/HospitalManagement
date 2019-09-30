@@ -115,6 +115,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_TIMECARE_ID = "message.activity.timecare.id";
     public static final String MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE = "message.activity.timecareactivitytype";
     public static final String MESSAGE_ACTIVITY_PUBLISHED = "message.activity.published";
+    public static final String MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED = "message.activity.timtype.published";
     public static final String MESSAGE_ACTIVITY_TIMETYPE_ABSENT = "message.activity.timeType.absent";
     public static final String ACTIVITY_NOT_ELIGIBLE_FOR_COPY = "activity.not.eligible.for.copy";
     public static final String MESSAGE_ACTIVITY_SKILL_MATCH = "message.activity.skill.match";

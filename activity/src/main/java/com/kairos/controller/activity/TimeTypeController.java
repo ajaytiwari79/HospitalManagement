@@ -65,14 +65,14 @@ public class TimeTypeController {
     }
 
     @ApiOperation("update Skill tab of timetype")
-    @PutMapping(value = "time-type/{timeTypeId}/skill")
+    @PutMapping(value = "/time_type/{timeTypeId}/skill")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateSkillTabOfActivity(@RequestBody SkillActivityDTO skillActivityDTO, @PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateSkillTabOfTimeType(skillActivityDTO,timeTypeId));
     }
 
     @ApiOperation("get Bonus Tab of timetype")
-    @GetMapping(value = "/time-type/{timeTypeId}/skill")
+    @GetMapping(value = "/time_type/{timeTypeId}/skill")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getSkillTabOfActivity(@PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getSkillTabOfTimeType(timeTypeId));
@@ -82,7 +82,7 @@ public class TimeTypeController {
     //organization Mapping
 
     @ApiOperation("update organization Mapping details  of timeType Type")
-    @PutMapping(value = "time-type/{timeTypeId}/organizationMapping")
+    @PutMapping(value = "/time_type/{timeTypeId}/organizationMapping")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateOrgMappingDetailOfActivity(@RequestBody OrganizationMappingDTO organizationMappingDTO, @PathVariable BigInteger timeTypeId) {
         timeTypeService.updateOrgMappingDetailOfActivity(organizationMappingDTO, timeTypeId);
@@ -90,21 +90,21 @@ public class TimeTypeController {
     }
 
     @ApiOperation("get organization Mapping details  of timeType")
-    @GetMapping(value = "time-type/{timeTypeId}/organizationMapping")
+    @GetMapping(value = "/time_type/{timeTypeId}/organizationMapping")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getOrgMappingDetailOfActivity(@PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getOrgMappingDetailOfTimeType(timeTypeId));
     }
 
     @ApiOperation("get Rules Tab of timeType")
-    @GetMapping(value = "time-type/{timeTypeId}/rules")
+    @GetMapping(value = "/time_type/{timeTypeId}/rules")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getRulesTab(@PathVariable Long countryId, @PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getRulesTabOfTimeType(timeTypeId,countryId));
     }
 
     @ApiOperation("Update Rules Tab of timeType")
-    @PutMapping(value = "time-type/{timeTypeId}/rules")
+    @PutMapping(value = "/time_type/{timeTypeId}/rules")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateRulesTab(@RequestBody RulesActivityTabDTO rulesDTO, @PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateRulesTab(rulesDTO,timeTypeId));
@@ -113,14 +113,14 @@ public class TimeTypeController {
     //Phase Settings
 
     @ApiOperation("get Phase setting Tab of timeType")
-    @GetMapping(value = "time-type/{timeTypeId}/phase_settings")
+    @GetMapping(value = "/time_type/{timeTypeId}/phase_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getPhaseSettingTab(@PathVariable Long countryId, @PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getPhaseSettingTabOfTimeType(timeTypeId,countryId));
     }
 
     @ApiOperation("Update Phase setting Tab of timeType")
-    @PutMapping(value = "time-type/{timeTypeId}/phase_settings")
+    @PutMapping(value = "/time_type/{timeTypeId}/phase_settings")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updatePhaseSettingTab(@RequestBody PhaseSettingsActivityTab phaseSettingsActivityTab, @PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updatePhaseSettingTab(phaseSettingsActivityTab,timeTypeId));
@@ -128,14 +128,14 @@ public class TimeTypeController {
 
 
     @ApiOperation("Update Time calculation Tab of timeType")
-    @PutMapping(value = "time-type/{timeTypeId}/timeCalculation")
+    @PutMapping(value = "/time_type/{timeTypeId}/timeCalculation")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateTimeCalculationTabOfActivity(@RequestBody TimeCalculationActivityDTO timeCalculationActivityDTO, @PathVariable BigInteger timeTypeId , @RequestParam boolean availableAllowActivity) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.updateTimeCalculationTabOfTimeType(timeCalculationActivityDTO,timeTypeId));
     }
 
     @ApiOperation("get getTime Calculation Tab of timeType")
-    @GetMapping(value = "time-type/{timeTypeId}/timeCalculation")
+    @GetMapping(value = "/time_type/{timeTypeId}/timeCalculation")
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getTimeCalculationTabOfActivity(@PathVariable Long countryId, @PathVariable BigInteger timeTypeId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeTypeService.getTimeCalculationTabOfTimeType(timeTypeId,countryId));

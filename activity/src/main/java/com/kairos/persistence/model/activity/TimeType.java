@@ -45,6 +45,7 @@ public class TimeType extends MongoBaseEntity{
     private List<Long> regions;
     private List<Long> levels;
     private List<Long> employmentTypes;
+    private boolean breakNotHeldValid;
 
     public TimeType() {}
 

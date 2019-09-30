@@ -91,7 +91,7 @@ public class TimeTypeService extends MongoBaseService {
 
         TimeType timeType = timeTypeMongoRepository.findOneById(timeTypeDTO.getId());
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.timetype.notfound");
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND);
         }
         List<TimeType> timeTypes = new ArrayList<>();
         List<TimeType> childTimeTypes = timeTypeMongoRepository.findAllChildByParentId(timeType.getId(), countryId);
@@ -113,7 +113,7 @@ public class TimeTypeService extends MongoBaseService {
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
-
+        timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
         Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
         if (isCollectionNotEmpty(activityCanBeCopiedForOrganizationHierarchy)) {
             if (activityCanBeCopiedForOrganizationHierarchy.size() == 1 && activityCanBeCopiedForOrganizationHierarchy.contains(OrganizationHierarchy.UNIT)) { //user cannot allow copy acitivity for Unit, without allowing copy activity for Organization
@@ -218,7 +218,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeTypeDTO> parentOfWorkingTimeType = new ArrayList<>();
         List<TimeTypeDTO> parentOfNonWorkingTimeType = new ArrayList<>();
         for (TimeType timeType : topLevelTimeTypes) {
-            TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts());
+            TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts(),timeType.isBreakNotHeldValid());
             timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
             if ( timeType.getId().equals(timeTypeId)) {
                 timeTypeDTO.setSelected(true);
@@ -287,7 +287,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeTypeDTO> lowerLevelTimeTypeDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> {
             if (timeType.getUpperLevelTimeTypeId().equals(upperlevelTimeTypeId)) {
-                TimeTypeDTO levelTwoTimeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts());
+                TimeTypeDTO levelTwoTimeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts(),timeType.isBreakNotHeldValid());
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     levelTwoTimeTypeDTO.setSelected(true);
                 }
@@ -376,12 +376,39 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeMongoRepository.existsByIdAndCountryIdAndDeletedFalse(id, countryId);
     }
 
+    public List<BigInteger> getAllTimeTypeWithItsLowerLevel(Long countryId, List<BigInteger> timeTypeIds){
+        List<TimeTypeDTO> timeTypeDTOS =  getAllTimeType(null,countryId);
+        List<BigInteger> resultTimeTypeDTOS = new ArrayList<>();
+        updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTOS.get(0).getChildren(), timeTypeIds,false);
+        updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTOS.get(1).getChildren(), timeTypeIds,false);
+        return resultTimeTypeDTOS;
+    }
+
+    private void updateTimeTypeList(List<BigInteger> resultTimeTypeDTOS, List<TimeTypeDTO> timeTypeDTOS, List<BigInteger> timeTypeIds, boolean addAllLowerLevelChildren){
+        for(TimeTypeDTO timeTypeDTO : timeTypeDTOS) {
+            if(timeTypeIds.indexOf(timeTypeDTO.getId())>=0){
+                resultTimeTypeDTOS.add(timeTypeDTO.getId());
+                if(isCollectionNotEmpty(timeTypeDTO.getChildren())){
+                    updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTO.getChildren(), timeTypeIds,true);
+                }
+            }else if(addAllLowerLevelChildren){
+                if(isCollectionNotEmpty(timeTypeDTO.getChildren())) {
+                    updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, true);
+                }else{
+                    resultTimeTypeDTOS.add(timeTypeDTO.getId());
+                }
+            }else{
+                updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, false);
+            }
+        }
+    }
+
     public TimeCalculationActivityDTO updateTimeCalculationTabOfTimeType(TimeCalculationActivityDTO timeCalculationActivityDTO, BigInteger timeTypeId) {
         TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab();
         ObjectMapperUtils.copyProperties(timeCalculationActivityDTO, timeCalculationActivityTab);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMECARE_ID, timeCalculationActivityDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
         //timeCalculationActivityDTO = verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
         if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
@@ -407,7 +434,7 @@ public class TimeTypeService extends MongoBaseService {
         RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, rulesActivityDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
         if (rulesActivityDTO.getCutOffIntervalUnit() != null && rulesActivityDTO.getCutOffStartFrom() != null) {
             if (CutOffIntervalUnit.DAYS.equals(rulesActivityDTO.getCutOffIntervalUnit()) && rulesActivityDTO.getCutOffdayValue() == 0) {
@@ -428,7 +455,7 @@ public class TimeTypeService extends MongoBaseService {
     public ActivityTabsWrapper getPhaseSettingTabOfTimeType(BigInteger timeTypeId, Long countryId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, timeTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
@@ -441,7 +468,7 @@ public class TimeTypeService extends MongoBaseService {
     public PhaseSettingsActivityTab updatePhaseSettingTab(PhaseSettingsActivityTab phaseSettingsActivityTab,BigInteger timeTypeId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, phaseSettingsActivityTab.getActivityId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, phaseSettingsActivityTab.getActivityId());
         }
         timeType.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
         timeTypeMongoRepository.save(timeType);
@@ -461,7 +488,7 @@ public class TimeTypeService extends MongoBaseService {
     public ActivityTabsWrapper updateSkillTabOfTimeType(SkillActivityDTO skillActivityDTO,BigInteger timeTypeId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, skillActivityDTO.getActivityId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, skillActivityDTO.getActivityId());
         }
         SkillActivityTab skillActivityTab = new SkillActivityTab(skillActivityDTO.getActivitySkills());
         timeType.setSkillActivityTab(skillActivityTab);
@@ -477,7 +504,7 @@ public class TimeTypeService extends MongoBaseService {
     public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger timeTypeId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, timeTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
         boolean isSuccess = userIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingDTO);
         if (!isSuccess) {
@@ -495,7 +522,7 @@ public class TimeTypeService extends MongoBaseService {
     public OrganizationMappingDTO getOrgMappingDetailOfTimeType(BigInteger timeTypeId) {
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, timeTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_TIMETYPE_NOTFOUND, timeTypeId);
         }
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         organizationMappingDTO.setOrganizationSubTypes(timeType.getOrganizationSubTypes());

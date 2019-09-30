@@ -32,6 +32,7 @@ public class TimeTypeDTO {
     private boolean allowChildActivities;
     private List<TimeTypeDTO> parent = new ArrayList<>();
     private boolean allowedConflicts;
+    private boolean breakNotHeldValid;
 
     public TimeTypeDTO() {
     }
@@ -50,7 +51,7 @@ public class TimeTypeDTO {
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
     }
 
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy, boolean partOfTeam, boolean allowChildActivities,boolean allowedConflicts) {
+    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy, boolean partOfTeam, boolean allowChildActivities,boolean allowedConflicts,boolean breakNotHeldValid) {
         this.id = id;
         this.timeTypes = timeTypes;
         this.label = label;
@@ -60,6 +61,7 @@ public class TimeTypeDTO {
         this.partOfTeam = partOfTeam;
         this.allowChildActivities = allowChildActivities;
         this.allowedConflicts=allowedConflicts;
+        this.breakNotHeldValid = breakNotHeldValid;
     }
 
 
