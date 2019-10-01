@@ -27,8 +27,8 @@ import java.util.Set;
 public class ExpertiseQueryResult {
     private String name;
     private String description;
-    private Long startDateMillis;
-    private Long endDateMillis;
+    private Long startDate;
+    private Long endDate;
     private Integer fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
     private Long id;

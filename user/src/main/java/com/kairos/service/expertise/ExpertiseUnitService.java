@@ -6,6 +6,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseLineQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
@@ -62,6 +63,10 @@ public class ExpertiseUnitService {
         List<ExpertiseQueryResult> expertises=new ArrayList<>();
         if(ObjectUtils.isNotNull(servicesAndLevel)){
             expertises  = expertiseGraphRepository.findExpertiseByOrganizationServicesForUnit(countryId, servicesAndLevel.getServicesId());
+            List<Long> allExpertiseIds=expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
+            List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
+            Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
+            expertises.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLineQueryResults(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
         }
         if (CollectionUtils.isNotEmpty(expertises)) {
             List<Long> expertiseIds = expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());

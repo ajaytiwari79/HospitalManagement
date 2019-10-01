@@ -325,7 +325,12 @@ public class ExpertiseService {
 
 
     public List<ExpertiseQueryResult> getAllExpertise(long countryId) {
-        return expertiseGraphRepository.getAllExpertiseByCountryId(countryId);
+        List<ExpertiseQueryResult> expertiseQueryResults= expertiseGraphRepository.getAllExpertise(countryId,new boolean[]{true});
+        List<Long> allExpertiseIds=expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
+        List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
+        Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
+        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLineQueryResults(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+        return expertiseQueryResults;
     }
 
 
@@ -479,7 +484,7 @@ public class ExpertiseService {
 //        return levelChanged;
 //    }
 
-    public ExpertiseQueryResult deleteExpertise(Long expertiseId) {
+    public boolean deleteExpertise(Long expertiseId) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
@@ -488,20 +493,13 @@ public class ExpertiseService {
         if (expertise.isPublished()) {
             exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_CANNOTREMOVED);
         }
-        ExpertiseQueryResult parentExpertise = expertiseGraphRepository.getParentExpertiseByExpertiseId(expertiseId);
-        if (Optional.ofNullable(parentExpertise).isPresent()) {
-            // remove link and unlink
-            expertiseGraphRepository.unlinkExpertiseAndMakeEditable(parentExpertise.getId(), false, false);
-
-            parentExpertise.setHistory(false);
-        }
         expertise.setDeleted(true);
         if (Optional.ofNullable(expertise.getSeniorityLevel()).isPresent() && !expertise.getSeniorityLevel().isEmpty()) {
             for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel())
                 seniorityLevel.setDeleted(true);
         }
         expertiseGraphRepository.save(expertise);
-        return parentExpertise;
+        return true;
     }
 
 
@@ -685,8 +683,9 @@ public class ExpertiseService {
         ExpertiseQueryResult expertise = expertiseGraphRepository.getExpertiseById(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
-
         }
+        List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(Arrays.asList(expertiseId));
+        expertise.setExpertiseLineQueryResults(expertiseLineQueryResults);
         return expertise;
     }
 
@@ -700,7 +699,7 @@ public class ExpertiseService {
     }
 
     public List<ExpertiseQueryResult> getUnpublishedExpertise(Long countryId) {
-        List<ExpertiseQueryResult> expertiseQueryResults= expertiseGraphRepository.getUnpublishedExpertise(countryId);
+        List<ExpertiseQueryResult> expertiseQueryResults= expertiseGraphRepository.getAllExpertise(countryId,new boolean[]{true,false});
         List<Long> allExpertiseIds=expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
         Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));

@@ -48,11 +48,6 @@ public interface FunctionalPaymentGraphRepository extends Neo4jBaseRepository<Fu
             "set functionalPayment.endDate={2} detach delete relation")
     void setEndDateToFunctionalPayment(Long functionalPaymentId, Long parentFunctionalPaymentId, String endDate);
 
-    @Query("MATCH(parent:Expertise)-[:VERSION_OF]-(child:Expertise) WHERE id(parent)={0} AND id(child)={1}\n" +
-            "MATCH(parent)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn:FunctionalPayment)\n" +
-            "MERGE (child)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(fn)")
-    void linkFunctionalPaymentExpertise(Long expertiseId, Long newExpertiseId);
-
 
     @Query("MATCH(parent:Expertise) WHERE id(parent)={0} \n" +
             "MATCH   (child:Expertise) WHERE id(child)={1} \n" +
