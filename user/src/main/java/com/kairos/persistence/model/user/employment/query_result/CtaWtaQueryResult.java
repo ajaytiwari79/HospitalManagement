@@ -4,7 +4,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.expertise.response.SeniorityLevelQueryResult;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

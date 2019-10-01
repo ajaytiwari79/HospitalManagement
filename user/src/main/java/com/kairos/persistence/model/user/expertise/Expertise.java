@@ -42,7 +42,6 @@ public class Expertise extends UserBaseEntity {
 
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private Integer numberOfWorkingDaysInWeek; // 5 or 7
-    private BreakPaymentSetting breakPaymentSetting;
 
     private boolean published;
 
@@ -127,19 +126,6 @@ public class Expertise extends UserBaseEntity {
         this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.published = published;
-    }
-
-    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, Country country, LocalDate startDate, LocalDate endDate, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, Sector sector) {
-        this.name = name;
-        this.description = description;
-        this.country = country;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-        this.breakPaymentSetting = breakPaymentSetting;
-        this.published = published;
-        //this.sector = sector;
     }
 
     public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description) {

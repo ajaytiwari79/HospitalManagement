@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.expertise.Response;
+package com.kairos.persistence.model.user.expertise.response;
 
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.pay_table.PayGrade;

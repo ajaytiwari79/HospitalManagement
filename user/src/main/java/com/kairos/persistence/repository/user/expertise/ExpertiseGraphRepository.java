@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.*;
+import com.kairos.persistence.model.user.expertise.response.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -21,7 +21,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise, Long> {
 
     @Query("MATCH (country:Country) WHERE id(country)={0}  " +
-            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp()) " +
+            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR expertise.endDate >= DATE()) " +
             "RETURN expertise")
     List<Expertise> getAllExpertiseByCountry(long countryId);
 
@@ -29,7 +29,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     Expertise getOneDefaultExpertiseByCountry(long countryId);
 
     @Query("MATCH (country:Country) WHERE id(country)={0} " +
-            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDateMillis IS NULL OR expertise.endDateMillis >= timestamp())  " +
+            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR expertise.endDate >= DATE())  " +
             "WITH expertise, country \n" +
             "RETURN id(expertise) as id, expertise.name as name")
     List<ExpertiseTagDTO> getAllExpertiseWithTagsByCountry(long countryId);
@@ -67,24 +67,30 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
 
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE id(country) = {0} " +
-            "MATCH(exl)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
-            " MATCH(exl)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization) \n" +
-            " MATCH(exl)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector)  "+
-            " MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
-            " MATCH(exl)-[seniorityRel:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
-            "OPTIONAL MATCH (payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable) WHERE id(payGradeData)=seniorityRel.payGradeId \n" +
-            " with expertise,exl,union,level,orgService,sector,Collect(payTable) as payTables, CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage," +
-            "   freeChoicePercentage:seniorityLevel.freeChoicePercentage,freeChoiceToPension:seniorityLevel.freeChoiceToPension, " +
-            "   to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels\n" +
             "OPTIONAL MATCH(expertise)-[:" + HAS_SENIOR_DAYS + "]->(seniorDays:CareDays) \n " +
             "OPTIONAL MATCH(expertise)-[:" + HAS_CHILD_CARE_DAYS + "]->(childCareDays:CareDays) \n" +
-            "with expertise,payTables,union,level,orgService,seniorityLevels,sector, " +
+            "with expertise " +
             "CASE when seniorDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE when childCareDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays " +
-            "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDateMillis as startDateMillis , expertise.history as history, " +
-            "expertise.endDateMillis as endDateMillis ,expertise.breakPaymentSetting as breakPaymentSetting,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published," +
-            "orgService as organizationService,level as organizationLevel,payTables[0] as payTable,union as union,seniorityLevels,seniorDays,childCareDays,sector ORDER BY expertise.name")
+            "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
+            "expertise.endDate as endDate ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published, " +
+            "seniorDays,childCareDays ORDER BY expertise.name")
     List<ExpertiseQueryResult> getUnpublishedExpertise(long countryId);
+
+    @Query("MATCH(exp:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(exp) IN {0} " +
+            "MATCH(exl)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
+            "MATCH(exl)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
+            "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
+            "with expertise,union,level, Collect(orgService) as services \n" +
+            "MATCH(exl)-[slRel:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)" +
+            "MATCH(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable) WHERE id(payGradeData)=slRel.payGradeId" +
+            " with expertise,union,level,services,sector,Collect(payTable) as payTables, CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage," +
+            "   freeChoicePercentage:seniorityLevel.freeChoicePercentage,freeChoiceToPension:seniorityLevel.freeChoiceToPension, " +
+            "   to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels "+
+            "RETURN id(exl) as id ,id(expertise) as expertiseId, exl.startDate as startDate , " +
+            "exl.endDate as endDate ,exl.breakPaymentSetting as breakPaymentSetting " +
+            "services as organizationService,level as organizationLevel,payTables[0] as payTable,union as union,seniorityLevels,sector")
+    List<ExpertiseLineQueryResult> findAllExpertiseLines(List<Long> expertiseIds);
 
 
     @Query("MATCH (e:Expertise)-[:" + VERSION_OF + "]->(expertise:Expertise) WHERE id(e) = {0}" +

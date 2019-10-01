@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.expertise.Response;
+package com.kairos.persistence.model.user.expertise.response;
 
 import java.util.List;
 

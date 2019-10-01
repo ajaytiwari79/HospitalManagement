@@ -34,7 +34,7 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentLines
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
+import com.kairos.persistence.model.user.expertise.response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -956,7 +956,7 @@ public class EmploymentService {
     }
 
     public List<StaffEmploymentDetails> getStaffIdAndEmploymentId(Long unitId, Long expertiseId, List<Long> staffId) {
-        return staffGraphRepository.getStaffIdAndEmploymentId(unitId, expertiseId, staffId, System.currentTimeMillis());
+        return staffGraphRepository.getStaffIdAndEmploymentId(unitId, expertiseId, staffId);
     }
 
     /**

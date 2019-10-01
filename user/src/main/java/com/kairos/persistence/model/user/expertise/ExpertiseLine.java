@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise;
 
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -34,6 +35,7 @@ public class ExpertiseLine extends UserBaseEntity {
 
     @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
+    private BreakPaymentSetting breakPaymentSetting;
 
     private ExpertiseLine(){
 
@@ -47,6 +49,7 @@ public class ExpertiseLine extends UserBaseEntity {
         this.organizationServices = expertiseLineBuilder.organizationServices;
         this.sector = expertiseLineBuilder.sector;
         this.union = expertiseLineBuilder.union;
+        this.breakPaymentSetting=expertiseLineBuilder.breakPaymentSetting;
     }
 
     public boolean isUpdated(ExpertiseLine expertiseLine) {
@@ -70,6 +73,7 @@ public class ExpertiseLine extends UserBaseEntity {
         private Sector sector;
         private List<OrganizationService> organizationServices;
         private Organization union;
+        private BreakPaymentSetting breakPaymentSetting;
 
 
         public ExpertiseLineBuilder setStartDate(LocalDate startDate) {
@@ -81,6 +85,12 @@ public class ExpertiseLine extends UserBaseEntity {
             this.endDate = endDate;
             return this;
         }
+
+        public ExpertiseLineBuilder setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
+            this.breakPaymentSetting = breakPaymentSetting;
+            return this;
+        }
+
 
         public ExpertiseLineBuilder setOrganizationLevel(Level organizationLevel) {
             this.organizationLevel = organizationLevel;

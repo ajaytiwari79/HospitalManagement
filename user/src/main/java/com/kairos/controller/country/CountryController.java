@@ -7,7 +7,7 @@ import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillDTO;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;

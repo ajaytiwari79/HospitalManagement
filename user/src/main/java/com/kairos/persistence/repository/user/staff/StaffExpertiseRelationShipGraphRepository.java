@@ -25,8 +25,7 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
             "RETURN DISTINCT id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths ")
     List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndServicesAndLevel(Long staffId,List<Long> serviceIds,Long levelId);
 
-    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) WHERE id(staff) = {0} " +
-            "MATCH(expertise)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) where id(orgService) IN {1}\n" +
+    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(staff) = {0} AND id(orgService) IN {1}\n" +
             "RETURN DISTINCT id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths ")
     List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndServices(Long staffId, Set<Long> serviceIds);
 
@@ -45,9 +44,9 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
             "RETURN id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths")
     List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndExpertiseIds(Long staffId, List<Long> expertiseId);
 
-   @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} " +
+   @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) where id(staff) = {0} AND (exl.startDate<=DATE() AND (exl.endDate IS NULL OR exl.endDate>=DATE())) " +
             "MATCH (expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
-            "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) " +
+            "MATCH(exl)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) " +
             "WITH sector,expertise, staff,rel,seniorityLevel ORDER By seniorityLevel.from " +
             "WITH expertise ,staff,rel,collect({id:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to}) as seniorityLevels,sector " +
             "OPTIONAL MATCH(expertise)<-[expRel:"+HAS_EXPERTISE_IN+"]-(employment:Employment)<-["+BELONGS_TO_STAFF+"]-(staff) " +

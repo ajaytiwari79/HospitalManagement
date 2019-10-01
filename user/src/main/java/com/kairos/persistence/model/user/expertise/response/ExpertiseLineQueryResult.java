@@ -1,9 +1,10 @@
-package com.kairos.persistence.model.user.expertise.Response;
+package com.kairos.persistence.model.user.expertise.response;
 
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
+import com.kairos.persistence.model.pay_table.PayTable;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -24,4 +25,6 @@ public class ExpertiseLineQueryResult {
     private List<OrganizationService> organizationServices;
     private Organization union;
     private Map<String, Object> seniorityLevel;
+    private PayTable payTable;
+    private Long expertiseId;
 }

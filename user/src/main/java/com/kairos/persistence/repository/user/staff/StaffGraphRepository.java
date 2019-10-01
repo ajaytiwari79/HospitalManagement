@@ -13,7 +13,7 @@ import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQu
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDTO;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -360,9 +360,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) WHERE id(expertise)={1} AND id(staff) IN {2}\n" +
             "MATCH(employment)-[:" + IN_UNIT + "]-(organization:Unit) WHERE id(organization)={0}   \n" +
-            "AND employment.startDateMillis<={3} AND  (employment.endDateMillis IS NULL or employment.endDateMillis>={3})  \n" +
+            "AND employment.startDate<=DATE() AND  (employment.endDate IS NULL or employment.endDate>=DATE())  \n" +
             "RETURN id(employment) AS id , id(staff) AS staffId")
-    List<StaffEmploymentDetails> getStaffIdAndEmploymentId(Long unitId, Long expertiseId, List<Long> staffIds, Long currentMillis);
+    List<StaffEmploymentDetails> getStaffIdAndEmploymentId(Long unitId, Long expertiseId, List<Long> staffIds);
 
     @Query("MATCH(staff:Staff) WHERE id(staff) in {0} RETURN staff.email")
     List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds);

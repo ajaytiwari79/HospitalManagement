@@ -1,7 +1,7 @@
 package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.pay_table.PayGrade;
-import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.expertise.response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

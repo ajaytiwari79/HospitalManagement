@@ -33,7 +33,7 @@ import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryRes
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.*;
-import com.kairos.persistence.model.user.expertise.Response.*;
+import com.kairos.persistence.model.user.expertise.response.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -700,11 +700,16 @@ public class ExpertiseService {
     }
 
     public List<ExpertiseQueryResult> getUnpublishedExpertise(Long countryId) {
-        return expertiseGraphRepository.getUnpublishedExpertise(countryId);
+        List<ExpertiseQueryResult> expertiseQueryResults= expertiseGraphRepository.getUnpublishedExpertise(countryId);
+        List<Long> allExpertiseIds=expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
+        List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
+        Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
+        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLineQueryResults(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+        return expertiseQueryResults;
     }
 
 
-    public List<com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
+    public List<com.kairos.persistence.model.user.expertise.response.ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId) {
         return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 
@@ -1078,7 +1083,7 @@ public class ExpertiseService {
         }
         Sector sector=getSector(expertiseDTO.getSector(),country);
         Organization union=getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country);
-        return new ExpertiseLine.ExpertiseLineBuilder().setStartDate(asLocalDate(expertiseDTO.getStartDateMillis())).setEndDate(asLocalDate(expertiseDTO.getEndDateMillis())).setOrganizationLevel(level).setSector(sector).setUnion(union).setOrganizationServices(organizationServices).createLine();
+        return new ExpertiseLine.ExpertiseLineBuilder().setStartDate(asLocalDate(expertiseDTO.getStartDateMillis())).setEndDate(asLocalDate(expertiseDTO.getEndDateMillis())).setOrganizationLevel(level).setSector(sector).setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting()).setUnion(union).setOrganizationServices(organizationServices).createLine();
     }
 
     private void initializeExpertiseLine(ExpertiseLine expertiseLine,ExpertiseDTO expertiseDTO,Country country){

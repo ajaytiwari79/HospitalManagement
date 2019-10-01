@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.expertise.Response;
+package com.kairos.persistence.model.user.expertise.response;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;

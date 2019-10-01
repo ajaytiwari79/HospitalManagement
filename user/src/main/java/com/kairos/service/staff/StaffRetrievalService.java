@@ -49,7 +49,7 @@ import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDTO;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.skill.Skill;

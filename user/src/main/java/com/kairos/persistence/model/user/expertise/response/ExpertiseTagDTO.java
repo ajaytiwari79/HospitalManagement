@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.user.expertise.Response;
+package com.kairos.persistence.model.user.expertise.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.user.country.tag.TagDTO;

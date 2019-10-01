@@ -1,7 +1,6 @@
 package com.kairos.service.employment;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
@@ -20,7 +19,7 @@ import com.kairos.persistence.model.user.employment.query_result.CtaWtaQueryResu
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
-import com.kairos.persistence.model.user.expertise.Response.SeniorityLevelQueryResult;
+import com.kairos.persistence.model.user.expertise.response.SeniorityLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
