@@ -183,7 +183,7 @@ public class TimeBankCalculationService {
             functionId = appliedFunctionDTO.isPresent() ? appliedFunctionDTO.get().getId() : null;
         }
         if(ctaRuleTemplateDTO.getStaffFunctions().contains(isNotNull(staffEmploymentDetails.getFunctionId()) ? staffEmploymentDetails.getFunctionId() : functionId)) {
-            value = !getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) ? new BigDecimal(ctaRuleTemplateDTO.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
+            value = !getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) ? (new BigDecimal(ctaRuleTemplateDTO.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60))).intValue(): 0;
         }
         return value;
     }
@@ -876,7 +876,7 @@ public class TimeBankCalculationService {
             if(ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
                 int ctaTimeBankMin = 0;
                 if((ruleTemplate.getActivityIds().contains(shift.getActivityId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(activity.getBalanceSettingsActivityTab().getTimeTypeId())))) {
-                    if(((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(shiftInterval.getStart().getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
+                    if(((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(asLocalDate(shiftInterval.getStart()).getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
                         if(ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
                             plannedTimeMin += calculateScheduleAndDurationHourForOpenShift(shift, activity, employmentWithCtaDetailsDTO);
                             totalTimebank += plannedTimeMin;
@@ -887,12 +887,12 @@ public class TimeBankCalculationService {
                                 for (Interval ctaInterval : ctaIntervals) {
                                     if(ctaInterval.overlaps(shiftInterval)) {
                                         int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).toDuration().getStandardMinutes();
-                                        if(ctaIntervalDTO.getCompensationMeasurementType().equals(AppConstants.MINUTES)) {
+                                        if(CompensationMeasurementType.MINUTES.equals(ctaIntervalDTO.getCompensationMeasurementType())) {
                                             ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
                                             totalTimebank += ctaTimeBankMin;
                                             plannedTimeMin += ctaTimeBankMin;
                                             break;
-                                        } else if(ctaIntervalDTO.getCompensationMeasurementType().equals(AppConstants.PERCENT)) {
+                                        } else if(CompensationMeasurementType.PERCENT.equals(ctaIntervalDTO.getCompensationMeasurementType())) {
                                             ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
                                             totalTimebank += ctaTimeBankMin;
                                             plannedTimeMin += ctaTimeBankMin;

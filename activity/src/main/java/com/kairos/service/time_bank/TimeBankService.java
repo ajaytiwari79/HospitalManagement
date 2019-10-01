@@ -545,6 +545,9 @@ public class TimeBankService{
             for (Shift shift : shifts) {
                 StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoMap.get(shift.getEmploymentId());
                 CTAResponseDTO ctaResponseDTO = getCTAByDate(employmentAndCTAResponseMap.get(shift.getEmploymentId()), asLocalDate(shift.getStartDate()));
+                if(isNull(ctaResponseDTO)){
+                    exceptionService.dataNotFoundException(MESSAGE_CTA_NOTFOUND);
+                }
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 staffAdditionalInfoDTO.setUnitId(shifts.get(0).getUnitId());
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
@@ -626,7 +629,7 @@ public class TimeBankService{
                 DailyTimeBankEntry dailyTimeBankEntryByStartDate = localDateDailyTimeBankEntryMap.get(startDate);
                 int publishBalance = 0;
                 if(isNotNull(dailyTimeBankEntryByStartDate)){
-                    publishBalance = dailyTimeBankEntryByStartDate.isPublishedSomeActivities() ? dailyTimeBankEntryByStartDate.getDeltaAccumulatedTimebankMinutes() : dailyTimeBankEntryByStartDate.getDeltaAccumulatedTimebankMinutes();
+                    publishBalance = dailyTimeBankEntryByStartDate.getDeltaAccumulatedTimebankMinutes();
                 }else {
                     publishBalance = -timeBankCalculationService.getContractualMinutesByDate(planningPeriodInterval, startDate, employmentIdAndStaffAdditionalInfoDTOEntry.getValue().getEmployment().getEmploymentLines());
                 }

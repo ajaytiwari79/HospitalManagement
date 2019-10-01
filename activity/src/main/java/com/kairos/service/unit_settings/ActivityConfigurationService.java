@@ -1,5 +1,6 @@
 package com.kairos.service.unit_settings;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -73,10 +74,10 @@ public class ActivityConfigurationService extends MongoBaseService {
             phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         }
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
-        Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
-        Optional<PresenceTypeDTO> extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny();
-        BigInteger normalPlannedTypeId = normalPlannedType.map(PresenceTypeDTO::getId).orElse(null);
-        BigInteger extraTimePlannedTypeId = extraTimePlannedType.isPresent() ? normalPlannedType.get().getId() : normalPlannedTypeId;
+        PresenceTypeDTO normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny().orElse(null);
+        PresenceTypeDTO extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny().orElse(null);
+        BigInteger normalPlannedTypeId = isNull(normalPlannedType) ? null : normalPlannedType.getId();
+        BigInteger extraTimePlannedTypeId = isNotNull(extraTimePlannedType) ? normalPlannedType.getId() : normalPlannedTypeId;
         for (Phase phase : phases) {
             createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId,employmentTypeIds,ConfLevel.UNIT);
             createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, unitId, ConfLevel.UNIT);
@@ -114,16 +115,13 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public AbsencePlannedTime updateAbsenceActivityConfiguration(BigInteger activityConfigurationId, AbsencePlannedTime absencePlannedTime) {
-        Optional<ActivityConfiguration> activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId);
-        if (!Optional.of(activityConfiguration).isPresent()) {
-            exceptionService.dataNotFoundByIdException(ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND);
-        }
+        ActivityConfiguration activityConfiguration = activityConfigurationRepository.findById(activityConfigurationId).orElseThrow(()->new DataNotFoundByIdException(convertMessage(ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND)));
         if (Optional.ofNullable(absencePlannedTime.getTimeTypeId()).isPresent()) {
-            activityConfiguration.get().getAbsencePlannedTime().setTimeTypeId(absencePlannedTime.getTimeTypeId());
-            activityConfiguration.get().getAbsencePlannedTime().setException(true);
+            activityConfiguration.getAbsencePlannedTime().setTimeTypeId(absencePlannedTime.getTimeTypeId());
+            activityConfiguration.getAbsencePlannedTime().setException(true);
         }
-        activityConfiguration.get().getAbsencePlannedTime().setPlannedTimeIds(absencePlannedTime.getPlannedTimeIds());
-        activityConfigurationRepository.save(activityConfiguration.get());
+        activityConfiguration.getAbsencePlannedTime().setPlannedTimeIds(absencePlannedTime.getPlannedTimeIds());
+        activityConfigurationRepository.save(activityConfiguration);
         return absencePlannedTime;
 
     }

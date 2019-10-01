@@ -722,7 +722,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
                 exceptionService.duplicateDataException("error.wta.invalid", wtadto.getStartDate(), isNotNull(wtadto.getEndDate()) ? wtadto.getEndDate() : "");
             }
         }
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = null;
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = new ArrayList<>();
         WTAResponseDTO wtaResponseDTO;
         if (isCollectionNotEmpty(wtadto.getRuleTemplates())) {
             wtaBaseRuleTemplates = wtaBuilderService.copyRuleTemplates(wtadto.getRuleTemplates(), false);

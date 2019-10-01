@@ -1,6 +1,8 @@
 package com.kairos.service.staffing_level;
 
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -85,6 +87,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
+import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 
@@ -191,7 +194,7 @@ public class StaffingLevelService extends MongoBaseService {
     public StaffingLevel getPresenceStaffingLevel(BigInteger staffingLevelId) {
         LOGGER.debug("getting staffing level staffingLevelId {}", staffingLevelId);
 
-        return staffingLevelMongoRepository.findById(staffingLevelId).get();
+        return staffingLevelMongoRepository.findById(staffingLevelId).orElseThrow(()->new DataNotFoundByIdException(convertMessage("Staffing Level Not Found By Id : {}", staffingLevelId)));
     }
 
     /**
@@ -202,7 +205,7 @@ public class StaffingLevelService extends MongoBaseService {
             , PresenceStaffingLevelDto presenceStaffingLevelDTO) {
         StaffingLevelUtil.sortStaffingLevelActivities(presenceStaffingLevelDTO, presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank());
         LOGGER.info("updating staffing level organizationId and staffingLevelId is {} ,{}", unitId, staffingLevelId);
-        StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).get();
+        StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(staffingLevelId).orElseThrow(()->new DataNotFoundException(convertMessage("Staffing Level Not Found")));
         if (!staffingLevel.getCurrentDate().equals(presenceStaffingLevelDTO.getCurrentDate())) {
             LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), presenceStaffingLevelDTO.getCurrentDate());
             exceptionService.unsupportedOperationException(MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE);
@@ -631,9 +634,8 @@ public class StaffingLevelService extends MongoBaseService {
         List<StaffingLevel> staffingLevels = new ArrayList<StaffingLevel>();
         List<StaffingLevelPlanningDTO> staffingLevelPlanningDTOS = new ArrayList<>();
         for (AbsenceStaffingLevelDto absenceStaffingLevelDto : absenceStaffingLevelDtos) {
-            StaffingLevel staffingLevel = null;
-            if (Optional.ofNullable(absenceStaffingLevelDto.getId()).isPresent()) {
-                staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).get();
+            StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).orElse(null);
+            if (isNotNull(staffingLevel)) {
                 if (!staffingLevel.getCurrentDate().equals(absenceStaffingLevelDto.getCurrentDate())) {
                     LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
                     exceptionService.unsupportedOperationException(MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE);
