@@ -85,6 +85,7 @@ import static java.util.stream.Collectors.*;
 @Transactional
 @Service
 public class WorkTimeAgreementService extends MongoBaseService {
+
     private static final Logger logger = LoggerFactory.getLogger(WorkTimeAgreementService.class);
     @Inject
     private WorkingTimeAgreementMongoRepository wtaRepository;
@@ -1091,18 +1092,21 @@ public class WorkTimeAgreementService extends MongoBaseService {
                                 ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate) wtaQueryResultDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplate -> WTATemplateType.PROTECTED_DAYS_OFF.equals(wtaBaseRuleTemplate.getWtaTemplateType())).findFirst().get();
                                 ActivityWrapper activityWrapper = activityWrapperMap.get(protectedDaysOffWTATemplate.getActivityId());
                                 DateTimeInterval dateTimeInterval = workTimeAgreementBalancesCalculationService.getCutoffInterval(activityWrapper.getActivity().getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getActivity().getRulesActivityTab().getCutOffdayValue(), startDate, getLocalDate());
-                                long count = employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
-                                DailyTimeBankEntry dailyTimeBankEntry = isNullOrElse(employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId()), new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
-                                int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(dateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
-                                dailyTimeBankEntry.setProtectedDaysOffHours(dailyTimeBankEntry.getProtectedDaysOffHours() + (count * contractualMinutes));
-                                dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
+                                if(dateTimeInterval.getStartLocalDate().equals(getLocalDate())) {
+                                    long count = employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
+                                    DailyTimeBankEntry dailyTimeBankEntry = isNullOrElse(employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId()), new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
+                                    int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(dateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+                                    dailyTimeBankEntry.setProtectedDaysOffHours(dailyTimeBankEntry.getProtectedDaysOffHours() + (count * contractualMinutes));
+                                    dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
+                                }
                             }
                         }catch (Exception e){
-                            e.printStackTrace();
+                            logger.error("error while add protected days off time bank in staff  {} ,\n {}  ",employmentDetails.getStaffId(),e);
                         }
                     }
                 }
             } catch (Exception e) {
+                logger.error("error while add protected days off time bank in unit  {} ,\n {}  ",unitId,e);
                 e.printStackTrace();
             }
         }
