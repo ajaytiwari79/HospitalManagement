@@ -56,6 +56,7 @@ public class StaffEmploymentDetails {
     private LocalDate accumulatedTimebankDate;
     private CTAResponseDTO costTimeAgreement;
     private EmploymentSubType employmentSubType;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
     public StaffEmploymentDetails() {
 
     }
@@ -346,5 +347,13 @@ public class StaffEmploymentDetails {
 
     public void setEmploymentSubType(EmploymentSubType employmentSubType) {
         this.employmentSubType = employmentSubType;
+    }
+
+    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
+        return protectedDaysOffSettings;
+    }
+
+    public void setProtectedDaysOffSettings(List<ProtectedDaysOffSetting> protectedDaysOffSettings) {
+        this.protectedDaysOffSettings = protectedDaysOffSettings;
     }
 }

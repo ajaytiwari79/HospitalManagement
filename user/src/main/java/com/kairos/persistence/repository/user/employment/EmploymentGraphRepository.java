@@ -312,10 +312,10 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "WHERE employment.employmentSubType={0}\n" +
             "MATCH (employment)-[:IN_UNIT]-(unit:Unit) \n" +
             "MATCH(employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine) WHERE  NOT EXISTS(employmentLine.endDate) OR date(employmentLine.endDate) >= date()" +
-            "MATCH (employmentLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(et:EmploymentType)\n" +
-            "WITH collect({protectedDaysOffSettings:protectedDaysOffSetting}) as expertise,staff,unit,employment\n" +
-            "RETURN id(employment) as id,id(staff) as staffId,id(unit) as unitId,expertise as expertise ,employment.endDate as endDate, id(employment) as id,employment.employmentSubType as employmentSubType,employment.published as published,employment.startDate as startDate ,\n" +
-            "CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
-            "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,employmentType:employmentType}) end as employmentLines ")
+            "MATCH (employmentLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)\n" +
+            "WITH CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
+            "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,employmentType:employmentType,startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines, expertise,staff,unit,employment,employmentLine,employmentType,protectedDaysOffSetting\n" +
+            "RETURN id(employment) as id,id(staff) as staffId,id(unit) as unitId,expertise ,employment.endDate as endDate,employment.employmentSubType as employmentSubType,employment.published as published,employment.startDate as startDate ,\n" +
+            "employmentLines,collect(protectedDaysOffSetting) as protectedDaysOffSettings")
     List<EmploymentQueryResult> getMainEmploymentOfStaffs(EmploymentSubType employmentSubType);
 }
