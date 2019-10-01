@@ -18,6 +18,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_UNIT_ID_NOTFOUND = "message.unit.id.notFound";
     public static final String MESSAGE_ACCESSGROUP_COPIED = "message.accessGroup.copied";
     public static final String EXPERTISE = "expertise";
+    public static final String DAY_TYPE = "day type";
     public static final String SERVICES = "services";
     public static final String UNION = "union";
     public static final String FUNCTION = "function";

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -87,4 +88,9 @@ public class FunctionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.findAppliedFunctionsAtEmployment(unitId,startDate,endDate));
     }
 
+    @ApiOperation(value = "get all date by function ids")
+    @PostMapping(API_V1 + UNIT_URL + "/get_functions_date")
+    public ResponseEntity<Map<String, Object>> getAllDateByfunctionIds(@PathVariable Long unitId, @RequestBody List<Long> functionIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getAllDateByFunctionIds(unitId, functionIds));
+    }
 }

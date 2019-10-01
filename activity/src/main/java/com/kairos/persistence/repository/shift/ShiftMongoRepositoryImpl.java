@@ -216,7 +216,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         query.addCriteria(where("staffId").is(staffId).and("startDate").gt(employmentEndDate));
         Update update = new Update();
         update.set("deleted", true);
-
         mongoTemplate.updateMulti(query, update, Shift.class);
 
     }
@@ -656,7 +655,6 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperations.add(new CustomAggregationOperation(Document.parse("{\n" +
                     "  $addFields: {\n" +
                     "       \"draftShift._id\": \"$_id\",\n" +
-                    "        \"draftShift.draft\": \"$draft\"\n" +
                     "     }}")));
             aggregationOperations.add(replaceRoot("draftShift"));
         }

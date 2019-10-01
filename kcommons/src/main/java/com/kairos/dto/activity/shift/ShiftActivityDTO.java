@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
@@ -24,7 +25,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
  */
 @Getter
 @Setter
-public class ShiftActivityDTO {
+public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
 
     private Set<ShiftStatus> status;
     private String message;
@@ -55,7 +56,7 @@ public class ShiftActivityDTO {
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
 
-    private Double timeBankCtaBonusMinutes;
+    private double timeBankCtaBonusMinutes;
     private List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions;
     private Map<String, Object> location;// location where this activity needs to perform
@@ -72,7 +73,10 @@ public class ShiftActivityDTO {
     private BigInteger fourthLevelTimeTypeId;
     private List<PlannedTime> plannedTimes;
     private BigInteger plannedTimeId;
+    private int plannedMinutesOfPayout;
+    private int payoutCtaBonusMinutes;
     private List<ShiftActivityDTO> childActivities = new ArrayList<>();
+    private boolean breakNotHeld;
 
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = startDate;
@@ -127,6 +131,11 @@ public class ShiftActivityDTO {
         this.status = status;
     }
 
+    @JsonIgnore
+    public DateTimeInterval getInterval(){
+        return new DateTimeInterval(this.startDate,this.endDate);
+    }
+
     public Set<ShiftStatus> getStatus() {
         return isNull(status) ? new HashSet<>() : status;
     }
@@ -166,5 +175,10 @@ public class ShiftActivityDTO {
         this.timeBankCtaBonusMinutes = 0d;
         this.timeBankCTADistributions = new ArrayList<>();
         this.getChildActivities().forEach(shiftActivityDTO -> shiftActivityDTO.resetTimebankDetails());
+    }
+
+    @Override
+    public int compareTo(ShiftActivityDTO shiftActivityDTO) {
+        return this.startDate.compareTo(shiftActivityDTO.startDate);
     }
 }

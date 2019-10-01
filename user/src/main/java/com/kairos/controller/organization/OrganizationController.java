@@ -306,8 +306,8 @@ public class OrganizationController {
 
     @GetMapping("/parent/{countryId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getParentOrganization(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOrganization(countryId));
+    public ResponseEntity<Map<String, Object>> getParentOrganization(@PathVariable long countryId,@RequestParam("viaCountry") boolean viaCountry) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOrganization(countryId,viaCountry));
     }
 
     @GetMapping("/parent/{orgId}/country/{countryId}/gdpr_workcenter")
@@ -989,6 +989,12 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.takeOverOrganization(organizationId,newOrganizationId));
     }
 
+    @ApiOperation(value = "Get all unit ids by country id")
+    @GetMapping(COUNTRY_URL + "/all_unit_by_country")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllUnitIdsByCountryId(@PathVariable Long countryId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getAllUnitIdsByCountryId(countryId));
+    }
 
 }
 

@@ -115,6 +115,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_TIMECARE_ID = "message.activity.timecare.id";
     public static final String MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE = "message.activity.timecareactivitytype";
     public static final String MESSAGE_ACTIVITY_PUBLISHED = "message.activity.published";
+    public static final String MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED = "message.activity.timtype.published";
     public static final String MESSAGE_ACTIVITY_TIMETYPE_ABSENT = "message.activity.timeType.absent";
     public static final String ACTIVITY_NOT_ELIGIBLE_FOR_COPY = "activity.not.eligible.for.copy";
     public static final String MESSAGE_ACTIVITY_SKILL_MATCH = "message.activity.skill.match";
@@ -297,6 +298,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PHASESETTINGS_ABSENT = "message.phaseSettings.absent";
     public static final String ERROR_PRESENCEACTIVITYCONFIGURATION_NOTFOUND = "error.presenceActivityConfiguration.notFound";
     public static final String ERROR_ABSENCEACTIVITYCONFIGURATION_NOTFOUND = "error.absenceActivityConfiguration.notFound";
+    public static final String ERROR_NONWORKINGACTIVITYCONFIGURATION_NOTFOUND = "error.nonWorkingActivityConfiguration.notFound";
     public static final String ERROR_ACTIVITYCONFIGURATION_NOTFOUND = "error.activityConfiguration.notFound";
     public static final String ERROR_TIMETYPE_UNSELECTED = "error.timetype.unselected";
     public static final String MESSAGE_TASKTYPE_NOTEXISTS = "message.taskType.notExists";
@@ -389,7 +391,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF = "message.organization.protected.days.off";
     public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
     public static final String FREQUENCY_VALUE_IS_ALWAYS_POSITIVE="frequency.value.is.always.positive";
-    public static final String MESSAGE_PLANNING_PERIOD_PUBLISH="message.period.publish";
+    public static final String STATUS_NOT_ALLOWED="status.not.allowed";
 
 
 }
