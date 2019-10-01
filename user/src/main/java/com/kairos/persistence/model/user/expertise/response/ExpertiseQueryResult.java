@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,8 +28,8 @@ import java.util.Set;
 public class ExpertiseQueryResult {
     private String name;
     private String description;
-    private Long startDate;
-    private Long endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private Integer fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
     private Long id;
