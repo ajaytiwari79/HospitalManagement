@@ -2,7 +2,9 @@ package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author pradeep
@@ -13,13 +15,15 @@ public class CompactViewDTO {
 
     private List<DetailViewDTO> staffShifts;
     private List<ReasonCodeDTO> reasonCodes;
+    private Map<LocalDate,List<FunctionDTO>> assignedFunctionsObj;
 
     public CompactViewDTO() {
     }
 
-    public CompactViewDTO( List<DetailViewDTO> staffShifts, List<ReasonCodeDTO> reasonCodes) {
+    public CompactViewDTO( List<DetailViewDTO> staffShifts, List<ReasonCodeDTO> reasonCodes,Map<LocalDate,List<FunctionDTO>> assignedFunctionsObj) {
         this.staffShifts = staffShifts;
         this.reasonCodes = reasonCodes;
+        this.assignedFunctionsObj=assignedFunctionsObj;
     }
 
     public  List<DetailViewDTO> getStaffShifts() {
