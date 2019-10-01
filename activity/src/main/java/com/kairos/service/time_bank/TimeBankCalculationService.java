@@ -284,7 +284,7 @@ public class TimeBankCalculationService {
                     }
                 }
             } else {
-                valid = ruleTemplateDTO.getDays() != null && dayTypeDTO.getValidDays().contains(asLocalDate(shiftDate).getDayOfWeek());
+                valid = ruleTemplateDTO.getDays() != null && ruleTemplateDTO.getDays().contains(asLocalDate(shiftDate).getDayOfWeek());
             }
             if(valid) {
                 break;
