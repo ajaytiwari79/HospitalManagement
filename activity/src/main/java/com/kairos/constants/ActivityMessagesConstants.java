@@ -394,5 +394,4 @@ public class ActivityMessagesConstants {
     public static final String STATUS_NOT_ALLOWED="status.not.allowed";
 
 
-
 }
