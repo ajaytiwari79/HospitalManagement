@@ -179,10 +179,12 @@ public class TimeBankService{
                 shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
                 shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
             });
-            shiftWithActivityDTO.getBreakActivities().forEach(shiftActivityDTO -> {
-                shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
-                shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
-            });
+            if(isCollectionNotEmpty(shiftWithActivityDTO.getBreakActivities())){
+                shiftWithActivityDTO.getBreakActivities().forEach(shiftActivityDTO -> {
+                    shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
+                    shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
+                });
+            }
         });
         dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, dailyTimeBankEntry, planningPeriodInterval, staffAdditionalInfoDTO.getDayTypes(), validatedByPlanner);
         updateBonusHoursOfTimeBankInShift(shiftWithActivityDTOS, Arrays.asList(shift));
