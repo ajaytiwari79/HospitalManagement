@@ -13,6 +13,7 @@ public class CompensationTable {
     private CompensationMeasurementType unusedDaysOffType;
     private float unusedDaysOffvalue;
 
+
     public CompensationTable() {
     }
 

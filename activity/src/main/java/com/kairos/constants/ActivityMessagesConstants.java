@@ -115,6 +115,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_ACTIVITY_TIMECARE_ID = "message.activity.timecare.id";
     public static final String MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE = "message.activity.timecareactivitytype";
     public static final String MESSAGE_ACTIVITY_PUBLISHED = "message.activity.published";
+    public static final String MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED = "message.activity.timtype.published";
     public static final String MESSAGE_ACTIVITY_TIMETYPE_ABSENT = "message.activity.timeType.absent";
     public static final String ACTIVITY_NOT_ELIGIBLE_FOR_COPY = "activity.not.eligible.for.copy";
     public static final String MESSAGE_ACTIVITY_SKILL_MATCH = "message.activity.skill.match";
@@ -391,7 +392,6 @@ public class ActivityMessagesConstants {
     public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
     public static final String FREQUENCY_VALUE_IS_ALWAYS_POSITIVE="frequency.value.is.always.positive";
     public static final String STATUS_NOT_ALLOWED="status.not.allowed";
-
 
 
 }

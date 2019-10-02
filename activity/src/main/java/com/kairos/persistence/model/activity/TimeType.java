@@ -1,9 +1,15 @@
 package com.kairos.persistence.model.activity;
 
+import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
+import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
+import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
@@ -12,6 +18,8 @@ import java.util.List;
 import java.util.Set;
 
 @Document(collection = "time_Type")
+@Getter
+@Setter
 public class TimeType extends MongoBaseEntity{
 
     private Long countryId;
@@ -27,6 +35,17 @@ public class TimeType extends MongoBaseEntity{
     private boolean partOfTeam;
     private boolean allowChildActivities;
     private boolean allowedConflicts;
+    private RulesActivityTab rulesActivityTab;
+    private TimeCalculationActivityTab timeCalculationActivityTab;
+    private SkillActivityTab skillActivityTab;
+    private PhaseSettingsActivityTab phaseSettingsActivityTab;
+    private List<Long> expertises;
+    private List<Long> organizationTypes;
+    private List<Long> organizationSubTypes;
+    private List<Long> regions;
+    private List<Long> levels;
+    private List<Long> employmentTypes;
+    private boolean breakNotHeldValid;
 
     public TimeType() {}
 

@@ -59,6 +59,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("startDate").
                 andInclude("endDate").
                 andInclude("phaseFlippingDate").
+                andInclude("publishEmploymentIds").
                 and("current_phase_data.name").as("currentPhase").
                 and("current_phase_data.color").as("color").
                 and("next_phase_data.name").as("nextPhase");
@@ -84,6 +85,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("name").
                 andInclude("startDate").
                 andInclude("endDate").
+                andInclude("publishEmploymentIds").
                 and("current_phase_data._id").as("phaseId").
                 and("current_phase_data.name").as("currentPhaseName").
                 and("current_phase_data.color").as("phaseColor").
@@ -138,6 +140,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("name").
                 andInclude("startDate").
                 andInclude("endDate").
+                andInclude("publishEmploymentIds").
                 andInclude("phaseFlippingDate").
                 and("current_phase_data.name").as("currentPhase").
                 and("next_phase_data.name").as("nextPhase");
@@ -230,6 +233,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 andInclude("name").
                 andInclude("startDate").
                 andInclude("endDate").
+                andInclude("publishEmploymentIds").
                 and("current_phase_data.name").as("currentPhase").
                 and("current_phase_data._id").as("currentPhaseId");
         Aggregation aggregation = newAggregation(
