@@ -1,0 +1,46 @@
+db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
+
+
+db.wtaBaseRuleTemplate.insert({
+    "_id" : "1747", //This Id should be according to SequenceNumber of That Class in QA and Development
+    "name" : "WTA for Protected Days Off",
+    "description" : "WTA for Protected Days Off",
+    "disabled" : false,
+    "ruleTemplateCategoryId" : "4",
+    "lastUpdatedBy" : "Ulrik",
+    "wtaTemplateType" : "PROTECTED_DAYS_OFF",
+    "phaseTemplateValues" : [],
+    "createdAt" : ISODate("2018-07-03T12:20:07.417Z"),
+    "updatedAt" : ISODate("2018-07-03T12:20:07.417Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.wta.templates.template_types.WTAForProtectedDaysOffClass"
+})
+
+
+
+//
+
+db.time_Type.insert({
+    "_id" : "85",
+    "countryId" : NumberLong(18712),
+    "timeTypes" : "NON_WORKING_TYPE",
+    "label" : "protected days off",
+    "leafNode" : false,
+    "description" : "",
+    "childTimeTypeIds" : [],
+    "backgroundColor" : "#f7c5e7",
+    "secondLevelType" : "PROTECTED_DAYS_OFF",
+    "createdAt" : ISODate("2017-12-08T08:13:10.829Z"),
+    "updatedAt" : ISODate("2017-12-08T08:13:10.829Z"),
+    "deleted" : false,
+    "_class" : "com.kairos.persistence.model.activity.TimeType",
+    "activityCanBeCopied" : false,
+    "activityCanBeCopiedForOrganizationHierarchy" : [],
+    "lastModifiedBy" : {
+        "_id" : NumberLong(18728),
+        "email" : "ulrik@kairosplanning.com",
+        "fullName" : "Ulrik Rasmussen"
+    },
+    "allowedConflicts" : false,
+    "partOfTeam" : false
+})
