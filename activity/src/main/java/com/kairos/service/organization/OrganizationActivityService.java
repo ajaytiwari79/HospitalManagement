@@ -201,6 +201,7 @@ public class OrganizationActivityService extends MongoBaseService {
                 activityCopied.setDeleted(true);
             }
         }
+        activityCopied.setState(ActivityStateEnum.PUBLISHED);
         activityMongoRepository.save(activityCopied);
         return retrieveBasicDetails(activityCopied);
     }

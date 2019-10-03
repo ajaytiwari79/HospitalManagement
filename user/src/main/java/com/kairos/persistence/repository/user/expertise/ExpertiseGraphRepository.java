@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -246,5 +247,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnitIds")
     List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
 
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(protectedSetting:ProtectedDaysOffSetting)\n" +
+            "RETURN protectedSetting")
+    List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(Long ExpertiseId);
 
 }

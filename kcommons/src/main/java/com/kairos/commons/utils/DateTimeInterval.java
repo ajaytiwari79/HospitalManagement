@@ -210,6 +210,12 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
         return (date.getTime() >= thisStart && date.getTime() < thisEnd);
     }
 
+    public boolean containsAndEqualsEndDate(Date date) {
+        long thisStart = getStartMillis();
+        long thisEnd = getEndMillis();
+        return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
+    }
+
     public boolean containsNow() {
         Date date = new Date();
         long thisStart = getStartMillis();

@@ -1,6 +1,7 @@
 package com.kairos.service.unit_settings;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.ActivityMessagesConstants;
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
@@ -79,11 +80,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
 
     public List<ProtectedDaysOffSettingDTO> getAllProtectedDaysOffByUnitIds(List<Long> unitIds){
         List<ProtectedDaysOffSetting> protectedDaysOffSettings =protectedDaysOffRepository.getAllProtectedDaysOffByUnitIdsAndDeletedFalse(unitIds);
-        List<ProtectedDaysOffSettingDTO> protectedDaysOffSettingDTOS =new ArrayList<>();
-        protectedDaysOffSettings.forEach(protectedDaysOffSetting -> {
-            protectedDaysOffSettingDTOS.add(new ProtectedDaysOffSettingDTO(protectedDaysOffSetting.getId(), protectedDaysOffSetting.getUnitId(), protectedDaysOffSetting.getProtectedDaysOffUnitSettings()));
-        });
-        return protectedDaysOffSettingDTOS;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(protectedDaysOffSettings,ProtectedDaysOffSettingDTO.class);
     }
 
     public Boolean createAutoProtectedDaysOffOfAllUnits(Long countryId){

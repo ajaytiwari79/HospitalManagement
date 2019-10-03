@@ -393,6 +393,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("locationActivityTab").as("activity.locationActivityTab")
                         .and("phaseSettingsActivityTab").as("activity.phaseSettingsActivityTab")
                         .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
+                        .and("timeType").arrayElementAt(0).as("timeTypeInfo")
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
@@ -424,6 +425,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("locationActivityTab").as("activity.locationActivityTab")
                         .and("phaseSettingsActivityTab").as("activity.phaseSettingsActivityTab")
                         .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
+                        .and("timeType").arrayElementAt(0).as("timeTypeInfo")
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
         return result.getMappedResults();
@@ -532,6 +534,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and("locationActivityTab").as("activity.locationActivityTab")
                         .and("phaseSettingsActivityTab").as("activity.phaseSettingsActivityTab")
                         .and("timeType").arrayElementAt(0).as("timeType").and("timeType.timeTypes").as("timeType")
+                        .and("timeType").arrayElementAt(0).as("timeTypeInfo")
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
         return result.getMappedResults();

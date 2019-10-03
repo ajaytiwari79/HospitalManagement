@@ -71,6 +71,19 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
     @Override
+    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(Set<Long> employmentIds, Date startDate, Date endDate, Set<BigInteger> activityIds) {
+        Criteria criteria;
+        if (Optional.ofNullable(endDate).isPresent()) {
+            criteria = Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).and("disabled").is(false)
+                    .and("startDate").lte(endDate).and("endDate").gte(startDate);
+        } else {
+            criteria = Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).and("disabled").is(false)
+                    .and("startDate").gte(startDate).orOperator(Criteria.where("endDate").gte(startDate));
+        }
+        return getShiftWithActivityByCriteria(criteria.and("activities.activityId").in(activityIds),false,ShiftWithActivityDTO.class);
+    }
+
+    @Override
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentId(Long employmentId, Date startDate, Date endDate,Boolean draftShift) {
         Criteria criteria;
         if (Optional.ofNullable(endDate).isPresent()) {
@@ -129,11 +142,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     }
 
 
-    @Override
-    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(List<Long> employmentIds, Date startDate, Date endDate) {
-        return getShiftWithActivityByCriteria(Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).and("disabled").is(false)
-                .and("startDate").lte(endDate).and("endDate").gte(startDate),false,ShiftWithActivityDTO.class);
-    }
+//    @Override
+//    public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(List<Long> employmentIds, Date startDate, Date endDate) {
+//        return getShiftWithActivityByCriteria(Criteria.where("deleted").is(false).and("employmentId").in(employmentIds).and("disabled").is(false)
+//                .and("startDate").lte(endDate).and("endDate").gte(startDate),false,ShiftWithActivityDTO.class);
+//    }
 
 
     @Override

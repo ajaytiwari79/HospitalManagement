@@ -249,6 +249,7 @@ public class ActivityConfigurationService extends MongoBaseService {
                 break;
             default:
                 plannedTimes = getNonWorkingPlannedTime(unitId, phaseId);
+
         }
         return plannedTimes;
     }
