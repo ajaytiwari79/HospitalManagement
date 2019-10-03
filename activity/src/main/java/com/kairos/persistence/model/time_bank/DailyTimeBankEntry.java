@@ -39,7 +39,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     //It is the sum of scheduledMinutesOfTimeBank + ctaBonusMinutesOfTimeBank
     private int plannedMinutesOfTimebank;
     private Map<LocalDate,Integer> publishedBalances;
-    private long protectedDaysOffHours;
+    private long protectedDaysOffMinutes;
     private DailyTimeBankEntry draftDailyTimeBankEntry;
 
 

@@ -1130,6 +1130,11 @@ public class TimeBankCalculationService {
             this.ctaTimeBankMinMap = new HashMap<>();
         }
 
+        public CalculatePlannedHoursAndScheduledHours(StaffAdditionalInfoDTO staffAdditionalInfoDTO, DateTimeInterval dateTimeInterval) {
+            this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
+            this.dateTimeInterval = dateTimeInterval;
+        }
+
         public CalculatePlannedHoursAndScheduledHours() {
         }
 
@@ -1171,6 +1176,12 @@ public class TimeBankCalculationService {
                         }
                     }
                 }
+                if(ruleTemplate.getCalculationFor().equals(UNUSED_DAYOFF_LEAVES)){
+                    int value = getContractualMinutesByDate(dateTimeInterval, getLocalDate(), staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
+                    value+=CompensationMeasurementType.MINUTES.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType())?ruleTemplate.getCompensationTable().getUnusedDaysOffvalue(): CompensationMeasurementType.PERCENT.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType()) ? value * ruleTemplate.getCompensationTable().getUnusedDaysOffvalue()/100:0;
+                    ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + value);
+                    totalDailyPlannedMinutes += value;
+                }
                 if (ruleTemplate.getCalculationFor().equals(FUNCTIONS) && ruleTemplateValid) {
                     int value = getFunctionalBonusCompensation(staffAdditionalInfoDTO.getEmployment(), ruleTemplate, dateTimeInterval);
                     ctaTimeBankMinMap.put(ruleTemplate.getId(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + value);
@@ -1179,6 +1190,7 @@ public class TimeBankCalculationService {
             }
             return this;
         }
+
 
         public ShiftActivityDTO getShiftActivityDTO(ShiftWithActivityDTO shift, ShiftActivityDTO shiftActivity) {
             ShiftActivityDTO shiftActivityDTO = shiftActivity;
