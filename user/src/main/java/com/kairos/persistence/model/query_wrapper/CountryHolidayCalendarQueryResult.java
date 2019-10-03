@@ -33,6 +33,12 @@ public class CountryHolidayCalendarQueryResult {
         //Default Constructor
     }
 
+    public CountryHolidayCalendarQueryResult(LocalDate holidayDate, DayType dayType, Long id) {
+        this.holidayDate = holidayDate;
+        this.dayType = dayType;
+        this.id = id;
+    }
+
     public LocalDate getHolidayDate() {
         return holidayDate;
     }

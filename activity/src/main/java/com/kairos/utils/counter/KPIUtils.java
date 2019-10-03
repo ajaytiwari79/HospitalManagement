@@ -52,7 +52,7 @@ public class KPIUtils {
 
         switch (interval) {
             case LAST:
-                localDate.minusDays(1);
+                localDate=localDate.minusDays(1);
                 for (int i = 0; i < value; i++) {
                     localDate = getLastDateTimeIntervalByDate(localDate,frequencyType, dateTimeIntervals);
                 }

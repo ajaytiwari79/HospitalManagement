@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -265,5 +266,11 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseUnitService.findAllExpertiseWithUnits());
     }
 
+
+    @ApiOperation(value = "create protected Days off Setting")
+    @GetMapping(value =  "/protected_days_setting")
+    public ResponseEntity<Map<String, Object>> findAllExpertiseAndLinkProtectedDaysOfSetting() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.linkProtectedDaysOffSetting(new ArrayList<>(),new ArrayList<>()));
+    }
 
 }

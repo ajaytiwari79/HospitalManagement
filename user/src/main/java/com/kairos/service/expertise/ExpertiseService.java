@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
@@ -50,6 +51,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -67,8 +69,6 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
-
-
 
 /**
  * Created by prabjot on 28/10/16.
@@ -845,6 +845,7 @@ public class ExpertiseService {
 //
 //        prepareExpertiseWhileCopy(targetExpertise, copyExpertiseDTO, sourceExpertise.get(), country);
 //        copyExpertiseDTO.getSector().setId(targetExpertise.getSector().getId());
+//          linkProtectedDaysOffSetting(new ArrayList<>(),Arrays.asList(targetExpertise));
 //        return copyExpertiseDTO;
 //    }
 
@@ -878,6 +879,7 @@ public class ExpertiseService {
 //            }
 //        }));
 //    }
+
 
     private void addSeniorityLevelsInExpertise(Expertise targetExpertise, CopyExpertiseDTO expertiseDTO, Expertise sourceExpertise) {
         Set<Long> payGradeIds = expertiseDTO.getSeniorityLevels().stream().map(SeniorityLevelDTO::getPayGradeId).collect(Collectors.toSet());
@@ -1017,6 +1019,7 @@ public class ExpertiseService {
         List<SeniorityLevel> seniorityLevels=ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class);
         Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),expertiseDTO.getFullTimeWeeklyMinutes(),expertiseDTO.getNumberOfWorkingDaysInWeek(),expertiseDTO.isPublished(),seniorityLevels);
         expertiseGraphRepository.save(expertise);
+        linkProtectedDaysOffSetting(new ArrayList<>(),Arrays.asList(expertise));
         return new ExpertiseResponseDTO();
     }
 
@@ -1146,6 +1149,24 @@ public class ExpertiseService {
                     seniorityLevelDTO.getFreeChoiceToPension(), false);
             expertise.addSeniorityLevel(seniorityLevel);
         });
+    }
+    public boolean linkProtectedDaysOffSetting(List<CountryHolidayCalendarQueryResult> countryHolidayCalendarQueryResults,List<Expertise> expertises){
+        if(ObjectUtils.isCollectionEmpty(expertises)) {
+            expertises = expertiseGraphRepository.getAllExpertiseByCountry(UserContext.getUserDetails().getCountryId());
+        }
+        if(ObjectUtils.isCollectionEmpty(countryHolidayCalendarQueryResults)) {
+            countryHolidayCalendarQueryResults = countryGraphRepository.findAllCalendarHoliday();
+        }
+        List<ProtectedDaysOffSetting> protectedDaysOffSettings=new ArrayList<>();
+        for (CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult : countryHolidayCalendarQueryResults) {
+            if(!countryHolidayCalendarQueryResult.getDayType().isAllowTimeSettings() && countryHolidayCalendarQueryResult.getDayType().isHolidayType())
+                protectedDaysOffSettings.add(new ProtectedDaysOffSetting(countryHolidayCalendarQueryResult.getId(),countryHolidayCalendarQueryResult.getHolidayDate(),true,countryHolidayCalendarQueryResult.getDayType().getId()));
+        }
+        for(Expertise expertise:expertises){
+            expertise.getProtectedDaysOffSettings().addAll(protectedDaysOffSettings);
+        }
+        expertiseGraphRepository.saveAll(expertises);
+        return true;
     }
 
 }

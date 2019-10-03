@@ -12,6 +12,7 @@ import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.expertise.OrganizationPersonalizeLocationRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
@@ -23,10 +24,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+
 
 /**
  * CreatedBy vipulpandey on 19/11/18
@@ -54,6 +59,9 @@ public class ExpertiseUnitService {
     private OrganizationPersonalizeLocationRelationShipGraphRepository organizationLocationRelationShipGraphRepository;
     @Inject
     private OrganizationBaseRepository organizationBaseRepository;
+    @Inject
+    private CountryGraphRepository countryGraphRepository;
+
 
 
     public List<ExpertiseQueryResult> findAllExpertise(Long unitId) {
@@ -107,4 +115,6 @@ public class ExpertiseUnitService {
         return expertiseGraphRepository.findAllExpertiseWithUnitIds();
     }
 
+
 }
+
