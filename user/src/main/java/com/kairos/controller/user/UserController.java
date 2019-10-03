@@ -5,6 +5,7 @@ import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
+import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.staff.UserSickService;
@@ -46,6 +47,8 @@ public class UserController {
     @Inject
     private AccessGroupService accessGroupService;
     @Inject private StaffRetrievalService staffRetrievalService;
+    @Inject private EmploymentService employmentService;
+
    /* @Inject
     TaskReportService taskReportService;*/
     /**
@@ -188,5 +191,12 @@ public class UserController {
     @ApiOperation("update google calender token of log")
     public ResponseEntity<Map<String, Object>> updateGoogleCalenderToken(@RequestBody GoogleCalenderTokenDTO googleCalenderTokenDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateGoogleCalenderToken(googleCalenderTokenDTO));
+    }
+
+
+    @ApiOperation(value = "get all staff main employments ")
+    @GetMapping(value = "/staffs/main_employments")
+    public ResponseEntity<Map<String, Object>> getStaffsMainEmployments()  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getMainEmploymentOfStaffs());
     }
 }
