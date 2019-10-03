@@ -336,8 +336,8 @@ public class CTARuleTemplateDTO {
         return this.getEmploymentTypes().contains(employmentId);
     }
 
-    public boolean isRuleTemplateValid(Long employmentId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
-        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
+    public boolean isRuleTemplateValid(Long employmentTypeId,BigInteger shiftPhaseId,BigInteger activityId,BigInteger timeTypeId,List<PlannedTime> plannedTimes){
+        return isPhaseValid(shiftPhaseId) && isEmployementTypeValid(employmentTypeId) && (isActivityAndTimeTypeAndPlannedTimeValid(activityId,timeTypeId,plannedTimes) || this.getCalculationFor().equals(FUNCTIONS));
     }
 
     @Override

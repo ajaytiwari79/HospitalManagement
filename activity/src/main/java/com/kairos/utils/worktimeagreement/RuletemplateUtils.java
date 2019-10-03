@@ -547,8 +547,6 @@ public class RuletemplateUtils {
                 currentDay.forEach(day -> {
                     if (!day.name().equals(EVERYDAY)) {
                         dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
-                    } else {
-                        dayOfWeeks.addAll(Arrays.asList(DayOfWeek.values()));
                     }
                 });
                 /*List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
