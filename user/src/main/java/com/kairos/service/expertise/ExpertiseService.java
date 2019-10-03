@@ -3,13 +3,16 @@ package com.kairos.service.expertise;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.custom_exception.ActionNotPermittedException;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.experties.*;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
@@ -28,16 +31,11 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
 import com.kairos.persistence.model.pay_table.PayGrade;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.StaffExpertiseRelationShip;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.expertise.CareDays;
-import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ExpertiseEmploymentTypeRelationship;
-import com.kairos.persistence.model.user.expertise.Response.ExpertisePlannedTimeQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
-import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.model.user.expertise.*;
+import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -57,6 +55,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,6 +198,7 @@ public class ExpertiseService {
             expertiseResponseDTO = objectMapper.convertValue(expertiseDTO, ExpertiseResponseDTO.class);
             expertiseResponseDTO.getSeniorityLevels().add(expertiseDTO.getSeniorityLevel());
         }
+        linkProtectedDaysOffSetting(new ArrayList<>(),Arrays.asList(expertise));
         return expertiseResponseDTO;
     }
 
@@ -803,6 +803,28 @@ public class ExpertiseService {
         return expertiseGraphRepository.getAllExpertiseWithTagsByCountry(countryId);
     }
 
+
+    public ProtectedDaysOffSettingDTO addOrUpdateProtectedDaysOffSetting(Long expertiseId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO){
+        Expertise expertise=expertiseGraphRepository.findById(expertiseId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
+        CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult =countryGraphRepository.findByCalendarHolidayId(protectedDaysOffSettingDTO.getHolidayId());
+        if(isNull(countryHolidayCalendarQueryResult)){
+            exceptionService.dataNotMatchedException(MESSAGE_DATANOTFOUND,DAY,DAY_TYPE,protectedDaysOffSettingDTO.getHolidayId());
+        }
+        protectedDaysOffSettingDTO.setDayTypeId(countryHolidayCalendarQueryResult.getDayType().getId());
+        protectedDaysOffSettingDTO.setPublicHolidayDate(countryHolidayCalendarQueryResult.getHolidayDate());
+        expertise.getProtectedDaysOffSettings().add(ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSettingDTO, ProtectedDaysOffSetting.class));
+        expertiseGraphRepository.save(expertise);
+        ProtectedDaysOffSetting protectedDaysOffSettings=expertise.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.getHolidayId().equals(protectedDaysOffSettingDTO.getHolidayId())).findAny().get();
+        protectedDaysOffSettingDTO.setId(protectedDaysOffSettings.getId());
+        return protectedDaysOffSettingDTO;
+    }
+
+    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSetting(Long expertiseId){
+        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getProtectedDaysOffSettings(),ProtectedDaysOffSettingDTO.class);
+    }
+
+
     public CopyExpertiseDTO copyExpertise(Long expertiseId, CopyExpertiseDTO copyExpertiseDTO, Long countryId) {
 
         Country country = countryGraphRepository.findOne(countryId);
@@ -825,6 +847,7 @@ public class ExpertiseService {
 
         prepareExpertiseWhileCopy(targetExpertise, copyExpertiseDTO, sourceExpertise.get(), country);
         copyExpertiseDTO.getSector().setId(targetExpertise.getSector().getId());
+        linkProtectedDaysOffSetting(new ArrayList<>(),Arrays.asList(targetExpertise));
         return copyExpertiseDTO;
     }
 
@@ -946,6 +969,25 @@ public class ExpertiseService {
         LOGGER.info("successfully job registered of add planning period");
     }
         return isCollectionNotEmpty(schedulerPanelDTOS);
+    }
+
+    public boolean linkProtectedDaysOffSetting(List<CountryHolidayCalendarQueryResult> countryHolidayCalendarQueryResults,List<Expertise> expertises){
+        if(ObjectUtils.isCollectionEmpty(expertises)) {
+            expertises = expertiseGraphRepository.getAllExpertiseByCountry(UserContext.getUserDetails().getCountryId());
+        }
+        if(ObjectUtils.isCollectionEmpty(countryHolidayCalendarQueryResults)) {
+            countryHolidayCalendarQueryResults = countryGraphRepository.findAllCalendarHoliday();
+        }
+        List<ProtectedDaysOffSetting> protectedDaysOffSettings=new ArrayList<>();
+        for (CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult : countryHolidayCalendarQueryResults) {
+            if(!countryHolidayCalendarQueryResult.getDayType().isAllowTimeSettings() && countryHolidayCalendarQueryResult.getDayType().isHolidayType())
+                protectedDaysOffSettings.add(new ProtectedDaysOffSetting(countryHolidayCalendarQueryResult.getId(),countryHolidayCalendarQueryResult.getHolidayDate(),true,countryHolidayCalendarQueryResult.getDayType().getId()));
+        }
+        for(Expertise expertise:expertises){
+            expertise.getProtectedDaysOffSettings().addAll(protectedDaysOffSettings);
+        }
+        expertiseGraphRepository.saveAll(expertises);
+        return true;
     }
 
 }

@@ -34,7 +34,6 @@ public class TodoRepositoryImpl implements CustomTodoRepository {
                 Aggregation.match(criteria),
              Aggregation.lookup("shifts","entityId","_id","shifts"),
              Aggregation.project("id","status","staffId").and("shifts").arrayElementAt(0).as("shift"),
-                Aggregation.match(new Criteria().and("shift").exists(true)),
                 Aggregation.project("id","status","staffId").and("shift.startDate").as("shiftDateTime")
         );
         AggregationResults<TodoDTO> result = mongoTemplate.aggregate(aggregation, Todo.class, TodoDTO.class);

@@ -713,7 +713,7 @@ public class StaffingLevelService extends MongoBaseService {
                 if(isNotNull(activity) && (FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))){
                     updateAbsenceStaffingLevelAvailableStaffCount(staffingLevel);
                 }else {
-                    int durationMinutes = staffingLevel.getStaffingLevelSetting().getDetailLevelMinutes();
+                    int durationMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
                     updateStaffingLevelInterval(shift.getBreakActivities(),durationMinutes,staffingLevel, shiftActivity, childAndParentActivityIdMap);
                 }
             }

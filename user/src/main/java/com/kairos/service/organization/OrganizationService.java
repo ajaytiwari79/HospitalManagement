@@ -315,9 +315,12 @@ public class OrganizationService {
 
     }
 
-    public Map<String, Object> getParentOrganization(Long countryId) {
+    public Map<String, Object> getParentOrganization(Long countryIdOrOrgId,boolean viaCountry) {
         Map<String, Object> data = new HashMap<>(2);
-        List<OrganizationBasicResponse> organizationQueryResult = unitGraphRepository.getAllParentOrganizationOfCountry(countryId);
+
+        Long countryId=viaCountry?countryIdOrOrgId:countryGraphRepository.getCountryIdByUnitId(countryIdOrOrgId);
+        List<OrganizationBasicResponse> organizationQueryResult =viaCountry? unitGraphRepository.getAllParentOrganizationOfCountry(countryId):
+                unitGraphRepository.getAllOrganizationOfOrganization(countryIdOrOrgId);
         OrganizationCreationData organizationCreationData = unitGraphRepository.getOrganizationCreationData(countryId);
         List<Map<String, Object>> zipCodes = FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId));
         if (Optional.ofNullable(organizationCreationData).isPresent()) {
@@ -327,6 +330,7 @@ public class OrganizationService {
         organizationCreationData.setCompanyUnitTypes(CompanyUnitType.getListOfCompanyUnitType());
         organizationCreationData.setAccessGroups(accessGroupService.getCountryAccessGroupsForOrganizationCreation(countryId));
         organizationCreationData.setHubList(unitGraphRepository.getAllHubByCountryId(countryId));
+        organizationCreationData.setCountryId(countryId);
         data.put("globalData", organizationCreationData);
         data.put("organization", organizationQueryResult);
         return data;

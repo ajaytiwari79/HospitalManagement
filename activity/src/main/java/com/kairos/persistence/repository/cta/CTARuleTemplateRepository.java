@@ -28,4 +28,7 @@ public interface CTARuleTemplateRepository extends MongoBaseRepository<CTARuleTe
 
     @Query("{'_id':{'$in':?0},'deleted':false}")
     List<CTARuleTemplate> findAllByIdAndDeletedFalse(List<BigInteger> ids);
+
+    @Query("{name:?0,deleted:false}")
+    List<CTARuleTemplate> findAllByNameAndDeletedFalse(String name);
 }

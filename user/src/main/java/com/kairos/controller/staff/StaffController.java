@@ -528,6 +528,14 @@ public class StaffController {
     }
 
 
+    @RequestMapping(value = "/{staffId}/get_staff_main_employment", method = RequestMethod.GET)
+    @ApiOperation("verify staff has unit employment in unit or not and get current employment ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getMainEmploymentOfStaff(@PathVariable long unitId, @PathVariable long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getMainEmploymentOfStaff(staffId, unitId));
+    }
+
+
     @RequestMapping(value = "/current_user/{userId}", method = RequestMethod.GET)
     @ApiOperation("fetch staff from given userId ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

@@ -32,4 +32,5 @@ public interface CountryHolidayCalenderGraphRepository extends Neo4jBaseReposito
     CountryHolidayCalendarQueryResult findByCountryId(Long countryId);
 
 
+
 }
