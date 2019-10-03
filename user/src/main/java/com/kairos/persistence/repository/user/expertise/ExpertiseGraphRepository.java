@@ -77,7 +77,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "seniorDays,childCareDays ORDER BY expertise.name")
     List<ExpertiseQueryResult> getAllExpertise(long countryId, boolean[] published);
 
-    @Query("MATCH(exp:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(exp) IN {0} " +
+    @Query("MATCH(expertise:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) IN {0} " +
             "MATCH(exl)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
             "MATCH(exl)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
             "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
@@ -89,8 +89,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "   freeChoicePercentage:seniorityLevel.freeChoicePercentage,freeChoiceToPension:seniorityLevel.freeChoiceToPension, " +
             "   to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels "+
             "RETURN id(exl) as id ,id(expertise) as expertiseId, exl.startDate as startDate , " +
-            "exl.endDate as endDate ,exl.breakPaymentSetting as breakPaymentSetting " +
-            "services as organizationService,level as organizationLevel,payTables[0] as payTable,union as union,seniorityLevels,sector")
+            "exl.endDate as endDate ,exl.breakPaymentSetting as breakPaymentSetting, " +
+            "services as organizationServices,level as organizationLevel,payTables[0] as payTable,union as union,seniorityLevels,sector")
     List<ExpertiseLineQueryResult> findAllExpertiseLines(List<Long> expertiseIds);
 
     @Query("MATCH (expertise:Expertise{deleted:false}) WHERE id(expertise) IN {0} \n" +

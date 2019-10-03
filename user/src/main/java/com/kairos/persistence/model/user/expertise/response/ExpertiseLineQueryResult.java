@@ -24,7 +24,7 @@ public class ExpertiseLineQueryResult {
     private Level organizationLevel;
     private List<OrganizationService> organizationServices;
     private Organization union;
-    private Map<String, Object> seniorityLevel;
+    private List<Map<String, Object>> seniorityLevels;
     private PayTable payTable;
     private Long expertiseId;
 }

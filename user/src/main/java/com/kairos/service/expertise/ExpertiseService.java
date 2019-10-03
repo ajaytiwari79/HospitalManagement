@@ -329,7 +329,7 @@ public class ExpertiseService {
         List<Long> allExpertiseIds=expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
         Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
-        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLineQueryResults(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
         return expertiseQueryResults;
     }
 
@@ -685,7 +685,7 @@ public class ExpertiseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
         }
         List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(Arrays.asList(expertiseId));
-        expertise.setExpertiseLineQueryResults(expertiseLineQueryResults);
+        expertise.setExpertiseLines(expertiseLineQueryResults);
         return expertise;
     }
 
@@ -703,7 +703,7 @@ public class ExpertiseService {
         List<Long> allExpertiseIds=expertiseQueryResults.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
         List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
         Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
-        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLineQueryResults(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+        expertiseQueryResults.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
         return expertiseQueryResults;
     }
 

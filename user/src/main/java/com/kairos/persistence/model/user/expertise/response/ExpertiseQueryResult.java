@@ -48,5 +48,5 @@ public class ExpertiseQueryResult {
     private Map<String,Object> unionRepresentative;// in case of expertise at unit level only
     private Location unionLocation;// in case of expertise at unit level only
     private Set<Long> supportedUnitIds;
-    private List<ExpertiseLineQueryResult> expertiseLineQueryResults;
+    private List<ExpertiseLineQueryResult> expertiseLines;
 }

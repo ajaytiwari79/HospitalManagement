@@ -206,7 +206,7 @@ public class StaffRetrievalService {
             List<Long> allExpertiseIds=expertises.stream().map(ExpertiseQueryResult::getId).collect(Collectors.toList());
             List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(allExpertiseIds);
             Map<Long,List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap=expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
-            expertises.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLineQueryResults(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
+            expertises.forEach(expertiseQueryResult -> expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId())));
             return expertises;
         }
         return expertises;
