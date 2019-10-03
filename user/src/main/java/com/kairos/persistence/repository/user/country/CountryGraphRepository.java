@@ -160,4 +160,10 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "RETURN ch.holidayDate as holidayDate, dt as dayType ")
     CountryHolidayCalendarQueryResult findByCalendarHolidayId(Long calendarHolidayId);
 
+
+
+    @Query("MATCH (ch:CountryHolidayCalender{isEnabled:true})-[:"+DAY_TYPE+"]->(dt:DayType{isEnabled:true}) " +
+            "RETURN ch.holidayDate as holidayDate, dt as dayType ,id(ch) as id")
+    List<CountryHolidayCalendarQueryResult> findAllCalendarHoliday();
+
 }
