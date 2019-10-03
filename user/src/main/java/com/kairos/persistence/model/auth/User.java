@@ -173,6 +173,17 @@ public class User extends UserBaseEntity {
         if(century >= 0 && century <= 3) {
             century = 1900;
         }
+        century = getCentury(year, century);
+        year = century + year;
+        LocalDate today = LocalDate.now();
+        LocalDate birthday = LocalDate.of(year, month, day);
+        // Calculating age in yeas from DOB
+        Period period = Period.between(birthday, today);
+        age = period.getYears();
+        return this.age = age;
+    }
+
+    private Integer getCentury(Integer year, Integer century) {
         if(century == 4) {
             if(year <= 36) {
                 century = 2000;
@@ -195,14 +206,7 @@ public class User extends UserBaseEntity {
                 century = 1900;
             }
         }
-        year = century + year;
-        LocalDate today = LocalDate.now();
-        LocalDate birthday = LocalDate.of(year, month, day);
-        // Calculating age in yeas from DOB
-        Period period = Period.between(birthday, today);
-        age = period.getYears();
-        this.age = age;
-        return this.age;
+        return century;
     }
 
     @Override

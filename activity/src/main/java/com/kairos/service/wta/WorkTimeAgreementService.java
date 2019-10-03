@@ -1080,6 +1080,8 @@ public class WorkTimeAgreementService extends MongoBaseService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, startDate, endDate, activityIds);
         Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap = shiftWithActivityDTOS.stream().collect(groupingBy(ShiftWithActivityDTO::getEmploymentId));
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getParentCTAByUpIds(new ArrayList<>(employmentIds));
+        Map<Long,CTAResponseDTO> employmentIdAndCtaResponseDTOMap=ctaResponseDTOS.stream().collect(Collectors.toMap(k->k.getEmploymentId(),v->v));
         for (Long unitId : unitIds) {
             try {
                 ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = unitIdAndProtectedDaysOffSettingDTOMap.get(unitId);
