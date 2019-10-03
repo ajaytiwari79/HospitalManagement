@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.shift.BreakPaymentSetting;
 
+import java.util.List;
+
 /**
  * Created by vipul on 6/2/18.
  */
@@ -13,6 +15,7 @@ public class Expertise {
     private Long id;
     private String name;
     private BreakPaymentSetting breakPaymentSetting;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
 
     public Expertise() {
         //Not in use
@@ -40,5 +43,13 @@ public class Expertise {
 
     public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
         this.breakPaymentSetting = breakPaymentSetting;
+    }
+
+    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
+        return protectedDaysOffSettings;
+    }
+
+    public void setProtectedDaysOffSettings(List<ProtectedDaysOffSetting> protectedDaysOffSettings) {
+        this.protectedDaysOffSettings = protectedDaysOffSettings;
     }
 }

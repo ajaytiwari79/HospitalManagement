@@ -812,6 +812,8 @@ public class ExpertiseService {
         protectedDaysOffSettingDTO.setPublicHolidayDate(countryHolidayCalendarQueryResult.getHolidayDate());
         expertise.getProtectedDaysOffSettings().add(ObjectMapperUtils.copyPropertiesByMapper(protectedDaysOffSettingDTO, ProtectedDaysOffSetting.class));
         expertiseGraphRepository.save(expertise);
+        ProtectedDaysOffSetting protectedDaysOffSettings=expertise.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.getHolidayId().equals(protectedDaysOffSettingDTO.getHolidayId())).findAny().get();
+        protectedDaysOffSettingDTO.setId(protectedDaysOffSettings.getId());
         return protectedDaysOffSettingDTO;
     }
 

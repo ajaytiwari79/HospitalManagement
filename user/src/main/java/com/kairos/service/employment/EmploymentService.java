@@ -34,8 +34,9 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentLines
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.response.ExpertisePlannedTimeQueryResult;
+import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
+import com.kairos.persistence.model.user.expertise.response.ExpertisePlannedTimeQueryResult;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -809,6 +810,8 @@ public class EmploymentService {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentById(employmentId);
         com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails = null;
         if (employment != null) {
+            List<ProtectedDaysOffSetting>  protectedDaysOffSettings=expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
+            employment.getExpertise().setProtectedDaysOffSettings(protectedDaysOffSettings);
             employmentDetails = convertEmploymentObject(employment);
             List<EmploymentLinesQueryResult> employmentLinesQueryResults = employmentGraphRepository.findFunctionalHourlyCost(Arrays.asList(employmentId));
             Map<Long, BigDecimal> hourlyCostMap = employmentLinesQueryResults.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
@@ -992,6 +995,10 @@ public class EmploymentService {
     public Long getUnitByEmploymentId(Long employmentId) {
         Employment employment = employmentGraphRepository.findOne(employmentId);
         return isNotNull(employment) ? isNotNull(employment.getUnit()) ? employment.getUnit().getId() : null : null;
+    }
+
+    public List<EmploymentQueryResult> getMainEmploymentOfStaffs(){
+        return employmentGraphRepository.getMainEmploymentOfStaffs(EmploymentSubType.MAIN);
     }
 }
 
