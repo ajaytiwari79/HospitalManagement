@@ -3,6 +3,7 @@ package com.kairos.service.unit_settings;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.*;
 import com.kairos.persistence.model.phase.Phase;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_AGESETTING_NOTFOUND;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_UNIT_SETTING_NOTFOUND;
+import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 
 @Service
 @Transactional
@@ -82,13 +84,10 @@ public class UnitSettingService extends MongoBaseService {
     }
 
     public UnitSettingDTO updateOpenShiftPhaseSettings(Long unitId, BigInteger unitSettingsId, UnitSettingDTO unitSettingsDTO) {
-        Optional<UnitSetting> unitSetting = unitSettingRepository.findById(unitSettingsId);
-        if (!unitSetting.isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_SETTING_NOTFOUND, unitSettingsId);
-        }
-        unitSetting.get().setUnitId(unitId);
-        unitSetting.get().setOpenShiftPhaseSetting(unitSettingsDTO.getOpenShiftPhaseSetting());
-        save(unitSetting.get());
+        UnitSetting unitSetting = unitSettingRepository.findById(unitSettingsId).orElseThrow(()->new DataNotFoundByIdException(convertMessage(MESSAGE_UNIT_SETTING_NOTFOUND, unitSettingsId)));
+        unitSetting.setUnitId(unitId);
+        unitSetting.setOpenShiftPhaseSetting(unitSettingsDTO.getOpenShiftPhaseSetting());
+        save(unitSetting);
         return unitSettingsDTO;
     }
 
