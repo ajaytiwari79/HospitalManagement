@@ -354,9 +354,7 @@ public class ActivityService {
     }
 
     public BalanceSettingsActivityTab updateBalanceSettingTab(GeneralActivityTabDTO generalActivityTabDTO, Activity activity) {
-        if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
-            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
-        }
+
         TimeType timeType = timeTypeMongoRepository.findOneById(generalActivityTabDTO.getTimeTypeId());
         if (!Optional.ofNullable(timeType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND);
@@ -378,6 +376,9 @@ public class ActivityService {
             }
         }
         if(isNotNull(generalActivityTabDTO.getTimeTypeId()) && !generalActivityTabDTO.getTimeTypeId().equals(activity.getBalanceSettingsActivityTab().getTimeTypeId())){
+            if (activity.getState().equals(ActivityStateEnum.PUBLISHED)) {
+                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMETYPE_PUBLISHED, activity.getId());
+            }
             activity.setPhaseSettingsActivityTab(timeType.getPhaseSettingsActivityTab());
             activity.setRulesActivityTab(timeType.getRulesActivityTab());
             activity.setTimeCalculationActivityTab(timeType.getTimeCalculationActivityTab());
