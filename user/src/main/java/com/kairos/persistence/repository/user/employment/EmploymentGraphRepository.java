@@ -35,7 +35,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "with expertise,employment,appliedFunctions,\n" +
             "CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,employmentType:{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)},fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines\n" +
-            "RETURN  DISTINCT expertise as expertise,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,employment.published as published, appliedFunctions as appliedFunctions,collect(employmentLines[0]) as employmentLines")
+            "RETURN  DISTINCT expertise as expertise,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,employment.employmentSubType as employmentSubType,employment.published as published, appliedFunctions as appliedFunctions,collect(employmentLines[0]) as employmentLines")
     EmploymentQueryResult getEmploymentById(Long employmentId);
 
     @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO+"]-(user:User) WHERE id(staff) IN {2}\n" +
@@ -307,5 +307,15 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN id(staff) as staffId,COLLECT({id:id(employment),expId:id(e),unitId:id(organization)}) as employmentDetails")
     List<Map> findStaffsWithEmploymentIds();
 
-
+    @Query("MATCH(staff:Staff{deleted:false})-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})\n" +
+            "MATCH (employment)-[:HAS_EXPERTISE_IN]-(expertise:Expertise{deleted:false})-[:HAS_PROTECTED_DAYS_OFF_SETTINGS]-(protectedDaysOffSetting:ProtectedDaysOffSetting{protectedDaysOff:true}) \n" +
+            "WHERE employment.employmentSubType={0}\n" +
+            "MATCH (employment)-[:IN_UNIT]-(unit:Unit) \n" +
+            "MATCH(employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine) WHERE  NOT EXISTS(employmentLine.endDate) OR date(employmentLine.endDate) >= date()" +
+            "MATCH (employmentLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)\n" +
+            "WITH CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
+            "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,employmentType:employmentType,startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines, expertise,staff,unit,employment,employmentLine,employmentType,protectedDaysOffSetting\n" +
+            "RETURN id(employment) as id,id(staff) as staffId,id(unit) as unitId,expertise ,employment.endDate as endDate,employment.employmentSubType as employmentSubType,employment.published as published,employment.startDate as startDate ,\n" +
+            "employmentLines,collect(protectedDaysOffSetting) as protectedDaysOffSettings")
+    List<EmploymentQueryResult> getMainEmploymentOfStaffs(EmploymentSubType employmentSubType);
 }
