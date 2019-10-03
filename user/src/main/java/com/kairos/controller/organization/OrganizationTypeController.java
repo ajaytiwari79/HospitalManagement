@@ -101,10 +101,10 @@ public class OrganizationTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrgTypesServicesAndSubServicesListByUnitId(unitId));
     }
 
-    @PostMapping(value = COUNTRY_URL + "/organization_type/organizations")
-    @ApiOperation("Get organizations by organization type ids")
-    public ResponseEntity<Map<String, Object>>  getOrganizationIdsByOrganizationSubTypeIds(@RequestBody List<Long> organizationSubTypeId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationIdsByOrganizationSubTypeIds(organizationSubTypeId));
+    @PostMapping(value = COUNTRY_URL + "/organization_type_service/organizations")
+    @ApiOperation("Get organizations by organization type ids and service ids")
+    public ResponseEntity<Map<String, Object>>  getOrganizationIdsByOrgSubTypeIdsAndSubServiceIds(@RequestBody Map<String,List<Long>> organizationSubTypeAndSubServiceIdMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationIdsByOrgSubTypeIdsAndSubServiceIds(organizationSubTypeAndSubServiceIdMap.get("organizationSubTypeIds"),organizationSubTypeAndSubServiceIdMap.get("organizationSubServicesIds")));
     }
 
 }

@@ -85,8 +85,9 @@ public class MasterAssetService {
     }
 
     private void assignAssetToUnits(Long countryId, MasterAssetDTO masterAssetDto){
-        List<Long> organizationSubTypeId = masterAssetDto.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList());
-        List<Long> unitIds = gdprToUserIntegrationService.getUnitIdsByOrgSubTypeId(countryId, organizationSubTypeId);
+        List<Long> organizationSubTypeIds = masterAssetDto.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList());
+        List<Long> organizationSubServicesIds = masterAssetDto.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList());
+        List<Long> unitIds = gdprToUserIntegrationService.getUnitIdsByOrgSubTypeId(countryId, organizationSubTypeIds, organizationSubServicesIds);
         if(isCollectionNotEmpty(unitIds)) {
             unitIds.forEach(unitId -> assetService.saveAsset(unitId, ObjectMapperUtils.copyPropertiesByMapper(masterAssetDto, AssetDTO.class),true));
         }
