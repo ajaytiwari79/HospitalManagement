@@ -1,8 +1,12 @@
 package com.kairos.dto.activity.staffing_level;
 
-import org.apache.commons.lang3.builder.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 public class StaffingLevelInterval {
     private int sequence;
     private int minNoOfStaff;

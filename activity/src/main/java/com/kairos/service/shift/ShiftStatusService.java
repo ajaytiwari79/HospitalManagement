@@ -5,12 +5,13 @@ import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
-import com.kairos.dto.activity.activity.activity_tabs.*;
+import com.kairos.dto.activity.activity.activity_tabs.ActivityShiftStatusSettings;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
+import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
@@ -37,16 +38,12 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.MAIL_SUBJECT;
@@ -89,9 +86,7 @@ public class ShiftStatusService {
         if(CommonConstants.FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())){
             List<Shift> shifts = shiftService.getFullWeekShiftsByDate(currentShift.getStartDate(),currentShift.getEmploymentId(), activity);
             shiftPublishDTO.getShifts().clear();
-            shifts.forEach(shift -> {
-                shiftPublishDTO.getShifts().add(new ShiftActivitiesIdDTO(shift.getId(),shift.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
-            });
+            shifts.forEach(shift -> shiftPublishDTO.getShifts().add(new ShiftActivitiesIdDTO(shift.getId(),shift.getActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList()))));
         }
         UserAccessRoleDTO userAccessRoleDTO = userIntegrationService.getAccessOfCurrentLoggedInStaff();
         Object[] objects = getActivitiesAndShiftIds(shiftPublishDTO.getShifts());
@@ -155,13 +150,21 @@ public class ShiftStatusService {
         boolean validAccessGroup = shiftValidatorService.validateAccessGroup(activityShiftStatusSettings, staffAccessGroupDTO);
         ShiftActivityResponseDTO shiftActivityResponseDTO = new ShiftActivityResponseDTO(shift.getId());
         boolean validateShiftActivityStatus = validateShiftActivityStatus(shiftPublishDTO.getStatus(), shiftActivity, activityIdAndActivityMap.get(shiftActivity.getActivityId()));
-        if (validAccessGroup && validateShiftActivityStatus) {
+        boolean draftShift=false;
+        if(FIX.equals(shiftPublishDTO.getStatus())){
+            draftShift=shift.isDraft();
+            shift.setDraftShift(null);
+        }
+        if (validAccessGroup && validateShiftActivityStatus & !draftShift) {
             removeOppositeStatus(shift, shiftActivity, shiftPublishDTO.getStatus());
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, shiftActivity.getStatus()));
         } else if (validAccessGroup && !validateShiftActivityStatus) {
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID), false));
         } else {
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(ACCESS_GROUP_NOT_MATCHED), false));
+        }
+        if(draftShift){
+            shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(STATUS_NOT_ALLOWED), false));
         }
         return shiftActivityResponseDTO;
     }

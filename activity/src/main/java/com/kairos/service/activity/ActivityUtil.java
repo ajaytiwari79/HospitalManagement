@@ -15,7 +15,6 @@ import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
@@ -27,7 +26,6 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_TIMETYPE_NOTFOUND;
 import static com.kairos.constants.AppConstants.*;
 
 public class ActivityUtil {

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_UNIT_URL;
@@ -37,7 +38,7 @@ class AssetController {
     @PostMapping("/asset")
     public ResponseEntity<Object> createAssetWithBasicDetail(@PathVariable Long unitId, @Valid @RequestBody AssetDTO asset) {
         asset.setSuggested(false);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAsset(unitId, asset));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.saveAsset(unitId, asset,false));
 
     }
 
@@ -107,5 +108,10 @@ class AssetController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.getAssetMetaData(unitId));
     }
 
+    @ApiOperation(value = "update asset basic detail")
+    @PutMapping("/asset/{assetId}")
+    public ResponseEntity<Object> updateAssetData(@PathVariable Long unitId, @PathVariable Long assetId, @Valid @RequestBody AssetDTO asset) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, assetService.updateAssetData(unitId, assetId, asset));
+    }
 
 }

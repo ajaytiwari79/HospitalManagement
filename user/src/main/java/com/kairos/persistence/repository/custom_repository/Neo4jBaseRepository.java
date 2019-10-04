@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @NoRepositoryBean
-public interface Neo4jBaseRepository<T, ID extends Serializable> extends Neo4jRepository<T, ID> {
+public interface Neo4jBaseRepository<T , ID extends Serializable> extends Neo4jRepository<T, ID> {
 	 T findOne(ID id);
 	 T findOne(ID id,int depth);
 	 List<T> findAllById(List<ID> ids);

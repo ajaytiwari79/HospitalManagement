@@ -4,14 +4,16 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
-import org.apache.poi.ss.formula.functions.Count;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by vipul on 30/8/17.
@@ -75,8 +77,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     List<Shift> findAllByDeletedFalse();
 
-    @Query("{deleted:false,employmentId:?0,disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
-    List<Shift> findAllOverlappedShiftsAndEmploymentId(Long employmentId, Date startDate, Date endDate);
+    @Query("{deleted:false,employmentId:{$in:?0},disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
+    List<Shift> findAllOverlappedShiftsAndEmploymentId(Collection<Long> employmentIds, Date startDate, Date endDate);
 
     @Query(value = "{disabled:false,deleted:false,planningPeriodId:{$exists:false},shiftType:?0}")
     List<Shift> findAllAbsenceShifts(String shiftType);

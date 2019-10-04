@@ -1,6 +1,8 @@
 package com.kairos.shiftplanning.listeners;
 
-import com.kairos.shiftplanning.domain.shift.*;
+import com.kairos.shiftplanning.domain.shift.Shift;
+import com.kairos.shiftplanning.domain.shift.ShiftBreak;
+import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.apache.commons.collections4.CollectionUtils;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;

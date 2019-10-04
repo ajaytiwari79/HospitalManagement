@@ -28,7 +28,7 @@ public class GdprIntegrationService {
     public boolean createDefaultDataForOrganization(Long countryId, Long unitId) {
         OrganizationTypeSubTypeAndServicesQueryResult organizationTypeSubType = organizationTypeGraphRepository.getOrganizationTypeSubTypesServiceAndSubServices(unitId);
         organizationTypeSubType.setCountryId(countryId);
-        return genericRestClient.publish(organizationTypeSubType, unitId, true, IntegrationOperation.CREATE, "/inherit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        return genericRestClient.publishRequest(organizationTypeSubType, unitId, true, IntegrationOperation.CREATE, "/inherit", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 

@@ -7,7 +7,9 @@ package com.kairos.persistence.model.counter;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;

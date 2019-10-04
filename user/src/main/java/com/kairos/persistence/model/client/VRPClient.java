@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.client;
 
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import org.neo4j.ogm.annotation.Relationship;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.BELONGS_TO;
@@ -27,7 +27,7 @@ public class VRPClient extends User {
 
 
     @Relationship(type = BELONGS_TO)
-    private Organization organization;
+    private Unit unit;
 
     @Relationship(type = HAS_PREFERED_TIME_WINDOW)
     private PreferedTimeWindow preferedTimeWindow;
@@ -42,12 +42,12 @@ public class VRPClient extends User {
     }
 
 
-    public Organization getOrganization() {
-        return organization;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setOrganization(Organization organization) {
-        this.organization = organization;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public Long getInstallationNumber() {

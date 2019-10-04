@@ -9,7 +9,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 import static com.kairos.constants.CommonMessageConstants.PLANNED_TIME_CANNOT_EMPTY;
 

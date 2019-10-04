@@ -6,6 +6,7 @@ package com.kairos.service.counter;
  */
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.counter.CounterServiceMapping;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
@@ -23,6 +24,7 @@ import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
+import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
@@ -31,15 +33,13 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.activity.TimeType;
-import com.kairos.persistence.model.counter.ApplicableFilter;
-import com.kairos.persistence.model.counter.ApplicableKPI;
-import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.model.counter.TabKPIConf;
+import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
@@ -94,6 +94,8 @@ public class CounterDataService extends MongoBaseService {
     private TimeTypeService timeTypeService;
     @Inject
     private CounterDistService counterDistService;
+    @Inject
+    private PlannedTimeTypeService plannedTimeTypeService;
 
     //FIXME: DO NOT REMOVE will be uncommented once representation model confirmed.
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId) {
@@ -232,6 +234,9 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(FilterType.DAYS_OF_WEEK)) {
             getDayOfWeekDefaultData(criteriaList);
         }
+        if (kpi.getFilterTypes().contains(FilterType.PLANNED_TIME_TYPE)) {
+            getPlannedTimeDefaultData(criteriaList);
+        }
         if (kpi.getFilterTypes().contains(FilterType.TIME_TYPE)) {
             getTimeTypesDefaultData(criteriaList, defaultKpiDataDTO);
         }
@@ -273,6 +278,13 @@ public class CounterDataService extends MongoBaseService {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         dayOfWeeks.forEach(dayOfWeek -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(dayOfWeek.toString(), dayOfWeek.toString())));
         criteriaList.add(new FilterCriteria(FilterType.DAYS_OF_WEEK.value, FilterType.DAYS_OF_WEEK, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getPlannedTimeDefaultData(List<FilterCriteria> criteriaList) {
+        List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        plannedTimes.forEach(presenceTypeDTO ->  kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(presenceTypeDTO.getId().toString(), presenceTypeDTO.getName())));
+        criteriaList.add(new FilterCriteria(FilterType.PLANNED_TIME_TYPE.value, FilterType.PLANNED_TIME_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getActivityStatusDefaultData(List<FilterCriteria> criteriaList) {
@@ -384,7 +396,7 @@ public class CounterDataService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTER_KPI_NOTFOUND);
         }
         KPI kpi = counterRepository.getKPIByid(kpiId);
-        if (!kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula()) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
+        if ((isNotNull(kpi.getCalculationFormula()) && !kpi.getCalculationFormula().equals(counterDTO.getCalculationFormula())) && !accessGroupPermissionCounterDTO.isCountryAdmin()) {
             exceptionService.actionNotPermittedException(MESSAGE_KPI_PERMISSION);
         }
         if (Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
@@ -409,10 +421,25 @@ public class CounterDataService extends MongoBaseService {
         }
         applicableKPIS.addAll(applicableKPIs);
         save(applicableKPIS);
+        linkKpiToUncategorized(refId, level, copyKpi);
         TabKPIDTO tabKPIDTO = getTabKpiData(copyKpi, counterDTO, accessGroupPermissionCounterDTO);
         tabKPIDTO.setId((isNotNull(tabKPIConf)) ? tabKPIConf.getId() : null);
         return tabKPIDTO;
     }
+
+    private void linkKpiToUncategorized(Long refId, ConfLevel level, KPI copyKpi) {
+        KPICategory kpiCategory = counterRepository.getKPICategoryByName(AppConstants.UNCATEGORIZED, level, refId);
+        if(isNotNull(kpiCategory)) {
+            CategoryKPIConf categoryKPIConf = null;
+            if (ConfLevel.UNIT.equals(level)) {
+                categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), null, refId, level);
+            } else if (ConfLevel.COUNTRY.equals(level)) {
+                categoryKPIConf = new CategoryKPIConf(copyKpi.getId(), kpiCategory.getId(), refId, null, level);
+            }
+            if (isNotNull(categoryKPIConf)) save(categoryKPIConf);
+        }
+    }
+
 
     public TabKPIDTO getKpiPreviewWithFilter(BigInteger kpiId, Long refId, FilterCriteriaDTO filterCriteria, ConfLevel level ) {
         AccessGroupPermissionCounterDTO  accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());

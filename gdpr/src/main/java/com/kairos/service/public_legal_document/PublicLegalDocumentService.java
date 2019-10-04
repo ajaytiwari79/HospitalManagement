@@ -1,9 +1,8 @@
 package com.kairos.service.public_legal_document;
 
 import com.kairos.commons.utils.DateUtils;
-
-import com.kairos.constants.GdprMessagesConstants;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.GdprMessagesConstants;
 import com.kairos.persistence.model.public_legal_document.PublicLegalDocument;
 import com.kairos.persistence.repository.public_legal_document.PublicLegalDocumentRepository;
 import com.kairos.response.dto.public_legal_document.PublicLegalDocumentDTO;
@@ -14,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.*;
 
 import static com.kairos.constants.AppConstant.PUBLIC_LEGAL_Document_LOGO_PATH;

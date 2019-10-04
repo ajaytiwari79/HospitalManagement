@@ -10,7 +10,6 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -22,19 +21,14 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
 
     List<EmploymentType> findAll();
 
-
-
-    @Query("Match (o:Organization),(et:EmploymentType) where id(o) = {0} AND id(et) = {1}\n" +
+    @Query("Match (o:Unit),(et:EmploymentType) where id(o) = {0} AND id(et) = {1}\n" +
             "MERGE (o)-[r:" + EMPLOYMENT_TYPE_SETTINGS + "]->(et)\n" +
             "ON CREATE SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.creationDate = {6},r.lastModificationDate = {7}\n" +
             "ON MATCH SET r.allowedForContactPerson = {2}, r.allowedForShiftPlan = {3}, r.allowedForFlexPool = {4}, r.paymentFrequency = {5}, r.lastModificationDate = {7} return true")
-    Boolean setEmploymentTypeSettingsForOrganization(Long organizationId, Long employmentTypeId,
-                                                     Boolean allowedForContactPerson,
-                                                     boolean allowedForShiftPlan,
-                                                     boolean allowedForFlexPool, PaidOutFrequencyEnum paymentFrequency, long creationDate, long lastModificationDate);
+    Boolean setEmploymentTypeSettingsForOrganization(Long organizationId, Long employmentTypeId, Boolean allowedForContactPerson, boolean allowedForShiftPlan, boolean allowedForFlexPool, PaidOutFrequencyEnum paymentFrequency, long creationDate, long lastModificationDate);
 
     @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND et.deleted={2}  with et\n" +
-            "MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
+            "MATCH (o:Unit)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
             "o,et,r \n" +
             "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories, \n" +
             "CASE WHEN r IS null THEN et.paymentFrequency ELSE r.paymentFrequency END as paymentFrequency, \n" +
@@ -44,7 +38,7 @@ public interface EmploymentTypeGraphRepository extends Neo4jBaseRepository<Emplo
     List<EmploymentTypeDTO> getCustomizedEmploymentTypeSettingsForOrganization(long countryId, long organizationId, boolean isDeleted);
 
     @Query("MATCH  (c:Country)-[r1:HAS_EMPLOYMENT_TYPE]-> (et:EmploymentType) WHERE  id(c)={0} AND  NOT (ID(et) IN {3}) AND et.deleted={2}  with et\n" +
-            "OPTIONAL MATCH (o:Organization)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
+            "OPTIONAL MATCH (o:Unit)-[r:EMPLOYMENT_TYPE_SETTINGS]->(et) WHERE id(o)={1}  WITH\n" +
             "o,et,r \n" +
             "return id(et) as id, et.name as name, et.description as description,et.employmentCategories as employmentCategories , et.paymentFrequency as paymentFrequency, \n" +
             "CASE WHEN r IS null THEN et.allowedForContactPerson ELSE r.allowedForContactPerson  END AS allowedForContactPerson,\n" +

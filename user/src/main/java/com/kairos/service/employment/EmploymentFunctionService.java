@@ -1,6 +1,8 @@
 package com.kairos.service.employment;
 
-import com.kairos.commons.utils.*;
+import com.kairos.commons.utils.ArrayUtil;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationship;
@@ -51,7 +53,7 @@ public class EmploymentFunctionService {
         Long functionId = payload.get(dateAsString);
         employmentFunctionRelationshipRepository.removeDateFromEmploymentFunctionRelationship(employmentId, DateUtils.asLocalDate(dateAsString).toString());
         employmentFunctionRelationshipRepository.createEmploymentFunctionRelationship(employmentId, functionId, Collections.singletonList(dateAsString));
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(DateUtils.asLocalDate(dateAsString), employmentGraphRepository.getStaffIdFromEmployment(employmentId), employmentId, unitId, ORGANIZATION, Collections.emptySet());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(DateUtils.asLocalDate(dateAsString), employmentGraphRepository.getStaffIdFromEmployment(employmentId), employmentId, unitId, Collections.emptySet());
         activityIntegrationService.updateTimeBank(employmentId, DateUtils.asLocalDate(dateAsString), staffAdditionalInfoDTO);
 
         return true;
@@ -60,7 +62,7 @@ public class EmploymentFunctionService {
     public Long removeFunction(Long unitId, Long employmentId, Date appliedDate) {
         Long functionId = employmentFunctionRelationshipRepository.removeDateFromEmploymentFunctionRelationship(employmentId, DateUtils.asLocalDate(appliedDate).toString());
         Long staffId = employmentGraphRepository.getStaffIdFromEmployment(employmentId);
-        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(DateUtils.asLocalDate(appliedDate), staffId, employmentId, unitId, ORGANIZATION, Collections.emptySet());
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffRetrievalService.getStaffEmploymentDataByEmploymentIdAndStaffId(DateUtils.asLocalDate(appliedDate), staffId, employmentId, unitId, Collections.emptySet());
         activityIntegrationService.updateTimeBank(employmentId, DateUtils.asLocalDate(appliedDate), staffAdditionalInfoDTO);
         return functionId;
     }

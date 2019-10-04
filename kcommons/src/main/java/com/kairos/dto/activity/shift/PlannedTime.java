@@ -1,6 +1,10 @@
 package com.kairos.dto.activity.shift;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.utils.DateTimeInterval;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.Date;
@@ -21,5 +25,10 @@ public class PlannedTime {
         this.plannedTimeId = plannedTimeId;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    @JsonIgnore
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(startDate,endDate);
     }
 }

@@ -8,7 +8,10 @@ import com.kairos.dto.gdpr.data_inventory.ProcessingActivityDTO;
 import com.kairos.dto.gdpr.master_data.MasterProcessingActivityDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
-import com.kairos.persistence.model.embeddables.*;
+import com.kairos.persistence.model.embeddables.OrganizationSubType;
+import com.kairos.persistence.model.embeddables.OrganizationType;
+import com.kairos.persistence.model.embeddables.ServiceCategory;
+import com.kairos.persistence.model.embeddables.SubServiceCategory;
 import com.kairos.persistence.model.master_data.default_proc_activity_setting.MasterProcessingActivity;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.MasterProcessingActivityRepository;
@@ -16,7 +19,7 @@ import com.kairos.persistence.repository.risk_management.RiskRepository;
 import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityResponseDTO;
 import com.kairos.response.dto.master_data.MasterProcessingActivityRiskResponseDTO;
-import com.kairos.rest_client.GenericRestClient;
+import com.kairos.rest_client.GDPRGenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -41,7 +44,7 @@ public class MasterProcessingActivityService {
     private RiskRepository riskRepository;
 
     @Inject
-    private GenericRestClient restClient;
+    private GDPRGenericRestClient restClient;
 
     @Inject
     private MasterProcessingActivityRepository masterProcessingActivityRepository;

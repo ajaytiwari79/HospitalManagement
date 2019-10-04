@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.ACTIVITY_STATUS;
-import static com.kairos.enums.FilterType.TIME_TYPE;
 
 /**
  * Created by pradeep

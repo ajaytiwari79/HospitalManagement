@@ -1,9 +1,13 @@
 package com.kairos.utils.worktimeagreement;
 
-import com.kairos.commons.utils.*;
+import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
-import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -14,9 +18,9 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.Day;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.phase.PhaseDefaultName;
-import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
+import com.kairos.enums.wta.ShiftLengthAndAverageSetting;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -26,7 +30,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -541,8 +547,6 @@ public class RuletemplateUtils {
                 currentDay.forEach(day -> {
                     if (!day.name().equals(EVERYDAY)) {
                         dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
-                    } else {
-                        dayOfWeeks.addAll(Arrays.asList(DayOfWeek.values()));
                     }
                 });
                 /*List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);

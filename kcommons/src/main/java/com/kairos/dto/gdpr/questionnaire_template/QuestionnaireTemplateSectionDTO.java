@@ -2,7 +2,9 @@ package com.kairos.dto.gdpr.questionnaire_template;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.gdpr.QuestionnaireTemplateStatus;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import java.util.List;

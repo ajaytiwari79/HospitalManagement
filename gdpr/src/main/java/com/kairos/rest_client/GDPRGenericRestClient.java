@@ -9,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -21,8 +23,8 @@ import java.util.List;
 import static com.kairos.utils.RestClientUrlUtil.getBaseUrl;
 
 @Service
-public class GenericRestClient {
-    private static final Logger logger = LoggerFactory.getLogger(GenericRestClient.class);
+public class GDPRGenericRestClient {
+    private static final Logger logger = LoggerFactory.getLogger(GDPRGenericRestClient.class);
 
     @Autowired
     private

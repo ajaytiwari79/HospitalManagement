@@ -5,7 +5,8 @@ public enum ConfLevel {
     DEFAULT(0),
     COUNTRY(1),
     UNIT(2),
-    STAFF(3);
+    STAFF(3),
+    ORGANIZATION(4);
 
     public int value;
 

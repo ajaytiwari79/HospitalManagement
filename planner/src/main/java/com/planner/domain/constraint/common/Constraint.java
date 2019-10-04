@@ -1,7 +1,9 @@
 package com.planner.domain.constraint.common;
 
 import com.kairos.dto.planner.constarints.ConstraintDTO;
-import com.kairos.enums.constraint.*;
+import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.enums.constraint.ConstraintType;
 import com.planner.domain.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 

@@ -5,7 +5,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Map;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.ADDRESS_ACCESS_DEAILS;
@@ -40,16 +39,4 @@ public interface AccessToLocationGraphRepository extends Neo4jBaseRepository<Acc
             "      addressType:type(r)"+
             "})} as accessDetails")
     Map<String,Object> findHomeAccessToLocation(long clientId, String imageUrl);
-
-
-    @Query("MATCH (c:Client)-[]->(cd:ContactAddress) WHERE id(c)={0}   WITH cd " +
-            "MATCH (cd)-[:"+ADDRESS_ACCESS_DEAILS+"]->(ac:AccessToLocation) return ac")
-    List<AccessToLocation> findAllAccessToLocation(Long clientId);
-
-    @Query("MATCH (c:Client)-[:HAS_HOME_ADDRESS]->(cd:ContactAddress) WHERE id(c)={0} " +
-            "WITH cd as contactAddress MATCH (contactAddress)-[:CAN_ACCESS_VIA]->(ac:AccessToLocation) RETURN ac")
-    AccessToLocation findHomeAccessToLocation1(Long clientId);
-
-    @Query("MATCH (ca:ContactAddress)-[:CAN_ACCESS_VIA]->(ac:AccessToLocation) where id(ca)={0} return ac")
-    AccessToLocation findByAddressId(Long homeId);
 }

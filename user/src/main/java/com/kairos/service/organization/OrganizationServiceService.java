@@ -1,12 +1,13 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.enums.OrganizationLevel;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationExternalServiceRelationship;
+import com.kairos.persistence.model.organization.OrganizationType;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
-import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
@@ -19,8 +20,6 @@ import javax.inject.Inject;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.constants.AppConstants.ORGANIZATION;
-import static com.kairos.constants.AppConstants.TEAM;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -28,14 +27,18 @@ import static com.kairos.constants.UserMessagesConstants.*;
  */
 @Transactional
 @Service
-public class OrganizationServiceService{
+public class OrganizationServiceService {
 
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
     private OrganizationServiceRepository organizationServiceRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
+    @Inject
+    private com.kairos.service.organization.OrganizationService organizationService;
     @Inject
     private CountryGraphRepository countryGraphRepository;
     //TODO move this dependency in task
@@ -47,18 +50,18 @@ public class OrganizationServiceService{
     @Inject
     private ExceptionService exceptionService;
 
-    private static final Logger logger = LoggerFactory.getLogger(OrganizationServiceService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
 
-    public Map<String, Object> updateOrganizationService(long id, String name, String description,Long countryId) {
-        if(isNull(name) || name.trim().isEmpty()){
+    public Map<String, Object> updateOrganizationService(long id, String name, String description, Long countryId) {
+        if (isNull(name) || name.trim().isEmpty()) {
             exceptionService.actionNotPermittedException(ERROR_ORGANIZATIONSERVICE_NAME_NOTEMPTY);
         }
         OrganizationService organizationService = organizationServiceRepository.findOne(id);
         if (organizationService == null) {
             return null;
         }
-        boolean alreadyExistWithSameName = organizationServiceRepository.checkDuplicateService(countryId, "(?i)" + name.trim(),id);
+        boolean alreadyExistWithSameName = organizationServiceRepository.checkDuplicateService(countryId, "(?i)" + name.trim(), id);
         if (alreadyExistWithSameName) {
             exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSERVICE_SERVICE_DUPLICATE);
         }
@@ -101,7 +104,7 @@ public class OrganizationServiceService{
 
         String name = "(?i)" + subService.getName();
         if (organizationServiceRepository.checkDuplicateSubService(organizationService.getId(), name) != null) {
-            logger.info("Can't create duplicate sub service in same category");
+            LOGGER.info("Can't create duplicate sub service in same category");
             return null;
         }
 
@@ -118,7 +121,7 @@ public class OrganizationServiceService{
         response.put("id", subService.getId());
         response.put("name", subService.getName());
         response.put("description", subService.getDescription());
-        logger.info("Sending Response: " + response);
+        LOGGER.info("Sending Response: " + response);
 
         return subService;
 
@@ -137,7 +140,7 @@ public class OrganizationServiceService{
 
         }
 
-        logger.info("Creating : " + subService.getName() + " In " + organizationService.getName());
+        LOGGER.info("Creating : " + subService.getName() + " In " + organizationService.getName());
         List<OrganizationService> subServicesList = organizationService.getOrganizationSubService();
 
         if (subServicesList != null) {
@@ -152,77 +155,39 @@ public class OrganizationServiceService{
 
     }
 
-    public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName, String type) {
-        if (type.equalsIgnoreCase("team")) {
-            return teamGraphRepository.addCustomNameOfServiceForTeam(serviceId, organizationId, customName);
-        } else {
-            return organizationGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
-        }
+    public OrganizationServiceQueryResult updateCustomNameOfService(long serviceId, long organizationId, String customName) {
+
+        return unitGraphRepository.addCustomNameOfServiceForOrganization(serviceId, organizationId, customName);
+
 
     }
 
-    public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId, long organizationId, String customName, String type) {
-        if (type.equalsIgnoreCase("team")) {
+    public OrganizationServiceQueryResult updateCustomNameOfSubService(long subServiceId, long organizationId, String customName) {
             return teamGraphRepository.addCustomNameOfSubServiceForTeam(organizationId, subServiceId, customName);
-        } else {
-            return organizationGraphRepository.addCustomNameOfSubServiceForOrganization(subServiceId, organizationId, customName);
-        }
     }
 
     private Boolean addDefaultCustomNameRelationShipOfServiceForOrganization(long subOrganizationServiceId, long organizationId) {
-        return organizationGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
+        return unitGraphRepository.addCustomNameOfServiceForOrganization(subOrganizationServiceId, organizationId);
     }
 
-    private Boolean addDefaultCustomNameRelationShipOfServiceForTeam(long subOrganizationServiceId, long teamId) {
-        return teamGraphRepository.addCustomNameOfServiceForTeam(subOrganizationServiceId, teamId);
-    }
-
-    public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected, String type) {
-
+    public Map<String, Object> updateServiceToOrganization(long id, long organizationServiceId, boolean isSelected) {
+        Unit unit=unitGraphRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND,"Unit",id)));
         OrganizationService organizationService = organizationServiceRepository.findOne(organizationServiceId);
         if (organizationService == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_ID_NOTFOUND);
-
         }
-
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-            Organization unit = organizationGraphRepository.findOne(id);
-            if (unit == null) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND,id);
-
-            }
-
-            if (isSelected) {
-                logger.info("check if already exist-------> " + organizationGraphRepository.isServiceAlreadyExist(id, organizationService.getId()));
-                if (organizationGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
-                    organizationGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
-                } else {
-                    organizationGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
-                }
-                addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
+        if (isSelected) {
+            LOGGER.info("check if already exist-------> ");
+            if (unitGraphRepository.isServiceAlreadyExist(id, organizationService.getId()) == 0) {
+                unitGraphRepository.addOrganizationServiceInUnit(id, Arrays.asList(organizationService.getId()), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
             } else {
-                organizationGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
+                unitGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
             }
-//                        getServiceOfSubService
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            Team team = teamGraphRepository.findOne(id);
-            if (team == null) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_TEAM_NOTFOUND);
-
-            }
-            if (isSelected) {
-                if (teamGraphRepository.countOfServices(id, organizationService.getId()) == 0) {
-                    teamGraphRepository.addServiceInTeam(id, organizationService.getId(), DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
-                } else {
-                    teamGraphRepository.updateOrganizationService(id, organizationServiceId, true, DateUtils.getCurrentDate().getTime());
-                }
-                addDefaultCustomNameRelationShipOfServiceForTeam(organizationService.getId(), id);
-            } else {
-                teamGraphRepository.updateOrganizationService(id, organizationServiceId, false, DateUtils.getCurrentDate().getTime());
-            }
-
+            addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
+        } else {
+            unitGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
         }
-        return organizationServiceData(id, type);
+        return organizationServiceData(id);
     }
 
 
@@ -244,7 +209,7 @@ public class OrganizationServiceService{
         List<Object> objectList = new ArrayList<>();
         if (organizationType != null) {
             if (checkIfServiceExistsWithOrganizationType(orgTypeId, serviceId) != 0) {
-                logger.info("Already Selected now Deselecting ");
+                LOGGER.info("Already Selected now Deselecting ");
                 organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
                 List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
                 for (Map<String, Object> map : mapList) {
@@ -254,7 +219,7 @@ public class OrganizationServiceService{
                 }
                 return objectList;
             } else {
-                logger.info("Not  Selected now Selecting ");
+                LOGGER.info("Not  Selected now Selecting ");
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
                 List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
                 for (Map<String, Object> map : mapList) {
@@ -279,7 +244,7 @@ public class OrganizationServiceService{
             return null;
         }
         String name = "(?i)" + organizationService.getName().trim();
-        boolean alreadyExistWithSameName = organizationServiceRepository.checkDuplicateService(countryId, name,-1L);
+        boolean alreadyExistWithSameName = organizationServiceRepository.checkDuplicateService(countryId, name, -1L);
         if (alreadyExistWithSameName) {
             exceptionService.duplicateDataException(MESSAGE_ORGANIZATIONSERVICE_SERVICE_DUPLICATE);
         }
@@ -291,46 +256,16 @@ public class OrganizationServiceService{
         return organizationService;
     }
 
-    public Map<String, Object> organizationServiceData(long id, String type) {
+    public Map<String, Object> organizationServiceData(long id) {
+        List<Long> allUnitIds=organizationBaseRepository.fetchAllUnitIds(id);
+        List<Map<String, Object>> services=(allUnitIds.size()==1 && allUnitIds.get(0).equals(id))?unitGraphRepository.getServicesForUnit(id):unitGraphRepository.getServicesForUnits(allUnitIds);
+        return filterSkillData(services);
 
-
-        Map<String, Object> response = null;
-
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-
-            Organization organization = organizationGraphRepository.findOne(id, 0);
-            if (organization == null) {
-                return null;
-            }
-            Organization parent;
-            if (organization.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(organization.getId());
-
-            } else {
-                parent = organizationGraphRepository.getParentOfOrganization(organization.getId());
-            }
-            if (parent != null) {
-                response = filterSkillData(organizationGraphRepository.getServicesForUnit(parent.getId(), id));
-            } else {
-                response = filterSkillData(organizationGraphRepository.getServicesForParent(id));
-            }
-
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            Team team = teamGraphRepository.findOne(id);
-            if (team == null) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATIONSERVICE_TEAM_NOTFOUND);
-
-            }
-            response = filterSkillData(teamGraphRepository.getOrganizationServicesOfTeam(id));
-
-        }
-        return response;
     }
 
     private Map<String, Object> filterSkillData(List<Map<String, Object>> skillData) {
         Map<String, Object> response = new HashMap<>();
         for (Map<String, Object> map : skillData) {
-
             if (((Map<String, Object>) map.get("data")).get("availableServices") != null) {
                 response.put("availableServices", ((Map<String, Object>) map.get("data")).get("availableServices"));
             }
@@ -345,7 +280,6 @@ public class OrganizationServiceService{
 
 
     /**
-     *
      * @param orgTypesIds
      * @return list of Organization services and Children SubServices
      */
@@ -369,11 +303,11 @@ public class OrganizationServiceService{
     }
 
     public Map<String, Object> organizationImportedServiceData(long id) {
-        Organization unit = organizationGraphRepository.findOne(id);
+        Unit unit = unitGraphRepository.findOne(id);
         if (unit == null) {
             return null;
         }
-        return filterSkillData(organizationGraphRepository.getImportedServicesForUnit(unit.getId()));
+        return filterSkillData(unitGraphRepository.getImportedServicesForUnit(unit.getId()));
 
     }
 

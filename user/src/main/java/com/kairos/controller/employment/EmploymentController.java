@@ -2,15 +2,12 @@ package com.kairos.controller.employment;
 
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
-
 import com.kairos.service.employment.EmploymentCTAWTAService;
 import com.kairos.service.employment.EmploymentFunctionService;
 import com.kairos.service.employment.EmploymentJobService;
 import com.kairos.service.employment.EmploymentService;
-
-
-import com.kairos.service.organization.UnionService;
 import com.kairos.service.initial_time_bank_log.InitialTimeBankLogService;
+import com.kairos.service.organization.UnionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,7 +21,10 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 
@@ -48,8 +48,8 @@ public class EmploymentController {
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/employment")
-    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId, @RequestParam("type") String type, @RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(unitId, type, employmentDTO, false, saveAsDraft));
+    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId,  @RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(unitId, employmentDTO, false, saveAsDraft));
     }
 
     /*
@@ -71,8 +71,8 @@ public class EmploymentController {
 
     @ApiOperation(value = "Update employment")
     @PutMapping(value = "/employment/{employmentId}")
-    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable Long employmentId, @RequestBody @Valid EmploymentDTO position, @RequestParam("type") String type, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.updateEmployment(employmentId, position, unitId, type, saveAsDraft));
+    public ResponseEntity<Map<String, Object>> updateEmployment(@PathVariable Long unitId, @PathVariable Long employmentId, @RequestBody @Valid EmploymentDTO position,  @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.updateEmployment(employmentId, position, unitId, saveAsDraft));
     }
 
     @ApiOperation(value = "Get employment")
@@ -185,9 +185,9 @@ public class EmploymentController {
     @RequestMapping(value = "/employment/default_data", method = RequestMethod.GET)
     @ApiOperation("Get All default data for unit employment  by organization ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getEmploymentDefaultData(@PathVariable Long unitId, @RequestParam("type") String type, @RequestParam("staffId") Long staffId) {
+    public ResponseEntity<Map<String, Object>> getEmploymentDefaultData(@PathVariable Long unitId,  @RequestParam("staffId") Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                unionService.getEmploymentDefaultData(unitId, type, staffId));
+                unionService.getEmploymentDefaultData(unitId, staffId));
     }
 
 

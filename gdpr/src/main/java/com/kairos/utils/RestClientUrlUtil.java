@@ -33,11 +33,12 @@ public class RestClientUrlUtil {
 
 
     public final static String getBaseUrl(boolean hasUnitInUrl) {
+
         String baseUrl;
         if (hasUnitInUrl) {
             baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append(UserContext.getUnitId()).toString();
         } else {
-            baseUrl = new StringBuilder(userServiceUrl).toString();
+            baseUrl = userServiceUrl;
         }
         return baseUrl;
     }
@@ -49,9 +50,9 @@ public class RestClientUrlUtil {
         } else {
             if (hasUnitInUrl) {
                 baseUrl = new StringBuilder(userServiceUrl)
-                        .append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                        .append("unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             } else {
-                baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
+                baseUrl = new StringBuilder(userServiceUrl).append("country/").append(id).toString();
             }
         }
         return baseUrl;

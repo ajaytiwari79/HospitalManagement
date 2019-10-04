@@ -5,10 +5,14 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.organization.PaymentSettingsDTO;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.query_results.ClientHomeAddressQueryResult;
-import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.PaymentSettings;
+import com.kairos.persistence.model.organization.PaymentSettingsQueryResult;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.region.LatLng;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
-import com.kairos.persistence.repository.organization.*;
+import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
+import com.kairos.persistence.repository.organization.PaymentSettingRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.slf4j.Logger;
@@ -35,7 +39,7 @@ public class OrganizationMetadataService {
     OrganizationMetadataRepository organizationMetadataRepository;
 
     @Inject
-    OrganizationGraphRepository organizationGraphRepository;
+    UnitGraphRepository unitGraphRepository;
     @Inject
     private EnvConfig envConfig;
     @Inject
@@ -52,7 +56,7 @@ public class OrganizationMetadataService {
         Map<String, Object> localAreaTagData = new HashMap<String, Object>();
         List<Object> clientList = new ArrayList<>();
         List<Object> localAreaTagsList = new ArrayList<>();
-        List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganization(unitId, envConfig.getServerHost() + FORWARD_SLASH);
+        List<Map<String, Object>> mapList = unitGraphRepository.getClientsOfOrganization(unitId, envConfig.getServerHost() + FORWARD_SLASH);
         for (Map<String, Object> map : mapList) {
             clientList.add(map.get("Client"));
         }
@@ -67,21 +71,21 @@ public class OrganizationMetadataService {
 
     public LocalAreaTag createNew(LocalAreaTag localAreaTag, long unitId) {
         logger.info("local area tag is" + localAreaTag.toString());
-        Organization organization = organizationGraphRepository.findOne(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
 
 
-        if (organization != null) {
+        if (unit != null) {
 
-            List<LocalAreaTag> localAreaTagList = organization.getLocalAreaTags();
+            List<LocalAreaTag> localAreaTagList = unit.getLocalAreaTags();
             LocalAreaTag areaTag = new LocalAreaTag();
             areaTag.setName(localAreaTag.getName());
             areaTag.setPaths(localAreaTag.getPaths());
             areaTag.setColor(localAreaTag.getColor());
             organizationMetadataRepository.save(areaTag);
             localAreaTagList.add(areaTag);
-            organization.setLocalAreaTags(localAreaTagList);
-            logger.debug("organization.getLocalAreaTags  " + organization.getLocalAreaTags());
-            organizationGraphRepository.save(organization);
+            unit.setLocalAreaTags(localAreaTagList);
+            logger.debug("organization.getLocalAreaTags  " + unit.getLocalAreaTags());
+            unitGraphRepository.save(unit);
             return areaTag;
         } else {
             return null;
@@ -186,10 +190,10 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
     }
 
 
-    private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Organization organization) {
+    private Long savePaymentSettings(PaymentSettingsDTO paymentSettingsDTO, Unit unit) {
         PaymentSettings paymentSettings = updatePaymentSettingsWithDates(new PaymentSettings(), paymentSettingsDTO);
-        organization.setPaymentSettings(paymentSettings);
-        organizationGraphRepository.save(organization);
+        unit.setPaymentSettings(paymentSettings);
+        unitGraphRepository.save(unit);
         return paymentSettings.getId();
 
     }
@@ -202,7 +206,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
     }
 
     public PaymentSettingsDTO updatePaymentsSettings(PaymentSettingsDTO paymentSettingsDTO, Long unitId) {
-        Optional<Organization> organization = organizationGraphRepository.findById(unitId, 1);
+        Optional<Unit> organization = unitGraphRepository.findById(unitId, 1);
         if (!organization.isPresent()) {
             logger.info("Unable to get unit while getting payments settings for unit ,{}", unitId);
             throw new DataNotFoundByIdException("Unable to get organization by id" + unitId);

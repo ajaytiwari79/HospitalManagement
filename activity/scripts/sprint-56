@@ -5,22 +5,28 @@ db.getCollection('kairos_sequence').find({ "sequenceName" : "KPISequence"})
 
 db.getCollection('counter').insert({
     "_id" : "32",
-    "type" : "ABSENCES_PER_INTERVAL",
-    "title" : "Absences Per Interval",
-    "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
-    "updatedAt" : ISODate("2018-09-03T09:37:10.374Z"),
-    "deleted" : false,
-    "_class" : "com.kairos.persistence.model.counter.KPI",
-    "counter" : false,
     "chart" : "STACKED_CHART",
-    "size" : "SIZE_8X2",
-    "filterTypes" : [
-        "STAFF_IDS",
- "TIME_INTERVAL",
-"ACTIVITY_STATUS"
-    ],
-    "multiDimensional" : true
-})
+        "size" : "SIZE_8X2",
+        "type" : "ABSENCES_PER_INTERVAL",
+        "title" : "Absences Per Interval",
+        "counter" : false,
+        "filterTypes" : [
+            "STAFF_IDS",
+            "TIME_INTERVAL",
+    "EMPLOYMENT_TYPE",
+            "ACTIVITY_STATUS"
+        ],
+        "multiDimensional" : true,
+        "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
+        "updatedAt" : ISODate("2019-09-04T11:20:26.298Z"),
+        "deleted" : false,
+        "lastModifiedBy" : {
+            "_id" : NumberLong(18728),
+            "email" : "ulrik@kairosplanning.com",
+            "fullName" : "Ulrik Rasmussen"
+        },
+        "_class" : "com.kairos.persistence.model.counter.KPI"
+    });
 
 
 db.getCollection('kairos_sequence').update({ "sequenceName" : "KPISequence"},{"$set":{"sequenceNumber" : 32}})
@@ -30,7 +36,7 @@ db.getCollection('kairos_sequence').update({ "sequenceName" : "KPISequence"},{"$
 db.getCollection('kairos_sequence').find({ "sequenceName" : "ApplicableKPISequence"})
 
 db.getCollection('applicableKPI').insert({
-    "_id" : "1594",
+    "_id" : "1612",
     "activeKpiId" : "32",
     "baseKpiId" : "32",
     "countryId" : NumberLong(18712),
@@ -40,11 +46,11 @@ db.getCollection('applicableKPI').insert({
     "deleted" : false,
     "frequencyType" : "DAYS",
     "interval" : "LAST",
-    "title" : "Absences Per Interval"
+    "title" : "Absences Per Interval",
     "kpiRepresentation" : "REPRESENT_PER_INTERVAL",
     "value" : 2.0,
     "_class" : "com.kairos.persistence.model.counter.ApplicableKPI"
 });
 
 
-db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 1595}})
+db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 1612}})

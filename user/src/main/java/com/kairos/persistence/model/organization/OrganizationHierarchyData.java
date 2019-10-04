@@ -2,6 +2,8 @@ package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -12,30 +14,11 @@ import java.util.List;
 @QueryResult
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class OrganizationHierarchyData {
     private Organization parent;
-    private List<Organization> childUnits;
-
-    public OrganizationHierarchyData() {
-        //Default Constructor
-    }
-
-    public Organization getParent() {
-        return parent;
-    }
-
-    public void setParent(Organization parent) {
-        this.parent = parent;
-    }
-
-    public List<Organization> getChildUnits() {
-        return childUnits;
-    }
-
-    public void setChildUnits(List<Organization> childUnits) {
-        this.childUnits = childUnits;
-    }
-
+    private List<Unit> childUnits;
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("OrganizationHierarchyData{");

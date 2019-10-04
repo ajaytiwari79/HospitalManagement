@@ -1,7 +1,9 @@
 package com.kairos.persistence.repository.user.country;
 
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.default_data.*;
+import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
+import com.kairos.persistence.model.country.default_data.RelationType;
+import com.kairos.persistence.model.country.default_data.RelationTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.OrganizationType;
@@ -58,7 +60,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (ot:OrganizationType)-[:"+BELONGS_TO+"]->(c:Country) WHERE id(c)= {0} RETURN ot")
     List<OrganizationType> getOrganizationTypes(Long countryId);
 
-    @Query("MATCH (organization:Organization) where id(organization)={0} with organization  " +
+    @Query("MATCH (organization) where id(organization)={0} with organization  " +
             "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
             "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN id(country)")
     Long getCountryIdByUnitId(long unitId);
@@ -81,10 +83,6 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
             "MATCH (os:OrganizationService)-[:"+ ORGANIZATION_SUB_SERVICE +"]->(subService)\n" +
             "MATCH (c:Country)-[:"+ HAS_ORGANIZATION_SERVICES +"]->(os) RETURN c limit 1")
     Country getCountryByOrganizationService(long subServiceId);
-
-    @Query("MATCH (team:Team) where id(team)={0} with team  MATCH(team)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+ZIP_CODE+"]->(zipCode:ZipCode)-[:"+MUNICIPALITY+"]->(muncipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
-            "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN id(country)")
-    Long getCountryOfTeam(long teamId);
 
     @Query("MATCH (c:Country)-[:"+ HAS_HOLIDAY +"]-(ch:CountryHolidayCalender) " +
             "where id(c) = {0}   AND date(ch.holidayDate) >={1} AND  date(ch.holidayDate) <={2}  " +
@@ -151,5 +149,10 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
 
     @Query("MATCH(country:Country{deleted:false,isEnabled:true}) where id(country)={0} RETURN country")
     Country findCountryById(Long countryId);
+
+    @Query("MATCH (organization) where id(organization)={0} with organization  " +
+            "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
+            "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN country")
+    Country getCountryByUnitId(long unitId);
 
 }

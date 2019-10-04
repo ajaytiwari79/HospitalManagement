@@ -2,8 +2,13 @@ package com.kairos.service.agreement_template;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.gdpr.*;
-import com.kairos.dto.gdpr.agreement_template.*;
+import com.kairos.dto.gdpr.OrganizationSubTypeDTO;
+import com.kairos.dto.gdpr.OrganizationTypeDTO;
+import com.kairos.dto.gdpr.ServiceCategoryDTO;
+import com.kairos.dto.gdpr.SubServiceCategoryDTO;
+import com.kairos.dto.gdpr.agreement_template.AgreementTemplateDTO;
+import com.kairos.dto.gdpr.agreement_template.CoverPageVO;
+import com.kairos.dto.gdpr.agreement_template.MasterAgreementTemplateDTO;
 import com.kairos.dto.gdpr.master_data.AccountTypeVO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.agreement_template.AgreementSection;
@@ -15,8 +20,11 @@ import com.kairos.persistence.repository.clause.ClauseRepository;
 import com.kairos.persistence.repository.template_type.TemplateTypeRepository;
 import com.kairos.response.dto.clause.ClauseBasicResponseDTO;
 import com.kairos.response.dto.master_data.TemplateTypeResponseDTO;
-import com.kairos.response.dto.policy_agreement.*;
-import com.kairos.rest_client.GenericRestClient;
+import com.kairos.response.dto.policy_agreement.AgreementSectionResponseDTO;
+import com.kairos.response.dto.policy_agreement.AgreementTemplateSectionResponseDTO;
+import com.kairos.response.dto.policy_agreement.GeneralAgreementTemplateResponseDTO;
+import com.kairos.response.dto.policy_agreement.PolicyAgreementTemplateResponseDTO;
+import com.kairos.rest_client.GDPRGenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.s3bucket.AWSBucketService;
 import com.kairos.service.template_type.TemplateTypeService;
@@ -26,7 +34,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.persistence.EntityNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -57,7 +68,7 @@ public class PolicyAgreementTemplateService {
     private TemplateTypeRepository templateTypeRepository;
 
     @Inject
-    private GenericRestClient genericRestClient;
+    private GDPRGenericRestClient gDPRGenericRestClient;
 
 
     /**
@@ -275,7 +286,7 @@ public class PolicyAgreementTemplateService {
 
     //get country template by unitId
     public List<TemplateType> getAllTemplateType(Long unitId) {
-        Long countryId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        Long countryId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
         return templateTypeRepository.getAllTemplateType(countryId);
     }
@@ -302,7 +313,7 @@ public class PolicyAgreementTemplateService {
     }
 
     public List<AgreementTemplateDTO> getAllDataHandlerTemplate(Long unitId) {
-        Long countryId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        Long countryId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
         TemplateType templateType = templateTypeRepository.findByCountryIdAndName(countryId,"Data Handler Agreement");
         List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllDataHandlerAgreementTemplateByCountry(countryId,templateType.getId());
         return policyAgreementTemplates.stream().map(policyAgreementTemplate ->
@@ -311,7 +322,7 @@ public class PolicyAgreementTemplateService {
     }
 
     public AgreementTemplateDTO getDataHandlerTemplate(Long referenceId,boolean isCountry, Long agreementTemplateId) {
-        Long countryId = isCountry?referenceId:genericRestClient.publishRequest(null, referenceId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        Long countryId = isCountry?referenceId: gDPRGenericRestClient.publishRequest(null, referenceId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
         PolicyAgreementTemplate policyAgreementTemplate=policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, countryId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
