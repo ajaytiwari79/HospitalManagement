@@ -23,26 +23,6 @@ public interface SkillCategoryGraphRepository extends Neo4jBaseRepository<SkillC
     @Query("Match (sc:SkillCategory) where sc.isEnabled=true return distinct sc")
     List<SkillCategory> findAll();
 
-
-    /**
-     * @param id
-     * @return  List all SkillCategory by CountryId
-     */
-    /*@Query("MATCH (s:SkillCategory)-[:BELONGS_TO]->(c:Country) where id(c)={0} " +
-            "AND s.isEnabled=true  with s as sc  " +
-            "OPTIONAL MATCH (s:Skill)-[:HAS_CATEGORY]->(sc) WHERE s.isEnabled=true with a,sc" +
-            "MATCH (s:Skill)-[:"+ RelationshipConstants.HAS_TAG+"]-(t:Tag)<-[:"+COUNTRY_HAS_TAG+"]-(c:Country{id:{0}}) WHERE t.masterDataType='SKILL' AND t.countryTag=true AND t.deleted = false\n"+
-            "return  { skillList: case when s is NULL then [] else collect({ " +
-            "  id:id(s), " +
-            "  name:s.name,  " +
-            "  visitourId:s.visitourId,  " +
-            "  shortName:s.shortName,  " +
-            "  tags:{id:id(t),name:t.name,countryTag:t.countryTag},  " +
-            "  description:s.description}) END , " +
-            "name:sc.name, " +
-            "id:id(sc),  " +
-            "description:sc.description " +
-            "}AS result")*/
     @Query("MATCH (s:SkillCategory)-[:BELONGS_TO]->(c:Country) where id(c)={0} AND s.isEnabled=true  with s as sc,c  OPTIONAL MATCH (s:Skill)-[:HAS_CATEGORY]->(sc) WHERE s.isEnabled=true with c,sc,s \n" +
             " OPTIONAL MATCH (s)-[r:HAS_TAG]->(t:Tag)<-[:COUNTRY_HAS_TAG]-(c) WHERE t.masterDataType='SKILL' AND t.countryTag=true AND t.deleted =false with CASE when t IS NULL THEN [] ELSE collect({id:id(t),name:t.name,countryTag:t.countryTag})   END as tags,sc,s\n" +
             "return  { skillList: case when s is NULL then [] else collect({   \n" +
@@ -57,7 +37,7 @@ public interface SkillCategoryGraphRepository extends Neo4jBaseRepository<SkillC
             "description:sc.description} AS result")
     List<Map<String,Object>> findSkillCategoryByCountryId(Long id);
 
-    @Query("MATCH (s:Skill)<-[:"+ORGANISATION_HAS_SKILL+"]-(organization:Organization) where id(organization)={0} AND s.isEnabled=true " +
+    @Query("MATCH (s:Skill)<-[:"+ORGANISATION_HAS_SKILL+"]-(organization:Unit) where id(organization)={0} AND s.isEnabled=true " +
             " OPTIONAL MATCH (s)-[:HAS_CATEGORY]->(sc:SkillCategory) WHERE sc.isEnabled=true with sc,s \n" +
             "return  { skillList: case when s is NULL then [] else collect({   \n" +
             "id:id(s), name:s.name, shortName:s.shortName, description:s.description}) END ,\n" +
@@ -66,10 +46,6 @@ public interface SkillCategoryGraphRepository extends Neo4jBaseRepository<SkillC
 
     @Query("MATCH (s:Skill)-[:HAS_CATEGORY]->(sc:SkillCategory) where id(sc)={0} AND s.isEnabled=true  return s")
     List<Skill> getThisCategorySkills(long id);
-
-    @Query("MATCH (s:Skill) where id(s)={0} MATCH (s)-[:HAS_CATEGORY]->(skillCategory:SkillCategory) return skillCategory")
-    SkillCategory getSkillCategoryBySkillId(long skillId);
-
 
     @Query("MATCH (sc:SkillCategory {isEnabled:true})-[:BELONGS_TO]->(c:Country) WHERE id(c)={0} AND sc.name=~ {1} return sc")
     List<SkillCategory> checkDuplicateSkillCategory(long countryId, String name);

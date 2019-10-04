@@ -31,6 +31,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_EMPTY_STAFF_OR_UNIT_SETTING;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_NOTFOUND;
 
@@ -62,7 +64,7 @@ public class SickService {
             Long userId = UserContext.getUserDetails().getId();
             BasicNameValuePair sickSettingsRequired = new BasicNameValuePair("sickSettingsRequired", "YES");
             List<StaffResultDTO> staffAndOrganizationDetails = userIntegrationService.getStaffAndOrganizationDetails(userId,sickSettingsRequired);
-            if (!Optional.ofNullable(staffAndOrganizationDetails).isPresent() && staffAndOrganizationDetails.isEmpty()) {
+            if (isCollectionEmpty(staffAndOrganizationDetails)) {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFF_NOTFOUND);
             }
             if (staffAndOrganizationDetails.size() == 1) {

@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -10,7 +11,6 @@ import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
@@ -21,13 +21,19 @@ import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.PartialLeave;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
-import com.kairos.persistence.model.staff.permission.*;
+import com.kairos.persistence.model.staff.permission.AccessPermission;
+import com.kairos.persistence.model.staff.permission.UnitPermission;
+import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.position.*;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
+import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
@@ -40,6 +46,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import org.apache.http.NameValuePair;
@@ -52,7 +59,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -62,7 +68,7 @@ import java.util.stream.Stream;
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.AppConstants.*;
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
@@ -74,6 +80,10 @@ import static com.kairos.constants.UserMessagesConstants.*;
 public class PositionService {
 
     @Inject
+    private UnitGraphRepository unitGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
+    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
@@ -81,6 +91,8 @@ public class PositionService {
     private PositionGraphRepository positionGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
     @Inject
     private AccessGroupRepository accessGroupRepository;
     @Inject
@@ -170,14 +182,14 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
-        Organization unit = organizationGraphRepository.findOne(unitId);
+        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND, unitId);
 
         }
 
-        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
-        if (!Optional.ofNullable(parentOrganization).isPresent()) {
+        Organization parentUnit = organizationService.fetchParentOrganization(unitId);
+        if (!Optional.ofNullable(parentUnit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
 
         }
@@ -186,7 +198,7 @@ public class PositionService {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
-        Position position = positionGraphRepository.findPosition(parentOrganization.getId(), staffId);
+        Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
         if (!Optional.ofNullable(position).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EMPLOYMENT_NOTFOUND, staffId);
 
@@ -198,20 +210,24 @@ public class PositionService {
         UnitPermission unitPermission = null;
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         if (created) {
-
-            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentOrganization.getId(), unitId, staffId, accessGroupId);
-            if (Optional.ofNullable(unitPermission).isPresent() && unitPermissionGraphRepository.checkUnitPermissionLinkedWithAccessGroup(unitPermission.getId(), accessGroupId)) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_UNITPERMISSION_ALREADYEXIST);
-
-            } else if (!Optional.ofNullable(unitPermission).isPresent()) {
+            unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentUnit.getId(), unitId, staffId, accessGroupId);
+            if (!Optional.ofNullable(unitPermission).isPresent()) {
                 unitPermission = new UnitPermission();
-                unitPermission.setOrganization(unit);
+                if (unit instanceof Organization) {
+                    unitPermission.setOrganization((Organization) unit);
+                } else {
+                    unitPermission.setUnit((Unit) unit);
+                }
                 unitPermission.setStartDate(DateUtils.getCurrentDate().getTime());
+                unitPermission.setAccessGroup(accessGroup);
+                position.getUnitPermissions().add(unitPermission);
+                positionGraphRepository.save(position, 2);
+            }else{
+                unitPermissionGraphRepository.createPermission(accessGroupId,unitPermission.getId());
             }
-            unitPermission.setAccessGroup(accessGroup);
-            position.getUnitPermissions().add(unitPermission);
-            positionGraphRepository.save(position);
-            LOGGER.info(unitPermission.getId() + " Currently created Unit Permission ");
+
+
+            LOGGER.info(" Currently created Unit Permission ");
             response.put("startDate", getDate(unitPermission.getStartDate()));
             response.put("endDate", getDate(unitPermission.getEndDate()));
             response.put("id", unitPermission.getId());
@@ -224,7 +240,7 @@ public class PositionService {
             if (unitPermissionGraphRepository.getAccessGroupRelationShipCountOfStaff(staffId) <= 1) {
                 exceptionService.actionNotPermittedException(ERROR_PERMISSION_REMOVE);
             }
-            unitPermissionGraphRepository.updateUnitPermission(parentOrganization.getId(), unitId, staffId, accessGroupId, false);
+            unitPermissionGraphRepository.updateUnitPermission(parentUnit.getId(), unitId, staffId, accessGroupId, false);
         }
         accessGroupPermissionCounterDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAccessGroupQueryResult, AccessGroupPermissionCounterDTO.class);
         accessGroupPermissionCounterDTO.setStaffId(staffId);
@@ -238,27 +254,10 @@ public class PositionService {
     }
 
 
-    public List<Map<String, Object>> getPositions(long staffId, long unitId, String type) {
+    public List<Map<String, Object>> getPositions(long staffId, long unitId) {
 
-        Organization unit = null;
-
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.findOne(unitId);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
-        } else {
-            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
-
-        }
-
-        Organization parent;
-        if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-            parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-
-        } else {
-            parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
-        }
-
+        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId);
+        Organization parent = unit instanceof Organization ? (Organization) unit : organizationService.fetchParentOrganization(unitId);
         List<Map<String, Object>> list = new ArrayList<>();
 
         if (parent == null) {
@@ -275,7 +274,7 @@ public class PositionService {
     }
 
 
-    public void createPositionForUnitManager(Staff staff, Organization parent, Organization unit, long accessGroupId) {
+    public void createPositionForUnitManager(Staff staff, Organization parent, Unit unit, long accessGroupId) {
 
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (accessGroup == null) {
@@ -287,7 +286,7 @@ public class PositionService {
         position.setStaff(staff);
         UnitPermission unitPermission = new UnitPermission();
 
-        unitPermission.setOrganization(unit);
+        unitPermission.setUnit(unit);
 
         //set permission in employment
         AccessPermission accessPermission = new AccessPermission(accessGroup);
@@ -296,8 +295,7 @@ public class PositionService {
         accessPageService.setPagePermissionToStaff(accessPermission, accessGroup.getId());
         position.getUnitPermissions().add(unitPermission);
         if (parent == null) {
-            unit.getPositions().add(position);
-            organizationGraphRepository.save(unit);
+            unitGraphRepository.save(unit);
         } else {
             parent.getPositions().add(position);
             organizationGraphRepository.save(parent);
@@ -306,43 +304,30 @@ public class PositionService {
     }
 
 
-    public List<Map<String, Object>> getWorkPlaces(long staffId, long unitId, String type) {
+    public List<Map<String, Object>> getWorkPlaces(long staffId, long unitId) {
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             return null;
         }
-        Organization unit = null;
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.findOne(unitId);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.getOrganizationByTeamId(unitId);
-
-        } else {
-            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
-
-        }
-        if (unit == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-
-        }
+        Organization organization=organizationGraphRepository.findOrganizationOfStaff(staffId);
+        OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId)));
         List<AccessGroup> accessGroups;
         List<Map<String, Object>> units;
 
-        Organization parentOrganization = unit.isParentOrganization() ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
-        accessGroups = accessGroupRepository.getAccessGroups(parentOrganization.getId());
-        units = organizationGraphRepository.getSubOrgHierarchy(parentOrganization.getId());
-        List<Map<String, Object>> employments;
+        accessGroups = accessGroupRepository.getAccessGroups(organization.getId());
+        units = unitGraphRepository.getSubOrgHierarchy(organization.getId());
+        List<Map<String, Object>> positions;
         List<Map<String, Object>> workPlaces = new ArrayList<>();
         // This is for parent organization i.e if unit is itself parent organization
-        if (units.isEmpty() && unit.isParentOrganization()) {
-            employments = new ArrayList<>();
+        if (units.isEmpty() && unit instanceof Organization) {
+            positions = new ArrayList<>();
             for (AccessGroup accessGroup : accessGroups) {
                 QueryResult queryResult = new QueryResult();
                 queryResult.setId(unit.getId());
                 queryResult.setName(unit.getName());
                 Map<String, Object> employment = positionGraphRepository.getPositionOfParticularRole(staffId, unit.getId(), accessGroup.getId());
                 if (employment != null && !employment.isEmpty()) {
-                    employments.add(employment);
+                    positions.add(employment);
                     queryResult.setAccessable(true);
                 } else {
                     queryResult.setAccessable(false);
@@ -351,7 +336,7 @@ public class PositionService {
                 workPlace.put("id", accessGroup.getId());
                 workPlace.put("name", accessGroup.getName());
                 workPlace.put("tree", queryResult);
-                workPlace.put("employments", employments);
+                workPlace.put("positions", positions);
                 workPlaces.add(workPlace);
             }
             return workPlaces;
@@ -363,19 +348,19 @@ public class PositionService {
         for (AccessGroup accessGroup : accessGroups) {
             list = new ArrayList<>();
             ids = new ArrayList<>();
-            employments = new ArrayList<>();
+            positions = new ArrayList<>();
             for (Map<String, Object> unitData : units) {
                 Map<String, Object> parentUnit = (Map<String, Object>) ((Map<String, Object>) unitData.get("data")).get("parent");
                 long id = (long) parentUnit.get("id");
-                Map<String, Object> employment;
+                Map<String, Object> position;
                 if (ids.contains(id)) {
                     for (QueryResult queryResult : list) {
                         if (queryResult.getId() == id) {
                             List<QueryResult> childs = queryResult.getChildren();
                             QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get("child"), QueryResult.class);
-                            employment = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
-                            if (employment != null && !employment.isEmpty()) {
-                                employments.add(employment);
+                            position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
+                            if (position != null && !position.isEmpty()) {
+                                positions.add(position);
                                 child.setAccessable(true);
                             } else {
                                 child.setAccessable(false);
@@ -387,18 +372,18 @@ public class PositionService {
                 } else {
                     List<QueryResult> queryResults = new ArrayList<>();
                     QueryResult child = objectMapper.convertValue(((Map<String, Object>) unitData.get("data")).get("child"), QueryResult.class);
-                    employment = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
-                    if (employment != null && !employment.isEmpty()) {
-                        employments.add(employment);
+                    position = positionGraphRepository.getPositionOfParticularRole(staffId, child.getId(), accessGroup.getId());
+                    if (position != null && !position.isEmpty()) {
+                        positions.add(position);
                         child.setAccessable(true);
                     } else {
                         child.setAccessable(false);
                     }
                     queryResults.add(child);
                     QueryResult queryResult = new QueryResult((String) parentUnit.get("name"), id, queryResults);
-                    employment = positionGraphRepository.getPositionOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
-                    if (employment != null && !employment.isEmpty()) {
-                        employments.add(employment);
+                    position = positionGraphRepository.getPositionOfParticularRole(staffId, queryResult.getId(), accessGroup.getId());
+                    if (position != null && !position.isEmpty()) {
+                        positions.add(position);
                         queryResult.setAccessable(true);
                     } else {
                         queryResult.setAccessable(false);
@@ -411,7 +396,7 @@ public class PositionService {
             workPlace.put("id", accessGroup.getId());
             workPlace.put("name", accessGroup.getName());
             workPlace.put("tree", treeStructureService.getTreeStructure(list));
-            workPlace.put("employments", employments);
+            workPlace.put("positions", positions);
             workPlaces.add(workPlace);
         }
         return workPlaces;
@@ -426,23 +411,15 @@ public class PositionService {
         return staffGraphRepository.editStaffWorkPlaces(staffId, teamId);
     }
 
-    public Map<String, Object> addPartialLeave(long staffId, long id, String type, PartialLeaveDTO partialLeaveDTO) throws ParseException {
+    public Map<String, Object> addPartialLeave(long staffId, long id, PartialLeaveDTO partialLeaveDTO) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
-        Organization unit = null;
+        Unit unit = unitGraphRepository.findOne(id);
 
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.findOne(id);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.getOrganizationByTeamId(id);
-        } else {
-            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
-
-        }
         PartialLeave partialLeave;
         if (partialLeaveDTO.getId() != null) {
             partialLeave = partialLeaveGraphRepository.findOne(partialLeaveDTO.getId());
@@ -455,13 +432,7 @@ public class PositionService {
             partialLeaveGraphRepository.save(partialLeave);
         } else {
 
-            Organization parent;
-            if (unit.getOrganizationLevel().equals(OrganizationLevel.CITY)) {
-                parent = organizationGraphRepository.getParentOrganizationOfCityLevel(unit.getId());
-            } else {
-                parent = organizationGraphRepository.getParentOfOrganization(unit.getId());
-            }
-
+            Organization parent = organizationService.fetchParentOrganization(unit.getId());
             UnitPermission unitPermission;
             if (parent == null) {
                 unitPermission = unitPermissionGraphRepository.getUnitPermissions(unit.getId(), staffId, unit.getId(), EmploymentStatus.PENDING);
@@ -489,29 +460,18 @@ public class PositionService {
     /**
      * @param staffId
      * @param id      {id of unit or team decided by paramter of type}
-     * @param type    {type can be an organization or team}
      * @return list of partial leaves
      * @author prabjot
      * to get partial leaves for particular unit
      */
-    public Map<String, Object> getPartialLeaves(long staffId, long id, String type) {
+    public Map<String, Object> getPartialLeaves(long staffId, long id) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         if (staff == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
 
         }
-
-        Organization unit = null;
-
-        if (ORGANIZATION.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.findOne(id);
-        } else if (TEAM.equalsIgnoreCase(type)) {
-            unit = organizationGraphRepository.getOrganizationByTeamId(id);
-        } else {
-            exceptionService.internalServerError(ERROR_TYPE_NOTVALID);
-
-        }
+        OrganizationBaseEntity unit = organizationBaseRepository.findOne(id);
         List<PartialLeave> partialLeaves = staffGraphRepository.getPartialLeaves(unit.getId(), staffId);
         List<Map<String, Object>> response = new ArrayList<>(partialLeaves.size());
         for (PartialLeave partialLeave : partialLeaves) {
@@ -534,9 +494,9 @@ public class PositionService {
         return map;
     }
 
-    public Position updateEmploymentEndDate(Organization unit, Long staffId) throws Exception {
+    public Position updatePositionEndDate(Organization organization, Long staffId) throws Exception {
         Long employmentEndDate = getMaxEmploymentEndDate(staffId);
-        return saveEmploymentEndDate(unit, employmentEndDate, staffId, null, null, null);
+        return saveEmploymentEndDate(organization, employmentEndDate, staffId, null, null, null);
     }
 
 
@@ -546,23 +506,23 @@ public class PositionService {
         List<ExpiredPositionsQueryResult> expiredPositionsQueryResults = positionGraphRepository.findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(positionIds);
         accessGroupRepository.deleteAccessGroupRelationAndCustomizedPermissionRelation(positionIds);
 
-        List<Organization> organizations;
+        List<Unit> units;
         List<Position> positions = new ArrayList<>();
         Position position;
 
         for (ExpiredPositionsQueryResult expiredPositionsQueryResult : expiredPositionsQueryResults) {
-            organizations = expiredPositionsQueryResult.getOrganizations();
+            units = expiredPositionsQueryResult.getUnits();
             position = expiredPositionsQueryResult.getPosition();
             unitPermissions = expiredPositionsQueryResult.getUnitPermissions();
-            List<Long> orgIds = organizations.stream().map(organization -> organization.getId()).collect(Collectors.toList());
+            List<Long> orgIds = units.stream().map(organization -> organization.getId()).collect(Collectors.toList());
 
             accessGroupRepository.createAccessGroupUnitRelation(orgIds, position.getAccessGroupIdOnPositionEnd());
             AccessGroup accessGroupDB = accessGroupRepository.findById(position.getAccessGroupIdOnPositionEnd()).get();
-            for (int currentElement = 0; currentElement < expiredPositionsQueryResult.getOrganizations().size(); currentElement++) {
+            for (int currentElement = 0; currentElement < expiredPositionsQueryResult.getUnits().size(); currentElement++) {
                 unitPermission = unitPermissions.get(currentElement);
                 if (!Optional.ofNullable(unitPermission).isPresent()) {
                     unitPermission = new UnitPermission();
-                    unitPermission.setOrganization(organizations.get(currentElement));
+                    unitPermission.setUnit(units.get(currentElement));
                     unitPermission.setStartDate(DateUtils.getCurrentDate().getTime());
                 }
                 unitPermission.setAccessGroup(accessGroupDB);
@@ -578,14 +538,14 @@ public class PositionService {
         return true;
     }
 
-    public Position updateEmploymentEndDate(Organization unit, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) throws Exception {
+    public Position updatePositionEndDate(Organization organization, Long staffId, Long endDateMillis, Long reasonCodeId, Long accessGroupId) throws Exception {
         Long employmentEndDate = null;
         if (Optional.ofNullable(endDateMillis).isPresent()) {
             employmentEndDate = getMaxEmploymentEndDate(staffId);
         }
 
 
-        return saveEmploymentEndDate(unit, employmentEndDate, staffId, reasonCodeId, endDateMillis, accessGroupId);
+        return saveEmploymentEndDate(organization, employmentEndDate, staffId, reasonCodeId, endDateMillis, accessGroupId);
     }
 
     private Long getMaxEmploymentEndDate(Long staffId) {
@@ -607,15 +567,15 @@ public class PositionService {
 
     }
 
-    private Position saveEmploymentEndDate(Organization unit, Long employmentEndDate, Long staffId, Long reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
+    private Position saveEmploymentEndDate(Organization organization, Long employmentEndDate, Long staffId, Long reasonCodeId, Long endDateMillis, Long accessGroupId) throws Exception {
 
-        Organization parentOrganization = (unit.isParentOrganization()) ? unit : organizationGraphRepository.getParentOfOrganization(unit.getId());
+        Organization parentUnit = organizationService.fetchParentOrganization(organization.getId());
         ReasonCode reasonCode = null;
-        if (!Optional.ofNullable(parentOrganization).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_PARENTORGANIZATION_NOTFOUND, unit.getId());
+        if (!Optional.ofNullable(parentUnit).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_PARENTORGANIZATION_NOTFOUND, organization.getId());
         }
 
-        Position position = positionGraphRepository.findPosition(parentOrganization.getId(), staffId);
+        Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
         //TODO Commented temporary due to kafka down on QA server
 //         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, position.getEndDateMillis(), parentOrganization.getId(), position.getId(),
 //             parentOrganization.getTimeZone());
@@ -678,50 +638,27 @@ public class PositionService {
         return true;
     }
 
-    public void createPosition(Organization organization, Organization unit, Staff staff, Long accessGroupId, Long employedSince, boolean employmentAlreadyExist) {
+    public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-        if(!Optional.ofNullable(accessGroup).isPresent()) {
+        if (!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId);
 
         }
-        if(accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
+        if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
-        Position position;
-        if(employmentAlreadyExist) {
-            position = (Optional.ofNullable(organization).isPresent()) ? positionGraphRepository.findPosition(organization.getId(), staff.getId()) : positionGraphRepository.findPosition(unit.getId(), staff.getId());
-        } else {
-            position = new Position();
-        }
+        Position position = new Position();
         position.setName("Working as staff");
         position.setStaff(staff);
         position.setStartDateMillis(employedSince);
         UnitPermission unitPermission = new UnitPermission();
-        unitPermission.setOrganization(unit);
+        unitPermission.setOrganization(organization);
         unitPermission.setAccessGroup(accessGroup);
         position.getUnitPermissions().add(unitPermission);
         positionGraphRepository.save(position);
-        if(Optional.ofNullable(organization).isPresent()) {
-            if(Optional.ofNullable(organization.getPositions()).isPresent()) {
-                organization.getPositions().add(position);
-                organizationGraphRepository.save(organization);
-            } else {
-                List<Position> positions = new ArrayList<>();
-                positions.add(position);
-                organization.setPositions(positions);
-                organizationGraphRepository.save(organization);
-            }
-        } else {
-            if(Optional.ofNullable(unit.getPositions()).isPresent()) {
-                unit.getPositions().add(position);
-                organizationGraphRepository.save(unit);
-            } else {
-                List<Position> positions = new ArrayList<>();
-                positions.add(position);
-                unit.setPositions(positions);
-                organizationGraphRepository.save(unit);
-            }
+        organization.getPositions().add(position);
+        organizationGraphRepository.save(organization);
 
-        }
     }
+
 }

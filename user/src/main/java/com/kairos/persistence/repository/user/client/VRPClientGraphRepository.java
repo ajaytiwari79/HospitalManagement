@@ -16,10 +16,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
 @Repository
 public interface VRPClientGraphRepository extends Neo4jBaseRepository<VRPClient,Long> {
 
-    @Query("MATCH (vc:VRPClient{deleted:false})-[:"+BELONGS_TO+"]-(o:Organization) where id(o)={0} return vc")
+    @Query("MATCH (vc:VRPClient{deleted:false})-[:"+BELONGS_TO+"]-(o:Unit) where id(o)={0} return vc")
     List<VRPClient> getAllClient(Long unitId);
 
-    @Query("MATCH (vc:VRPClient{deleted:false})-[:"+BELONGS_TO+"]-(o:Organization) where id(o)={0} return vc.installationNumber")
+    @Query("MATCH (vc:VRPClient{deleted:false})-[:"+BELONGS_TO+"]-(o:Unit) where id(o)={0} return vc.installationNumber")
     List<Long> getAllClientInstalltionNo(Long unitId);
 
 }

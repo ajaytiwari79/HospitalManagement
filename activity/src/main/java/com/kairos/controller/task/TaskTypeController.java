@@ -1,7 +1,12 @@
 package com.kairos.controller.task;
 
-import com.kairos.dto.activity.task_type.*;
-import com.kairos.persistence.model.task_type.*;
+import com.kairos.dto.activity.task_type.TaskTypeCopyDTO;
+import com.kairos.dto.activity.task_type.TaskTypeDTO;
+import com.kairos.dto.activity.task_type.TaskTypeSettingDTO;
+import com.kairos.dto.activity.task_type.TaskTypeSlaConfigDTO;
+import com.kairos.persistence.model.task_type.MapPointer;
+import com.kairos.persistence.model.task_type.TaskType;
+import com.kairos.persistence.model.task_type.TaskTypeDefination;
 import com.kairos.service.MapPointerService;
 import com.kairos.service.task_type.TaskTypeService;
 import com.kairos.utils.response.ResponseHandler;
@@ -20,7 +25,10 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -703,20 +711,20 @@ public class TaskTypeController {
     @ApiOperation(value = "Get Available Task from serviceId")
     @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.GET)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getTaskTypes(@PathVariable long subServiceId, @PathVariable long unitId, @RequestParam("type") String type) {
+    public ResponseEntity<Map<String, Object>> getTaskTypes(@PathVariable long subServiceId, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                taskTypeService.getTaskTypes(unitId, subServiceId, type));
+                taskTypeService.getTaskTypes(unitId, subServiceId));
     }
 
     @ApiOperation(value = "Add/ Remove TaskType to Organization")
     @RequestMapping(value = "/unit/{unitId}/service/{subServiceId}/task_type", method = RequestMethod.POST)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addTaskTypeInOrganization(@PathVariable long unitId, @PathVariable long subServiceId,
-                                                                         @RequestBody Map<String, Object> data, @RequestParam("type") String type) throws CloneNotSupportedException {
+                                                                         @RequestBody Map<String, Object> data) {
         String taskTypeId = data.get("taskTyp/task_types/getAllAvlSkilleId") + "";
         boolean isSelected = (boolean) data.get("isSelected");
         return ResponseHandler.generateResponse(HttpStatus.OK, true,
-                taskTypeService.updateTaskType(unitId, subServiceId, taskTypeId, isSelected, type));
+                taskTypeService.updateTaskType(unitId, subServiceId, taskTypeId, isSelected));
     }
 
     @ApiOperation(value = "Add/ Remove TaskType to Organization")

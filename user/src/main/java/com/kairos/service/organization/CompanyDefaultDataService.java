@@ -5,8 +5,10 @@ import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.service.client.VRPClientService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.country.ReasonCodeService;
@@ -36,6 +38,8 @@ public class CompanyDefaultDataService {
     @Inject
     private VRPClientService vrpClientService;
     @Inject
+    private UnitGraphRepository unitGraphRepository;
+    @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
     private ReasonCodeService reasonCodeService;
@@ -44,7 +48,7 @@ public class CompanyDefaultDataService {
     @Inject private EmploymentTypeService employmentTypeService;
 
 
-    public void createDefaultDataInUnit(Long parentId, List<Organization> units, Long countryId, List<TimeSlot> timeSlots) {
+    public void createDefaultDataInUnit(Long parentId, List<Unit> units, Long countryId, List<TimeSlot> timeSlots) {
         OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO = new OrgTypeAndSubTypeDTO(countryId, parentId);
         List<EmploymentType> employmentTypes = employmentTypeService.getEmploymentTypeList(countryId,false);
         List<Long> employmentTypeIds = employmentTypes.stream().map(employmentType -> employmentType.getId()).collect(Collectors.toList());
@@ -54,7 +58,7 @@ public class CompanyDefaultDataService {
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(unit.getOrganizationSubTypes().get(0).getId());
             orgTypeAndSubTypeDTO.setWorkcentre(unit.isWorkcentre());
             orgTypeAndSubTypeDTO.setSubTypeId(unit.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
-            orgTypeAndSubTypeDTO.setParentOrganization(unit.isParentOrganization());
+            orgTypeAndSubTypeDTO.setParentOrganization(false);
             orgTypeAndSubTypeDTO.setEmploymentTypeIds(employmentTypeIds);
             activityIntegrationService.crateDefaultDataForOrganization(unit.getId(), parentId, orgTypeAndSubTypeDTO);
             activityIntegrationService.createDefaultKPISetting(
@@ -63,25 +67,23 @@ public class CompanyDefaultDataService {
             timeSlotService.createDefaultTimeSlots(unit, timeSlots);
             vrpClientService.createDefaultPreferredTimeWindow(unit);
             activityIntegrationService.createDefaultPriorityGroupsFromCountry(countryId, unit.getId());
-            reasonCodeService.createDefaultDataForSubUnit(unit, parentId);
-            //gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
+            reasonCodeService.createReasonCodeForUnit(unit, parentId);
+            gdprIntegrationService.createDefaultDataForOrganization(countryId, unit.getId());
 
         });
     }
 
     public void createDefaultDataForParentOrganization(Organization organization, Map<Long, Long> countryAndOrgAccessGroupIdsMap,
 
-                                                                         List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
+                                                       List<TimeSlot> timeSlots, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO, Long countryId) {
             orgTypeAndSubTypeDTO.setSubTypeId(organization.getOrganizationSubTypes().stream().map(k->k.getId()).collect(Collectors.toList()));
             orgTypeAndSubTypeDTO.setOrganizationSubTypeId(organization.getOrganizationSubTypes().get(0).getId());
             activityIntegrationService.crateDefaultDataForOrganization(organization.getId(), organization.getId(), orgTypeAndSubTypeDTO);
-            vrpClientService.createDefaultPreferredTimeWindow(organization);
-            organizationGraphRepository.linkWithRegionLevelOrganization(organization.getId());
+            unitGraphRepository.linkWithRegionLevelOrganization(organization.getId());
             activityIntegrationService.createDefaultKPISetting(new DefaultKPISettingDTO(orgTypeAndSubTypeDTO.getSubTypeId(), organization.getCountry().getId(), null, countryAndOrgAccessGroupIdsMap), organization.getId());
             timeSlotService.createDefaultTimeSlots(organization, timeSlots);
             organizationGraphRepository.assignDefaultSkillsToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
             organizationGraphRepository.assignDefaultServicesToOrg(organization.getId(), DateUtils.getCurrentDayStartMillis(), DateUtils.getCurrentDayStartMillis());
-            reasonCodeService.createDefaultDataForUnit(organization, countryId);
-            //gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
+            gdprIntegrationService.createDefaultDataForOrganization(countryId, organization.getId());
     }
 }

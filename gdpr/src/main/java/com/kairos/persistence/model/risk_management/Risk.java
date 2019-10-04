@@ -3,7 +3,9 @@ package com.kairos.persistence.model.risk_management;
 import com.kairos.enums.RiskSeverity;
 import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.response.dto.common.RiskResponseDTO;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

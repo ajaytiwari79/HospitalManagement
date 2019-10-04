@@ -1,6 +1,7 @@
 package com.planner.appConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kairos.dto.CurrentUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;

@@ -5,8 +5,8 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.enums.scheduler.Result;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.utils.external_plateform_shift.Transstatus;
 import org.apache.commons.codec.binary.Base64;
@@ -19,8 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import javax.xml.bind.*;
-import java.io.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
@@ -33,7 +37,7 @@ public class IntegrationJobsExecutorService {
     @Inject
     private EnvConfig envConfig;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     private static Logger logger = LoggerFactory.getLogger(IntegrationJobsExecutorService.class);
 
     @Inject
@@ -56,8 +60,8 @@ public class IntegrationJobsExecutorService {
         //  String endDate = DateFormatUtils.format(controlPanel.getEndDate(), "yyyy-MM-dd");
         Long workplaceId = Long.valueOf(String.valueOf("15"));
         if(job.getUnitId() != null){
-            Organization organization = organizationGraphRepository.findOne(job.getUnitId());
-            if(organization.getExternalId() != null) workplaceId = Long.valueOf(organization.getExternalId());
+            Unit unit = unitGraphRepository.findOne(job.getUnitId());
+            if(unit.getExternalId() != null) workplaceId = Long.valueOf(unit.getExternalId());
         }
         String importShiftURI = "";
         int weeks = 35;

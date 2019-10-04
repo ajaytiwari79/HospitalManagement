@@ -1,7 +1,7 @@
 package com.kairos.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.utils.user_context.CurrentUserDetails;
+import com.kairos.dto.CurrentUserDetails;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

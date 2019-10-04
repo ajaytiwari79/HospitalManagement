@@ -2,7 +2,9 @@ package com.kairos.dto.user.client;
 
 import com.kairos.dto.user.organization.AddressDTO;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by oodles on 14/2/17.

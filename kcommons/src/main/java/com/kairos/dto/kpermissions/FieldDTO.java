@@ -1,6 +1,8 @@
 package com.kairos.dto.kpermissions;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

@@ -7,8 +7,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.enums.FilterType.*;
-import static com.kairos.enums.FilterType.ACTIVITY_STATUS;
+import static com.kairos.enums.FilterType.ACTIVITY_TIMECALCULATION_TYPE;
 
 /**
  * Created by pradeep

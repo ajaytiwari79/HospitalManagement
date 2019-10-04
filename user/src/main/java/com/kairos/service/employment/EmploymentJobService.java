@@ -8,10 +8,14 @@ import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
-import com.kairos.persistence.model.staff.position.*;
-import com.kairos.persistence.model.user.employment.*;
+import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
+import com.kairos.persistence.model.staff.position.Position;
+import com.kairos.persistence.model.staff.position.PositionQueryResult;
+import com.kairos.persistence.model.user.employment.Employment;
+import com.kairos.persistence.model.user.employment.EmploymentLine;
+import com.kairos.persistence.model.user.employment.EmploymentLineEmploymentTypeRelationShip;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentSeniorityLevelQueryResult;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentAndEmploymentTypeRelationShipGraphRepository;
@@ -48,7 +52,7 @@ public class EmploymentJobService {
     @Inject
     private EmploymentAndEmploymentTypeRelationShipGraphRepository employmentAndEmploymentTypeRelationShipGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private PositionGraphRepository positionGraphRepository;
     @Inject

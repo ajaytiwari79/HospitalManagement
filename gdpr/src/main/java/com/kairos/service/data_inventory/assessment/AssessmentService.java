@@ -12,7 +12,9 @@ import com.kairos.enums.gdpr.*;
 import com.kairos.persistence.model.data_inventory.assessment.*;
 import com.kairos.persistence.model.data_inventory.asset.Asset;
 import com.kairos.persistence.model.data_inventory.processing_activity.ProcessingActivity;
-import com.kairos.persistence.model.questionnaire_template.*;
+import com.kairos.persistence.model.questionnaire_template.Question;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireSection;
+import com.kairos.persistence.model.questionnaire_template.QuestionnaireTemplate;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.data_inventory.Assessment.AssessmentRepository;
 import com.kairos.persistence.repository.data_inventory.asset.AssetRepository;
@@ -31,10 +33,13 @@ import com.kairos.persistence.repository.master_data.processing_activity_masterd
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.responsibility_type.ResponsibilityTypeRepository;
 import com.kairos.persistence.repository.master_data.processing_activity_masterdata.transfer_method.TransferMethodRepository;
 import com.kairos.persistence.repository.questionnaire_template.QuestionnaireTemplateRepository;
-import com.kairos.response.dto.common.*;
+import com.kairos.response.dto.common.AssessmentBasicResponseDTO;
+import com.kairos.response.dto.common.AssessmentResponseDTO;
+import com.kairos.response.dto.common.MetaDataCommonResponseDTO;
+import com.kairos.response.dto.common.RiskBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionBasicResponseDTO;
 import com.kairos.response.dto.master_data.questionnaire_template.QuestionnaireSectionResponseDTO;
-import com.kairos.rest_client.GenericRestClient;
+import com.kairos.rest_client.GDPRGenericRestClient;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.utils.user_context.UserContext;
@@ -63,7 +68,7 @@ public class AssessmentService {
     @Inject
     private ObjectMapper objectMapper;
     @Inject
-    private GenericRestClient genericRestClient;
+    private GDPRGenericRestClient gDPRGenericRestClient;
     @Inject
     private AssessmentRepository assessmentRepository;
     @Inject
@@ -627,7 +632,7 @@ public class AssessmentService {
      */
     public List<AssessmentBasicResponseDTO> getAllLaunchedAssessmentOfCurrentLoginUser(Long unitId) {
 
-        Long staffId = genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        Long staffId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/user/staffId", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
         List<Assessment> assessments = assessmentRepository.getAllAssessmentByUnitIdAndStaffId(unitId, staffId, assessmentStatusList);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(assessments, AssessmentBasicResponseDTO.class);

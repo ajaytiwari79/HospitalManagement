@@ -1,6 +1,9 @@
 package com.kairos.dto.user.organization;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class OrganizationTypeHierarchyQueryResult {
 

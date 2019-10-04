@@ -1,13 +1,15 @@
-package com.kairos.utils.user_context;
+package com.kairos.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CurrentUserDetails {
     private Long id;
     private String userName;
@@ -21,23 +23,22 @@ public class CurrentUserDetails {
     private boolean hubMember;
     private Long languageId;
     private Long lastSelectedOrganizationId;
-    private String googleCalenderTokenId;
-    private String googleCalenderAccessToken;
+
 
     public CurrentUserDetails(Long id, String userName, String nickName,
-                              String firstName, String lastName, String email,
-                              boolean hubMember) {
+                              String firstName, String lastName, String email,boolean passwordUpdated) {
         this.id = id;
         this.userName = userName;
         this.nickName = nickName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.hubMember =  hubMember;
+        this.passwordUpdated=passwordUpdated;
     }
 
     @JsonIgnore
     public String getFullName(){
         return this.firstName+" "+this.lastName;
     }
+
 }

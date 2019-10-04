@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.*;
 
@@ -99,5 +101,10 @@ public class OrganizationTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrgTypesServicesAndSubServicesListByUnitId(unitId));
     }
 
+    @PostMapping(value = COUNTRY_URL + "/organization_type/organizations")
+    @ApiOperation("Get organizations by organization type ids")
+    public ResponseEntity<Map<String, Object>>  getOrganizationIdsByOrganizationSubTypeIds(@RequestBody List<Long> organizationSubTypeId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.getOrganizationIdsByOrganizationSubTypeIds(organizationSubTypeId));
+    }
 
 }

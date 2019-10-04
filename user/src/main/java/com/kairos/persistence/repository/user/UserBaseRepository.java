@@ -11,13 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserBaseRepository extends Neo4jBaseRepository<UserBaseEntity,Long> {
 
-    @Query("MATCH (b:UserBaseEntity) WHERE id(b) = {0} SET b.isEnabled = false return b")
-    UserBaseEntity safeDelete(Long id);
-
-    @Query("MATCH (n:UserBaseEntity) where id(n) = {0} DETACH DELETE n")
-    void delete(Long aLong);
-
-
     @Query("MATCH (s:UserBaseEntity) where id(s)={0} AND s.isEnabled= true return s")
     UserBaseEntity findOne(Long id);
 

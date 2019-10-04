@@ -177,7 +177,7 @@ public class OrganizationTypeService{
         return organizationTypeGraphRepository.getOrganizationTypeHierarchy(countryId, orgSubServiceId);
     }
 
-    public List<Organization> getOrganizationByOrganizationTypeId(long organizationTypeId) {
+    public List<Unit> getOrganizationByOrganizationTypeId(long organizationTypeId) {
         return organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationTypeId);
     }
 
@@ -204,5 +204,7 @@ public class OrganizationTypeService{
       return organizationTypeGraphRepository.getOrganizationTypeSubTypesServiceAndSubServices(unitId);
     }
 
-
+    public List<Long> getOrganizationIdsByOrganizationSubTypeIds(List<Long>organizationSubTypeId) {
+        return organizationTypeGraphRepository.getOrganizationByOrganizationSubTypeIds(organizationSubTypeId);
+    }
 }

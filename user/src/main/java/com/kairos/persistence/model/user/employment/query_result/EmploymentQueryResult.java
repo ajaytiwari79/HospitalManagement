@@ -12,7 +12,10 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by vipul on 10/8/17.
@@ -47,6 +50,7 @@ public class EmploymentQueryResult {
     private LocalDate accumulatedTimebankDate;
     private long totalShifts;
 
+
     /**
      *  Please do not use in backend its just only for FE compactibility
      */
@@ -67,7 +71,7 @@ public class EmploymentQueryResult {
     }
 
     public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
-                                   Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
+                                 Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -87,4 +91,14 @@ public class EmploymentQueryResult {
         this.accumulatedTimebankDate = accumulatedTimebankDate;
 
     }
+
+    public Map<String, Object> getUnitInfo() {
+        return unitInfo;
+    }
+
+    public List<EmploymentLinesQueryResult> getEmploymentLines() {
+        return Optional.ofNullable(employmentLines).orElse(new ArrayList<>());
+    }
+
+
 }

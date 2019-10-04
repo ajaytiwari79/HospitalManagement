@@ -6,7 +6,10 @@ import com.kairos.dto.activity.activity.ActivityCategoryListDTO;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDTO;
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.OrganizationContactAddress;
+import com.kairos.persistence.model.organization.StaffTeamRelationShipQueryResult;
+import com.kairos.persistence.model.organization.StaffTeamRelationship;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
@@ -14,8 +17,8 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
@@ -40,7 +43,6 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;
-
 /**
  * Created by oodles on 7/10/16.
  */
@@ -51,7 +53,7 @@ public class TeamService {
     @Inject
     private TeamGraphRepository teamGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
@@ -75,8 +77,8 @@ public class TeamService {
 
     public TeamDTO createTeam(Long unitId, TeamDTO teamDTO) {
 
-        OrganizationContactAddress organizationContactAddress = organizationGraphRepository.getOrganizationByOrganizationId(unitId);
-        if (organizationContactAddress.getOrganization() == null) {
+        OrganizationContactAddress organizationContactAddress = unitGraphRepository.getOrganizationByOrganizationId(unitId);
+        if (organizationContactAddress.getUnit() == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_UNIT_ID_NOTFOUND_BY_GROUP);
         }
         boolean teamExistInOrganizationByName = teamGraphRepository.teamExistInOrganizationByName(unitId, -1L, "(?i)" + teamDTO.getName());
@@ -84,7 +86,7 @@ public class TeamService {
             exceptionService.duplicateDataException(MESSAGE_TEAMSERVICE_TEAM_ALREADYEXISTS_IN_UNIT, teamDTO.getName());
         }
 
-        Organization organization = organizationContactAddress.getOrganization();
+        Unit unit = organizationContactAddress.getUnit();
 
         ContactAddress contactAddress;
         ZipCode zipCode;
@@ -115,8 +117,8 @@ public class TeamService {
         teamGraphRepository.save(team);
         teamDTO.setId(team.getId());
 
-        organization.getTeams().add(team);
-        organizationGraphRepository.save(organization, 2);
+        unit.getTeams().add(team);
+        unitGraphRepository.save(unit, 2);
         teamDTO.setId(team.getId());
         assignTeamLeadersToTeam(teamDTO, team);
         return teamDTO;
@@ -201,7 +203,7 @@ public class TeamService {
     }
 
 
-    public boolean addStaffInTeam(long teamId, long staffId, boolean isAssigned, long unitId) {
+    public boolean addStaffInTeam(long teamId, long staffId, boolean isAssigned) {
 
         Staff staff = staffGraphRepository.findOne(staffId);
         Team team = teamGraphRepository.findOne(teamId, 0);
@@ -254,7 +256,7 @@ public class TeamService {
 
 
     public List<Map<String, Object>> getTeamSelectedServices(Long teamId) {
-        return organizationGraphRepository.getTeamAllSelectedSubServices(teamId);
+        return unitGraphRepository.getTeamAllSelectedSubServices(teamId);
     }
 
     public List<com.kairos.persistence.model.organization.services.OrganizationService> addTeamSelectedServices(Long teamId, Long[] organizationService) {
@@ -293,12 +295,12 @@ public class TeamService {
     }
 
     public Long getOrganizationIdByTeamId(Long teamId) {
-        Organization organization = organizationGraphRepository.getOrganizationByTeamId(teamId);
-        return organization.getId();
+        Unit unit = unitGraphRepository.getOrganizationByTeamId(teamId);
+        return unit.getId();
     }
 
-    public Organization getOrganizationByTeamId(Long teamId) {
-        return organizationGraphRepository.getOrganizationByTeamId(teamId);
+    public Unit getOrganizationByTeamId(Long teamId) {
+        return unitGraphRepository.getOrganizationByTeamId(teamId);
     }
 
     public TeamDTO updateTeamGeneralDetails(long teamId, TeamDTO teamDTO) {
@@ -313,7 +315,7 @@ public class TeamService {
     }
 
     public List<Object> getTeamsInUnit(Long unitId) {
-        List<Map<String, Object>> data = organizationGraphRepository.getUnitTeams(unitId);
+        List<Map<String, Object>> data = unitGraphRepository.getUnitTeams(unitId);
         List<Object> response = new ArrayList<>();
         for (Map<String, Object> map :
                 data) {

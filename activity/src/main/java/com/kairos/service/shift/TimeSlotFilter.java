@@ -5,13 +5,12 @@ import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.rest_client.UserIntegrationService;
-import org.springframework.util.CollectionUtils;
 
-import javax.inject.Inject;
 import java.time.temporal.ChronoField;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;

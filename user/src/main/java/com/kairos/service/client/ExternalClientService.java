@@ -5,14 +5,18 @@ import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.patient.PatientRelative;
 import com.kairos.dto.user.patient.PatientWrapper;
 import com.kairos.dto.user.staff.CurrentAddress;
-import com.kairos.persistence.model.client.*;
+import com.kairos.persistence.model.client.Client;
+import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.client.relationships.ClientOrganizationRelation;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
-import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.user.client.*;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.client.ClientGraphRepository;
+import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
+import com.kairos.persistence.repository.user.client.ContactDetailsGraphRepository;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
@@ -30,6 +34,7 @@ import java.util.Map;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_ORGANISATION_NOTFOUND;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_HOME_ADDRESS;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_SECONDARY_ADDRESS;
+
 
 
 /**
@@ -70,7 +75,7 @@ public class ExternalClientService {
     private MunicipalityGraphRepository municipalityGraphRepository;
 
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
 
     @Inject
     private CountryGraphRepository countryGraphRepository;
@@ -248,8 +253,8 @@ public class ExternalClientService {
     }
 // TODO FIX the import
     public Client createCitizenFromExternalService(PatientWrapper patientWrapper, Long unitId) {
-        Organization organization = organizationGraphRepository.findOne(unitId);
-        if (organization == null) {
+        Unit unit = unitGraphRepository.findOne(unitId);
+        if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANISATION_NOTFOUND);
 
         }
@@ -293,7 +298,7 @@ public class ExternalClientService {
             int count = relationService.checkClientOrganizationRelation(client.getId(), unitId);
             if (count == 0) {
                 logger.debug("Creating Existing Client relationship from KMD : " + client.getId());
-                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, organization, DateUtils.getCurrentDate().getTime());
+                ClientOrganizationRelation relation = new ClientOrganizationRelation(client, unit, DateUtils.getCurrentDate().getTime());
                 relationService.createRelation(relation);
             }
             saveAddressDetails(patientWrapper, client, unitId);

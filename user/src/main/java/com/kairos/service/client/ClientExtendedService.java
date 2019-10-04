@@ -6,19 +6,23 @@ import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.*;
-import com.kairos.persistence.model.client.relationships.*;
+import com.kairos.persistence.model.client.relationships.ClientLanguageRelation;
+import com.kairos.persistence.model.client.relationships.ClientNextToKinRelationship;
+import com.kairos.persistence.model.client.relationships.ClientRelativeRelation;
 import com.kairos.persistence.model.country.default_data.CitizenStatus;
 import com.kairos.persistence.model.country.default_data.RelationType;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
+import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.*;
 import com.kairos.persistence.repository.user.country.CitizenStatusGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
-import com.kairos.persistence.repository.user.region.*;
+import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
+import com.kairos.persistence.repository.user.region.RegionGraphRepository;
+import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.FileUtil;
@@ -52,7 +56,7 @@ public class ClientExtendedService{
     @Inject
     private ClientGraphRepository clientGraphRepository;
     @Inject
-    private OrganizationGraphRepository organizationGraphRepository;
+    private UnitGraphRepository unitGraphRepository;
     @Inject
     private ClientService clientService;
     @Inject

@@ -8,7 +8,9 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 17/8/17.
@@ -24,7 +26,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'deleted' : false, 'countryId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1,'balanceSettingsActivityTab':1}")
     List<ActivityDTO> findByDeletedFalseAndCountryId(Long countryId);
 
-    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1, 'balanceSettingsActivityTab':1}")
+    @Query(value = "{'deleted' : false, 'unitId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1, 'balanceSettingsActivityTab':1,'countryParentId':1}")
     List<ActivityDTO> findByDeletedFalseAndUnitId(Long unitId);
 
     @Query(value = "{'deleted' : false, 'unitId' :{$in:?0} }", fields = "{'name':1,'_id':1,'unitId':1}")
@@ -63,8 +65,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0}, deleted:false}")
     List<Activity>  findAllByTimeTypeId(BigInteger timeTypeId);
 
-    @Query(value = "{'_id':{'$in':?0}, 'deleted':false}",fields = "{'name':1,'description':1}")
-    List<ActivityDTO> findByDeletedFalseAndIdsIn(Set<BigInteger> activityIds);
+    @Query(value = "{'_id':{'$in':?0}, 'deleted':false}")
+    List<ActivityDTO> findByDeletedFalseAndIdsIn(Collection<BigInteger> activityIds);
 
     @Query(value = "{'balanceSettingsActivityTab.timeTypeId':?0}, deleted:false}",exists = true)
     boolean existsByTimeTypeId(BigInteger timeTypeId);

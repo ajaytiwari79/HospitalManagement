@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.public_legal_document;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

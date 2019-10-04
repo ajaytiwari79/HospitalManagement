@@ -5,7 +5,9 @@ package com.kairos.dto.activity.activity.activity_tabs;/*
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class AllowedSettings {
     private Set<AccessGroupRole> canEdit;
