@@ -1,7 +1,6 @@
 package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.constants.RelationshipConstants;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

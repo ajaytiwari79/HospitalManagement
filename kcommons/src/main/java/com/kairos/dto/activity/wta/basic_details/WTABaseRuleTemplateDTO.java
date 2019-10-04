@@ -3,11 +3,9 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.kairos.commons.annotation.ValidateIgnoreCounter;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.wta.templates.*;
 import com.kairos.enums.wta.WTATemplateType;
-import lombok.ToString;
 
 import java.math.BigInteger;
 import java.util.List;

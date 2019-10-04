@@ -1,20 +1,19 @@
 package com.kairos.dto.user.country.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.DateTime;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by vipul on 30/3/18.

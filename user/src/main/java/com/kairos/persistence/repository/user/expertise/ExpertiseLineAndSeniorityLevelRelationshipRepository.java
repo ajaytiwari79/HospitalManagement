@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.expertise;
 
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLineSeniorityLevelRelationship;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;

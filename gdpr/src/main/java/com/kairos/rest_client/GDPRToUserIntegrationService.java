@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.List;
 
-import static com.kairos.constants.ApiConstant.*;
+import static com.kairos.constants.ApiConstant.GET_ALL_UNITS_BY_COUNTRY;
+import static com.kairos.constants.ApiConstant.GET_ORGANIZATION_IDS_ORGANIZATION_SUB_TYPE_Id;
 
 /**
  * Created By G.P.Ranjan on 10/9/19

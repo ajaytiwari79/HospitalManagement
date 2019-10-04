@@ -5,7 +5,6 @@ import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;

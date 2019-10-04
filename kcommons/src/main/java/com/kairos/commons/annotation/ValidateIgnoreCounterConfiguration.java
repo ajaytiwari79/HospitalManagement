@@ -4,7 +4,6 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;

@@ -14,7 +14,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.addMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;

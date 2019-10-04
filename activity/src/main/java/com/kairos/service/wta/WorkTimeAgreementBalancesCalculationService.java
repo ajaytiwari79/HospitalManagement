@@ -2,7 +2,6 @@ package com.kairos.service.wta;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;

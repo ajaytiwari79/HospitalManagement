@@ -5,7 +5,6 @@ package com.kairos.persistence.model.organization;/*
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
-import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.time_slot.TimeSlotMode;
@@ -17,7 +16,6 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotSet;
 import com.kairos.persistence.model.user.region.LocalAreaTag;
-import com.kairos.persistence.model.user.region.ZipCode;
 import com.kairos.utils.ZoneIdStringConverter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,13 +23,11 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
-import org.neo4j.ogm.annotation.typeconversion.DateString;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotNull;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_ORGANIZATION_CONTACTADDRESS_NOTNULL;

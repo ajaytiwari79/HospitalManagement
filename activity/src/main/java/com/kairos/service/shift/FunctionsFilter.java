@@ -2,11 +2,8 @@ package com.kairos.service.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.rest_client.UserIntegrationService;
 
-import javax.inject.Inject;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.FUNCTIONS;

@@ -3,7 +3,6 @@ package com.kairos.dto.activity.shift;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;

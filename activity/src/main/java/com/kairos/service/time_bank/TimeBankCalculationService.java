@@ -74,9 +74,9 @@ import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY_END_DATE_L
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
-import static com.kairos.enums.phase.PhaseDefaultName.*;
 import static com.kairos.enums.phase.PhaseDefaultName.PAYROLL;
 import static com.kairos.enums.phase.PhaseDefaultName.REALTIME;
+import static com.kairos.enums.phase.PhaseDefaultName.*;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.stream.Collectors.toMap;
 
