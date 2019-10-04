@@ -2,10 +2,8 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.organization.union.Sector;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -58,7 +56,7 @@ public class Expertise extends UserBaseEntity {
     private List<CareDays> childCareDays;
 
     @Relationship(type = HAS_EXPERTISE_LINES)
-    private List<ExpertiseLine> expertiseLines;
+    private List<ExpertiseLine> expertiseLines=new ArrayList<>();
 
     public Expertise(String name, Country country) {
         this.name = name;
@@ -79,7 +77,8 @@ public class Expertise extends UserBaseEntity {
         this.expertiseLines = expertiseLines;
     }
 
-    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek,  boolean published, List<SeniorityLevel> seniorityLevel) {
+    public Expertise(Long id,@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek,  boolean published, List<SeniorityLevel> seniorityLevel,List<ExpertiseLine> expertiseLines) {
+        this.id=id;
         this.name = name;
         this.description = description;
         this.startDate = startDate;
@@ -88,6 +87,7 @@ public class Expertise extends UserBaseEntity {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.published = published;
         this.seniorityLevel = seniorityLevel;
+        this.expertiseLines=expertiseLines;
     }
 
     public List<CareDays> getSeniorDays() {
@@ -127,14 +127,6 @@ public class Expertise extends UserBaseEntity {
         this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.published = published;
     }
-
-    public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description) {
-
-        this.name = name;
-        this.id = id;
-        this.description = description;
-    }
-
 
     public Expertise retrieveBasicDetails() {
         return new Expertise(this.id, this.name, this.description, this.startDate, this.endDate, this.fullTimeWeeklyMinutes, this.numberOfWorkingDaysInWeek, this.published);

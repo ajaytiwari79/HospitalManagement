@@ -40,7 +40,7 @@ public class SeniorityLevelDTO {
                 return false;
             }
             if (Optional.ofNullable(this.to).isPresent()) {
-                if (this.to < this.from)
+                if (this.to <= this.from)
                     return false;
             }
 

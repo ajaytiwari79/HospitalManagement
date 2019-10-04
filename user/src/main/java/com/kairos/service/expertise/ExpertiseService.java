@@ -228,6 +228,19 @@ public class ExpertiseService {
 
     }
 
+    private boolean validateSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
+        Collections.sort(seniorityLevels);
+        if(seniorityLevels.size()>1){
+            for (int i = 0; i < seniorityLevels.size()-1; i++) {
+                if(!seniorityLevels.get(i).getTo().equals(seniorityLevels.get(i+1).getFrom())){
+                    exceptionService.actionNotPermittedException("Please enter valid Seniority Levels");
+                }
+            }
+        }
+        return true;
+
+    }
+
 
     /* Add previously added seniority level in current.
         This method is used to to copy sr level from and expertise and add in another expertise.
@@ -886,7 +899,7 @@ public class ExpertiseService {
         List<PayGrade> payGrades = payGradeGraphRepository.getAllPayGradesById(payGradeIds);
         Map<Long, PayGrade> payGradeMap = payGrades.stream().collect(Collectors.toMap(PayGrade::getId, v -> v));
         expertiseDTO.getSeniorityLevels().forEach(seniorityLevelDTO -> {
-            SeniorityLevel seniorityLevel = new SeniorityLevel(seniorityLevelDTO.getFrom(), seniorityLevelDTO.getTo(), payGradeMap.get(seniorityLevelDTO.getPayGradeId()), seniorityLevelDTO.getPensionPercentage(), seniorityLevelDTO.getFreeChoicePercentage(),
+            SeniorityLevel seniorityLevel = new SeniorityLevel(seniorityLevelDTO.getId(),seniorityLevelDTO.getFrom(), seniorityLevelDTO.getTo(), payGradeMap.get(seniorityLevelDTO.getPayGradeId()), seniorityLevelDTO.getPensionPercentage(), seniorityLevelDTO.getFreeChoicePercentage(),
                     seniorityLevelDTO.getFreeChoiceToPension(), false);
             targetExpertise.addSeniorityLevel(seniorityLevel);
         });
@@ -986,9 +999,9 @@ public class ExpertiseService {
         });
 //        List<SeniorityLevel> seniorityLevels=ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class);
 //        seniorityLevels=Arrays.asList(ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO.getSeniorityLevel(),SeniorityLevel.class));
-
+        validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class));
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO, country);
-        Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),asLocalDate(expertiseDTO.getStartDateMillis()),asLocalDate(expertiseDTO.getEndDateMillis()),country,expertiseDTO.getFullTimeWeeklyMinutes(),expertiseDTO.getNumberOfWorkingDaysInWeek(),expertiseDTO.isPublished(),null,Collections.singletonList(expertiseLine));
+        Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),country,expertiseDTO.getFullTimeWeeklyMinutes(),expertiseDTO.getNumberOfWorkingDaysInWeek(),expertiseDTO.isPublished(),null,Collections.singletonList(expertiseLine));
         addSeniorityLevelsInExpertise(expertise,expertiseDTO);
         expertiseGraphRepository.save(expertise);
         Map<Integer,PayGrade> fromAndPayGradeLevelMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(SeniorityLevel::getFrom,v->v.getPayGrade()));
@@ -1016,8 +1029,9 @@ public class ExpertiseService {
                 exceptionService.duplicateDataException(MESSAGE_DUPLICATE, EXPERTISE);
             }
         }
-        List<SeniorityLevel> seniorityLevels=ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class);
-        Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),expertiseDTO.getFullTimeWeeklyMinutes(),expertiseDTO.getNumberOfWorkingDaysInWeek(),expertiseDTO.isPublished(),seniorityLevels);
+        validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class));
+        addSeniorityLevelsInExpertise(currentExpertise,expertiseDTO);
+        Expertise expertise=new Expertise(currentExpertise.getId(),expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),expertiseDTO.getFullTimeWeeklyMinutes(),expertiseDTO.getNumberOfWorkingDaysInWeek(),expertiseDTO.isPublished(),currentExpertise.getSeniorityLevel(),currentExpertise.getExpertiseLines());
         expertiseGraphRepository.save(expertise);
         linkProtectedDaysOffSetting(new ArrayList<>(),Arrays.asList(expertise));
         return new ExpertiseResponseDTO();
@@ -1032,9 +1046,13 @@ public class ExpertiseService {
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId());
         }
-
+        expertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
         ExpertiseLine currentExpertiseLine = expertise.getExpertiseLines().stream().filter(expertiseLine -> expertiseLine.getId().equals(expertiseDTO.getExpertiseLineId()))
                 .findFirst().orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_POSITION_LINE_NOTFOUND, expertiseDTO.getId())));
+        if(!expertiseDTO.getExpertiseLineId().equals(expertise.getExpertiseLines().get(expertise.getExpertiseLines().size()-1))){
+            exceptionService.actionNotPermittedException("Please provide the valid line id");
+        }
+
         if(expertise.isPublished() && isExpertiseLineChanged(currentExpertiseLine,expertiseDTO.getOrganizationLevelId(), expertiseDTO.getOrganizationServiceIds(),expertiseDTO.getSector().getId(),expertiseDTO.getUnion().getId(),expertiseDTO)){
             ExpertiseLine expertiseLine=createExpertiseLine(expertiseDTO,country);
             currentExpertiseLine.setEndDate(expertiseDTO.getStartDate());
@@ -1087,7 +1105,7 @@ public class ExpertiseService {
         }
         Sector sector=getSector(expertiseDTO.getSector(),country);
         Organization union=getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country);
-        return new ExpertiseLine.ExpertiseLineBuilder().setStartDate(asLocalDate(expertiseDTO.getStartDateMillis())).setEndDate(asLocalDate(expertiseDTO.getEndDateMillis())).setOrganizationLevel(level).setSector(sector).setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting()).setUnion(union).setOrganizationServices(organizationServices).createLine();
+        return new ExpertiseLine.ExpertiseLineBuilder().setStartDate(expertiseDTO.getStartDate()).setEndDate(expertiseDTO.getEndDate()).setOrganizationLevel(level).setSector(sector).setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting()).setUnion(union).setOrganizationServices(organizationServices).createLine();
     }
 
     private void initializeExpertiseLine(ExpertiseLine expertiseLine,ExpertiseDTO expertiseDTO,Country country){
@@ -1112,7 +1130,6 @@ public class ExpertiseService {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
-
         }
 
         List<Long> seniorityLevelId = new ArrayList<>();
@@ -1145,7 +1162,7 @@ public class ExpertiseService {
         List<PayGrade> payGrades = payGradeGraphRepository.getAllPayGradesById(payGradeIds);
         Map<Long, PayGrade> payGradeMap = payGrades.stream().collect(Collectors.toMap(PayGrade::getId, v -> v));
         expertiseDTO.getSeniorityLevels().forEach(seniorityLevelDTO -> {
-            SeniorityLevel seniorityLevel = new SeniorityLevel(seniorityLevelDTO.getFrom(), seniorityLevelDTO.getTo(), payGradeMap.get(seniorityLevelDTO.getPayGradeId()), seniorityLevelDTO.getPensionPercentage(), seniorityLevelDTO.getFreeChoicePercentage(),
+            SeniorityLevel seniorityLevel = new SeniorityLevel(seniorityLevelDTO.getId(),seniorityLevelDTO.getFrom(), seniorityLevelDTO.getTo(), payGradeMap.get(seniorityLevelDTO.getPayGradeId()), seniorityLevelDTO.getPensionPercentage(), seniorityLevelDTO.getFreeChoicePercentage(),
                     seniorityLevelDTO.getFreeChoiceToPension(), false);
             expertise.addSeniorityLevel(seniorityLevel);
         });

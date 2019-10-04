@@ -34,18 +34,14 @@ public class CopyExpertiseDTO {
     private BreakPaymentSetting breakPaymentSetting;
     private Long parentId;
     // TODO REMOVE FOR FE compactibility
-    private Long startDateMillis;
-    private Long endDateMillis;
     private SectorDTO sector;
 
     @AssertTrue(message = "message.start_date.less_than.end_date")
     public boolean isValid() {
-        if (!Optional.ofNullable(this.startDateMillis).isPresent() && Optional.ofNullable(this.endDateMillis).isPresent()) {
+        if (!Optional.ofNullable(this.startDate).isPresent() && Optional.ofNullable(this.endDate).isPresent()) {
             return false;
-        } else if (Optional.ofNullable(this.startDateMillis).isPresent() && (Optional.ofNullable(this.endDateMillis).isPresent())) {
-            DateTime endDateAsUtc = new DateTime(this.endDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            DateTime startDateAsUtc = new DateTime(this.startDateMillis).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            return !endDateAsUtc.isBefore(startDateAsUtc);
+        } else if (Optional.ofNullable(this.startDate).isPresent() && (Optional.ofNullable(this.endDate).isPresent())) {
+            return startDate.isAfter(endDate);
         }
         return true;
     }
