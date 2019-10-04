@@ -1104,11 +1104,15 @@ public class WorkTimeAgreementService extends MongoBaseService {
                                             dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
                                         }
                                         break;
-                                    case ACTIVITY_CUT_OFF_INTERVAL:
+                                    case ONCE_IN_A_YEAR:
+                                        DateTimeInterval activityDateTimeInterval=activityIdDateTimeIntervalMap.get(protectedDaysOffWTATemplate.getActivityId());
+                                        long count=employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && activityDateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
                                         employmentDetails.getCtaRuleTemplates().addAll(employmentIdAndCtaResponseDTOMap.get(employmentDetails.getId()).getRuleTemplates());
                                         TimeBankCalculationService.CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours(new StaffAdditionalInfoDTO(employmentDetails), dateTimeInterval).calculate();
                                         break;
-                                    case ONCE_IN_A_YEAR:
+                                    case ACTIVITY_CUT_OFF_INTERVAL:
+                                        DateTimeInterval DateTimeInterval=activityIdDateTimeIntervalMap.get(protectedDaysOffWTATemplate.getActivityId());
+                                        long protectedDayscount=employmentDetails.getProtectedDaysOffSettings.stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && protectedDaysOffSetting.getPublicHolidayDate().isBefore(startDate) && isNotNull(getCutoffInterval(protectedDaysOffSetting.getPublicHolidayDate(), cutOffIntervalUnit, cutOffdayValue, asDate(getLocalDate().minusDays(1)), protectedDaysOffSetting.getPublicHolidayDate().plusDays(1))));
                                         break;
                                     default:
                                         break;
