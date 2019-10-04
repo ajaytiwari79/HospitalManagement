@@ -370,7 +370,7 @@ public class StaffRetrievalService {
                             exceptionService.dataNotMatchedException(MESSAGE_DAY_TYPE_ABSENT, accessGroupDayTypes.getAccessGroup().getName());
                         }
                         List<String> validDays = dayType.getValidDays().stream().map(day -> day.name()).collect(Collectors.toList());
-                        if (validDays.contains(loginDay.toString()) || validDays.contains(EVERYDAY)) {
+                        if (validDays.contains(loginDay.toString()) || validDays.contains(EVERYDAY.toString())) {
                             staffRole = accessGroupDayTypes.getAccessGroup().getRole().name();
                             if (AccessGroupRole.MANAGEMENT.name().equals(staffRole)) {
                                 STAFF_CURRENT_ROLE = staffRole;

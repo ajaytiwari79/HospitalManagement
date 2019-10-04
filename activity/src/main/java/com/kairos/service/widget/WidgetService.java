@@ -1,5 +1,6 @@
 package com.kairos.service.widget;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
@@ -140,9 +141,9 @@ public class WidgetService {
             TimeTypeDTO timeType = timeTypeDTOMap.get(timeTypeId);
             shiftActivityDTO.setSecondLevelType(timeType.getSecondLevelType());
             if (timeType.getParent().size() == 2) {
-                TimeTypeDTO thirdLevelTimeType = timeType.getParent().stream().filter(timeTypeDTO -> timeTypeDTO.getId().equals(timeType.getUpperLevelTimeTypeId())).findFirst().get();
+                TimeTypeDTO thirdLevelTimeType = timeType.getParent().stream().filter(timeTypeDTO -> timeTypeDTO.getId().equals(timeType.getUpperLevelTimeTypeId())).findFirst().orElseThrow(()-> new DataNotFoundByIdException("Third Level Time Type Not Found By Id :"+timeType.getUpperLevelTimeTypeId()));
                 shiftActivityDTO.setThirdLevelTimeTypeId(thirdLevelTimeType.getId());
-                TimeTypeDTO secondLevelTimeType = timeType.getParent().stream().filter(timeTypeDTO -> timeTypeDTO.getId().equals(thirdLevelTimeType.getUpperLevelTimeTypeId())).findFirst().get();
+                TimeTypeDTO secondLevelTimeType = timeType.getParent().stream().filter(timeTypeDTO -> timeTypeDTO.getId().equals(thirdLevelTimeType.getUpperLevelTimeTypeId())).findFirst().orElseThrow(()-> new DataNotFoundByIdException("Second Level Time Type Not Found By Id :"+thirdLevelTimeType.getUpperLevelTimeTypeId()));
                 shiftActivityDTO.setSecondLevelTimeTypeId(secondLevelTimeType.getId());
                 shiftActivityDTO.setFourthLevelTimeTypeId(timeTypeId);
             } else if (timeType.getParent().size() == 1) {
