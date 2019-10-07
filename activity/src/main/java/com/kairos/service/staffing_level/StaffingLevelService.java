@@ -778,7 +778,8 @@ public class StaffingLevelService extends MongoBaseService {
             exceptionService.dataNotFoundByIdException(STAFFINGLEVELTEMPLATE_NOT_FOUND, templateId);
         }
         Set<BigInteger> activityIds = staffingLevelFromTemplateDTO.getActivitiesByDate().stream().flatMap(s -> s.getActivityIds().stream()).collect(Collectors.toSet());
-        List<ActivityValidationError> activityValidationErrors = staffingLevelTemplateService.validateActivityRules(activityIds, ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate, StaffingLevelTemplateDTO.class));
+        List<BigInteger> parentActivityIds=new ArrayList<>();
+        List<ActivityValidationError> activityValidationErrors = staffingLevelTemplateService.validateActivityRules(activityIds, ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate, StaffingLevelTemplateDTO.class),parentActivityIds);
         Map<BigInteger, ActivityValidationError> activityValidationErrorMap = activityValidationErrors.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
         List<StaffingLevel> staffingLevels = new ArrayList<>();
         List<DateWiseActivityDTO> dateWiseActivityDTOS = staffingLevelFromTemplateDTO.getActivitiesByDate();
@@ -798,8 +799,11 @@ public class StaffingLevelService extends MongoBaseService {
 
                     if (activityMap.get(activity.getActivityId()) != null && activityValidationErrorMap.get(activity.getActivityId()) == null) {
                         selectedActivitiesForCurrentDate.add(activity);
-                        min.addAndGet(activity.getMinNoOfStaff());
-                        max.addAndGet(activity.getMaxNoOfStaff());
+                        if(parentActivityIds.contains(activity.getActivityId())){
+                            min.addAndGet(activity.getMinNoOfStaff());
+                            max.addAndGet(activity.getMaxNoOfStaff());
+                        }
+
                     }
                 });
                 currentInterval.setStaffingLevelActivities(selectedActivitiesForCurrentDate);

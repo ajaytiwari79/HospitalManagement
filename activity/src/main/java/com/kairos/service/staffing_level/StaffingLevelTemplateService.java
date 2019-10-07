@@ -54,7 +54,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
             exceptionService.duplicateDataException(ERROR_NAME_DUPLICATE,staffingLevelTemplateDTO.getName());
         }
         //validating Activities
-        List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
+        List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO,null);
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -81,7 +81,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         LOGGER.info("updating staffing level Template ID={}", staffingTemplateId);
 
         //validating Activities
-        List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO);
+        List<ActivityValidationError> errors= validateActivityRules(new HashSet<>(),staffingLevelTemplateDTO,null);
         if(!errors.isEmpty()){
             staffingLevelTemplateDTO.setErrors(errors);
             return staffingLevelTemplateDTO;
@@ -133,7 +133,7 @@ public class StaffingLevelTemplateService extends MongoBaseService {
      * @param staffingLevelTemplateDTO
      * @return
      */
-    public List<ActivityValidationError> validateActivityRules(Set<BigInteger> activityIds,StaffingLevelTemplateDTO staffingLevelTemplateDTO){
+    public List<ActivityValidationError> validateActivityRules(Set<BigInteger> activityIds,StaffingLevelTemplateDTO staffingLevelTemplateDTO,List<BigInteger> parentActivityIds){
         if(activityIds.isEmpty()) {
             staffingLevelTemplateDTO.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
                 staffingLevelInterval.getStaffingLevelActivities().forEach(staffingLevelActivity -> {
@@ -145,6 +145,9 @@ public class StaffingLevelTemplateService extends MongoBaseService {
         List<Activity> activities=activityMongoRepository.findAllActivitiesByIds(activityIds);
         List<ActivityValidationError> activityValidationErrors =new ArrayList<>();
         activities.forEach(activity -> {
+            if(parentActivityIds!=null && activities.stream().noneMatch(phaseTemplateValue -> phaseTemplateValue.getChildActivityIds().contains(activity.getId()))){
+                parentActivityIds.add(activity.getId());
+            }
                 List<String> errors=new ArrayList<>();
                 if(!Optional.ofNullable(staffingLevelTemplateDTO.getValidity().getEndDate()).isPresent()) {
                     if (!Optional.ofNullable(activity.getGeneralActivityTab().getEndDate()).isPresent() &&
