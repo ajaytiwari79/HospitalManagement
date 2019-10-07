@@ -1,24 +1,27 @@
 package com.kairos.service.shift;
 
+import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
+import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.enums.FilterType.*;
 
 /**
  * Created by pradeep
@@ -26,39 +29,59 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
  **/
 @Service
 public class ShiftFilterService {
-
     @Inject
     private UserIntegrationService userIntegrationService;
-
     @Inject
     private ShiftStateService shiftStateService;
-
+    @Inject
+    private TimeTypeService timeTypeService;
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
         if (isNull(staffFilterDTO)) {
             staffFilterDTO = new StaffFilterDTO();
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
-//        Set<String> teamIds=new HashSet<>();
         List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(UserContext.getUnitId());
         Map<FilterType, Set<String>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
-//        if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
-//            teamIds=filterTypeMap.get(TEAM);
-//        }
-  ///      ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUnitId(),teamIds));
-        ShiftFilter timeTypeFilter = new TimeTypeFilter(filterTypeMap);
+        List<BigInteger> timeTypeIds = new ArrayList<>();
+        if(filterTypeMap.containsKey(TIME_TYPE)) {
+            List<BigInteger> ids = filterTypeMap.get(TIME_TYPE).stream().map(s -> new BigInteger(s)).collect(Collectors.toList());
+            timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), ids);
+        }
+        ShiftFilter timeTypeFilter = new TimeTypeFilter(filterTypeMap, timeTypeIds);
         ShiftFilter activityTimecalculationTypeFilter = new ActivityTimeCalculationTypeFilter(filterTypeMap);
         ShiftFilter activityStatusFilter = new ActivityStatusFilter(filterTypeMap);
         ShiftFilter timeSlotFilter = new TimeSlotFilter(filterTypeMap,timeSlotDTOS);
-        ShiftFilter activityFilter = new ActivityFilter(filterTypeMap);
+        List<BigInteger> selectedActivityIds = new ArrayList<>();
+        if(filterTypeMap.containsKey(ABSENCE_ACTIVITY)) {
+            selectedActivityIds.addAll(filterTypeMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s)).collect(Collectors.toList()));
+        }
+        if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
+            Set<String> teamIds = filterTypeMap.get(TEAM);
+            ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUnitId(),teamIds));
+            selectedActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
+        }
+        ShiftFilter activityFilter = new ActivityFilter(filterTypeMap, selectedActivityIds);
         ShiftFilter plannedTimeTypeFilter=new PlannedTimeTypeFilter(filterTypeMap);
         if(filterTypeMap.containsKey(FilterType.VALIDATED_BY)) {
             Set<BigInteger> shiftIds = shiftWithActivityDTOS.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
-           List<ShiftState> shiftStates = shiftStateService.findAllByShiftIdsByAccessgroupRole(shiftIds, filterTypeMap.get(FilterType.VALIDATED_BY));
-           shiftStateIds=shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toList());
+            List<ShiftState> shiftStates = shiftStateService.findAllByShiftIdsByAccessgroupRole(shiftIds, filterTypeMap.get(FilterType.VALIDATED_BY));
+            shiftStateIds=shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toList());
         }
         ShiftFilter TimeAndAttendanceFilter=new TimeAndAttendanceFilter(filterTypeMap,shiftStateIds);
-        ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter);
+        List<Date> functionDates = new ArrayList<>();
+        if(filterTypeMap.containsKey(FilterType.FUNCTIONS)) {
+            List<Long> functionIds = filterTypeMap.get(FUNCTIONS).stream().map(s -> new Long(s)).collect(Collectors.toList());
+            functionDates = userIntegrationService.getAllDateByFunctionIds(shiftWithActivityDTOS.get(0).getUnitId(), functionIds);
+        }
+        ShiftFilter functionsFilter = new FunctionsFilter(filterTypeMap, functionDates);
+        Set<BigInteger> sickTimeTypes = new HashSet<>();
+        if(filterTypeMap.containsKey(REAL_TIME_STATUS)) {
+            sickTimeTypes = userIntegrationService.getSickSettingsOfUnit(shiftWithActivityDTOS.get(0).getUnitId());
+        }
+        ShiftFilter realTimeStatusFilter=new RealTimeStatusFilter(filterTypeMap, sickTimeTypes);
+        ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter)
+                                    .and(functionsFilter).and(realTimeStatusFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
 }

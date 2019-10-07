@@ -35,7 +35,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "with expertise,employment,appliedFunctions,\n" +
             "CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,employmentType:{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)},fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines\n" +
-            "RETURN  DISTINCT expertise as expertise,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,employment.published as published, appliedFunctions as appliedFunctions,collect(employmentLines[0]) as employmentLines")
+            "RETURN  DISTINCT expertise as expertise,employment.startDate as startDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,employment.endDate as endDate, id(employment) as id,employment.lastWorkingDate as lastWorkingDate,employment.employmentSubType as employmentSubType,employment.published as published, appliedFunctions as appliedFunctions,collect(employmentLines[0]) as employmentLines")
     EmploymentQueryResult getEmploymentById(Long employmentId);
 
     @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO+"]-(user:User) WHERE id(staff) IN {2}\n" +
@@ -90,7 +90,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Unit{isEnable:true,union:true}) \n" +
             "RETURN expertise as expertise,unionData as union, id(employment) as id,\n" +
             " employment.startDate as startDate,employment.employmentSubType as employmentSubType,employment.taxDeductionPercentage as taxDeductionPercentage, employment.endDate as endDate, \n" +
-            "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode,employment.history as history,employment.editable as editable,employment.published as published, \n" +
+            "CASE reasonCode WHEN null THEN null else {id:id(reasonCode),name:reasonCode.name,code:reasonCode.code} END as reasonCode,employment.history as history,employment.editable as editable,employment.published as published, \n" +
             "employment.lastWorkingDate as lastWorkingDate,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes,id(org) as parentUnitId, id(subOrg) as unitId, {id:id(subOrg),name:subOrg.name} as unitInfo ")
     List<EmploymentQueryResult> getAllEmploymentsByUser(long userId);
 //Date is not supported as a return type in Bolt protocol version 1.
@@ -127,7 +127,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "OPTIONAL MATCH (employment)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (expertise)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Unit{isEnable:true,union:true}) \n" +
             "RETURN id(employment) as id,employment.startDate as startDate, employment.endDate as endDate,employment.employmentSubType as employmentSubType,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes, \n" +
-            "CASE WHEN reasonCode IS NULL THEN null else {id:id(reasonCode),name:reasonCode.name} END as reasonCode, employment.history as history,employment.taxDeductionPercentage as taxDeductionPercentage,employment.editable as editable,employment.published as published,\n" +
+            "CASE WHEN reasonCode IS NULL THEN null else {id:id(reasonCode),name:reasonCode.name,code:reasonCode.code} END as reasonCode, employment.history as history,employment.taxDeductionPercentage as taxDeductionPercentage,employment.editable as editable,employment.published as published,\n" +
             "employment.lastWorkingDate as lastWorkingDate,id(org)  as unitId,{id:id(org),name:org.name} as unitInfo,expertise as expertise,unionData as union")
     List<EmploymentQueryResult> getAllEmploymentsForCurrentOrganization(long staffId, Long unitId);
 
@@ -303,9 +303,19 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     boolean updateEmploymentLineEndDateByEmploymentIds(Set<Long> employmentIds,String endDate);
 
     @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})-[:"+HAS_EXPERTISE_IN+"]-(e:Expertise{deleted:false}) \n" +
-            "MATCH (employment)-[:"+IN_UNIT+"]-(organization:Organization) \n"+
+            "MATCH (employment)-[:"+IN_UNIT+"]-(organization:Unit) \n"+
             "RETURN id(staff) as staffId,COLLECT({id:id(employment),expId:id(e),unitId:id(organization)}) as employmentDetails")
     List<Map> findStaffsWithEmploymentIds();
 
-
+    @Query("MATCH(staff:Staff{deleted:false})-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})\n" +
+            "MATCH (employment)-[:HAS_EXPERTISE_IN]-(expertise:Expertise{deleted:false})-[:HAS_PROTECTED_DAYS_OFF_SETTINGS]-(protectedDaysOffSetting:ProtectedDaysOffSetting{protectedDaysOff:true}) \n" +
+            "WHERE employment.employmentSubType={0}\n" +
+            "MATCH (employment)-[:IN_UNIT]-(unit:Unit) \n" +
+            "MATCH(employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine) WHERE  NOT EXISTS(employmentLine.endDate) OR date(employmentLine.endDate) >= date()" +
+            "MATCH (employmentLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)\n" +
+            "WITH CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
+            "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,employmentType:employmentType,startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines, expertise,staff,unit,employment,employmentLine,employmentType,protectedDaysOffSetting\n" +
+            "RETURN id(employment) as id,id(staff) as staffId,id(unit) as unitId,expertise ,employment.endDate as endDate,employment.employmentSubType as employmentSubType,employment.published as published,employment.startDate as startDate ,\n" +
+            "employmentLines,collect(protectedDaysOffSetting) as protectedDaysOffSettings")
+    List<EmploymentQueryResult> getMainEmploymentOfStaffs(EmploymentSubType employmentSubType);
 }

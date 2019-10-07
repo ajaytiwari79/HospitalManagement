@@ -77,11 +77,13 @@ public class FileIOUtil {
         PrintWriter out = null;
         try {
             out = new PrintWriter(new File("" +fileName+".xml"));
+            out.write(xmlString);
+            out.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        }catch(NullPointerException ex){
+            ex.printStackTrace();
         }
-        out.write(xmlString);
-        out.close();
     }
 
     public static void copyFileContent(File baseFile, File file) {
@@ -104,12 +106,14 @@ public class FileIOUtil {
                 try {
                     fr.close();
                 } catch(IOException e) {
+                    e.printStackTrace();
                 }
             }
             if (fw != null) {
                 try {
                     fw.close();
                 } catch(IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

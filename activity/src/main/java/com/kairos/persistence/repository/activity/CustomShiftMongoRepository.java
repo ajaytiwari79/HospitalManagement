@@ -22,7 +22,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId);
 
-    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(List<Long> employmentIds, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmployments(Set<Long> employmentIds, Date startDate, Date endDate ,Set<BigInteger> activityIds);
 
     List<ShiftDTO> getAllAssignedShiftsByDateAndUnitId(Long unitId, Date startDate, Date endDate);
 
