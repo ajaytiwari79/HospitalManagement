@@ -39,6 +39,7 @@ import static com.kairos.constants.ApiConstants.UNIT_URL;
 @RequestMapping(API_V1)
 @Api(value = API_V1)
 public class AuthController {
+    public static final String USER_INFO_IS = "user info is {}";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -61,7 +62,7 @@ public class AuthController {
     @ApiOperation(value = "Authenticate User")
     ResponseEntity<Map<String, Object>> checkUser(@RequestBody User user) {
 
-        logger.info("user info is {}", user);
+        logger.info(USER_INFO_IS, user);
 
         Map<String, Object> response = userService.authenticateUser(user);
         if (response == null) {
@@ -74,7 +75,7 @@ public class AuthController {
     @RequestMapping(value = "/forgot", method = RequestMethod.POST)
     @ApiOperation(value = "forgot password")
     ResponseEntity<Map<String, Object>> forgotPassword(@RequestParam("email") String email) {
-        logger.info("user info is {}", email);
+        logger.info(USER_INFO_IS, email);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.forgotPassword(email));
 
     }
@@ -82,7 +83,7 @@ public class AuthController {
     @RequestMapping(value = "/reset", method = RequestMethod.POST)
     @ApiOperation(value = "reset password")
     ResponseEntity<Map<String, Object>> resetPassword(@RequestParam("token") String token, @RequestBody PasswordUpdateDTO passwordUpdateDTO) {
-        logger.info("user info is {}", token);
+        logger.info(USER_INFO_IS, token);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.resetPassword(token, passwordUpdateDTO));
 
     }

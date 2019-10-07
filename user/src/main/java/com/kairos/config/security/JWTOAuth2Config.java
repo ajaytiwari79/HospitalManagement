@@ -25,6 +25,8 @@ import javax.inject.Inject;
 @EnableAuthorizationServer
 public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
 
+    public static final String CLIENT_CREDENTIALS = "client_credentials";
+    public static final String REFRESH_TOKEN = "refresh_token";
     @Autowired
     private AuthenticationManager authenticationManager;
     @Inject
@@ -61,17 +63,17 @@ public class JWTOAuth2Config extends AuthorizationServerConfigurerAdapter {
         clients.inMemory()
                 .withClient("kairos")
                 .secret("$2a$10$CA3JnlNGZpRIqvBe904d1eOBjoJXX0rLatl7kMQL9mGPyGVm6xYj.")
-                .authorizedGrantTypes("refresh_token", "password", "client_credentials")
+                .authorizedGrantTypes(REFRESH_TOKEN, "password", CLIENT_CREDENTIALS)
                 .scopes("webclient", "mobileclient")
                 .and()
                 .withClient("activity-service")
                 .secret("task")
-                .authorizedGrantTypes("client_credentials", "refresh_token")
+                .authorizedGrantTypes(CLIENT_CREDENTIALS, REFRESH_TOKEN)
                 .scopes("server")
                 .and()
                 .withClient("user-service")
                 .secret("user")
-                .authorizedGrantTypes("client_credentials", "refresh_token")
+                .authorizedGrantTypes(CLIENT_CREDENTIALS, REFRESH_TOKEN)
                 .scopes("server");
 
 
