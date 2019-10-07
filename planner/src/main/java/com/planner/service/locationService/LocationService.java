@@ -1,5 +1,6 @@
 package com.planner.service.locationService;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.dto.user.organization.union.LocationDTO;
 import com.kairos.planner.vrp.taskplanning.model.LocationInfo;
 import com.planner.domain.location.LocationDistance;
@@ -38,7 +39,7 @@ public class LocationService {
     }
 
     public PlanningLocation findOne(String id) {
-        return (PlanningLocation) planningLocationRepository.findById(id).get();
+        return  planningLocationRepository.findById(id).orElseThrow(()->new DataNotFoundByIdException("Planning Location Not found by id: "+id));
     }
 
     public List<PlanningLocation> findByIds(List<String> ids) {

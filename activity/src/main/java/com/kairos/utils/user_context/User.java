@@ -51,7 +51,7 @@ public class User implements Serializable{
      */
     public String getUserName() {
         if (userName!=null){
-            userName.toLowerCase();
+            return userName.toLowerCase();
         }
         return userName;
 

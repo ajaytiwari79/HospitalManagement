@@ -7,7 +7,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.kairos.constants.ApiConstant.*;
 
@@ -22,8 +24,11 @@ public class GDPRToUserIntegrationService {
     @Inject
     private ExceptionService exceptionService;
 
-    public List<Long> getUnitIdsByOrgSubTypeId(Long countryId, List<Long> organizationSubTypeId) {
-        return gdprGenericRestClient.publishRequest(organizationSubTypeId, countryId, false, IntegrationOperation.CREATE, GET_ORGANIZATION_IDS_ORGANIZATION_SUB_TYPE_Id, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
+    public List<Long> getUnitIdsByOrgSubTypeId(Long countryId, List<Long> organizationSubTypeIds, List<Long> organizationSubServicesIds) {
+        Map<String,List<Long>> requestBody = new HashMap<>();
+        requestBody.put("organizationSubTypeIds",organizationSubTypeIds);
+        requestBody.put("organizationSubServicesIds",organizationSubServicesIds);
+        return gdprGenericRestClient.publishRequest(requestBody, countryId, false, IntegrationOperation.CREATE, GET_ORGANIZATION_IDS_BY_ORGANIZATION_SUB_TYPE_IdS_AND_SUB_SERVICE_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
     }
 
     public List<Long> getAllUnitIdsByCountryId(Long countryId) {

@@ -292,12 +292,7 @@ public class TaskTypeService extends MongoBaseService {
         OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult =
                 userIntegrationService.getOrgTypesHierarchy(countryDTO.getId(), taskType.getOrganizationSubTypes());
         Map<String, Object> generalSettings = taskType.getGeneralSettings(filePath);
-        List<TagDTO> tags;
-        if (type != null && type.equals("Organization")) {
-            tags = tagMongoRepository.getTagsById(taskType.getTags());
-        } else {
-            tags = tagMongoRepository.getTagsById(taskType.getTags());
-        }
+        List<TagDTO> tags = tagMongoRepository.getTagsById(taskType.getTags());
         generalSettings.put("tags", tags);
         response.put("generalSettings", generalSettings);
         response.put("taskTypes", taskTypeMongoRepository.getTaskTypesForCopySettings(taskTypeId));
