@@ -4,31 +4,43 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
+import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +53,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.constants.AppConstants.STOP_BRICK_BLOCKING_POINT;
+import static com.kairos.dto.user.country.agreement.cta.CalculationFor.UNUSED_DAYOFF_LEAVES;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
 
 
 @Service
@@ -53,6 +69,8 @@ public class WorkTimeAgreementBalancesCalculationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkTimeAgreementBalancesCalculationService.class);
 
+    @Inject
+    private TimeBankRepository timeBankRepository;
     @Inject
     private WorkingTimeAgreementMongoRepository workingTimeAgreementMongoRepository;
     @Inject
@@ -69,6 +87,15 @@ public class WorkTimeAgreementBalancesCalculationService {
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
     private ProtectedDaysOffService protectedDaysOffService;
+    @Inject
+    private TimeBankCalculationService timeBankCalculationService;
+    @Inject
+    private TimeBankService timeBankService;
+    @Inject
+    private WorkingTimeAgreementMongoRepository wtaRepository;
+    @Inject
+    private CostTimeAgreementRepository costTimeAgreementRepository;
+
 
 
     public DateTimeInterval getIntervalByRuletemplates(Map<BigInteger, ActivityWrapper> activityWrapperMap, List<WTABaseRuleTemplate> WTARuleTemplates, LocalDate startDate, LocalDate planningPeriodEndDate, Long unitId) {
@@ -396,7 +423,7 @@ public class WorkTimeAgreementBalancesCalculationService {
         return workTimeAgreementRuleTemplateBalancesDTO;
     }
 
-    private int[] getShiftsActivityCountByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Set<BigInteger> activityIds) {
+    public int[] getShiftsActivityCountByInterval(DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Set<BigInteger> activityIds) {
         int activityCount = 0;
         int approveCount = 0;
         for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {
@@ -483,5 +510,141 @@ public class WorkTimeAgreementBalancesCalculationService {
         return dateTimeInterval;
     }
 
+
+    public boolean setProtectedDaysOffHoursViaJob() {
+        List<DailyTimeBankEntry> dailyTimeBankEntriesToSave = new ArrayList<>();
+        Date startDate = asDate(getLocalDate());
+        Date endDate = asDate(getLocalDate());
+        List<StaffEmploymentDetails> staffEmploymentDetails = userIntegrationService.getStaffsMainEmployment();
+        Set<Long> unitIds = staffEmploymentDetails.stream().map(staffEmploymentDetail -> staffEmploymentDetail.getUnitId()).collect(Collectors.toSet());
+        List<ProtectedDaysOffSettingDTO> protectedDaysOffSettingOfUnit = protectedDaysOffService.getAllProtectedDaysOffByUnitIds(new ArrayList<>(unitIds));
+        Map<Long, ProtectedDaysOffSettingDTO> unitIdAndProtectedDaysOffSettingDTOMap = protectedDaysOffSettingOfUnit.stream().collect(Collectors.toMap(k -> k.getUnitId(), v -> v));
+        Map<Long, List<StaffEmploymentDetails>> unitAndStaffEmploymentDetailsMap = staffEmploymentDetails.stream().collect(groupingBy(StaffEmploymentDetails::getUnitId));
+        Set<Long> employmentIds = staffEmploymentDetails.stream().map(staffEmploymentDetail -> staffEmploymentDetail.getId()).collect(toSet());
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankService.findAllByEmploymentIdsAndBetweenDate(employmentIds, startDate, endDate);
+        Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getEmploymentId(), v -> v));
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getProtectedWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds), startDate, endDate, WTATemplateType.PROTECTED_DAYS_OFF);
+        Map<Long, WTAQueryResultDTO> employmentAndWTAQueryResultDTOMap = wtaQueryResultDTOS.stream().collect(Collectors.toMap(k -> k.getEmploymentId(), v -> v));
+        List<Activity> activities = activityMongoRepository.findAllByUnitIdsAndSecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF,unitIds);
+        Set<BigInteger> activityIds = activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+        Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        Map<Long,Activity> unitIdAndActivityMap=activities.stream().collect(Collectors.toMap(k->k.getUnitId(),v->v));
+        Map[] activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap = getActivityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap(employmentIds, activityIds, activityMap);
+        Map<BigInteger,DateTimeInterval> activityIdDateTimeIntervalMap=activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap[0];
+        Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap=activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap[1];
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(new ArrayList<>(employmentIds),startDate,endDate);
+        Map<Long,List<CTAResponseDTO>> employmentIdAndCtaResponseDTOMap=ctaResponseDTOS.stream().collect(groupingBy(ctaResponseDTO -> ctaResponseDTO.getEmploymentId()));
+        for (Long unitId : unitIds) {
+            try {
+                ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = unitIdAndProtectedDaysOffSettingDTOMap.get(unitId);
+                if (isNotNull(protectedDaysOffSettingDTO) ) {
+                    List<StaffEmploymentDetails> staffEmploymentDetailsList = unitAndStaffEmploymentDetailsMap.get(unitId);
+                    for (StaffEmploymentDetails employmentDetails : staffEmploymentDetailsList) {
+                        try {
+                            WTAQueryResultDTO wtaQueryResultDTO = employmentAndWTAQueryResultDTOMap.get(employmentDetails.getId());
+                            switch (protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings()) {
+                                case UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR:
+                                    if (isNotNull(wtaQueryResultDTO) && wtaQueryResultDTO.getRuleTemplates().stream().anyMatch(wtaBaseRuleTemplate -> wtaBaseRuleTemplate.getWtaTemplateType().equals(WTATemplateType.PROTECTED_DAYS_OFF))) {
+                                        DateTimeInterval dateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
+                                        if (dateTimeInterval.getStartLocalDate().equals(getLocalDate())) {
+                                            long count = employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
+                                            DailyTimeBankEntry dailyTimeBankEntry = isNullOrElse(employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId()), new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
+                                            int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(dateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+                                            timeBankCalculationService.resetDailyTimebankEntry(dailyTimeBankEntry,contractualMinutes);
+                                            dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + (count * contractualMinutes));
+                                            dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
+                                        }
+                                    }
+                                    break;
+                                case ONCE_IN_A_YEAR:
+                                    dailyTimeBankEntriesToSave.add(getDailyTimeBankByOnceInAYear(employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, employmentDetails));;
+                                    break;
+                                case ACTIVITY_CUT_OFF_INTERVAL:
+                                    dailyTimeBankEntriesToSave.add(getDailyTimeBankEntryByCutOfInterval(employmentIdAndCtaResponseDTOMap,employmentIdAndDailyTimeBankEntryMap,unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, unitId, employmentDetails));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }catch (Exception e){
+                            LOGGER.error("error while add protected days off time bank in staff  {} ,\n {}  ",employmentDetails.getStaffId(),e);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("error while add protected days off time bank in unit  {} ,\n {}  ",unitId,e);
+                e.printStackTrace();
+            }
+        }
+        if(isCollectionNotEmpty(dailyTimeBankEntriesToSave))  timeBankRepository.saveEntities(dailyTimeBankEntriesToSave);
+        return true;
+    }
+
+    private DailyTimeBankEntry getDailyTimeBankEntryByCutOfInterval(Map<Long, List<CTAResponseDTO>> employmentIdAndCtaResponseDTOMap,Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap,Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Long unitId, StaffEmploymentDetails employmentDetails) {
+        int[] scheduledAndApproveActivityCount;
+        Activity activity = unitIdAndActivityMap.get(unitId);
+        DateTimeInterval activityDateTimeInterval=activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
+        List<ProtectedDaysOffSetting> protectedDaysOffSettings=new ArrayList<>();
+        for (ProtectedDaysOffSetting protectedDaysOffSetting : employmentDetails.getProtectedDaysOffSettings()) {
+            DateTimeInterval dateTimeInterval=getCutoffInterval(protectedDaysOffSetting.getPublicHolidayDate(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), protectedDaysOffSetting.getPublicHolidayDate().plusDays(1));
+            if(isNotNull(dateTimeInterval) && !dateTimeInterval.getEndLocalDate().isAfter(getLocalDate()) && protectedDaysOffSetting.isProtectedDaysOff() && protectedDaysOffSetting.getPublicHolidayDate().isBefore(getLocalDate()) ){
+                protectedDaysOffSettings.add(protectedDaysOffSetting);
+            }
+        }
+        long count = protectedDaysOffSettings.size();
+        protectedDaysOffSettings.sort((protectedDaysOffSetting, t1) -> protectedDaysOffSetting.getPublicHolidayDate().compareTo(t1.getPublicHolidayDate()));
+        DateTimeInterval protectedDaysDateTimeInterval=new DateTimeInterval(protectedDaysOffSettings.get(0).getPublicHolidayDate(),getLocalDate());
+        scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId()))?employmentIdAndShiftMap.get(employmentDetails.getId()):new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
+        count=count-scheduledAndApproveActivityCount[0];
+        DailyTimeBankEntry dailyTimeBankEntry = getDailyTimeBankEntry(employmentIdAndDailyTimeBankEntryMap, employmentIdAndCtaResponseDTOMap, employmentDetails, activityDateTimeInterval, count);
+        return dailyTimeBankEntry;
+    }
+
+    private DailyTimeBankEntry getDailyTimeBankByOnceInAYear(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, List<CTAResponseDTO>> employmentIdAndCtaResponseDTOMap, Long unitId, StaffEmploymentDetails employmentDetails) {
+        int[] scheduledAndApproveActivityCount;
+        DateTimeInterval activityDateTimeInterval=activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
+        long count=employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && activityDateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
+        scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId()))?employmentIdAndShiftMap.get(employmentDetails.getId()):new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
+        count=count-scheduledAndApproveActivityCount[0];
+        DailyTimeBankEntry dailyTimeBankEntry = getDailyTimeBankEntry(employmentIdAndDailyTimeBankEntryMap, employmentIdAndCtaResponseDTOMap, employmentDetails, activityDateTimeInterval, count);
+        return dailyTimeBankEntry;
+    }
+
+    private DailyTimeBankEntry getDailyTimeBankEntry(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, List<CTAResponseDTO>> employmentIdAndCtaResponseDTOMap, StaffEmploymentDetails employmentDetails, DateTimeInterval activityDateTimeInterval, long count) {
+        DailyTimeBankEntry dailyTimeBankEntry = employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId());
+        if(isNull(dailyTimeBankEntry)){
+        dailyTimeBankEntry=new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), getLocalDate());
+        int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(activityDateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+        timeBankCalculationService.resetDailyTimebankEntry(dailyTimeBankEntry, contractualMinutes);
+        }
+        List<CTAResponseDTO> ctaResponseDTOs=employmentIdAndCtaResponseDTOMap.get(employmentDetails.getId());
+        for (CTAResponseDTO ctaResponseDTO : ctaResponseDTOs) {
+            long value = getBonusOfUnusedDaysOff(ctaResponseDTO.getRuleTemplates(),count,activityDateTimeInterval,employmentDetails.getEmploymentLines());
+            dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + value);
+        }
+        return dailyTimeBankEntry;
+    }
+
+    private Map[] getActivityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap(Set<Long> employmentIds, Set<BigInteger> activityIds, Map<BigInteger, Activity> activityWrapperMap) {
+        Map<BigInteger,DateTimeInterval> activityIdDateTimeIntervalMap=new HashMap<>();
+        for (BigInteger activityId : activityWrapperMap.keySet()) {
+            Activity activityWrapper = activityWrapperMap.get(activityId);
+            activityIdDateTimeIntervalMap.putIfAbsent(activityId, getCutoffInterval(activityWrapper.getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), getLocalDate()));
+        }
+        List<DateTimeInterval> dateTimeIntervals=new ArrayList<>(activityIdDateTimeIntervalMap.values());
+        dateTimeIntervals.sort((dateTimeInterval, t1) -> dateTimeInterval.getStartLocalDate().compareTo(t1.getStartLocalDate()));
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndDate(), activityIds);
+        Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap = shiftWithActivityDTOS.stream().collect(groupingBy(ShiftWithActivityDTO::getEmploymentId));
+        return new Map[]{activityIdDateTimeIntervalMap,employmentIdAndShiftMap};
+    }
+    private long getBonusOfUnusedDaysOff(List<CTARuleTemplateDTO> ruleTemplates, long remainingProtectedDaysOff, DateTimeInterval dateTimeInterval, List<EmploymentLinesDTO> employmentLines) {
+        long value = 0;
+        for (CTARuleTemplateDTO ruleTemplate : ruleTemplates) {
+            if(ruleTemplate.getCalculationFor().equals(UNUSED_DAYOFF_LEAVES)){
+                value = timeBankCalculationService.getContractualMinutesByDate(dateTimeInterval, getLocalDate(), employmentLines);
+                value+= CompensationMeasurementType.MINUTES.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType())?ruleTemplate.getCompensationTable().getUnusedDaysOffvalue(): CompensationMeasurementType.PERCENT.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType()) ? value * ruleTemplate.getCompensationTable().getUnusedDaysOffvalue()/100:0;
+            }
+        }
+        return value * remainingProtectedDaysOff;
+    }
 
 }

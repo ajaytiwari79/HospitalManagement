@@ -1,6 +1,7 @@
 package com.kairos.service.scheduler_service;
 
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
+import com.kairos.controller.unit_settings.ProtectedDaysOffController;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.enums.payroll_setting.PayrollFrequency;
 import com.kairos.service.activity.ActivityService;
@@ -9,6 +10,8 @@ import com.kairos.service.dashboard.SickService;
 import com.kairos.service.payroll_setting.UnitPayrollSettingService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.shift.ShiftReminderService;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
+import com.kairos.service.wta.WorkTimeAgreementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,8 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
     private UnitPayrollSettingService unitPayrollSettingService;
     @Inject
     private ActivityService activityService;
+    @Inject
+    private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
     @Override
     public void execute(KairosSchedulerExecutorDTO job) {
         logger.info("Job type----------------->"+job.getJobSubType());
@@ -62,6 +67,10 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
             case ADD_PLANNING_PERIOD:
                 logger.info("Job to add planning period ");
                 planningPeriodService.addPlanningPeriodViaJob();
+                break;
+            case PROTECTED_DAYS_OFF:
+                logger.info("Job to protected days off ");
+                workTimeAgreementBalancesCalculationService.setProtectedDaysOffHoursViaJob();
                 break;
             case UNASSIGN_EXPERTISE_FROM_ACTIVITY:
                 logger.info("Job to Unassign expertise from activity ");

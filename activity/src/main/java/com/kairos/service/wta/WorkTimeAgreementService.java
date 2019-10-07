@@ -11,7 +11,6 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.activity.wta.CTAWTAResponseDTO;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
@@ -31,7 +30,6 @@ import com.kairos.persistence.model.cta.CTARuleTemplate;
 import com.kairos.persistence.model.cta.CostTimeAgreement;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.wta.*;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.model.wta.templates.template_types.*;
@@ -68,13 +66,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.getLocalDate;
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.COPY_OF;
 import static com.kairos.persistence.model.constants.TableSettingConstants.ORGANIZATION_AGREEMENT_VERSION_TABLE_ID;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
 
 
 /**
@@ -134,6 +131,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
     private ProtectedDaysOffService protectedDaysOffService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+
 
     public WTAResponseDTO createWta(long referenceId, WTADTO wtaDTO, boolean creatingFromCountry, boolean mapWithOrgType) {
         if (creatingFromCountry) {
@@ -724,6 +722,10 @@ public class WorkTimeAgreementService extends MongoBaseService {
                     WTAForCareDays wtaForCareDays = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, WTAForCareDays.class);
                     activityIds.addAll(wtaForCareDays.getCareDayCounts().stream().map(activityCareDayCount -> activityCareDayCount.getActivityId()).collect(Collectors.toSet()));
                     break;
+                case PROTECTED_DAYS_OFF:
+                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
+                    activityIds.addAll(newHashSet(protectedDaysOffWTATemplate.getActivityId()));
+                    break;
             }
         }
 
@@ -1059,89 +1061,4 @@ public class WorkTimeAgreementService extends MongoBaseService {
     }
 
 
-    public boolean setProtectedDaysOffHoursViaJob() {
-        List<DailyTimeBankEntry> dailyTimeBankEntriesToSave = new ArrayList<>();
-        Date startDate = asDate(getLocalDate());
-        Date endDate = asDate(getLocalDate());
-        List<StaffEmploymentDetails> staffEmploymentDetails = userIntegrationService.getStaffsMainEmployment();
-        Set<Long> unitIds = staffEmploymentDetails.stream().map(staffEmploymentDetail -> staffEmploymentDetail.getUnitId()).collect(Collectors.toSet());
-        List<ProtectedDaysOffSettingDTO> protectedDaysOffSettingOfUnit = protectedDaysOffService.getAllProtectedDaysOffByUnitIds(new ArrayList<>(unitIds));
-        Map<Long, ProtectedDaysOffSettingDTO> unitIdAndProtectedDaysOffSettingDTOMap = protectedDaysOffSettingOfUnit.stream().collect(Collectors.toMap(k -> k.getUnitId(), v -> v));
-        Map<Long, List<StaffEmploymentDetails>> unitAndStaffEmploymentDetailsMap = staffEmploymentDetails.stream().collect(groupingBy(StaffEmploymentDetails::getUnitId));
-        Set<Long> employmentIds = staffEmploymentDetails.stream().map(staffEmploymentDetail -> staffEmploymentDetail.getId()).collect(toSet());
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankService.findAllByEmploymentIdsAndBetweenDate(employmentIds, startDate, endDate);
-        Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getEmploymentId(), v -> v));
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getProtectedWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds), startDate, endDate, WTATemplateType.PROTECTED_DAYS_OFF);
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).collect(Collectors.toList());
-        Map<Long, WTAQueryResultDTO> employmentAndWTAQueryResultDTOMap = wtaQueryResultDTOS.stream().collect(Collectors.toMap(k -> k.getEmploymentId(), v -> v));
-        Set<BigInteger> activityIds = workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
-        List<ActivityWrapper> activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(activityIds));
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        Map[] activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap = getActivityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap(employmentIds, activityIds, activityWrapperMap);
-        Map<BigInteger,DateTimeInterval> activityIdDateTimeIntervalMap=activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap[0];
-        Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap=activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap[1];
-        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(new ArrayList<>(employmentIds),startDate,endDate);
-        Map<Long,CTAResponseDTO> employmentIdAndCtaResponseDTOMap=ctaResponseDTOS.stream().collect(Collectors.toMap(k->k.getEmploymentId(),v->v));
-        for (Long unitId : unitIds) {
-            try {
-                ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = unitIdAndProtectedDaysOffSettingDTOMap.get(unitId);
-                if (isNotNull(protectedDaysOffSettingDTO) ) {
-                    List<StaffEmploymentDetails> staffEmploymentDetailsList = unitAndStaffEmploymentDetailsMap.get(unitId);
-                    for (StaffEmploymentDetails employmentDetails : staffEmploymentDetailsList) {
-                        try {
-                            WTAQueryResultDTO wtaQueryResultDTO = employmentAndWTAQueryResultDTOMap.get(employmentDetails.getId());
-                            if (isNotNull(wtaQueryResultDTO) && wtaQueryResultDTO.getRuleTemplates().stream().anyMatch(wtaBaseRuleTemplate -> wtaBaseRuleTemplate.getWtaTemplateType().equals(WTATemplateType.PROTECTED_DAYS_OFF))) {
-                                ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate) wtaQueryResultDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplate -> WTATemplateType.PROTECTED_DAYS_OFF.equals(wtaBaseRuleTemplate.getWtaTemplateType())).findFirst().get();
-                                ActivityWrapper activityWrapper = activityWrapperMap.get(protectedDaysOffWTATemplate.getActivityId());
-                                DateTimeInterval dateTimeInterval = workTimeAgreementBalancesCalculationService.getCutoffInterval(activityWrapper.getActivity().getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getActivity().getRulesActivityTab().getCutOffdayValue(), startDate, getLocalDate());
-                                switch (protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings()) {
-                                    case UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR:
-                                        if (dateTimeInterval.getStartLocalDate().equals(getLocalDate())) {
-                                            long count = employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
-                                            DailyTimeBankEntry dailyTimeBankEntry = isNullOrElse(employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId()), new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
-                                            int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(dateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
-                                            dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + (count * contractualMinutes));
-                                            dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
-                                        }
-                                        break;
-                                    case ONCE_IN_A_YEAR:
-                                        DateTimeInterval activityDateTimeInterval=activityIdDateTimeIntervalMap.get(protectedDaysOffWTATemplate.getActivityId());
-                                        long count=employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && activityDateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
-                                        employmentDetails.getCtaRuleTemplates().addAll(employmentIdAndCtaResponseDTOMap.get(employmentDetails.getId()).getRuleTemplates());
-                                        TimeBankCalculationService.CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours(new StaffAdditionalInfoDTO(employmentDetails), dateTimeInterval).calculate();
-                                        break;
-                                    case ACTIVITY_CUT_OFF_INTERVAL:
-                                        DateTimeInterval DateTimeInterval=activityIdDateTimeIntervalMap.get(protectedDaysOffWTATemplate.getActivityId());
-                                        long protectedDayscount=employmentDetails.getProtectedDaysOffSettings.stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && protectedDaysOffSetting.getPublicHolidayDate().isBefore(startDate) && isNotNull(getCutoffInterval(protectedDaysOffSetting.getPublicHolidayDate(), cutOffIntervalUnit, cutOffdayValue, asDate(getLocalDate().minusDays(1)), protectedDaysOffSetting.getPublicHolidayDate().plusDays(1))));
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                        }catch (Exception e){
-                            logger.error("error while add protected days off time bank in staff  {} ,\n {}  ",employmentDetails.getStaffId(),e);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                logger.error("error while add protected days off time bank in unit  {} ,\n {}  ",unitId,e);
-                e.printStackTrace();
-            }
-        }
-        if(isCollectionNotEmpty(dailyTimeBankEntriesToSave)) save(dailyTimeBankEntriesToSave);
-        return true;
-    }
-
-    private Map[] getActivityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap(Set<Long> employmentIds, Set<BigInteger> activityIds, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        Map<BigInteger,DateTimeInterval> activityIdDateTimeIntervalMap=new HashMap<>();
-        for (BigInteger activityId : activityWrapperMap.keySet()) {
-            ActivityWrapper activityWrapper = activityWrapperMap.get(activityId);
-            activityIdDateTimeIntervalMap.putIfAbsent(activityId, workTimeAgreementBalancesCalculationService.getCutoffInterval(activityWrapper.getActivity().getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getActivity().getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), getLocalDate()));
-        }
-        List<DateTimeInterval> dateTimeIntervals=new ArrayList<>(activityIdDateTimeIntervalMap.values());
-        dateTimeIntervals.sort((dateTimeInterval, t1) -> dateTimeInterval.getStartLocalDate().compareTo(t1.getStartLocalDate()));
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndDate(), activityIds);
-        Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap = shiftWithActivityDTOS.stream().collect(groupingBy(ShiftWithActivityDTO::getEmploymentId));
-        return new Map[]{activityIdDateTimeIntervalMap,employmentIdAndShiftMap};
-    }
 }
