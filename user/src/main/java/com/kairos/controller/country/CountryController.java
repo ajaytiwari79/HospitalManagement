@@ -310,7 +310,7 @@ public class CountryController {
     @ApiOperation(value = "Publish expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/publish", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishExpertise(@PathVariable long expertiseId, @RequestParam Long publishedDate) {
+    public ResponseEntity<Map<String, Object>> publishExpertise(@PathVariable long expertiseId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.publishExpertise(expertiseId));
     }
 
