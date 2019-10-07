@@ -163,22 +163,6 @@ public class TimeBankCalculationService {
         Double ctaBonusMinutes = 0.0;
         if (isNotNull(shiftInterval)) {
             ctaBonusMinutes = calculateCTARuleTemplateBonus(ruleTemplate, dateTimeInterval, shiftInterval);
-
-            shiftActivity.setTimeBankCtaBonusMinutes(shiftActivity.getTimeBankCtaBonusMinutes() + ctaBonusMinutes);
-            Optional<TimeBankDistributionDTO> timeBankDistributionDTOOptional = shiftActivity.getTimeBankCTADistributions().stream().filter(timeBankDistributionDTO -> timeBankDistributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findFirst();
-            if (timeBankDistributionDTOOptional.isPresent()) {
-                timeBankDistributionDTOOptional.get().setMinutes(ctaBonusMinutes.intValue() + timeBankDistributionDTOOptional.get().getMinutes());
-            } else {
-                Optional<TimeBankDistributionDTO> optionalTimeBankDistributionDTO = shiftActivity.getTimeBankCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
-                if(optionalTimeBankDistributionDTO.isPresent()){
-                    optionalTimeBankDistributionDTO.get().setMinutes(optionalTimeBankDistributionDTO.get().getMinutes() + ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaBonusMinutes.intValue());
-                }else {
-                    TimeBankDistributionDTO timeBankDistributionDTO = new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(new Date()), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0) + ctaBonusMinutes.intValue());
-                    shiftActivity.getTimeBankCTADistributions().add(timeBankDistributionDTO);
-                }
-            }
-
-
         }
         return ctaBonusMinutes;
     }
