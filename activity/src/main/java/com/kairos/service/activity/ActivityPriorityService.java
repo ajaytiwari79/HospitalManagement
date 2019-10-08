@@ -24,6 +24,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 @Service
 public class ActivityPriorityService {
 
+    public static final String MESSAGE_ACTIVITY_PRIORITY_SEQUENCE = "message.activity.priority.sequence";
     @Inject
     private ActivityPriorityMongoRepository activityPriorityMongoRepository;
     @Inject
@@ -41,7 +42,7 @@ public class ActivityPriorityService {
         }
         int activityPriorityCount = activityPriorityMongoRepository.getActivityPriorityCountAtCountry(countryId);
         if ((activityPriorityCount + 1) != activityPriorityDTO.getSequence()) {
-            exceptionService.actionNotPermittedException("message.activity.priority.sequence");
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
         }
         ActivityPriority activityPriority = activityPriorityMongoRepository.findBySequenceAndCountryId(activityPriorityDTO.getSequence(), countryId);
         if (isNotNull(activityPriority)) {
@@ -80,7 +81,7 @@ public class ActivityPriorityService {
     private boolean createActivityPriorityAtOrganizations(ActivityPriority activityPriority, Long unitId) {
         List<Long> organizationIds = userIntegrationService.getAllOrganizationIds(unitId);
         List<ActivityPriority> activityPriorities = activityPriorityMongoRepository.findLastSeqenceByOrganizationIds(organizationIds);
-        Map<Long, Integer> activityPrioritiesMap = activityPriorities.stream().collect(Collectors.toMap(k -> k.getOrganizationId(), v -> v.getSequence()));
+        Map<Long, Integer> activityPrioritiesMap = activityPriorities.stream().collect(Collectors.toMap(ActivityPriority::getOrganizationId, ActivityPriority::getSequence));
         List<ActivityPriority> activityPrioritiesOfOrganization = new ArrayList<>(organizationIds.size());
         for (Long organizationId : organizationIds) {
             ActivityPriority organizationActivityPriority = copyActivityPriorityToOrganization(organizationId, activityPriority);
@@ -100,7 +101,7 @@ public class ActivityPriorityService {
         }
         int activityPriorityCount = activityPriorityMongoRepository.getActivityPriorityCountAtOrganization(organizationId);
         if ((activityPriorityCount + 1) != activityPriorityDTO.getSequence()) {
-            exceptionService.actionNotPermittedException("message.activity.priority.sequence");
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
         }
         ActivityPriority activityPriority = activityPriorityMongoRepository.findBySequenceAndOrganizationId(activityPriorityDTO.getSequence(), organizationId);
         if (isNotNull(activityPriority)) {
@@ -144,7 +145,7 @@ public class ActivityPriorityService {
         }
         int activityPriorityCount = activityPriorityMongoRepository.getActivityPriorityCountAtOrganization(unitId);
         if (activityPriorityCount < activityPriorityDTO.getSequence()) {
-            exceptionService.actionNotPermittedException("message.activity.priority.sequence");
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PRIORITY_SEQUENCE);
         }
         ActivityPriority activityPriority = activityPriorityMongoRepository.findOne(activityPriorityDTO.getId());
         if (activityPriority.getSequence() != activityPriorityDTO.getSequence()) {

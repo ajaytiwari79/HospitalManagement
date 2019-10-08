@@ -18,6 +18,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  * Created by vipul on 14/5/18.
  */
 public class OpenShiftMongoRepositoryImpl implements CustomOpenShiftMongoRepository {
+    public static final String ACTIVITY = "activity";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -31,9 +32,9 @@ public class OpenShiftMongoRepositoryImpl implements CustomOpenShiftMongoReposit
    public OpenShiftActivityWrapper getOpenShiftAndActivity(BigInteger openShiftId, Long unitId){
         Aggregation aggregation=Aggregation.newAggregation(
                 match(Criteria.where("_id").is(openShiftId).and("unitId").is(unitId).and("deleted").is(false)),
-                        lookup("activities","activityId","_id","activity"),
+                        lookup("activities","activityId","_id", ACTIVITY),
                 lookup("order","orderId","_id","order"),
-                project().and("order.expertiseId").arrayElementAt(0).as("expertiseId").and("activity").arrayElementAt(0).as("activity"));
+                project().and("order.expertiseId").arrayElementAt(0).as("expertiseId").and(ACTIVITY).arrayElementAt(0).as(ACTIVITY));
         AggregationResults<OpenShiftActivityWrapper> result=mongoTemplate.aggregate(aggregation,OpenShift.class,OpenShiftActivityWrapper.class);
         return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
 

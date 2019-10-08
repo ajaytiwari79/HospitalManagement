@@ -118,6 +118,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public static final String ACTIVITY_SHIFT_STATUS_SETTINGS = "activityShiftStatusSettings";
     public static final String PHASE_ID = "phaseId";
     public static final String ACTIVITY_PRIORITY = "activityPriority";
+    public static final String COUNTRY_ID = "countryId";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -200,10 +201,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityTagDTO> findAllActivityByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").is(countryId).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", STATE, DESCRIPTION, "countryId", IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB, "tags", ACTIVITY_PRIORITY_ID, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
+                project("name", STATE, DESCRIPTION, COUNTRY_ID, IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB, "tags", ACTIVITY_PRIORITY_ID, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
                         .and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).as("methodForCalculatingTime")
 
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
@@ -215,9 +216,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityTagDTO> findAllowChildActivityByCountryId(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").is(countryId).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
-                project("name", "countryId", IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
+                project("name", COUNTRY_ID, IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(APPLICABLE_FOR_CHILD_ACTIVITIES),
                 match(Criteria.where(APPLICABLE_FOR_CHILD_ACTIVITIES).is(true))
@@ -231,7 +232,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("_id").is(activityId).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
                 lookup(ACTIVITIES, "_id", CHILD_ACTIVITY_IDS, "parentActivity"),
-                project("name", STATE, DESCRIPTION, "countryId", IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB, ACTIVITY_PRIORITY_ID, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
+                project("name", STATE, DESCRIPTION, COUNTRY_ID, IS_PARENT_ACTIVITY, GENERAL_ACTIVITY_TAB, ACTIVITY_PRIORITY_ID, CHILD_ACTIVITY_IDS).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
                         .and("parentActivity._id").as("parentActivityId")
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(APPLICABLE_FOR_CHILD_ACTIVITIES)
@@ -242,7 +243,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityWithCTAWTASettingsDTO> findAllActivityWithCtaWtaSettingByCountry(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").is(countryId).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true).and(STATE).is(ActivityStateEnum.PUBLISHED)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(IS_PARENT_ACTIVITY).is(true).and(STATE).is(ActivityStateEnum.PUBLISHED)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
                 project("$id", "name", DESCRIPTION, CTA_AND_WTA_SETTINGS_ACTIVITY_TAB, GENERAL_ACTIVITY_TAB_CATEGORY_ID)
                         .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1),
@@ -340,7 +341,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     public List<ActivityDTO> findAllActivitiesWithTimeTypes(long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("countryId").is(countryId).and(DELETED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
                         BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_INFO),
                 match(Criteria.where("balanceSettingsActivityTab.timeTypeInfo.timeTypes").is(WORKING_TYPE)),
@@ -366,7 +367,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
 
     public Activity findByNameExcludingCurrentInCountryAndDate(String name, BigInteger activityId, Long countryId, LocalDate startDate, LocalDate endDate) {
-        Criteria criteria = Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(DELETED).is(false).and("countryId").is(countryId);
+        Criteria criteria = Criteria.where("id").ne(activityId).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(DELETED).is(false).and(COUNTRY_ID).is(countryId);
         if (endDate == null) {
             Criteria startDateCriteria = new Criteria().orOperator(Criteria.where(GENERAL_ACTIVITY_TAB_START_DATE).gte(startDate), Criteria.where(GENERAL_ACTIVITY_TAB_START_DATE).lte(startDate));
             Criteria endDateCriteria = new Criteria().orOperator(Criteria.where(GENERAL_ACTIVITY_TAB_END_DATE).exists(false), Criteria.where(GENERAL_ACTIVITY_TAB_END_DATE).gte(startDate));
@@ -413,7 +414,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     public Activity findByNameIgnoreCaseAndCountryIdAndByDate(String name, Long countryId, LocalDate startDate, LocalDate endDate) {
-        Criteria criteria = Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(DELETED).is(false).and("countryId").is(countryId);
+        Criteria criteria = Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(DELETED).is(false).and(COUNTRY_ID).is(countryId);
         if (endDate == null) {
             Criteria startDateCriteria = new Criteria().orOperator(Criteria.where(GENERAL_ACTIVITY_TAB_START_DATE).gte(startDate), Criteria.where(GENERAL_ACTIVITY_TAB_START_DATE).lte(startDate));
             Criteria endDateCriteria = new Criteria().orOperator(Criteria.where(GENERAL_ACTIVITY_TAB_END_DATE).exists(false), Criteria.where(GENERAL_ACTIVITY_TAB_END_DATE).gte(startDate));
@@ -445,7 +446,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
                         TIME_TYPE1),
                 project().and("id").as(ACTIVITY_ID).and("name").as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
-                        .and("countryId").as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
+                        .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
                         .and("id").as("activity.id")
                         .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                         .and("regions").as("activity.regions").and("levels").as("activity.levels")
@@ -477,7 +478,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
                         TIME_TYPE1),
                 project().and("id").as(ACTIVITY_ID).and("name").as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
-                        .and("countryId").as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
+                        .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
                         .and("id").as("activity.id")
                         .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                         .and("regions").as("activity.regions").and("levels").as("activity.levels")
@@ -587,7 +588,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where(DELETED).is(false).and(UNIT_ID).is(unitId).orOperator(Criteria.where("countryParentId").in(activityIds), Criteria.where("id").in(activityIds))),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
                 project().and("id").as(ACTIVITY_ID).and("name").as(ACTIVITY_NAME)
-                        .and("countryId").as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
+                        .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
                         .and(PARENT_ID).as(ACTIVITY_PARENT_ID)
                         .and("countryParentId").as("activity.countryParentId")
                         .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES)
@@ -613,7 +614,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<ActivityDTO> findAllActivitiesByCountryIdAndTimeTypes(Long countryId, List<BigInteger> timeTypeIds) {
-        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).in(timeTypeIds).and(DELETED).is(false).and("countryId").is(countryId))
+        Aggregation aggregation = Aggregation.newAggregation(match(Criteria.where(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).in(timeTypeIds).and(DELETED).is(false).and(COUNTRY_ID).is(countryId))
                 , project().and("id").as("id").and("name").as("name"));
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();

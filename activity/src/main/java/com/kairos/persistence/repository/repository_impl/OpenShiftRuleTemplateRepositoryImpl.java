@@ -17,6 +17,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Repository
 public class OpenShiftRuleTemplateRepositoryImpl implements CustomOpenShiftRuleTemplateRepository {
 
+    public static final String OPEN_SHIFT_INTERVAL = "openShiftInterval";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -24,9 +25,9 @@ public class OpenShiftRuleTemplateRepositoryImpl implements CustomOpenShiftRuleT
 
     Aggregation aggregation =  Aggregation.newAggregation(
              match(Criteria.where("deleted").is(false).and("unitId").is(unitId)),
-             lookup("openShiftInterval", "openShiftIntervalId", "_id",
-                     "openShiftInterval"),
-             project("$id","activitiesPerTimeTypes","selectedSkills").and("openShiftInterval").arrayElementAt(0).as("openShiftInterval"));
+             lookup(OPEN_SHIFT_INTERVAL, "openShiftIntervalId", "_id",
+                     OPEN_SHIFT_INTERVAL),
+             project("$id","activitiesPerTimeTypes","selectedSkills").and(OPEN_SHIFT_INTERVAL).arrayElementAt(0).as(OPEN_SHIFT_INTERVAL));
      AggregationResults<OpenShiftRuleTemplateDTO> result =  mongoTemplate.aggregate(aggregation, OpenShiftRuleTemplate.class, OpenShiftRuleTemplateDTO.class);
 
 
