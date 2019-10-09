@@ -48,7 +48,7 @@ public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
         List<WTAQueryResultDTO> wtaQueryResultDTOS = workTimeAgreementService.getWTAByEmploymentIdAndDates(infoWrapper.getShift().getEmploymentId(), (infoWrapper.getShift().getStartDate()), infoWrapper.getShift().getEndDate());
         ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate)wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplate -> PROTECTED_DAYS_OFF.equals(wtaBaseRuleTemplate.getWtaTemplateType()))).findFirst().get();
         IntervalBalance intervalBalance =workTimeAgreementService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(),asLocalDate(infoWrapper.getShift().getStartDate()),infoWrapper.getShift().getStaffId(),protectedDaysOffWTATemplate.activityId);
-        if(intervalBalance.getAvailable()<1) {
+        if(protectedDaysOffWTATemplate.getActivityId().equals(infoWrapper.getShift().getActivities().get(0).getActivityId()) && intervalBalance.getAvailable()<1) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, (int) intervalBalance.getTotal(),
                             DurationType.DAYS, String.valueOf(0));
