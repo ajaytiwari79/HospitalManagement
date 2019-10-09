@@ -523,8 +523,6 @@ public class WorkTimeAgreementBalancesCalculationService {
         Set<Long> employmentIds = staffEmploymentDetails.stream().map(staffEmploymentDetail -> staffEmploymentDetail.getId()).collect(toSet());
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankService.findAllByEmploymentIdsAndBetweenDate(employmentIds, startDate, endDate);
         Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getEmploymentId(), v -> v));
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getProtectedWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds), startDate, endDate, WTATemplateType.PROTECTED_DAYS_OFF);
-        Map<Long, WTAQueryResultDTO> employmentAndWTAQueryResultDTOMap = wtaQueryResultDTOS.stream().collect(Collectors.toMap(k -> k.getEmploymentId(), v -> v));
         List<Activity> activities = activityMongoRepository.findAllByUnitIdsAndSecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF,unitIds);
         Set<BigInteger> activityIds = activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
         Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
@@ -541,10 +539,8 @@ public class WorkTimeAgreementBalancesCalculationService {
                     List<StaffEmploymentDetails> staffEmploymentDetailsList = unitAndStaffEmploymentDetailsMap.get(unitId);
                     for (StaffEmploymentDetails employmentDetails : staffEmploymentDetailsList) {
                         try {
-                            WTAQueryResultDTO wtaQueryResultDTO = employmentAndWTAQueryResultDTOMap.get(employmentDetails.getId());
                             switch (protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings()) {
                                 case UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR:
-                                    if (isNotNull(wtaQueryResultDTO) && wtaQueryResultDTO.getRuleTemplates().stream().anyMatch(wtaBaseRuleTemplate -> wtaBaseRuleTemplate.getWtaTemplateType().equals(WTATemplateType.PROTECTED_DAYS_OFF))) {
                                         DateTimeInterval dateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
                                         if (dateTimeInterval.getStartLocalDate().equals(getLocalDate())) {
                                             long count = employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
@@ -554,7 +550,6 @@ public class WorkTimeAgreementBalancesCalculationService {
                                             dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + (count * contractualMinutes));
                                             dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
                                         }
-                                    }
                                     break;
                                 case ONCE_IN_A_YEAR:
                                     dailyTimeBankEntriesToSave.add(getDailyTimeBankByOnceInAYear(employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, employmentDetails));;
