@@ -1,6 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.RestClientUrlUtil;
 import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
@@ -833,8 +834,10 @@ public class UserIntegrationService {
         });
     }
 
-    public List<Date> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
-        return genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Date>>>() {});
+    public List<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
+
+        List<Object> data= genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Object>>>() {});
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(data,LocalDate.class);
     }
 
     public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {
