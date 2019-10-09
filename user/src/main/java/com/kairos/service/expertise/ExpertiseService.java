@@ -219,7 +219,7 @@ public class ExpertiseService {
                         throw new ActionNotPermittedException("Already a Sr level is present 1:" + seniorityLevel.getId());
                     } else if (seniorityLevelDTO.getFrom() > seniorityLevel.getFrom() && !(seniorityLevelDTO.getFrom() >= seniorityLevel.getTo())) {
                         throw new ActionNotPermittedException("Already a Sr level is present 2:" + seniorityLevel.getId());
-                    } else if (seniorityLevelDTO.getFrom() == seniorityLevel.getFrom() || seniorityLevelDTO.getTo() == seniorityLevel.getTo()) {
+                    } else if (seniorityLevelDTO.getFrom().equals(seniorityLevel.getFrom()) || seniorityLevelDTO.getTo() == seniorityLevel.getTo()) {
                         throw new ActionNotPermittedException("Same Seniority level already exists");
                     }
                 }
@@ -998,8 +998,6 @@ public class ExpertiseService {
                 exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
             }
         });
-//        List<SeniorityLevel> seniorityLevels=ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class);
-//        seniorityLevels=Arrays.asList(ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO.getSeniorityLevel(),SeniorityLevel.class));
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class));
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO, country);
         Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),country,expertiseDTO.getFullTimeWeeklyMinutes(),expertiseDTO.getNumberOfWorkingDaysInWeek(),expertiseDTO.isPublished(),null,Collections.singletonList(expertiseLine));
@@ -1040,7 +1038,9 @@ public class ExpertiseService {
         Expertise expertise=new Expertise(currentExpertise.getId(),expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),expertiseDTO.getFullTimeWeeklyMinutes(),expertiseDTO.getNumberOfWorkingDaysInWeek(),expertiseDTO.isPublished(),currentExpertise.getSeniorityLevel(),currentExpertise.getExpertiseLines());
         expertise.setCountry(country);
         expertiseGraphRepository.save(expertise);
-        linkProtectedDaysOffSetting(new ArrayList<>(), Collections.singletonList(expertise));
+        if(expertiseDTO.getExpertiseLineId()!=null){
+            updateExpertiseLine(countryId,expertiseDTO);
+        }
         return new ExpertiseResponseDTO();
     }
 

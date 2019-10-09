@@ -32,7 +32,6 @@ public class SeniorityLevelDTO {
     private BigDecimal freeChoiceToPension;
     private Long payGradeLevel;
 
-
     @AssertTrue(message = "Incorrect Data")
     public boolean isValid() {
 
@@ -40,8 +39,7 @@ public class SeniorityLevelDTO {
                 return false;
             }
             if (Optional.ofNullable(this.to).isPresent()) {
-                if (this.to <= this.from)
-                    return false;
+                return this.to > this.from;
             }
 
         return true;

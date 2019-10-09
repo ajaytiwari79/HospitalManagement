@@ -300,6 +300,8 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertiseByNewWay(countryId, expertise));
     }
 
+
+
     @ApiOperation(value = "Delete expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.DELETE)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
