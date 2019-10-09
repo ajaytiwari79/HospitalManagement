@@ -21,14 +21,15 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 
 public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
 
+    public static final String EMPLOYMENT_ID = "employmentId";
     @Inject private MongoTemplate mongoTemplate;
 
 
     @Override
     public DailyTimeBankEntry findLastTimeBankByEmploymentId(Long employmentId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("employmentId").in(employmentId).and("deleted").is(false)),
-                group("employmentId").last("date").as("date")
+                match(Criteria.where(EMPLOYMENT_ID).in(employmentId).and("deleted").is(false)),
+                group(EMPLOYMENT_ID).last("date").as("date")
 
         );
         AggregationResults<DailyTimeBankEntry> results = mongoTemplate.aggregate(aggregation,DailyTimeBankEntry.class,DailyTimeBankEntry.class);
@@ -39,7 +40,7 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
 
     @Override
     public List<DailyTimeBankEntry> findAllDailyTimeBankByEmploymentIdAndBetweenDates(Long employmentId, Date startDate, Date endDate){
-        Criteria criteria = Criteria.where("employmentId").is(employmentId).and("deleted").is(false).and("date").gte(startDate);
+        Criteria criteria = Criteria.where(EMPLOYMENT_ID).is(employmentId).and("deleted").is(false).and("date").gte(startDate);
         if(endDate!=null){
             criteria.lte(endDate);
         }

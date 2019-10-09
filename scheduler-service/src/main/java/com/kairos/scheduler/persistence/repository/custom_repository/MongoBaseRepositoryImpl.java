@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
+	public static final String THE_GIVEN_ID_MUST_NOT_BE_NULL = "The given id must not be null!";
 	private final MongoOperations mongoOperations;
 	private final MongoEntityInformation<T, ID> entityInformation;
 	MongoDatabase mongoDatabase;
@@ -42,20 +43,20 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	}
 	@Override
 	public T findOne(ID  id) {
-		Assert.notNull(id, "The given id must not be null!");
+		Assert.notNull(id, THE_GIVEN_ID_MUST_NOT_BE_NULL);
 		return mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName());
 	}
 
 	@Override
 	public T safeDeleteById(ID id){
-		Assert.notNull(id, "The given id must not be null!");
+		Assert.notNull(id, THE_GIVEN_ID_MUST_NOT_BE_NULL);
 
 	return	mongoOperations.findAndModify(new Query(Criteria.where("_id").is(id)),Update.update("deleted",true),entityInformation.getJavaType(),entityInformation.getCollectionName());
 	}
 
 	@Override
 	public <T extends MongoBaseEntity> void safeDelete(T object){
-		Assert.notNull(object.getId(), "The given id must not be null!");
+		Assert.notNull(object.getId(), THE_GIVEN_ID_MUST_NOT_BE_NULL);
 		mongoOperations.updateFirst(new Query(Criteria.where("_id").is(object.getId())),Update.update("deleted",true),entityInformation.getJavaType());
 	}
 

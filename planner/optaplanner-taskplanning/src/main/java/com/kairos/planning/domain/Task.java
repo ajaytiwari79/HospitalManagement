@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 @PlanningEntity(difficultyComparatorClass = TaskDifficultyComparator.class)
 public class Task extends TaskOrEmployee {
 	public static final int DRIVING_TIME_MULTIPLIER = 1;
+	public static final String HH_MM = "HH:mm";
+	public static final String IS_NOT_INITIALIZED_YET = ") is not initialized yet.";
 	private static Logger log = LoggerFactory.getLogger(Task.class);
 	private TaskType taskType;
 	@PlanningVariable(valueRangeProviderRefs = { "taskRange",
@@ -389,14 +391,14 @@ public class Task extends TaskOrEmployee {
 	}
 
 	public String getLabel() {
-		return id + "_" + priority + "_I_1:(" + initialStartTime1.toString("HH:mm") + "_"
-				+ initialEndTime1.toString("HH:mm") + "),"
+		return id + "_" + priority + "_I_1:(" + initialStartTime1.toString(HH_MM) + "_"
+				+ initialEndTime1.toString(HH_MM) + "),"
 				+ (initialStartTime2 != null
-						? ("I_2:(" + initialStartTime2.toString("HH:mm") + "_" + initialEndTime2.toString("HH:mm"))
+						? ("I_2:(" + initialStartTime2.toString(HH_MM) + "_" + initialEndTime2.toString(HH_MM))
 						: "")
-				+ ")," + "P:" + plannedStartTime.toString("HH:mm") + "_" + getPlannedEndTime().toString("HH:mm")
-				+ "PiD:" + "," + getIntervalIncludingArrivalAndWaiting().getStart().toString("HH:mm") + "_"
-				+ getIntervalIncludingArrivalAndWaiting().getEnd().toString("HH:mm") + ",Dis:"
+				+ ")," + "P:" + plannedStartTime.toString(HH_MM) + "_" + getPlannedEndTime().toString(HH_MM)
+				+ "PiD:" + "," + getIntervalIncludingArrivalAndWaiting().getStart().toString(HH_MM) + "_"
+				+ getIntervalIncludingArrivalAndWaiting().getEnd().toString(HH_MM) + ",Dis:"
 				+ getDrivingMinutesFromPreviousTaskOrEmployee() + ",wait:" + getWaitingMinutes()
 				+ ",plannedInSecondInterval" + isPlannedInSecondInterval();
 	}
@@ -464,7 +466,7 @@ public class Task extends TaskOrEmployee {
 	public Long getDistanceFromPreviousTaskOrEmployee() {
 		if (previousTaskOrEmployee == null) {
 			throw new IllegalStateException("This method must not be called when the previousTaskOrVehicle ("
-					+ previousTaskOrEmployee + ") is not initialized yet.");
+					+ previousTaskOrEmployee + IS_NOT_INITIALIZED_YET);
 		}
 		return getDistanceFrom(previousTaskOrEmployee);
 	}
@@ -501,11 +503,11 @@ public class Task extends TaskOrEmployee {
 	public int getDrivingMinutesFromPreviousTaskOrEmployee() {
 		if (previousTaskOrEmployee == null) {
 			throw new IllegalStateException("This method must not be called when the previousTaskOrVehicle ("
-					+ previousTaskOrEmployee + ") is not initialized yet.");
+					+ previousTaskOrEmployee + IS_NOT_INITIALIZED_YET);
 		}
 		if (employee.getVehicle() == null) {
 			throw new IllegalStateException(
-					"This method must not be called when the vehicle (" + employee + ") is not initialized yet.");
+					"This method must not be called when the vehicle (" + employee + IS_NOT_INITIALIZED_YET);
 		}
 		/*
 		 * if(this.getId().equals(1979693l) && previousTaskOrEmployee instanceof

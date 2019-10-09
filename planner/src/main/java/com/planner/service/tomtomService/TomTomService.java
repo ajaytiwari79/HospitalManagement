@@ -52,6 +52,9 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class TomTomService {
     private static final String ARRIVE_RIGHT ="ARRIVE_RIGHT" ;
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String APPLICATION_JSON = "application/json";
+    public static final String UTF_8 = "UTF-8";
     private static Logger log= LoggerFactory.getLogger(TomTomService.class);
     @Autowired
     private TaskService taskService;
@@ -161,9 +164,9 @@ public class TomTomService {
             params.add(new BasicNameValuePair("travelMode", "car"));
             builder.setParameters(params);
             HttpPost httppost = new HttpPost(builder.build());
-            httppost.setHeader("Content-Type","application/json");
-            httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-            httppost.setEntity(new ByteArrayEntity(requestBody.getBytes("UTF-8")));
+            httppost.setHeader(CONTENT_TYPE, APPLICATION_JSON);
+            httppost.setEntity(new UrlEncodedFormEntity(params, UTF_8));
+            httppost.setEntity(new ByteArrayEntity(requestBody.getBytes(UTF_8)));
             HttpResponse response = httpclient.execute(httppost);
             ObjectMapper mapper = new ObjectMapper();
             TomTomResponse tomTomResponse = null;
@@ -197,7 +200,7 @@ public class TomTomService {
             params.add(new BasicNameValuePair("language", "en-GB"));
             builder.setParameters(params);
             HttpGet httpGet = new HttpGet(builder.build());
-            httpGet.setHeader("Content-Type","application/json");
+            httpGet.setHeader(CONTENT_TYPE, APPLICATION_JSON);
             response = httpclient.execute(httpGet);
             ObjectMapper mapper = ObjectMapperUtils.getObjectMapper();
 
@@ -220,7 +223,7 @@ public class TomTomService {
         try {
             builder = new URIBuilder("https://api.tomtom.com"+headersUrl);
             HttpGet httppost = new HttpGet(builder.build());
-            httppost.setHeader("Content-Type","application/json");
+            httppost.setHeader(CONTENT_TYPE, APPLICATION_JSON);
             HttpResponse response = httpclient.execute(httppost);
             ObjectMapper mapper = new ObjectMapper();
             TomTomResponse tomTomResponse = mapper.readValue(response.getEntity().getContent(), TomTomResponse.class);
@@ -275,7 +278,7 @@ public class TomTomService {
         try {
             builder = new URIBuilder("https://api.tomtom.com"+headersUrl);
             HttpGet httppost = new HttpGet(builder.build());
-            httppost.setHeader("Content-Type","application/json");
+            httppost.setHeader(CONTENT_TYPE, APPLICATION_JSON);
             HttpResponse response = httpclient.execute(httppost);
             ObjectMapper mapper = new ObjectMapper();
             Route route = mapper.readValue(response.getEntity().getContent(), Route.class);
