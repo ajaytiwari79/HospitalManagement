@@ -904,4 +904,31 @@ public class StaffingLevelService extends MongoBaseService {
         }
         return staffingLevelDto;
     }
+
+    public void removedActivityFromStaffingLevel(BigInteger activityId, boolean isPresence){
+        List<StaffingLevel> staffingLevels = isPresence ? staffingLevelMongoRepository.findPresenceStaffingLevelsByActivityId(activityId) : staffingLevelMongoRepository.findAbsenceStaffingLevelsByActivityId(activityId);
+        for(StaffingLevel staffingLevel : staffingLevels){
+            for(StaffingLevelInterval staffingLevelInterval : isPresence ? staffingLevel.getPresenceStaffingLevelInterval() : staffingLevel.getAbsenceStaffingLevelInterval()){
+                removedActivityFromStaffingLevelInterval(staffingLevelInterval, activityId);
+            }
+        }
+        staffingLevelMongoRepository.saveAll(staffingLevels);
+    }
+
+    private void removedActivityFromStaffingLevelInterval(StaffingLevelInterval staffingLevelInterval, BigInteger activityId) {
+        Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
+        int minNoOfStaff = 0;
+        int maxNoOfStaff = 0;
+        for(StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()){
+            if(staffingLevelActivity.getActivityId().equals(activityId)){
+                minNoOfStaff += staffingLevelActivity.getMinNoOfStaff();
+                maxNoOfStaff += staffingLevelActivity.getMaxNoOfStaff();
+            }else{
+                staffingLevelActivities.add(staffingLevelActivity);
+            }
+        }
+        staffingLevelInterval.setMinNoOfStaff(staffingLevelInterval.getMinNoOfStaff() - minNoOfStaff);
+        staffingLevelInterval.setMaxNoOfStaff(staffingLevelInterval.getMaxNoOfStaff() - maxNoOfStaff);
+        staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
+    }
 }
