@@ -36,8 +36,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class Organization extends OrganizationBaseEntity {
 
     private boolean isKairosHub;
-    @Relationship(type = KAIROS_STATUS)
-    private KairosStatus kairosStatus;
     //fixme need to remove
     private boolean isParentOrganization;
 
