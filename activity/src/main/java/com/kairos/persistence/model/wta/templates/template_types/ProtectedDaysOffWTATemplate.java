@@ -7,6 +7,7 @@ import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -15,9 +16,13 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.brakeRuleTemplateAndUpdateViolationDetails;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getHoursByMinutes;
 
@@ -34,13 +39,15 @@ public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
     private BigInteger activityId;
 
     public ProtectedDaysOffWTATemplate() {
-        this.wtaTemplateType = WTATemplateType.PROTECTED_DAYS_OFF;
+        this.wtaTemplateType = PROTECTED_DAYS_OFF;
     }
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         WorkTimeAgreementService workTimeAgreementService= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementService.class);
-        IntervalBalance intervalBalance =workTimeAgreementService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(),asLocalDate(infoWrapper.getShift().getStartDate()),infoWrapper.getShift().getStaffId(),infoWrapper.getShift().getActivityIds().get(0));
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = workTimeAgreementService.getWTAByEmploymentIdAndDates(infoWrapper.getShift().getEmploymentId(), (infoWrapper.getShift().getStartDate()), infoWrapper.getShift().getEndDate());
+        ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate)wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream().filter(wtaBaseRuleTemplate -> PROTECTED_DAYS_OFF.equals(wtaBaseRuleTemplate.getWtaTemplateType()))).findFirst().get();
+        IntervalBalance intervalBalance =workTimeAgreementService.getProtectedDaysOffCount(infoWrapper.getShift().getUnitId(),asLocalDate(infoWrapper.getShift().getStartDate()),infoWrapper.getShift().getStaffId(),protectedDaysOffWTATemplate.activityId);
         if(intervalBalance.getAvailable()<1) {
             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, (int) intervalBalance.getTotal(),
