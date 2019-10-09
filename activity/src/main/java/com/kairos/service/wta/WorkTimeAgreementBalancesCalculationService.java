@@ -133,6 +133,7 @@ public class WorkTimeAgreementBalancesCalculationService {
                 case PROTECTED_DAYS_OFF:
                     ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate) ruleTemplate;
                     activityIds.add(protectedDaysOffWTATemplate.getActivityId());
+                    break;
                 default:
                     break;
             }
