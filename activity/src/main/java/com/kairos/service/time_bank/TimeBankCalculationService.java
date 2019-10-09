@@ -135,7 +135,8 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setStaffId(staffEmploymentDetails.getStaffId());
         dailyTimeBankEntry.setTimeBankMinutesWithoutCta(timeBankMinWithoutCta);
         dailyTimeBankEntry.setPlannedMinutesOfTimebank(totalDailyPlannedMinutes);
-        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : 0);
+        int deltaAccumulatedTimebankMinutes = anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : 0;
+        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes + dailyTimeBankEntry.getProtectedDaysOffMinutes());
         dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(ctaTimeBankMinMap.values().stream().mapToInt(ctaBonus -> ctaBonus).sum());
         dailyTimeBankEntry.setPublishedSomeActivities(anyShiftPublish);
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
@@ -149,7 +150,7 @@ public class TimeBankCalculationService {
     public void resetDailyTimebankEntry(DailyTimeBankEntry dailyTimeBankEntry, int contractualMinutes) {
         dailyTimeBankEntry.setTimeBankMinutesWithoutCta(0);
         dailyTimeBankEntry.setPlannedMinutesOfTimebank(0);
-        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(0);
+        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes());
         dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(0);
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         dailyTimeBankEntry.setScheduledMinutesOfTimeBank(0);
@@ -189,7 +190,7 @@ public class TimeBankCalculationService {
             functionId = appliedFunctionDTO.isPresent() ? appliedFunctionDTO.get().getId() : null;
         }
         if (ctaRuleTemplateDTO.getStaffFunctions().contains(isNotNull(staffEmploymentDetails.getFunctionId()) ? staffEmploymentDetails.getFunctionId() : functionId)) {
-            value = !getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) ? new BigDecimal(ctaRuleTemplateDTO.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
+            value = getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) ? new BigDecimal(ctaRuleTemplateDTO.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
         }
         return value;
     }
@@ -999,7 +1000,7 @@ public class TimeBankCalculationService {
         return deltaTimebankMinutes;
     }
 
-    private BigDecimal getHourlyCostByDate(List<EmploymentLinesDTO> employmentLines, java.time.LocalDate localDate) {
+    public BigDecimal getHourlyCostByDate(List<EmploymentLinesDTO> employmentLines, java.time.LocalDate localDate) {
         BigDecimal hourlyCost = new BigDecimal(0);
         for (EmploymentLinesDTO employmentLine : employmentLines) {
             DateTimeInterval positionInterval = employmentLine.getInterval();
