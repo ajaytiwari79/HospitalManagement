@@ -25,6 +25,9 @@ import static java.time.ZoneId.systemDefault;
 public class RandomDateGeneratorService extends MongoBaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(RandomDateGeneratorService.class);
+    public static final String SATURDAY = "SATURDAY";
+    public static final String SUNDAY = "SUNDAY";
+    public static final String RANDOM_DATE = "randomDate";
 
 
     public List<Map<String, LocalDate>> getRandomDates(int numberOfWeeks, int visitCount, LocalDate createTaskFrom, boolean isWeekEnd, Date demandEndDate, List<Long> publicHolidayList, boolean skipTaskOnPublicHoliday) {
@@ -84,13 +87,13 @@ public class RandomDateGeneratorService extends MongoBaseService {
 
             if ((randomDate.isBefore(taskDemandEndDate) || randomDate.isEqual(taskDemandEndDate)) && (!randomDateList.contains(randomDate))) {
                 if (isWeekEnd != true) {
-                    if (!randomDate.getDayOfWeek().name().equals("SATURDAY") && !randomDate.getDayOfWeek().name().equals("SUNDAY")) {
+                    if (!randomDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !randomDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
                         if( (!publicHolidayList.contains(date.getTime())) ||  (publicHolidayList.contains(date.getTime()) && !skipTaskOnPublicHoliday )){
                             randomDateList.add(randomDate);
                         }
                     }
                 } else {
-                    if (randomDate.getDayOfWeek().name().equals("SATURDAY") || randomDate.getDayOfWeek().name().equals("SUNDAY")) {
+                    if (randomDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) || randomDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
                         randomDateList.add(randomDate);
                     }
                 }
@@ -149,13 +152,13 @@ public class RandomDateGeneratorService extends MongoBaseService {
 
         if(!repetitions.contains(randomDate)) {
             if (isWeekEnd != true) {
-                if (!randomDate.getDayOfWeek().name().equals("SATURDAY") && !randomDate.getDayOfWeek().name().equals("SUNDAY")) {
+                if (!randomDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !randomDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
                     if (!publicHolidayList.contains(date.getTime())) {
                         localDate = randomDate;
                     }
                 }
             } else {
-                if (randomDate.getDayOfWeek().name().equals("SATURDAY") || randomDate.getDayOfWeek().name().equals("SUNDAY")) {
+                if (randomDate.getDayOfWeek().name().equals(SATURDAY) || randomDate.getDayOfWeek().name().equals(SUNDAY)) {
                     localDate = randomDate;
                 }
             }
@@ -174,7 +177,7 @@ public class RandomDateGeneratorService extends MongoBaseService {
         List<Map<String, LocalDate>> randomDatesList = new ArrayList<>();
         for (LocalDate randomDate : initialRandomDates) {
             Map<String, LocalDate> map = new HashMap<>();
-            map.put("randomDate", randomDate);
+            map.put(RANDOM_DATE, randomDate);
             map.put("taskStartBoundary", boundaryStartDate);
             map.put("taskEndBoundary", boundaryEndDate);
             randomDatesList.add(map);
@@ -200,7 +203,7 @@ public class RandomDateGeneratorService extends MongoBaseService {
         while (taskDemandStartDate.isBefore(taskDemandEndDate) || taskDemandStartDate.isEqual(taskDemandEndDate)) {
 
             for(int i =1; i <= taskDemand.getDailyFrequency();){
-                if((counter%2==0) && (!taskDemandStartDate.getDayOfWeek().name().equals("SATURDAY") && !taskDemandStartDate.getDayOfWeek().name().equals("SUNDAY"))  ){
+                if((counter%2==0) && (!taskDemandStartDate.getDayOfWeek().name().equals(SATURDAY) && !taskDemandStartDate.getDayOfWeek().name().equals(SUNDAY))  ){
                     if(taskDemandStartDate.isBefore(taskDemandEndDate) || taskDemandStartDate.isEqual(taskDemandEndDate)){
                         if(taskDemand.getEndDate()==null && randomDateList.size() == taskDemand.getEndAfterOccurrence()){
                             break outerWhileLoop;
@@ -210,7 +213,7 @@ public class RandomDateGeneratorService extends MongoBaseService {
                     }
                 }
                 taskDemandStartDate = taskDemandStartDate.plusDays(1);
-                if(!taskDemandStartDate.getDayOfWeek().name().equals("SATURDAY") && !taskDemandStartDate.getDayOfWeek().name().equals("SUNDAY")){
+                if(!taskDemandStartDate.getDayOfWeek().name().equals(SATURDAY) && !taskDemandStartDate.getDayOfWeek().name().equals(SUNDAY)){
                     i++;
                 }
             }
@@ -222,7 +225,7 @@ public class RandomDateGeneratorService extends MongoBaseService {
         randomDatesList.addAll(addBoundaryDates(randomDateList, boundaryStartDate, boundaryEndDate));
 
         if(taskDemand.getEndDate()==null && taskDemand.getEndAfterOccurrence()>0){
-            LocalDate lastRandomDate = randomDatesList.get(randomDatesList.size()-1).get("randomDate");
+            LocalDate lastRandomDate = randomDatesList.get(randomDatesList.size()-1).get(RANDOM_DATE);
             taskDemand.setEndDate(Date.from(lastRandomDate.atStartOfDay(systemDefault()).toInstant()));
             save(taskDemand);
         }
@@ -253,7 +256,7 @@ public class RandomDateGeneratorService extends MongoBaseService {
             LocalDate boundaryEndDate = boundaryStartDate.plusMonths(monthlyFrequency.getMonthFrequency()-1).with(TemporalAdjusters.lastDayOfMonth());
             List<LocalDate> randomDates = new ArrayList<>();
             while (maximumOccurenceReached==false && (taskDemandStartDate.isBefore(taskDemandEndDate) || taskDemandStartDate.isEqual(taskDemandEndDate))) {
-                if (!taskDemandStartDate.getDayOfWeek().name().equals("SATURDAY") && !taskDemandStartDate.getDayOfWeek().name().equals("SUNDAY")) {
+                if (!taskDemandStartDate.getDayOfWeek().name().equals(SATURDAY) && !taskDemandStartDate.getDayOfWeek().name().equals(SUNDAY)) {
                     if((taskDemand.getEndDate()==null) && (randomDatesList.size() == taskDemand.getEndAfterOccurrence() || randomDates.size() == taskDemand.getEndAfterOccurrence())){
                         maximumOccurenceReached = true;
                     } else {
@@ -330,7 +333,7 @@ public class RandomDateGeneratorService extends MongoBaseService {
         }
         logger.debug("getRandomDatesForMonthlyPattern " + randomDatesList);
         if(taskDemand.getEndDate()==null && taskDemand.getEndAfterOccurrence()>0){
-            LocalDate lastRandomDate = randomDatesList.get(randomDatesList.size()-1).get("randomDate");
+            LocalDate lastRandomDate = randomDatesList.get(randomDatesList.size()-1).get(RANDOM_DATE);
             taskDemand.setEndDate(Date.from(lastRandomDate.atStartOfDay(systemDefault()).toInstant()));
             save(taskDemand);
         }
@@ -377,7 +380,7 @@ public class RandomDateGeneratorService extends MongoBaseService {
         while (taskDemandStartDate.isBefore(taskDemandEndDate) || taskDemandStartDate.isEqual(taskDemandEndDate)) {
 
             for(int i =1; i <= taskDemand.getDailyFrequency();){
-                if((counter%2==0) && (!taskDemandStartDate.getDayOfWeek().name().equals("SATURDAY") && !taskDemandStartDate.getDayOfWeek().name().equals("SUNDAY"))  ){
+                if((counter%2==0) && (!taskDemandStartDate.getDayOfWeek().name().equals(SATURDAY) && !taskDemandStartDate.getDayOfWeek().name().equals(SUNDAY))  ){
                     if(taskDemandStartDate.isBefore(taskDemandEndDate) || taskDemandStartDate.isEqual(taskDemandEndDate)){
                         if(taskDemand.getEndDate()==null && randomDateList.size() == taskDemand.getEndAfterOccurrence()){
                             break outerWhileLoop;
@@ -387,7 +390,7 @@ public class RandomDateGeneratorService extends MongoBaseService {
                     }
                 }
                 taskDemandStartDate = taskDemandStartDate.plusDays(1);
-                if(!taskDemandStartDate.getDayOfWeek().name().equals("SATURDAY") && !taskDemandStartDate.getDayOfWeek().name().equals("SUNDAY")){
+                if(!taskDemandStartDate.getDayOfWeek().name().equals(SATURDAY) && !taskDemandStartDate.getDayOfWeek().name().equals(SUNDAY)){
                     i++;
                 }
             }

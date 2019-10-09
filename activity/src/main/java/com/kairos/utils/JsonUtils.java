@@ -16,6 +16,7 @@ import java.io.Writer;
  *
  */
 public class JsonUtils {
+  public static final String SOURCE = " source: ";
   private static ObjectMapper jsonMapper = new ObjectMapper();
 
   /**
@@ -51,12 +52,8 @@ public class JsonUtils {
   public static <T> T toObject(String value, Class<T> klazz) {
     try {
       return jsonMapper.readValue(value, klazz);
-    } catch (final JsonGenerationException e) {
-      throw new JsonMarshallingException(e.toString() + " source: " + value, e);
-    } catch (final JsonMappingException e) {
-      throw new JsonMarshallingException(e.toString() + " source: " + value, e);
-    } catch (IOException e) {
-      throw new JsonMarshallingException(e.toString() + " source: " + value, e);
+    } catch (final IOException e) {
+      throw new JsonMarshallingException(e.toString() + SOURCE + value, e);
     }
   }
 
@@ -95,9 +92,9 @@ public class JsonUtils {
     try {
       return (T) jsonMapper.readValue(value, collectionType);
     } catch (final JsonGenerationException e) {
-      throw new JsonMarshallingException(e.toString() + " source: " + value, e);
+      throw new JsonMarshallingException(e.toString() + SOURCE + value, e);
     } catch (final JsonMappingException e) {
-      throw new JsonMarshallingException(e.toString() + " source: " + value, e);
+      throw new JsonMarshallingException(e.toString() + SOURCE + value, e);
     }
   }
 

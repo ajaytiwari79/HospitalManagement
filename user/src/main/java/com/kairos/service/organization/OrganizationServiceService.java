@@ -29,6 +29,9 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Service
 public class OrganizationServiceService {
 
+    public static final String RESULT = "result";
+    public static final String AVAILABLE_SERVICES = "availableServices";
+    public static final String SELECTED_SERVICES = "selectedServices";
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
@@ -80,7 +83,7 @@ public class OrganizationServiceService {
         List<Map<String, Object>> map = organizationServiceRepository.getOrganizationServicesByCountryId(countryId);
         List<Object> objectList = new ArrayList<>();
         for (Map<String, Object> result : map) {
-            objectList.add(result.get("result"));
+            objectList.add(result.get(RESULT));
         }
         return objectList;
     }
@@ -196,7 +199,7 @@ public class OrganizationServiceService {
         if (organizationServices != null) {
             List<Object> objectList = new ArrayList<>();
             for (Map<String, Object> map : organizationServices) {
-                Object o = map.get("result");
+                Object o = map.get(RESULT);
                 objectList.add(o);
             }
             return objectList;
@@ -213,7 +216,7 @@ public class OrganizationServiceService {
                 organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
                 List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
                 for (Map<String, Object> map : mapList) {
-                    Object o = map.get("result");
+                    Object o = map.get(RESULT);
                     objectList.add(o);
 
                 }
@@ -223,7 +226,7 @@ public class OrganizationServiceService {
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
                 List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
                 for (Map<String, Object> map : mapList) {
-                    Object o = map.get("result");
+                    Object o = map.get(RESULT);
                     objectList.add(o);
                 }
                 return objectList;
@@ -266,11 +269,11 @@ public class OrganizationServiceService {
     private Map<String, Object> filterSkillData(List<Map<String, Object>> skillData) {
         Map<String, Object> response = new HashMap<>();
         for (Map<String, Object> map : skillData) {
-            if (((Map<String, Object>) map.get("data")).get("availableServices") != null) {
-                response.put("availableServices", ((Map<String, Object>) map.get("data")).get("availableServices"));
+            if (((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES) != null) {
+                response.put(AVAILABLE_SERVICES, ((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES));
             }
-            if (((Map<String, Object>) map.get("data")).get("selectedServices") != null) {
-                response.put("selectedServices", ((Map<String, Object>) map.get("data")).get("selectedServices"));
+            if (((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES) != null) {
+                response.put(SELECTED_SERVICES, ((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES));
             }
         }
 
@@ -288,7 +291,7 @@ public class OrganizationServiceService {
         if (organizationServices != null) {
             List<Object> objectList = new ArrayList<>();
             for (Map<String, Object> map : organizationServices) {
-                Object o = map.get("result");
+                Object o = map.get(RESULT);
                 objectList.add(o);
             }
             return objectList;

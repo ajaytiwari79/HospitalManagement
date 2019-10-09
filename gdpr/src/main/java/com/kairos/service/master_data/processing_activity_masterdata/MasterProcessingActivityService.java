@@ -35,6 +35,8 @@ import java.util.*;
 public class MasterProcessingActivityService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterProcessingActivityService.class);
+    public static final String MESSAGE_PROCESSING_ACTIVITY = "message.processingActivity";
+    public static final String MESSAGE_DATA_NOT_FOUND = "message.dataNotFound";
 
 
     @Inject
@@ -59,7 +61,7 @@ public class MasterProcessingActivityService {
     public MasterProcessingActivityDTO createMasterProcessingActivity(Long countryId, MasterProcessingActivityDTO masterProcessingActivityDto) {
 
         if (masterProcessingActivityRepository.findByNameAndCountryId(masterProcessingActivityDto.getName(), countryId) != null) {
-            exceptionService.duplicateDataException("message.duplicate", "message.processingActivity", masterProcessingActivityDto.getName().toLowerCase());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_PROCESSING_ACTIVITY, masterProcessingActivityDto.getName().toLowerCase());
         }
         MasterProcessingActivity masterProcessingActivity = new MasterProcessingActivity(masterProcessingActivityDto.getName(), masterProcessingActivityDto.getDescription(), SuggestedDataStatus.APPROVED, countryId);
         setMetadataOfMasterProcessingActivity(masterProcessingActivityDto, masterProcessingActivity);
@@ -133,11 +135,11 @@ public class MasterProcessingActivityService {
 
         MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByNameAndCountryId(masterProcessingActivityDto.getName(), countryId);
         if (Optional.ofNullable(processingActivity).isPresent() && !id.equals(processingActivity.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.processingActivity", masterProcessingActivityDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_PROCESSING_ACTIVITY, masterProcessingActivityDto.getName());
         }
         processingActivity = masterProcessingActivityRepository.getOne(id);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_PROCESSING_ACTIVITY, id);
         } else {
             if (!masterProcessingActivityDto.getSubProcessingActivities().isEmpty()) {
                 List<MasterProcessingActivity> subProcessingActivities = updateExistingAndCreateNewSubProcessingActivity(countryId, masterProcessingActivityDto.getSubProcessingActivities(), processingActivity);
@@ -226,7 +228,7 @@ public class MasterProcessingActivityService {
         if (updateCount > 0) {
             LOGGER.info("Master Processing Activity is deleted successfully with id :: {}", id);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_PROCESSING_ACTIVITY, id);
         }
         return true;
 
@@ -243,7 +245,7 @@ public class MasterProcessingActivityService {
     public boolean deleteSubProcessingActivity(Long countryId, Long processingActivityId, Long subProcessingActivityId) {
         Integer updateCount = masterProcessingActivityRepository.deleteSubProcessingActivityFromMasterProcessingActivity(countryId, processingActivityId, subProcessingActivityId);
         if (updateCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_PROCESSING_ACTIVITY, processingActivityId);
         } else {
             LOGGER.info("Sub processing Activity deleted successfully");
         }
@@ -255,7 +257,7 @@ public class MasterProcessingActivityService {
     public MasterProcessingActivityResponseDTO getMasterProcessingActivityWithSubProcessing(Long countryId, Long id) {
         MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.findByCountryIdAndId(countryId, id);
         if (!Optional.of(masterProcessingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_PROCESSING_ACTIVITY, id);
         }
         return prepareMasterProcessingActivityResponseDTO(masterProcessingActivity, new ArrayList<>());
 
@@ -304,7 +306,7 @@ public class MasterProcessingActivityService {
     public MasterProcessingActivityRiskDTO createRiskAndLinkWithProcessingActivityAndSubProcessingActivity(Long countryId, Long processingActivityId, MasterProcessingActivityRiskDTO processingActivityRiskDTO) {
         MasterProcessingActivity masterProcessingActivity = masterProcessingActivityRepository.findByCountryIdAndId(countryId, processingActivityId);
         if (!Optional.ofNullable(masterProcessingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_PROCESSING_ACTIVITY, processingActivityId);
         }
         if (!processingActivityRiskDTO.getRisks().isEmpty()) {
             List<Risk> processingActivityRisks = ObjectMapperUtils.copyPropertiesOfListByMapper(processingActivityRiskDTO.getRisks(), Risk.class);
@@ -328,14 +330,14 @@ public class MasterProcessingActivityService {
 
         MasterProcessingActivity processingActivity = masterProcessingActivityRepository.findByCountryIdAndId(countryId, processingActivityId);
         if (!Optional.ofNullable(processingActivity).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.processingActivity", processingActivityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_PROCESSING_ACTIVITY, processingActivityId);
         }
         Risk linkedRisk = processingActivity.getRisks().stream().filter(risk -> risk.getId().equals(riskId)).findFirst().orElse(null);
         if (linkedRisk != null) {
             processingActivity.getRisks().remove(linkedRisk);
             riskRepository.delete(linkedRisk);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.risk", processingActivityId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "message.risk", processingActivityId);
         }
         masterProcessingActivityRepository.save(processingActivity);
         return true;

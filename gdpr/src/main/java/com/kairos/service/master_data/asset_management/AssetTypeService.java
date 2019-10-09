@@ -7,6 +7,7 @@ import com.kairos.dto.gdpr.BasicRiskDTO;
 import com.kairos.dto.gdpr.master_data.AssetTypeDTO;
 import com.kairos.dto.gdpr.metadata.AssetTypeBasicDTO;
 import com.kairos.enums.gdpr.SuggestedDataStatus;
+import com.kairos.persistence.model.common.BaseEntity;
 import com.kairos.persistence.model.master_data.default_asset_setting.AssetType;
 import com.kairos.persistence.model.risk_management.Risk;
 import com.kairos.persistence.repository.master_data.asset_management.AssetTypeRepository;
@@ -28,6 +29,9 @@ import java.util.stream.Collectors;
 @Service
 public class AssetTypeService {
 
+    public static final String MESSAGE_DUPLICATE = "message.duplicate";
+    public static final String MESSAGE_ASSET_TYPE = "message.assetType";
+    public static final String MESSAGE_DATA_NOT_FOUND = "message.dataNotFound";
     @Inject
     private ExceptionService exceptionService;
 
@@ -54,7 +58,7 @@ public class AssetTypeService {
 
         AssetType assetTypeExist = assetTypeRepository.findByNameAndCountryIdAndSubAssetType(assetTypeDto.getName(), countryId, false);
         if (Optional.ofNullable(assetTypeExist).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDto.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_ASSET_TYPE, assetTypeDto.getName());
         }
         AssetType assetType = new AssetType(assetTypeDto.getName(), countryId, SuggestedDataStatus.APPROVED);
         List<Risk> assetTypeRisks;
@@ -102,7 +106,7 @@ public class AssetTypeService {
      */
     private List<AssetType> updateSubAssetTypes(Long countryId, List<AssetTypeDTO> subAssetTypesDtos, AssetType assetType) {
         checkForDuplicacyInNameOfAssetType(subAssetTypesDtos);
-        Map<Long, AssetType> subAssetTypesMap = assetType.getSubAssetTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        Map<Long, AssetType> subAssetTypesMap = assetType.getSubAssetTypes().stream().collect(Collectors.toMap(BaseEntity::getId, v -> v));
         List<AssetType> subAssetTypes = new ArrayList<>();
         subAssetTypesDtos.forEach(subAssetTypeDTO ->
                 {
@@ -237,7 +241,7 @@ public class AssetTypeService {
     public AssetTypeRiskResponseDTO getAssetTypeById(Long countryId, Long id) {
         AssetType assetType = assetTypeRepository.findByIdAndCountryIdAndDeleted(id, countryId);
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_ASSET_TYPE, id);
         }
         return buildAssetTypeOrSubTypeResponseData(assetType);
 
@@ -248,11 +252,11 @@ public class AssetTypeService {
 
         List<String> masterAssetsLinkedWithAssetType = masterAssetRepository.findMasterAssetsLinkedWithAssetType(countryId, assetTypeId);
         if (CollectionUtils.isNotEmpty(masterAssetsLinkedWithAssetType)) {
-            exceptionService.invalidRequestException("message.metaData.linked.with.asset", "message.assetType", StringUtils.join(masterAssetsLinkedWithAssetType, ','));
+            exceptionService.invalidRequestException("message.metaData.linked.with.asset", MESSAGE_ASSET_TYPE, StringUtils.join(masterAssetsLinkedWithAssetType, ','));
         }
         AssetType assetType = assetTypeRepository.findByCountryIdAndId(countryId, assetTypeId, false);
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_ASSET_TYPE, assetTypeId);
         }
         assetType.delete();
         assetTypeRepository.save(assetType);
@@ -273,11 +277,11 @@ public class AssetTypeService {
     public AssetTypeDTO updateAssetTypeUpdateAndCreateNewSubAssetsAndAddToAssetType(Long countryId, Long assetTypeId, AssetTypeDTO assetTypeDto) {
         AssetType assetType = assetTypeRepository.findByNameAndCountryIdAndSubAssetType(assetTypeDto.getName(), countryId, false);
         if (Optional.ofNullable(assetType).isPresent() && !assetTypeId.equals(assetType.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDto.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_ASSET_TYPE, assetTypeDto.getName());
         }
         assetType = assetTypeRepository.findByCountryIdAndId(countryId, assetTypeId, false);
         if (!Optional.ofNullable(assetType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", assetTypeId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_ASSET_TYPE, assetTypeId);
         }
         assetType.setName(assetTypeDto.getName());
         List<AssetType> subAssetTypeList = updateSubAssetTypes(countryId, assetTypeDto.getSubAssetTypes(), assetType);
@@ -356,7 +360,7 @@ public class AssetTypeService {
         List<String> names = new ArrayList<>();
         for (AssetTypeDTO assetTypeDTO : assetTypeDTOs) {
             if (names.contains(assetTypeDTO.getName().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetTypeDTO.getName());
+                exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_ASSET_TYPE, assetTypeDTO.getName());
             }
             names.add(assetTypeDTO.getName().toLowerCase());
         }

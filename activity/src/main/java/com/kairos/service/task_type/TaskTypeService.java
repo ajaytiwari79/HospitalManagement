@@ -53,6 +53,8 @@ import static com.kairos.utils.FileUtil.createDirectory;
 @Service
 public class TaskTypeService extends MongoBaseService {
     private static final Logger logger = LoggerFactory.getLogger(TaskTypeService.class);
+    public static final String ORGANIZATION_TYPES = "organizationTypes";
+    public static final String IS_ARRIVAL = "isArrival";
     @Inject
     private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject
@@ -266,10 +268,10 @@ public class TaskTypeService extends MongoBaseService {
             return null;
         }
         List<Long> organizationTypes = new ArrayList<>();
-        for (Integer organizationType : (List<Integer>) settings.get("organizationTypes")) {
+        for (Integer organizationType : (List<Integer>) settings.get(ORGANIZATION_TYPES)) {
             organizationTypes.add(organizationType.longValue());
         }
-        settings.put("organizationTypes", organizationTypes);
+        settings.put(ORGANIZATION_TYPES, organizationTypes);
         List<BigInteger> tagsList = new ArrayList<BigInteger>();
         List<Object> tagList = (List<Object>) settings.get("tags");
         for (Object tag : tagList) {
@@ -296,7 +298,7 @@ public class TaskTypeService extends MongoBaseService {
         generalSettings.put("tags", tags);
         response.put("generalSettings", generalSettings);
         response.put("taskTypes", taskTypeMongoRepository.getTaskTypesForCopySettings(taskTypeId));
-        response.put("organizationTypes", organizationTypeHierarchyQueryResult.getOrganizationTypes());
+        response.put(ORGANIZATION_TYPES, organizationTypeHierarchyQueryResult.getOrganizationTypes());
         return response;
 
     }
@@ -348,13 +350,13 @@ public class TaskTypeService extends MongoBaseService {
             return null;
         }
 
-        if ((boolean) settings.get("isArrival")) {
+        if ((boolean) settings.get(IS_ARRIVAL)) {
             String time = (String) settings.get("time");
             String[] args = time.split(":");
             taskType.setHours(Integer.parseInt(args[0]));
             taskType.setMinutes(Integer.parseInt(args[1]));
         }
-        taskType.setArrival((boolean) settings.get("isArrival"));
+        taskType.setArrival((boolean) settings.get(IS_ARRIVAL));
         save(taskType);
         return settings;
     }
@@ -365,7 +367,7 @@ public class TaskTypeService extends MongoBaseService {
             return null;
         }
         Map<String, Object> response = new HashMap<>(4);
-        response.put("isArrival", taskType.isArrival());
+        response.put(IS_ARRIVAL, taskType.isArrival());
         response.put("time", taskType.getHours() + ":" + taskType.getMinutes());
         return response;
     }
