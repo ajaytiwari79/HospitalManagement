@@ -897,13 +897,10 @@ public class StaffingLevelService extends MongoBaseService {
         return staffingLevelDto;
     }
 
-    public void removedActivityFromStaffingLevel(BigInteger activityId){
-        List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByActivityId(activityId);
+    public void removedActivityFromStaffingLevel(BigInteger activityId, boolean isPresence){
+        List<StaffingLevel> staffingLevels = isPresence ? staffingLevelMongoRepository.findPresenceStaffingLevelsByActivityId(activityId) : staffingLevelMongoRepository.findAbsenceStaffingLevelsByActivityId(activityId);
         for(StaffingLevel staffingLevel : staffingLevels){
-            for(StaffingLevelInterval staffingLevelInterval : staffingLevel.getPresenceStaffingLevelInterval()){
-                removedActivityFromStaffingLevelInterval(staffingLevelInterval, activityId);
-            }
-            for(StaffingLevelInterval staffingLevelInterval : staffingLevel.getAbsenceStaffingLevelInterval()){
+            for(StaffingLevelInterval staffingLevelInterval : isPresence ? staffingLevel.getPresenceStaffingLevelInterval() : staffingLevel.getAbsenceStaffingLevelInterval()){
                 removedActivityFromStaffingLevelInterval(staffingLevelInterval, activityId);
             }
         }
