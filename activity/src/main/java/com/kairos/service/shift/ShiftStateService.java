@@ -80,33 +80,33 @@ public class ShiftStateService {
         Map<String, Phase> phaseMap = phases.stream().collect(Collectors.toMap(p->p.getPhaseEnum().toString(), Function.identity()));
         List<ShiftState> newShiftState=new ArrayList<>();
         List<ShiftState> oldRealtimeShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()),phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
-        newShiftState=createRealTimeShiftState(newShiftState,oldRealtimeShiftStates,shifts,phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
-        newShiftState.addAll(createDraftShiftState(new ArrayList<>(),shifts,phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
-        if( !newShiftState.isEmpty()) {
-             shiftMongoRepository.saveEntities(newShiftState);
-          }
+        newShiftState=createDraftShiftState(shifts,phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId());
+        newShiftState.addAll(createRealTimeShiftState(oldRealtimeShiftStates,shifts,phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId()));
         if(!checkIn) {
-            List<ShiftState> timeAndAttendanceShiftStates = createTimeAndAttendanceShiftState( new ArrayList<>(), shifts, phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString()).getId());
+            newShiftState.addAll(createTimeAndAttendanceShiftState(shifts, phaseMap.get(PhaseDefaultName.TIME_ATTENDANCE.toString()).getId()));
             deleteDraftShiftsViaTimeAndAttendanceJob(unitId);
-            if (!timeAndAttendanceShiftStates.isEmpty())
-                shiftStateMongoRepository.saveEntities(timeAndAttendanceShiftStates);
         }
+        if( isCollectionNotEmpty(newShiftState)) shiftStateMongoRepository.saveEntities(newShiftState);
+
     }
 
-    public List<ShiftState> createRealTimeShiftState(List<ShiftState> realtimeShiftStates,List<ShiftState> oldRealtimeShiftStates,List<Shift> shifts,BigInteger phaseId){
+    public List<ShiftState> createRealTimeShiftState(List<ShiftState> oldRealtimeShiftStates,List<Shift> shifts,BigInteger phaseId){
+        List<ShiftState> realtimeShiftStates= new ArrayList<>();
         Map<BigInteger,ShiftState> realtimeShiftStateMap= CollectionUtils.isNotEmpty(oldRealtimeShiftStates)?oldRealtimeShiftStates.stream().filter(distinctByKey(ShiftState::getShiftId)).collect(Collectors.toMap(ShiftState::getShiftId, v->v)):new HashMap<>();
         getShiftStateLists(realtimeShiftStates, shifts, phaseId, realtimeShiftStateMap,true);
         return realtimeShiftStates;
     }
 
-    public List<ShiftState> createDraftShiftState(List<ShiftState> draftShiftStates,List<Shift> shifts,BigInteger phaseId){
+    public List<ShiftState> createDraftShiftState(List<Shift> shifts,BigInteger phaseId){
+        List<ShiftState> draftShiftStates=new ArrayList<>();
         List<ShiftState> oldDraftShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()),phaseId);
         Map<BigInteger,ShiftState> draftShiftStateMap=CollectionUtils.isNotEmpty(oldDraftShiftStates)?oldDraftShiftStates.stream().filter(distinctByKey(ShiftState::getShiftId)).collect(Collectors.toMap(ShiftState::getShiftId, v->v)):new HashMap<>();
         getShiftStateLists(draftShiftStates, shifts, phaseId, draftShiftStateMap,false);
         return draftShiftStates;
     }
 
-    public List<ShiftState> createTimeAndAttendanceShiftState(List<ShiftState> timeAndAttendanceShiftStates,List<Shift> shifts,BigInteger phaseId){
+    public List<ShiftState> createTimeAndAttendanceShiftState(List<Shift> shifts,BigInteger phaseId){
+        List<ShiftState> timeAndAttendanceShiftStates=new ArrayList<>();
         List<ShiftState> oldTimeAndAttendanceShiftStates=shiftStateMongoRepository.findShiftStateByShiftIdsAndPhaseId(shifts.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()),phaseId);
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phaseId)&&shiftState.getAccessGroupRole().equals(AccessGroupRole.STAFF)).collect(Collectors.toMap(ShiftState::getShiftId, v->v));
         getShiftStateLists(timeAndAttendanceShiftStates, shifts, phaseId, timeAndAttendanceShiftStateMap,false);
@@ -165,8 +165,8 @@ public class ShiftStateService {
 
     public List<ShiftState> checkAndCreateRealtimeAndDraftState(List<Shift> shifts, List<ShiftState> shiftStates, Map<String, Phase> phaseMap) {
         List<ShiftState> newShiftStates = new ArrayList<>();
-        newShiftStates = createRealTimeShiftState(newShiftStates, shiftStates, shifts, phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
-        newShiftStates.addAll(createDraftShiftState(new ArrayList<>(), shifts, phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
+        newShiftStates = createRealTimeShiftState( shiftStates, shifts, phaseMap.get(PhaseDefaultName.REALTIME.toString()).getId());
+        newShiftStates.addAll(createDraftShiftState(shifts, phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId()));
         if (!newShiftStates.isEmpty()) shiftStateMongoRepository.saveEntities(newShiftStates);
         return newShiftStates;
     }
