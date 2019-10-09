@@ -69,7 +69,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         SickSettingsDTO sickSettings = sickSettingsRepository.checkUserIsSick(UserContext.getUserDetails().getId());
         return (Optional.ofNullable(timeAndAttendance).isPresent()) ? new TimeAndAttendanceDTO(getAttendanceDTOObject(timeAndAttendance.getAttendanceTimeSlot()), sickSettings) : new TimeAndAttendanceDTO(null, sickSettings);
     }
-        // peer review
+
     public TimeAndAttendanceDTO updateTimeAndAttendance(Long unitId, Long reasonCodeId, Long employmentId, boolean checkIn) {
         TimeAndAttendanceDTO timeAndAttendanceDTO = null;
         TimeAndAttendance timeAndAttendance = null;
