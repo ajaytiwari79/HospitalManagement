@@ -28,6 +28,8 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.newA
 @Repository
 public class ClientAggregatorMongoRepositoryImpl implements CustomClientAggregatorRepository {
 
+    public static final String UNIT_ID = "unitId";
+    public static final String CLIENT_EXCEPTION_COUNTS = "clientExceptionCounts";
     @Inject
     private MongoTemplate mongoTemplate;
     @Inject
@@ -37,7 +39,7 @@ public class ClientAggregatorMongoRepositoryImpl implements CustomClientAggregat
        String group = "{'$group':{'_id':'$citizenId', 'citizenData':{'$push':\"$$ROOT\"}}}";
 
        Document groupObject = Document.parse(group);
-       Criteria criteria = Criteria.where("unitId").is(unitId);
+       Criteria criteria = Criteria.where(UNIT_ID).is(unitId);
        Aggregation aggregation = newAggregation(
                match(criteria),
                new CustomAggregationOperation(groupObject)
@@ -54,14 +56,14 @@ public class ClientAggregatorMongoRepositoryImpl implements CustomClientAggregat
     }
 
     public long getCountOfAggregateData(long unitId){
-      Query query = Query.query(Criteria.where("unitId").is(unitId).and("clientExceptionCounts").exists(true));
+      Query query = Query.query(Criteria.where(UNIT_ID).is(unitId).and(CLIENT_EXCEPTION_COUNTS).exists(true));
       return mongoTemplate.count(query,ClientAggregator.class);
     }
 
     @Override
     public List<ClientAggregator> getAggregateDataByUnit(long unitId,int skip,int limit) {
-        Query query = new Query().addCriteria(Criteria.where("unitId").is(unitId).and("clientExceptionCounts").exists(true));
-        query.fields().include("citizenId").include("clientExceptionCounts");
+        Query query = new Query().addCriteria(Criteria.where(UNIT_ID).is(unitId).and(CLIENT_EXCEPTION_COUNTS).exists(true));
+        query.fields().include("citizenId").include(CLIENT_EXCEPTION_COUNTS);
         query.skip(skip).limit(limit);
         query.with(new Sort(Sort.DEFAULT_DIRECTION,"citizenId"));
         return mongoTemplate.find(query,ClientAggregator.class,"clientAggregator");

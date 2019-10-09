@@ -60,6 +60,7 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 public class ShiftCopyService extends MongoBaseService {
 
+    public static final String ERROR = "error";
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -93,7 +94,6 @@ public class ShiftCopyService extends MongoBaseService {
     @Inject
     private PayOutService payOutService;
 
-    private static final Logger logger = LoggerFactory.getLogger(ShiftCopyService.class);
 
     public CopyShiftResponse copyShifts(Long unitId, CopyShiftDTO copyShiftDTO) {
         List<ShiftResponseDTO> shifts = shiftMongoRepository.findAllByIdGroupByDate(copyShiftDTO.getShiftIds());
@@ -132,8 +132,8 @@ public class ShiftCopyService extends MongoBaseService {
 
             Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffEmployment, activityMap, copyShiftDTO,dataWrapper, wtaQueryResultDTOS, planningPeriodMap, activityConfigurations, currentStaffPreviousShifts);
             StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffEmployment.getStaff(), response.get("success"));
-            StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffEmployment.getStaff(), response.get("error"));
-            unCopiedShiftCount += response.get("error").size();
+            StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffEmployment.getStaff(), response.get(ERROR));
+            unCopiedShiftCount += response.get(ERROR).size();
             copyShiftResponse.getSuccessFul().add(successfullyCopied);
             copyShiftResponse.getFailure().add(errorInCopy);
         }
@@ -197,7 +197,7 @@ public class ShiftCopyService extends MongoBaseService {
 
         }
         statusMap.put("success", successfullyCopiedShifts);
-        statusMap.put("error", errorInCopyingShifts);
+        statusMap.put(ERROR, errorInCopyingShifts);
         if (!newShifts.isEmpty()) {
 
             save(newShifts);

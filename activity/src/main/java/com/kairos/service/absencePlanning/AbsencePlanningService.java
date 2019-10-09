@@ -33,7 +33,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -56,6 +55,24 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 @Service("nametest")
 @Transactional
 public class AbsencePlanningService {
+    public static final String STAFF_LIST = "staffList";
+    public static final String RESOURCE = "resource";
+    public static final String TASK_LISTS = "taskLists";
+    public static final String TASK_LIST = "taskList";
+    public static final String TASK_TYPE_VISIBILITY = "taskTypeVisibility";
+    public static final String DOLLOR_ADD_TO_SET = "$addToSet";
+    public static final String TASK_TYPE_ID = "taskTypeId";
+    public static final String DOLLOR_GROUP = "$group";
+    public static final String START_DATE = "startDate";
+    public static final String END_DATE = "endDate";
+    public static final String INFO_1 = "info1";
+    public static final String INFO_2 = "info2";
+    public static final String START_ADDRESS = "startAddress";
+    public static final String END_ADDRESS = "endAddress";
+    public static final String DURATION = "duration";
+    public static final String PRIORITY = "priority";
+    public static final String EXCEPTION_OCCURS_WHILE_SENDING_PARTIAL_ABSENCES_TASKS_TO_FLS = "Exception occurs while sending Partial Absences Tasks to FLS-----> {}";
+    public static final String YYYY_MMM_DD_HH_MM_SS = "yyyy MMM dd, hh:mm:ss";
     @Autowired
     MongoTemplate mongoTemplate;
     @Inject
@@ -110,10 +127,10 @@ public class AbsencePlanningService {
         for (Map object : mappedResults) {
 
             // tasks =  (List) object.get("taskLists");
-            staffIds = (List) object.get("staffList");
+            staffIds = (List) object.get(STAFF_LIST);
             for (Map<String, Object> map : (List<Map<String, Object>>) object.get("taskTypeList")) {
                 Map<String, Object> taskTypeData = new HashMap();
-                taskTypeData.put("id", map.get("resource").toString());
+                taskTypeData.put("id", map.get(RESOURCE).toString());
                 taskTypeData.put("name", map.get("title"));
                 taskTypes.add(taskTypeData);
             }
@@ -127,9 +144,9 @@ public class AbsencePlanningService {
                 teamStaffList.add(anonymousData);
             }
             //call via rest API anilm2
-            data.put("tasks", taskAggregationData((List<BigInteger>) object.get("taskLists")));
+            data.put("tasks", taskAggregationData((List<BigInteger>) object.get(TASK_LISTS)));
             data.put("staffs", staffList);
-            data.put("taskTypeStaffs", taskTypesAggregationData((List<ObjectId>) object.get("taskLists")));
+            data.put("taskTypeStaffs", taskTypesAggregationData((List<ObjectId>) object.get(TASK_LISTS)));
         }
         return data;
     }
@@ -142,7 +159,7 @@ public class AbsencePlanningService {
         List<Map> data = absencePlanningAggregationData(null, true, AppConstants.ALL_TAB);
         List<String> tasks = new ArrayList<>();
         for (Map object : data) {
-            tasks = (List) object.get("taskLists");
+            tasks = (List) object.get(TASK_LISTS);
         }
         for (String taskId : tasks) {
             Task task = taskMongoRepository.findOne(new BigInteger(taskId));
@@ -172,16 +189,14 @@ public class AbsencePlanningService {
      * @return
      */
     public List<Map> absencePlanningAggregationData(Long unitId, Boolean isDaily, String tab) {
-        // DBObject dbGroupObj = (DBObject) JSON.parse(CustomAggregationQuery.absencePlanningDataGroupingQuery());
         Document dbUnwindObj = (Document.parse(CustomAggregationQuery.absencePlanningDataUnwindQuery()));
-        // DBObject dbProjectionObj = (DBObject) JSON.parse(CustomAggregationQuery.absencePlanningProjectionQuery());
         Criteria criteria = new Criteria();
-        Criteria c = Criteria.where("taskList").ne(Collections.EMPTY_LIST).and("taskList.timeCareExternalId").exists(true).and("taskList.isDeleted").is(false);
-        Document dbObject = new Document("$group",
-                new BasicDBObject("taskLists", new BasicDBObject("$addToSet", "$taskList._id")).append("_id", null)
-                        .append("taskTypeList", new BasicDBObject("$addToSet", new BasicDBObject("resource", "$_id").append("title", "$title")))
-                        .append("staffList", new BasicDBObject("$addToSet", "$taskList.staffId"))
-                        .append("staffAnonymousList", new BasicDBObject("$addToSet", "$taskList.staffAnonymousId")));
+        Criteria c = Criteria.where(TASK_LIST).ne(Collections.EMPTY_LIST).and("taskList.timeCareExternalId").exists(true).and("taskList.isDeleted").is(false);
+        Document dbObject = new Document(DOLLOR_GROUP,
+                new BasicDBObject(TASK_LISTS, new BasicDBObject(DOLLOR_ADD_TO_SET, "$taskList._id")).append("_id", null)
+                        .append("taskTypeList", new BasicDBObject(DOLLOR_ADD_TO_SET, new BasicDBObject(RESOURCE, "$_id").append("title", "$title")))
+                        .append(STAFF_LIST, new BasicDBObject(DOLLOR_ADD_TO_SET, "$taskList.staffId"))
+                        .append("staffAnonymousList", new BasicDBObject(DOLLOR_ADD_TO_SET, "$taskList.staffAnonymousId")));
         if (unitId != null)
             c.and("taskList.unitId").is(unitId);
         if (isDaily) {
@@ -191,19 +206,19 @@ public class AbsencePlanningService {
             c.and("taskList.startDate").gte(startTimeOfDay).lt(endTimeOfDay);
         }
         if (tab.equals(AppConstants.PRESENCE_TAB)) {
-            criteria = Criteria.where("taskTypeVisibility").is(AppConstants.PRESENT);
+            criteria = Criteria.where(TASK_TYPE_VISIBILITY).is(AppConstants.PRESENT);
         }
         if (tab.equals(AppConstants.FULL_DAY_ABSENCE_TAB)) {
-            criteria = Criteria.where("taskTypeVisibility").is(AppConstants.ABSENT).and("taskTypeSchedule").is(AppConstants.FULL_DAY);
+            criteria = Criteria.where(TASK_TYPE_VISIBILITY).is(AppConstants.ABSENT).and("taskTypeSchedule").is(AppConstants.FULL_DAY);
         }
         if (tab.equals(AppConstants.PARTIAL_ABSENCE_TAB)) {
-            criteria = Criteria.where("taskTypeVisibility").is(AppConstants.ABSENT).and("taskTypeSchedule").is(AppConstants.PARTIALLY);
+            criteria = Criteria.where(TASK_TYPE_VISIBILITY).is(AppConstants.ABSENT).and("taskTypeSchedule").is(AppConstants.PARTIALLY);
         }
         if (tab.equals(AppConstants.ALL_TAB)) {
             List tasTypes = new ArrayList<String>();
             tasTypes.add(AppConstants.ABSENT);
             tasTypes.add(AppConstants.PRESENT);
-            criteria = Criteria.where("taskTypeVisibility").in(tasTypes);
+            criteria = Criteria.where(TASK_TYPE_VISIBILITY).in(tasTypes);
         }
         Aggregation aggregation = Aggregation.newAggregation(
                 match(
@@ -214,8 +229,8 @@ public class AbsencePlanningService {
                                 "$lookup",
                                 new Document("from", "tasks")
                                         .append("localField", "_id")
-                                        .append("foreignField", "taskTypeId")
-                                        .append("as", "taskList")
+                                        .append("foreignField", TASK_TYPE_ID)
+                                        .append("as", TASK_LIST)
                         )
                 ),
                 new CustomAggregationOperation(dbUnwindObj),
@@ -233,11 +248,11 @@ public class AbsencePlanningService {
     public List<Map> taskAggregationData(List<BigInteger> tasks) {
         List<Map> finalTaskList = new ArrayList<>();
         Document dbProjectionObj = Document.parse(CustomAggregationQuery.absencePlanningProjectionQuery());
-        Document dbObject = new Document("$group", new BasicDBObject("_id", "$grouping")
-                .append("taskList", new BasicDBObject("$push", new BasicDBObject("resource", "$_id")
-                        .append("taskTypeId", "$taskTypeId").append("startDate", "$startDate").append("endDate", "$endDate")
-                        .append("info1", "$info1").append("info2", "$info2").append("startAddress", "$startAddress").append("endAddress", "$endAddress")
-                        .append("absencePlanningStatus", "$absencePlanningStatus").append("staffId", "$grouping").append("duration", "$duration").append("priority", "$priority").append("isActive", "$isActive"))));
+        Document dbObject = new Document(DOLLOR_GROUP, new BasicDBObject("_id", "$grouping")
+                .append(TASK_LIST, new BasicDBObject("$push", new BasicDBObject(RESOURCE, "$_id")
+                        .append(TASK_TYPE_ID, "$taskTypeId").append(START_DATE, "$startDate").append(END_DATE, "$endDate")
+                        .append(INFO_1, "$info1").append(INFO_2, "$info2").append(START_ADDRESS, "$startAddress").append(END_ADDRESS, "$endAddress")
+                        .append("absencePlanningStatus", "$absencePlanningStatus").append("staffId", "$grouping").append(DURATION, "$duration").append(PRIORITY, "$priority").append("isActive", "$isActive"))));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(
                         Criteria.where("_id").in(tasks)
@@ -249,7 +264,7 @@ public class AbsencePlanningService {
                 mongoTemplate.aggregate(aggregation, Task.class, Map.class);
 
         for (Map map : finalResult.getMappedResults()) {
-            List<Map> taskList = (List) map.get("taskList");
+            List<Map> taskList = (List) map.get(TASK_LIST);
             // this start and end hours are required for frontend
             List<Integer> startHours = new ArrayList();
             startHours.add(00);
@@ -266,23 +281,23 @@ public class AbsencePlanningService {
             List<Integer> days = new ArrayList<>();
             for (Map<String, Object> task : taskList) {
                 Map<String, Object> finalTaskData = new HashMap<>();
-                TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(task.get("taskTypeId").toString()));
+                TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(task.get(TASK_TYPE_ID).toString()));
 
-                finalTaskData.put("id", task.get("resource").toString());
-                finalTaskData.put("taskTypeId", task.get("taskTypeId").toString());
+                finalTaskData.put("id", task.get(RESOURCE).toString());
+                finalTaskData.put(TASK_TYPE_ID, task.get(TASK_TYPE_ID).toString());
                 finalTaskData.put("taskTypeName", taskType.getTitle());
-                finalTaskData.put("startDate", new DateTime(task.get("startDate"), DateTimeZone.forTimeZone(TimeZone.getTimeZone("Denmark"))).toString());
-                finalTaskData.put("endDate", new DateTime(task.get("endDate"), DateTimeZone.forTimeZone(TimeZone.getTimeZone("Denmark"))).toString());
-                finalTaskData.put("resource", task.get("staffId"));
-                finalTaskData.put("startAddress", task.get("startAddress") != null ? task.get("startAddress").toString() : null);
-                finalTaskData.put("endAddress", task.get("endAddress") != null ? task.get("endAddress").toString() : null);
+                finalTaskData.put(START_DATE, new DateTime(task.get(START_DATE), DateTimeZone.forTimeZone(TimeZone.getTimeZone("Denmark"))).toString());
+                finalTaskData.put(END_DATE, new DateTime(task.get(END_DATE), DateTimeZone.forTimeZone(TimeZone.getTimeZone("Denmark"))).toString());
+                finalTaskData.put(RESOURCE, task.get("staffId"));
+                finalTaskData.put(START_ADDRESS, task.get(START_ADDRESS) != null ? task.get(START_ADDRESS).toString() : null);
+                finalTaskData.put(END_ADDRESS, task.get(END_ADDRESS) != null ? task.get(END_ADDRESS).toString() : null);
                 finalTaskData.put("status", task.get("absencePlanningStatus"));
-                finalTaskData.put("info1", task.get("info1"));
-                finalTaskData.put("info2", task.get("info2"));
-                finalTaskData.put("duration", task.get("duration"));
-                finalTaskData.put("priority", task.get("priority"));
+                finalTaskData.put(INFO_1, task.get(INFO_1));
+                finalTaskData.put(INFO_2, task.get(INFO_2));
+                finalTaskData.put(DURATION, task.get(DURATION));
+                finalTaskData.put(PRIORITY, task.get(PRIORITY));
                 finalTaskData.put("active", task.get("isActive"));
-                Date startDate = (Date) task.get("startDate");
+                Date startDate = (Date) task.get(START_DATE);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(startDate);
                 Integer day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -301,8 +316,8 @@ public class AbsencePlanningService {
 
     public List<Map> taskTypesAggregationData(List<ObjectId> tasks) {
         List<Map> finalTaskList = new ArrayList<>();
-        Document dbObject = new Document("$group", new BasicDBObject("_id", "$taskTypeId")
-                .append("staffList", new BasicDBObject("$addToSet", "$staffId")));
+        Document dbObject = new Document(DOLLOR_GROUP, new BasicDBObject("_id", "$taskTypeId")
+                .append(STAFF_LIST, new BasicDBObject(DOLLOR_ADD_TO_SET, "$staffId")));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(
                         Criteria.where("_id").in(tasks)
@@ -314,7 +329,7 @@ public class AbsencePlanningService {
         for (Map map : finalResult.getMappedResults()) {
 
             Map<String, Object> finalTaskData = new HashMap<>();
-            finalTaskData.put(map.get("_id").toString(), map.get("staffList"));
+            finalTaskData.put(map.get("_id").toString(), map.get(STAFF_LIST));
 
             finalTaskList.add(finalTaskData);
         }
@@ -322,8 +337,8 @@ public class AbsencePlanningService {
     }
 
     public List<Map> taskReportsByUnit() {
-        Document dbObject = new Document("$group", new Document("_id", "$unitId")
-                .append("staffList", new Document("$addToSet", "$staffId")));
+        Document dbObject = new Document(DOLLOR_GROUP, new Document("_id", "$unitId")
+                .append(STAFF_LIST, new Document(DOLLOR_ADD_TO_SET, "$staffId")));
 
         Aggregation aggregation = Aggregation.newAggregation(
                 new CustomAggregationOperation(dbObject)
@@ -335,8 +350,8 @@ public class AbsencePlanningService {
     }
 
     public List<Map> tasksByUnit() {
-        Document dbObject = new Document("$group", new Document("_id", "$unitId")
-                .append("taskList", new Document("$push", new Document("resource", "$_id"))));
+        Document dbObject = new Document(DOLLOR_GROUP, new Document("_id", "$unitId")
+                .append(TASK_LIST, new Document("$push", new Document(RESOURCE, "$_id"))));
         Criteria c = Criteria.where("timeCareExternalId").exists(true);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(c),
@@ -458,7 +473,7 @@ public class AbsencePlanningService {
             }
             return taskList;
         } catch (Exception exception) {
-            logger.warn("Exception occurs while sending Partial Absences Tasks to FLS-----> " + exception);
+            logger.warn(EXCEPTION_OCCURS_WHILE_SENDING_PARTIAL_ABSENCES_TASKS_TO_FLS, exception);
             return null;
         }
     }
@@ -560,14 +575,14 @@ public class AbsencePlanningService {
         taskReport.setTaskId(task.getId());
         taskReport.setStaffId(task.getStaffId());
         taskReport.setUnitId(task.getUnitId());
-        taskReport.setUpdateDate(DateFormatUtils.format(DateUtils.getDate(), "yyyy MMM dd, hh:mm:ss"));
+        taskReport.setUpdateDate(DateFormatUtils.format(DateUtils.getDate(), YYYY_MMM_DD_HH_MM_SS));
 
         //previous data
         DateTime startDateTime = new DateTime(task.getStartDate()).toDateTime(DateTimeZone.UTC);
         DateTime endDateTime = new DateTime(task.getEndDate()).toDateTime(DateTimeZone.UTC);
 
-        taskReport.setPreviousFrom(startDateTime.toString("yyyy MMM dd, hh:mm:ss"));
-        taskReport.setPreviousTo(endDateTime.toString("yyyy MMM dd, hh:mm:ss"));
+        taskReport.setPreviousFrom(startDateTime.toString(YYYY_MMM_DD_HH_MM_SS));
+        taskReport.setPreviousTo(endDateTime.toString(YYYY_MMM_DD_HH_MM_SS));
         taskReport.setPreviousDuration(task.getDuration().toString());
         taskReport.setPreviousActivity(taskTypeMongoRepository.findOne(new BigInteger(task.getTaskTypeId().toString())).getTitle());
 
@@ -575,9 +590,9 @@ public class AbsencePlanningService {
         DateTime currentStartDateTime = new DateTime(taskDTO.getStartDate()).toDateTime(DateTimeZone.UTC);
         DateTime currentEndDateTime = new DateTime(taskDTO.getEndDate()).toDateTime(DateTimeZone.UTC);
         if (task.getStartDate().compareTo(taskDTO.getStartDate()) != 0)
-            taskReport.setCurrentFrom(currentStartDateTime.toString("yyyy MMM dd, hh:mm:ss"));
+            taskReport.setCurrentFrom(currentStartDateTime.toString(YYYY_MMM_DD_HH_MM_SS));
         if (task.getEndDate().compareTo(taskDTO.getEndDate()) != 0)
-            taskReport.setCurrentTo(currentEndDateTime.toString("yyyy MMM dd, hh:mm:ss"));
+            taskReport.setCurrentTo(currentEndDateTime.toString(YYYY_MMM_DD_HH_MM_SS));
         if (task.getDuration().compareTo(taskDTO.getDuration()) != 0)
             taskReport.setCurrentDuration(taskDTO.getDuration().toString());
         if (!task.getTaskTypeId().toString().equals(taskDTO.getTaskTypeId().toString()))
@@ -625,7 +640,7 @@ public class AbsencePlanningService {
         List<String> taskIds = new ArrayList<>();
         for (Map object : data) {
 
-            taskIds = (List) object.get("taskLists");
+            taskIds = (List) object.get(TASK_LISTS);
         }
         List<Task> tasks = taskMongoRepository.getAllTasksByIdsIn(taskIds);
         Map<String, String> flsCredentials = null;
@@ -678,8 +693,8 @@ public class AbsencePlanningService {
             // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(organizationId);
             OrganizationDTO organization = userIntegrationService.getOrganization();
             //Organization organization = organizationGraphRepository.findOne(organizationId);
-            for (Map object : (List<Map>) data.get("taskList")) {
-                Task task = taskMongoRepository.findOne(new BigInteger(object.get("resource").toString()));
+            for (Map object : (List<Map>) data.get(TASK_LIST)) {
+                Task task = taskMongoRepository.findOne(new BigInteger(object.get(RESOURCE).toString()));
                 if (task.getTaskTypeId() != null && task.getStaffId() != null && task.getAddress() != null) {
                     TaskType taskType = taskTypeMongoRepository.findOne(task.getTaskTypeId());
                     TaskDTO taskDTO = new TaskDTO();
@@ -731,8 +746,8 @@ public class AbsencePlanningService {
         workScheduleMetaData.put("startLocation", AddressCode.valueOf(task.getStartAddress()).getValue()); //0=Start at home address (default), -1=Start at office address
         workScheduleMetaData.put("endLocation", AddressCode.valueOf(task.getEndAddress()).getValue());
         Map<String, Object> dateTimeInfo = new HashMap<>();
-        dateTimeInfo.put("startDate", task.getStartDate()); //Assigning Absence starting from tomorrow
-        dateTimeInfo.put("endDate", task.getEndDate()); //till day after tomorrow
+        dateTimeInfo.put(START_DATE, task.getStartDate()); //Assigning Absence starting from tomorrow
+        dateTimeInfo.put(END_DATE, task.getEndDate()); //till day after tomorrow
         DateTime startDateTime = new DateTime(task.getStartDate()).toDateTime(DateTimeZone.UTC);
         Date reducedEndTime = DateUtils.getDeductionInTimeDuration(task.getStartDate(), task.getEndDate(), organization.getDayShiftTimeDeduction(), organization.getNightShiftTimeDeduction());
         DateTime endDateTime = new DateTime(reducedEndTime).toDateTime(DateTimeZone.UTC);
@@ -801,7 +816,7 @@ public class AbsencePlanningService {
             callMetaData.put("city", organization.getContactAddress().getCity());
             callMetaData.put("street", organization.getContactAddress().getStreet1());
             callMetaData.put("hnr", organization.getContactAddress().getHouseNumber());
-            callMetaData.put("priority", 3);
+            callMetaData.put(PRIORITY, 3);
             //FOR MVP All Partial Absence Task link to one at FLS
             callMetaData.put("taskTypeID", "16");
             Map<String, Object> timeFrameInfo = new HashMap<>();
@@ -820,7 +835,7 @@ public class AbsencePlanningService {
                 }
             }
             Duration dur = new Duration(startDateTime, endDateTime);
-            callMetaData.put("duration", Integer.valueOf(String.valueOf(dur.getStandardMinutes())));
+            callMetaData.put(DURATION, Integer.valueOf(String.valueOf(dur.getStandardMinutes())));
             timeFrameInfo.put("timeFrom", startDateTime);
             timeFrameInfo.put("timeTo", endDateTime);
             timeFrameInfo.put("fixedDate", startDateTime);
@@ -868,8 +883,8 @@ public class AbsencePlanningService {
             DateTime startDateTime = new DateTime(firstTaskOfDay.getStartDate()).toDateTime(DateTimeZone.UTC);
             Date reducedEndTime = DateUtils.getDeductionInTimeDuration(firstTaskOfDay.getStartDate(), lastTaskOfDay.getEndDate(), organization.getDayShiftTimeDeduction(), organization.getNightShiftTimeDeduction());
             DateTime endDateTime = new DateTime(reducedEndTime).toDateTime(DateTimeZone.UTC);
-            dateTimeInfo.put("startDate", startDate); //Assigning Absence starting from tomorrow
-            dateTimeInfo.put("endDate", lastTaskOfDay.getEndDate()); //till day after tomorrow
+            dateTimeInfo.put(START_DATE, startDate); //Assigning Absence starting from tomorrow
+            dateTimeInfo.put(END_DATE, lastTaskOfDay.getEndDate()); //till day after tomorrow
             dateTimeInfo.put("startTime", startDateTime.hourOfDay().get()); //Assigning Absence starting from tomorrow
             dateTimeInfo.put("endTime", endDateTime.hourOfDay().get()); //till day after tomorrow
             dateTimeInfo.put("startTimeMinute", startDateTime.minuteOfHour().get()); //Assigning Absence starting from tomorrow

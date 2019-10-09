@@ -25,6 +25,8 @@ import java.util.Set;
 public class DataDisposalService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataDisposalService.class);
+    public static final String MESSAGE_DATA_NOT_FOUND = "message.dataNotFound";
+    public static final String MESSAGE_DATA_DISPOSAL = "message.dataDisposal";
 
     @Inject
     private ExceptionService exceptionService;
@@ -81,7 +83,7 @@ public class DataDisposalService {
     public DataDisposal getDataDisposalById(Long countryId, Long id) {
         DataDisposal exist = dataDisposalRepository.findByIdAndCountryIdAndDeletedFalse(id, countryId);
         if (!Optional.ofNullable(exist).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataDisposal", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_DATA_DISPOSAL, id);
         }
         return exist;
 
@@ -118,7 +120,7 @@ public class DataDisposalService {
         }
         Integer resultCount = dataDisposalRepository.updateMasterMetadataName(dataDisposalDTO.getName(), id, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataDisposal", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_DATA_DISPOSAL, id);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", id, dataDisposalDTO.getName());
         }
@@ -147,7 +149,7 @@ public class DataDisposalService {
         if (updateCount > 0) {
             LOGGER.info("Data Disposals are updated successfully with ids :: {}", dataDisposalIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.dataDisposal", dataDisposalIds);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_DATA_DISPOSAL, dataDisposalIds);
         }
         return dataDisposalRepository.findAllByIds(dataDisposalIds);
     }

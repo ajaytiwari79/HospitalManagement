@@ -24,6 +24,20 @@ import java.util.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TaskType extends MongoBaseEntity {
 
+    public static final String HAS_BIDDING = "hasBidding";
+    public static final String HAS_DUTY_TIME = "hasDutyTime";
+    public static final String MULTI_DAY_TASK = "multiDayTask";
+    public static final String TIME_TYPES = "timeTypes";
+    public static final String EXPIRY_COST = "expiryCost";
+    public static final String BILLABLE = "billable";
+    public static final String WAITING_TIME = "waitingTime";
+    public static final String DRIVING_TIME = "drivingTime";
+    public static final String SETUP = "setup";
+    public static final String OVER_HEAD = "overHead";
+    public static final String FLEXI_TIME = "flexiTime";
+    public static final String OVER_NIGHT_STAY = "overNightStay";
+    public static final String COLLECTIVE_AGREEMENT = "collectiveAgreement";
+    public static final String DISTANCE_RELATED_COST = "distanceRelatedCost";
     private  String title;
     private  String shortName;
     private  String uniqueName;
@@ -437,10 +451,10 @@ public class TaskType extends MongoBaseEntity {
         this.taskTypeVisibility = (String) balanceSettings.get("taskTypeVisibility");
         this.taskTypeSchedule = (String) balanceSettings.get("taskTypeSchedule");
         this.taskTypeWorkType = (String) balanceSettings.get("taskTypeWorkType");
-        this.taskTypeTime = (String) balanceSettings.get("timeTypes");
-        this.hasBidding = balanceSettings.get("hasBidding") != null && (boolean) balanceSettings.get("hasBidding");
-        this.hasDutyTime = balanceSettings.get("hasDutyTime") != null && (boolean) balanceSettings.get("hasDutyTime");
-        this.multiDayTask = balanceSettings.get("multiDayTask") != null && (boolean) balanceSettings.get("multiDayTask");
+        this.taskTypeTime = (String) balanceSettings.get(TIME_TYPES);
+        this.hasBidding = balanceSettings.get(HAS_BIDDING) != null && (boolean) balanceSettings.get(HAS_BIDDING);
+        this.hasDutyTime = balanceSettings.get(HAS_DUTY_TIME) != null && (boolean) balanceSettings.get(HAS_DUTY_TIME);
+        this.multiDayTask = balanceSettings.get(MULTI_DAY_TASK) != null && (boolean) balanceSettings.get(MULTI_DAY_TASK);
     }
 
     public Map<String, Object> getBalanceSettings() {
@@ -464,10 +478,10 @@ public class TaskType extends MongoBaseEntity {
         map.put("taskTypeIncluded", taskTypeIncludes);
         map.put("taskTypeSchedule", this.taskTypeSchedule);
         map.put("taskTypeWorkType", this.taskTypeWorkType);
-        map.put("timeTypes", this.taskTypeTime);
-        map.put("multiDayTask", this.multiDayTask);
-        map.put("hasBidding", this.hasBidding);
-        map.put("hasDutyTime", this.hasDutyTime);
+        map.put(TIME_TYPES, this.taskTypeTime);
+        map.put(MULTI_DAY_TASK, this.multiDayTask);
+        map.put(HAS_BIDDING, this.hasBidding);
+        map.put(HAS_DUTY_TIME, this.hasDutyTime);
         map.put("taskTypeDate", taskTypeDates);
         return map;
     }
@@ -511,31 +525,31 @@ public class TaskType extends MongoBaseEntity {
 
     public void saveIncomeCostSettings(Map<String, Object> incomeSettings) {
         this.costType = TaskTypeEnum.CostType.getByValue((String) incomeSettings.get("costType"));
-        this.expiryCost = incomeSettings.get("expiryCost") != null && (boolean) incomeSettings.get("expiryCost");
-        this.billable = incomeSettings.get("billable") != null && (boolean) incomeSettings.get("billable");
-        this.waitingTime = incomeSettings.get("waitingTime") != null && (boolean) incomeSettings.get("waitingTime");
-        this.drivingTime = incomeSettings.get("drivingTime") != null && (boolean) incomeSettings.get("drivingTime");
-        this.setup = incomeSettings.get("setup") != null && (boolean) incomeSettings.get("setup");
-        this.overHead = incomeSettings.get("overHead") != null && (boolean) incomeSettings.get("overHead");
-        this.flexiTime = incomeSettings.get("flexiTime") != null && (boolean) incomeSettings.get("flexiTime");
-        this.overNightStay = incomeSettings.get("overNightStay") != null && (boolean) incomeSettings.get("overNightStay");
-        this.collectiveAgreement = incomeSettings.get("collectiveAgreement") != null && (boolean) incomeSettings.get("collectiveAgreement");
-        this.distanceRelatedCost = incomeSettings.get("distanceRelatedCost") != null && (boolean) incomeSettings.get("distanceRelatedCost");
+        this.expiryCost = incomeSettings.get(EXPIRY_COST) != null && (boolean) incomeSettings.get(EXPIRY_COST);
+        this.billable = incomeSettings.get(BILLABLE) != null && (boolean) incomeSettings.get(BILLABLE);
+        this.waitingTime = incomeSettings.get(WAITING_TIME) != null && (boolean) incomeSettings.get(WAITING_TIME);
+        this.drivingTime = incomeSettings.get(DRIVING_TIME) != null && (boolean) incomeSettings.get(DRIVING_TIME);
+        this.setup = incomeSettings.get(SETUP) != null && (boolean) incomeSettings.get(SETUP);
+        this.overHead = incomeSettings.get(OVER_HEAD) != null && (boolean) incomeSettings.get(OVER_HEAD);
+        this.flexiTime = incomeSettings.get(FLEXI_TIME) != null && (boolean) incomeSettings.get(FLEXI_TIME);
+        this.overNightStay = incomeSettings.get(OVER_NIGHT_STAY) != null && (boolean) incomeSettings.get(OVER_NIGHT_STAY);
+        this.collectiveAgreement = incomeSettings.get(COLLECTIVE_AGREEMENT) != null && (boolean) incomeSettings.get(COLLECTIVE_AGREEMENT);
+        this.distanceRelatedCost = incomeSettings.get(DISTANCE_RELATED_COST) != null && (boolean) incomeSettings.get(DISTANCE_RELATED_COST);
     }
 
     public Map<String, Object> getIncomeSettings() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("costType", this.costType.value);
-        map.put("expiryCost", this.expiryCost);
-        map.put("billable", this.billable);
-        map.put("waitingTime", this.waitingTime);
-        map.put("drivingTime", this.drivingTime);
-        map.put("setup", this.setup);
-        map.put("overHead", this.overHead);
-        map.put("flexiTime", this.flexiTime);
-        map.put("overNightStay", this.overNightStay);
-        map.put("collectiveAgreement", this.collectiveAgreement);
-        map.put("distanceRelatedCost", this.distanceRelatedCost);
+        map.put(EXPIRY_COST, this.expiryCost);
+        map.put(BILLABLE, this.billable);
+        map.put(WAITING_TIME, this.waitingTime);
+        map.put(DRIVING_TIME, this.drivingTime);
+        map.put(SETUP, this.setup);
+        map.put(OVER_HEAD, this.overHead);
+        map.put(FLEXI_TIME, this.flexiTime);
+        map.put(OVER_NIGHT_STAY, this.overNightStay);
+        map.put(COLLECTIVE_AGREEMENT, this.collectiveAgreement);
+        map.put(DISTANCE_RELATED_COST, this.distanceRelatedCost);
         return map;
     }
 
@@ -821,7 +835,7 @@ public class TaskType extends MongoBaseEntity {
         Map<String, Object> map = new HashMap<>();
         map.put("isCalculateEndTime", this.isCalculateEndTime);
         map.put("durationType", (this.durationType==null)?null:this.durationType.value);
-        map.put("timeTypes", timeTypesList);
+        map.put(TIME_TYPES, timeTypesList);
         map.put("isDivideByWeeklyHours", this.isDivideByWeeklyHours);
         map.put("weeklyHours", this.weeklyHours);
         map.put("isDivideByFullTime", this.isDivideByFullTime);

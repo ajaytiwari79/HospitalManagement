@@ -53,6 +53,7 @@ import static com.kairos.constants.ApiConstants.*;
 @Api(API_V1)
 public class OrganizationController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationController.class);
+    public static final String IS_SELECTED = "isSelected";
     @Inject
     private OrganizationService organizationService;
     @Inject
@@ -137,7 +138,7 @@ public class OrganizationController {
     @PutMapping(UNIT_URL + "/skill")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganizationSkills(@PathVariable long unitId, @RequestBody Map<String, Object> data) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.addNewSkill(unitId, Long.valueOf(String.valueOf(data.get("id"))), (boolean) data.get("isSelected")));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.addNewSkill(unitId, Long.valueOf(String.valueOf(data.get("id"))), (boolean) data.get(IS_SELECTED)));
     }
 
     @ApiOperation(value = "update skill(visitour, custom Name) for an organization")
@@ -158,7 +159,7 @@ public class OrganizationController {
     @PutMapping(UNIT_URL + "/skill/{skillId}/assign")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> assignSkillToStaff(@PathVariable long skillId,  @PathVariable long unitId, @RequestBody Map<String, Object> data) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.assignSkillToStaff(unitId, Long.valueOf((String) data.get("staffId")), skillId, (boolean) data.get("isSelected")));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.assignSkillToStaff(unitId, Long.valueOf((String) data.get("staffId")), skillId, (boolean) data.get(IS_SELECTED)));
     }
 
     @ApiOperation(value = "Get Available Services")
@@ -172,7 +173,7 @@ public class OrganizationController {
     @PutMapping(UNIT_URL + "/service")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addOrganizationService(@PathVariable long unitId, @RequestBody Map<String, Object> data) {
-        Map<String, Object> services = organizationServiceService.updateServiceToOrganization(unitId, Long.valueOf(String.valueOf(data.get("organizationServiceId"))), (boolean) data.get("isSelected"));
+        Map<String, Object> services = organizationServiceService.updateServiceToOrganization(unitId, Long.valueOf(String.valueOf(data.get("organizationServiceId"))), (boolean) data.get(IS_SELECTED));
         if(services == null) {
             return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, true, false);
         }

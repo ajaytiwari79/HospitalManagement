@@ -21,6 +21,12 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  */
 public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRepository{
 
+    public static final String STAFF_QUESTIONNAIRES_IDS = "staffQuestionnairesIds";
+    public static final String STAFF_QUESTIONNAIRE = "staffQuestionnaire";
+    public static final String QUESTIONNAIRE_CREATED_DATE = "questionnaireCreatedDate";
+    public static final String SUBMITTED = "submitted";
+    public static final String SUBMITTED_ON = "submittedOn";
+    public static final String QUESTION_ANSWER_PAIR_QUESTION = "questionAnswerPair.question";
     @Inject
     MongoTemplate mongoTemplate;
 
@@ -31,30 +37,30 @@ public class NightWorkerMongoRepositoryImpl implements CustomNightWorkerMongoRep
         String sortString = "{$sort:{questionnaireCreatedDate:-1, createdDate:1}}";
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("deleted").is(false).and("staffId").is(staffId)),
-                project().andExclude("_id").and("staffQuestionnairesId").as("staffQuestionnairesIds"),
-                unwind("staffQuestionnairesIds"),
-                lookup("staffQuestionnaire", "staffQuestionnairesIds", "_id", "staffQuestionnaire"),
-                unwind("staffQuestionnaire"),
+                project().andExclude("_id").and("staffQuestionnairesId").as(STAFF_QUESTIONNAIRES_IDS),
+                unwind(STAFF_QUESTIONNAIRES_IDS),
+                lookup(STAFF_QUESTIONNAIRE, STAFF_QUESTIONNAIRES_IDS, "_id", STAFF_QUESTIONNAIRE),
+                unwind(STAFF_QUESTIONNAIRE),
 
                 project().and("staffQuestionnaire.name").as("name").
-                        and("staffQuestionnaire.createdAt").as("questionnaireCreatedDate").
-                        and("staffQuestionnaire.submitted").as("submitted").
-                        and("staffQuestionnaire.submittedOn").as("submittedOn").
+                        and("staffQuestionnaire.createdAt").as(QUESTIONNAIRE_CREATED_DATE).
+                        and("staffQuestionnaire.submitted").as(SUBMITTED).
+                        and("staffQuestionnaire.submittedOn").as(SUBMITTED_ON).
                         and("staffQuestionnaire._id").as("_id").
                         and("staffQuestionnaire.questionAnswerPair").as("questionAnswerPair").
                         and("staffQuestionnaire.name").as("name"),
                 unwind("questionAnswerPair"),
-                lookup("nightWorkerQuestion", "questionAnswerPair.questionId", "_id", "questionAnswerPair.question"),
-                unwind("questionAnswerPair.question"),
+                lookup("nightWorkerQuestion", "questionAnswerPair.questionId", "_id", QUESTION_ANSWER_PAIR_QUESTION),
+                unwind(QUESTION_ANSWER_PAIR_QUESTION),
 
                 project().and("questionAnswerPair.answer").as("questionAnswerPair.answer").
-                        and("questionAnswerPair.question.question").as("questionAnswerPair.question").
+                        and("questionAnswerPair.question.question").as(QUESTION_ANSWER_PAIR_QUESTION).
                         and("questionAnswerPair.question._id").as( "questionAnswerPair.questionId").
                         and("name").as("name").
-                        and("questionnaireCreatedDate").as("questionnaireCreatedDate").
+                        and(QUESTIONNAIRE_CREATED_DATE).as(QUESTIONNAIRE_CREATED_DATE).
                         and("questionAnswerPair.question.createdAt").as("createdDate").
-                        and("submitted").as("submitted").
-                        and("submittedOn").as("submittedOn"),
+                        and(SUBMITTED).as(SUBMITTED).
+                        and(SUBMITTED_ON).as(SUBMITTED_ON),
                 new CustomAggregationOperation(Document.parse(sortString)),
                 new CustomAggregationOperation(Document.parse(groupString))
         );

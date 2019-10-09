@@ -31,6 +31,8 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 @Service
 public class StaffActivitySettingService extends MongoBaseService {
 
+    public static final String SUCCESS = "success";
+    public static final String ERROR = "error";
     @Inject private StaffActivitySettingRepository staffActivitySettingRepository;
     @Inject private ExceptionService exceptionService;
     @Inject private ActivityMongoRepository activityMongoRepository;
@@ -148,8 +150,8 @@ public class StaffActivitySettingService extends MongoBaseService {
 
    private Map<String,List<StaffActivityResponse>> assignActivitySettingsForCurrentStaff(Map<String,List<StaffActivityResponse>> responseMap,Map<BigInteger,Activity> activityMap,Map<Long,StaffDTO> staffExpertiseWrapperMap,Long staffId,
                                                                                          List<StaffActivitySettingDTO> staffActivitySettingDTOS,Long unitId,Set<StaffActivitySetting> staffActivitySettings){
-       List<StaffActivityResponse> success=(responseMap.get("success")==null)?new ArrayList<>():responseMap.get("success");
-       List<StaffActivityResponse> error=(responseMap.get("error")==null)?new ArrayList<>():responseMap.get("error");
+       List<StaffActivityResponse> success=(responseMap.get(SUCCESS)==null)?new ArrayList<>():responseMap.get(SUCCESS);
+       List<StaffActivityResponse> error=(responseMap.get(ERROR)==null)?new ArrayList<>():responseMap.get(ERROR);
        Set<StaffActivitySetting> staffActivitySettingSet=new HashSet<>();
        Map<BigInteger,StaffActivitySettingDTO> activitySettingDTOMap=new HashMap<>();
        Map<Long,Map<BigInteger,StaffActivitySettingDTO>> staffWiseActivityMap=new HashMap<>();
@@ -197,8 +199,8 @@ public class StaffActivitySettingService extends MongoBaseService {
            save(staffActivitySettingSet);
        }
 
-       responseMap.put("success",success);
-       responseMap.put("error",error);
+       responseMap.put(SUCCESS,success);
+       responseMap.put(ERROR,error);
        return responseMap;
    }
 }

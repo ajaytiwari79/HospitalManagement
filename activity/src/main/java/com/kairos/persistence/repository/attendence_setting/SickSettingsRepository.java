@@ -18,25 +18,26 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 
 @Repository
 public class SickSettingsRepository {
+    public static final String END_DATE = "endDate";
     @Inject
     private MongoTemplate mongoTemplate;
 
     public void markUserAsFine(Long staffId, Long unitId) {
-        Query query = new Query(Criteria.where("unitId").is(unitId).and("staffId").is(staffId).and("endDate").is(null));
-        Update update = new Update().set("endDate", DateUtils.getCurrentLocalDate());
+        Query query = new Query(Criteria.where("unitId").is(unitId).and("staffId").is(staffId).and(END_DATE).is(null));
+        Update update = new Update().set(END_DATE, DateUtils.getCurrentLocalDate());
         mongoTemplate.findAndModify(query, update, SickSettings.class);
     }
 
     public SickSettingsDTO checkUserIsSick(Long userId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("userId").is(userId).and("startDate").lte(DateUtils.getCurrentLocalDate()).and("endDate").is(null))
+                match(Criteria.where("userId").is(userId).and("startDate").lte(DateUtils.getCurrentLocalDate()).and(END_DATE).is(null))
         );
         AggregationResults<SickSettingsDTO> results = mongoTemplate.aggregate(aggregation, SickSettings.class, SickSettingsDTO.class);
         return results.getMappedResults().size() > 0 ? results.getMappedResults().get(0) : null;
     }
 
     public List<SickSettings> findAllSickUsersOfUnit(Long unitId) {
-        Query query = new Query(Criteria.where("unitId").is(unitId).and("endDate").is(null));
+        Query query = new Query(Criteria.where("unitId").is(unitId).and(END_DATE).is(null));
         return mongoTemplate.find(query, SickSettings.class);
     }
 }

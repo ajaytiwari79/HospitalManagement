@@ -30,6 +30,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Service
 public class CountryConstraintService {
 
+    public static final String MESSAGE_DATA_NOT_FOUND = "message.dataNotFound";
     @Inject
     private ConstraintsRepository constraintsRepository;
     @Inject
@@ -123,13 +124,13 @@ public class CountryConstraintService {
     private boolean preValidateCountryConstraintDTO(CountryConstraintDTO countryConstraintDTO, boolean isCurrentObjectIdNull) {
         String result = userNeo4jRepo.validateCountryOrganizationServiceAndSubService(countryConstraintDTO.getCountryId(), countryConstraintDTO.getOrganizationServiceId(), countryConstraintDTO.getOrganizationSubServiceId());
         if ("countryNotExists".equals(result)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "Country", countryConstraintDTO.getCountryId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "Country", countryConstraintDTO.getCountryId());
         } else if (constraintsRepository.isNameExistsById(countryConstraintDTO.getName(), isCurrentObjectIdNull ? null : countryConstraintDTO.getId(), true, countryConstraintDTO.getCountryId())) {
             exceptionService.dataNotFoundByIdException("message.name.alreadyExists");
         } else if ("organizationServiceNotExists".equals(result)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "OrganizationService", countryConstraintDTO.getOrganizationServiceId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "OrganizationService", countryConstraintDTO.getOrganizationServiceId());
         } else if ("organizationSubServiceNotExists".equals(result)) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "OrganizationSubService", countryConstraintDTO.getOrganizationSubServiceId());
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "OrganizationSubService", countryConstraintDTO.getOrganizationSubServiceId());
         } else if ("relationShipNotValid".equals(result)) {
             exceptionService.relationShipNotValidException("message.relationship.notValid");
         }

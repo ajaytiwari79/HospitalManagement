@@ -10,8 +10,6 @@ import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.utils.user_context.UserContext;
 import com.mongodb.client.MongoDatabase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -30,10 +28,11 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
+	public static final String THE_GIVEN_ID_MUST_NOT_BE_NULL = "The given id must not be null!";
+	public static final String DELETED = "deleted";
 	private final MongoOperations mongoOperations;
 	private final MongoEntityInformation<T, ID> entityInformation;
 	MongoDatabase mongoDatabase;
-	private final Logger logger = LoggerFactory.getLogger(MongoBaseRepositoryImpl.class);
 
 	/**
 	 *  Sequence collection name prefix
@@ -50,39 +49,39 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	}
 	@Override
 	public T findOne(ID  id) {
-		Assert.notNull(id, "The given id must not be null!");
+		Assert.notNull(id, THE_GIVEN_ID_MUST_NOT_BE_NULL);
 		return mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName());
 	}
 
 	@Override
 	public void safeDeleteById(ID id){
-		Assert.notNull(id, "The given id must not be null!");
-		mongoOperations.findAndModify(new Query(Criteria.where("_id").is(id)),Update.update("deleted",true),entityInformation.getJavaType(),entityInformation.getCollectionName());
+		Assert.notNull(id, THE_GIVEN_ID_MUST_NOT_BE_NULL);
+		mongoOperations.findAndModify(new Query(Criteria.where("_id").is(id)),Update.update(DELETED,true),entityInformation.getJavaType(),entityInformation.getCollectionName());
 	}
 
 	@Override
 	public <T extends MongoBaseEntity> void safeDelete(T object){
-		Assert.notNull(object.getId(), "The given id must not be null!");
-		mongoOperations.updateFirst(new Query(Criteria.where("_id").is(object.getId())),Update.update("deleted",true),entityInformation.getJavaType());
+		Assert.notNull(object.getId(), THE_GIVEN_ID_MUST_NOT_BE_NULL);
+		mongoOperations.updateFirst(new Query(Criteria.where("_id").is(object.getId())),Update.update(DELETED,true),entityInformation.getJavaType());
 	}
 
 	@Override
 	public boolean existsByName(String name){
 		Assert.notNull(name, "The given name must not be null!");
-		return mongoOperations.exists(new Query(Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false)),entityInformation.getJavaType());
+		return mongoOperations.exists(new Query(Criteria.where("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(DELETED).is(false)),entityInformation.getJavaType());
 	}
 
 	@Override
 	public boolean existsByNameAndNotEqualToId(String name,BigInteger id){
 		Assert.notNull(name, "The given name must not be null!");
-		Assert.notNull(id, "The given id must not be null!");
-		return mongoOperations.exists(new Query(Criteria.where("_id").ne(id).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and("deleted").is(false)),entityInformation.getJavaType());
+		Assert.notNull(id, THE_GIVEN_ID_MUST_NOT_BE_NULL);
+		return mongoOperations.exists(new Query(Criteria.where("_id").ne(id).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE)).and(DELETED).is(false)),entityInformation.getJavaType());
 	}
 
 	@Override
 	public <T extends MongoBaseEntity> T findLastOrFirstByField(Sort sort){
 		Assert.notNull(sort, "The given sort must not be null!");
-		Query query = new Query(Criteria.where("deleted").is(false));
+		Query query = new Query(Criteria.where(DELETED).is(false));
 		query.with(sort);
 		return (T)mongoOperations.findOne(query,entityInformation.getJavaType());
 	}
@@ -182,99 +181,6 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 
 
 
-	/*public <T extends MongoBaseEntity> List<T> saveEntities(@Valid List<T> entities){
-		Assert.notNull(entities, "Entity must not be null!");
-		Assert.notEmpty(entities, "Entity must not be Empty!");
 
-		String collectionName = mongoOperations.getCollectionName(entities.get(0).getClass());
-
-		*//**
-		 *  Creating BulkWriteOperation object
-		 * *//*
-
-		BulkWriteOperation bulkWriteOperation= ((MongoTemplate) mongoOperations).getMongoDbFactory().getLegacyDb().getCollection(collectionName).initializeUnorderedBulkOperation();
-
-		*//**
-		 *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
-		 * *//*
-		MongoConverter converter = mongoOperations.getConverter();
-
-		BasicDBObject dbObject;
-
-		*//**
-		 *  Handling bulk write exceptions
-		 * *//*
-		try{
-
-			for (T entity: entities) {
-				*//**
-				 *  Get class name for sequence class
-				 * *//*
-				String className = entity.getClass().getSimpleName();
-				*//**
-				 *  Set updatedAt time as current time
-				 * *//*
-				entity.setUpdatedAt(DateUtils.getDate());
-
-
-				if(entity.getId() == null){
-					entity.setCreatedAt(DateUtils.getDate());
-					*//**
-					 *  Set Id if entity don't have Id
-					 * *//*
-					if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
-						//Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
-						className = entity.getClass().getSuperclass().getSimpleName();
-					}
-					entity.setId(nextSequence(className));
-					entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
-					dbObject = new BasicDBObject();
-
-                    *//*
-                    *  Converting entity object to BasicDBObject
-                    * *//*
-					converter.write(entity, dbObject);
-
-                    *//*
-                    *  Adding entity (BasicDBObject)
-                    * *//*
-					bulkWriteOperation.insert(dbObject);
-				}else {
-					entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
-					dbObject = new BasicDBObject();
-
-                    *//*
-                    *  Converting entity object to BasicDBObject
-                    * *//*
-					converter.write(entity, dbObject);
-
-					*//**
-					 *  Creating BasicDbObject for find query
-					 * *//*
-					BasicDBObject query = new BasicDBObject();
-
-					*//**
-					 *  Adding query (find by ID)
-					 * *//*
-					query.put("_id", dbObject.get("_id"));
-
-					*//**
-					 *  Replacing whole Object
-					 * *//*
-					bulkWriteOperation.find(query).replaceOne(dbObject);
-				}
-			}
-
-			*//**
-			 * Executing the Operation
-			 * *//*
-			bulkWriteOperation.execute();
-			return entities;
-
-		} catch(Exception ex){
-			logger.error("BulkWriteOperation Exception ::  ", ex);
-			return null;
-		}
-	}*/
 
 }

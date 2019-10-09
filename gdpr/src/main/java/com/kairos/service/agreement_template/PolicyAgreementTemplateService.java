@@ -45,6 +45,9 @@ import java.util.stream.Collectors;
 public class PolicyAgreementTemplateService {
 
 
+    public static final String MESSAGE_DATA_NOT_FOUND = "message.dataNotFound";
+    public static final String MESSAGE_POLICY_AGREEMENT_TEMPLATE= "message.policy.agreementTemplate";
+    public static final String COUNTRY_ID = "/country_id";
     @Inject
     private PolicyAgreementRepository policyAgreementRepository;
 
@@ -87,7 +90,7 @@ public class PolicyAgreementTemplateService {
             previousTemplate = isOrganization ? policyAgreementRepository.findByOrganizationIdAndDeletedAndName(referenceId, policyAgreementTemplateDto.getName()) : policyAgreementRepository.findByCountryIdAndName(referenceId, policyAgreementTemplateDto.getName());
         }
         if (Optional.ofNullable(previousTemplate).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "message.policy.agreementTemplate", policyAgreementTemplateDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_POLICY_AGREEMENT_TEMPLATE, policyAgreementTemplateDto.getName());
         }
         PolicyAgreementTemplate policyAgreementTemplate = buildAgreementTemplate(referenceId, isOrganization, policyAgreementTemplateDto);
         policyAgreementRepository.save(policyAgreementTemplate);
@@ -128,7 +131,7 @@ public class PolicyAgreementTemplateService {
 
         PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(agreementTemplateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, referenceId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_POLICY_AGREEMENT_TEMPLATE, agreementTemplateId);
         }
         String coverPageLogoUrl = awsBucketService.uploadImage(coverPageLogo);
         if (policyAgreementTemplate.isCoverPageAdded()) {
@@ -192,7 +195,7 @@ public class PolicyAgreementTemplateService {
             template = isOrganization ? policyAgreementRepository.findByOrganizationIdAndDeletedAndName(referenceId, policyAgreementTemplateDto.getName()) : policyAgreementRepository.findByCountryIdAndName(referenceId, policyAgreementTemplateDto.getName());
         }
         if (Optional.ofNullable(template).isPresent() && !agreementTemplateId.equals(template.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.policy.agreementTemplate", policyAgreementTemplateDto.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_POLICY_AGREEMENT_TEMPLATE, policyAgreementTemplateDto.getName());
         }
         try {
             template = policyAgreementRepository.getOne(agreementTemplateId);
@@ -209,7 +212,7 @@ public class PolicyAgreementTemplateService {
             }
             policyAgreementRepository.save(template);
         } catch (EntityNotFoundException nfe) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_POLICY_AGREEMENT_TEMPLATE, agreementTemplateId);
         }
         return policyAgreementTemplateDto;
 
@@ -226,7 +229,7 @@ public class PolicyAgreementTemplateService {
     public AgreementTemplateSectionResponseDTO getAllSectionsAndSubSectionOfAgreementTemplateByAgreementTemplateIdAndReferenceId(Long referenceId, boolean isOrganization, Long agreementTemplateId) {
         PolicyAgreementTemplate template = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(agreementTemplateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, referenceId);
         if (!Optional.ofNullable(template).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_POLICY_AGREEMENT_TEMPLATE, agreementTemplateId);
         }
         AgreementTemplateSectionResponseDTO agreementTemplateResponse = new AgreementTemplateSectionResponseDTO();
         List<ClauseBasicResponseDTO> clauseListForPolicyAgreementTemplate;
@@ -276,7 +279,7 @@ public class PolicyAgreementTemplateService {
 
         PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_POLICY_AGREEMENT_TEMPLATE, templateId);
         }
         policyAgreementTemplate.delete();
         policyAgreementRepository.save(policyAgreementTemplate);
@@ -286,7 +289,7 @@ public class PolicyAgreementTemplateService {
 
     //get country template by unitId
     public List<TemplateType> getAllTemplateType(Long unitId) {
-        Long countryId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        Long countryId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, COUNTRY_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         });
         return templateTypeRepository.getAllTemplateType(countryId);
     }
@@ -306,14 +309,14 @@ public class PolicyAgreementTemplateService {
             template.setDataHandlerHtmlContent(policyAgreementTemplateDto.getDataHandlerHtmlContent());
             policyAgreementRepository.save(template);
         } catch (EntityNotFoundException nfe) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_POLICY_AGREEMENT_TEMPLATE, agreementTemplateId);
         }
         return policyAgreementTemplateDto;
 
     }
 
     public List<AgreementTemplateDTO> getAllDataHandlerTemplate(Long unitId) {
-        Long countryId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        Long countryId = gDPRGenericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, COUNTRY_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
         TemplateType templateType = templateTypeRepository.findByCountryIdAndName(countryId,"Data Handler Agreement");
         List<PolicyAgreementTemplate> policyAgreementTemplates = policyAgreementRepository.findAllDataHandlerAgreementTemplateByCountry(countryId,templateType.getId());
         return policyAgreementTemplates.stream().map(policyAgreementTemplate ->
@@ -322,10 +325,10 @@ public class PolicyAgreementTemplateService {
     }
 
     public AgreementTemplateDTO getDataHandlerTemplate(Long referenceId,boolean isCountry, Long agreementTemplateId) {
-        Long countryId = isCountry?referenceId: gDPRGenericRestClient.publishRequest(null, referenceId, true, IntegrationOperation.GET, "/country_id", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
+        Long countryId = isCountry?referenceId: gDPRGenericRestClient.publishRequest(null, referenceId, true, IntegrationOperation.GET, COUNTRY_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
         PolicyAgreementTemplate policyAgreementTemplate=policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(agreementTemplateId, countryId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", agreementTemplateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_POLICY_AGREEMENT_TEMPLATE, agreementTemplateId);
         }
         return new AgreementTemplateDTO(policyAgreementTemplate.getId(), policyAgreementTemplate.getName(), policyAgreementTemplate.getDescription(), policyAgreementTemplate.getTemplateType().getId(), policyAgreementTemplate.getDataHandlerHtmlContent());
     }
