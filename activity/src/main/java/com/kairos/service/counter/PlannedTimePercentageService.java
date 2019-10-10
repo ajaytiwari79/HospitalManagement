@@ -66,7 +66,7 @@ public class PlannedTimePercentageService implements CounterService {
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new ArrayList<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         List<PresenceTypeDTO> plannedTimes=plannedTimeTypeService.getAllPresenceTypeByCountry(UserContext.getUserDetails().getCountryId());
         if(isCollectionNotEmpty(plannedTimeIds)){
-         plannedTimeIdAndNameMap=plannedTimes.stream().filter(presenceTypeDTO -> plannedTimeIds.contains(presenceTypeDTO.getId())).collect(Collectors.toMap(k->k.getId(),v->v.getName()));
+            plannedTimeIdAndNameMap=plannedTimes.stream().filter(presenceTypeDTO -> plannedTimeIds.contains(presenceTypeDTO.getId())).collect(Collectors.toMap(k->k.getId(),v->v.getName()));
         }else {
             plannedTimeIdAndNameMap=plannedTimes.stream().collect(Collectors.toMap(k->k.getId(),v->v.getName()));
         }
