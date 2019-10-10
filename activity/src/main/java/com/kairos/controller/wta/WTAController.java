@@ -280,10 +280,5 @@ public class WTAController {
     }
 
 
-    @ApiOperation("Get CTARultemplate By EmploymentId")
-    @GetMapping("/test")
-    public ResponseEntity<Map<String,Object>> getTest(){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,workTimeAgreementBalancesCalculationService.setProtectedDaysOffHoursViaJob());
-    }
 
 }

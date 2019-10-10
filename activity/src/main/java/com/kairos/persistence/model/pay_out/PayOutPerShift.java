@@ -8,7 +8,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /*
 * Created By Pradeep singh rajawat
@@ -35,7 +38,7 @@ public class PayOutPerShift extends MongoBaseEntity{
     private LocalDate date;
     private boolean paidOut;
     //It Includes CTAcompensation of Function and Bonus Ruletemplate which accountType is equal to PAID_OUT
-    private List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions;
+    private List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions = new ArrayList<>();
     private long protectedDaysOffMinutes;
 
 
@@ -56,9 +59,6 @@ public class PayOutPerShift extends MongoBaseEntity{
         this.totalPayOutMinutes = totalPayOutMinutes;
         this.date = date;
     }
-
-
-
 
 
 }

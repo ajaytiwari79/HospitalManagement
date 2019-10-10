@@ -10,6 +10,7 @@ import com.kairos.service.dashboard.SickService;
 import com.kairos.service.payroll_setting.UnitPayrollSettingService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.shift.ShiftReminderService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
     @Inject
     private ActivityService activityService;
     @Inject
-    private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    private TimeBankCalculationService timeBankCalculationService;
     @Override
     public void execute(KairosSchedulerExecutorDTO job) {
         logger.info("Job type----------------->"+job.getJobSubType());
@@ -70,7 +71,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case PROTECTED_DAYS_OFF:
                 logger.info("Job to protected days off ");
-                workTimeAgreementBalancesCalculationService.setProtectedDaysOffHoursViaJob();
+                timeBankCalculationService.setProtectedDaysOffHoursViaJob();
                 break;
             case UNASSIGN_EXPERTISE_FROM_ACTIVITY:
                 logger.info("Job to Unassign expertise from activity ");

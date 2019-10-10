@@ -217,4 +217,7 @@ public class PayOutService extends MongoBaseService {
         payOutRepository.saveEntities(payOutPerShifts);
     }
 
+    public List<PayOutPerShift> findAllByEmploymentsAndDate(Set<Long> employmentIds, Date startDate, Date endDate){
+        return payOutRepository.findAllByEmploymentsAndDate(employmentIds,startDate,endDate);
+    }
 }
