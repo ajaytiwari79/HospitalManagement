@@ -92,8 +92,8 @@ public class TasksMergingService extends MongoBaseService {
     public List<Task> mergeRepetitions(List<String> taskIds, List<String> jointEventsIds, Date dateFrom,Long  citizenId, long unitId, String mainTaskName, boolean isActualPlanningScreen) throws CloneNotSupportedException {
 
         List<Task> taskList = new ArrayList<>();
-        //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+        //Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
+        //Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
         TaskDemandVisitWrapper taskDemandVisitWrapper= userIntegrationService.
                 getPrerequisitesForTaskCreation(citizenId,unitId);
 
@@ -383,7 +383,7 @@ public class TasksMergingService extends MongoBaseService {
             }
         }
 
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
        /* if (tasksToCreate.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasksToCreate, flsCredentials);
         } else {

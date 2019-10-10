@@ -1,6 +1,7 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.RestClientUrlUtil;
 import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
@@ -192,9 +193,8 @@ public class UserIntegrationService {
 
     public Long removeFunctionFromEmploymentByDate(Long unitId, Long employmentId, Date shiftDate) {
         BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", DateUtils.asLocalDate(shiftDate).toString());
-        Long functionId = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTION_FROM_EMPLOYMENT_ON_DELETE_SHIFT, Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.DELETE, REMOVE_FUNCTION_FROM_EMPLOYMENT_ON_DELETE_SHIFT, Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
         }, employmentId);
-        return functionId;
     }
 
     public Boolean restoreFunctionFromEmploymentByDate(Long unitId, Long employmentId, Map<Long, Set<LocalDate>> dateAndFunctionIdMap) {
@@ -323,7 +323,7 @@ public class UserIntegrationService {
     }
 
 
-    public Map<String, String> getFLS_Credentials(Long citizenUnitId) {
+    public Map<String, String> getFLSCredentials(Long citizenUnitId) {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, INTEGRATION_UNIT_CITIZEN_UNIT_ID_FLSCRED, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, String>>>() {
         }, citizenUnitId);
     }
@@ -352,7 +352,7 @@ public class UserIntegrationService {
     }
 
     //Previously this API didn't match with any API on user micro-service (corrected)
-    public Map<Long, Long> getEmploymentExpertiseMap(Long organizationId, Long unitId) {
+    public Map<Long, Long> getEmploymentExpertiseMap(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, EMPLOYMENT_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long, Long>>>() {
         });
     }
@@ -509,7 +509,7 @@ public class UserIntegrationService {
         }, clientId);
     }
 
-    public ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, Long unitId, Long clientId) {
+    public ClientTemporaryAddress updateClientTemporaryAddress(ClientExceptionDTO clientExceptionDto, Long clientId) {
         return genericRestClient.publishRequest(clientExceptionDto, null, RestClientUrlType.UNIT, HttpMethod.POST, UPDATE_CLIENT_TEMP_ADDRESS_BY_CLIENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ClientTemporaryAddress>>() {
         }, clientId);
     }
@@ -536,7 +536,7 @@ public class UserIntegrationService {
 
     //On user-microservive ClientController organizationId is not actually this function organizationId
     //TODO verify
-    public OrganizationClientWrapper getOrganizationClients(Long organizationId) {
+    public OrganizationClientWrapper getOrganizationClients() {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, CLIENT_ORGANIZATION_CLIENTS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationClientWrapper>>() {
         });
     }
@@ -728,7 +728,7 @@ public class UserIntegrationService {
     }
 
     public void restoreFunctionsWithDatesByEmploymentIds(Map<Long, Map<LocalDate, Long>> employmentIdWithShiftDateFunctionIdMap, Long unitId) {
-        Boolean AreFunctionsRestored = genericRestClient.publishRequest(employmentIdWithShiftDateFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTION_ON_PHASE_RESTORATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+        genericRestClient.publishRequest(employmentIdWithShiftDateFunctionIdMap, unitId, RestClientUrlType.UNIT, HttpMethod.POST, RESTORE_FUNCTION_ON_PHASE_RESTORATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 
@@ -834,7 +834,8 @@ public class UserIntegrationService {
     }
 
     public Set<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
-        return genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<LocalDate>>>() {});
+        Set<Object> data= genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Object>>>() {});
+        return ObjectMapperUtils.copyPropertiesOfSetByMapper(data,LocalDate.class);
     }
 
     public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {

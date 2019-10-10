@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -67,6 +68,11 @@ public class WTABuilderService extends MongoBaseService {
                         BigInteger activityId = activitiesIdsAndUnitIdsMap.get(careDayCount.getActivityId()+"-"+unitId);
                         careDayCount.setActivityId(activityId);
                     }
+                    break;
+                case PROTECTED_DAYS_OFF:
+                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate)wtaBaseRuleTemplate;
+                    activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId, Arrays.asList(protectedDaysOffWTATemplate.getActivityId()));
+                    protectedDaysOffWTATemplate.setActivityId(activityIds.get(0));
                     break;
                 default:
                     break;

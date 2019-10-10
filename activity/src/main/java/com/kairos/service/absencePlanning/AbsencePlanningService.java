@@ -490,8 +490,8 @@ public class AbsencePlanningService {
         try {
             // Organization organization = organizationGraphRepository.findOne(unitId, 2);
             OrganizationDTO organization = userIntegrationService.getOrganization();
-            Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
-            //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+            Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
+            //Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
             for (TaskDTO task : taskList) {
                 syncPresentFullDayAbsencesTask(task, flsCredentials, organization);
             }
@@ -513,8 +513,8 @@ public class AbsencePlanningService {
         try {
             OrganizationDTO organization = userIntegrationService.getOrganization();
             // Organization organization = organizationGraphRepository.findOne(unitId, 2);
-            Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
-            //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+            Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
+            //Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
             for (TaskDTO task : taskList) {
                 TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(task.getTaskTypeId().toString()));
                 if (taskType.getTaskTypeVisibility().equals(AppConstants.ABSENT) && taskType.getTaskTypeSchedule().equals(AppConstants.PARTIALLY)) {
@@ -646,8 +646,8 @@ public class AbsencePlanningService {
         Map<String, String> flsCredentials = null;
         if (tasks != null && tasks.size() > 0) {
             TaskType taskType = taskTypeMongoRepository.findOne(tasks.get(0).getTaskTypeId());
-            flsCredentials = userIntegrationService.getFLS_Credentials(taskType.getOrganizationId());
-            //flsCredentials = integrationService.getFLS_Credentials(taskType.getUnitID());
+            flsCredentials = userIntegrationService.getFLSCredentials(taskType.getOrganizationId());
+            //flsCredentials = integrationService.getFLSCredentials(taskType.getUnitID());
         }
         for (Task task : tasks) {
             try {
@@ -689,8 +689,8 @@ public class AbsencePlanningService {
         Date date = DateUtils.getDate();
         for (Map data : unitTasks) {
             Long organizationId = Long.valueOf(data.get("_id").toString());
-            Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(organizationId);
-            // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(organizationId);
+            // Map<String, String> flsCredentials = integrationService.getFLSCredentials(organizationId);
             OrganizationDTO organization = userIntegrationService.getOrganization();
             //Organization organization = organizationGraphRepository.findOne(organizationId);
             for (Map object : (List<Map>) data.get(TASK_LIST)) {
@@ -775,8 +775,8 @@ public class AbsencePlanningService {
      */
     public void syncPartialAbsencesTask(TaskDTO task, OrganizationDTO organization) {
         Task task1 = taskMongoRepository.findOne(new BigInteger(task.getId()));
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(organization.getId());
-        // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(organization.getId());
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(organization.getId());
+        // Map<String, String> flsCredentials = integrationService.getFLSCredentials(organization.getId());
         int vtID;
         if (task.getActive() != null && task.getActive() == false) {
             if (task1.getVisitourId() != null && !task1.getTaskStatus().equals(TaskStatus.CANCELLED)) {

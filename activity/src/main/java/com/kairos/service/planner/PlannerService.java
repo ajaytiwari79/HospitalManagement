@@ -695,7 +695,7 @@ public class PlannerService extends MongoBaseService {
         Date taskStartTime = dateISOFormat.parse(requestPayload.get("startTime").toString());
         List<Task> taskList = getTasksFromDemandVisits(droppedTaskDemandVisit, taskDemand, (boolean) requestPayload.get(IS_WEEKEND), citizenId, taskType, taskStartTime);
 
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         //taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);
         //Set Demand Status to Generated, once demand drag&drop in Gantt View.
         if (taskDemand.getStatus() == TaskDemand.Status.VISITATED) {
@@ -874,7 +874,7 @@ public class PlannerService extends MongoBaseService {
         LocalDate upcomingMonday = DateUtils.calcNextMonday(LocalDate.now());
         LocalDate fourWeekLater = upcomingMonday.plusDays(28);
 
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         List<Task> taskList = new ArrayList<>();
         List<Task> taskRepetitionsList = new ArrayList<>();
         List<Task> tasksToReturn = new ArrayList<>();
@@ -1170,7 +1170,7 @@ public class PlannerService extends MongoBaseService {
 
     public List<Task> mergeRepetitions(List<String> jointEventsIds, Date dateFrom, Long citizenId, long unitId, String mainTaskName, boolean isActualPlanningScreen) throws CloneNotSupportedException {
 
-        //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+        //Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
         TaskDemandVisitWrapper taskDemandVisitWrapper = userIntegrationService.
                 getPrerequisitesForTaskCreation(citizenId, unitId);
 
@@ -1581,8 +1581,8 @@ public class PlannerService extends MongoBaseService {
             }
         }
 
-        //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        //Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
        /* if (tasksToCreate.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasksToCreate, flsCredentials);
         } else {
@@ -1618,8 +1618,8 @@ public class PlannerService extends MongoBaseService {
                 revertTaskState.add(actualTask);
             }
         });
-        // Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        // Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         //taskConverterService.createFlsCallFromTasks(revertTaskState, flsCredentials);
         return customizeTaskData(revertTaskState);
     }
@@ -1651,7 +1651,7 @@ public class PlannerService extends MongoBaseService {
         List<Object> clientList = new ArrayList<>();
 
         LOGGER.debug("Finding citizen with Id: " + organizationId);
-        OrganizationClientWrapper organizationClientWrapper = userIntegrationService.getOrganizationClients(organizationId);
+        OrganizationClientWrapper organizationClientWrapper = userIntegrationService.getOrganizationClients();
         //List<Map<String, Object>> mapList = organizationGraphRepository.getClientsOfOrganizationExcludeDead(organizationId,envConfig.getServerHost() + FORWARD_SLASH);
         List<Map<String, Object>> mapList = organizationClientWrapper.getClientList();
         LOGGER.debug("CitizenList Size: " + mapList.size());
@@ -1787,7 +1787,7 @@ public class PlannerService extends MongoBaseService {
 
         List<Task> tasks = taskMongoRepository.getTaskBetweenDatesForUnit(unitId, dateFrom, dateTo);
         LOGGER.info("No of tasks to sync " + tasks.size());
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         /*if (tasks.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
         } else {
@@ -1970,7 +1970,7 @@ public class PlannerService extends MongoBaseService {
 
     public boolean deleteTasksFromDBAndVisitour(List<Task> taskList, Long unitId) {
         if (!taskList.isEmpty()) {
-            //Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+            //Map<String, String> flsCredentials = integrationServiceRestClient.getFLSCredentials(unitId);
             for (Task task : taskList) {
                 /*Map<String, Object> callMetaData = new HashMap<>();
                 callMetaData.put("functionCode", 4);
