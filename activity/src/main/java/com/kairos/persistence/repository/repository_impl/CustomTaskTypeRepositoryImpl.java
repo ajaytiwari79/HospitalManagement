@@ -32,11 +32,27 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Repository
 public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
 
+    public static final String CITIZEN_ID = "citizenId";
+    public static final String TASK_TYPE_ID = "taskTypeId";
+    public static final String TASK_TYPE_IDS = "taskTypeIds";
+    public static final String TASK_TYPES = "task_types";
+    public static final String TITLE = "title";
+    public static final String IS_ENABLED = "isEnabled";
+    public static final String STATUS = "status";
+    public static final String ORGANIZATION_ID = "organizationId";
+    public static final String TAGS_DATA = "tags_data";
+    public static final String DOLLOR_TITLE = "$title";
+    public static final String DOLLOR_DESCRIPTION = "$description";
+    public static final String DOLLOR_SUB_SERVICE_ID = "$subServiceId";
+    public static final String DOLLOR_EXPIRES_ON = "$expiresOn";
+    public static final String DOLLOR_IS_ENABLED = "$isEnabled";
+    public static final String DOLLOR_ROOT_ID = "$rootId";
+    public static final String DESCRIPTION = "description";
+    public static final String SUB_SERVICE_ID = "subServiceId";
+    public static final String EXPIRES_ON = "expiresOn";
+    public static final String PARENT_TASK_TYPE_ID = "parentTaskTypeId";
     @Inject
     private MongoTemplate mongoTemplate;
-
-//    @Inject
-//    private TaskTypeService taskTypeService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -44,8 +60,8 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
     public List<TaskTypeAggregateResult> getTaskTypesOfCitizens(List<Long> citizenIds) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria
-                        .where("citizenId").in(citizenIds).and("isDeleted").is(false)),
-                group("citizenId").addToSet("taskTypeId").as("taskTypeIds")
+                        .where(CITIZEN_ID).in(citizenIds).and("isDeleted").is(false)),
+                group(CITIZEN_ID).addToSet(TASK_TYPE_ID).as(TASK_TYPE_IDS)
         );
         AggregationResults<TaskTypeAggregateResult> result = mongoTemplate.aggregate(aggregation, TaskDemand.class,TaskTypeAggregateResult.class);
         return result.getMappedResults();
@@ -55,9 +71,9 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
     public List<OrgTaskTypeAggregateResult> getTaskTypesOfUnit(long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId)),
-                lookup("task_types","taskTypeId","_id","task_types"),
-                unwind("task_types"),
-                group("task_types._id").first("task_types.title").as("title")
+                lookup(TASK_TYPES, TASK_TYPE_ID,"_id", TASK_TYPES),
+                unwind(TASK_TYPES),
+                group("task_types._id").first("task_types.title").as(TITLE)
         );
         AggregationResults<OrgTaskTypeAggregateResult> result = mongoTemplate.aggregate(aggregation, TaskDemand.class,OrgTaskTypeAggregateResult.class);
         return result.getMappedResults();
@@ -67,7 +83,7 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
     public void updateUnitTaskTypesStatus(BigInteger taskTypeId, boolean status) {
         Query query = Query.query(Criteria.where("rootId").is(taskTypeId));
         Update update = new Update();
-        update.set("isEnabled",status);
+        update.set(IS_ENABLED,status);
         mongoTemplate.updateMulti(query, update,TaskType.class);
     }
 
@@ -79,18 +95,14 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
         List<BigInteger> taskTypes = new ArrayList();
         taskTypesSet.addAll(clientFilterDTO.getTaskTypes());
         if(clientFilterDTO.isNewDemands()){
-            criteria.and("status").ne(TaskDemand.Status.VISITATED);
+            criteria.and(STATUS).ne(TaskDemand.Status.VISITATED);
         }
 
-        /*if(!clientFilterDTO.getServicesTypes().isEmpty()){
-            List<String> taskTypeIdsByServiceIds = taskTypeService.getTaskTypeIdsByServiceIds(clientFilterDTO.getServicesTypes(),unitId);
-            taskTypesSet.addAll(taskTypeIdsByServiceIds);
-        }*/
         taskTypesSet.addAll(taskTypeIdsByServiceIds);
         taskTypes.addAll(taskTypesSet);
-        logger.info("taskTypes----------> "+taskTypes);
+        logger.info("taskTypes----------> {}",taskTypes);
         if(!taskTypes.isEmpty()){
-          c =  c.where("taskTypeIds").in(taskTypes);
+          c =  c.where(TASK_TYPE_IDS).in(taskTypes);
         }
         if(!clientFilterDTO.getTimeSlots().isEmpty()){
             c.andOperator(Criteria.where("weekDayTimeSlotIds").in(clientFilterDTO.getTimeSlots()).orOperator(Criteria.where("weekEndTimeSlotIds").in(clientFilterDTO.getTimeSlots())));
@@ -101,7 +113,7 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
                 match(
                         criteria
                 ),
-                group("citizenId").addToSet("taskTypeId").as("taskTypeIds").addToSet("weekdayVisits.timeSlotId").as("weekDayTimeSlotIds").addToSet("weekendVisits.timeSlotId").as("weekEndTimeSlotIds"),
+                group(CITIZEN_ID).addToSet(TASK_TYPE_ID).as(TASK_TYPE_IDS).addToSet("weekdayVisits.timeSlotId").as("weekDayTimeSlotIds").addToSet("weekendVisits.timeSlotId").as("weekEndTimeSlotIds"),
                 unwind("$taskTypeIds"),
                 unwind("$weekDayTimeSlotIds"),
                 unwind("$weekEndTimeSlotIds"),
@@ -119,18 +131,18 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
     public List<TaskTypeResponseDTO> getAllTaskType(){
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("isEnabled").is(true).and("organizationId").is(0)),
+                match(Criteria.where(IS_ENABLED).is(true).and(ORGANIZATION_ID).is(0)),
                 unwind("tags", true),
-                lookup("tag","tags","_id","tags_data"),
-                unwind("tags_data",true),
+                lookup("tag","tags","_id", TAGS_DATA),
+                unwind(TAGS_DATA,true),
                 group("$id")
-                        .first("$title").as("title")
-                        .first("$description").as("description")
-                        .first("$subServiceId").as("subServiceId")
-                        .first("$expiresOn").as("expiresOn")
-                        .first("$isEnabled").as("status")
-                        .first("$rootId").as("parentTaskTypeId")
-                        .push("tags_data").as("tags")
+                        .first(DOLLOR_TITLE).as(TITLE)
+                        .first(DOLLOR_DESCRIPTION).as(DESCRIPTION)
+                        .first(DOLLOR_SUB_SERVICE_ID).as(SUB_SERVICE_ID)
+                        .first(DOLLOR_EXPIRES_ON).as(EXPIRES_ON)
+                        .first(DOLLOR_IS_ENABLED).as(STATUS)
+                        .first(DOLLOR_ROOT_ID).as(PARENT_TASK_TYPE_ID)
+                        .push(TAGS_DATA).as("tags")
         );
 
         AggregationResults<TaskTypeResponseDTO> result = mongoTemplate.aggregate(aggregation, TaskType.class,TaskTypeResponseDTO.class);
@@ -141,18 +153,18 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
     public List<TaskTypeResponseDTO> getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(long subServiceId, long organizationId, boolean isEnabled){
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("isEnabled").is(true).and("organizationId").is(organizationId).and("subServiceId").is(subServiceId)),
+                match(Criteria.where(IS_ENABLED).is(true).and(ORGANIZATION_ID).is(organizationId).and(SUB_SERVICE_ID).is(subServiceId)),
                 unwind("tags", true),
-                lookup("tag","tags","_id","tags_data"),
-                unwind("tags_data",true),
+                lookup("tag","tags","_id", TAGS_DATA),
+                unwind(TAGS_DATA,true),
                 group("$id")
-                        .first("$title").as("title")
-                        .first("$description").as("description")
-                        .first("$subServiceId").as("subServiceId")
-                        .first("$expiresOn").as("expiresOn")
-                        .first("$isEnabled").as("status")
-                        .first("$rootId").as("parentTaskTypeId")
-                        .push("tags_data").as("tags")
+                        .first(DOLLOR_TITLE).as(TITLE)
+                        .first(DOLLOR_DESCRIPTION).as(DESCRIPTION)
+                        .first(DOLLOR_SUB_SERVICE_ID).as(SUB_SERVICE_ID)
+                        .first(DOLLOR_EXPIRES_ON).as(EXPIRES_ON)
+                        .first(DOLLOR_IS_ENABLED).as(STATUS)
+                        .first(DOLLOR_ROOT_ID).as(PARENT_TASK_TYPE_ID)
+                        .push(TAGS_DATA).as("tags")
         );
 
         AggregationResults<TaskTypeResponseDTO> result = mongoTemplate.aggregate(aggregation, TaskType.class,TaskTypeResponseDTO.class);
@@ -163,18 +175,18 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
     public List<TaskTypeResponseDTO> getAllTaskTypeByTeamIdAndSubServiceAndIsEnabled(long teamId, long subServiceId, boolean isEnabled){
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("isEnabled").is(true).and("teamId").is(teamId).and("subServiceId").is(subServiceId)),
+                match(Criteria.where(IS_ENABLED).is(true).and("teamId").is(teamId).and(SUB_SERVICE_ID).is(subServiceId)),
                 unwind("tags", true),
-                lookup("tag","tags","_id","tags_data"),
-                unwind("tags_data",true),
+                lookup("tag","tags","_id", TAGS_DATA),
+                unwind(TAGS_DATA,true),
                 group("$id")
-                        .first("$title").as("title")
-                        .first("$description").as("description")
-                        .first("$subServiceId").as("subServiceId")
-                        .first("$expiresOn").as("expiresOn")
-                        .first("$isEnabled").as("status")
-                        .first("$rootId").as("parentTaskTypeId")
-                        .push("tags_data").as("tags")
+                        .first(DOLLOR_TITLE).as(TITLE)
+                        .first(DOLLOR_DESCRIPTION).as(DESCRIPTION)
+                        .first(DOLLOR_SUB_SERVICE_ID).as(SUB_SERVICE_ID)
+                        .first(DOLLOR_EXPIRES_ON).as(EXPIRES_ON)
+                        .first(DOLLOR_IS_ENABLED).as(STATUS)
+                        .first(DOLLOR_ROOT_ID).as(PARENT_TASK_TYPE_ID)
+                        .push(TAGS_DATA).as("tags")
         );
 
         AggregationResults<TaskTypeResponseDTO> result = mongoTemplate.aggregate(aggregation, TaskType.class,TaskTypeResponseDTO.class);
@@ -185,18 +197,18 @@ public class CustomTaskTypeRepositoryImpl implements CustomTaskTypeRepository {
     public List<TaskTypeResponseDTO> findAllBySubServiceIdAndOrganizationId(long subServiceId, long organizationId){
 
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("isEnabled").is(true).and("subServiceId").is(subServiceId).and("organizationId").is(0)),
+                match(Criteria.where(IS_ENABLED).is(true).and(SUB_SERVICE_ID).is(subServiceId).and(ORGANIZATION_ID).is(0)),
                 unwind("tags", true),
-                lookup("tag","tags","_id","tags_data"),
-                unwind("tags_data",true),
+                lookup("tag","tags","_id", TAGS_DATA),
+                unwind(TAGS_DATA,true),
                 group("$id")
-                        .first("$title").as("title")
-                        .first("$description").as("description")
-                        .first("$subServiceId").as("subServiceId")
-                        .first("$expiresOn").as("expiresOn")
-                        .first("$isEnabled").as("status")
-                        .first("$rootId").as("parentTaskTypeId")
-                        .push("tags_data").as("tags")
+                        .first(DOLLOR_TITLE).as(TITLE)
+                        .first(DOLLOR_DESCRIPTION).as(DESCRIPTION)
+                        .first(DOLLOR_SUB_SERVICE_ID).as(SUB_SERVICE_ID)
+                        .first(DOLLOR_EXPIRES_ON).as(EXPIRES_ON)
+                        .first(DOLLOR_IS_ENABLED).as(STATUS)
+                        .first(DOLLOR_ROOT_ID).as(PARENT_TASK_TYPE_ID)
+                        .push(TAGS_DATA).as("tags")
         );
 
         AggregationResults<TaskTypeResponseDTO> result = mongoTemplate.aggregate(aggregation, TaskType.class,TaskTypeResponseDTO.class);

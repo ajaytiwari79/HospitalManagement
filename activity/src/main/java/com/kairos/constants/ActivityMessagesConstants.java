@@ -392,6 +392,6 @@ public class ActivityMessagesConstants {
     public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
     public static final String FREQUENCY_VALUE_IS_ALWAYS_POSITIVE="frequency.value.is.always.positive";
     public static final String STATUS_NOT_ALLOWED="status.not.allowed";
-
+    public static final String ACTIVITY_CONFIGURATION_DEFAULT_SETTINGS_ALREADY_EXISTS = "activity.configuration.default.settings.already.exists";
 
 }

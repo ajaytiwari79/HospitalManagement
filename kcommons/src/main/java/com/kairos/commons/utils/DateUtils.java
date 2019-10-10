@@ -29,7 +29,9 @@ public  class DateUtils {
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
     public static final String COMMON_DATE_FORMAT = "dd-MM-yyyy";
+    public static final String KPI_DATE_FORMAT = "ddMMMyy";
     public static final String COMMON_TIME_FORMAT="HH:mm";
+    public static final String THE_DATE_MUST_NOT_BE_NULL = "The date must not be null";
 
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -285,7 +287,7 @@ public  class DateUtils {
 
     private static Date add(final Date date, final int calendarField, final int amount) {
         if (date == null) {
-            throw new IllegalArgumentException("The date must not be null");
+            throw new IllegalArgumentException(THE_DATE_MUST_NOT_BE_NULL);
         }
         final Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -295,7 +297,7 @@ public  class DateUtils {
 
     public static boolean isSameDay(final Date date1, final Date date2) {
         if (date1 == null || date2 == null) {
-            throw new IllegalArgumentException("The date must not be null");
+            throw new IllegalArgumentException(THE_DATE_MUST_NOT_BE_NULL);
         }
         final Calendar cal1 = Calendar.getInstance();
         cal1.setTime(date1);
@@ -306,7 +308,7 @@ public  class DateUtils {
 
     public static boolean isSameDay(final Calendar cal1, final Calendar cal2) {
         if (cal1 == null || cal2 == null) {
-            throw new IllegalArgumentException("The date must not be null");
+            throw new IllegalArgumentException(THE_DATE_MUST_NOT_BE_NULL);
         }
         return (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
                 cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
@@ -854,10 +856,10 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate().minusDays(1),"dd-MM-yyyy");
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate().minusDays(1),KPI_DATE_FORMAT);
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
+        return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+"";
     }
 
     public static long getMinutesBetweenDate(Date toDate,Date fromDate){
@@ -869,10 +871,8 @@ public  class DateUtils {
 
     public static String getEmailDateTimeWithFormat(LocalDateTime dateTime){
         LocalTime time=getLocalTimeFromLocalDateTime(dateTime);
-        String localtime=time.format(DateTimeFormatter.ofPattern("HH:mm"));
-        String date = dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
-        return date;
-
+        String localtime=time.format(DateTimeFormatter.ofPattern(COMMON_TIME_FORMAT));
+        return dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
     }
 
     public static ZonedDateTime roundDateByMinutes(ZonedDateTime zonedDateTime,int minutes){

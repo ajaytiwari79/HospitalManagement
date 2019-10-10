@@ -28,6 +28,9 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleMongoRepository<T, ID> implements MongoBaseRepository<T, ID> {
 
+    public static final String DELETED = "deleted";
+    public static final String COUNTRY_ID = "countryId";
+    public static final String UNIT_ID = "unitId";
     private final MongoOperations mongoOperations;
     private final MongoEntityInformation<T, ID> entityInformation;
     //Sequence collection name prefix
@@ -51,7 +54,7 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
 
     @Override
     public boolean safeDeleteById(BigInteger id) {
-        mongoOperations.findAndModify(new Query(Criteria.where("_id").is(id)), Update.update("deleted", true), entityInformation.getJavaType());
+        mongoOperations.findAndModify(new Query(Criteria.where("_id").is(id)), Update.update(DELETED, true), entityInformation.getJavaType());
         return true;
     }
 
@@ -65,8 +68,8 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
      */
     @Override
     public boolean isNameExistsById(String name, BigInteger solverConfigId, boolean checkForCountry,Long countryOrUnitId) {
-        String applicableIdField = checkForCountry ? "countryId" : "unitId";
-        Criteria criteria = Criteria.where(applicableIdField).is(countryOrUnitId).and("deleted").is(false);
+        String applicableIdField = checkForCountry ? COUNTRY_ID : UNIT_ID;
+        Criteria criteria = Criteria.where(applicableIdField).is(countryOrUnitId).and(DELETED).is(false);
         if (isNotNull(solverConfigId)){
             criteria=criteria.and("_id").ne(solverConfigId.toString());
         }
@@ -76,32 +79,32 @@ public class MongoBaseRepositoryImpl<T, ID extends Serializable> extends SimpleM
 
     @Override
     public <T1 extends MongoBaseEntity> boolean safeDeleteByObject(T1 o) {
-        mongoOperations.findAndModify(new Query(Criteria.where("_id").is(o.getId())), Update.update("deleted", true), o.getClass());
+        mongoOperations.findAndModify(new Query(Criteria.where("_id").is(o.getId())), Update.update(DELETED, true), o.getClass());
         return true;
     }
 
     @Override
     @Deprecated
     public List<T> findAllNotDeleted() {
-        return mongoOperations.find(new Query(Criteria.where("deleted").exists(false)), entityInformation.getJavaType());
+        return mongoOperations.find(new Query(Criteria.where(DELETED).exists(false)), entityInformation.getJavaType());
     }
 
     @Deprecated
     @Override
     public List<T> findAllSolverConfigNotDeletedByType(String solverConfigType) {
-        String idType = "country".equalsIgnoreCase(solverConfigType) ? "countryId" : "unitId";
-        return mongoOperations.find(new Query(Criteria.where("deleted").exists(false).andOperator(Criteria.where(idType).exists(true))), entityInformation.getJavaType());
+        String idType = "country".equalsIgnoreCase(solverConfigType) ? COUNTRY_ID : UNIT_ID;
+        return mongoOperations.find(new Query(Criteria.where(DELETED).exists(false).andOperator(Criteria.where(idType).exists(true))), entityInformation.getJavaType());
 
     }
     @Override
     public List<T> findAllObjectsNotDeletedById(boolean checkForCountry,Long countryOrUnitId) {
-        String applicableIdField = checkForCountry ? "countryId" : "unitId";
-        Criteria criteria=Criteria.where("deleted").ne(true).and(applicableIdField).is(countryOrUnitId);
+        String applicableIdField = checkForCountry ? COUNTRY_ID : UNIT_ID;
+        Criteria criteria=Criteria.where(DELETED).ne(true).and(applicableIdField).is(countryOrUnitId);
         return mongoOperations.find(new Query(criteria), entityInformation.getJavaType());
     }
 
      public T findByIdNotDeleted(BigInteger objectId){
-        Criteria criteria=Criteria.where("_id").is(objectId).and("deleted").ne(true);
+        Criteria criteria=Criteria.where("_id").is(objectId).and(DELETED).ne(true);
         return mongoOperations.findOne(new Query(criteria), entityInformation.getJavaType());
     }
 /**********************************Custom Sequence Generator by this Application******************************************************/

@@ -74,15 +74,10 @@ public class FileIOUtil {
         }
     }
     public static  void writeXml(String xmlString,String fileName){
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(new File("" +fileName+".xml"));
+        try(PrintWriter out=new PrintWriter(new File("" +fileName+".xml"))) {
             out.write(xmlString);
-            out.close();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | NullPointerException e) {
             e.printStackTrace();
-        }catch(NullPointerException ex){
-            ex.printStackTrace();
         }
     }
 
