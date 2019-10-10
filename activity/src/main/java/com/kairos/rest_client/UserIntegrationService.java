@@ -833,8 +833,8 @@ public class UserIntegrationService {
         });
     }
 
-    public List<Date> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
-        return genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Date>>>() {});
+    public Set<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
+        return genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<LocalDate>>>() {});
     }
 
     public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {
