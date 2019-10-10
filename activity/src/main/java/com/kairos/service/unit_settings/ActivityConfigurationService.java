@@ -163,9 +163,12 @@ public class ActivityConfigurationService extends MongoBaseService {
 
 
     public void createDefaultSettingsForCountry(Long countryId, List<Phase> phases) {
+        if(activityConfigurationRepository.existsByCountryIdAndDeletedFalse(countryId)){
+            exceptionService.duplicateDataException(ACTIVITY_CONFIGURATION_DEFAULT_SETTINGS_ALREADY_EXISTS,countryId);
+        }
         List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
         if (phases == null || phases.isEmpty()) {
-            phases = phaseMongoRepository.getPlanningPhasesByCountry(countryId);
+            phases = ObjectMapperUtils.copyPropertiesOfListByMapper(phaseMongoRepository.getPhasesByCountryId(countryId, Sort.Direction.ASC), Phase.class);
         }
         List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
         Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
@@ -175,9 +178,9 @@ public class ActivityConfigurationService extends MongoBaseService {
         List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByCountry(countryId);
         List<Long> employmentTypeIds = employmentTypeDTOS.stream().map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toList());
         for (Phase phase : phases) {
-            createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, countryId,employmentTypeIds,ConfLevel.UNIT);
-            createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.UNIT);
-            createDefaultNonWorkingSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.UNIT);
+            createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, countryId,employmentTypeIds,ConfLevel.COUNTRY);
+            createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.COUNTRY);
+            createDefaultNonWorkingSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.COUNTRY);
         }
         activityConfigurationRepository.saveEntities(activityConfigurations);
     }
