@@ -29,10 +29,10 @@ public class TaskType extends MongoBaseEntity {
     public static final String MULTI_DAY_TASK = "multiDayTask";
     public static final String TIME_TYPES = "timeTypes";
     public static final String EXPIRY_COST = "expiryCost";
-    public static final String BILLABLE = "billable";
+    public static final String TASK_TYPE_BILLABLE = "billable";
     public static final String WAITING_TIME = "waitingTime";
     public static final String DRIVING_TIME = "drivingTime";
-    public static final String SETUP = "setup";
+    public static final String TASK_TYPE_SETUP = "setup";
     public static final String OVER_HEAD = "overHead";
     public static final String FLEXI_TIME = "flexiTime";
     public static final String OVER_NIGHT_STAY = "overNightStay";
@@ -526,10 +526,10 @@ public class TaskType extends MongoBaseEntity {
     public void saveIncomeCostSettings(Map<String, Object> incomeSettings) {
         this.costType = TaskTypeEnum.CostType.getByValue((String) incomeSettings.get("costType"));
         this.expiryCost = incomeSettings.get(EXPIRY_COST) != null && (boolean) incomeSettings.get(EXPIRY_COST);
-        this.billable = incomeSettings.get(BILLABLE) != null && (boolean) incomeSettings.get(BILLABLE);
+        this.billable = incomeSettings.get(TASK_TYPE_BILLABLE) != null && (boolean) incomeSettings.get(TASK_TYPE_BILLABLE);
         this.waitingTime = incomeSettings.get(WAITING_TIME) != null && (boolean) incomeSettings.get(WAITING_TIME);
         this.drivingTime = incomeSettings.get(DRIVING_TIME) != null && (boolean) incomeSettings.get(DRIVING_TIME);
-        this.setup = incomeSettings.get(SETUP) != null && (boolean) incomeSettings.get(SETUP);
+        this.setup = incomeSettings.get(TASK_TYPE_SETUP) != null && (boolean) incomeSettings.get(TASK_TYPE_SETUP);
         this.overHead = incomeSettings.get(OVER_HEAD) != null && (boolean) incomeSettings.get(OVER_HEAD);
         this.flexiTime = incomeSettings.get(FLEXI_TIME) != null && (boolean) incomeSettings.get(FLEXI_TIME);
         this.overNightStay = incomeSettings.get(OVER_NIGHT_STAY) != null && (boolean) incomeSettings.get(OVER_NIGHT_STAY);
@@ -541,10 +541,10 @@ public class TaskType extends MongoBaseEntity {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("costType", this.costType.value);
         map.put(EXPIRY_COST, this.expiryCost);
-        map.put(BILLABLE, this.billable);
+        map.put(TASK_TYPE_BILLABLE, this.billable);
         map.put(WAITING_TIME, this.waitingTime);
         map.put(DRIVING_TIME, this.drivingTime);
-        map.put(SETUP, this.setup);
+        map.put(TASK_TYPE_SETUP, this.setup);
         map.put(OVER_HEAD, this.overHead);
         map.put(FLEXI_TIME, this.flexiTime);
         map.put(OVER_NIGHT_STAY, this.overNightStay);
