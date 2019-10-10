@@ -1302,7 +1302,7 @@ public class TimeBankCalculationService {
     }
 
 
-    public boolean setProtectedDaysOffHoursViaJob() {
+    public boolean updateTimeBankAgainstProtectedDaysOffSetting() {
         List<DailyTimeBankEntry> dailyTimeBankEntriesToSave = new ArrayList<>();
         List<PayOutPerShift> payOutOfStaffs = new ArrayList<>();
         Date startDate = asDate(getLocalDate());
