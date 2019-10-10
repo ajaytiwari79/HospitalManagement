@@ -891,10 +891,12 @@ public class StaffService {
         StaffEmploymentDetails employmentDetails = null;
         List<EmploymentQueryResult> employmentQueryResults =  employmentGraphRepository.getAllEmploymentsForCurrentOrganization(staffId, unitId);
         if(isCollectionNotEmpty(employmentQueryResults)) {
-            EmploymentQueryResult employment = employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().get();
-            List<ProtectedDaysOffSetting>  protectedDaysOffSettings=expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-            employment.getExpertise().setProtectedDaysOffSettings(protectedDaysOffSettings);
-            employmentDetails = new StaffEmploymentDetails(employment.getId(),ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class), employment.getEndDate(), employment.getStartDate(), employment.getUnitId(), employment.getEmploymentSubType());
+            EmploymentQueryResult employment = employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().orElse(null);
+            if (isNotNull(employment)) {
+                List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
+                employment.getExpertise().setProtectedDaysOffSettings(protectedDaysOffSettings);
+                employmentDetails = new StaffEmploymentDetails(employment.getId(), ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class), employment.getEndDate(), employment.getStartDate(), employment.getUnitId(), employment.getEmploymentSubType());
+            }
         }
         return employmentDetails;
     }
