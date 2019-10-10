@@ -30,8 +30,9 @@ public class FunctionsFilter implements ShiftFilter {
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                if(functionDates.contains(asLocalDate(shiftDTO.getStartDate())))
-                    filteredShifts.add((T)shiftDTO);
+                if(functionDates.contains(asLocalDate(shiftDTO.getStartDate()))) {
+                    filteredShifts.add((T) shiftDTO);
+                }
             }
         }
         return filteredShifts;

@@ -130,7 +130,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  userIntegrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -205,7 +205,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  userIntegrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -261,7 +261,7 @@ public class AggregatorService extends MongoBaseService {
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  userIntegrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
@@ -308,7 +308,7 @@ public class AggregatorService extends MongoBaseService {
             Long  citizenId = Long.valueOf(map.get("_id").toString());
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  userIntegrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
             if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                  clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
