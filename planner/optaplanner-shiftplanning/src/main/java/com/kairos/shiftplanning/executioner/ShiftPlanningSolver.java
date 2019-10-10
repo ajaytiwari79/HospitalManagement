@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 
 public class ShiftPlanningSolver {
     public static final String BASE_SRC = "src/main/resources/data/";
+    public static final String STR = "\n------------------------\n";
     public static String config2 = "com/kairos/shiftplanning/configuration/ShiftPlanning_Request_ActivityLine.solver.xml";
     public static String config_breaks = "com/kairos/shiftplanning/configuration/BreakAndIndirectActivityPlanning.solver.xml";
     public static String configWithWTA = "com/kairos/shiftplanning/configuration/ShiftPlanningRequest_activityLine_Wta.xml";
@@ -211,7 +212,7 @@ public class ShiftPlanningSolver {
         indictmentMap.forEach((entity,indictment)->{
             if(entity instanceof ShiftImp && !((ShiftImp) entity).isLocked() && ((ShiftImp) entity).getInterval()!=null) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("\n------------------------\n");
+                sb.append(STR);
                 sb.append(getShiftPlanInfo((ShiftImp) entity)+"\n");
                 MutableBoolean any=new MutableBoolean(false);
                 indictment.getConstraintMatchSet().forEach(constraintMatch -> {
@@ -219,13 +220,13 @@ public class ShiftPlanningSolver {
                         return;
                     }
                     any.setTrue();
-                    sb.append("------"+constraintMatch.getConstraintName()+"-------"+constraintMatch.getScore().toString()+"\n");
+                    sb.append(constraintMatch.getConstraintName()+"--"+constraintMatch.getScore().toString()+"\n");
                 });
                 if(any.isTrue())
                     log.info(sb.toString());
             }else if(entity instanceof ActivityLineInterval ) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("\n------------------------\n");
+                sb.append(STR);
                 if(((ActivityLineInterval)entity).getShift()==null){
                     unassignedIntervals.increment();
                     return;
@@ -238,13 +239,13 @@ public class ShiftPlanningSolver {
                         return;
                     }
                     any.setTrue();
-                    sb.append("------"+constraintMatch.getConstraintName()+"-------"+constraintMatch.getScore().toString()+"\n");
+                    sb.append("-------------"+constraintMatch.getConstraintName()+"----------"+constraintMatch.getScore().toString()+"\n");
                 });
                 if(any.isTrue())
                     log.info(sb.toString());
             }else if(entity instanceof Activity) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("\n------------------------\n");
+                sb.append(STR);
 
                 sb.append(entity.toString()+"---\n");
                 MutableBoolean any=new MutableBoolean(false);
@@ -253,13 +254,13 @@ public class ShiftPlanningSolver {
                         return;
                     }
                     any.setTrue();
-                    sb.append("------"+constraintMatch.getConstraintName()+"-------"+constraintMatch.getScore().toString()+"\n");
+                    sb.append("------"+constraintMatch.getConstraintName()+"--------"+constraintMatch.getScore().toString()+"\n");
                 });
                 if(any.isTrue())
                     log.info(sb.toString());
             }else if(entity instanceof Employee) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("\n------------------------\n");
+                sb.append(STR);
                 sb.append(entity.toString()+"---\n");
                 MutableBoolean any=new MutableBoolean(false);
                 indictment.getConstraintMatchSet().forEach(constraintMatch -> {

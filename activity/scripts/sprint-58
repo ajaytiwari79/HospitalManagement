@@ -2,8 +2,9 @@ db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
 
 db.getCollection('kairos_sequence').update({ "sequenceName" : "WTABaseRuleTemplateSequence"},{"$set":{"sequenceNumber" : 3535}})
 
+
 db.wtaBaseRuleTemplate.insert({
-    "_id" : "3535", //This Id should be according to SequenceNumber of That Class in QA and Development
+    "_id" : "1994", //This Id should be according to SequenceNumber of That Class in QA and Development
     "name" : "WTA for Protected Days Off",
     "description" : "WTA for Protected Days Off",
     "disabled" : false,
@@ -23,6 +24,10 @@ db.wtaBaseRuleTemplate.insert({
 //
 db.kairos_sequence.find({"sequenceName" : "WTABaseRuleTemplateSequence"})
 db.getCollection('kairos_sequence').update({ "sequenceName" : "WTABaseRuleTemplateSequence"},{"$set":{"sequenceNumber" : 3535}})
+
+
+db.kairos_sequence.find({"sequenceName" : "TimeTypeSequence"})
+db.getCollection('kairos_sequence').update({ "sequenceName" : "TimeTypeSequence	"},{"$set":{"sequenceNumber" : 85}})
 
 db.time_Type.insert({
     "_id" : "85",

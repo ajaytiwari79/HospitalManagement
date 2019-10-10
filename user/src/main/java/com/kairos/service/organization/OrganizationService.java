@@ -99,6 +99,9 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Transactional
 @Service
 public class OrganizationService {
+    public static final String ESTIMOTE_APP_ID = "estimoteAppId";
+    public static final String ESTIMOTE_APP_TOKEN = "estimoteAppToken";
+    public static final String CLIENT_SINCE = "clientSince";
     @Inject
     private AccessGroupService accessGroupService;
     @Inject
@@ -244,7 +247,7 @@ public class OrganizationService {
         List<Municipality> municipalities = (zipCode == null) ? Collections.emptyList() : municipalityGraphRepository.getMunicipalitiesByZipCode(zipCode.getId());
         Map<String, Object> generalTabQueryResult = unitGraphRepository.getGeneralTabInfo(id);
         HashMap<String, Object> generalTabInfo = new HashMap<>(generalTabQueryResult);
-        generalTabInfo.put("clientSince", (generalTabInfo.get("clientSince") == null ? null : getDate((long) generalTabInfo.get("clientSince"))));
+        generalTabInfo.put(CLIENT_SINCE, (generalTabInfo.get(CLIENT_SINCE) == null ? null : getDate((long) generalTabInfo.get(CLIENT_SINCE))));
         cloneMap.put("municipalities", municipalities);
         response.put("generalTabInfo", generalTabInfo);
         response.put("otherData", cloneMap);
@@ -388,9 +391,9 @@ public class OrganizationService {
 
     public Map setEstimoteCredentials(long organization, Map<String, String> payload) {
         Unit unitObj = unitGraphRepository.findOne(organization);
-        if (unitObj != null && payload.containsKey("estimoteAppId") && payload.containsKey("estimoteAppToken") && payload.get("estimoteAppId") != null && payload.get("estimoteAppToken") != null) {
-            unitObj.setEstimoteAppId(payload.get("estimoteAppId"));
-            unitObj.setEstimoteAppToken(payload.get("estimoteAppToken"));
+        if (unitObj != null && payload.containsKey(ESTIMOTE_APP_ID) && payload.containsKey(ESTIMOTE_APP_TOKEN) && payload.get(ESTIMOTE_APP_ID) != null && payload.get(ESTIMOTE_APP_TOKEN) != null) {
+            unitObj.setEstimoteAppId(payload.get(ESTIMOTE_APP_ID));
+            unitObj.setEstimoteAppToken(payload.get(ESTIMOTE_APP_TOKEN));
             return payload;
         }
         return null;
@@ -400,8 +403,8 @@ public class OrganizationService {
         Map returnData = new HashMap();
         Unit unitObj = unitGraphRepository.findOne(organization);
         if (unitObj != null) {
-            returnData.put("estimoteAppId", unitObj.getEstimoteAppId());
-            returnData.put("estimoteAppToken", unitObj.getEstimoteAppToken());
+            returnData.put(ESTIMOTE_APP_ID, unitObj.getEstimoteAppId());
+            returnData.put(ESTIMOTE_APP_TOKEN, unitObj.getEstimoteAppToken());
         }
         return returnData;
     }

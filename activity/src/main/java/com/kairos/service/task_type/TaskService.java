@@ -109,6 +109,15 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 public class TaskService extends MongoBaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
+    public static final String TASK_TYPE_ID = "taskTypeId";
+    public static final String DATE_FROM = "dateFrom";
+    public static final String START_DATE = "startDate";
+    public static final String END_DATE = "endDate";
+    public static final String START_ADDRESS = "startAddress";
+    public static final String END_ADDRESS = "endAddress";
+    public static final String ORGANIZATION_ID = "organizationId";
+    public static final String STAFF_ID = "staffId";
+    public static final String DURATION = "duration";
 
     @Inject
     private TaskMongoRepository taskMongoRepository;
@@ -219,7 +228,7 @@ public class TaskService extends MongoBaseService {
         LOGGER.info("Query: " + aggregation.toString());
         // Result
         mongoTemplate.indexOps(Task.class).
-                ensureIndex(new Index().on("taskTypeId", Sort.Direction.ASC));
+                ensureIndex(new Index().on(TASK_TYPE_ID, Sort.Direction.ASC));
         AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, TaskType.class, Map.class);
         // Mapped Result
         List<Map> mappedResult = finalResult.getMappedResults();
@@ -234,7 +243,7 @@ public class TaskService extends MongoBaseService {
     }
 
     public List<Task> getTasksByDemandId(String taskDemandId) {
-        return taskMongoRepository.findAllByTaskDemandIdAndIsDeleted(taskDemandId, false, new Sort(Sort.Direction.ASC, "dateFrom"));
+        return taskMongoRepository.findAllByTaskDemandIdAndIsDeleted(taskDemandId, false, new Sort(Sort.Direction.ASC, DATE_FROM));
     }
 
     public List<Task> getAllTasks() {
@@ -255,9 +264,9 @@ public class TaskService extends MongoBaseService {
     public Task createTaskFromTimeCare(Map<String, Object> data, String requestFrom) throws ParseException {
         if (data != null) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-            Date startDate = simpleDateFormat.parse(data.get("startDate").toString());
-            Date endDate = simpleDateFormat.parse(String.valueOf(data.get("endDate")));
-            Date fixedDate = simpleDateFormat.parse(String.valueOf(data.get("startDate")));
+            Date startDate = simpleDateFormat.parse(data.get(START_DATE).toString());
+            Date endDate = simpleDateFormat.parse(String.valueOf(data.get(END_DATE)));
+            Date fixedDate = simpleDateFormat.parse(String.valueOf(data.get(START_DATE)));
             Date updateDate = simpleDateFormat.parse(String.valueOf(data.get("updateDate")));
             String externalId = String.valueOf(data.get("externalId"));
             String kmdExternalId = String.valueOf(data.get("kmdExternalId"));
@@ -288,25 +297,25 @@ public class TaskService extends MongoBaseService {
 
             if (task == null) task = new Task();
             if (isTaskTypeAnonymous == false) {
-                task.setTaskTypeId(new BigInteger(data.get("taskTypeId") + ""));
-                LOGGER.debug("taskTypeId--object Id---> " + data.get("taskTypeId"));
+                task.setTaskTypeId(new BigInteger(data.get(TASK_TYPE_ID) + ""));
+                LOGGER.debug("taskTypeId--object Id---> " + data.get(TASK_TYPE_ID));
             } else {
                 Long taskTypeAnonymousId = Long.valueOf(String.valueOf(data.get("taskTypeAnonymousId")));
                 task.setTaskTypeAnonymousId(taskTypeAnonymousId);
             }
-            if (data.get("startAddress") != null && data.get("endAddress") != null) {
-                String startAddress = data.get("startAddress").toString();
-                String endAddress = data.get("endAddress").toString();
+            if (data.get(START_ADDRESS) != null && data.get(END_ADDRESS) != null) {
+                String startAddress = data.get(START_ADDRESS).toString();
+                String endAddress = data.get(END_ADDRESS).toString();
                 task.setStartAddress(AddressCode.getKey(startAddress));
                 task.setEndAddress(AddressCode.getKey(endAddress));
             }
-            Long orgnaizationId = Long.valueOf(String.valueOf(data.get("organizationId")));
+            Long orgnaizationId = Long.valueOf(String.valueOf(data.get(ORGANIZATION_ID)));
             Boolean isStaffAnonymous = Boolean.valueOf(String.valueOf(data.get("isStaffAnonymous")));
             Long staffId = null;
-            if (data.get("staffId") != null) {
-                staffId = Long.valueOf(String.valueOf(data.get("staffId")));
+            if (data.get(STAFF_ID) != null) {
+                staffId = Long.valueOf(String.valueOf(data.get(STAFF_ID)));
             }
-            Long duration = Long.valueOf(String.valueOf(data.get("duration")));
+            Long duration = Long.valueOf(String.valueOf(data.get(DURATION)));
             task.setTaskStatus(TaskStatus.GENERATED);
             task.setPriority(3);
             task.setFixed(true);
@@ -343,10 +352,10 @@ public class TaskService extends MongoBaseService {
             map.put("name", taskTypeMongoRepository.findOne(task.getTaskTypeId()).getTitle());
             map.put("shifts", 1);
             map.put("start", task.getStartDate());
-            map.put("taskTypeId", task.getTaskTypeId());
+            map.put(TASK_TYPE_ID, task.getTaskTypeId());
             map.put("end", task.getEndDate());
             map.put("citizenId", task.getCitizenId());
-            map.put("organizationId", task.getUnitId());
+            map.put(ORGANIZATION_ID, task.getUnitId());
             map.put("status", task.getTaskStatus());
             mapList.add(map);
         }
@@ -359,7 +368,7 @@ public class TaskService extends MongoBaseService {
         DateTime startDateTo = startDate.withTime(23, 59, 59, 00);
         Aggregation aggregation = Aggregation.newAggregation(
                 match(
-                        Criteria.where("startDate").gte(startDateFrom).lte(startDateTo).and("staffId").is(staffId)
+                        Criteria.where(START_DATE).gte(startDateFrom).lte(startDateTo).and(STAFF_ID).is(staffId)
                 ),
                 new CustomAggregationOperation(dbGroupObj)
         );
@@ -380,7 +389,7 @@ public class TaskService extends MongoBaseService {
         String groupByTaskStatus = "{'$group':{'_id':'$taskStatus', 'count':{'$sum':1}}}";
         Document group = Document.parse(groupByTaskStatus);
         Aggregation agg = Aggregation.newAggregation(
-                match(Criteria.where("taskDemandId").is(taskDemandId).and("dateFrom").gte(dateFrom).and("dateTo").lte(dateTo).and("taskOriginator").ne("ACTUAL_PLANNING").and("relatedTaskId").exists(false)),
+                match(Criteria.where("taskDemandId").is(taskDemandId).and(DATE_FROM).gte(dateFrom).and("dateTo").lte(dateTo).and("taskOriginator").ne("ACTUAL_PLANNING").and("relatedTaskId").exists(false)),
                 new CustomAggregationOperation(group)
         );
         AggregationResults<Map> result =
@@ -499,7 +508,7 @@ public class TaskService extends MongoBaseService {
             Date fromDate = Date.from(localDateFrom.atZone(ZoneId.systemDefault()).toInstant());
             Date toDate = Date.from(localDateTo.atZone(ZoneId.systemDefault()).toInstant());
             Criteria criteria = Criteria.where("visitourId").exists(false).orOperator(Criteria.where("visitourId").is(null));
-            criteria.and("dateFrom").gte(fromDate).and("dateTo").lt(toDate).and("isSubTask").is(false).and("isDeleted").is(false);
+            criteria.and(DATE_FROM).gte(fromDate).and("dateTo").lt(toDate).and("isSubTask").is(false).and("isDeleted").is(false);
             criteria.and("taskOriginator").is(TaskTypeEnum.TaskOriginator.PRE_PLANNING).and("taskStatus").ne(TaskStatus.CANCELLED);
             String lookup = "{'$lookup':{'from':'task_types','localField':'taskTypeId','foreignField':'_id','as':'taskTypeList'}}";
             String unwind = "{ '$unwind': '$taskTypeList'  }";
@@ -532,8 +541,8 @@ public class TaskService extends MongoBaseService {
                         //taskConverterService.createFlsCallFromTasks(tasksToSync, flsCredentials);
 
                         Map<String, Object> datePayload = new HashMap<>();
-                        datePayload.put("startDate", fromDate);
-                        datePayload.put("endDate", toDate);
+                        datePayload.put(START_DATE, fromDate);
+                        datePayload.put(END_DATE, toDate);
                         Map<String, Object> openCall = new HashMap<>();
                         openCall.put("openCallsMode", "2");
                         //scheduler.optmizeSchedule(openCall, datePayload, flsCredentials);
@@ -618,7 +627,7 @@ public class TaskService extends MongoBaseService {
                 map.put("id", task.getId());
                 map.put("name", taskTypeMongoRepository.findOne(demand.getTaskTypeId()).getTitle());
                 map.put("start", task.getStartDate());
-                map.put("taskTypeId", demand.getTaskTypeId());
+                map.put(TASK_TYPE_ID, demand.getTaskTypeId());
                 map.put("end", task.getEndDate());
                 map.put("citizenId", task.getCitizenId());
                 mapList.add(map);
@@ -666,7 +675,7 @@ public class TaskService extends MongoBaseService {
         taskGanttDTO.setEndHour(resourceDate.getHours());
         taskGanttDTO.setEndMinute(resourceDate.getMinutes());
         Map<String, Object> timeWindow = new HashMap<>();
-        timeWindow.put("duration", TimeUnit.MINUTES.toSeconds(task.getSlaStartDuration()));
+        timeWindow.put(DURATION, TimeUnit.MINUTES.toSeconds(task.getSlaStartDuration()));
         taskGanttDTO.setTimeWindow(timeWindow);
         return taskGanttDTO;
     }
@@ -780,23 +789,23 @@ public class TaskService extends MongoBaseService {
         try {
             TaskType taskType = taskTypeService.findByExternalId("6123");
             Map<String, Object> taskMetaData = new HashMap<>();
-            taskMetaData.put("startDate", shift.getStartTime());
-            taskMetaData.put("endDate", shift.getEndTime());
+            taskMetaData.put(START_DATE, shift.getStartTime());
+            taskMetaData.put(END_DATE, shift.getEndTime());
             taskMetaData.put("updateDate", DateUtils.getDate());
             taskMetaData.put("kmdExternalId", shift.getId());
             taskMetaData.put("externalId", shift.getId());
-            taskMetaData.put("organizationId", unitId);
-            taskMetaData.put("staffId", staffId);
-            taskMetaData.put("taskTypeId", taskType.getId());
-            taskMetaData.put("duration", DateUtils.getTimeDuration(shift.getStartTime(), shift.getEndTime()));
-            taskMetaData.put("startAddress", -1);
-            taskMetaData.put("endAddress", -1);
+            taskMetaData.put(ORGANIZATION_ID, unitId);
+            taskMetaData.put(STAFF_ID, staffId);
+            taskMetaData.put(TASK_TYPE_ID, taskType.getId());
+            taskMetaData.put(DURATION, DateUtils.getTimeDuration(shift.getStartTime(), shift.getEndTime()));
+            taskMetaData.put(START_ADDRESS, -1);
+            taskMetaData.put(END_ADDRESS, -1);
             createTaskFromTimeCare(taskMetaData, AppConstants.REQUEST_FROM_KMD);
         } catch (ParseException exception) {
-            LOGGER.warn("Exception Occur while saving shifts from KMD----> " + exception.getMessage());
+            LOGGER.warn("Exception Occur while saving shifts from KMD----> {}" , exception.getMessage());
 
         } catch (Exception e) {
-            LOGGER.warn("Exception Occur while saving shifts from KMD----> " + e.getMessage());
+            LOGGER.warn("Exception Occur while saving shifts from KMD----> {}" ,e.getMessage());
         }
     }
 
@@ -818,12 +827,12 @@ public class TaskService extends MongoBaseService {
         loginTemplate.getMessageConverters().add(stringHttpMessageConverterNew);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
-        LOGGER.info("Auth token--------> " + AppConstants.KMD_NEXUS_ACCESS_TOKEN);
+        LOGGER.info("Auth token--------> {}" , AppConstants.KMD_NEXUS_ACCESS_TOKEN);
         Map map = new HashMap<String, String>();
         map.put("Content-Type", "application/json");
         //   headers.setAll(map);
         HttpEntity<String> headersElements = new HttpEntity<String>(headers);
-        LOGGER.info("headers------headersElements-----> " + headersElements);
+        LOGGER.info("headers------headersElements-----> {}" , headersElements);
         ResponseEntity<String> responseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_CALENDAR_STAFFS_SHIFT_FILTER, filterId), HttpMethod.POST, headersElements, String.class);
         JSONObject jsonObject = new JSONObject(responseEntity.getBody());
         JSONArray jsonArray = jsonObject.getJSONArray("eventResources");

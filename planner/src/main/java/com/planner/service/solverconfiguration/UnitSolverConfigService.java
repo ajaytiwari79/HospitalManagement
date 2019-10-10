@@ -93,7 +93,7 @@ public class UnitSolverConfigService {
 
     private List<BigInteger> getConstraintsIds(UnitSolverConfigDTO unitSolverConfigDTO, SolverConfig solverConfig) {
         Map<BigInteger, UnitConstraint> countryConstraintDTOMap = new HashMap<>();
-        if(isNotNull(solverConfig)){
+        if(solverConfig!=null){
             List<UnitConstraint> solverConfigConstraints = constraintsRepository.findAllUnitConstraintByIds(solverConfig.getConstraintIds());
             countryConstraintDTOMap = solverConfigConstraints.stream().collect(Collectors.toMap(k->k.getId(), v->v));
         }

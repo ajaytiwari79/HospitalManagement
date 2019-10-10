@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 public class StaffingLevelInterval {
+    public static final String CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY = "Can't add null staffLevelActivity";
     private int sequence;
     private int minNoOfStaff;
     private int maxNoOfStaff;
@@ -99,7 +100,7 @@ public class StaffingLevelInterval {
 
     public void addStaffLevelActivity(StaffingLevelActivity staffLevelActivity) {
         if (staffLevelActivity == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
+            throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);
 
         this.getStaffingLevelActivities().add(staffLevelActivity);
 
@@ -107,7 +108,7 @@ public class StaffingLevelInterval {
 
     public void addStaffLevelActivity(Set<StaffingLevelActivity> staffLevelActivitys) {
         if (staffLevelActivitys == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
+            throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);
 
         this.getStaffingLevelActivities().addAll(staffLevelActivitys);
 
@@ -117,7 +118,7 @@ public class StaffingLevelInterval {
     public void addStaffLevelSkill(StaffingLevelSkill staffLevelSkill) {
 
         if (staffLevelSkill == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
+            throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);
         this.getStaffingLevelSkills().add(staffLevelSkill);
 
     }
@@ -125,7 +126,7 @@ public class StaffingLevelInterval {
     public void addStaffLevelSkill(Set<StaffingLevelSkill> staffLevelSkills) {
 
         if (staffLevelSkills == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
+            throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);
         this.getStaffingLevelSkills().addAll(staffLevelSkills);
 
     }

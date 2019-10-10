@@ -74,14 +74,11 @@ public class FileIOUtil {
         }
     }
     public static  void writeXml(String xmlString,String fileName){
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(new File("" +fileName+".xml"));
-        } catch (FileNotFoundException e) {
+        try(PrintWriter out=new PrintWriter(new File("" +fileName+".xml"))) {
+            out.write(xmlString);
+        } catch (FileNotFoundException | NullPointerException e) {
             e.printStackTrace();
         }
-        out.write(xmlString);
-        out.close();
     }
 
     public static void copyFileContent(File baseFile, File file) {
@@ -104,12 +101,14 @@ public class FileIOUtil {
                 try {
                     fr.close();
                 } catch(IOException e) {
+                    e.printStackTrace();
                 }
             }
             if (fw != null) {
                 try {
                     fw.close();
                 } catch(IOException e) {
+                    e.printStackTrace();
                 }
             }
         }

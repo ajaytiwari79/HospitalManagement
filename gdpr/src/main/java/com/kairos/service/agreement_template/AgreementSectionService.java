@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 public class AgreementSectionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgreementSectionService.class);
+    public static final String MESSAGE_DATA_NOT_FOUND = "message.dataNotFound";
+    public static final String MESSAGE_AGREEMENT_SECTION = "message.agreement.section";
 
 
     @Inject
@@ -68,7 +70,7 @@ public class AgreementSectionService {
     public AgreementTemplateSectionResponseDTO createAndUpdateAgreementSectionsAndClausesAndAddToAgreementTemplate(Long referenceId, boolean isOrganization, Long templateId, AgreementTemplateSectionDTO agreementTemplateSectionDTO) {
         PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         if (!Optional.ofNullable(policyAgreementTemplate).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.policy.agreementTemplate", templateId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "message.policy.agreementTemplate", templateId);
         }
         updateSectionAndSubSection(policyAgreementTemplate, agreementTemplateSectionDTO, referenceId, isOrganization);
         policyAgreementRepository.save(policyAgreementTemplate);
@@ -151,7 +153,7 @@ public class AgreementSectionService {
 
         AgreementSection agreementSection = isOrganization ? agreementSectionRepository.findByIdAndOrganizationIdAndDeleted(sectionId, referenceId) : agreementSectionRepository.findByIdAndCountryIdAndDeleted(sectionId, referenceId);
         if (!Optional.ofNullable(agreementSection).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section", sectionId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_AGREEMENT_SECTION, sectionId);
         }
         PolicyAgreementTemplate policyAgreementTemplate = isOrganization ? policyAgreementRepository.findByIdAndOrganizationIdAndDeletedFalse(templateId, referenceId) : policyAgreementRepository.findByIdAndCountryIdAndDeletedFalse(templateId, referenceId);
         policyAgreementTemplate.getAgreementSections().remove(agreementSection);
@@ -171,7 +173,7 @@ public class AgreementSectionService {
 
         Integer updateCount = agreementSectionRepository.deleteAgreementSubSection(sectionId, subSectionId);
         if (updateCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.subSection" + sectionId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "message.agreement.subSection" + sectionId);
         } else {
             LOGGER.info("Sub section with id :: {} is successfully deleted from section with id :: {}", subSectionId, sectionId);
         }
@@ -189,7 +191,7 @@ public class AgreementSectionService {
 
         Integer updateCount = agreementSectionRepository.removeClauseIdFromAgreementSection(sectionId, clauseId);
         if (updateCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.agreement.section" + sectionId);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_AGREEMENT_SECTION + sectionId);
         } else {
             LOGGER.info("Clause with id :: {} removed from section with id :: {}", clauseId, sectionId);
         }
@@ -203,7 +205,7 @@ public class AgreementSectionService {
         Set<String> clauseTitles = new HashSet<>();
         for (AgreementSectionDTO agreementSectionDTO : agreementSectionDTOS) {
             if (titles.contains(agreementSectionDTO.getTitle().toLowerCase())) {
-                exceptionService.duplicateDataException("message.duplicate", "message.agreement.section", agreementSectionDTO.getTitle());
+                exceptionService.duplicateDataException("message.duplicate", MESSAGE_AGREEMENT_SECTION, agreementSectionDTO.getTitle());
             } else if (CollectionUtils.isNotEmpty(agreementSectionDTO.getClauses())) {
                 checkDuplicateClauseInAgreementSection(agreementSectionDTO.getClauses(), clauseTitles, agreementSectionDTO.getTitle());
             } else if (Optional.ofNullable(agreementSectionDTO.getAgreementSubSections()).isPresent()) {

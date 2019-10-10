@@ -24,6 +24,8 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 public class KPIUtils {
 
+    public static final String DD_MM_YYYY = "dd-MM-yyyy";
+
     public static List<Long> getLongValue(List<Object> objects){
         return !(ObjectUtils.isCollectionEmpty(objects))?objects.stream().map(o -> ((Integer)o).longValue()).collect(Collectors.toList()):new ArrayList<>();
     }
@@ -52,7 +54,7 @@ public class KPIUtils {
 
         switch (interval) {
             case LAST:
-                localDate.minusDays(1);
+                localDate=localDate.minusDays(1);
                 for (int i = 0; i < value; i++) {
                     localDate = getLastDateTimeIntervalByDate(localDate,frequencyType, dateTimeIntervals);
                 }
@@ -100,15 +102,16 @@ public class KPIUtils {
         if(isCollectionNotEmpty(kpiDataUnits)) {
             String label = kpiDataUnits.get(0).getLabel();
             if (label.matches("\\d{2}-\\d{2}-\\d{4}")) {
-                kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel(), DateTimeFormatter.ofPattern("dd-MM-yyyy")).compareTo(LocalDate.parse(o2.getLabel(), DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+                kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel(), DateTimeFormatter.ofPattern(DD_MM_YYYY)).compareTo(LocalDate.parse(o2.getLabel(), DateTimeFormatter.ofPattern(DD_MM_YYYY))));
             } else if (label.matches("\\d{2}-\\d{2}-\\d{4} - \\d{2}-\\d{2}-\\d{4}")) {
-                kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern("dd-MM-yyyy")).compareTo(LocalDate.parse(o2.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+                kpiDataUnits.sort((o1, o2) -> LocalDate.parse(o1.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern(DD_MM_YYYY)).compareTo(LocalDate.parse(o2.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern(DD_MM_YYYY))));
             }
         }
     }
 
     public static boolean verifyKPIResponseListData(Map<Object, List<ClusteredBarChartKpiDataUnit>> objectListMap){
-        return  objectListMap.values().stream().flatMap(clusteredBarChartKpiDataUnits -> clusteredBarChartKpiDataUnits.stream()).anyMatch(clusteredBarChartKpiDataUnit -> !new Double(0.0).equals(clusteredBarChartKpiDataUnit.getValue()));
+        return  objectListMap.values().stream().flatMap(clusteredBarChartKpiDataUnits -> clusteredBarChartKpiDataUnits.stream()).anyMatch(clusteredBarChartKpiDataUnit -> !new
+                Double(0.0).equals(clusteredBarChartKpiDataUnit.getValue()));
     }
 
     public static boolean verifyKPIResponseData(Map<Object, Double> objectListMap){

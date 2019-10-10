@@ -24,6 +24,9 @@ import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 @Component
 public class ActivityTypesRestClient {
     private static final Logger logger = LoggerFactory.getLogger(ActivityTypesRestClient.class);
+    public static final String STATUS = "status {}";
+    public static final String RESPONSE = "response {}";
+    public static final String EXCEPTION_OCCURRED_IN_TASK_MICRO_SERVICE = "exception occurred in task micro service";
 
     @Autowired
     RestTemplate restTemplate;
@@ -52,9 +55,9 @@ public class ActivityTypesRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
+            throw new RuntimeException(EXCEPTION_OCCURRED_IN_TASK_MICRO_SERVICE + " " +e.getMessage());
         }
 
     }
@@ -80,9 +83,9 @@ public class ActivityTypesRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
+            throw new RuntimeException(EXCEPTION_OCCURRED_IN_TASK_MICRO_SERVICE + " " +e.getMessage());
         }
 
     }
@@ -108,9 +111,9 @@ public class ActivityTypesRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
+            throw new RuntimeException(EXCEPTION_OCCURRED_IN_TASK_MICRO_SERVICE + " " +e.getMessage());
         }
 
     }
@@ -139,9 +142,9 @@ public class ActivityTypesRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
-            throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
+            throw new RuntimeException(EXCEPTION_OCCURRED_IN_TASK_MICRO_SERVICE + " " +e.getMessage());
         }
 
     }

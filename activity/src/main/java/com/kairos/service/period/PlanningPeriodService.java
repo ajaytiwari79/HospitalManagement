@@ -78,6 +78,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 @Transactional
 public class PlanningPeriodService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlanningPeriodService.class);
+    public static final String SCHEDULER_PANEL = "/scheduler_panel";
 
     @Inject
     private PhaseService phaseService;
@@ -382,7 +383,7 @@ public class PlanningPeriodService extends MongoBaseService {
             List<SchedulerPanelDTO> schedulerPanelRestDTOS = new ArrayList<>();
             try {
                 LOGGER.info("send rest call for create job of planning period flippng date of unit");
-                schedulerPanelRestDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1l, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+                schedulerPanelRestDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1l, true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
                 });
                 LOGGER.info("successfully created job of planning period flippng date");
             } catch (Exception e) {
@@ -512,7 +513,7 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         List<BigInteger> schedulerPanelIds = planningPeriod.getPhaseFlippingDate().stream().filter(periodPhaseFlippingDate -> periodPhaseFlippingDate.getSchedulerPanelId() != null).map(PeriodPhaseFlippingDate::getSchedulerPanelId).collect(Collectors.toList());
         try {
-            schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+            schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
             }, null, null);
         } catch (Exception ex) {
             LOGGER.error("ex " + ex);
@@ -771,7 +772,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public boolean createJobOfPlanningPeriod() {
         List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PLANNING_PERIOD, JobFrequencyType.MONTHLY, getLocalDateTime(getFirstDayOfMonth(getLocalDate()), 02, 00, 00), false));
         LOGGER.info("create job for add planning period");
-        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
+        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
         LOGGER.info("job registered of add planning period");
         return isCollectionNotEmpty(schedulerPanelDTOS);

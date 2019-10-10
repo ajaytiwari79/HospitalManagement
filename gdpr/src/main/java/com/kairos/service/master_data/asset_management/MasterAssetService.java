@@ -41,6 +41,10 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 public class MasterAssetService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterAssetService.class);
+    public static final String MESSAGE_DUPLICATE = "message.duplicate";
+    public static final String MESSAGE_ASSET = "message.asset";
+    public static final String MESSAGE_DATA_NOT_FOUND = "message.dataNotFound";
+    public static final String MESSAGE_ADD_MANDATORY_FIELD_STATUS_APPROVED = "message.add.mandatory.field.status.approved";
 
     @Inject
     private ExceptionService exceptionService;
@@ -73,7 +77,7 @@ public class MasterAssetService {
     public MasterAssetDTO addMasterAsset(Long countryId, MasterAssetDTO masterAssetDto) {
         MasterAsset previousAsset = masterAssetRepository.findByNameAndCountryId(masterAssetDto.getName(), countryId);
         if (Optional.ofNullable(previousAsset).isPresent()) {
-            exceptionService.duplicateDataException("message.duplicate", "message.asset", masterAssetDto.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_ASSET, masterAssetDto.getName());
         }
         MasterAsset masterAsset = new MasterAsset(masterAssetDto.getName(), masterAssetDto.getDescription(), countryId, SuggestedDataStatus.APPROVED);
         addMetadataOfMasterAsset(masterAssetDto, masterAsset);
@@ -85,8 +89,9 @@ public class MasterAssetService {
     }
 
     private void assignAssetToUnits(Long countryId, MasterAssetDTO masterAssetDto){
-        List<Long> organizationSubTypeId = masterAssetDto.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList());
-        List<Long> unitIds = gdprToUserIntegrationService.getUnitIdsByOrgSubTypeId(countryId, organizationSubTypeId);
+        List<Long> organizationSubTypeIds = masterAssetDto.getOrganizationSubTypes().stream().map(OrganizationSubTypeDTO::getId).collect(Collectors.toList());
+        List<Long> organizationSubServicesIds = masterAssetDto.getOrganizationSubServices().stream().map(SubServiceCategoryDTO::getId).collect(Collectors.toList());
+        List<Long> unitIds = gdprToUserIntegrationService.getUnitIdsByOrgSubTypeId(countryId, organizationSubTypeIds, organizationSubServicesIds);
         if(isCollectionNotEmpty(unitIds)) {
             unitIds.forEach(unitId -> assetService.saveAsset(unitId, ObjectMapperUtils.copyPropertiesByMapper(masterAssetDto, AssetDTO.class),true));
         }
@@ -121,7 +126,7 @@ public class MasterAssetService {
             masterAsset.setAssetType(assetType);
         } else {
             AssetType previousAssetType = assetTypeRepository.findByNameAndCountryIdAndSubAssetType(masterAssetDTO.getAssetType().getName(), countryId, false);
-            Optional.ofNullable(previousAssetType).ifPresent(assetType1 -> exceptionService.duplicateDataException("message.duplicate", "message.assetType", assetType1.getName()));
+            Optional.ofNullable(previousAssetType).ifPresent(assetType1 -> exceptionService.duplicateDataException(MESSAGE_DUPLICATE, "message.assetType", assetType1.getName()));
             assetType = new AssetType(masterAssetDTO.getAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
         }
 
@@ -131,7 +136,7 @@ public class MasterAssetService {
                 if (subAssetTypeObj.isPresent()) {
                     subAssetType = subAssetTypeObj.get();
                 } else {
-                    exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.assetType", masterAssetDTO.getSubAssetType().getId());
+                    exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, "message.assetType", masterAssetDTO.getSubAssetType().getId());
                 }
             } else {
                 subAssetType = new AssetType(masterAssetDTO.getSubAssetType().getName(), countryId, SuggestedDataStatus.APPROVED);
@@ -211,7 +216,7 @@ public class MasterAssetService {
     public MasterAssetDTO updateMasterAsset(Long countryId, Long id, MasterAssetDTO masterAssetDto) {
         MasterAsset masterAsset = masterAssetRepository.findByNameAndCountryId(masterAssetDto.getName(), countryId);
         if (Optional.ofNullable(masterAsset).isPresent() && !id.equals(masterAsset.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.asset", masterAssetDto.getName());
+            exceptionService.duplicateDataException(MESSAGE_DUPLICATE, MESSAGE_ASSET, masterAssetDto.getName());
         }
         addMetadataOfMasterAsset(masterAssetDto, masterAsset);
         masterAsset = masterAssetRepository.getOne(id);
@@ -228,7 +233,7 @@ public class MasterAssetService {
         if (updateCount > 0) {
             LOGGER.info("Master Asset is deleted successfully with id :: {}", id);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", id);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_ASSET, id);
         }
         return true;
 
@@ -277,32 +282,32 @@ public class MasterAssetService {
     public boolean updateStatusOfSuggestedMasterAsset(Long countryId, Set<Long> assetIds, SuggestedDataStatus suggestedDataStatus) {
         if (SuggestedDataStatus.APPROVED.equals(suggestedDataStatus)) {
             List<MasterAsset> masterAssetList = masterAssetRepository.findAllByCountryIdAndIds(countryId, assetIds);
-            masterAssetList.forEach(masterAsset -> validateMasterAsset(masterAsset));
+            masterAssetList.forEach(this::validateMasterAsset);
         }
         Integer updateCount = masterAssetRepository.updateMasterAssetStatus(countryId, assetIds, suggestedDataStatus);
         if (updateCount > 0) {
             LOGGER.info("Master Assets are updated successfully with ids :: {}", assetIds);
         } else {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.asset", assetIds);
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATA_NOT_FOUND, MESSAGE_ASSET, assetIds);
         }
         return true;
     }
 
     private void validateMasterAsset(MasterAsset masterAsset) {
         if (!Optional.ofNullable(masterAsset.getAssetType()).isPresent())
-            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+            exceptionService.invalidRequestException(MESSAGE_ADD_MANDATORY_FIELD_STATUS_APPROVED, masterAsset.getName());
         if (!Optional.ofNullable(masterAsset.getName()).isPresent())
-            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+            exceptionService.invalidRequestException(MESSAGE_ADD_MANDATORY_FIELD_STATUS_APPROVED, masterAsset.getName());
         if (!Optional.ofNullable(masterAsset.getDescription()).isPresent())
-            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+            exceptionService.invalidRequestException(MESSAGE_ADD_MANDATORY_FIELD_STATUS_APPROVED, masterAsset.getName());
         if (CollectionUtils.isEmpty(masterAsset.getOrganizationTypes()))
-            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+            exceptionService.invalidRequestException(MESSAGE_ADD_MANDATORY_FIELD_STATUS_APPROVED, masterAsset.getName());
         if (CollectionUtils.isEmpty(masterAsset.getOrganizationSubTypes()))
-            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+            exceptionService.invalidRequestException(MESSAGE_ADD_MANDATORY_FIELD_STATUS_APPROVED, masterAsset.getName());
         if (CollectionUtils.isEmpty(masterAsset.getOrganizationServices()))
-            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+            exceptionService.invalidRequestException(MESSAGE_ADD_MANDATORY_FIELD_STATUS_APPROVED, masterAsset.getName());
         if (CollectionUtils.isEmpty(masterAsset.getOrganizationSubServices()))
-            exceptionService.invalidRequestException("message.add.mandatory.field.status.approved", masterAsset.getName());
+            exceptionService.invalidRequestException(MESSAGE_ADD_MANDATORY_FIELD_STATUS_APPROVED, masterAsset.getName());
     }
 
 }
