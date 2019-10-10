@@ -7,7 +7,6 @@ import org.springframework.cloud.gateway.discovery.DiscoveryClientRouteDefinitio
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.web.server.WebFilter;
 import reactor.core.publisher.Mono;
 
 @SpringBootApplication
