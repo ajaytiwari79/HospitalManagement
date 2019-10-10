@@ -38,8 +38,6 @@ public class WTAController {
     @Inject
     private WorkTimeAgreementService workTimeAgreementService;
     @Inject
-    private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
-    @Inject
     private WTAOrganizationService wtaOrganizationService;
 
     @ApiOperation(value = "Create a New WTA")

@@ -29,8 +29,6 @@ public class TimeBankController {
 
     @Autowired
     private TimeBankService timeBankService;
-    @Inject
-    private TimeBankCalculationService timeBankCalculationService;
 
     @GetMapping(value = "/employment/{employmentId}/")
     public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@PathVariable Long employmentId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
