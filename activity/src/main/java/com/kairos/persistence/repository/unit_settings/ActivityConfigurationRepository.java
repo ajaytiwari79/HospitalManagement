@@ -16,6 +16,8 @@ public interface ActivityConfigurationRepository extends MongoBaseRepository<Act
 
    List<ActivityConfiguration> findAllByUnitIdAndDeletedFalse(Long unitId);
 
+   boolean existsByCountryIdAndDeletedFalse(Long countryId);
+
    @Query("{unitId:?0,presencePlannedTime:{$exists:true}}")
    List<ActivityConfigurationDTO> findPresenceConfigurationByUnitId(Long unitId);
 
