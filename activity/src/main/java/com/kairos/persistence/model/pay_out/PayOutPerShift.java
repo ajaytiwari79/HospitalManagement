@@ -1,16 +1,27 @@
 package com.kairos.persistence.model.pay_out;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /*
 * Created By Pradeep singh rajawat
 *  Date-27/01/2018
 *
 * */
+@Getter
+@Setter
+@Document
+@NoArgsConstructor
 public class PayOutPerShift extends MongoBaseEntity{
 
     private Long employmentId;
@@ -27,7 +38,8 @@ public class PayOutPerShift extends MongoBaseEntity{
     private LocalDate date;
     private boolean paidOut;
     //It Includes CTAcompensation of Function and Bonus Ruletemplate which accountType is equal to PAID_OUT
-    private List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions;
+    private List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions = new ArrayList<>();
+    private long protectedDaysOffMinutes;
 
 
     public PayOutPerShift(BigInteger shiftId, Long employmentId, Long staffId, LocalDate date, Long unitId) {
@@ -38,52 +50,7 @@ public class PayOutPerShift extends MongoBaseEntity{
         this.unitId = unitId;
     }
 
-    public long getPayoutBeforeThisDate() {
-        return payoutBeforeThisDate;
-    }
 
-    public void setPayoutBeforeThisDate(long payoutBeforeThisDate) {
-        this.payoutBeforeThisDate = payoutBeforeThisDate;
-    }
-
-    public boolean isPaidOut() {
-        return paidOut;
-    }
-
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public void setPaidOut(boolean paidOut) {
-        this.paidOut = paidOut;
-    }
-
-
-
-    public BigInteger getShiftId() {
-        return shiftId;
-    }
-
-    public void setShiftId(BigInteger shiftId) {
-        this.shiftId = shiftId;
-    }
-
-    public List<PayOutPerShiftCTADistribution> getPayOutPerShiftCTADistributions() {
-        return payOutPerShiftCTADistributions;
-    }
-
-    public void setPayOutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions) {
-        this.payOutPerShiftCTADistributions = payOutPerShiftCTADistributions;
-    }
-
-
-    public PayOutPerShift() {
-    }
 
 
     public PayOutPerShift(Long employmentId, Long staffId, long totalPayOutMinutes, LocalDate date) {
@@ -92,55 +59,6 @@ public class PayOutPerShift extends MongoBaseEntity{
         this.totalPayOutMinutes = totalPayOutMinutes;
         this.date = date;
     }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public long getScheduledMinutes() {
-        return scheduledMinutes;
-    }
-
-    public void setScheduledMinutes(long scheduledMinutes) {
-        this.scheduledMinutes = scheduledMinutes;
-    }
-
-    public long getCtaBonusMinutesOfPayOut() {
-        return ctaBonusMinutesOfPayOut;
-    }
-
-    public void setCtaBonusMinutesOfPayOut(long ctaBonusMinutesOfPayOut) {
-        this.ctaBonusMinutesOfPayOut = ctaBonusMinutesOfPayOut;
-    }
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public long getTotalPayOutMinutes() {
-        return totalPayOutMinutes;
-    }
-
-    public void setTotalPayOutMinutes(long totalPayOutMinutes) {
-        this.totalPayOutMinutes = totalPayOutMinutes;
-    }
-
 
 
 }

@@ -60,6 +60,7 @@ public class TimeBankDTO {
     private long actualTimebankMinutes;
     private LocalDate planningPeriodStartDate;
     private LocalDate planningPeriodEndDate;
+    private long protectedDaysOffMinutes;
 
     public TimeBankDTO(Long employmentId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
      {
