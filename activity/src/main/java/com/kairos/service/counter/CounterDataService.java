@@ -33,6 +33,7 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.activity.TimeType;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
@@ -107,7 +108,7 @@ public class CounterDataService extends MongoBaseService {
     public Map generateKPIData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
         Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
-        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));
+        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(MongoBaseEntity::getId, kpi -> kpi));
         List<Future<CommonRepresentationData>> kpiResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
         Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera = new HashMap<>();
@@ -129,9 +130,9 @@ public class CounterDataService extends MongoBaseService {
             try {
                 if(isNotNull(data))kpisData.add(data.get());
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                LOGGER.error("error while generate KPI  data",ex);
             } catch (ExecutionException ex) {
-                ex.printStackTrace();
+                LOGGER.error("error while generate KPI  data",ex);
             }
         }
 
@@ -141,9 +142,9 @@ public class CounterDataService extends MongoBaseService {
     private void getStaffKPiFilterAndApplicableKpi(FilterCriteriaDTO filters, Long staffId, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKPIMap, List<KPI> kpis, Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera) {
         List<ApplicableKPI> staffApplicableKPIS;
         if (filters.isCountryAdmin()) {
-            staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
+            staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
         } else {
-            staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(kpi -> kpi.getId()).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
+            staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
         }
         for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
             Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
@@ -151,7 +152,6 @@ public class CounterDataService extends MongoBaseService {
                 staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
                 if(KPIRepresentation.INDIVIDUAL_STAFF.equals(staffApplicableKPI.getKpiRepresentation())){
                     staffFilterBasedCriteria.put(STAFF_IDS, Arrays.asList(isNotNull(filters.getStaffId()) ?filters.getStaffId().intValue() : staffId.intValue()));
-                   // staffApplicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                 }
                 if(isNotNull(filters.getFrequencyType())){
                     staffApplicableKPI.setInterval(filters.getInterval());
@@ -423,7 +423,9 @@ public class CounterDataService extends MongoBaseService {
         save(applicableKPIS);
         linkKpiToUncategorized(refId, level, copyKpi);
         TabKPIDTO tabKPIDTO = getTabKpiData(copyKpi, counterDTO, accessGroupPermissionCounterDTO);
-        tabKPIDTO.setId((isNotNull(tabKPIConf)) ? tabKPIConf.getId() : null);
+        if(isNotNull(tabKPIConf)){
+            tabKPIDTO.setId(tabKPIConf.getId());
+        }
         return tabKPIDTO;
     }
 
@@ -465,15 +467,16 @@ public class CounterDataService extends MongoBaseService {
         tabKPIDTO.setKpi(ObjectMapperUtils.copyPropertiesByMapper(copyKpi, KPIDTO.class));
         tabKPIDTO.getKpi().setSelectedFilters(counterDTO.getSelectedFilters());
         Map<BigInteger, CommonRepresentationData> data = generateKPIData(new FilterCriteriaDTO(counterDTO.getSelectedFilters(), Arrays.asList(copyKpi.getId()), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.isCountryAdmin(),counterDTO.getKpiRepresentation(),counterDTO.getInterval(),counterDTO.getValue(),counterDTO.getFrequencyType()), UserContext.getUserDetails().getLastSelectedOrganizationId(), accessGroupPermissionCounterDTO.getStaffId());
-        if(isNotNull(data))
-        tabKPIDTO.setData(data.get(copyKpi.getId()));
+        if(isNotNull(data)) {
+            tabKPIDTO.setData(data.get(copyKpi.getId()));
+        }
         return tabKPIDTO;
     }
 
     public  KPIResponseDTO generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId, LocalDate startDate) {
         Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
-        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(kpi -> kpi.getId(), kpi -> kpi));
+        Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(MongoBaseEntity::getId, kpi -> kpi));
         List<Future<KPIResponseDTO>> kpiResults = new ArrayList<>();
         Map<FilterType, List> filterBasedCriteria = new HashMap<>();
         Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera = new HashMap<>();
@@ -502,9 +505,9 @@ public class CounterDataService extends MongoBaseService {
                     kpiResponseDTO.setStaffKPIValue(data.get().getStaffKPIValue());
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("error while generate KPI calculation data",e);
             } catch (ExecutionException e) {
-                e.printStackTrace();
+                LOGGER.error("error while generate KPI calculation data",e);
             }
         }
         return kpiResponseDTO;

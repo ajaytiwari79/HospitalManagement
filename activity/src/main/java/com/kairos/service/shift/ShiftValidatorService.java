@@ -10,7 +10,6 @@ import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.dto.activity.time_bank.TimeBankIntervalDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
@@ -39,7 +38,6 @@ import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.staffing_level.StaffingLevelActivityRank;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.unit_settings.PhaseSettings;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
@@ -208,7 +206,7 @@ public class ShiftValidatorService {
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
         updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO, activityWrapperMap);
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shift.getStartDate().getTime(), shift.getEndDate().getTime());
-        Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         TimeBankCalculationService.CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, newArrayList(shift), false, false, dayTypeDTOMap).calculate();
         shift.setPlannedMinutesOfTimebank(calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes());
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills(), ruleTemplateSpecificInfo, exceptionService);
@@ -580,29 +578,6 @@ public class ShiftValidatorService {
         }
         return staffingLevelStatus;
 
-    }
-
-    public void verifyShiftActivities(Set<AccessGroupRole> roles, Long employmentTypeId, Map<BigInteger, com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue> phaseTemplateValue, ShiftActivityIdsDTO shiftActivityIdsDTO) {
-        boolean staff = roles.contains(AccessGroupRole.STAFF);
-        boolean management = roles.contains(AccessGroupRole.MANAGEMENT);
-        phaseTemplateValue.forEach((k, v) -> {
-            if (shiftActivityIdsDTO.getActivitiesToAdd().contains(k)) {
-                if ((staff && !v.getEligibleEmploymentTypes().contains(employmentTypeId)) || (management && !v.isEligibleForManagement())) {
-                    exceptionService.actionNotPermittedException(ERROR_SHIFT_NOT_AUTHORISED_PHASE);
-                }
-            }
-            if (shiftActivityIdsDTO.getActivitiesToEdit().contains(k)) {
-                if (!CollectionUtils.containsAny(v.getAllowedSettings().getCanEdit(), roles)) {
-                    exceptionService.actionNotPermittedException(ERROR_SHIFT_NOT_EDITABLE_PHASE);
-                }
-            }
-            if (shiftActivityIdsDTO.getActivitiesToDelete().contains(k)) {
-                if ((management && !v.isManagementCanDelete()) || (staff && !v.isStaffCanDelete())) {
-                    exceptionService.actionNotPermittedException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
-                }
-            }
-
-        });
     }
 
 

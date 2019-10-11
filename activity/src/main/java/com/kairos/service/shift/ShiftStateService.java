@@ -81,7 +81,7 @@ public class ShiftStateService {
         Set<PhaseDefaultName> phaseDefaultNames=newHashSet(PhaseDefaultName.REALTIME,PhaseDefaultName.TIME_ATTENDANCE,PhaseDefaultName.TENTATIVE);
         List<Phase> phases=phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
         Map<String, Phase> phaseMap = phases.stream().collect(Collectors.toMap(p->p.getPhaseEnum().toString(), Function.identity()));
-        Map<BigInteger,PhaseDefaultName> phaseIdAndDefaultNameMap=phases.stream().collect(Collectors.toMap(k->k.getId(),v->v.getPhaseEnum()));
+        Map<BigInteger,PhaseDefaultName> phaseIdAndDefaultNameMap=phases.stream().collect(Collectors.toMap(MongoBaseEntity::getId, Phase::getPhaseEnum));
         List<ShiftState> newShiftState;
         shifts=shifts.stream().filter(shift -> !phaseDefaultNames.contains(phaseIdAndDefaultNameMap.get(shift.getPhaseId()))).collect(Collectors.toList());
         newShiftState=createDraftShiftState(shifts,phaseMap.get(PhaseDefaultName.DRAFT.toString()).getId());
