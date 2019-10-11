@@ -73,11 +73,6 @@ public class WTABuilderService extends MongoBaseService {
                     activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId, Arrays.asList(protectedDaysOffWTATemplate.getActivityId()));
                     protectedDaysOffWTATemplate.setActivityId(activityIds.get(0));
                     break;
-                case PROTECTED_DAYS_OFF:
-                    ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = (ProtectedDaysOffWTATemplate)wtaBaseRuleTemplate;
-                    activityIds = getActivityIdsByCountryActvityIds(activitiesIdsAndUnitIdsMap,unitId, Arrays.asList(protectedDaysOffWTATemplate.getActivityId()));
-                    protectedDaysOffWTATemplate.setActivityId(activityIds.get(0));
-                    break;
                 default:
                     break;
             }
