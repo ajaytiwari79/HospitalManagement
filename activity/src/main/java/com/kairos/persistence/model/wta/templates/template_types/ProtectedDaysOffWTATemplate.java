@@ -13,18 +13,12 @@ import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.brakeRuleTemplateAndUpdateViolationDetails;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getHoursByMinutes;
 
 /**
  * Created by pradeep
