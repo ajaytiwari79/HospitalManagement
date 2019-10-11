@@ -169,7 +169,7 @@ public class ClientExceptionService extends MongoBaseService {
 
             }
             case CHANGE_LOCATION: {
-                ClientTemporaryAddress clientTemporaryAddress = userIntegrationService.updateClientTemporaryAddress(clientExceptionDto, unitId, clientId);
+                ClientTemporaryAddress clientTemporaryAddress = userIntegrationService.updateClientTemporaryAddress(clientExceptionDto, clientId);
                 return createChangeLocationException(unitId, clientId, clientExceptionDto, clientExceptionType, clientTemporaryAddress);
             }
             case DO_NOT_DISTURB: {
@@ -354,7 +354,7 @@ public class ClientExceptionService extends MongoBaseService {
                 updateTaskAddress(unhandledTask, clientTemporaryAddress);
             }
         });
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         //taskConverterService.createFlsCallFromTasks(unhandledTasks, flsCredentials);
         return unhandledTasks;
     }
@@ -681,7 +681,7 @@ public class ClientExceptionService extends MongoBaseService {
         List<Long> houseHoldMembers = new ArrayList<>(clientExceptionDTO.getHouseHoldMembers());
         houseHoldMembers.add(exceptionOfCitizen.getClientId());
         validateTimeSlotsForException(clientExceptionDTO, exceptionOfCitizen, houseHoldMembers, exceptionIds);
-        ClientTemporaryAddress clientTemporaryAddress = userIntegrationService.updateClientTemporaryAddress(clientExceptionDTO, exceptionOfCitizen.getUnitId(), exceptionOfCitizen.getClientId());
+        ClientTemporaryAddress clientTemporaryAddress = userIntegrationService.updateClientTemporaryAddress(clientExceptionDTO, exceptionOfCitizen.getClientId());
         List<Task> updatedTasks = updateTasksOnCreatingChangeLocationException(houseHoldMembers, exceptionOfCitizen, clientExceptionDTO, clientTemporaryAddress, exceptionsOfHouseHoldMembers);
         for (ClientException exceptionsOfHouseHoldMember : exceptionsOfHouseHoldMembers) {
             exceptionsOfHouseHoldMember.setTemporaryAddressId(clientTemporaryAddress.getId());
@@ -761,7 +761,7 @@ public class ClientExceptionService extends MongoBaseService {
                 tasksByNewDate.add(oldTask);
             }
         });
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         //taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
         return tasksByNewDate;
     }
@@ -804,7 +804,7 @@ public class ClientExceptionService extends MongoBaseService {
                 tasksByNewDate.add(oldTask);
             }
         });
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(exceptionOfCitizen.getUnitId());
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(exceptionOfCitizen.getUnitId());
         //taskConverterService.createFlsCallFromTasks(tasksByNewDate, flsCredentials);
         return tasksByNewDate;
     }

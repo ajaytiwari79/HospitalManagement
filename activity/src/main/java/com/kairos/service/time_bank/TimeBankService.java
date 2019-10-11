@@ -179,11 +179,17 @@ public class TimeBankService{
             shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
                 shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
                 shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
+                shiftActivityDTO.setPlannedMinutesOfPayout(0);
+                shiftActivityDTO.setPlannedMinutesOfTimebank(0);
+                shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
             });
             if(isCollectionNotEmpty(shiftWithActivityDTO.getBreakActivities())){
                 shiftWithActivityDTO.getBreakActivities().forEach(shiftActivityDTO -> {
                     shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
                     shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
+                    shiftActivityDTO.setPlannedMinutesOfPayout(0);
+                    shiftActivityDTO.setPlannedMinutesOfTimebank(0);
+                    shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
                 });
             }
         });

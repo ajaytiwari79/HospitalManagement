@@ -28,6 +28,7 @@ import com.kairos.persistence.repository.organization.OrganizationGraphRepositor
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.LocationGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
+import com.kairos.persistence.repository.user.client.ContactAddressGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.ReasonCodeGraphRepository;
 import com.kairos.persistence.repository.user.region.MunicipalityGraphRepository;
@@ -90,6 +91,8 @@ public class UnionService {
     private OrganizationService organizationService;
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject
+    private ContactAddressGraphRepository contactAddressGraphRepository;
 
 
     public List<Sector> findAllSectorsByCountry(Long countryId) {
@@ -410,6 +413,7 @@ public class UnionService {
             if (!Optional.ofNullable(zipCode).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
             }
+
             if (zipCodeUpdated) {
                 zipCodeGraphRepository.deleteAddressZipcodeRelation(addressId, oldZipCodeId);
             }
@@ -425,8 +429,7 @@ public class UnionService {
                 municipalityGraphRepository.deleteAddressMunicipalityRelation(addressId, oldMunicipalityId);
             }
         }
-
-
+        contactAddressGraphRepository.save(contactAddress);
         return contactAddress;
     }
 

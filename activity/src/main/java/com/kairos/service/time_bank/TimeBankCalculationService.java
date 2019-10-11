@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.cta.CompensationTableInterval;
 import com.kairos.dto.activity.pay_out.PayOutDTO;
@@ -17,6 +18,7 @@ import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.ScheduledActivitiesDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.CompensationMeasurementType;
@@ -25,6 +27,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -33,18 +36,25 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
+import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.time_bank.TimeBankCTADistribution;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
 import com.kairos.persistence.repository.pay_out.PayOutRepository;
 import com.kairos.persistence.repository.pay_out.PayOutTransactionMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
+import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutCalculationService;
+import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.unit_settings.ProtectedDaysOffService;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -73,12 +83,14 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY_END_DATE_LESS_THAN_START_DATE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
+import static com.kairos.enums.cta.AccountType.PAID_OUT;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 import static com.kairos.enums.phase.PhaseDefaultName.PAYROLL;
 import static com.kairos.enums.phase.PhaseDefaultName.REALTIME;
 import static com.kairos.enums.phase.PhaseDefaultName.*;
+import static com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService.getCutoffInterval;
 import static java.time.temporal.ChronoUnit.MINUTES;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 /*
  * Created By Pradeep singh rajawat
@@ -104,7 +116,23 @@ public class TimeBankCalculationService {
     private TimeBankRepository timeBankRepository;
     @Inject
     private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
-    @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    @Inject
+    private PayOutService payOutService;
+    @Inject
+    private UserIntegrationService userIntegrationService;
+    @Inject
+    private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject
+    private ProtectedDaysOffService protectedDaysOffService;
+    @Inject
+    private TimeBankService timeBankService;
+
 
     public DailyTimeBankEntry calculateDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry, DateTimeInterval planningPeriodInterval, List<DayTypeDTO> dayTypeDTOS, boolean validatedByPlanner) {
         boolean anyShiftPublish = false;
@@ -135,7 +163,8 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setStaffId(staffEmploymentDetails.getStaffId());
         dailyTimeBankEntry.setTimeBankMinutesWithoutCta(timeBankMinWithoutCta);
         dailyTimeBankEntry.setPlannedMinutesOfTimebank(totalDailyPlannedMinutes);
-        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : 0);
+        int deltaAccumulatedTimebankMinutes = anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : 0;
+        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes + dailyTimeBankEntry.getProtectedDaysOffMinutes());
         dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(ctaTimeBankMinMap.values().stream().mapToInt(ctaBonus -> ctaBonus).sum());
         dailyTimeBankEntry.setPublishedSomeActivities(anyShiftPublish);
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
@@ -146,10 +175,10 @@ public class TimeBankCalculationService {
         return dailyTimeBankEntry;
     }
 
-    private void resetDailyTimebankEntry(DailyTimeBankEntry dailyTimeBankEntry, int contractualMinutes) {
+    public void resetDailyTimebankEntry(DailyTimeBankEntry dailyTimeBankEntry, int contractualMinutes) {
         dailyTimeBankEntry.setTimeBankMinutesWithoutCta(0);
         dailyTimeBankEntry.setPlannedMinutesOfTimebank(0);
-        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(0);
+        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes());
         dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(0);
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         dailyTimeBankEntry.setScheduledMinutesOfTimeBank(0);
@@ -174,9 +203,8 @@ public class TimeBankCalculationService {
             Optional<FunctionDTO> appliedFunctionDTO = staffEmploymentDetails.getAppliedFunctions().stream().filter(function -> function.getAppliedDates().contains(dateTimeInterval.getStartLocalDate())).findFirst();
             functionId = appliedFunctionDTO.isPresent() ? appliedFunctionDTO.get().getId() : null;
         }
-        if(ctaRuleTemplateDTO.getStaffFunctions().contains(isNotNull(staffEmploymentDetails.getFunctionId()) ? staffEmploymentDetails.getFunctionId() : functionId)) {
-            value = !getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) ? (new BigDecimal(ctaRuleTemplateDTO.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60))).intValue(): 0;
-
+        if (ctaRuleTemplateDTO.getStaffFunctions().contains(isNotNull(staffEmploymentDetails.getFunctionId()) ? staffEmploymentDetails.getFunctionId() : functionId)) {
+            value = getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) ? new BigDecimal(ctaRuleTemplateDTO.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
         }
         return value;
     }
@@ -353,6 +381,7 @@ public class TimeBankCalculationService {
         scheduledCTADistributions = getCTADistributionsOfTimebank(ctaDistributionMap, employmentWithCtaDetailsDTO);
         List<CTADistributionDTO> ctaBonusDistributions = timeBankIntervalDTOS.stream().flatMap(ti -> ti.getTimeBankDistribution().getCtaRuletemplateBonus().getCtaDistributions().stream()).collect(Collectors.toList());
         Map<String, Integer> ctaBonusDistributionMap = ctaBonusDistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getName(), Collectors.summingInt(tb -> tb.getMinutes())));
+        long  protectedDaysOffMinutes=dailyTimeBankEntries.stream().collect(Collectors.summingLong(dailyTimeBankEntry -> dailyTimeBankEntry.getProtectedDaysOffMinutes()));
         long[] calculatedTimebankValues = getSumOfTimebankIntervalValues(timeBankIntervalDTOS);
         long totalContractedMin = calculatedTimebankValues[0];
         long totalScheduledMin = calculatedTimebankValues[1];
@@ -377,6 +406,7 @@ public class TimeBankCalculationService {
         timeBankDTO.setTotalScheduledMin(totalScheduledMin);
         timeBankDTO.setTotalTimeBankDiff(totalTimeBankDiff);
         timeBankDTO.setTotalPlannedMinutes(totalPlannedMinutes);
+        timeBankDTO.setProtectedDaysOffMinutes(protectedDaysOffMinutes);
         List<PayOutPerShift> payOutPerShiftBeforestartDate = payOutRepository.findAllByEmploymentAndBeforeDate(employmentWithCtaDetailsDTO.getId(), startDate);
         long payoutMinutesBefore = isCollectionNotEmpty(payOutPerShiftBeforestartDate) ? payOutPerShiftBeforestartDate.stream().mapToLong(payout -> payout.getTotalPayOutMinutes()).sum() : 0;
         PayOutDTO payOut = payOutCalculationService.getAdvanceViewPayout(intervals, payOutPerShifts, payoutMinutesBefore, payoutTransactionIntervalMap, employmentWithCtaDetailsDTO, query);
@@ -603,6 +633,7 @@ public class TimeBankCalculationService {
             timeBankIntervalDTO.setPaidoutChange(paidPayOut);
             timeBankIntervalDTO.setHeaderName(getHeaderName(query, interval));
             if (isCollectionNotEmpty(dailyTimeBankEntries)) {
+                long  protectedDaysOffMinutes=dailyTimeBankEntries.stream().collect(Collectors.summingLong(dailyTimeBankEntry -> dailyTimeBankEntry.getProtectedDaysOffMinutes()));
                 timeBankIntervalDTO.setTitle(getTitle(query, interval));
                 long[] calculatedTimebankValues = getSumOfTimebankValues(dailyTimeBankEntries);
                 long calculatedTimeBank = calculatedTimebankValues[0];
@@ -618,6 +649,7 @@ public class TimeBankCalculationService {
                 timeBankIntervalDTO.setTotalTimeBankAfterCtaMin(totalTimeBankBefore - approvePayOut);
                 timeBankIntervalDTO.setTotalTimeBankMin(totalTimeBank - approvePayOut);
                 timeBankIntervalDTO.setTotalTimeBankDiff(totalTimeBank - approvePayOut);
+                timeBankIntervalDTO.setProtectedDaysOffMinutes(protectedDaysOffMinutes);
                 timeBankIntervalDTO.setTotalScheduledMin(scheduledMinutesOfTimebank + scheduledMinutesOfPayout);
                 List<TimeBankCTADistribution> timeBankDistributions = dailyTimeBankEntries.stream().filter(tb -> (interval.getStart().equals(DateUtils.toJodaDateTime(tb.getDate())) || interval.contains(asDate(tb.getDate()).getTime()))).flatMap(tb -> tb.getTimeBankCTADistributionList().stream()).collect(Collectors.toList());
                 Map<String, Integer> ctaDistributionMap = timeBankDistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getCtaName(), Collectors.summingInt(tb -> tb.getMinutes())));
@@ -868,9 +900,9 @@ public class TimeBankCalculationService {
             if (ruleTemplate.getPlannedTimeWithFactor().getAccountType() == null) continue;
             if (ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
                 int ctaTimeBankMin = 0;
-                if((ruleTemplate.getActivityIds().contains(shift.getActivityId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(activity.getBalanceSettingsActivityTab().getTimeTypeId())))) {
-                    if(((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(asLocalDate(shiftInterval.getStart()).getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
-                        if(ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
+                if ((ruleTemplate.getActivityIds().contains(shift.getActivityId()) || (ruleTemplate.getTimeTypeIds() != null && ruleTemplate.getTimeTypeIds().contains(activity.getBalanceSettingsActivityTab().getTimeTypeId())))) {
+                    if (((ruleTemplate.getDays() != null && ruleTemplate.getDays().contains(asLocalDate(shiftInterval.getStart()).getDayOfWeek())) || (ruleTemplate.getPublicHolidays() != null && ruleTemplate.getPublicHolidays().contains(DateUtils.toLocalDate(shiftInterval.getStart()))))) {
+                        if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
                             plannedTimeMin += calculateScheduleAndDurationHourForOpenShift(shift, activity, employmentWithCtaDetailsDTO);
                             totalTimebank += plannedTimeMin;
                         }
@@ -880,12 +912,12 @@ public class TimeBankCalculationService {
                                 for (Interval ctaInterval : ctaIntervals) {
                                     if (ctaInterval.overlaps(shiftInterval)) {
                                         int overlapTimeInMin = (int) ctaInterval.overlap(shiftInterval).toDuration().getStandardMinutes();
-                                        if(CompensationMeasurementType.MINUTES.equals(ctaIntervalDTO.getCompensationMeasurementType())) {
+                                        if (CompensationMeasurementType.MINUTES.equals(ctaIntervalDTO.getCompensationMeasurementType())) {
                                             ctaTimeBankMin += (int) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) * ctaIntervalDTO.getValue();
                                             totalTimebank += ctaTimeBankMin;
                                             plannedTimeMin += ctaTimeBankMin;
                                             break;
-                                        } else if(CompensationMeasurementType.PERCENT.equals(ctaIntervalDTO.getCompensationMeasurementType())) {
+                                        } else if (CompensationMeasurementType.PERCENT.equals(ctaIntervalDTO.getCompensationMeasurementType())) {
                                             ctaTimeBankMin += (int) (((double) Math.round((double) overlapTimeInMin / ruleTemplate.getCompensationTable().getGranularityLevel()) / 100) * ctaIntervalDTO.getValue());
                                             totalTimebank += ctaTimeBankMin;
                                             plannedTimeMin += ctaTimeBankMin;
@@ -986,7 +1018,7 @@ public class TimeBankCalculationService {
         return deltaTimebankMinutes;
     }
 
-    private BigDecimal getHourlyCostByDate(List<EmploymentLinesDTO> employmentLines, java.time.LocalDate localDate) {
+    public BigDecimal getHourlyCostByDate(List<EmploymentLinesDTO> employmentLines, java.time.LocalDate localDate) {
         BigDecimal hourlyCost = new BigDecimal(0);
         for (EmploymentLinesDTO employmentLine : employmentLines) {
             DateTimeInterval positionInterval = employmentLine.getInterval();
@@ -1117,6 +1149,11 @@ public class TimeBankCalculationService {
             this.ctaTimeBankMinMap = new HashMap<>();
         }
 
+        public CalculatePlannedHoursAndScheduledHours(StaffAdditionalInfoDTO staffAdditionalInfoDTO, DateTimeInterval dateTimeInterval) {
+            this.staffAdditionalInfoDTO = staffAdditionalInfoDTO;
+            this.dateTimeInterval = dateTimeInterval;
+        }
+
         public CalculatePlannedHoursAndScheduledHours() {
         }
 
@@ -1124,9 +1161,9 @@ public class TimeBankCalculationService {
             boolean ruleTemplateValid = false;
             for (CTARuleTemplateDTO ruleTemplate : staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates()) {
                 for (ShiftWithActivityDTO shift : shifts) {
-                    List<ShiftActivityDTO> shiftActivities = getShiftActivityByBreak(shift.getActivities(),shift.getBreakActivities());
+                    List<ShiftActivityDTO> shiftActivities = getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
                     for (ShiftActivityDTO shiftActivity : shiftActivities) {
-                        ShiftActivityDTO shiftActivityDTO = getShiftActivityDTO(shift,shiftActivity);
+                        ShiftActivityDTO shiftActivityDTO = getShiftActivityDTO(shift, shiftActivity);
                         ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getStartDate(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
                         LOGGER.debug("rule template : {} valid {}", ruleTemplate.getId(), ruleTemplateValid);
                         if (ruleTemplateValid) {
@@ -1138,13 +1175,13 @@ public class TimeBankCalculationService {
                             } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
                                 ctaBonusAndScheduledMinutes = getAndUpdateCtaBonusMinutes(dateTimeInterval, ctaTimeBankMinMap, ruleTemplate, shiftActivity);
                                 Optional<TimeBankDistributionDTO> optionalTimeBankDistributionDTO = shiftActivityDTO.getTimeBankCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
-                                if(optionalTimeBankDistributionDTO.isPresent()){
+                                if (optionalTimeBankDistributionDTO.isPresent()) {
                                     optionalTimeBankDistributionDTO.get().setMinutes(optionalTimeBankDistributionDTO.get().getMinutes() + ctaBonusAndScheduledMinutes);
-                                }else {
-                                    TimeBankDistributionDTO timeBankDistributionDTO = new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(new Date()),  ctaBonusAndScheduledMinutes);
+                                } else {
+                                    TimeBankDistributionDTO timeBankDistributionDTO = new TimeBankDistributionDTO(ruleTemplate.getName(), ruleTemplate.getId(), DateUtils.asLocalDate(new Date()), ctaBonusAndScheduledMinutes);
                                     shiftActivityDTO.getTimeBankCTADistributions().add(timeBankDistributionDTO);
                                 }
-                                shiftActivityDTO.setTimeBankCtaBonusMinutes(ctaBonusAndScheduledMinutes+shiftActivityDTO.getTimeBankCtaBonusMinutes());
+                                shiftActivityDTO.setTimeBankCtaBonusMinutes(ctaBonusAndScheduledMinutes + shiftActivityDTO.getTimeBankCtaBonusMinutes());
                                 LOGGER.debug("rule template : {} minutes {}", ruleTemplate.getId(), ctaBonusAndScheduledMinutes);
                             }
                             shiftActivityDTO.setPlannedMinutesOfTimebank(ctaBonusAndScheduledMinutes + shiftActivityDTO.getPlannedMinutesOfTimebank());
@@ -1167,31 +1204,32 @@ public class TimeBankCalculationService {
             return this;
         }
 
+
         public ShiftActivityDTO getShiftActivityDTO(ShiftWithActivityDTO shift, ShiftActivityDTO shiftActivity) {
             ShiftActivityDTO shiftActivityDTO = shiftActivity;
             try {
                 return shift.getActivities().stream().filter(shiftActivityDTO1 -> shiftActivityDTO1.getId().equals(shiftActivity.getId()) || (isCollectionNotEmpty(shift.getBreakActivities()) && shift.getBreakActivities().get(0).getId().equals(shiftActivityDTO1.getId()))).findAny().get();
-            }catch (NullPointerException | NoSuchElementException e){
+            } catch (NullPointerException | NoSuchElementException e) {
                 shiftActivityDTO = shiftActivity;
             }
             return shiftActivityDTO;
         }
 
-        public List<ShiftActivityDTO> getShiftActivityByBreak(List<ShiftActivityDTO> shiftActivities, List<ShiftActivityDTO> breakActivities){
+        public List<ShiftActivityDTO> getShiftActivityByBreak(List<ShiftActivityDTO> shiftActivities, List<ShiftActivityDTO> breakActivities) {
             List<ShiftActivityDTO> updatedShiftActivities = new ArrayList<>();
-            if(isCollectionNotEmpty(breakActivities) && !(breakActivities.get(0)).isBreakNotHeld()){
+            if (isCollectionNotEmpty(breakActivities) && !(breakActivities.get(0)).isBreakNotHeld()) {
                 List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndIdsIn(newArrayList(breakActivities.get(0).getActivityId()));
                 for (ShiftActivityDTO shiftActivity : shiftActivities) {
                     for (ShiftActivityDTO breakActivity : breakActivities) {
-                        if(shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes()==breakActivity.getInterval().getMinutes()){
+                        if (shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes()) {
                             List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(breakActivity.getInterval());
                             for (DateTimeInterval timeInterval : dateTimeIntervals) {
-                                ShiftActivityDTO updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity,ShiftActivityDTO.class);
+                                ShiftActivityDTO updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity, ShiftActivityDTO.class);
                                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
                                 updatedShiftActivity.setEndDate(timeInterval.getEndDate());
                                 List<PlannedTime> plannedTimes = new ArrayList<>();
                                 for (PlannedTime plannedTime : updatedShiftActivity.getPlannedTimes()) {
-                                    if(plannedTime.getInterval().overlaps(timeInterval)){
+                                    if (plannedTime.getInterval().overlaps(timeInterval)) {
                                         DateTimeInterval plannedTimeInterval = plannedTime.getInterval().overlap(timeInterval);
                                         plannedTime.setStartDate(plannedTimeInterval.getStartDate());
                                         plannedTime.setEndDate(plannedTimeInterval.getEndDate());
@@ -1204,9 +1242,9 @@ public class TimeBankCalculationService {
                             }
                             List<PlannedTime> plannedTimes = new ArrayList<>();
                             for (PlannedTime plannedTime : shiftActivity.getPlannedTimes()) {
-                                if(breakActivity.getInterval().overlaps(plannedTime.getInterval())){
+                                if (breakActivity.getInterval().overlaps(plannedTime.getInterval())) {
                                     DateTimeInterval dateTimeInterval = breakActivity.getInterval().overlap(plannedTime.getInterval());
-                                    PlannedTime breakPlannedTime = ObjectMapperUtils.copyPropertiesByMapper(plannedTime,PlannedTime.class);
+                                    PlannedTime breakPlannedTime = ObjectMapperUtils.copyPropertiesByMapper(plannedTime, PlannedTime.class);
                                     breakPlannedTime.setStartDate(dateTimeInterval.getStartDate());
                                     breakPlannedTime.setEndDate(dateTimeInterval.getEndDate());
                                     plannedTimes.add(breakPlannedTime);
@@ -1218,7 +1256,7 @@ public class TimeBankCalculationService {
                         }
                     }
                 }
-            }else {
+            } else {
                 updatedShiftActivities = shiftActivities;
             }
             Collections.sort(updatedShiftActivities);
@@ -1262,5 +1300,206 @@ public class TimeBankCalculationService {
         }
     }
 
+
+    public boolean updateTimeBankAgainstProtectedDaysOffSetting() {
+        List<DailyTimeBankEntry> dailyTimeBankEntriesToSave = new ArrayList<>();
+        List<PayOutPerShift> payOutOfStaffs = new ArrayList<>();
+        List<StaffEmploymentDetails> staffEmploymentDetails = userIntegrationService.getStaffsMainEmployment();
+        Set<Long> unitIds = staffEmploymentDetails.stream().map(staffEmploymentDetail -> staffEmploymentDetail.getUnitId()).collect(Collectors.toSet());
+        List<ProtectedDaysOffSettingDTO> protectedDaysOffSettingOfUnit = protectedDaysOffService.getAllProtectedDaysOffByUnitIds(new ArrayList<>(unitIds));
+        Map<Long, ProtectedDaysOffSettingDTO> unitIdAndProtectedDaysOffSettingDTOMap = protectedDaysOffSettingOfUnit.stream().collect(Collectors.toMap(k -> k.getUnitId(), v -> v));
+        Map<Long, List<StaffEmploymentDetails>> unitAndStaffEmploymentDetailsMap = staffEmploymentDetails.stream().collect(groupingBy(StaffEmploymentDetails::getUnitId));
+        Set<Long> employmentIds = staffEmploymentDetails.stream().map(staffEmploymentDetail -> staffEmploymentDetail.getId()).collect(toSet());
+        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankService.findAllByEmploymentIdsAndBetweenDate(employmentIds, getDate(), getDate());
+        Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(k -> k.getEmploymentId(), v -> v));
+        List<Activity> activities = activityMongoRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, unitIds);
+        Set<BigInteger> activityIds = activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+        Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        Map<Long, Activity> unitIdAndActivityMap = activities.stream().collect(Collectors.toMap(k -> k.getUnitId(), v -> v));
+        Map[] activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap = getActivityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap(employmentIds, activityIds, activityMap);
+        Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap = activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap[0];
+        Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap = activityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap[1];
+        List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(new ArrayList<>(employmentIds), getDate(), getDate());
+        Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap = ctaResponseDTOS.stream().collect(Collectors.toMap(k -> k.getEmploymentId(), v -> v));
+        for (Long unitId : unitIds) {
+            getDailyTimeBankEntryAndPaidOutPerUnit(dailyTimeBankEntriesToSave, payOutOfStaffs, unitIdAndProtectedDaysOffSettingDTOMap, unitAndStaffEmploymentDetailsMap, employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId);
+        }
+        if (isCollectionNotEmpty(dailyTimeBankEntriesToSave)) {
+            timeBankRepository.saveEntities(dailyTimeBankEntriesToSave);
+        }
+        if (isCollectionNotEmpty(payOutOfStaffs)) {
+            payOutService.savePayout(payOutOfStaffs);
+        }
+        return true;
+    }
+
+    private Object[] getDailyTimeBankEntryAndPaidOutPerUnit(List<DailyTimeBankEntry> dailyTimeBankEntriesToSave, List<PayOutPerShift> payOutOfStaffs,  Map<Long, ProtectedDaysOffSettingDTO> unitIdAndProtectedDaysOffSettingDTOMap, Map<Long, List<StaffEmploymentDetails>> unitAndStaffEmploymentDetailsMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId) {
+        Object[] dailyTimeBankAndPayoutByOnceInAYear = new Object[]{};
+        try {
+            ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = unitIdAndProtectedDaysOffSettingDTOMap.get(unitId);
+            Activity activity= unitIdAndActivityMap.get(unitId);
+            if (isNotNull(protectedDaysOffSettingDTO) && isNotNull(activity)) {
+                List<StaffEmploymentDetails> staffEmploymentDetailsList = unitAndStaffEmploymentDetailsMap.get(unitId);
+                for (StaffEmploymentDetails employmentDetails : staffEmploymentDetailsList) {
+                    dailyTimeBankAndPayoutByOnceInAYear = setDailyTimeBankAndPayoutPerStaff(dailyTimeBankEntriesToSave, dailyTimeBankAndPayoutByOnceInAYear, employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, protectedDaysOffSettingDTO, activity, employmentDetails);
+                }
+                if (isNotNull(dailyTimeBankAndPayoutByOnceInAYear[0])) {
+                    dailyTimeBankEntriesToSave.add((DailyTimeBankEntry) dailyTimeBankAndPayoutByOnceInAYear[0]);
+                }
+                if (isNotNull(dailyTimeBankAndPayoutByOnceInAYear[1])) {
+                    payOutOfStaffs.add((PayOutPerShift) dailyTimeBankAndPayoutByOnceInAYear[1]);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("error while add protected days off time bank in unit  {} ,\n {}  ", unitId, e);
+            e.printStackTrace();
+        }
+        return dailyTimeBankAndPayoutByOnceInAYear;
+    }
+
+    private Object[] setDailyTimeBankAndPayoutPerStaff(List<DailyTimeBankEntry> dailyTimeBankEntriesToSave, Object[] dailyTimeBankAndPayoutByOnceInAYear, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO, Activity activity, StaffEmploymentDetails employmentDetails) {
+        List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+        try {
+            protectedDaysOffSettings = employmentDetails.getProtectedDaysOffSettings();
+            protectedDaysOffSettings=protectedDaysOffSettings.stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.getPublicHolidayDate().isAfter(employmentDetails.getStartDate()) || (isNull(employmentDetails.getEndDate())|| !protectedDaysOffSetting.getPublicHolidayDate().isAfter(employmentDetails.getEndDate()))).collect(Collectors.toList());
+            employmentDetails.setProtectedDaysOffSettings(protectedDaysOffSettings);
+            switch (protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings()) {
+                case UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR:
+                    DateTimeInterval dateTimeInterval=getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate()), getLocalDate());
+                    if (dateTimeInterval.getStartLocalDate().equals(getLocalDate())) {
+                        long count = employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
+                        DailyTimeBankEntry dailyTimeBankEntry = isNullOrElse(employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId()), new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
+                        int contractualMinutes = getContractualMinutesByDate(dateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+                        resetDailyTimebankEntry(dailyTimeBankEntry, contractualMinutes);
+                        dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + (int) (count * contractualMinutes));
+                        dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
+                    }
+                    break;
+                case ONCE_IN_A_YEAR:
+                    dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankAndPayoutByOnceInAYear(employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, employmentDetails);
+                    break;
+                case ACTIVITY_CUT_OFF_INTERVAL:
+                    dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankEntryAndPayoutByCutOffInterval(employmentIdAndCtaResponseDTOMap, employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, unitId, employmentDetails);
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            LOGGER.error("error while add protected days off time bank in staff  {} ,\n {}  ", employmentDetails.getStaffId(), e);
+        }
+        return dailyTimeBankAndPayoutByOnceInAYear;
+    }
+
+
+    private Object[] getDailyTimeBankEntryAndPayoutByCutOffInterval(Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Long unitId, StaffEmploymentDetails employmentDetails) {
+        int[] scheduledAndApproveActivityCount;
+        Activity activity = unitIdAndActivityMap.get(unitId);
+        DateTimeInterval activityDateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
+        List<ProtectedDaysOffSetting> protectedDaysOffSettings = new ArrayList<>();
+        for (ProtectedDaysOffSetting protectedDaysOffSetting : employmentDetails.getProtectedDaysOffSettings()) {
+            DateTimeInterval dateTimeInterval = getCutoffInterval(protectedDaysOffSetting.getPublicHolidayDate(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), protectedDaysOffSetting.getPublicHolidayDate().plusDays(1));
+            if (isNotNull(dateTimeInterval) && dateTimeInterval.getEndLocalDate().isEqual(getLocalDate()) && protectedDaysOffSetting.isProtectedDaysOff() && protectedDaysOffSetting.getPublicHolidayDate().isBefore(getLocalDate())) {
+                protectedDaysOffSettings.add(protectedDaysOffSetting);
+            }
+        }
+        int count = protectedDaysOffSettings.size();
+        protectedDaysOffSettings.sort((protectedDaysOffSetting, t1) -> protectedDaysOffSetting.getPublicHolidayDate().compareTo(t1.getPublicHolidayDate()));
+        DateTimeInterval protectedDaysDateTimeInterval = new DateTimeInterval(protectedDaysOffSettings.get(0).getPublicHolidayDate(), getLocalDate());
+        scheduledAndApproveActivityCount = workTimeAgreementBalancesCalculationService.getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId())) ? employmentIdAndShiftMap.get(employmentDetails.getId()) : new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
+        count = count - scheduledAndApproveActivityCount[0];
+        DailyTimeBankEntry dailyTimeBankEntry = getDailyTimeBankEntry(employmentIdAndDailyTimeBankEntryMap, employmentIdAndCtaResponseDTOMap, employmentDetails, protectedDaysDateTimeInterval, count);
+        PayOutPerShift payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap, employmentDetails, protectedDaysDateTimeInterval, count);
+        return new Object[]{dailyTimeBankEntry, payOutPerShift};
+    }
+
+    private Object[] getDailyTimeBankAndPayoutByOnceInAYear(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, StaffEmploymentDetails employmentDetails) {
+        int[] scheduledAndApproveActivityCount;
+        DateTimeInterval activityDateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
+        int count = (int) employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && activityDateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
+        scheduledAndApproveActivityCount = workTimeAgreementBalancesCalculationService.getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId())) ? employmentIdAndShiftMap.get(employmentDetails.getId()) : new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
+        count = count - scheduledAndApproveActivityCount[0];
+        DailyTimeBankEntry dailyTimeBankEntry = getDailyTimeBankEntry(employmentIdAndDailyTimeBankEntryMap, employmentIdAndCtaResponseDTOMap, employmentDetails, activityDateTimeInterval, count);
+        PayOutPerShift payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap, employmentDetails, activityDateTimeInterval, count);
+        return new Object[]{dailyTimeBankEntry, payOutPerShift};
+    }
+
+    private DailyTimeBankEntry getDailyTimeBankEntry(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, StaffEmploymentDetails employmentDetails, DateTimeInterval activityDateTimeInterval, int count) {
+        DailyTimeBankEntry dailyTimeBankEntry = employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId());
+        if(count>0) {
+            CTAResponseDTO ctaResponseDTO = employmentIdAndCtaResponseDTOMap.get(employmentDetails.getId());
+            int contractualMinutes = getContractualMinutesByDate(activityDateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+            int value = 0;
+            for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
+                if (UNUSED_DAYOFF_LEAVES.equals(ruleTemplate.getCalculationFor()) && TIMEBANK_ACCOUNT.equals(ruleTemplate.getPlannedTimeWithFactor().getAccountType())) {
+                    if (isNull(dailyTimeBankEntry)) {
+                        dailyTimeBankEntry = new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), getLocalDate());
+                        resetDailyTimebankEntry(dailyTimeBankEntry, contractualMinutes);
+                    }
+                    int bonusByRuletemplate = getBonusOfUnusedDaysOff(activityDateTimeInterval, employmentDetails, contractualMinutes, ruleTemplate);
+                    value += (bonusByRuletemplate * count);
+                    dailyTimeBankEntry.getTimeBankCTADistributionList().add(new TimeBankCTADistribution(ruleTemplate.getName(), value, ruleTemplate.getId()));
+                }
+            }
+            if (isNotNull(dailyTimeBankEntry)) {
+                dailyTimeBankEntry.setPlannedMinutesOfTimebank(dailyTimeBankEntry.getPlannedMinutesOfTimebank() + value);
+                dailyTimeBankEntry.setDeltaTimeBankMinutes(dailyTimeBankEntry.getDeltaTimeBankMinutes() + value);
+                dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() + value);
+            }
+        }
+        return dailyTimeBankEntry;
+    }
+
+    private PayOutPerShift getPayoutData(Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, StaffEmploymentDetails employmentDetails, DateTimeInterval activityDateTimeInterval, int count) {
+        PayOutPerShift payOutPerShift = null;
+        if(count>0) {
+            CTAResponseDTO ctaResponseDTO = employmentIdAndCtaResponseDTOMap.get(employmentDetails.getId());
+            int contractualMinutes = getContractualMinutesByDate(activityDateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+            int value = 0;
+            for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
+                if (UNUSED_DAYOFF_LEAVES.equals(ruleTemplate.getCalculationFor()) && PAID_OUT.equals(ruleTemplate.getPlannedTimeWithFactor().getAccountType())) {
+                    if (isNull(payOutPerShift)) {
+                        payOutPerShift = new PayOutPerShift(new BigInteger("-1"), employmentDetails.getId(), employmentDetails.getStaffId(), getLocalDate(), employmentDetails.getUnitId());
+                    }
+                    int bonusByRuletemplate = getBonusOfUnusedDaysOff(activityDateTimeInterval, employmentDetails, contractualMinutes, ruleTemplate);
+                    value += (bonusByRuletemplate * count);
+
+                    payOutPerShift.getPayOutPerShiftCTADistributions().add(new PayOutPerShiftCTADistribution(ruleTemplate.getName(), value, ruleTemplate.getId()));
+                }
+            }
+            if (isNotNull(payOutPerShift)) {
+                payOutPerShift.setCtaBonusMinutesOfPayOut(value);
+                payOutPerShift.setScheduledMinutes(0);
+                payOutPerShift.setTotalPayOutMinutes(value);
+            }
+        }
+        return payOutPerShift;
+    }
+
+    private Map[] getActivityIdDateTimeIntervalMapAndEmploymentIdAndShiftMap(Set<Long> employmentIds, Set<BigInteger> activityIds, Map<BigInteger, Activity> activityWrapperMap) {
+        Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap = new HashMap<>();
+        for (BigInteger activityId : activityWrapperMap.keySet()) {
+            Activity activityWrapper = activityWrapperMap.get(activityId);
+            activityIdDateTimeIntervalMap.putIfAbsent(activityId, getCutoffInterval(activityWrapper.getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), getLocalDate()));
+        }
+        List<DateTimeInterval> dateTimeIntervals = new ArrayList<>(activityIdDateTimeIntervalMap.values());
+        dateTimeIntervals.sort((dateTimeInterval, t1) -> dateTimeInterval.getStartLocalDate().compareTo(t1.getStartLocalDate()));
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), activityIds);
+        Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap = shiftWithActivityDTOS.stream().collect(groupingBy(ShiftWithActivityDTO::getEmploymentId));
+        return new Map[]{activityIdDateTimeIntervalMap, employmentIdAndShiftMap};
+    }
+
+
+
+    private int getBonusOfUnusedDaysOff(DateTimeInterval dateTimeInterval, StaffEmploymentDetails staffEmploymentDetails, int contractualMinutes, CTARuleTemplateDTO ruleTemplate) {
+        int value = 0;
+        if (ruleTemplate.getCalculationFor().equals(UNUSED_DAYOFF_LEAVES)) {
+            if (CompensationMeasurementType.FIXED_VALUE.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType())) {
+                value += getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) ? new BigDecimal(ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
+            } else if (CompensationMeasurementType.PERCENT.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType())) {
+                value += contractualMinutes * ruleTemplate.getCompensationTable().getUnusedDaysOffvalue() / 100;
+            }
+        }
+        return value;
+    }
 
 }

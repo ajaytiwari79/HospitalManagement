@@ -3,8 +3,13 @@ package com.kairos.service.shift;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.FUNCTIONS;
 
@@ -13,8 +18,8 @@ import static com.kairos.enums.FilterType.FUNCTIONS;
  **/
 public class FunctionsFilter implements ShiftFilter {
     private Map<FilterType, Set<String>> filterCriteriaMap;
-    private List<Date> functionDates;
-    public FunctionsFilter(Map<FilterType, Set<String>> filterCriteriaMap, List<Date> functionDates) {
+    private Set<LocalDate> functionDates;
+    public FunctionsFilter(Map<FilterType, Set<String>> filterCriteriaMap, Set<LocalDate> functionDates) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.functionDates = functionDates;
     }
@@ -25,8 +30,9 @@ public class FunctionsFilter implements ShiftFilter {
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                if(functionDates.contains(shiftDTO.getStartDate()))
-                    filteredShifts.add((T)shiftDTO);
+                if(functionDates.contains(asLocalDate(shiftDTO.getStartDate()))) {
+                    filteredShifts.add((T) shiftDTO);
+                }
             }
         }
         return filteredShifts;
