@@ -97,7 +97,7 @@ public class PayOutService extends MongoBaseService {
             payOutPerShift.setPayoutBeforeThisDate(lastPayOutPerShift.getPayoutBeforeThisDate() + lastPayOutPerShift.getTotalPayOutMinutes());
         }
         payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(), (int) payOutPerShift.getTotalPayOutMinutes());
-        save(payOutPerShift);
+        payOutRepository.save(payOutPerShift);
         return true;
     }
 
@@ -210,6 +210,12 @@ public class PayOutService extends MongoBaseService {
         if (isNotNull(payOutPerShift)) {
             payOutPerShift.setDeleted(true);
             payOutRepository.save(payOutPerShift);
+        }
+    }
+
+    public void savePayout(List<PayOutPerShift> payOutPerShifts){
+        if(isCollectionNotEmpty(payOutPerShifts)) {
+            payOutRepository.saveEntities(payOutPerShifts);
         }
     }
 

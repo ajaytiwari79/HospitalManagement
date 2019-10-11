@@ -262,7 +262,7 @@ public class ShiftService extends MongoBaseService {
 
         shift.setScheduledMinutes(scheduledMinutes);
         shift.setDurationMinutes(durationMinutes);
-        shiftStatusService.updateStatusOfShiftIfPhaseValid(phase, shift, activityWrapperMap, staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftAction);
+        shiftStatusService.updateStatusOfShiftIfPhaseValid(planningPeriod,phase, shift, activityWrapperMap, staffAdditionalInfoDTO, shiftAction);
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
         shift.setShiftType(updateShiftType(activityWrapperMap, shift));
         if (isNotNull(functionId)) {

@@ -307,10 +307,10 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN id(staff) as staffId,COLLECT({id:id(employment),expId:id(e),unitId:id(organization)}) as employmentDetails")
     List<Map> findStaffsWithEmploymentIds();
 
-    @Query("MATCH(staff:Staff{deleted:false})-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})\n" +
-            "MATCH (employment)-[:HAS_EXPERTISE_IN]-(expertise:Expertise{deleted:false})-[:HAS_PROTECTED_DAYS_OFF_SETTINGS]-(protectedDaysOffSetting:ProtectedDaysOffSetting{protectedDaysOff:true}) \n" +
+    @Query("MATCH(staff:Staff{deleted:false})-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{deleted:false,published:true})\n" +
+            "MATCH (employment)-[:"+HAS_EXPERTISE_IN+"]-(expertise:Expertise{deleted:false})-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]-(protectedDaysOffSetting:ProtectedDaysOffSetting{protectedDaysOff:true}) \n" +
             "WHERE employment.employmentSubType={0}\n" +
-            "MATCH (employment)-[:IN_UNIT]-(unit:Unit) \n" +
+            "MATCH (employment)-[:"+IN_UNIT+"]-(unit:Unit) \n" +
             "MATCH(employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine) WHERE  NOT EXISTS(employmentLine.endDate) OR date(employmentLine.endDate) >= date()" +
             "MATCH (employmentLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)\n" +
             "WITH CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +

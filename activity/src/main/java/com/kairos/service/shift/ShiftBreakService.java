@@ -93,7 +93,7 @@ public class ShiftBreakService {
                         }
                     }
                 } else if(isCollectionNotEmpty(shift.getBreakActivities()) && !shiftUpdated){
-                    breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate);
+                    breakActivity = validateBreakOnUpdateShift(shift, eligibleBreakInterval, placeBreakAfterThisDate,breakSettings);
                 }
                 if (isNotNull(breakActivity)) {
                     if (breakActivity.getId() == null) {
@@ -106,12 +106,12 @@ public class ShiftBreakService {
         return breakActivities;
     }
 
-    private ShiftActivity validateBreakOnUpdateShift(Shift shift, DateTimeInterval eligibleBreakInterval, Date placeBreakAfterThisDate) {
+    private ShiftActivity validateBreakOnUpdateShift(Shift shift, DateTimeInterval eligibleBreakInterval, Date placeBreakAfterThisDate,BreakSettings breakSettings) {
         ShiftActivity breakActivity = shift.getBreakActivities().get(0);
         Date startdate = placeBreakAfterThisDate.after(eligibleBreakInterval.getStartDate()) ? eligibleBreakInterval.getStartDate() : placeBreakAfterThisDate;
         Date endDate = placeBreakAfterThisDate.after(eligibleBreakInterval.getEndDate()) ? placeBreakAfterThisDate : eligibleBreakInterval.getEndDate();
         eligibleBreakInterval = new DateTimeInterval(startdate,endDate);
-        if(!eligibleBreakInterval.containsInterval(breakActivity.getInterval())){
+        if(!eligibleBreakInterval.containsInterval(breakActivity.getInterval()) || !breakSettings.getBreakDurationInMinute().equals(breakActivity.getInterval().getMinutes())){
             exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
         }
         return breakActivity;
@@ -119,7 +119,7 @@ public class ShiftBreakService {
 
     private ShiftActivity getBreakByShiftActivity(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakSettings breakSetting, boolean placeBreakAnyWhereInShift, ShiftActivity breakActivity, Date placeBreakAfterThisDate) {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
-            if(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid()) {
+            //if(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid()) {
                 if (isCollectionNotEmpty(shiftActivity.getChildActivities())) {
                     for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
                         breakActivity = getBreakActivityAfterCalculation(activityWrapperMap, breakSetting, placeBreakAnyWhereInShift, placeBreakAfterThisDate, childActivity, staffAdditionalInfoDTO);
@@ -127,7 +127,7 @@ public class ShiftBreakService {
                 } else {
                     breakActivity = getBreakActivityAfterCalculation(activityWrapperMap, breakSetting, placeBreakAnyWhereInShift, placeBreakAfterThisDate, shiftActivity, staffAdditionalInfoDTO);
                 }
-            }
+            //}
         }
         return breakActivity;
     }

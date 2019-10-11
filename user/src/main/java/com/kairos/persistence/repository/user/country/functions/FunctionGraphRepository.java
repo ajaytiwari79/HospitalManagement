@@ -8,6 +8,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -90,5 +91,5 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "WITH filter(x IN collect(rel.appliedDates) WHERE size(x)>0) as dates \n" +
             "UNWIND dates AS appliedDates WITH  DISTINCT appliedDates \n" +
             "RETURN appliedDates")
-    List<Date> findAllDateByFunctionIds(Long unitId, List<Long> functionIds);
+    List<LocalDate> findAllDateByFunctionIds(Long unitId, List<Long> functionIds);
 }

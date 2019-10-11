@@ -34,7 +34,7 @@ public class RealTimeStatusFilter implements ShiftFilter {
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                if (isCurrentDayShift(shiftDTO) && isOnBreak(shiftDTO) || isSick(shiftDTO) || isUpcoming(shiftDTO) || isResting(shiftDTO) || isOnLeave(shiftDTO) || isCurrentlyWorking(shiftDTO)){
+                if (isCurrentDayShift(shiftDTO) && (isOnBreak(shiftDTO) || isSick(shiftDTO) || isUpcoming(shiftDTO) || isResting(shiftDTO) || isOnLeave(shiftDTO) || isCurrentlyWorking(shiftDTO))){
                    filteredShifts.add((T)shiftDTO);
                 }
             }

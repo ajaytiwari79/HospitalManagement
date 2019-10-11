@@ -40,7 +40,7 @@ public class StaffFilterDTO {
 
     public boolean isValidFilterForShift(){
         boolean isValidFilterForShift = false;
-        Set<FilterType> filterTypeSet = newHashSet(TIME_TYPE,ACTIVITY_TIMECALCULATION_TYPE,ACTIVITY_STATUS,TIME_SLOT,ABSENCE_ACTIVITY,VALIDATED_BY,PLANNED_TIME_TYPE);
+        Set<FilterType> filterTypeSet = newHashSet(TIME_TYPE,ACTIVITY_TIMECALCULATION_TYPE,ACTIVITY_STATUS,TIME_SLOT,ABSENCE_ACTIVITY,VALIDATED_BY,PLANNED_TIME_TYPE,REAL_TIME_STATUS,TIME_TYPE,FUNCTIONS);
         for (FilterSelectionDTO filterSelectionDTO : this.getFiltersData()) {
             isValidFilterForShift = isCollectionNotEmpty(filterSelectionDTO.getValue()) && filterTypeSet.contains(filterSelectionDTO.getName());
             if(isValidFilterForShift){
