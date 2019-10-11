@@ -3,6 +3,7 @@ package com.kairos.service.unit_settings;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;

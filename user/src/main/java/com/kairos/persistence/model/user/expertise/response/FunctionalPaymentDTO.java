@@ -2,6 +2,8 @@ package com.kairos.persistence.model.user.expertise.response;
 
 
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.constraints.Min;
@@ -9,6 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @QueryResult
+@Getter
+@Setter
 public class FunctionalPaymentDTO {
     @Min(0)
     private Long expertiseId;
@@ -19,75 +23,4 @@ public class FunctionalPaymentDTO {
     private boolean published;
     private BigDecimal percentageValue;
     private boolean oneTimeUpdatedAfterPublish;
-
-
-
-
-    public FunctionalPaymentDTO() {
-        //dc
-    }
-
-    public Long getExpertiseId() {
-        return expertiseId;
-    }
-
-    public void setExpertiseId(Long expertiseId) {
-        this.expertiseId = expertiseId;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public PaidOutFrequencyEnum getPaymentUnit() {
-        return paymentUnit;
-    }
-
-    public void setPaymentUnit(PaidOutFrequencyEnum paymentUnit) {
-        this.paymentUnit = paymentUnit;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public BigDecimal getPercentageValue() {
-        return percentageValue;
-    }
-
-    public void setPercentageValue(BigDecimal percentageValue) {
-        this.percentageValue = percentageValue;
-    }
-
-    public boolean isOneTimeUpdatedAfterPublish() {
-        return oneTimeUpdatedAfterPublish;
-    }
-
-    public void setOneTimeUpdatedAfterPublish(boolean oneTimeUpdatedAfterPublish) {
-        this.oneTimeUpdatedAfterPublish = oneTimeUpdatedAfterPublish;
-    }
 }

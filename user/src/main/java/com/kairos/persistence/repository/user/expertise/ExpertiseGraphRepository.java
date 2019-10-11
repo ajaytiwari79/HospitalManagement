@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.expertise.response.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
@@ -9,6 +10,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -161,4 +163,9 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(protectedSetting:ProtectedDaysOffSetting)\n" +
             "RETURN protectedSetting")
     List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(Long expertiseId);
-}
+
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) = {0} AND (exl.startDate<=DATE({1}) AND (exl.endDate IS NULL OR exl.endDate>=DATE({1}))" +
+            "RETURN exl LIMIT 1")
+    ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, LocalDate startDate);
+
+ }

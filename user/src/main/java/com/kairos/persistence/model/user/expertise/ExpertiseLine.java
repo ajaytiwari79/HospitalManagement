@@ -36,6 +36,8 @@ public class ExpertiseLine extends UserBaseEntity {
     @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
     private BreakPaymentSetting breakPaymentSetting;
+    private int fullTimeWeeklyMinutes; // This is equals to 37 hours
+    private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
     private ExpertiseLine(){
 
@@ -50,15 +52,13 @@ public class ExpertiseLine extends UserBaseEntity {
         this.sector = expertiseLineBuilder.sector;
         this.union = expertiseLineBuilder.union;
         this.breakPaymentSetting=expertiseLineBuilder.breakPaymentSetting;
+        this.fullTimeWeeklyMinutes=expertiseLineBuilder.fullTimeWeeklyMinutes;
+        this.numberOfWorkingDaysInWeek=expertiseLineBuilder.numberOfWorkingDaysInWeek;
     }
 
     public boolean isUpdated(ExpertiseLine expertiseLine) {
-        if (!this.getOrganizationLevel().getId().equals(expertiseLine.getOrganizationLevel().getId()) || isServiceChanged(expertiseLine.getOrganizationServices()) || !this.getSector().getId().equals(expertiseLine.getSector().getId()) ||
-                !this.getUnion().getId().equals(expertiseLine.getUnion().getId())
-        ) {
-            return true;
-        }
-        return false;
+        return !this.getOrganizationLevel().getId().equals(expertiseLine.getOrganizationLevel().getId()) || isServiceChanged(expertiseLine.getOrganizationServices()) || !this.getSector().getId().equals(expertiseLine.getSector().getId()) ||
+                !this.getUnion().getId().equals(expertiseLine.getUnion().getId());
     }
 
     private boolean isServiceChanged(List<OrganizationService> organizationServices) {
@@ -74,6 +74,8 @@ public class ExpertiseLine extends UserBaseEntity {
         private List<OrganizationService> organizationServices;
         private Organization union;
         private BreakPaymentSetting breakPaymentSetting;
+        private int fullTimeWeeklyMinutes; // This is equals to 37 hours
+        private Integer numberOfWorkingDaysInWeek; // 5 or 7
 
 
         public ExpertiseLineBuilder setStartDate(LocalDate startDate) {
@@ -111,6 +113,16 @@ public class ExpertiseLine extends UserBaseEntity {
             this.union = union;
             return this;
         }
+        public ExpertiseLineBuilder setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+            this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+            return this;
+        }
+        public ExpertiseLineBuilder setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
+            this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+            return this;
+        }
+
+
 
         public ExpertiseLine createLine() {
             return new ExpertiseLine(this);

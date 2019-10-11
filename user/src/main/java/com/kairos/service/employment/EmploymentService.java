@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
@@ -34,6 +35,7 @@ import com.kairos.persistence.model.user.employment.query_result.EmploymentLines
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.expertise.response.ExpertisePlannedTimeQueryResult;
@@ -58,6 +60,7 @@ import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.AsynchronousService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.initial_time_bank_log.InitialTimeBankLogService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
@@ -162,6 +165,8 @@ public class EmploymentService {
     private EnvConfig envConfig;
     @Inject
     private InitialTimeBankLogService initialTimeBankLogService;
+    @Inject
+    private ExpertiseService expertiseService;
 
 
 
@@ -660,14 +665,14 @@ public class EmploymentService {
         if (!Optional.ofNullable(seniorityLevel).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_SENIORITYLEVEL_ID_NOTFOUND, employmentDTO.getReasonCodeId());
         }
-
+        ExpertiseLine expertiseLine=expertiseService.getCurrentlyActiveExpertiseLineByDate(employment.getExpertise().getId(),employment.getStartDate());
         EmploymentLine employmentLine = new EmploymentLine.EmploymentLineBuilder()
                 .setSeniorityLevel(seniorityLevel)
                 .setStartDate(employmentDTO.getStartDate())
                 .setEndDate(employmentDTO.getEndDate())
                 .setTotalWeeklyMinutes(employmentDTO.getTotalWeeklyMinutes() + (employmentDTO.getTotalWeeklyHours() * 60))
-                .setFullTimeWeeklyMinutes(employment.getExpertise().getFullTimeWeeklyMinutes())
-                .setWorkingDaysInWeek(employment.getExpertise().getNumberOfWorkingDaysInWeek())
+                .setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes())
+                .setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek())
                 .setAvgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
                 .setHourlyCost(employmentDTO.getHourlyCost())
                 .build();
@@ -771,8 +776,11 @@ public class EmploymentService {
         EmploymentLinesQueryResult employmentLinesQueryResult = new EmploymentLinesQueryResult(employmentLine.getId(), employmentLine.getStartDate(), employmentLine.getEndDate()
                 , employmentLine.getWorkingDaysInWeek(), employmentLine.getTotalWeeklyMinutes() / 60, employmentLine.getAvgDailyWorkingHours(), employmentLine.getFullTimeWeeklyMinutes(), 0D,
                 employmentLine.getTotalWeeklyMinutes() % 60, employmentLine.getHourlyCost(), employmentTypes, seniorityLevel, employment.getId(), employment.getAccumulatedTimebankMinutes());
-
-        return new EmploymentQueryResult(employment.getExpertise().retrieveBasicDetails(), employment.getStartDate(),
+        ExpertiseDTO expertiseDTO=ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(),ExpertiseDTO.class);
+        ExpertiseLine expertiseLine=expertiseService.getCurrentlyActiveExpertiseLineByDate(employment.getExpertise().getId(),employmentDTO.getStartDate());
+        expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
+        expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
+        return new EmploymentQueryResult(expertiseDTO, employment.getStartDate(),
                 employment.getEndDate(), employment.getId(), employment.getUnion(), employment.getLastWorkingDate()
                 , wtaResponseDTO, employment.getUnit().getId(), parentOrganizationId, employment.isPublished(), reasonCode, unitInfo, employment.getEmploymentSubType(),
                 Collections.singletonList(employmentLinesQueryResult), employmentDTO.getTaxDeductionPercentage(), employment.getAccumulatedTimebankMinutes(), employment.getAccumulatedTimebankDate());
@@ -781,7 +789,11 @@ public class EmploymentService {
 
     protected EmploymentQueryResult getBasicDetails(Employment employment, WTAResponseDTO wtaResponseDTO, EmploymentLine employmentLine) {
         EmploymentQueryResult employmentQueryResult = employmentGraphRepository.getUnitIdAndParentUnitIdByEmploymentId(employment.getId());
-        return new EmploymentQueryResult(employment.getExpertise().retrieveBasicDetails(), employment.getStartDate(), employment.getEndDate(), employment.getId(), employment.getUnion(),
+        ExpertiseDTO expertiseDTO=ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(),ExpertiseDTO.class);
+        ExpertiseLine expertiseLine=expertiseService.getCurrentlyActiveExpertiseLineByDate(employment.getExpertise().getId(),employment.getStartDate());
+        expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
+        expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
+        return new EmploymentQueryResult(expertiseDTO, employment.getStartDate(), employment.getEndDate(), employment.getId(), employment.getUnion(),
                 employment.getLastWorkingDate(), wtaResponseDTO, employmentQueryResult.getUnitId(), employment.isPublished(), employmentQueryResult.getParentUnitId());
 
     }
@@ -811,7 +823,7 @@ public class EmploymentService {
         com.kairos.dto.activity.shift.StaffEmploymentDetails employmentDetails = null;
         if (employment != null) {
             List<ProtectedDaysOffSetting>  protectedDaysOffSettings=expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-            employment.getExpertise().setProtectedDaysOffSettings(protectedDaysOffSettings);
+            employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyPropertiesOfListByMapper(protectedDaysOffSettings, com.kairos.dto.activity.shift.ProtectedDaysOffSetting.class));
             employmentDetails = convertEmploymentObject(employment);
             List<EmploymentLinesQueryResult> employmentLinesQueryResults = employmentGraphRepository.findFunctionalHourlyCost(Arrays.asList(employmentId));
             Map<Long, BigDecimal> hourlyCostMap = employmentLinesQueryResults.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));

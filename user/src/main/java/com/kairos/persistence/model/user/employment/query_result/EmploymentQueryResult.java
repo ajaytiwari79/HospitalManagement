@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.employment.query_result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
@@ -28,7 +29,7 @@ import java.util.Optional;
 @Setter
 @NoArgsConstructor
 public class EmploymentQueryResult {
-    private Expertise expertise;
+    //private Expertise expertise;
     private LocalDate startDate;
     private LocalDate endDate;
     private Long id;
@@ -51,6 +52,7 @@ public class EmploymentQueryResult {
     private LocalDate accumulatedTimebankDate;
     private long totalShifts;
     private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+    private ExpertiseDTO expertise;
 
 
     /**
@@ -58,7 +60,7 @@ public class EmploymentQueryResult {
      */
     private WTAResponseDTO workingTimeAgreement;
 
-    public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Boolean published, Long parentUnitId) {
+    public EmploymentQueryResult(ExpertiseDTO expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Boolean published, Long parentUnitId) {
         this.expertise = expertise;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -72,7 +74,7 @@ public class EmploymentQueryResult {
 
     }
 
-    public EmploymentQueryResult(Expertise expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
+    public EmploymentQueryResult(ExpertiseDTO expertise, LocalDate startDate, LocalDate endDate, long id, Organization union, LocalDate lastWorkingDate, WTAResponseDTO wta, Long unitId, Long parentUnitId, Boolean published,
                                  Map<String, Object> reasonCode, Map<String, Object> unitInfo, EmploymentSubType employmentSubType, List<EmploymentLinesQueryResult> employmentLines, float taxDeductionPercentage, long accumulatedTimebankMinutes, LocalDate accumulatedTimebankDate) {
         this.expertise = expertise;
         this.startDate = startDate;

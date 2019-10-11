@@ -1,6 +1,8 @@
 package com.kairos.dto.user.country.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
+import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
@@ -12,6 +14,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,10 +39,11 @@ public class ExpertiseDTO {
     private BreakPaymentSetting breakPaymentSetting;
     private SectorDTO sector;
     @Valid
-    private List<SeniorityLevelDTO> seniorityLevels;
+    private List<SeniorityLevelDTO> seniorityLevels=new ArrayList<>();
     private LocalDate startDate;
     private LocalDate endDate;
     private Long expertiseLineId;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
 
 
     @AssertTrue(message = "message.start_date.less_than.end_date")

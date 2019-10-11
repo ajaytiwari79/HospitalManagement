@@ -14,6 +14,8 @@ import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.getLocalDate;
+import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTEMPTY;
 import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -38,9 +40,6 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = BELONGS_TO)
     private Country country;
 
-    private int fullTimeWeeklyMinutes; // This is equals to 37 hours
-    private Integer numberOfWorkingDaysInWeek; // 5 or 7
-
     private boolean published;
 
     @Relationship(type = FOR_SENIORITY_LEVEL)
@@ -64,27 +63,23 @@ public class Expertise extends UserBaseEntity {
     }
 
 
-    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published, List<SeniorityLevel> seniorityLevel, List<ExpertiseLine> expertiseLines) {
+    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country, boolean published, List<SeniorityLevel> seniorityLevel, List<ExpertiseLine> expertiseLines) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.country = country;
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.published = published;
         this.seniorityLevel = seniorityLevel;
         this.expertiseLines = expertiseLines;
     }
 
-    public Expertise(Long id,@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek,  boolean published, List<SeniorityLevel> seniorityLevel,List<ExpertiseLine> expertiseLines) {
+    public Expertise(Long id,@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, boolean published, List<SeniorityLevel> seniorityLevel,List<ExpertiseLine> expertiseLines) {
         this.id=id;
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
         this.published = published;
         this.seniorityLevel = seniorityLevel;
         this.expertiseLines=expertiseLines;
@@ -117,22 +112,6 @@ public class Expertise extends UserBaseEntity {
         getSeniorityLevel().add(seniorityLevel);
     }
 
-    public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description, LocalDate startDate, LocalDate endDate, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
-        this.name = name;
-        this.id = id;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-        this.published = published;
-    }
-
-    public Expertise retrieveBasicDetails() {
-        return new Expertise(this.id, this.name, this.description, this.startDate, this.endDate, this.fullTimeWeeklyMinutes, this.numberOfWorkingDaysInWeek, this.published);
-
-    }
-
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap<>(6);
         map.put("id", this.id);
@@ -143,6 +122,5 @@ public class Expertise extends UserBaseEntity {
         map.put("creationDate", this.getCreationDate());
         return map;
     }
-
 
 }
