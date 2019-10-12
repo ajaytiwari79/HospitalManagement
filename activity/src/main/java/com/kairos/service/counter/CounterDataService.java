@@ -72,7 +72,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class CounterDataService extends MongoBaseService {
-    private final static Logger LOGGER = LoggerFactory.getLogger(CounterDataService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CounterDataService.class);
     @Inject
     private TaskService taskService;
     @Inject
@@ -100,8 +100,7 @@ public class CounterDataService extends MongoBaseService {
 
     //FIXME: DO NOT REMOVE will be uncommented once representation model confirmed.
     public List<KPI> getCountersData(Long unitId, BigInteger solverConfigId) {
-        ArrayList<KPI> kpiList = new ArrayList<>();
-        return kpiList;
+        return new ArrayList<>();
     }
 
 
@@ -129,9 +128,7 @@ public class CounterDataService extends MongoBaseService {
         for (Future<CommonRepresentationData> data : kpiResults) {
             try {
                 if(isNotNull(data))kpisData.add(data.get());
-            } catch (InterruptedException ex) {
-                LOGGER.error("error while generate KPI  data",ex);
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException|ExecutionException ex) {
                 LOGGER.error("error while generate KPI  data",ex);
             }
         }
@@ -140,35 +137,44 @@ public class CounterDataService extends MongoBaseService {
     }
 
     private void getStaffKPiFilterAndApplicableKpi(FilterCriteriaDTO filters, Long staffId, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKPIMap, List<KPI> kpis, Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera) {
+        List<ApplicableKPI> staffApplicableKPIS = getApplicableKPIS(filters, staffId, kpis);
+        for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
+            getStaffFIlterBasedCriteria(filters, staffId, staffKpiFilterCritera, staffApplicableKPI);
+            kpiIdAndApplicableKPIMap.put(staffApplicableKPI.getActiveKpiId(),staffApplicableKPI);
+        }
+    }
+
+    private void getStaffFIlterBasedCriteria(FilterCriteriaDTO filters, Long staffId, Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera, ApplicableKPI staffApplicableKPI) {
+         Map<FilterType, List> staffFilterBasedCriteria=new HashMap<>();
+        if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
+            staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
+            if(KPIRepresentation.INDIVIDUAL_STAFF.equals(staffApplicableKPI.getKpiRepresentation())){
+                staffFilterBasedCriteria.put(STAFF_IDS, Arrays.asList(isNotNull(filters.getStaffId()) ?filters.getStaffId().intValue() : staffId.intValue()));
+            }
+            if(isNotNull(filters.getFrequencyType())){
+                staffApplicableKPI.setInterval(filters.getInterval());
+                staffApplicableKPI.setValue(filters.getValue());
+                staffApplicableKPI.setFrequencyType(filters.getFrequencyType());
+            }
+            if(isNotNull(filters.getStartDate()) && isNotNull( filters.getEndDate())) {
+                staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
+                staffApplicableKPI.setFrequencyType(DurationType.MONTHS);
+            }
+            if(isCollectionNotEmpty(staffApplicableKPI.getFibonacciKPIConfigs())){
+                staffFilterBasedCriteria.put(FilterType.FIBONACCI,staffApplicableKPI.getFibonacciKPIConfigs());
+            }
+            staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
+        }
+    }
+
+    private List<ApplicableKPI> getApplicableKPIS(FilterCriteriaDTO filters, Long staffId, List<KPI> kpis) {
         List<ApplicableKPI> staffApplicableKPIS;
         if (filters.isCountryAdmin()) {
             staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()), ConfLevel.COUNTRY, filters.getCountryId());
         } else {
             staffApplicableKPIS = counterRepository.getApplicableKPI(kpis.stream().map(MongoBaseEntity::getId).collect(Collectors.toList()), ConfLevel.STAFF, staffId);
         }
-        for (ApplicableKPI staffApplicableKPI : staffApplicableKPIS) {
-            Map<FilterType, List> staffFilterBasedCriteria = new HashMap<>();
-            if (isNotNull(staffApplicableKPI.getApplicableFilter())) {
-                staffApplicableKPI.getApplicableFilter().getCriteriaList().forEach(filterCriteria -> staffFilterBasedCriteria.put(filterCriteria.getType(), filterCriteria.getValues()));
-                if(KPIRepresentation.INDIVIDUAL_STAFF.equals(staffApplicableKPI.getKpiRepresentation())){
-                    staffFilterBasedCriteria.put(STAFF_IDS, Arrays.asList(isNotNull(filters.getStaffId()) ?filters.getStaffId().intValue() : staffId.intValue()));
-                }
-                if(isNotNull(filters.getFrequencyType())){
-                    staffApplicableKPI.setInterval(filters.getInterval());
-                    staffApplicableKPI.setValue(filters.getValue());
-                    staffApplicableKPI.setFrequencyType(filters.getFrequencyType());
-                }
-                if(isNotNull(filters.getStartDate()) && isNotNull( filters.getEndDate())) {
-                    staffFilterBasedCriteria.put(FilterType.TIME_INTERVAL,Arrays.asList(filters.getStartDate(),filters.getEndDate()));
-                    staffApplicableKPI.setFrequencyType(DurationType.MONTHS);
-                }
-                if(isCollectionNotEmpty(staffApplicableKPI.getFibonacciKPIConfigs())){
-                    staffFilterBasedCriteria.put(FilterType.FIBONACCI,staffApplicableKPI.getFibonacciKPIConfigs());
-                }
-                staffKpiFilterCritera.put(staffApplicableKPI.getActiveKpiId(), staffFilterBasedCriteria);
-            }
-            kpiIdAndApplicableKPIMap.put(staffApplicableKPI.getActiveKpiId(),staffApplicableKPI);
-        }
+        return staffApplicableKPIS;
     }
 
     //kpi default data and copy and save filter
@@ -379,7 +385,7 @@ public class CounterDataService extends MongoBaseService {
     }
 
     public TabKPIDTO copyKpiFilterData(String tabId, Long refId, BigInteger kpiId, CounterDTO counterDTO, ConfLevel level) {
-        boolean copy = (isNotNull(tabId) ? true : false);
+        boolean copy = isNotNull(tabId);
         TabKPIConf tabKPIConf = null;
         List<ApplicableKPI> applicableKPIS;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
@@ -504,9 +510,7 @@ public class CounterDataService extends MongoBaseService {
                     kpiResponseDTO.setKpiName(data.get().getKpiName());
                     kpiResponseDTO.setStaffKPIValue(data.get().getStaffKPIValue());
                 }
-            } catch (InterruptedException e) {
-                LOGGER.error("error while generate KPI calculation data",e);
-            } catch (ExecutionException e) {
+            } catch (InterruptedException|ExecutionException e) {
                 LOGGER.error("error while generate KPI calculation data",e);
             }
         }
