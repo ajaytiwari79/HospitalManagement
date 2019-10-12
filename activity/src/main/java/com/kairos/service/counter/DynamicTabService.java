@@ -116,7 +116,7 @@ public class DynamicTabService extends MongoBaseService {
             }
         });
         if (ObjectUtils.isCollectionEmpty(duplicateEntries)) {
-            exceptionService.duplicateDataException(ERROR_DASHBOARD_NAME_DUPLICATE)
+            exceptionService.duplicateDataException(ERROR_DASHBOARD_NAME_DUPLICATE);
         }
     }
 
