@@ -97,7 +97,7 @@ public class ExpertiseNightWorkerSettingService{
     }
 
     public Boolean updateNightWorkerStatusByUnitId(Long unitId) {
-        Map<Long, Long> employmentIdAndExpertiseMap = userIntegrationService.getEmploymentExpertiseMap(unitId, unitId);
+        Map<Long, Long> employmentIdAndExpertiseMap = userIntegrationService.getEmploymentExpertiseMap(unitId);
         List<ShiftDTO> shifts = shiftMongoRepository.getShiftsByUnitBeforeDate(unitId, DateUtils.getDate());
         Map<Long, List<ShiftDTO>> shiftsOfStaff = new HashMap<>();
 

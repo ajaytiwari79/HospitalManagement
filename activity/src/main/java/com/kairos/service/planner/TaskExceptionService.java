@@ -156,7 +156,7 @@ public class TaskExceptionService extends MongoBaseService {
         List<Long> citizenIds = taskRestrictionDtos.stream().map(taskRestrictionDto -> taskRestrictionDto.getCitizenId()).collect(Collectors.toList());
 
         List<Task> tasks = taskMongoRepository.getPrePlanningTaskBetweenExceptionDates(unitId, citizenIds, dateFromAsDate, dateToAsDate);
-        Map<String,String> flsCredentails = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String,String> flsCredentails = userIntegrationService.getFLSCredentials(unitId);
         taskRestrictionDtos.forEach(taskRestrictionDto -> {
             List<Task> filtertedTasks = tasks.stream().filter(task -> task.getCitizenId() == taskRestrictionDto.getCitizenId()).collect(Collectors.toList());
             removeRestrictionFromTask(filtertedTasks,taskRestrictionDto,flsCredentails);
@@ -199,7 +199,7 @@ public class TaskExceptionService extends MongoBaseService {
             }
             removeRestrictionFromTask(task);
         });
-        Map<String,String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String,String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
        // taskConverterService.createFlsCallFromTasks(tasks,flsCredentials);
         return true;
     }
@@ -220,7 +220,7 @@ public class TaskExceptionService extends MongoBaseService {
             }
             updateUnhandledTaskInfo(task, taskDTO);
         });
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         //taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
 
         if(!tasks.isEmpty()){
@@ -261,7 +261,7 @@ public class TaskExceptionService extends MongoBaseService {
             }
             updateTaskInfo(task, bulkUpdateTaskDTO);
         });
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         //taskConverterService.createFlsCallFromTasks(tasks, flsCredentials);
         return taskService.customizeTaskData(tasks);
     }
@@ -329,7 +329,7 @@ public class TaskExceptionService extends MongoBaseService {
 
         Map<String, Object> returnData = new HashMap<>();
 
-        /*Map<String, String> flsCredentials = integrationServiceRestClient.getFLS_Credentials(unitId);
+        /*Map<String, String> flsCredentials = integrationServiceRestClient.getFLSCredentials(unitId);
 
         Map <String,Object> callMetaData = new HashMap<>();
         callMetaData.put("functionCode",1);
@@ -362,7 +362,7 @@ public class TaskExceptionService extends MongoBaseService {
 
         Task task =  taskService.findOne(String.valueOf(taskId));
 
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
 
         Map<String,Object> confirmMetaData = new HashMap<>();
         confirmMetaData.put("functionCode",2);
@@ -408,7 +408,7 @@ public class TaskExceptionService extends MongoBaseService {
             return Collections.emptyList();
         }
         List<Task> tasksToReturn = new ArrayList<>(tasksToUpdate.size());
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         tasksToUpdate.forEach(task -> {
             if (!task.isSingleTask() && task.getActualPlanningTask() == null) {
                 taskService.savePreplanningStateOfTask(task);
@@ -488,7 +488,7 @@ public class TaskExceptionService extends MongoBaseService {
         }
 
         taskService.save(tasksToReturn);
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(task.getUnitId());
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(task.getUnitId());
         //taskConverterService.createFlsCallFromTasks(tasksToReturn, flsCredentials);
         return taskService.customizeTaskData(tasksToReturn);
     }
@@ -535,7 +535,7 @@ public class TaskExceptionService extends MongoBaseService {
                 revertTaskState.add(actualTask);
             }
         });
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         //taskConverterService.createFlsCallFromTasks(revertTaskState, flsCredentials);
         if(!revertTaskState.isEmpty()){
             ClientAggregator clientAggregator = updateTaskCountInAggregator(revertTaskState,unitId,revertTaskState.get(0).getCitizenId(),false);
@@ -561,7 +561,7 @@ public class TaskExceptionService extends MongoBaseService {
             logger.info("taskList >>>>>>>  " + taskList);
         }
         String action = synchronizeTaskPayload.get("action").toString();
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
         if (action.equals("sync")) {
             /*if (taskList.size() > 0) {
                 taskConverterService.createFlsCallFromTasks(taskList, flsCredentials);

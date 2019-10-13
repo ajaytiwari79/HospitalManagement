@@ -39,7 +39,7 @@ import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.*;
 
-public class ActivityCalculationKPIService implements CounterService {
+public class ActivityKPICalculationService implements CounterService {
 
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
@@ -50,17 +50,10 @@ public class ActivityCalculationKPIService implements CounterService {
     @Inject
     private ShiftFilterService shiftFilterService;
 
-    public double getTotal(List<ShiftWithActivityDTO> shifts, LocalDate startDate, LocalDate endDate) {
+    public double getTotal(List<ShiftWithActivityDTO> shifts) {
         //all shifts should be sorted on startDate
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate, endDate);
-        long totaltotalMinutes = dateTimeInterval.getMilliSeconds() / 3600000;
-        for (ShiftWithActivityDTO shift : shifts) {
-            DateTimeInterval shiftInterval = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
-            if (dateTimeInterval.overlaps(shiftInterval)) {
-                totaltotalMinutes -= (int) (dateTimeInterval.overlap(shiftInterval).getMinutes() / 60);
-            }
-        }
-        return totaltotalMinutes;
+        double total = 0;
+        return total;
     }
 
     public Map<Object, Double> calculateTotalHours(List<Long> staffIds, ApplicableKPI applicableKPI, List<DateTimeInterval> dateTimeIntervals, List<ShiftWithActivityDTO> shifts) {
@@ -171,7 +164,9 @@ public class ActivityCalculationKPIService implements CounterService {
         Map<Long, List<ShiftWithActivityDTO>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
             for (Long staffId : staffIds) {
-                totalHours += getTotal(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeInterval.getStartDate()), dateTimeInterval.getEndLocalDate());
+                List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffShiftMapping.getOrDefault(staffId, new ArrayList<>());
+                shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
+                totalHours += getTotal(shiftWithActivityDTOS);
             }
         }
         staffTotalHours.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), totalHours);
@@ -182,8 +177,11 @@ public class ActivityCalculationKPIService implements CounterService {
         Double totalHours;
         Map<Object, Double> staffTotalHours = new HashMap<>();
         Map<Long, List<ShiftWithActivityDTO>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(),dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         for (Long staffId : staffIds) {
-            totalHours = getTotal(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), DateUtils.asLocalDate(dateTimeIntervals.get(0).getStartDate()), DateUtils.asLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate()));
+            List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffShiftMapping.getOrDefault(staffId, new ArrayList<>());
+            shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
+            totalHours = getTotal(shiftWithActivityDTOS);
             staffTotalHours.put(staffId, totalHours);
         }
         return staffTotalHours;

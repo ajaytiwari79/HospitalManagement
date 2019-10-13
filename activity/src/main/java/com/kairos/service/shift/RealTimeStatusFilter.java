@@ -33,29 +33,8 @@ public class RealTimeStatusFilter implements ShiftFilter {
         boolean validFilter = filterCriteriaMap.containsKey(REAL_TIME_STATUS) && isCollectionNotEmpty(filterCriteriaMap.get(REAL_TIME_STATUS));
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
-            Date currentDate = getDate();
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                List<BigInteger> currentOnBreakActivityIds = new ArrayList<>();
-                boolean shiftOnBreak = false;
-                if(isCollectionNotEmpty(shiftDTO.getBreakActivities())) {
-                    for (ShiftActivityDTO shiftActivityDTO : shiftDTO.getBreakActivities()) {
-                        if (shiftActivityDTO.getStartDate().before(currentDate) && shiftActivityDTO.getEndDate().after(currentDate)) {
-                            currentOnBreakActivityIds.add(shiftActivityDTO.getActivityId());
-                        }
-                    }
-                    shiftOnBreak = shiftDTO.getBreakActivities().stream().anyMatch(shiftActivityDTO -> currentOnBreakActivityIds.contains(shiftActivityDTO.getActivityId()));
-                }
-                Set<BigInteger> timeTypeIds = new HashSet<>();
-                shiftDTO.getActivities().forEach(shiftActivityDTO -> {
-                    timeTypeIds.add(shiftActivityDTO.getActivity().getTimeType().getId());
-                    shiftActivityDTO.getChildActivities().forEach(childActivityDTO ->  timeTypeIds.add(childActivityDTO.getActivity().getTimeType().getId()));
-                });
-                if (isCurrentDayShift(shiftDTO) && ((filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_BREAK.toString()) && shiftOnBreak) ||
-                        (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.SICK.toString()) && CollectionUtils.containsAny(selectedSickTimeTypeIds,timeTypeIds))  ||
-                        (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.UPCOMING.toString()) && shiftDTO.getStartDate().after(currentDate))  ||
-                        (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString()) && !(ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) && (shiftDTO.getStartDate().after(currentDate) || shiftDTO.getEndDate().before(currentDate)))  ||
-                        (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_LEAVE.toString()) && ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())))  ||
-                        (filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.CURRENTLY_WORKING.toString()) && shiftDTO.getStartDate().before(currentDate) && shiftDTO.getEndDate().after(currentDate)))) {
+                if (isCurrentDayShift(shiftDTO) && (isOnBreak(shiftDTO) || isSick(shiftDTO) || isUpcoming(shiftDTO) || isResting(shiftDTO) || isOnLeave(shiftDTO) || isCurrentlyWorking(shiftDTO))){
                    filteredShifts.add((T)shiftDTO);
                 }
             }
@@ -67,5 +46,45 @@ public class RealTimeStatusFilter implements ShiftFilter {
         Date currentDate = asDate(asZoneDateTime(getDate()).truncatedTo(ChronoUnit.DAYS));
         Date shiftDate = asDate(asZoneDateTime(shiftDTO.getStartDate()).truncatedTo(ChronoUnit.DAYS));
         return currentDate.equals(shiftDate);
+    }
+
+    private boolean isCurrentlyWorking(ShiftDTO shiftDTO){
+        Date currentDate = getDate();
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.CURRENTLY_WORKING.toString()) && shiftDTO.getStartDate().before(currentDate) && shiftDTO.getEndDate().after(currentDate);
+    }
+
+    private boolean isOnLeave(ShiftDTO shiftDTO){
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_LEAVE.toString()) && ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()));
+    }
+
+    private boolean isResting(ShiftDTO shiftDTO){
+        Date currentDate = getDate();
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.RESTING.toString()) && !(ShiftType.ABSENCE.equals(shiftDTO.getShiftType()) && (CommonConstants.FULL_WEEK.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(shiftDTO.getActivities().get(0).getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()))) && (shiftDTO.getStartDate().after(currentDate) || shiftDTO.getEndDate().before(currentDate));
+    }
+
+    private boolean isUpcoming(ShiftDTO shiftDTO){
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.UPCOMING.toString()) && shiftDTO.getStartDate().after(getDate());
+    }
+
+    private boolean isSick(ShiftDTO shiftDTO){
+        Set<BigInteger> timeTypeIds = new HashSet<>();
+        shiftDTO.getActivities().forEach(shiftActivityDTO -> {
+            timeTypeIds.add(shiftActivityDTO.getActivity().getTimeType().getId());
+            shiftActivityDTO.getChildActivities().forEach(childActivityDTO ->  timeTypeIds.add(childActivityDTO.getActivity().getTimeType().getId()));
+        });
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.SICK.toString()) && CollectionUtils.containsAny(selectedSickTimeTypeIds,timeTypeIds);
+    }
+
+    private boolean isOnBreak(ShiftDTO shiftDTO){
+        Date currentDate = getDate();
+        Set<BigInteger> currentOnBreakActivityIds = new HashSet<>();
+        if(isCollectionNotEmpty(shiftDTO.getBreakActivities())) {
+            for (ShiftActivityDTO shiftActivityDTO : shiftDTO.getBreakActivities()) {
+                if (shiftActivityDTO.getStartDate().before(currentDate) && shiftActivityDTO.getEndDate().after(currentDate)) {
+                    currentOnBreakActivityIds.add(shiftActivityDTO.getActivityId());
+                }
+            }
+        }
+        return filterCriteriaMap.get(REAL_TIME_STATUS).contains(RealTimeStatus.ON_BREAK.toString()) && shiftDTO.getBreakActivities().stream().anyMatch(shiftActivityDTO -> currentOnBreakActivityIds.contains(shiftActivityDTO.getActivityId()));
     }
 }

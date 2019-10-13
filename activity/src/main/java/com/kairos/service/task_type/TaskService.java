@@ -562,7 +562,7 @@ public class TaskService extends MongoBaseService {
      * @auther anil maurya
      */
     private Map<String, String> getFLS_Credentials(long organizationId) {
-        Map<String, String> flsCredential = userIntegrationService.getFLS_Credentials(organizationId);
+        Map<String, String> flsCredential = userIntegrationService.getFLSCredentials(organizationId);
         return flsCredential;
     }
 
