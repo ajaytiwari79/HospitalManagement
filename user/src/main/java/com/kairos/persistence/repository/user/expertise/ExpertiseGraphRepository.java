@@ -247,7 +247,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnitIds")
     List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
 
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(protectedSetting:ProtectedDaysOffSetting)\n" +
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true}) WHERE id(expertise) = {0}" +
+            "MATCH(expertise)-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(protectedSetting:ProtectedDaysOffSetting)\n" +
             "RETURN protectedSetting")
     List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(Long ExpertiseId);
 
