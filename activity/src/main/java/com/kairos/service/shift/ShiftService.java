@@ -276,7 +276,7 @@ public class ShiftService extends MongoBaseService {
             BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", asLocalDate(shift.getStartDate()).toString());
             userIntegrationService.applyFunction(shift.getUnitId(), shift.getEmploymentId(), null, HttpMethod.DELETE, Arrays.asList(appliedDate));
         }
-        if (updateShift && isNotNull(shiftAction) && !shift.getActivities().stream().anyMatch(shiftActivity -> !shiftActivity.getStatus().contains(ShiftStatus.PUBLISH))) {
+        if (updateShift && isNotNull(shiftAction) && !shift.getActivities().stream().anyMatch(shiftActivity -> !shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
             shift = updateShiftAfterPublish(shift, staffAdditionalInfoDTO.getUserAccessRoleDTO(), shiftAction);
         }
         if (!updateShift && planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())
