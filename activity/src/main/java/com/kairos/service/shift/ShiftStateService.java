@@ -95,7 +95,7 @@ public class ShiftStateService {
 
     }
 
-    public void createShiftStateByCurrentPhase(List<Shift> shifts,Phase phase){
+    public void createShiftStateByPhase(List<Shift> shifts, Phase phase){
         List<ShiftState> newShiftState=new ArrayList<>();
         switch (phase.getPhaseEnum()){
             case REALTIME:

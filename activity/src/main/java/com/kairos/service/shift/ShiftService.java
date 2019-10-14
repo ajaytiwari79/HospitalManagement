@@ -289,7 +289,7 @@ public class ShiftService extends MongoBaseService {
         }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
         shiftMongoRepository.save(shift);
-        shiftStateService.createShiftStateByCurrentPhase(Arrays.asList(shift),phase);
+        shiftStateService.createShiftStateByPhase(Arrays.asList(shift),phase);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
         return shift;
     }
