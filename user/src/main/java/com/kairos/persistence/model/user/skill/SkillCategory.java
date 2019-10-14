@@ -2,9 +2,6 @@ package com.kairos.persistence.model.user.skill;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -20,8 +17,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
  * SkillCategory has relationship with Skill
  */
 @NodeEntity
-@Getter
-@Setter
 public class SkillCategory extends UserBaseEntity {
 
     @Relationship(type = BELONGS_TO)
@@ -34,6 +29,48 @@ public class SkillCategory extends UserBaseEntity {
 
 
     private boolean isEnabled = true;
+
+
+
+    public SkillCategory() {
+
+    }
+
+    public SkillCategory(String name) {
+        this.name = name;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
     public Map<String,Object> retieveDetails() {
         Map<String,Object> objectMap = new HashMap<>();

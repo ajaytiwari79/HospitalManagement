@@ -33,8 +33,8 @@ public class ExpertiseDTO {
     private Long organizationLevelId;
     private List<Long> organizationServiceIds;
     private UnionIDNameDTO union;
-    private Integer fullTimeWeeklyMinutes; // This is equals to 37 hours
-    private Integer numberOfWorkingDaysInWeek; // 5 or 7
+    private int fullTimeWeeklyMinutes; // This is equals to 37 hours
+    private int numberOfWorkingDaysInWeek; // 5 or 7
     private boolean published;
     private BreakPaymentSetting breakPaymentSetting;
     private SectorDTO sector;

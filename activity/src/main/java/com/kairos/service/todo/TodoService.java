@@ -202,6 +202,8 @@ public class TodoService {
             case DISAPPROVE:
                 shiftStatus = ShiftStatus.DISAPPROVE;
                 break;
+             default:
+                 break;
         }
         return shiftStatus;
     }

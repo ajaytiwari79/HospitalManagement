@@ -918,7 +918,7 @@ public class ExpertiseService {
         List<ExpertiseEmploymentTypeRelationship> expertiseEmploymentList = new ArrayList<>();
         ExpertisePlannedTimeQueryResult expertiseEmploymentTypeRelationships = expertiseEmploymentTypeRelationshipGraphRepository.getPlannedTimeConfigurationByExpertise(sourceExpertise.getId());
         if (Optional.ofNullable(expertiseEmploymentTypeRelationships).isPresent()) {
-            expertiseEmploymentTypeRelationships.employmentTypes.forEach(employmentType -> {
+            expertiseEmploymentTypeRelationships.getEmploymentTypes().forEach(employmentType -> {
                 ExpertiseEmploymentTypeRelationship expertiseEmploymentTypeRelationship = new ExpertiseEmploymentTypeRelationship(targetExpertise,
                         employmentType, expertiseEmploymentTypeRelationships.getIncludedPlannedTime(), expertiseEmploymentTypeRelationships.getExcludedPlannedTime());
                 expertiseEmploymentList.add(expertiseEmploymentTypeRelationship);
@@ -1100,7 +1100,7 @@ public class ExpertiseService {
 
         return !expertiseLine.getOrganizationLevel().getId().equals(levelId) || isServiceChanged(organizationServiceIds, expertiseLine) || !expertiseLine.getSector().getId().equals(sectorId) ||
                 !expertiseLine.getUnion().getId().equals(unionId) || expertiseLine.getFullTimeWeeklyMinutes()!=expertiseDTO.getFullTimeWeeklyMinutes() ||
-                !expertiseLine.getNumberOfWorkingDaysInWeek().equals(expertiseDTO.getNumberOfWorkingDaysInWeek())||
+                expertiseLine.getNumberOfWorkingDaysInWeek()!=expertiseDTO.getNumberOfWorkingDaysInWeek()||
                 !expertiseLine.getStartDate().equals(expertiseDTO.getStartDate())||
                 isPayGradeChanged(expertiseLineSeniorityLevelRelationships,expertiseDTO.getSeniorityLevels());
     }
@@ -1121,30 +1121,36 @@ public class ExpertiseService {
 
     private ExpertiseLine createExpertiseLine(ExpertiseDTO expertiseDTO, Country country) {
         Level level = countryGraphRepository.getLevel(country.getId(), expertiseDTO.getOrganizationLevelId());
-        if (!Optional.ofNullable(level).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "level", expertiseDTO.getOrganizationLevelId());
-        }
+//        if (!Optional.ofNullable(level).isPresent()) {
+//            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "level", expertiseDTO.getOrganizationLevelId());
+//        }
         List<OrganizationService> organizationServices = organizationServiceRepository.findAllOrganizationServicesByIds(expertiseDTO.getOrganizationServiceIds());
-        if (!Optional.ofNullable(organizationServices).isPresent() || organizationServices.size() != expertiseDTO.getOrganizationServiceIds().size()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_MULTIPLEDATANOTFOUND, SERVICES);
-        }
+//        if (!Optional.ofNullable(organizationServices).isPresent() || organizationServices.size() != expertiseDTO.getOrganizationServiceIds().size()) {
+//            exceptionService.dataNotFoundByIdException(MESSAGE_MULTIPLEDATANOTFOUND, SERVICES);
+//        }
         Sector sector=getSector(expertiseDTO.getSector(),country);
-        Organization union=getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country);
+        Organization union=null;
+        if(expertiseDTO.getUnion()!=null){
+            union=getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country);
+        }
         return new ExpertiseLine.ExpertiseLineBuilder().setStartDate(expertiseDTO.getStartDate()).setEndDate(expertiseDTO.getEndDate()).setOrganizationLevel(level).setSector(sector).setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting())
                 .setUnion(union).setOrganizationServices(organizationServices).setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek()).setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes()).createLine();
     }
 
     private void initializeExpertiseLine(ExpertiseLine expertiseLine,ExpertiseDTO expertiseDTO,Country country){
         Level level = countryGraphRepository.getLevel(country.getId(), expertiseDTO.getOrganizationLevelId());
-        if (!Optional.ofNullable(level).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "level", expertiseDTO.getOrganizationLevelId());
-        }
+//        if (!Optional.ofNullable(level).isPresent()) {
+//            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "level", expertiseDTO.getOrganizationLevelId());
+//        }
         List<OrganizationService> organizationServices = organizationServiceRepository.findAllOrganizationServicesByIds(expertiseDTO.getOrganizationServiceIds());
-        if (!Optional.ofNullable(organizationServices).isPresent() || organizationServices.size() != expertiseDTO.getOrganizationServiceIds().size()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_MULTIPLEDATANOTFOUND, SERVICES);
-        }
+//        if (!Optional.ofNullable(organizationServices).isPresent() || organizationServices.size() != expertiseDTO.getOrganizationServiceIds().size()) {
+//            exceptionService.dataNotFoundByIdException(MESSAGE_MULTIPLEDATANOTFOUND, SERVICES);
+//        }
         Sector sector=getSector(expertiseDTO.getSector(),country);
-        Organization union=getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country);
+        Organization union=null;
+        if(expertiseDTO.getUnion()!=null){
+            union=getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country);
+        }
         expertiseLine.setOrganizationLevel(level);
         expertiseLine.setOrganizationServices(organizationServices);
         expertiseLine.setSector(sector);

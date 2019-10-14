@@ -11,7 +11,6 @@ import java.util.List;
 @QueryResult
 @Getter
 @Setter
-@NoArgsConstructor
 public class AccessGroupStaffQueryResult {
     private OrganizationBaseEntity organization;
     private Long staffId;

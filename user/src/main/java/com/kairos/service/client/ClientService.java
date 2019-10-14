@@ -1310,9 +1310,10 @@ public class ClientService {
             ContactAddress homeAddressofHouseHoldPerson = addressOfHouseHoldPerson.getHomeAddress();
             ZipCode zipCodeOfHouseHoldPerson = addressOfHouseHoldPerson.getZipCode();
             hasSameAddress = (homeAddressOfClient.getStreet().equalsIgnoreCase(homeAddressofHouseHoldPerson.getStreet()) &&
-                    homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()) &&
-                    zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
+                    homeAddressOfClient.getHouseNumber().equalsIgnoreCase(homeAddressofHouseHoldPerson.getHouseNumber()));
         }
+                    //zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
+
         return hasSameAddress;
     }
 

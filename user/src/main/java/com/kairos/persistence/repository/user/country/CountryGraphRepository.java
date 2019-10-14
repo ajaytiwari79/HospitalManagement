@@ -82,7 +82,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (subService:OrganizationService) where id(subService)={0}\n" +
             "MATCH (os:OrganizationService)-[:"+ ORGANIZATION_SUB_SERVICE +"]->(subService)\n" +
             "MATCH (c:Country)-[:"+ HAS_ORGANIZATION_SERVICES +"]->(os) RETURN c limit 1")
-    Country getCountryByOrganizationService(long subServiceId);
+    Country getCountryByOrganizationService(Long subServiceId);
 
     @Query("MATCH (c:Country)-[:"+ HAS_HOLIDAY +"]-(ch:CountryHolidayCalender) " +
             "where id(c) = {0}   AND date(ch.holidayDate) >={1} AND  date(ch.holidayDate) <={2}  " +
@@ -99,17 +99,17 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<CountryHolidayCalendarQueryResult> getCountryHolidayCalendarBetweenDates(Long countryId, LocalDate start, LocalDate end);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} RETURN level")
-    Level getLevel(long countryId, long levelId);
+    Level getLevel(Long countryId, Long levelId);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} RETURN level")
-    List<Level> getLevelsByCountry(long countryId);
+    List<Level> getLevelsByCountry(Long countryId);
 
     @Query("MATCH (country:Country)-[:"+ HAS_RELATION_TYPES +"]->(relationType:RelationType {enabled:true}) where id(country)={0} " +
             "RETURN id(relationType) as id, relationType.name as name, relationType.description as description ORDER BY relationType.creationDate DESC")
-    List<RelationTypeDTO> getRelationTypesByCountry(long countryId);
+    List<RelationTypeDTO> getRelationTypesByCountry(Long countryId);
 
     @Query("MATCH (country:Country)-[:"+HAS_RELATION_TYPES+"]->(relationType:RelationType{enabled:true}) where id(country)={0} AND id(relationType)={1} RETURN relationType")
-    RelationType getRelationType(long countryId, long relationTypeId);
+    RelationType getRelationType(Long countryId, Long relationTypeId);
 
     @Query("MATCH(country:Country)-[:" + HAS_RELATION_TYPES + "]->(relationType:RelationType {enabled:true}) WHERE id(country)={0} AND id(relationType)<>{2} AND relationType.name =~{1}  " +
             " WITH count(relationType) as totalCount " +
@@ -117,7 +117,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     Boolean relationTypeExistInCountryByName(Long countryId, String name, Long currentRelationTypeId);
 
     @Query("MATCH (country:Country)-[:"+HAS_RESOURCES+"]->(resources:Vehicle{enabled:true}) where id(country)={0} AND id(resources)={1} RETURN resources")
-    Vehicle getResources(long countryId, long resourcesId);
+    Vehicle getResources(Long countryId, Long resourcesId);
 
     @Query("MATCH(country:Country)-[:" + HAS_RESOURCES + "]->(resources:Vehicle {enabled:true}) WHERE id(country)={0} AND id(resources)<>{2} AND resources.name =~{1}  " +
             " WITH count(resources) as totalCount " +
@@ -134,18 +134,18 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     List<Vehicle> getResourcesByCountry(Long countryId);
 
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType{deleted:false}) where id(country)={0} AND id(employmentType)={1} RETURN employmentType")
-    EmploymentType getEmploymentTypeByCountryAndEmploymentType(long countryId, long employmentTypeId);
+    EmploymentType getEmploymentTypeByCountryAndEmploymentType(Long countryId, Long employmentTypeId);
 
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} " +
             "RETURN employmentType")
-    List<EmploymentType> getEmploymentTypeByCountry(long countryId, Boolean isDeleted);
+    List<EmploymentType> getEmploymentTypeByCountry(Long countryId, Boolean isDeleted);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level) IN {1} RETURN level")
-    List<Level> getLevelsByIdsIn(long countryId,List<Long> levelIds);
+    List<Level> getLevelsByIdsIn(Long countryId,List<Long> levelIds);
 
     @Query("MATCH (country:Country)-[:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) where id(country)={0} AND employmentType.deleted={1} " +
             "RETURN id(employmentType) as id ,employmentType.name as name ORDER BY employmentType.creationDate DESC")
-    List<EmploymentTypeDTO> getEmploymentTypes(long countryId, Boolean isDeleted);
+    List<EmploymentTypeDTO> getEmploymentTypes(Long countryId, Boolean isDeleted);
 
     @Query("MATCH(country:Country{deleted:false,isEnabled:true}) where id(country)={0} RETURN country")
     Country findCountryById(Long countryId);
@@ -153,7 +153,7 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (organization) where id(organization)={0} with organization  " +
             "MATCH (organization)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+PROVINCE+"]->(province:Province)-[:"+REGION+"]->(region:Region) with region \n" +
             "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN country")
-    Country getCountryByUnitId(long unitId);
+    Country getCountryByUnitId(Long unitId);
 
     @Query("MATCH (ch:CountryHolidayCalender{isEnabled:true})-[:"+DAY_TYPE+"]->(dt:DayType{isEnabled:true}) " +
             "WHERE id(ch) ={0}"  +

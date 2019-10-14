@@ -13,6 +13,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.shift.Shift;
@@ -49,7 +50,6 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_EMPLOYMENT_
 @Service
 public class PayOutService extends MongoBaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PayOutService.class);
 
     @Inject
     private PayOutRepository payOutRepository;
@@ -73,7 +73,7 @@ public class PayOutService extends MongoBaseService {
      */
     public void savePayOuts(StaffEmploymentDetails employmentDetails, List<Shift> shifts, List<Activity> activities, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<DayTypeDTO> dayTypeDTOS) {
         if (isNull(activityWrapperMap)) {
-            activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> new ActivityWrapper(v, "")));
+            activityWrapperMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, v -> new ActivityWrapper(v, "")));
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(employmentDetails,dayTypeDTOS);
         for (Shift shift : shifts) {

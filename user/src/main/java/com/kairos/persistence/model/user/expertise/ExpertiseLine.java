@@ -37,7 +37,7 @@ public class ExpertiseLine extends UserBaseEntity {
     private Organization union;
     private BreakPaymentSetting breakPaymentSetting;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
-    private Integer numberOfWorkingDaysInWeek; // 5 or 7
+    private int numberOfWorkingDaysInWeek; // 5 or 7
 
     private ExpertiseLine(){
 

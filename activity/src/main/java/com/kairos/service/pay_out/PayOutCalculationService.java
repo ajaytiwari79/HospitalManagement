@@ -61,7 +61,7 @@ public class PayOutCalculationService {
     public PayOutPerShift calculateAndUpdatePayOut(DateTimeInterval interval, StaffEmploymentDetails staffEmploymentDetails, ShiftWithActivityDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, PayOutPerShift payOutPerShift, List<DayTypeDTO> dayTypeDTOS) {
         int scheduledMinutesOfPayout = 0;
         Map<BigInteger, Integer> ctaPayoutMinMap = new HashMap<>();
-        Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(k->k.getId(), v->v));
+        Map<Long,DayTypeDTO> dayTypeDTOMap = dayTypeDTOS.stream().collect(Collectors.toMap(DayTypeDTO::getId, v->v));
         boolean ruleTemplateValid = false;
         int ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ruleTemplate : staffEmploymentDetails.getCtaRuleTemplates()) {
@@ -69,7 +69,6 @@ public class PayOutCalculationService {
             List<ShiftActivityDTO> shiftActivities = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getShiftActivityByBreak(shift.getActivities(),shift.getBreakActivities());
             for (ShiftActivityDTO shiftActivity : shiftActivities) {
                 ShiftActivityDTO shiftActivityDTO = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getShiftActivityDTO(shift,shiftActivity);
-                DateTimeInterval shiftInterval = new DateTimeInterval(shiftActivity.getStartDate().getTime(), shiftActivity.getEndDate().getTime());
                 Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
                 ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, staffEmploymentDetails, shift.getPhaseId(), activity.getId(), activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getStartDate(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
                 if (ruleTemplateValid) {
@@ -138,10 +137,10 @@ public class PayOutCalculationService {
         Map<Interval, List<PayOutPerShift>> payoutsIntervalMap = getPayoutIntervalsMap(intervals, payOutPerShifts);
         List<PayOutIntervalDTO> payoutIntervalDTOS = getPayoutIntervals(intervals, payoutsIntervalMap,payoutMinutesBefore, payoutTransactionAndIntervalMap, employmentWithCtaDetailsDTO, query);
         List<CTADistributionDTO> scheduledCTADistributions = payoutIntervalDTOS.stream().flatMap(ti -> ti.getPayOutDistribution().getScheduledCTADistributions().stream()).collect(Collectors.toList());
-        Map<String, Integer> ctaDistributionMap = scheduledCTADistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getName(), Collectors.summingInt(tb -> tb.getMinutes())));
+        Map<String, Integer> ctaDistributionMap = scheduledCTADistributions.stream().collect(Collectors.groupingBy(CTADistributionDTO::getName, Collectors.summingInt(CTADistributionDTO::getMinutes)));
         scheduledCTADistributions = getScheduledCTADistributions(ctaDistributionMap, employmentWithCtaDetailsDTO);
         List<CTADistributionDTO> ctaBonusDistributions = payoutIntervalDTOS.stream().flatMap(ti -> ti.getPayOutDistribution().getCtaRuletemplateBonus().getCtaDistributions().stream()).collect(Collectors.toList());
-        Map<String, Integer> ctaBonusDistributionMap = ctaBonusDistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getName(), Collectors.summingInt(tb -> tb.getMinutes())));
+        Map<String, Integer> ctaBonusDistributionMap = ctaBonusDistributions.stream().collect(Collectors.groupingBy(CTADistributionDTO::getName, Collectors.summingInt(CTADistributionDTO::getMinutes)));
         long[] payoutCalculatedValue = calculatePayoutForInterval(payoutIntervalDTOS);
         long payoutChange = payoutCalculatedValue[0];
         long payoutBefore = payoutCalculatedValue[1];
@@ -215,12 +214,12 @@ public class PayOutCalculationService {
         for (Interval interval : intervals) {
             List<PayOutPerShift> payOutPerShifts = payoutsIntervalMap.get(interval);
             List<PayOutTransaction> payOutTransactionList = payoutTransactionAndIntervalMap.get(interval);
-            Long payoutChange = payOutPerShifts.stream().mapToLong(p -> p.getTotalPayOutMinutes()).sum();
+            Long payoutChange = payOutPerShifts.stream().mapToLong(PayOutPerShift::getTotalPayOutMinutes).sum();
             Long approvePayOut = payOutTransactionList.stream().filter(p -> p.getPayOutTrasactionStatus().equals(PayOutTrasactionStatus.APPROVED)).mapToLong(p -> (long) p.getMinutes()).sum();
             payoutChange += approvePayOut;
             Long payoutAfter = payoutMinutesBefore + payoutChange;
             List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions = payOutPerShifts.stream().flatMap(payOutPerShift -> payOutPerShift.getPayOutPerShiftCTADistributions().stream()).collect(Collectors.toList());
-            Map<String, Integer> ctaDistributionMap = payOutPerShiftCTADistributions.stream().collect(Collectors.groupingBy(tbdistribution -> tbdistribution.getCtaName(), Collectors.summingInt(tb -> tb.getMinutes())));
+            Map<String, Integer> ctaDistributionMap = payOutPerShiftCTADistributions.stream().collect(Collectors.groupingBy(PayOutPerShiftCTADistribution::getCtaName, Collectors.summingInt(PayOutPerShiftCTADistribution::getMinutes)));
             Long payoutFromCTA = payOutPerShifts.stream().mapToLong(payOutPerShift->payOutPerShift.getScheduledMinutes()+payOutPerShift.getCtaBonusMinutesOfPayOut()).sum();
             PayOutCTADistributionDTO payOutCTADistributionDTO = getDistributionOfPayout(ctaDistributionMap, employmentWithCtaDetailsDTO,payoutFromCTA);
             String title = getTitle(query, interval);
@@ -264,7 +263,6 @@ public class PayOutCalculationService {
                 return StringUtils.capitalize(AppConstants.QUARTER) + " " + (interval.getStart().dayOfMonth().withMinimumValue().equals(interval.getStart()) ? interval.getStart().getMonthOfYear() / 3 : (interval.getStart().getMonthOfYear() / 3) + 1);
             default:
                 break;
-                //case "ByPeriod": return getActualTimeBankByPeriod(startDate,endDate,shifts);
         }
         return "";
     }
