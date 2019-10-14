@@ -2,6 +2,9 @@ package com.kairos.persistence.model.user.region;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -18,6 +21,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.PROVI
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Municipality extends UserBaseEntity {
     @NotBlank(message = ERROR_MUNICIPALITY_NAME_NOTEMPTY)
     private String name;
@@ -35,74 +41,11 @@ public class Municipality extends UserBaseEntity {
     private Province province;
     private boolean isEnable = true;
 
-    public Municipality() {
-    }
-
     public Municipality(Long id,String name) {
         this.name = name;
         this.id=id;
     }
 
-    public String getGeoFence() {
-        return geoFence;
-    }
-
-    public void setGeoFence(String geoFence) {
-        this.geoFence = geoFence;
-    }
-
-    public Province getProvince() {
-        return province;
-    }
-
-    public void setProvince(Province province) {
-        this.province = province;
-    }
-
-    public boolean isEnable() {
-        return isEnable;
-    }
-
-    public void setEnable(boolean enable) {
-        isEnable = enable;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
-    }
-
-    public float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
-    }
-
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public Municipality(Long id) {
-        this.id = id;
-    }
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> response = new HashMap();

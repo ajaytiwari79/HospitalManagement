@@ -3,6 +3,9 @@ package com.kairos.persistence.model.user.resources;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.io.Serializable;
@@ -14,6 +17,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
+@Getter
+@Setter
+@NoArgsConstructor
 public class ResourceWrapper implements Serializable {
     private Long id;
     private String registrationNumber;
@@ -27,92 +33,9 @@ public class ResourceWrapper implements Serializable {
     private boolean isDecommision;
     private List<ResourceUnAvailability> resourceUnAvailabilities;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getRegistrationNumber() {
-        return registrationNumber;
-    }
-
-    public void setRegistrationNumber(String registrationNumber) {
-        this.registrationNumber = registrationNumber;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getModelDescription() {
-        return modelDescription;
-    }
-
-    public void setModelDescription(String modelDescription) {
-        this.modelDescription = modelDescription;
-    }
-
-    public float getCostPerKM() {
-        return costPerKM;
-    }
-
-    public void setCostPerKM(float costPerKM) {
-        this.costPerKM = costPerKM;
-    }
-
-    public FuelType getFuelType() {
-        return fuelType;
-    }
-
-    public void setFuelType(FuelType fuelType) {
-        this.fuelType = fuelType;
-    }
-
-    public Vehicle getVehicleType() {
-        return vehicleType;
-    }
-
-    public void setVehicleType(Vehicle vehicleType) {
-        this.vehicleType = vehicleType;
-    }
-
-    public List<ResourceUnAvailability> getResourceUnAvailabilities() {
-        return resourceUnAvailabilities;
-    }
-
-    public void setResourceUnAvailabilities(List<ResourceUnAvailability> resourceUnAvailabilities) {
-        this.resourceUnAvailabilities = resourceUnAvailabilities;
-    }
-
-    public Long getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Long creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    public Long getDecommissionDate() {
-        return decommissionDate;
-    }
-
-    public void setDecommissionDate(Long decommissionDate) {
-        this.decommissionDate = decommissionDate;
-    }
-
     @JsonProperty(value = "isDecommision")
     public boolean isDecommision() {
         return isDecommision;
     }
 
-    public void setDecommision(boolean decommision) {
-        isDecommision = decommision;
-    }
 }
