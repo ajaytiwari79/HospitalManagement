@@ -726,7 +726,10 @@ public class WorkTimeAgreementService extends MongoBaseService {
                     ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
                     activityIds.addAll(newHashSet(protectedDaysOffWTATemplate.getActivityId()));
                     break;
+                default:
+                    break;
             }
+
         }
 
         List<Activity> activities = activityMongoRepository.findAllActivitiesByUnitIds(organisationIds, activityIds);

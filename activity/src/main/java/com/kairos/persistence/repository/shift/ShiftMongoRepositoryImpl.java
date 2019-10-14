@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.shift;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -66,11 +67,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         LocalDate currentLocalDate = DateUtils.getCurrentLocalDate();
         Criteria criteria = where(DISABLED).is(false).and(DELETED).is(false);
         List<Criteria> dynamicCriteria = new ArrayList<>();
-        sickSettings.forEach(currentSickSettings -> {
-            dynamicCriteria.add(new Criteria().and(STAFF_ID).is(currentSickSettings.getStaffId())
+        sickSettings.forEach(currentSickSettings -> dynamicCriteria.add(new Criteria().and(STAFF_ID).is(currentSickSettings.getStaffId())
                     .and(START_DATE).gte(currentLocalDate)
-                    .lte(DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activityMap.get(currentSickSettings.getActivityId()).getRulesActivityTab().getRecurrenceDays() - 1)));
-        });
+                    .lte(DateUtils.addDays(DateUtils.getDateFromLocalDate(null), activityMap.get(currentSickSettings.getActivityId()).getRulesActivityTab().getRecurrenceDays() - 1))));
 
         criteria.orOperator(dynamicCriteria.toArray(new Criteria[dynamicCriteria.size()]));
         Query query = new Query(criteria);
@@ -131,11 +130,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdAndDraftShiftExists(Long employmentId, Date startDate, Date endDate,boolean draftShiftExists){
         Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).is(employmentId).and(DISABLED).is(false)
                     .and(START_DATE).gte(startDate).lt(endDate).and(DRAFT_SHIFT).exists(draftShiftExists);
-        if(draftShiftExists){
-            return getShiftWithActivityByCriteria(criteria,true,ShiftWithActivityDTO.class);
-        }else {
-            return getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
-        }
+            return draftShiftExists ? getShiftWithActivityByCriteria(criteria,true,ShiftWithActivityDTO.class): getShiftWithActivityByCriteria(criteria,false,ShiftWithActivityDTO.class);
+
     }
 
 
@@ -251,7 +247,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         Criteria criteria = where(ACTIVITIES_ACTIVITY_ID).in(shiftActivityIds).and(DELETED).is(false);
         if(isNotNull(startDate) && isNotNull(endDate)){
             criteria = criteria.and(START_DATE).gte(startDate).lte(endDate);
-        }if(isNotNull(staffId)){
+        }
+        if(isNotNull(staffId)){
             criteria = criteria.and(STAFF_ID).is(staffId);
         }
         Query query = new Query(criteria);
@@ -301,7 +298,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             criteria.and(START_DATE).gte(startDate).lte(getEndOfDay(asDate(endDate)));
         }
         return getShiftWithActivityByCriteria(criteria,false,ShiftDTO.class);
-    };
+    }
 
     @Override
     public List<ShiftWithActivityDTO> findAllDraftShiftsByIds(List<BigInteger> shiftIds,boolean draftShift ) {
@@ -446,7 +443,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<Shift> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate) {
         Criteria criteria = where(STAFF_ID).in(staffIds).and(UNIT_ID).in(unitIds).and(DELETED).is(false).and(DISABLED).is(false)
                 .and(START_DATE).gte(startDate).lt(endDate);
-        List<AggregationOperation> aggregationOperation = new ArrayList<AggregationOperation>();
+        List<AggregationOperation> aggregationOperation = new ArrayList<>();
         aggregationOperation.add(new MatchOperation(criteria));
         aggregationOperation.add(unwind(ACTIVITIES));
         if (CollectionUtils.isNotEmpty(shiftActivityStatus)) {
@@ -471,7 +468,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate) {
         Criteria criteria = where(STAFF_ID).in(staffIds).and(UNIT_ID).in(unitIds).and(DELETED).is(false).and(DISABLED).is(false)
                 .and(START_DATE).gte(startDate).lte(endDate);
-        List<AggregationOperation> aggregationOperation = new ArrayList<AggregationOperation>();
+        List<AggregationOperation> aggregationOperation = new ArrayList<>();
         aggregationOperation.add(new MatchOperation(criteria));
         aggregationOperation.add(unwind(ACTIVITIES));
         if (CollectionUtils.isNotEmpty(activitiesIds)) {
@@ -562,18 +559,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return Document.parse(project);
     }
 
-    private String groupByForPlannedHours() {
-        return "{'$group':{'_id':'$staffId'}}";
-    }
 
     private String groupByShiftAndActivity() {
         return "{'$group':{'_id':'$_id', 'durationMinutes':{'$first':'$durationMinutes'},\n" +
                 "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'endDate':{'$first':'$endDate'}'activities':{'$addToSet':'$activities'}}}";
     }
 
-    private String projectionOfShift() {
-        return "{'$project' : { 'refId' : '$_id' ,'value':'$plannedHours'} }";
-    }
 
     public List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds) {
         Criteria criteria;
@@ -652,8 +643,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private <T extends ShiftDTO> Set<BigInteger> getActivityIdsByShift( T shift) {
         Set<BigInteger> activityIds = new HashSet<>();
-        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
-        activityIds.addAll(shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
+        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+        activityIds.addAll(shift.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         return activityIds;
     }
 

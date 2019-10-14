@@ -34,8 +34,6 @@ import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -54,8 +52,6 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 @Service
 public class WorkTimeAgreementBalancesCalculationService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkTimeAgreementBalancesCalculationService.class);
 
     @Inject
     private TimeBankRepository timeBankRepository;
