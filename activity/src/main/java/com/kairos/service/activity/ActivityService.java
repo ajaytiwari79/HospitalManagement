@@ -520,6 +520,12 @@ public class ActivityService {
         validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(), rulesActivityDTO.getLatestStartTime(), rulesActivityDTO.getMaximumEndTime(), rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
+        if(rulesActivityDTO.isEligibleForStaffingLevel() && !activity.getRulesActivityTab().isEligibleForStaffingLevel()){
+            Activity parentActivity = activityMongoRepository.findByChildActivityId(rulesActivityDTO.getActivityId());
+            if(isNotNull(parentActivity) && !parentActivity.getRulesActivityTab().isEligibleForStaffingLevel()){
+                exceptionService.actionNotPermittedException(MESSAGE_PARENT_SETTING_FALSE);
+            }
+        }
         if (!Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, rulesActivityDTO.getActivityId());
         }
@@ -532,7 +538,7 @@ public class ActivityService {
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
         if(activity.getRulesActivityTab().isEligibleForStaffingLevel() != rulesActivityTab.isEligibleForStaffingLevel() && !rulesActivityTab.isEligibleForStaffingLevel()){
-            //remove activity in db
+            removedActivityFromStaffingLevelOfChildActivity(activity.getChildActivityIds());
             staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
         }
         activity.setRulesActivityTab(rulesActivityTab);
@@ -543,6 +549,16 @@ public class ActivityService {
         return new ActivityTabsWrapper(rulesActivityTab);
     }
 
+    private void removedActivityFromStaffingLevelOfChildActivity(Set<BigInteger> childActivityIds){
+        for (BigInteger childActivityId : childActivityIds) {
+            Activity activity = activityMongoRepository.findOne(childActivityId);
+            if(activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
+                staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
+                activity.getRulesActivityTab().setEligibleForStaffingLevel(false);
+                activityMongoRepository.save(activity);
+            }
+        }
+    }
     public ActivityTabsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long countryId) {
         Activity activity = activityMongoRepository.findOne(activityId);
         if (!Optional.ofNullable(activity).isPresent()) {
