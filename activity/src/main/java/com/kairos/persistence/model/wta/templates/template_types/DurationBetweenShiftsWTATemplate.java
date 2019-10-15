@@ -61,7 +61,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         if (!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(), this.phaseTemplateValues) && isCollectionNotEmpty(plannedTimeIds) && containsAny(plannedTimeIds, infoWrapper.getShift().getActivities().stream().flatMap(k->k.getPlannedTimes().stream().map(v->v.getPlannedTimeId())).collect(Collectors.toList())) && isCollectionNotEmpty(timeTypeIds) && containsAny(timeTypeIds, infoWrapper.getShift().getActivitiesTimeTypeIds())) {
             int timefromPrevShift = 0;
             List<ShiftWithActivityDTO> shifts = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
-            shifts = (List<ShiftWithActivityDTO>)shifts.stream().filter(shiftWithActivityDTO -> DateUtils.asZoneDateTime(getEndDateExceptNonWorkingActivity(shiftWithActivityDTO.getActivities())).isBefore(DateUtils.asZoneDateTime(getStartDateExceptNonWorkingActivity(infoWrapper.getShift().getActivities()))) || getEndDateExceptNonWorkingActivity(shiftWithActivityDTO.getActivities()).equals(getStartDateExceptNonWorkingActivity(infoWrapper.getShift().getActivities()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
+            shifts = (List<ShiftWithActivityDTO>)shifts.stream().filter(shiftWithActivityDTO -> isWorkingShiftActivity(shiftWithActivityDTO.getActivities()) && isWorkingShiftActivity(infoWrapper.getShift().getActivities()) && DateUtils.asZoneDateTime(getEndDateExceptNonWorkingActivity(shiftWithActivityDTO.getActivities())).isBefore(DateUtils.asZoneDateTime(getStartDateExceptNonWorkingActivity(infoWrapper.getShift().getActivities()))) || getEndDateExceptNonWorkingActivity(shiftWithActivityDTO.getActivities()).equals(getStartDateExceptNonWorkingActivity(infoWrapper.getShift().getActivities()))).sorted(getShiftStartTimeComparator()).collect(Collectors.toList());
             if(!shifts.isEmpty()){
                 ZonedDateTime prevShiftEnd = DateUtils.asZoneDateTime(getEndDateExceptNonWorkingActivity(shifts.get(shifts.size() - 1).getActivities()));
                 timefromPrevShift = (int) new DateTimeInterval(prevShiftEnd, DateUtils.asZoneDateTime(getStartDateExceptNonWorkingActivity(infoWrapper.getShift().getActivities()))).getMinutes();
@@ -119,4 +119,8 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         return returnDate;
     }
 
+    boolean isWorkingShiftActivity(List<ShiftActivityDTO> shiftActivityDTOS){
+        shiftActivityDTOS = shiftActivityDTOS.stream().filter(k->TimeTypes.WORKING_TYPE.toValue().equals(k.getTimeType())).collect(Collectors.toList());
+        return isCollectionNotEmpty(shiftActivityDTOS);
+    }
 }
