@@ -98,7 +98,7 @@ public class ActivityMongoRepository {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(EMPLOYMENT_ID).in(employmentIds).and(START_DATE).lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
                 lookup(WTABASE_TEMPLATE, "ruleTemplateIds", "_id", "ruleTemplates"));
-        AggregationResults<WorkingTimeAgreement> aggregationResults = mongoTemplate.aggregate(aggregation, Working_Time_AGREEMENT, WorkingTimeAgreement.class);
+        AggregationResults<WorkingTimeAgreement> aggregationResults = mongoTemplate.aggregate(aggregation, WORKING_TIME_AGREEMENT, WorkingTimeAgreement.class);
 
         return aggregationResults.getMappedResults();
     }
