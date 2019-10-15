@@ -1371,14 +1371,10 @@ public class TimeBankCalculationService {
                 switch (protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings()) {
                     case UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR:
                         DateTimeInterval dateTimeInterval = getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate()), getLocalDate());
-                        if (dateTimeInterval.getStartLocalDate().equals(getLocalDate())) {
-                            long count = employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
-                            DailyTimeBankEntry dailyTimeBankEntry = isNullOrElse(employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId()), new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
-                            int contractualMinutes = getContractualMinutesByDate(dateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
-                            resetDailyTimebankEntry(dailyTimeBankEntry, contractualMinutes);
-                            dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + (int) (count * contractualMinutes));
-                            dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
+                        if(!dateTimeInterval.getStartLocalDate().isBefore(employmentDetails.getStartDate())) {
+                            dateTimeInterval=new DateTimeInterval(employmentDetails.getStartDate(),dateTimeInterval.getEndLocalDate());
                         }
+                        updateTimeBankOnFirstDayOfCutOff(dailyTimeBankEntriesToSave, employmentIdAndDailyTimeBankEntryMap, employmentDetails, dateTimeInterval);
                         break;
                     case ONCE_IN_A_YEAR:
                         dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankAndPayoutByOnceInAYear(employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, employmentDetails);
@@ -1395,8 +1391,19 @@ public class TimeBankCalculationService {
             return dailyTimeBankAndPayoutByOnceInAYear;
         }
 
+    private void updateTimeBankOnFirstDayOfCutOff(List<DailyTimeBankEntry> dailyTimeBankEntriesToSave, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, StaffEmploymentDetails employmentDetails, DateTimeInterval dateTimeInterval) {
+        if (dateTimeInterval.getStartLocalDate().equals(getLocalDate())) {
+            long count = employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && dateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
+            DailyTimeBankEntry dailyTimeBankEntry = isNullOrElse(employmentIdAndDailyTimeBankEntryMap.get(employmentDetails.getId()), new DailyTimeBankEntry(employmentDetails.getId(), employmentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
+            int contractualMinutes = getContractualMinutesByDate(dateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
+            resetDailyTimebankEntry(dailyTimeBankEntry, contractualMinutes);
+            dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + (int) (count * contractualMinutes));
+            dailyTimeBankEntriesToSave.add(dailyTimeBankEntry);
+        }
+    }
 
-        private Object[] getDailyTimeBankEntryAndPayoutByCutOffInterval(Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Long unitId, StaffEmploymentDetails employmentDetails) {
+
+    private Object[] getDailyTimeBankEntryAndPayoutByCutOffInterval(Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Long unitId, StaffEmploymentDetails employmentDetails) {
             int[] scheduledAndApproveActivityCount;
             Activity activity = unitIdAndActivityMap.get(unitId);
             DateTimeInterval activityDateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
