@@ -29,6 +29,8 @@ public class TimeBankController {
 
     @Autowired
     private TimeBankService timeBankService;
+    @Inject
+    private TimeBankCalculationService timeBankCalculationService;
 
     @GetMapping(value = "/employment/{employmentId}/")
     public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@PathVariable Long employmentId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
@@ -96,6 +98,12 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getCTARultemplateByEmploymentId(employmentId));
     }
 
+    //remove after test qa
+    @ApiOperation("update time bank of protected days off")
+    @GetMapping("/test_timebank")
+    public ResponseEntity<Map<String,Object>> testApiForProtecrtedDaysOFf(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankCalculationService.updateTimeBankAgainstProtectedDaysOffSetting());
+    }
 
 
 }
