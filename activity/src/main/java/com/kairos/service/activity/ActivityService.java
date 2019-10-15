@@ -550,13 +550,15 @@ public class ActivityService {
     }
 
     private void removedActivityFromStaffingLevelOfChildActivity(Set<BigInteger> childActivityIds){
-        for (BigInteger childActivityId : childActivityIds) {
-            Activity activity = activityMongoRepository.findOne(childActivityId);
-            if(activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
-                staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
-                activity.getRulesActivityTab().setEligibleForStaffingLevel(false);
-                activityMongoRepository.save(activity);
+        if(isCollectionNotEmpty(childActivityIds)) {
+            List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(childActivityIds);
+            for (Activity activity : activities) {
+                if (activity.getRulesActivityTab().isEligibleForStaffingLevel()) {
+                    staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
+                    activity.getRulesActivityTab().setEligibleForStaffingLevel(false);
+                }
             }
+            activityMongoRepository.saveAll(activities);
         }
     }
     public ActivityTabsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long countryId) {
