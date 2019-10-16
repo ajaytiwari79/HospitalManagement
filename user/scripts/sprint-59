@@ -4,7 +4,7 @@ DETACH DELETE e;
 
 
 MATCH (e:Expertise)
-set e.startDate=toString(date(datetime({epochmillis:e.startDateMillis})));
+set e.startDate=toString(date(datetime({epochmillis:e.startDateMillis}))),e.endDate=null;
 
 MATCH (e:Expertise)
 REMOVE e.startDateMillis,e.endDateMillis

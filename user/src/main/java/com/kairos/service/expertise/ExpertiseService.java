@@ -238,9 +238,12 @@ public class ExpertiseService {
 
     private boolean validateSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
         Collections.sort(seniorityLevels);
+        if (seniorityLevels.get(0).getTo()!=null && seniorityLevels.get(0).getTo()<=seniorityLevels.get(0).getFrom()  ) {
+            exceptionService.actionNotPermittedException("Please enter valid Seniority Levels");
+        }
         if(seniorityLevels.size()>1){
             for (int i = 0; i < seniorityLevels.size()-1; i++) {
-                if(!seniorityLevels.get(i).getTo().equals(seniorityLevels.get(i+1).getFrom())){
+                if(seniorityLevels.get(i).getTo()!=null &&seniorityLevels.get(i).getTo()>seniorityLevels.get(i).getFrom() || !seniorityLevels.get(i).getTo().equals(seniorityLevels.get(i+1).getFrom())){
                     exceptionService.actionNotPermittedException("Please enter valid Seniority Levels");
                 }
             }
@@ -1024,7 +1027,7 @@ public class ExpertiseService {
     }
 
 
-    public ExpertiseResponseDTO updateExpertiseByNewWay(Long countryId,ExpertiseDTO expertiseDTO,Long expertiseId){
+    public ExpertiseResponseDTO updateExpertise(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId){
         expertiseDTO.setId(expertiseId);
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -1065,8 +1068,10 @@ public class ExpertiseService {
         if(!expertiseDTO.getExpertiseLineId().equals(currentExpertiseLine.getId())){
             exceptionService.actionNotPermittedException("Please provide the valid line id");
         }
-
-        if(expertise.isPublished() && isExpertiseLineChanged(currentExpertiseLine,expertiseDTO.getOrganizationLevelId(), expertiseDTO.getOrganizationServiceIds(),expertiseDTO.getSector().getId(),expertiseDTO.getUnion().getId(),expertiseDTO)){
+        if( expertiseDTO.getStartDate().isBefore(currentExpertiseLine.getStartDate())){
+            exceptionService.actionNotPermittedException("Please select published date less after current line start date");
+        }
+        if(expertise.isPublished() && isExpertiseLineChanged(currentExpertiseLine,expertiseDTO.getOrganizationLevelId(), expertiseDTO.getOrganizationServiceIds(),expertiseDTO.getSector().getId(),expertiseDTO.getUnion().getId(),expertiseDTO) && currentExpertiseLine.getStartDate().isBefore(expertiseDTO.getStartDate())){
             if(isNotNull(expertise.getEndDate()) && !expertiseDTO.getStartDate().isBefore(expertise.getEndDate())){
                 exceptionService.actionNotPermittedException("Please select published date less before expertise end date");
             }
@@ -1084,13 +1089,17 @@ public class ExpertiseService {
             Map<Integer,ExpertiseLineSeniorityLevelRelationship> seniorityLevelRelationshipMap=expertiseLineSeniorityLevelRelationships.stream().collect(Collectors.toMap(k->k.getSeniorityLevel().getFrom(), Function.identity()));
             List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationshipList=new ArrayList<>();
             Map<Integer,SeniorityLevel> fromSeniorityLevelMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(SeniorityLevel::getFrom,Function.identity()));
+            Set<Long> payGradeIds = expertiseDTO.getSeniorityLevels().stream().map(SeniorityLevelDTO::getPayGradeId).collect(Collectors.toSet());
+            List<PayGrade> payGrades = payGradeGraphRepository.getAllPayGradesById(payGradeIds);
+            Map<Long, PayGrade> payGradeMap = payGrades.stream().collect(Collectors.toMap(PayGrade::getId, v -> v));
             for (SeniorityLevelDTO seniorityLevelDTO:expertiseDTO.getSeniorityLevels()) {
                     SeniorityLevel seniorityLevel=fromSeniorityLevelMap.get(seniorityLevelDTO.getFrom());
                     ExpertiseLineSeniorityLevelRelationship  seniorityLevelRelationship=seniorityLevelRelationshipMap.getOrDefault(seniorityLevelDTO.getFrom(),new ExpertiseLineSeniorityLevelRelationship(currentExpertiseLine,seniorityLevel,seniorityLevelDTO.getPayGradeId(),seniorityLevelDTO.getPayGradeLevel()));
-                    seniorityLevelRelationship.setPayGradeLevel(seniorityLevelDTO.getPayGradeLevel());
+                    seniorityLevelRelationship.setPayGradeId(seniorityLevelDTO.getPayGradeId());
+                    seniorityLevelRelationship.setPayGradeLevel(payGradeMap.get(seniorityLevelDTO.getPayGradeId()).getPayGradeLevel());
                     expertiseLineSeniorityLevelRelationshipList.add(seniorityLevelRelationship);
             }
-            if(isCollectionNotEmpty(expertiseLineSeniorityLevelRelationships)){
+            if(isCollectionNotEmpty(expertiseLineSeniorityLevelRelationshipList)){
                 expertiseLineAndSeniorityLevelRelationshipRepository.saveAll(expertiseLineSeniorityLevelRelationshipList);
             }
         }
@@ -1106,7 +1115,6 @@ public class ExpertiseService {
         return !expertiseLine.getOrganizationLevel().getId().equals(levelId) || isServiceChanged(organizationServiceIds, expertiseLine) || !expertiseLine.getSector().getId().equals(sectorId) ||
                 !expertiseLine.getUnion().getId().equals(unionId) || expertiseLine.getFullTimeWeeklyMinutes()!=expertiseDTO.getFullTimeWeeklyMinutes() ||
                 expertiseLine.getNumberOfWorkingDaysInWeek()!=expertiseDTO.getNumberOfWorkingDaysInWeek()||
-                !expertiseLine.getStartDate().equals(expertiseDTO.getStartDate())||
                 isPayGradeChanged(expertiseLineSeniorityLevelRelationships,expertiseDTO.getSeniorityLevels());
     }
 
@@ -1218,7 +1226,7 @@ public class ExpertiseService {
     }
 
     public ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, LocalDate startDate){
-        return expertiseGraphRepository.getCurrentlyActiveExpertiseLineByDate(expertiseId,startDate);
+        return expertiseGraphRepository.getCurrentlyActiveExpertiseLineByDate(expertiseId,startDate.toString());
     }
 
     public ExpertiseQueryResult copyExpertise(Long expertiseId,ExpertiseDTO expertiseDTO){

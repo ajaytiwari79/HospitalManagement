@@ -297,7 +297,7 @@ public class CountryController {
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId, @RequestBody  ExpertiseDTO expertise,@PathVariable Long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertiseByNewWay(countryId, expertise,expertiseId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(countryId, expertise,expertiseId));
     }
 
     @ApiOperation(value = "Update expertise Line")

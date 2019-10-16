@@ -24,7 +24,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise, Long> {
 
     @Query("MATCH (country:Country) WHERE id(country)={0}  " +
-            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR expertise.endDate >= DATE()) " +
+            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE()) " +
             "RETURN expertise")
     List<Expertise> getAllExpertiseByCountry(long countryId);
 
@@ -32,7 +32,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     Expertise getOneDefaultExpertiseByCountry(long countryId);
 
     @Query("MATCH (country:Country) WHERE id(country)={0} " +
-            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR expertise.endDate >= DATE())  " +
+            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())  " +
             "WITH expertise, country \n" +
             "RETURN id(expertise) as id, expertise.name as name")
     List<ExpertiseTagDTO> getAllExpertiseWithTagsByCountry(long countryId);
@@ -115,7 +115,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     boolean findExpertiseByUniqueName(String expertiseName);
 
 
-    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(country) = {0} AND (expertise.endDate IS NULL OR expertise.endDate >= DATE())\n" +
+    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(country) = {0} AND (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())\n" +
             "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1}\n" +
             "RETURN expertise order by expertise.creationDate")
     List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, Set<Long> organizationServicesIds);
@@ -129,16 +129,16 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("MATCH(organizationType:OrganizationType) WHERE id(organizationType)={1}\n" +
             "MATCH(organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService)\n" +
-            " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDate IS NULL OR expertise.endDate >= DATE())\n" +
+            " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())\n" +
             "RETURN distinct id(expertise) as id,expertise.name as name")
     List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
 
     @Query("MATCH (country:Country) WHERE id(country)={0}  " +
-            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR expertise.endDate >= DATE()) " +
+            "MATCH (country)<-[:"+BELONGS_TO+"]-(expertise:Expertise{deleted:false,published:true}) WHERE  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE()) " +
             "RETURN id(expertise) as id , expertise.name as name")
     List<ExpertiseDTO> getAllExpertiseByCountryAndDate(long countryId);
 
-    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE id(country) = {0} AND (exl.startDate<=DATE() AND (exl.endDate IS NULL OR exl.endDate>=DATE()))  \n" +
+    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE id(country) = {0} AND (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  \n" +
             "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1}\n" +
             "MATCH(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
             "OPTIONAL MATCH(expertise)-[:" + HAS_SENIOR_DAYS + "]->(seniorDays:CareDays) \n " +
@@ -155,7 +155,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             " RETURN location as name ORDER BY location.name ASC" )
     List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine)->[:"+SUPPORTS_SERVICES+"]->(os)<-[:"+PROVIDE_SERVICE+"{isEnabled:true}]-(unit:Unit) WHERE expertise.endDate IS NULL OR expertise.endDate >= DATE()\n" +
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine)->[:"+SUPPORTS_SERVICES+"]->(os)<-[:"+PROVIDE_SERVICE+"{isEnabled:true}]-(unit:Unit) WHERE expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE()\n" +
             "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnitIds")
     List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
 
@@ -165,8 +165,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN protectedSetting")
     List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(Long expertiseId);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) = {0} AND (exl.startDate<=DATE({1}) AND (exl.endDate IS NULL OR exl.endDate>=DATE({1}))" +
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) = {0} AND (DATE(exl.startDate)<=DATE({1}) AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE({1})))" +
             "RETURN exl LIMIT 1")
-    ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, LocalDate startDate);
+    ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
 
  }

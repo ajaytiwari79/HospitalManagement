@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.user.expertise.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
@@ -17,6 +18,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 
 /**
  * Created by vipul on 28/3/18.
@@ -49,4 +52,15 @@ public class ExpertiseQueryResult {
     private Location unionLocation;// in case of expertise at unit level only
     private Set<Long> supportedUnitIds;
     private List<ExpertiseLineQueryResult> expertiseLines;
+
+    public ExpertiseLineQueryResult getCurrentlyActiveLine(){
+        ExpertiseLineQueryResult currentExpertiseLineQueryResult=null;
+        for (ExpertiseLineQueryResult expertiseLineQueryResult:this.getExpertiseLines()) {
+            if(startDateIsEqualsOrBeforeEndDate(expertiseLineQueryResult.getStartDate(),LocalDate.now()) && (expertiseLineQueryResult.getEndDate()==null || startDateIsEqualsOrBeforeEndDate(LocalDate.now(),expertiseLineQueryResult.getEndDate()))){
+                currentExpertiseLineQueryResult=expertiseLineQueryResult;
+                break;
+            }
+        }
+        return currentExpertiseLineQueryResult;
+    }
 }

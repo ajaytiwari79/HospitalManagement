@@ -85,7 +85,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "MATCH(staff)<-[:"+BELONGS_TO+"]-(position:Position)<-[:"+ HAS_POSITIONS +"]-(org:Organization) \n" +
             "MATCH(org)-[:"+HAS_UNIT+"]->(subOrg:Unit)  \n" +
             "OPTIONAL MATCH(subOrg)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) WITH employment,org,subOrg,staff,position \n" +
-            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE (exl.startDate<=DATE() AND (exl.endDate IS NULL OR exl.endDate>=DATE())) \n" +
+            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE())) \n" +
             "OPTIONAL MATCH (employment)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (exl)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "RETURN expertise as expertise,unionData as union, id(employment) as id,\n" +
@@ -123,7 +123,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     String getMaxEmploymentStartDate(Long staffId);
 
     @Query("MATCH(org:Unit)<-[:"+IN_UNIT+"]-(employment:Employment{deleted:false})<-[:"+BELONGS_TO_STAFF+"]-(staff) WHERE id(staff)={0} AND id(org)={1}\n" +
-            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE (exl.startDate<=DATE() AND (exl.endDate IS NULL OR exl.endDate>=DATE()))  \n" +
+            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise)-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  \n" +
             "OPTIONAL MATCH (employment)-[:"+HAS_REASON_CODE+"]->(reasonCode:ReasonCode) \n" +
             "OPTIONAL MATCH (exl)-[:"+SUPPORTED_BY_UNION+"]->(unionData:Organization{isEnable:true,union:true}) \n" +
             "RETURN id(employment) as id,employment.startDate as startDate, employment.endDate as endDate,employment.employmentSubType as employmentSubType,employment.accumulatedTimebankDate as accumulatedTimebankDate,employment.accumulatedTimebankMinutes as accumulatedTimebankMinutes, \n" +
