@@ -103,7 +103,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
 
 
     private Date getStartDateExceptNonWorkingActivity(List<ShiftActivityDTO> shiftActivityDTOS){
-       return shiftActivityDTOS.stream().filter(k->TimeTypes.WORKING_TYPE.toValue().equals(k.getTimeType())).findFirst().orElse(new ShiftActivityDTO()).getStartDate();
+       return shiftActivityDTOS.stream().filter(k->(String.valueOf(TimeTypes.WORKING_TYPE)).equals(k.getTimeType())).findFirst().orElse(new ShiftActivityDTO()).getStartDate();
     }
 
     private Date getEndDateExceptNonWorkingActivity(List<ShiftActivityDTO> shiftActivityDTOS){
@@ -120,6 +120,6 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     boolean isWorkingShiftActivity(List<ShiftActivityDTO> shiftActivityDTOS){
-        return shiftActivityDTOS.stream().anyMatch(k->TimeTypes.WORKING_TYPE.toValue().equals(k.getTimeType()));
+        return shiftActivityDTOS.stream().anyMatch(k->(String.valueOf(TimeTypes.WORKING_TYPE)).equals(k.getTimeType()));
     }
 }
