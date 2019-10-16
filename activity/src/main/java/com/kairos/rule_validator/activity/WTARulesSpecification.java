@@ -40,7 +40,7 @@ public class WTARulesSpecification extends AbstractSpecification<ShiftWithActivi
 
     @Override
     public List<String> isSatisfiedString(ShiftWithActivityDTO shift) {
-        List<String> exceptionMessages = new ArrayList<>();/*
+        return new ArrayList<>();/*
         for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
             String exceptionMessage = ;
             if(!exceptionMessage.isEmpty()){
@@ -49,7 +49,6 @@ public class WTARulesSpecification extends AbstractSpecification<ShiftWithActivi
                 break;
             }
         }*/
-        return exceptionMessages;
     }
 
 }

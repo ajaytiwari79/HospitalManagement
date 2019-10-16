@@ -149,8 +149,7 @@ public class PhaseDTO {
 
 
     public PhaseWeeklyDTO buildWeekDTO() {
-        PhaseWeeklyDTO phaseWeeklyDTO = new PhaseWeeklyDTO(id, name, description, duration, sequence, organizationId);
-        return phaseWeeklyDTO;
+        return new PhaseWeeklyDTO(id, name, description, duration, sequence, organizationId);
     }
 
     public String getColor() {

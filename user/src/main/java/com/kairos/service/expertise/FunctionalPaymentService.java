@@ -82,8 +82,7 @@ public class FunctionalPaymentService {
                 .and(new IsFunctionalPaymentAvailable(functionalPaymentFromDb, exceptionService));
 
         isGreaterThanStartDateAndToday.isSatisfied(functionalPaymentDTO);
-        FunctionalPayment functionalPayment = new FunctionalPayment(expertise, functionalPaymentDTO.getStartDate(), functionalPaymentDTO.getEndDate(), functionalPaymentDTO.getPaymentUnit());
-        return functionalPayment;
+        return new FunctionalPayment(expertise, functionalPaymentDTO.getStartDate(), functionalPaymentDTO.getEndDate(), functionalPaymentDTO.getPaymentUnit());
     }
 
     public FunctionalPaymentDTO updateFunctionalPayment(Long expertiseId, FunctionalPaymentDTO functionalPaymentDTO) {

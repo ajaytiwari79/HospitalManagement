@@ -811,8 +811,7 @@ public class PlannerService extends MongoBaseService {
             sendAggregateDataToClient(clientAggregator, unitId);
         }
 
-        List<TaskGanttDTO> responseList = customizeTaskData(tasksToReturn);
-        return responseList;
+        return customizeTaskData(tasksToReturn);
     }
 
     private boolean validateDaySpecification(TaskType taskType, Task task) {

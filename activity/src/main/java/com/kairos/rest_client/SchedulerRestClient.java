@@ -43,8 +43,7 @@ public class SchedulerRestClient {
             RestTemplateResponseEnvelope<List<Long>> response = restExchange.getBody();
             if (restExchange.getStatusCode().is2xxSuccessful()) {
 
-                List<Long> organizations =  response.getData();
-                return organizations;
+                return  response.getData();
             } else {
                 throw new RuntimeException(response.getMessage());
             }

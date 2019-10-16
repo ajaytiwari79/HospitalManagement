@@ -185,8 +185,7 @@ It searches whether citizen's address lies within LocalAreaTag coordinates list 
     }
 
     public PaymentSettingsQueryResult getPaymentSettings(Long unitId) {
-        PaymentSettingsQueryResult paymentSettings = paymentSettingRepository.getPaymentSettingByUnitId(unitId);
-        return paymentSettings;
+        return paymentSettingRepository.getPaymentSettingByUnitId(unitId);
     }
 
 

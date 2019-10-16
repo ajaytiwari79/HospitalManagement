@@ -28,8 +28,7 @@ public class AuditLoggingRepository {
 
         Query query = new Query();
         query.addCriteria(Criteria.where("staffId").is(staffId).and ("startDate").gte(startDate).and("endDate").lte(endDate));
-        List<Map> shifts = mongoTemplate.find(query ,Map.class,"Shift");
-        return shifts;
+        return mongoTemplate.find(query ,Map.class,"Shift");
     }
 }
 

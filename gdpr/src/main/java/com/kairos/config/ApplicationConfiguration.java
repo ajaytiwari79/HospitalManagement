@@ -23,7 +23,6 @@ public class ApplicationConfiguration {
     @Bean
     PermissionSchemaProcessor prePermissionSchemaProcessor(){
         List<Map<String, Object>> permissionSchema= new PermissionSchemaScanner().createPermissionSchema(envConfigCommon.getModelPackagePath());
-        PermissionSchemaProcessor permissionSchemaProcessor = new PermissionSchemaProcessor(permissionSchema, userRestClient,envConfigCommon.getUserServiceUrl(), envConfigCommon.getKpermissionDataPublish());
-        return permissionSchemaProcessor;
+        return new PermissionSchemaProcessor(permissionSchema, userRestClient,envConfigCommon.getUserServiceUrl(), envConfigCommon.getKpermissionDataPublish());
     }
 }

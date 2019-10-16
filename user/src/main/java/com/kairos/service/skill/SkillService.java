@@ -112,8 +112,7 @@ public class SkillService {
             logger.info("tags for skill : " + tags);
             skill.setTags(tags);
             skillGraphRepository.save(skill);
-            Map<String, Object> response = skill.retrieveDetails();
-            return response;
+            return skill.retrieveDetails();
         }
         exceptionService.duplicateDataException(MESSAGE_SKILL_NAME_DUPLICATE);
         return null;
