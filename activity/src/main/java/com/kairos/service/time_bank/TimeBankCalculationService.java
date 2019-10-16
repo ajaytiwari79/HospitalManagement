@@ -433,7 +433,7 @@ public class TimeBankCalculationService {
         List<CTADistributionDTO> ctaBonusDistributions = new ArrayList<>();
         long ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ctaRuleTemplate : ctaRuleTemplateDTOS) {
-            if (newHashSet(TIMEBANK_ACCOUNT,BONUS_HOURS,UNUSED_DAYOFF_LEAVES).contains(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType())) {
+            if (ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT) && newHashSet(BONUS_HOURS,FUNCTIONS,UNUSED_DAYOFF_LEAVES).contains(ctaRuleTemplate.getCalculationFor())) {
                 CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
                 ctaBonusDistributions.add(ctaDistributionDTO);
                 ctaBonusMinutes += ctaDistributionDTO.getMinutes();
@@ -709,7 +709,7 @@ public class TimeBankCalculationService {
         long ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ctaRuleTemplate : employmentWithCtaDetailsDTO.getCtaRuleTemplates()) {
             if (ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
-                if (newHashSet(TIMEBANK_ACCOUNT,BONUS_HOURS,UNUSED_DAYOFF_LEAVES).contains(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType())) {
+                if (newHashSet(BONUS_HOURS,FUNCTIONS,UNUSED_DAYOFF_LEAVES).contains(ctaRuleTemplate.getCalculationFor())) {
                     CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
                     timeBankCTADistributionDTOS.add(ctaDistributionDTO);
                     ctaBonusMinutes += ctaDistributionDTO.getMinutes();

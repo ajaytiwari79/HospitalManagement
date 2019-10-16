@@ -2,6 +2,7 @@ package com.kairos.service.pay_out;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
@@ -32,11 +33,9 @@ import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.PAID_OUT;
-import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 
 
 /*
@@ -239,7 +238,7 @@ public class PayOutCalculationService {
         long ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ctaRuleTemplate : employmentWithCtaDetailsDTO.getCtaRuleTemplates()) {
             if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT)) {
-                if(newHashSet(TIMEBANK_ACCOUNT,BONUS_HOURS,UNUSED_DAYOFF_LEAVES).contains(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType())) {
+                if(ObjectUtils.newHashSet(BONUS_HOURS,FUNCTIONS,UNUSED_DAYOFF_LEAVES).contains(ctaRuleTemplate.getCalculationFor())) {
                     CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
                     timeBankCTADistributionDTOS.add(ctaDistributionDTO);
                     ctaBonusMinutes += ctaDistributionDTO.getMinutes();
