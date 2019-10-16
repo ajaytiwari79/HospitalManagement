@@ -16,7 +16,7 @@ public class ValidateIgnoreCounterConfiguration implements ConstraintValidator<V
 
     @Override
     public void initialize(ValidateIgnoreCounter constraintAnnotation) {
-
+        //It's implemented
     }
 
     @Override

@@ -101,40 +101,22 @@ import static java.util.stream.Collectors.groupingBy;
  * */
 @Service
 public class TimeBankCalculationService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeBankCalculationService.class);
-
-    @Inject
-    private PayOutCalculationService payOutCalculationService;
-    @Inject
-    private PlanningPeriodService planningPeriodService;
-    @Inject
-    private ExceptionService exceptionService;
-    @Inject
-    private PayOutRepository payOutRepository;
-    @Inject
-    private PhaseService phaseService;
-    @Inject
-    private TimeBankRepository timeBankRepository;
-    @Inject
-    private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
-    @Inject
-    private ActivityMongoRepository activityMongoRepository;
-    @Inject
-    private ShiftMongoRepository shiftMongoRepository;
-    @Inject
-    private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
-    @Inject
-    private PayOutService payOutService;
-    @Inject
-    private UserIntegrationService userIntegrationService;
-    @Inject
-    private CostTimeAgreementRepository costTimeAgreementRepository;
-    @Inject
-    private ProtectedDaysOffService protectedDaysOffService;
-    @Inject
-    private TimeBankService timeBankService;
-
+    @Inject private PayOutCalculationService payOutCalculationService;
+    @Inject private PlanningPeriodService planningPeriodService;
+    @Inject private ExceptionService exceptionService;
+    @Inject private PayOutRepository payOutRepository;
+    @Inject private PhaseService phaseService;
+    @Inject private TimeBankRepository timeBankRepository;
+    @Inject private PayOutTransactionMongoRepository payOutTransactionMongoRepository;
+    @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    @Inject private PayOutService payOutService;
+    @Inject private UserIntegrationService userIntegrationService;
+    @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private ProtectedDaysOffService protectedDaysOffService;
+    @Inject private TimeBankService timeBankService;
 
     public DailyTimeBankEntry calculateDailyTimeBank(StaffAdditionalInfoDTO staffAdditionalInfoDTO, DateTimeInterval dateTimeInterval, List<ShiftWithActivityDTO> shifts, DailyTimeBankEntry dailyTimeBankEntry, DateTimeInterval planningPeriodInterval, List<DayTypeDTO> dayTypeDTOS, boolean validatedByPlanner) {
         boolean anyShiftPublish = false;
@@ -156,7 +138,6 @@ public class TimeBankCalculationService {
         }
         return dailyTimeBankEntry;
     }
-
 
     private DailyTimeBankEntry updateDailyTimeBankEntry(StaffEmploymentDetails staffEmploymentDetails, DateTimeInterval dateTimeInterval, DailyTimeBankEntry dailyTimeBankEntry, boolean anyShiftPublish, int contractualMinutes, int totalDailyPlannedMinutes, int scheduledMinutesOfTimeBank, int totalPublishedDailyPlannedMinutes, Map<BigInteger, Integer> ctaTimeBankMinMap) {
         dailyTimeBankEntry = isNullOrElse(dailyTimeBankEntry, new DailyTimeBankEntry(staffEmploymentDetails.getId(), staffEmploymentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
@@ -423,7 +404,6 @@ public class TimeBankCalculationService {
         employmentWithCtaDetailsDTO.getCtaRuleTemplates().forEach(cta -> {
             if (cta.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT) && cta.getCalculationFor().equals(SCHEDULED_HOURS)) {
                 scheduledCTADistributions.add(new CTADistributionDTO(cta.getId(), cta.getName(), ctaDistributionMap.getOrDefault(cta.getName(), 0)));
-
             }
         });
         return scheduledCTADistributions;
@@ -1514,5 +1494,4 @@ public class TimeBankCalculationService {
         }
         return value;
     }
-
 }
