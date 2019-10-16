@@ -32,9 +32,11 @@ import java.time.DayOfWeek;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.PAID_OUT;
+import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
 
 
 /*
@@ -154,7 +156,7 @@ public class PayOutCalculationService {
         List<CTADistributionDTO> ctaBonusDistributions = new ArrayList<>();
         long ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ctaRuleTemplate : employmentWithCtaDetailsDTO.getCtaRuleTemplates()) {
-            if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT) && (ctaRuleTemplate.getCalculationFor().equals(BONUS_HOURS) || ctaRuleTemplate.getCalculationFor().equals(FUNCTIONS))) {
+            if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT) && (ctaRuleTemplate.getCalculationFor().equals(BONUS_HOURS) || ctaRuleTemplate.getCalculationFor().equals(FUNCTIONS) || ctaRuleTemplate.getCalculationFor().equals(UNUSED_DAYOFF_LEAVES))) {
                 CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
                 ctaBonusDistributions.add(ctaDistributionDTO);
                 ctaBonusMinutes += ctaDistributionDTO.getMinutes();
@@ -237,7 +239,7 @@ public class PayOutCalculationService {
         long ctaBonusMinutes = 0;
         for (CTARuleTemplateDTO ctaRuleTemplate : employmentWithCtaDetailsDTO.getCtaRuleTemplates()) {
             if(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT)) {
-                if(ctaRuleTemplate.getCalculationFor().equals(BONUS_HOURS) || ctaRuleTemplate.getCalculationFor().equals(FUNCTIONS)) {
+                if(newHashSet(TIMEBANK_ACCOUNT,BONUS_HOURS,UNUSED_DAYOFF_LEAVES).contains(ctaRuleTemplate.getPlannedTimeWithFactor().getAccountType())) {
                     CTADistributionDTO ctaDistributionDTO = new CTADistributionDTO(ctaRuleTemplate.getId(), ctaRuleTemplate.getName(), ctaDistributionMap.getOrDefault(ctaRuleTemplate.getName(), 0));
                     timeBankCTADistributionDTOS.add(ctaDistributionDTO);
                     ctaBonusMinutes += ctaDistributionDTO.getMinutes();
