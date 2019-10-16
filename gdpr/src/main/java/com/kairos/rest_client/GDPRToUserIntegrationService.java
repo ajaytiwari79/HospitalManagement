@@ -28,7 +28,7 @@ public class GDPRToUserIntegrationService {
         Map<String,List<Long>> requestBody = new HashMap<>();
         requestBody.put("organizationSubTypeIds",organizationSubTypeIds);
         requestBody.put("organizationSubServicesIds",organizationSubServicesIds);
-        return gdprGenericRestClient.publishRequest(requestBody, countryId, false, IntegrationOperation.CREATE, GET_ORGANIZATION_IDS_BY_ORGANIZATION_SUB_TYPE_IdS_AND_SUB_SERVICE_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
+        return gdprGenericRestClient.publishRequest(requestBody, countryId, false, IntegrationOperation.CREATE, GET_ORGANIZATION_IDS_BY_ORGANIZATION_SUB_TYPE_IDS_AND_SUB_SERVICE_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
     }
 
     public List<Long> getAllUnitIdsByCountryId(Long countryId) {

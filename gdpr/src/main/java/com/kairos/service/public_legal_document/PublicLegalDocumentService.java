@@ -18,7 +18,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.*;
 
-import static com.kairos.constants.AppConstant.PUBLIC_LEGAL_Document_LOGO_PATH;
+import static com.kairos.constants.AppConstant.PUBLIC_LEGAL_DOCUMENT_LOGO_PATH;
 
 /**
  * Created By G.P.Ranjan on 26/6/19
@@ -48,7 +48,7 @@ public class PublicLegalDocumentService {
     }
 
     public Map<String,String> uploadPublicLegalDocumentLogo(MultipartFile file){
-        File directory = new File(PUBLIC_LEGAL_Document_LOGO_PATH);
+        File directory = new File(PUBLIC_LEGAL_DOCUMENT_LOGO_PATH);
         if (!directory.exists()) {
             try {
                 directory.mkdir();
@@ -57,7 +57,7 @@ public class PublicLegalDocumentService {
             }
         }
         String fileName = DateUtils.getCurrentDate().getTime() + file.getOriginalFilename();
-        final String path = PUBLIC_LEGAL_Document_LOGO_PATH + File.separator + fileName;
+        final String path = PUBLIC_LEGAL_DOCUMENT_LOGO_PATH + File.separator + fileName;
         try (InputStream inputStream = file.getInputStream();
              FileOutputStream fileOutputStream = new FileOutputStream(new File(path))) {
             byte[] buf = new byte[1024];

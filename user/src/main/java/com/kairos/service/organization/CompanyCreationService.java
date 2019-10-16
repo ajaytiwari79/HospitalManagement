@@ -237,8 +237,9 @@ public class CompanyCreationService {
                 organizationIds.add(unit.getId());
                 accessGroupService.removeDefaultCopiedAccessGroup(organizationIds);
 
-                if(unit instanceof Organization)
-                accessGroupService.createDefaultAccessGroups(((Organization) unit), ((Organization) unit).getUnits());
+                if(unit instanceof Organization) {
+                    accessGroupService.createDefaultAccessGroups(((Organization) unit), ((Organization) unit).getUnits());
+                }
             }
         }
         setCompanyData(unit, orgDetails);
