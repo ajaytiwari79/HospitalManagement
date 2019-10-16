@@ -704,8 +704,8 @@ public class TimeBankService{
         return costTimeAgreementRepository.getCTARultemplateByEmploymentId(employmentId).stream().filter(distinctByKey(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getName())).collect(toList());
     }
 
-    public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, Date startDate, Date endDate){
-        return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,startDate,endDate);
+    public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, LocalDate startDate, LocalDate endDate){
+        return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,asDate(startDate),asDate(endDate));
     }
 
 
