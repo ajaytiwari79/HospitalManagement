@@ -222,8 +222,9 @@ public class ShiftPlanningSolver {
                     any.setTrue();
                     sb.append(constraintMatch.getConstraintName()+"--"+constraintMatch.getScore().toString()+"\n");
                 });
-                if(any.isTrue())
+                if(any.isTrue()) {
                     log.info(sb.toString());
+                }
             }else if(entity instanceof ActivityLineInterval ) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(STR);
@@ -241,8 +242,9 @@ public class ShiftPlanningSolver {
                     any.setTrue();
                     sb.append("-------------"+constraintMatch.getConstraintName()+"----------"+constraintMatch.getScore().toString()+"\n");
                 });
-                if(any.isTrue())
+                if(any.isTrue()) {
                     log.info(sb.toString());
+                }
             }else if(entity instanceof Activity) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(STR);
@@ -256,8 +258,9 @@ public class ShiftPlanningSolver {
                     any.setTrue();
                     sb.append("------"+constraintMatch.getConstraintName()+"--------"+constraintMatch.getScore().toString()+"\n");
                 });
-                if(any.isTrue())
+                if(any.isTrue()) {
                     log.info(sb.toString());
+                }
             }else if(entity instanceof Employee) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(STR);
@@ -270,8 +273,9 @@ public class ShiftPlanningSolver {
                     any.setTrue();
                     sb.append("------"+constraintMatch.getConstraintName()+"-------"+constraintMatch.getScore().toString()+"\n");
                 });
-                if(any.isTrue())
-                log.info(sb.toString());
+                if(any.isTrue()) {
+                    log.info(sb.toString());
+                }
             }else{
                 //log.info("------------------------");
                 //log.info(entity.toString()+"-----------"+indictment.toString());
