@@ -156,7 +156,6 @@ public class SystemLanguageService {
         List<Long> countryLanguageSettingRelationshipIds = countryLanguageSettingRelationshipRepository.findAllByCountryId(country.getId());
         List<CountryLanguageSettingRelationship> countryLanguageSettingRelationships = countryLanguageSettingRelationshipRepository.findAllById(countryLanguageSettingRelationshipIds);
         if (isCollectionNotEmpty(countryLanguageSettingRelationships) && isNotNull(defaultSetting) && defaultSetting) {
-
             countryLanguageSettingRelationships.forEach(countryLanguageSettingRelationship -> {
                 if (countryLanguageSettingRelationship.getSystemLanguage().getId().equals(systemLanguage.getId())) {
                     countryLanguageSettingRelationship.setDefaultLanguage(defaultSetting);

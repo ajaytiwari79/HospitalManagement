@@ -161,24 +161,42 @@ public class TimeBankCalculationService {
 
     private DailyTimeBankEntry updateDailyTimeBankEntry(StaffEmploymentDetails staffEmploymentDetails, DateTimeInterval dateTimeInterval, DailyTimeBankEntry dailyTimeBankEntry, boolean anyShiftPublish, int contractualMinutes, int totalDailyPlannedMinutes, int scheduledMinutesOfTimeBank, int totalPublishedDailyPlannedMinutes, Map<BigInteger, Integer> ctaTimeBankMinMap) {
         dailyTimeBankEntry = isNullOrElse(dailyTimeBankEntry, new DailyTimeBankEntry(staffEmploymentDetails.getId(), staffEmploymentDetails.getStaffId(), dateTimeInterval.getStartLocalDate()));
-        int deltaTimeBankMinutes = totalDailyPlannedMinutes - contractualMinutes;
         int timeBankMinWithoutCta = scheduledMinutesOfTimeBank - contractualMinutes;
         dailyTimeBankEntry.setStaffId(staffEmploymentDetails.getStaffId());
         dailyTimeBankEntry.setTimeBankMinutesWithoutCta(timeBankMinWithoutCta);
-        dailyTimeBankEntry.setPlannedMinutesOfTimebank(totalDailyPlannedMinutes);
-        int deltaAccumulatedTimebankMinutes = anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : 0;
-        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes + dailyTimeBankEntry.getProtectedDaysOffMinutes());
-        dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(ctaTimeBankMinMap.values().stream().mapToInt(ctaBonus -> ctaBonus).sum());
-        dailyTimeBankEntry.setPublishedSomeActivities(anyShiftPublish);
+        int deltaAccumulatedTimebankMinutes = anyShiftPublish ? (totalPublishedDailyPlannedMinutes - contractualMinutes) : MINIMUM_VALUE;
+        List<TimeBankCTADistribution> timeBankCTADistributionList = getProtectedDaysOffTimeBankCTADistributions(dailyTimeBankEntry);
+        int bonusOfProtectedDaysOff = timeBankCTADistributionList.stream().mapToInt(timeBankCTADistribution -> timeBankCTADistribution.getMinutes()).sum();
+        dailyTimeBankEntry.setPlannedMinutesOfTimebank(totalDailyPlannedMinutes + bonusOfProtectedDaysOff);
+        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(deltaAccumulatedTimebankMinutes + bonusOfProtectedDaysOff);
+        dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(ctaTimeBankMinMap.values().stream().mapToInt(ctaBonus -> ctaBonus).sum() + bonusOfProtectedDaysOff);
+        dailyTimeBankEntry.setPublishedSomeActivities(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() > MINIMUM_VALUE);
         dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
         dailyTimeBankEntry.setScheduledMinutesOfTimeBank(scheduledMinutesOfTimeBank);
+        int deltaTimeBankMinutes = dailyTimeBankEntry.getPlannedMinutesOfTimebank() - contractualMinutes;
         dailyTimeBankEntry.setDeltaTimeBankMinutes(deltaTimeBankMinutes);
-        dailyTimeBankEntry.setTimeBankCTADistributionList(getCTADistributionsOfTimebank(staffEmploymentDetails.getCtaRuleTemplates(), ctaTimeBankMinMap));
+        timeBankCTADistributionList.addAll(getCTADistributionsOfTimebank(staffEmploymentDetails.getCtaRuleTemplates(), ctaTimeBankMinMap));
+        dailyTimeBankEntry.setTimeBankCTADistributionList(timeBankCTADistributionList);
         dailyTimeBankEntry.setDraftDailyTimeBankEntry(null);
         return dailyTimeBankEntry;
     }
 
     public void resetDailyTimebankEntry(DailyTimeBankEntry dailyTimeBankEntry, int contractualMinutes) {
+        List<TimeBankCTADistribution> timeBankCTADistributionList = getProtectedDaysOffTimeBankCTADistributions(dailyTimeBankEntry);
+        dailyTimeBankEntry.setTimeBankMinutesWithoutCta(MINIMUM_VALUE);
+        int bonusOfProtectedDaysOff = timeBankCTADistributionList.stream().mapToInt(timeBankCTADistribution -> timeBankCTADistribution.getMinutes()).sum();
+        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(bonusOfProtectedDaysOff);
+        dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(bonusOfProtectedDaysOff);
+        dailyTimeBankEntry.setPlannedMinutesOfTimebank(bonusOfProtectedDaysOff);
+        dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
+        dailyTimeBankEntry.setScheduledMinutesOfTimeBank(MINIMUM_VALUE);
+        dailyTimeBankEntry.setDeltaTimeBankMinutes(-contractualMinutes);
+        dailyTimeBankEntry.setPublishedSomeActivities(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() > MINIMUM_VALUE);
+        dailyTimeBankEntry.setTimeBankCTADistributionList(isCollectionNotEmpty(timeBankCTADistributionList) ?timeBankCTADistributionList :new ArrayList<>());
+        dailyTimeBankEntry.setDraftDailyTimeBankEntry(null);
+    }
+
+    private List<TimeBankCTADistribution> getProtectedDaysOffTimeBankCTADistributions(DailyTimeBankEntry dailyTimeBankEntry) {
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(dailyTimeBankEntry.getEmploymentId(), asDate(java.time.LocalDate.now()));
         Set<BigInteger> unusedCtaRuleTemplateId= ctaResponseDTO.getRuleTemplates().stream().filter(ctaRuleTemplateDTO -> UNUSED_DAYOFF_LEAVES.equals(ctaRuleTemplateDTO.getCalculationFor())).map(CTARuleTemplateDTO::getId).collect(toSet());
         List<TimeBankCTADistribution> timeBankCTADistributionList=new ArrayList<>();
@@ -189,16 +207,7 @@ public class TimeBankCalculationService {
                 }
             }
         }
-        dailyTimeBankEntry.setTimeBankMinutesWithoutCta(0);
-        dailyTimeBankEntry.setPlannedMinutesOfTimebank(0);
-        dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes());
-        dailyTimeBankEntry.setCtaBonusMinutesOfTimeBank(0);
-        dailyTimeBankEntry.setContractualMinutes(contractualMinutes);
-        dailyTimeBankEntry.setScheduledMinutesOfTimeBank(0);
-        dailyTimeBankEntry.setDeltaTimeBankMinutes(-contractualMinutes);
-        dailyTimeBankEntry.setPublishedSomeActivities(false);
-        dailyTimeBankEntry.setTimeBankCTADistributionList(isCollectionNotEmpty(timeBankCTADistributionList) ?timeBankCTADistributionList :new ArrayList<>());
-        dailyTimeBankEntry.setDraftDailyTimeBankEntry(null);
+        return timeBankCTADistributionList;
     }
 
     private Double calculateBonusAndUpdateShiftActivity(DateTimeInterval dateTimeInterval,  CTARuleTemplateDTO ruleTemplate, DateTimeInterval shiftInterval, StaffEmploymentDetails staffEmploymentDetails) {
@@ -359,7 +368,7 @@ public class TimeBankCalculationService {
     private List<TimeBankCTADistribution> getCTADistributionsOfTimebank(List<CTARuleTemplateDTO> ctaRuleTemplateCalulatedTimeBankDTOS, Map<BigInteger, Integer> ctaTimeBankMinMap) {
         List<TimeBankCTADistribution> timeBankCTADistributions = new ArrayList<>(ctaRuleTemplateCalulatedTimeBankDTOS.size());
         for (CTARuleTemplateDTO ruleTemplate : ctaRuleTemplateCalulatedTimeBankDTOS) {
-            if (ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT)) {
+            if (ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT) && !ruleTemplate.getCalculationFor().equals(UNUSED_DAYOFF_LEAVES)) {
                 timeBankCTADistributions.add(new TimeBankCTADistribution(ruleTemplate.getName(), ctaTimeBankMinMap.getOrDefault(ruleTemplate.getId(), 0), ruleTemplate.getId()));
             }
         }
@@ -1453,6 +1462,9 @@ public class TimeBankCalculationService {
                 dailyTimeBankEntry.setPlannedMinutesOfTimebank(dailyTimeBankEntry.getPlannedMinutesOfTimebank() + value);
                 dailyTimeBankEntry.setDeltaTimeBankMinutes(dailyTimeBankEntry.getDeltaTimeBankMinutes() + value);
                 dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() + value);
+                if(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() > MINIMUM_VALUE){
+                    dailyTimeBankEntry.setPublishedSomeActivities(true);
+                }
             }
         }
         return dailyTimeBankEntry;
