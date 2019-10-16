@@ -27,8 +27,7 @@ public class AppLogService extends MongoBaseService {
         }*/
        // appLog.setActivityLog(activityLog);
        // return logging(appLog);
-        AppLog appLog = new AppLog();
-        return appLog;
+        return new AppLog();
     }
 
     public AppLog logging(AppLog appLog){

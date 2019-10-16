@@ -23,18 +23,14 @@ public class UserIntegrationService {
     private EnvConfig envConfig;
 
     public String getTimeZoneOfUnit(Long unitId) {
-        String timezone = userRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
+        return userRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<String>>() {
         },false);
-
-        return timezone;
 
     }
 
     public Map<Long,String> getTimeZoneOfAllUnits() {
-        Map<Long,String> unitTimeZoneMappingDTOS = userRestClient.publishRequest(null, null, false, IntegrationOperation.GET, "time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,String>>>() {
+        return userRestClient.publishRequest(null, null, false, IntegrationOperation.GET, "time_zone", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,String>>>() {
         },true);
-
-        return unitTimeZoneMappingDTOS;
 
     }
 

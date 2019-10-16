@@ -327,7 +327,7 @@ public class TaskExceptionService extends MongoBaseService {
 
         Task task =  taskService.findOne(String.valueOf(taskId));
 
-        Map<String, Object> returnData = new HashMap<>();
+        return new HashMap<>();
 
         /*Map<String, String> flsCredentials = integrationServiceRestClient.getFLSCredentials(unitId);
 
@@ -351,8 +351,6 @@ public class TaskExceptionService extends MongoBaseService {
 
         returnData.put("taskId",taskId);
         returnData.put("taskAppointmentSuggestionList",taskAppointmentSuggestionDTOList);*/
-
-        return returnData;
 
     }
 

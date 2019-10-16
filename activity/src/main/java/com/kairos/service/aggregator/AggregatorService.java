@@ -389,9 +389,8 @@ public class AggregatorService extends MongoBaseService {
 
         }
 
-        ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO(longDrivingCount, longDrivingTasks, mostDrivenCount, mostDrivenTasks, escalationCount, escalationTasks, waitingCount, plannedStatusCount, waitingTasks, plannedStatusTasks, totalPlannedProblemsTasks);
+        return new ClientAggregatorDTO(longDrivingCount, longDrivingTasks, mostDrivenCount, mostDrivenTasks, escalationCount, escalationTasks, waitingCount, plannedStatusCount, waitingTasks, plannedStatusTasks, totalPlannedProblemsTasks);
 
-        return clientAggregatorDTO;
 
     }
 

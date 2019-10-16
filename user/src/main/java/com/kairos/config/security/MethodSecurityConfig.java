@@ -10,10 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler() {
-        CustomOAuth2WebSecurityExpressionHandler expressionHandler =
-                new CustomOAuth2WebSecurityExpressionHandler();
-
-        return expressionHandler;
+        return new CustomOAuth2WebSecurityExpressionHandler();
     }
 }
 

@@ -105,8 +105,7 @@ public class AbsencePlanningService {
      */
     public Map<String, Object> getAbsencePlanningData(Long unitId, String tab) {
         List<Map> data = absencePlanningAggregationData(unitId, false, tab);
-        Map<String, Object> finalData = getAbsencePlanningTasks(unitId, data);
-        return finalData;
+        return getAbsencePlanningTasks(unitId, data);
     }
 
     /**

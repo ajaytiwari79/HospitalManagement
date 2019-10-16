@@ -736,32 +736,28 @@ public class ClientService {
 
     @Async public CompletableFuture<Boolean> getPreRequisiteData(Long organizationId, Map<String, Object> clientData, List<Map<String, Object>> clientList) throws InterruptedException, ExecutionException {
         Callable<Map<String, Object>> callableTaskDemand = () -> {
-            Map<String, Object> clientInfo = taskDemandRestClient.getOrganizationClientsInfo(organizationId, clientList);
-            return clientInfo;
+            return taskDemandRestClient.getOrganizationClientsInfo(organizationId, clientList);
         };
         Future<Map<String, Object>> futureTaskDemand = asynchronousService.executeAsynchronously(callableTaskDemand);
         if (futureTaskDemand.get() != null) {
             clientData.putAll(futureTaskDemand.get());
         }
         Callable<Map<String, Object>> callableTimeSlotData = () -> {
-            Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-            return timeSlotData;
+            return timeSlotService.getTimeSlots(organizationId);
         };
         Future<Map<String, Object>> futureTimeSlotData = asynchronousService.executeAsynchronously(callableTimeSlotData);
         if (futureTimeSlotData.get() != null) {
             clientData.put("timeSlotList", futureTimeSlotData.get());
         }
         Callable<List<OrganizationServiceQueryResult>> callableOrganizationServices = () -> {
-            List<OrganizationServiceQueryResult> organizationServiceQueryResults = organizationServiceRepository.getOrganizationServiceByOrgId(organizationId);
-            return organizationServiceQueryResults;
+            return organizationServiceRepository.getOrganizationServiceByOrgId(organizationId);
         };
         Future<List<OrganizationServiceQueryResult>> futureOrganizationServices = asynchronousService.executeAsynchronously(callableOrganizationServices);
         if (futureOrganizationServices.get() != null) {
             clientData.put("serviceTypes", futureOrganizationServices.get());
         }
         Callable<List<Map<String, Object>>> callableTagLists = () -> {
-            List<Map<String, Object>> tagList = organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
-            return tagList;
+            return organizationMetadataRepository.findAllByIsDeletedAndUnitId(organizationId);
         };
         Future<List<Map<String, Object>>> futureTagLists = asynchronousService.executeAsynchronously(callableTagLists);
         if (futureTagLists.get() != null) {
@@ -801,8 +797,7 @@ public class ClientService {
     }
 
     public List<Map<String, Object>> getOrganizationClientsExcludeDead(Long organizationId) {
-        List<Map<String, Object>> mapList = unitGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        return mapList;
+        return unitGraphRepository.getClientsOfOrganizationExcludeDead(organizationId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
     }
 
     public ClientStaffInfoDTO getStaffClientInfo(Long clientId, String loggedInUserName) {
@@ -977,8 +972,7 @@ public class ClientService {
         List<Map<String, Object>> mapList = unitGraphRepository.getClientsByClintIdList(citizenId);
         logger.info("CitizenList Size: " + mapList.size());
         Map<String, Object> timeSlotData = timeSlotService.getTimeSlots(organizationId);
-        OrganizationClientWrapper organizationClientWrapper = new OrganizationClientWrapper(mapList, timeSlotData);
-        return organizationClientWrapper;
+        return new OrganizationClientWrapper(mapList, timeSlotData);
     }
 
     public List<EscalateTaskWrapper> getClientAggregation(Long unitId) {
@@ -1163,8 +1157,7 @@ public class ClientService {
         List<Map<String, Object>> temporaryAddressList = FormatUtil.formatNeoResponse(clientGraphRepository.getClientTemporaryAddressById(clientId));
         List<TimeSlotWrapper> timeSlotWrappers = timeSlotGraphRepository.getTimeSlots(unit.getId(), unit.getTimeSlotMode());
         List<ClientExceptionTypesDTO> clientExceptionTypesDTOS = clientExceptionRestClient.getClientExceptionTypes();
-        ClientPersonalCalenderPrerequisiteDTO clientPersonalCalenderPrerequisiteDTO = new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS,
+        return new ClientPersonalCalenderPrerequisiteDTO(clientExceptionTypesDTOS,
                 temporaryAddressList, timeSlotWrappers);
-        return clientPersonalCalenderPrerequisiteDTO;
     }
 }
