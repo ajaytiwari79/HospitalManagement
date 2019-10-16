@@ -20,7 +20,6 @@ MATCH(e)-[serviceRel:SUPPORTS_SERVICES]->(os:OrganizationService)
 MATCH(e)-[unionRel:SUPPORTED_BY_UNION]->(union:Organization)
 MATCH(e)-[sectorRel:BELONGS_TO_SECTOR]->(s:Sector)
 MATCH(e)-[levelRel:IN_ORGANIZATION_LEVEL]->(l:Level)
-
 CREATE UNIQUE(e)-[:HAS_EXPERTISE_LINES]->(exl:ExpertiseLine)
 CREATE UNIQUE(exl)-[:SUPPORTS_SERVICES]->(os)
 CREATE UNIQUE(exl)-[:SUPPORTED_BY_UNION]->(union)

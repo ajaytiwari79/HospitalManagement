@@ -2,7 +2,6 @@ package com.kairos.dto.user.country.experties;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
-import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;

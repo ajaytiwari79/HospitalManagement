@@ -991,7 +991,7 @@ public class ExpertiseService {
         return isCollectionNotEmpty(schedulerPanelDTOS);
     }
 
-    public ExpertiseResponseDTO saveExpertise(Long countryId,ExpertiseDTO expertiseDTO){
+    public ExpertiseQueryResult saveExpertise(Long countryId,ExpertiseDTO expertiseDTO){
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, COUNTRY, countryId);
@@ -1020,13 +1020,7 @@ public class ExpertiseService {
                 null, null, null, null, countryId, expertise.getId());
         genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
                 "/expertise/" + expertise.getId() + "/night_worker_setting", null);
-        expertiseDTO.setId(expertise.getId());
-        expertiseDTO.setSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorityLevel(),SeniorityLevelDTO.class));
-        ExpertiseResponseDTO expertiseResponseDTO=ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO,ExpertiseResponseDTO.class);
-        ExpertiseLineDTO expertiseLineDTO=ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO,ExpertiseLineDTO.class);
-        expertiseLineDTO.setId(expertiseLine.getId());
-        expertiseResponseDTO.setExpertiseLines(Collections.singletonList(expertiseLineDTO));
-        return expertiseResponseDTO;
+        return updatedExpertiseData(expertise);
     }
 
 
@@ -1060,7 +1054,7 @@ public class ExpertiseService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, COUNTRY, countryId);
         }
-        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
+        Expertise expertise = expertiseGraphRepository.findOne(expertiseId,2);
         if (isNull(expertise) || expertise.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId());
         }
@@ -1079,32 +1073,30 @@ public class ExpertiseService {
             ExpertiseLine expertiseLine=createExpertiseLine(expertiseDTO,country);
             currentExpertiseLine.setEndDate(expertiseDTO.getStartDate().minusDays(1L));
             expertise.getExpertiseLines().add(expertiseLine);
+            Map<Integer,PayGrade> fromAndPayGradeLevelMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(SeniorityLevel::getFrom, SeniorityLevel::getPayGrade));
+            List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationships =new ArrayList<>();
+            expertise.getSeniorityLevel().forEach(sl-> expertiseLineSeniorityLevelRelationships.add(new ExpertiseLineSeniorityLevelRelationship(expertiseLine,sl,fromAndPayGradeLevelMap.get(sl.getFrom()).getId(),fromAndPayGradeLevelMap.get(sl.getFrom()).getPayGradeLevel())));
+            expertiseLineAndSeniorityLevelRelationshipRepository.saveAll(expertiseLineSeniorityLevelRelationships);
         }else {
             initializeExpertiseLine(currentExpertiseLine,expertiseDTO,country);
+            expertiseGraphRepository.save(expertise);
             List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationships=expertiseLineAndSeniorityLevelRelationshipRepository.findAllByLineId(currentExpertiseLine.getId());
             Map<Integer,ExpertiseLineSeniorityLevelRelationship> seniorityLevelRelationshipMap=expertiseLineSeniorityLevelRelationships.stream().collect(Collectors.toMap(k->k.getSeniorityLevel().getFrom(), Function.identity()));
+            List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationshipList=new ArrayList<>();
+            Map<Integer,SeniorityLevel> fromSeniorityLevelMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(SeniorityLevel::getFrom,Function.identity()));
             for (SeniorityLevelDTO seniorityLevelDTO:expertiseDTO.getSeniorityLevels()) {
-                    SeniorityLevel seniorityLevel=expertise.getSeniorityLevel().stream().filter(k->k.getId().equals(seniorityLevelDTO.getId())).findFirst().orElseThrow(()->new DataNotFoundByIdException("No Seniority level found"));
+                    SeniorityLevel seniorityLevel=fromSeniorityLevelMap.get(seniorityLevelDTO.getFrom());
                     ExpertiseLineSeniorityLevelRelationship  seniorityLevelRelationship=seniorityLevelRelationshipMap.getOrDefault(seniorityLevelDTO.getFrom(),new ExpertiseLineSeniorityLevelRelationship(currentExpertiseLine,seniorityLevel,seniorityLevelDTO.getPayGradeId(),seniorityLevelDTO.getPayGradeLevel()));
                     seniorityLevelRelationship.setPayGradeLevel(seniorityLevelDTO.getPayGradeLevel());
+                    expertiseLineSeniorityLevelRelationshipList.add(seniorityLevelRelationship);
             }
             if(isCollectionNotEmpty(expertiseLineSeniorityLevelRelationships)){
-                expertiseLineAndSeniorityLevelRelationshipRepository.saveAll(expertiseLineSeniorityLevelRelationships);
+                expertiseLineAndSeniorityLevelRelationshipRepository.saveAll(expertiseLineSeniorityLevelRelationshipList);
             }
         }
 
         expertiseGraphRepository.save(expertise);
-//        expertiseDTO.setId(expertise.getId());
-//        ExpertiseResponseDTO expertiseResponseDTO=ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO,ExpertiseResponseDTO.class);
-//        ExpertiseLineDTO expertiseLineDTO=ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO,ExpertiseLineDTO.class);
-//        expertiseLineDTO.setId(currentExpertiseLine.getId());
-//        expertiseResponseDTO.setExpertiseLines(Collections.singletonList(expertiseLineDTO));
-        ExpertiseQueryResult expertiseQueryResult=ObjectMapperUtils.copyPropertiesByMapper(expertise,ExpertiseQueryResult.class);
-        List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(Collections.singletonList(expertiseQueryResult.getId()));
-        expertiseQueryResult.setExpertiseLines(expertiseLineQueryResults);
-        return expertiseQueryResult;
-
-       // return expertiseResponseDTO;
+        return updatedExpertiseData(expertise);
 
     }
 
@@ -1154,9 +1146,11 @@ public class ExpertiseService {
         countryGraphRepository.addLevel(expertiseLine.getId(),expertiseDTO.getOrganizationLevelId());
         organizationServiceRepository.addServices(expertiseLine.getId(),expertiseDTO.getOrganizationServiceIds());
         organizationGraphRepository.addSector(expertiseLine.getId(),expertiseDTO.getSector().getId());
-        organizationGraphRepository.addUnion(expertiseLine.getId(),expertiseDTO.getSector().getId());
+        organizationGraphRepository.addUnion(expertiseLine.getId(),expertiseDTO.getUnion().getId());
         expertiseLine.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertiseLine.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
+        expertiseLine.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
+
     }
 
     public ExpertiseQueryResult publishExpertise(Long expertiseId) {
@@ -1243,12 +1237,15 @@ public class ExpertiseService {
         expertiseDTO.setBreakPaymentSetting(expertiseLine.getBreakPaymentSetting());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
-        saveExpertise(expertise.getCountry().getId(),expertiseDTO);
+        return saveExpertise(expertise.getCountry().getId(),expertiseDTO);
+
+    }
+
+    private ExpertiseQueryResult updatedExpertiseData(Expertise expertise){
         ExpertiseQueryResult expertiseQueryResult=ObjectMapperUtils.copyPropertiesByMapper(expertise,ExpertiseQueryResult.class);
         List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(Collections.singletonList(expertiseQueryResult.getId()));
         expertiseQueryResult.setExpertiseLines(expertiseLineQueryResults);
         return expertiseQueryResult;
-
     }
 
 }

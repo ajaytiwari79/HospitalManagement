@@ -93,7 +93,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "   to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels "+
             "RETURN id(exl) as id ,id(expertise) as expertiseId, exl.startDate as startDate , " +
             "exl.endDate as endDate ,exl.breakPaymentSetting as breakPaymentSetting,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek, " +
-            "services as organizationServices,level as organizationLevel,payTables[0] as payTable,union as union,seniorityLevels,sector")
+            "services as organizationServices,level as organizationLevel,payTables[0] as payTable,union as union,seniorityLevels,sector ORDER BY exl.startDate")
     List<ExpertiseLineQueryResult> findAllExpertiseLines(List<Long> expertiseIds);
 
     @Query("MATCH (expertise:Expertise{deleted:false}) WHERE id(expertise) IN {0} \n" +

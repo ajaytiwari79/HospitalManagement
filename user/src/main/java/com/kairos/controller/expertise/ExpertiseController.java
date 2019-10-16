@@ -2,7 +2,10 @@ package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.user.country.experties.*;
+import com.kairos.dto.user.country.experties.AgeRangeDTO;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
+import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
+import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
 import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.response.ProtectedDaysOffSettingDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;

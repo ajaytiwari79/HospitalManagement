@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;

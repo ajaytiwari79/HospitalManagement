@@ -14,9 +14,6 @@ import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.kairos.commons.utils.DateUtils.getLocalDate;
-import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
-import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTEMPTY;
 import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 

@@ -12,7 +12,6 @@ import org.neo4j.ogm.annotation.Relationship;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_PAGE;

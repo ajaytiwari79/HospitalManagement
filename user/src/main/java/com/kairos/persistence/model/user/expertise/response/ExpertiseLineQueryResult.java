@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise.response;
 
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -29,4 +30,5 @@ public class ExpertiseLineQueryResult {
     private Long expertiseId;
     private int fullTimeWeeklyMinutes;
     private int numberOfWorkingDaysInWeek;
+    private BreakPaymentSetting breakPaymentSetting;
 }

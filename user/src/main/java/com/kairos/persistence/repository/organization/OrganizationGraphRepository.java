@@ -100,7 +100,7 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
     @Query("MATCH(exl:ExpertiseLine)  WHERE id(exl)={0} " +
             "OPTIONAL MATCH(exl)-[rel:"+SUPPORTED_BY_UNION+"]-(union:Organization)\n" +
             "with exl,rel  " +
-            "MATCH(newUnion:Sector) where id(newUnion) = {1} \n" +
+            "MATCH(newUnion:Organization) where id(newUnion) = {1} \n" +
             "DETACH delete rel \n" +
             "CREATE UNIQUE(exl)-[:"+SUPPORTED_BY_UNION+"]-(newUnion) ")
     void addUnion(Long expertiseLineId,Long unionId);
