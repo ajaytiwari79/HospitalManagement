@@ -2,9 +2,7 @@ package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.dto.user.country.experties.AgeRangeDTO;
-import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
-import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.dto.user.country.experties.*;
 import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
 import com.kairos.persistence.model.user.expertise.response.ProtectedDaysOffSettingDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
@@ -189,11 +187,11 @@ public class ExpertiseController {
     }
 
 
-//    @ApiOperation(value = "copy Expertise")
-//    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/copy")
-//    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO, @PathVariable long countryId) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO, countryId));
-//    }
+    @ApiOperation(value = "copy Expertise")
+    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/copy")
+    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid ExpertiseDTO expertiseDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, expertiseDTO));
+    }
 
     @ApiOperation(value = "add proteched days off setting")
     @PostMapping(value =   "/expertise/{expertiseId}/protected_days_off")

@@ -294,10 +294,17 @@ public class CountryController {
     }
 
     @ApiOperation(value = "Update expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId, @RequestBody @Validated ExpertiseDTO expertise) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertiseByNewWay(countryId, expertise));
+    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId, @RequestBody  ExpertiseDTO expertise,@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertiseByNewWay(countryId, expertise,expertiseId));
+    }
+
+    @ApiOperation(value = "Update expertise Line")
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/expertise_line/{expertiseLineId}", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable Long countryId, @RequestBody  ExpertiseDTO expertise,@PathVariable Long expertiseId,@PathVariable Long expertiseLineId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertiseLine(countryId, expertise,expertiseId,expertiseLineId));
     }
 
 

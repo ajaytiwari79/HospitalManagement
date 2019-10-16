@@ -76,7 +76,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "CASE when seniorDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE when childCareDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays " +
             "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
-            "expertise.endDate as endDate ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published, " +
+            "expertise.endDate as endDate ,expertise.description as description ,expertise.published as published, " +
             "seniorDays,childCareDays ORDER BY expertise.name")
     List<ExpertiseQueryResult> getAllExpertise(long countryId, boolean[] published);
 
@@ -92,7 +92,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "   freeChoicePercentage:seniorityLevel.freeChoicePercentage,freeChoiceToPension:seniorityLevel.freeChoiceToPension, " +
             "   to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels "+
             "RETURN id(exl) as id ,id(expertise) as expertiseId, exl.startDate as startDate , " +
-            "exl.endDate as endDate ,exl.breakPaymentSetting as breakPaymentSetting, " +
+            "exl.endDate as endDate ,exl.breakPaymentSetting as breakPaymentSetting,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek, " +
             "services as organizationServices,level as organizationLevel,payTables[0] as payTable,union as union,seniorityLevels,sector")
     List<ExpertiseLineQueryResult> findAllExpertiseLines(List<Long> expertiseIds);
 

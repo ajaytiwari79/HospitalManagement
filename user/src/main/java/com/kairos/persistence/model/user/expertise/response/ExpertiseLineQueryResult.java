@@ -27,4 +27,6 @@ public class ExpertiseLineQueryResult {
     private List<Map<String, Object>> seniorityLevels;
     private PayTable payTable;
     private Long expertiseId;
+    private int fullTimeWeeklyMinutes;
+    private int numberOfWorkingDaysInWeek;
 }

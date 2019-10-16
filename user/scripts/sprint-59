@@ -1,0 +1,35 @@
+
+MATCH(e:Expertise) where e.hasDraftCopy=true OR e.published=false OR e.deleted=true
+DETACH DELETE e;
+
+
+MATCH (e:Expertise)
+set e.startDate=toString(date(datetime({epochmillis:e.startDateMillis})));
+
+MATCH (e:Expertise)
+REMOVE e.startDateMillis,e.endDateMillis
+
+
+// Script to convert Expertise into Line
+
+
+
+
+MATCH(e:Expertise{deleted:false,published:true})
+MATCH(e)-[serviceRel:SUPPORTS_SERVICES]->(os:OrganizationService)
+MATCH(e)-[unionRel:SUPPORTED_BY_UNION]->(union:Organization)
+MATCH(e)-[sectorRel:BELONGS_TO_SECTOR]->(s:Sector)
+MATCH(e)-[levelRel:IN_ORGANIZATION_LEVEL]->(l:Level)
+
+CREATE UNIQUE(e)-[:HAS_EXPERTISE_LINES]->(exl:ExpertiseLine)
+CREATE UNIQUE(exl)-[:SUPPORTS_SERVICES]->(os)
+CREATE UNIQUE(exl)-[:SUPPORTED_BY_UNION]->(union)
+CREATE UNIQUE(exl)-[:BELONGS_TO_SECTOR]->(s)
+CREATE UNIQUE(exl)-[:IN_ORGANIZATION_LEVEL]->(l)
+set exl.breakPaymentSetting=e.breakPaymentSetting,
+exl.fullTimeWeeklyMinutes=e.fullTimeWeeklyMinutes,
+exl.numberOfWorkingDaysInWeek=e.numberOfWorkingDaysInWeek,
+exl.startDate=e.startDate,
+exl.endDate=e.endDate
+REMOVE e.breakPaymentSetting,e.fullTimeWeeklyMinutes,e.numberOfWorkingDaysInWeek
+DETACH delete serviceRel,unionRel,sectorRel,levelRel
