@@ -26,7 +26,7 @@ import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 public class KPIUtils {
 
     public static final String DD_MM_YYYY = "dd-MM-yyyy";
-    public static final String DD_MMM_YY = "ddMMMyy";
+    public static final String DD_MMM_YY = "dd-MMM-yy";
 
     private KPIUtils() {
     }
