@@ -120,7 +120,6 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
     }
 
     boolean isWorkingShiftActivity(List<ShiftActivityDTO> shiftActivityDTOS){
-        shiftActivityDTOS = shiftActivityDTOS.stream().filter(k->TimeTypes.WORKING_TYPE.toValue().equals(k.getTimeType())).collect(Collectors.toList());
-        return isCollectionNotEmpty(shiftActivityDTOS);
+        return shiftActivityDTOS.stream().anyMatch(k->TimeTypes.WORKING_TYPE.toValue().equals(k.getTimeType()));
     }
 }
