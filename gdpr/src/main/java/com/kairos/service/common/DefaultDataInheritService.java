@@ -63,6 +63,8 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+
 @SuppressWarnings("unchecked")
 @Service
 public class DefaultDataInheritService {
@@ -463,6 +465,16 @@ public class DefaultDataInheritService {
             LOGGER.error("Error in constructing the objects::" + ex.getMessage());
         }
         return baseEntityList;
+    }
+
+    public boolean copyMasterAssetToUnitAsset(long unitId, List<Long> orgSubTypeId, long OrgSubServiceId){
+        Long countryId = 18712l;
+        List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrgSubTypeAndOrgSubService(countryId, orgSubTypeId, OrgSubServiceId);
+        if(isCollectionNotEmpty(masterAssets)) {
+            Map<Long, AssetType> longAssetTypeMap = copyAssetTypeFromCountry(unitId, assetTypeRepository.getAllAssetTypeByCountryId(countryId));
+            copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssets, longAssetTypeMap);
+        }
+        return true;
     }
 }
 
