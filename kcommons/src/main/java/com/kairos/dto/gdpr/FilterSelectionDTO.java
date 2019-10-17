@@ -24,4 +24,9 @@ public class FilterSelectionDTO {
 
 
     private String moduleId;
+
+    public FilterSelectionDTO(FilterType name, Set<String> value) {
+        this.name = name;
+        this.value = value;
+    }
 }
