@@ -1,36 +1,17 @@
 package com.kairos.dto.planner.vrp.vrpPlanning;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author pradeep
  * @date - 9/7/18
  */
 
+@Getter
+@Setter
 public class ConstraintScoreDTO {
     private String constraintName;
     private ScoreDTO score;
-
-    public ConstraintScoreDTO(String constraintName, ScoreDTO score) {
-        this.constraintName = constraintName;
-        this.score = score;
-    }
-
-    public ConstraintScoreDTO() {
-    }
-
-    public String getConstraintName() {
-        return constraintName;
-    }
-
-    public void setConstraintName(String constraintName) {
-        this.constraintName = constraintName;
-    }
-
-    public ScoreDTO getScore() {
-        return score;
-    }
-
-    public void setScore(ScoreDTO score) {
-        this.score = score;
-    }
 }
