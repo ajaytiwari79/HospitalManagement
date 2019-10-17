@@ -5,6 +5,7 @@ package com.kairos.persistence.model.counter;
  */
 
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.KPISetType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class KPISet extends MongoBaseEntity {
     private BigInteger phaseId;
     private Long referenceId;
     private ConfLevel confLevel;
+    private KPISetType kpiSetType;
 
     public KPISet(BigInteger id,String name,BigInteger phaseId, Long referenceId,ConfLevel confLevel, TimeTypeEnum timeType, Set<BigInteger> kpiIds) {
         this.id=id;

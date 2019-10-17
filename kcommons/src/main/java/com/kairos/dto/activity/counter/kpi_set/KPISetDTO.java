@@ -6,6 +6,7 @@ package com.kairos.dto.activity.counter.kpi_set;
 
 import com.kairos.commons.utils.NotNullOrEmpty;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.KPISetType;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,7 @@ public class KPISetDTO {
     private BigInteger phaseId;
     private Long referenceId;
     private ConfLevel confLevel;
+    private KPISetType kpiSetType;
 
     public String getName() {
         return name.trim();
