@@ -42,8 +42,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private OrganizationActivityService organizationActivityService;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
-        activityService.validateActivityTimeRules(staffActivitySettingDTO.getEarliestStartTime(),staffActivitySettingDTO.getLatestStartTime(),
-                staffActivitySettingDTO.getMaximumEndTime(),staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
+        activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=new StaffActivitySetting();
         ObjectMapperUtils.copyProperties(staffActivitySettingDTO,staffActivitySetting);
         staffActivitySetting.setUnitId(unitId);
@@ -57,8 +56,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     }
 
     public StaffActivitySettingDTO updateStaffActivitySettings(BigInteger staffActivitySettingId,Long unitId, StaffActivitySettingDTO staffActivitySettingDTO){
-        activityService.validateActivityTimeRules(staffActivitySettingDTO.getEarliestStartTime(),staffActivitySettingDTO.getLatestStartTime(),
-                staffActivitySettingDTO.getMaximumEndTime(),staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
+        activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
         StaffActivitySetting staffActivitySetting=staffActivitySettingRepository.findByIdAndDeletedFalse(staffActivitySettingId);
         if(!Optional.ofNullable(staffActivitySetting).isPresent()){
             exceptionService.dataNotFoundException(MESSAGE_STAFF_ACTIVITY_SETTINGS_ABSENT);
