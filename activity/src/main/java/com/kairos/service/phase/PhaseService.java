@@ -1,10 +1,8 @@
 package com.kairos.service.phase;
-
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
 import com.kairos.dto.activity.phase.PhaseDTO;
-import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
@@ -34,8 +32,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.phase.PhaseType.ACTUAL;
 
@@ -138,7 +135,7 @@ public class PhaseService extends MongoBaseService {
     public Phase createPhaseInCountry(Long countryId, PhaseDTO phaseDTO) {
         long phaseExists = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
         if (phaseExists > 0) {
-            LOGGER.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
+            LOGGER.info("Phase already exist by sequence in country {}" , phaseDTO.getCountryId());
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_PHASE_SEQUENCE, phaseDTO.getCountryId());
         }
         Phase phase = buildPhaseForCountry(phaseDTO);
@@ -180,7 +177,7 @@ public class PhaseService extends MongoBaseService {
     public boolean deletePhase(Long countryId, BigInteger phaseId) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
-            LOGGER.info("Phase not found in country " + phaseId);
+            LOGGER.info("Phase not found in country phase id is {}" , phaseId);
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_PHASE_NOTFOUND, phaseId);
         }
         phase.setDeleted(true);
@@ -192,21 +189,17 @@ public class PhaseService extends MongoBaseService {
     public Phase updatePhases(Long countryId, BigInteger phaseId, PhaseDTO phaseDTO) {
         Phase phase = phaseMongoRepository.findOne(phaseId);
         if (!Optional.ofNullable(phase).isPresent()) {
-            LOGGER.info("Phase not found in country " + phaseId);
+            LOGGER.info("Phase not found in country phase id {}" , phaseId);
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_PHASE_NOTFOUND, phaseId);
 
         }
         if (phase.getSequence() != phaseDTO.getSequence()) {
             long phaseInUse = phaseMongoRepository.findBySequenceAndCountryIdAndDeletedFalse(phaseDTO.getSequence(), countryId);
             if (phaseInUse > 0) {
-                LOGGER.info("Phase already exist by sequence in country" + phaseDTO.getCountryId());
+                LOGGER.info("Phase already exist by sequence in country {}" , phaseDTO.getCountryId());
                 exceptionService.duplicateDataException(MESSAGE_COUNTRY_PHASE_SEQUENCE, phaseDTO.getCountryId());
             }
         }
-        // Disable update of name
-        /*phase.setName(phaseDTO.getName());
-        phase.setSequence(phaseDTO.getSequence());*/
-
         if (PhaseType.PLANNING.equals(phase.getPhaseType())) {
             preparePlanningPhase(phase, phaseDTO);
         }
@@ -246,7 +239,7 @@ public class PhaseService extends MongoBaseService {
     public PhaseDTO updatePhase(BigInteger phaseId, Long unitId, PhaseDTO phaseDTO) {
         phaseDTO.setOrganizationId(unitId);
         Phase oldPhase = phaseMongoRepository.findOne(phaseId);
-        if (oldPhase == null) {
+        if (isNull(oldPhase)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PHASE_ID_NOTFOUND, phaseDTO.getId());
         }
         Phase phase = phaseMongoRepository.findByUnitIdAndName(unitId, phaseDTO.getName());
@@ -285,7 +278,6 @@ public class PhaseService extends MongoBaseService {
         }
         else {
             List<Phase> actualPhases = phaseMongoRepository.findByOrganizationIdAndPhaseTypeAndDeletedFalse(unitId, ACTUAL.toString());
-            LocalDateTime previousMonday=DateUtils.getDateForPreviousDay(LocalDate.now(),DayOfWeek.MONDAY).atStartOfDay();
             Map<String, Phase> phaseMap = actualPhases.stream().collect(Collectors.toMap(k->k.getPhaseEnum().toString(), Function.identity()));
             phase= getActualPhaseApplicableForDate(startDateTime,endDateTime,phaseMap,untilTentativeDate,timeZone);
         }
@@ -342,9 +334,9 @@ public class PhaseService extends MongoBaseService {
         int minutesToCalculate=phaseMap.get(PhaseDefaultName.REALTIME.toString()).getRealtimeDuration();
         LocalDateTime localDateTimeAfterMinus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).minusMinutes(minutesToCalculate+1);
         LocalDateTime localDateTimeAfterPlus=DateUtils.getLocalDateTimeFromZoneId(ZoneId.of(timeZone)).plusMinutes(minutesToCalculate+1);
-        DateTimeInterval shiftInterval=(Optional.ofNullable(endDateTime).isPresent())?new DateTimeInterval(DateUtils.asDate(startDateTime),DateUtils.asDate(endDateTime)):null;
+        DateTimeInterval shiftInterval=isNotNull(endDateTime)?new DateTimeInterval(DateUtils.asDate(startDateTime),DateUtils.asDate(endDateTime)):null;
         DateTimeInterval realtimeInterval=(Optional.ofNullable(endDateTime).isPresent())?new DateTimeInterval(DateUtils.asDate(localDateTimeAfterMinus),DateUtils.asDate(localDateTimeAfterPlus)):null;
-        boolean realTime=Optional.ofNullable(endDateTime).isPresent()?shiftInterval.overlaps(realtimeInterval):
+        boolean realTime=isNotNull(shiftInterval)?shiftInterval.overlaps(realtimeInterval):
                 startDateTime.isAfter(localDateTimeAfterMinus) && startDateTime.isBefore(localDateTimeAfterPlus);
          if(realTime){
             phase= phaseMap.get(PhaseDefaultName.REALTIME.toString());

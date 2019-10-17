@@ -1,14 +1,12 @@
 package com.kairos.service.period;
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.period.PeriodSettingsDTO;
 import com.kairos.persistence.model.period.PeriodSettings;
 import com.kairos.persistence.repository.period.PeriodSettingsMongoRepository;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.service.phase.PhaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +21,6 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_PERIODSETTI
 @Service
 @Transactional
 public class PeriodSettingsService extends MongoBaseService {
-    private static final Logger logger = LoggerFactory.getLogger(PhaseService.class);
 
     @Inject
     PeriodSettingsMongoRepository periodSettingsMongoRepository;
@@ -37,7 +34,7 @@ public class PeriodSettingsService extends MongoBaseService {
         int presenceLimitInYear = AppConstants.PRESENCE_LIMIT_IN_YEAR;
         int absenceLimitInYear = AppConstants.ABSENCE_LIMIT_IN_YEAR;
 
-        if(Optional.ofNullable(periodSettingsOfParentOrg).isPresent()){
+        if(ObjectUtils.isNotNull(periodSettingsOfParentOrg)){
             presenceLimitInYear = periodSettingsOfParentOrg.getPresenceLimitInYear();
             absenceLimitInYear = periodSettingsOfParentOrg.getAbsenceLimitInYear();
         }

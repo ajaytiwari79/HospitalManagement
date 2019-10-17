@@ -12,6 +12,7 @@ import com.kairos.dto.activity.period.PeriodPhaseDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
@@ -162,21 +163,18 @@ public class PlanningPeriodService extends MongoBaseService {
             for (PeriodPhaseDTO flippingDateTime : planningPeriod.getPhaseFlippingDate()) {
                 int phaseSequence = phaseIdAndSequenceMap.get(flippingDateTime.getPhaseId());
                 switch (phaseSequence) {
-                    case 4: {
+                    case 4:
                         flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
                         planningPeriod.setConstructionToDraftDate(flippingDateDTO);
                         break;
-                    }
-                    case 3: {
+                    case 3:
                         flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
                         planningPeriod.setPuzzleToConstructionDate(flippingDateDTO);
                         break;
-                    }
-                    case 2: {
+                    case 2:
                         flippingDateDTO = setFlippingDateAndTime(flippingDateTime);
                         planningPeriod.setRequestToPuzzleDate(flippingDateDTO);
                         break;
-                    }
                     default:
                         break;
                 }
@@ -201,7 +199,7 @@ public class PlanningPeriodService extends MongoBaseService {
         }
         LocalDate startDate = requestPlanningPeriods.get(0).getStartDate();
         LocalDate endDate = requestPlanningPeriods.get(requestPlanningPeriods.size() - 1).getEndDate();
-        if (requestPlanningPeriods.size() > 0) {
+        if (isCollectionNotEmpty(requestPlanningPeriods)) {
             createMigratedPlanningPeriodForTimeDuration(startDate, endDate, unitId, planningPeriodDTO, unitIdAndPhasesMap.get(unitId));
             for (PlanningPeriod planningPeriod : requestPlanningPeriods) {
                 planningPeriod.setActive(false);
@@ -216,9 +214,9 @@ public class PlanningPeriodService extends MongoBaseService {
         List<LocalDate> startDateList = getListOfStartDateInWeekOrMonths(oldStartDate, oldEndDate, planningPeriodDTO);
         Set<LocalDate> existingPlanningPeriods = new HashSet<>();
         for (LocalDate startDate : startDateList) {
-            boolean alreadyExist = false;
+            boolean alreadyExist;
             LocalDate endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO);
-            alreadyExist = existingPlanningPeriods.stream().filter(startDate::isBefore).findAny().isPresent();
+            alreadyExist = existingPlanningPeriods.stream().anyMatch(startDate::isBefore);
             if (!alreadyExist) {
                 if (endDate.isAfter(oldEndDate) || endDate.isEqual(oldEndDate)) {
                     endDate = oldEndDate;
@@ -387,7 +385,7 @@ public class PlanningPeriodService extends MongoBaseService {
                 });
                 LOGGER.info("successfully created job of planning period flippng date");
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.info("error while created job of planning period flippng date",e);
                 planningPeriodMongoRepository.deleteAll(planningPeriods);
                 exceptionService.internalError(INTERNAL_SERVER_ERROR);
             }
@@ -402,8 +400,7 @@ public class PlanningPeriodService extends MongoBaseService {
                             }
                         });
                     } catch (Exception e) {
-                        LOGGER.info("error in set schedulerPanel job id in planning period via job in " + planningPeriod.getUnitId());
-                        e.printStackTrace();
+                        LOGGER.info("error in set schedulerPanel job id in planning period via job in unit id {}" , planningPeriod.getUnitId() , e);
                     }
                 });
                 planningPeriodMongoRepository.saveEntities(planningPeriods);
@@ -419,30 +416,27 @@ public class PlanningPeriodService extends MongoBaseService {
 
         for (PeriodPhaseFlippingDate phaseFlippingDate : phaseFlippingDateList) {
             switch (phasesMap.get(phaseFlippingDate.getPhaseId())) {
-                case 4: {
+                case 4:
                     if (phaseFlippingDate.getFlippingDate() != null && phaseFlippingDate.getFlippingTime() != null && !isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
                         phaseFlippingDate.setFlippingDate(planningPeriodDTO.getConstructionToDraftDate().getDate());
                         phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getConstructionToDraftDate().getHours(), planningPeriodDTO.getConstructionToDraftDate().getMinutes()));
                         updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(), unitId, phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime());
                     }
                     break;
-                }
-                case 3: {
+                case 3:
                     if (phaseFlippingDate.getFlippingDate() != null && phaseFlippingDate.getFlippingTime() != null && !isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
                         phaseFlippingDate.setFlippingDate(planningPeriodDTO.getPuzzleToConstructionDate().getDate());
                         phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getPuzzleToConstructionDate().getHours(), planningPeriodDTO.getPuzzleToConstructionDate().getMinutes()));
                         updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(), unitId, phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime());
                     }
                     break;
-                }
-                case 2: {
+                case 2:
                     if (phaseFlippingDate.getFlippingDate() != null && phaseFlippingDate.getFlippingTime() != null && !isPastDate(LocalDateTime.of(phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime()))) {
                         phaseFlippingDate.setFlippingDate(planningPeriodDTO.getRequestToPuzzleDate().getDate());
                         phaseFlippingDate.setFlippingTime(LocalTime.of(planningPeriodDTO.getRequestToPuzzleDate().getHours(), planningPeriodDTO.getRequestToPuzzleDate().getMinutes()));
                         updateSchedularFlippingDateById(phaseFlippingDate.getSchedulerPanelId(), unitId, phaseFlippingDate.getFlippingDate(), phaseFlippingDate.getFlippingTime());
                     }
                     break;
-                }
                 default:
                     break;
             }
@@ -516,7 +510,7 @@ public class PlanningPeriodService extends MongoBaseService {
             schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
             }, null, null);
         } catch (Exception ex) {
-            LOGGER.error("ex " + ex);
+            LOGGER.error("ex {}" , ex);
         }
         planningPeriod.setDeleted(true);
         save(planningPeriod);
@@ -536,7 +530,7 @@ public class PlanningPeriodService extends MongoBaseService {
         if (PlanningPeriodAction.FLIP.equals(planningPeriodAction)) {
             if(PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
                 List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByUnitId(unitId);
-                employmentTypeIds = isCollectionEmpty(employmentTypeIds) ? employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toSet()):employmentTypeIds;
+                employmentTypeIds = isCollectionEmpty(employmentTypeIds) ? employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(EmploymentTypeDTO::getId).collect(Collectors.toSet()):employmentTypeIds;
                 planningPeriod.getPublishEmploymentIds().addAll(employmentTypeIds);
                 publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
             }
@@ -569,8 +563,8 @@ public class PlanningPeriodService extends MongoBaseService {
         Map<Long, Map<Long, Set<LocalDate>>> employmentWithShiftDateFunctionIdMap = getEmploymentIdWithFunctionIdShiftDateMap(shifts);
         createShiftState(shifts, oldPlanningPeriodPhaseId, employmentWithShiftDateFunctionIdMap);
         createStaffingLevelState(staffingLevels, oldPlanningPeriodPhaseId, planningPeriod.getId());
-//        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
-//            }, null, null);
+        schedulerRestClient.publishRequest(schedulerPanelIds, unitId, true, IntegrationOperation.DELETE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+            }, null, null);
     }
 
     //TODO test
@@ -612,7 +606,7 @@ public class PlanningPeriodService extends MongoBaseService {
             Phase initialNextPhase = phaseMongoRepository.findOne(planningPeriod.getNextPhaseId());
             if (PhaseDefaultName.DRAFT.equals(initialNextPhase.getPhaseEnum())) {
                 List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByUnitId(unitId);
-                Set<Long> employmentTypeIds = employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toSet());
+                Set<Long> employmentTypeIds = employmentTypeDTOS.stream().filter(employmentTypeDTO -> employmentTypeDTO.getEmploymentCategories().contains(EmploymentCategory.PERMANENT)).map(EmploymentTypeDTO::getId).collect(Collectors.toSet());
                 publishPlanningPeriod(unitId, employmentTypeIds, planningPeriod);
                 planningPeriod.getPublishEmploymentIds().addAll(employmentTypeIds);
             }
@@ -798,8 +792,7 @@ public class PlanningPeriodService extends MongoBaseService {
                         startDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()) : startDate.plusMonths(planningPeriod.getDuration());
                     }
                 } catch (Exception e) {
-                    LOGGER.info("error while adding planning period via job for Unit Id " + planningPeriod.getUnitId());
-                    e.printStackTrace();
+                    LOGGER.info("error while adding planning period via job for Unit Id {} " , planningPeriod.getUnitId(),e);
                 }
             }
             if (isCollectionNotEmpty(planningPeriodsViaJob)) {
@@ -817,7 +810,7 @@ public class PlanningPeriodService extends MongoBaseService {
     public void publishShiftsAfterFlippingPhaseConstructionToDraft(PlanningPeriod planningPeriod, Long unitId, Set<Long> employmentTypeIds) {
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(new ArrayList<>(employmentTypeIds), unitId, planningPeriod.getStartDate().toString(), planningPeriod.getEndDate().toString());
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = userIntegrationService.getStaffsByFilter(staffEmploymentTypeDTO);
-        List<Long> employmentIds = staffKpiFilterDTOS.stream().flatMap(k -> k.getEmployment().stream().map(v -> v.getId())).collect(Collectors.toList());
+        List<Long> employmentIds = staffKpiFilterDTOS.stream().flatMap(k -> k.getEmployment().stream().map(EmploymentWithCtaDetailsDTO::getId)).collect(Collectors.toList());
         LOGGER.info("publish shift after flipping planning period contruction to draft phase");
         List<Shift> shifts = shiftMongoRepository.findAllUnPublishShiftByPlanningPeriodAndUnitId(planningPeriod.getId(), unitId, employmentIds, Arrays.asList(ShiftStatus.PUBLISH, ShiftStatus.PENDING, ShiftStatus.REQUEST));
         if (isCollectionNotEmpty(shifts)) {

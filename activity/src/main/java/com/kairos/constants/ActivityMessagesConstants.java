@@ -109,6 +109,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_RESTRICTIONFREQUENCY_ID = "message.restrictionfrequency.id";
     public static final String ERROR_ACTIVITY_FULLWEEK_START  = "error.activity.fullweek.start ";
     public static final String MESSAGE_ACTIVITY_ID = "message.activity.id";
+    public static final String MESSAGE_PARENT_SETTING_FALSE = "message.parent.setting.false";
     public static final String ACTIVITY_USED_AT_UNIT="activity.used.unit";
     public static final String MESSAGE_ACTIVITY_NAME_NOTEMPTY = "message.activity.name.notEmpty";
     public static final String MESSAGE_ACTIVITY_NAME = "message.activity.name";
@@ -393,5 +394,6 @@ public class ActivityMessagesConstants {
     public static final String FREQUENCY_VALUE_IS_ALWAYS_POSITIVE="frequency.value.is.always.positive";
     public static final String STATUS_NOT_ALLOWED="status.not.allowed";
     public static final String ACTIVITY_CONFIGURATION_DEFAULT_SETTINGS_ALREADY_EXISTS = "activity.configuration.default.settings.already.exists";
+    public static final String CALCULATION_TYPE_NOT_VALID="calculation.type.not.valid";
 
 }

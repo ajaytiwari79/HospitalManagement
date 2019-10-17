@@ -23,8 +23,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.user_context.UserContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -57,9 +55,6 @@ public class KPISetService {
     private PhaseService phaseService;
     @Inject
     private CounterDataService counterDataService;
-
-
-    private static final Logger logger = LoggerFactory.getLogger(KPISetService.class);
 
     public KPISetDTO createKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
         verifyDetails(referenceId, confLevel, kpiSetDTO);

@@ -69,6 +69,7 @@ public class ShiftDTO {
     protected ShiftType shiftType;
     protected BigInteger shiftStatePhaseId;
     protected int timeBankCtaBonusMinutes;
+    protected int payoutCtaBonusMinutes;
     protected int plannedMinutesOfTimebank;
     protected int plannedMinutesOfPayout;
     protected boolean multipleActivity;

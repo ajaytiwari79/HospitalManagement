@@ -181,11 +181,17 @@ public class TimeBankService{
             shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
                 shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
                 shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
+                shiftActivityDTO.setPlannedMinutesOfPayout(0);
+                shiftActivityDTO.setPlannedMinutesOfTimebank(0);
+                shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
             });
             if(isCollectionNotEmpty(shiftWithActivityDTO.getBreakActivities())){
                 shiftWithActivityDTO.getBreakActivities().forEach(shiftActivityDTO -> {
                     shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
                     shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
+                    shiftActivityDTO.setPlannedMinutesOfPayout(0);
+                    shiftActivityDTO.setPlannedMinutesOfTimebank(0);
+                    shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
                 });
             }
         });
@@ -698,8 +704,8 @@ public class TimeBankService{
         return costTimeAgreementRepository.getCTARultemplateByEmploymentId(employmentId).stream().filter(distinctByKey(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getName())).collect(toList());
     }
 
-    public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, Date startDate, Date endDate){
-        return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,startDate,endDate);
+    public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, LocalDate startDate, LocalDate endDate){
+        return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,asDate(startDate),asDate(endDate));
     }
 
 
