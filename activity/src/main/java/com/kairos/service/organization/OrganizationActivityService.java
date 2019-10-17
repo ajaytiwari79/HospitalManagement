@@ -465,9 +465,8 @@ public class OrganizationActivityService extends MongoBaseService {
         UnitSettingDTO minOpenShiftHours = unitSettingRepository.getMinOpenShiftHours(unitId);
         List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
 
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
+        return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
                 minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(), counters);
-        return activityWithTimeTypeDTO;
     }
 
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {

@@ -210,8 +210,7 @@ public class TaskPlanningSolver {
 	}
 
 	private long sumHardScore(BendableLongScore score){
-		long hardScoreSum=Arrays.stream(score.getHardScores()).count();
-		return hardScoreSum;
+		return Arrays.stream(score.getHardScores()).count();
 	}
 
 	private void printEntitiesThatBrokeContraints(Map<Task,Indictment> indictmentMap) {

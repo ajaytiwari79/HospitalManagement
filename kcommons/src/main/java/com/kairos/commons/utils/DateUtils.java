@@ -58,8 +58,7 @@ public  class DateUtils {
 
     public static LocalDate getLocalDateFromDate(Date date) {
 
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return localDate;
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     public static Date convertLocalDateToDate(LocalDate dateToConvert) {
@@ -104,20 +103,18 @@ public  class DateUtils {
 
     public static LocalDateTime getMondayFromWeek(int week, int year) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime ldt = LocalDateTime.now()
+        return LocalDateTime.now()
                 .withYear(year)
                 .with(weekFields.weekOfYear(), week)
                 .with(weekFields.dayOfWeek(), 2);
-        return ldt;
     }
 
     public static LocalDateTime getSundayFromWeek(int week, int year) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime ldt = LocalDateTime.now()
+        return LocalDateTime.now()
                 .withYear(year)
                 .with(weekFields.weekOfYear(), week + 1)
                 .with(weekFields.dayOfWeek(), 1);
-        return ldt;
     }
 
     public static Date getDeductionInTimeDuration(Date startDate, Date endDate, int dayShiftPercentage, int nightShiftPercentage) {
@@ -223,10 +220,9 @@ public  class DateUtils {
 
 
     public static Date getDateFromLocalDate(LocalDate localDate) {
-        Date date = localDate != null
+        return localDate != null
                 ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
                 : Date.from(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC));
-        return date;
     }
 
     public static Date asDate(LocalDateTime localDateTime) {
@@ -265,8 +261,7 @@ public  class DateUtils {
     public static Date asDate(LocalTime localTime) {
         Instant instant = localTime.atDate(LocalDate.now()).
                 atZone(ZoneId.systemDefault()).toInstant();
-        Date time = Date.from(instant);
-        return time;
+        return Date.from(instant);
     }
 
     public static LocalDateTime asLocalDateTime(Date date) {
@@ -495,10 +490,8 @@ public  class DateUtils {
 
     public static Date getISOEndOfWeekDate(LocalDate date) {
 
-        Date endOfWeek = Date.from(ZonedDateTime.ofInstant(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+        return Date.from(ZonedDateTime.ofInstant(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
                 ZoneId.systemDefault()).with(DayOfWeek.SUNDAY).toInstant());
-
-        return endOfWeek;
     }
 
     public static Long getISOStartOfWeek(LocalDate date) {

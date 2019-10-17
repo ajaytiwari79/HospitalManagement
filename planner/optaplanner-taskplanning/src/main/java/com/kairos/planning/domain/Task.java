@@ -328,12 +328,10 @@ public class Task extends TaskOrEmployee {
 	}
 
 	public boolean isPlannedInPossibleInterval() {
-		boolean isPlannedFine= getTimeWindows().stream().filter(tw->tw.contains(plannedStartTime)).findFirst().isPresent();
-		return isPlannedFine;
+		return getTimeWindows().stream().filter(tw->tw.contains(plannedStartTime)).findFirst().isPresent();
 	}
 	public boolean isInPossibleInterval(DateTime plannedTime) {
-		boolean isPlannedFine= getTimeWindows().stream().filter(tw->tw.contains(plannedTime)).findFirst().isPresent();
-		return isPlannedFine;
+		return getTimeWindows().stream().filter(tw->tw.contains(plannedTime)).findFirst().isPresent();
 	}
 	public int getIndexInTaskType() {
 		return indexInTaskType;
@@ -517,10 +515,9 @@ public class Task extends TaskOrEmployee {
 		 * .getSpeedKmpm()+","+getDistanceFrom(previousTaskOrEmployee) /
 		 * employee.getVehicle() .getSpeedKmpm()); }
 		 */
-		int drivingTime = (int) Math
+		return (int) Math
 				.ceil((getDistanceFrom(previousTaskOrEmployee) / employee.getVehicle().getSpeedKmpm())
 						* DRIVING_TIME_MULTIPLIER);
-		return drivingTime;
 	}
 
 	public DateTime getPlannedReachingTime() {
@@ -605,9 +602,8 @@ public class Task extends TaskOrEmployee {
 	}
 
 	public Interval getReachBackUnitInterval() {
-		Interval interval = new Interval(getPlannedEndTime(),
+		return new Interval(getPlannedEndTime(),
 				getPlannedEndTime().plusMinutes(getTimeToReachBackUnit().intValue()));
-		return interval;
 	}
 
 	/*

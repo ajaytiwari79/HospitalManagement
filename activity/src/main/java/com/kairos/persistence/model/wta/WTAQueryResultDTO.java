@@ -191,9 +191,8 @@ public class WTAQueryResultDTO {
     }
 
     public BreakWTATemplate getBreakRule(){
-        BreakWTATemplate breakWTATemplate=(BreakWTATemplate)
+        return (BreakWTATemplate)
         this.getRuleTemplates().stream().filter(current->current.getWtaTemplateType().toString().equals(WTA_FOR_BREAKS_IN_SHIFT.toString())).findFirst().orElse(null);
-        return breakWTATemplate;
     }
 
 }
