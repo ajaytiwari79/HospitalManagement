@@ -56,15 +56,6 @@ public class ExpertiseLine extends UserBaseEntity {
         this.numberOfWorkingDaysInWeek=expertiseLineBuilder.numberOfWorkingDaysInWeek;
     }
 
-    public boolean isUpdated(ExpertiseLine expertiseLine) {
-        return !this.getOrganizationLevel().getId().equals(expertiseLine.getOrganizationLevel().getId()) || isServiceChanged(expertiseLine.getOrganizationServices()) || !this.getSector().getId().equals(expertiseLine.getSector().getId()) ||
-                !this.getUnion().getId().equals(expertiseLine.getUnion().getId());
-    }
-
-    private boolean isServiceChanged(List<OrganizationService> organizationServices) {
-        return (this.getOrganizationServices().size() != organizationServices.size() || !this.getOrganizationServices().stream().map(OrganizationService::getId).collect(Collectors.toList()).containsAll(organizationServices.stream().map(OrganizationService::getId).collect(Collectors.toList())));
-    }
-
 
     public static class ExpertiseLineBuilder {
         private LocalDate startDate;

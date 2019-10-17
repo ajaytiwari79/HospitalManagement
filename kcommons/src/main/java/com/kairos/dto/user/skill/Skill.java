@@ -1,5 +1,7 @@
 package com.kairos.dto.user.skill;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -10,6 +12,8 @@ import java.util.Map;
  * Skill Domain extends UserBaseEntity
  * SKill has relationship with SkillLevel Domain
  */
+@Getter
+@Setter
 public class Skill {
     @NotEmpty(message = "error.Skill.name.notEmpty") @NotNull(message = "error.Skill.name.notnull")
     private String name;
