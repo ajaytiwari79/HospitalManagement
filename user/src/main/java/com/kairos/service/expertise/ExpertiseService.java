@@ -262,8 +262,10 @@ public class ExpertiseService {
 
     private boolean validateSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
         Collections.sort(seniorityLevels);
-        if (seniorityLevels.get(0).getTo()!=null && seniorityLevels.get(0).getTo()<=seniorityLevels.get(0).getFrom()  ) {
-            exceptionService.actionNotPermittedException("Please enter valid Seniority Levels");
+        if(isCollectionNotEmpty(seniorityLevels)){
+            if (seniorityLevels.get(0).getTo()!=null && seniorityLevels.get(0).getTo()<=seniorityLevels.get(0).getFrom()  ) {
+                exceptionService.actionNotPermittedException("Please enter valid Seniority Levels");
+            }
         }
         if(seniorityLevels.size()>1){
             for (int i = 0; i < seniorityLevels.size()-1; i++) {

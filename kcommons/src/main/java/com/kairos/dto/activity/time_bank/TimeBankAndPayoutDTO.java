@@ -1,39 +1,22 @@
 package com.kairos.dto.activity.time_bank;
 
 import com.kairos.dto.activity.pay_out.PayOutDTO;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author pradeep
  * @date - 19/7/18
  */
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TimeBankAndPayoutDTO {
 
     private TimeBankDTO timeBank;
     private PayOutDTO payOut;
-
-
-    public TimeBankAndPayoutDTO() {
-    }
-
-    public TimeBankAndPayoutDTO(TimeBankDTO timeBank, PayOutDTO payOut) {
-        this.timeBank = timeBank;
-        this.payOut = payOut;
-    }
-
-    public TimeBankDTO getTimeBank() {
-        return timeBank;
-    }
-
-    public void setTimeBank(TimeBankDTO timeBank) {
-        this.timeBank = timeBank;
-    }
-
-    public PayOutDTO getPayOut() {
-        return payOut;
-    }
-
-    public void setPayOut(PayOutDTO payOut) {
-        this.payOut = payOut;
-    }
 }
