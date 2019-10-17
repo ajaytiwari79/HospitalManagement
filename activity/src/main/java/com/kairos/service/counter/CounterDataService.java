@@ -26,8 +26,11 @@ import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
+import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.kpi.CalculationBasedOn;
+import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
@@ -65,7 +68,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.activity.counter.enums.CounterType.ABSENCES_PER_INTERVAL;
-import static com.kairos.enums.FilterType.STAFF_IDS;
+import static com.kairos.enums.FilterType.*;
 import static java.util.stream.Collectors.toList;
 
 
@@ -256,6 +259,15 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(FilterType.ACTIVITY_IDS)) {
             getActivityDefaultData(criteriaList, unitIds);
         }
+        if (kpi.getFilterTypes().contains(CALCULATION_TYPE)) {
+            getCalculationTypeData(criteriaList, defaultKpiDataDTO);
+        }
+        if (kpi.getFilterTypes().contains(CALCULATION_BASED_ON)) {
+            getCalculationBasedOnData(criteriaList, defaultKpiDataDTO);
+        }
+        if (kpi.getFilterTypes().contains(CALCULATION_UNIT)) {
+            getCalculationUnitData(criteriaList, defaultKpiDataDTO);
+        }
     }
 
     private void getActivityDefaultData(List<FilterCriteria> criteriaList, List<Long> unitIds) {
@@ -311,6 +323,30 @@ public class CounterDataService extends MongoBaseService {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
         defaultKpiDataDTO.getStaffKpiFilterDTOs().forEach(staffKpiFilterDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(staffKpiFilterDTO.getId(), staffKpiFilterDTO.getFullName(), staffKpiFilterDTO.getUnitIds())));
         criteriaList.add(new FilterCriteria(STAFF_IDS.value, STAFF_IDS, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getCalculationTypeData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        for (CalculationType calculationType : CalculationType.values()) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(calculationType.toString(), calculationType.value));
+        }
+        criteriaList.add(new FilterCriteria(CALCULATION_TYPE.value, CALCULATION_TYPE, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getCalculationUnitData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        for (CalculationUnit calculationType : CalculationUnit.values()) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(calculationType.toString(), calculationType.value));
+        }
+        criteriaList.add(new FilterCriteria(CALCULATION_UNIT.value, CALCULATION_UNIT, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getCalculationBasedOnData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        for (CalculationBasedOn calculationType : CalculationBasedOn.values()) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(calculationType.toString(), calculationType.value));
+        }
+        criteriaList.add(new FilterCriteria(CALCULATION_BASED_ON.value, CALCULATION_BASED_ON, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getUnitIdsDefaultData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
