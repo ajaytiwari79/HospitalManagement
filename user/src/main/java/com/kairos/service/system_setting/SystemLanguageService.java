@@ -46,7 +46,7 @@ public class SystemLanguageService {
 
     public SystemLanguageDTO addSystemLanguage(SystemLanguageDTO systemLanguageDTO) {
 
-        logger.info("featureDTO : " + systemLanguageDTO.getName());
+        logger.info("featureDTO : {}", systemLanguageDTO.getName());
         if (systemLanguageGraphRepository.isSystemLanguageExistsWithSameName(systemLanguageDTO.getName().trim())) {
             exceptionService.duplicateDataException(MESSAGE_SYSTEM_LANGUAGE_NAME_ALREADYEXIST, systemLanguageDTO.getName());
         }
@@ -68,7 +68,7 @@ public class SystemLanguageService {
 
     public SystemLanguageDTO updateSystemLanguage(Long systemLanguageId, SystemLanguageDTO systemLanguageDTO) {
 
-        logger.info("featureDTO : " + systemLanguageDTO.getName());
+        logger.info("featureDTO : {}" , systemLanguageDTO.getName());
         SystemLanguage systemLanguage = systemLanguageGraphRepository.findOne(systemLanguageId);
         if (!Optional.ofNullable(systemLanguage).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_SYSTEM_LANGUAGE_NOTFOUND, systemLanguageId);
@@ -175,8 +175,7 @@ public class SystemLanguageService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
-        List<SystemLanguageDTO> systemLanguageDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
-        return systemLanguageDTOS;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(systemLanguageGraphRepository.findSystemLanguagesByCountryId(countryId), SystemLanguageDTO.class);
     }
 
     public List<SystemLanguageDTO> getSystemLanguageAndCountryMapping(Long countryId) {
