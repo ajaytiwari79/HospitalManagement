@@ -51,6 +51,7 @@ import com.kairos.service.data_subject_management.DataCategoryService;
 import com.kairos.service.data_subject_management.DataSubjectService;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,8 @@ import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 @SuppressWarnings("unchecked")
 @Service
@@ -463,6 +466,16 @@ public class DefaultDataInheritService {
             LOGGER.error("Error in constructing the objects::" + ex.getMessage());
         }
         return baseEntityList;
+    }
+
+    public boolean copyMasterAssetToUnitAsset(long unitId, List<Long> orgSubTypeId, long OrgSubServiceId){
+        Long countryId = UserContext.getUserDetails().getCountryId();
+        List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrgSubTypeAndOrgSubService(countryId, orgSubTypeId, OrgSubServiceId);
+        if(isCollectionNotEmpty(masterAssets)) {
+            Map<Long, AssetType> longAssetTypeMap = copyAssetTypeFromCountry(unitId, assetTypeRepository.getAllAssetTypeByCountryId(countryId));
+            copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssets, longAssetTypeMap);
+        }
+        return true;
     }
 }
 
