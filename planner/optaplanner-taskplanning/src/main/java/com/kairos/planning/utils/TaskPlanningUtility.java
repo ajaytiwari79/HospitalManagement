@@ -205,9 +205,8 @@ public class TaskPlanningUtility {
 			
 		});
 		Collections.sort(earlyStartTimes);
-		DateTime plannedTime=earlyStartTimes.isEmpty()?task.getTimeWindows().get(0).getStart():earlyStartTimes.get(0);
+		return earlyStartTimes.isEmpty()?task.getTimeWindows().get(0).getStart():earlyStartTimes.get(0);
 		//log.info("First task {} planned on {}, planned fine:{}",task.getId(),plannedTime,task.isInPossibleInterval(plannedTime));
-		return plannedTime;
 	}
     public static DateTime getEarliestStartTimeForChain(Task task) {
 		List<DateTime> earlyStartTimes= new ArrayList<>();
@@ -220,9 +219,8 @@ public class TaskPlanningUtility {
 			earlyStartTimes.add(earliestStart);
 		});
 		Collections.sort(earlyStartTimes);
-		DateTime plannedTime=earlyStartTimes.isEmpty()?earliestPossibleStart:earlyStartTimes.get(0);
+		return earlyStartTimes.isEmpty()?earliestPossibleStart:earlyStartTimes.get(0);
 		//log.info("Chained task {} planned on {}, planned fine:{}",task.getId(),plannedTime,task.isInPossibleInterval(plannedTime));
-		return plannedTime;
 	}
     public static boolean contains(List<Interval> intervals,Interval interval ){
     	boolean[] contains=new boolean[]{false};

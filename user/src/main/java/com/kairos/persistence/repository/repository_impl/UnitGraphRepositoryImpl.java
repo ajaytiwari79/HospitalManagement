@@ -29,8 +29,7 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
     private Session session;
 
     public String appendWhereOrAndPreFixOnQueryString(int countOfSubString) {
-        String subString = (countOfSubString == 0 ? " WHERE" : ((countOfSubString > 0) ? " AND" : ""));
-        return subString;
+        return (countOfSubString == 0 ? " WHERE" : ((countOfSubString > 0) ? " AND" : ""));
     }
 
     public String getMatchQueryForNameGenderStatusOfStaffByFilters(Map<FilterType, Set<String>> filters, String searchText) {

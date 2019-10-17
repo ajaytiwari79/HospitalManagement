@@ -82,11 +82,7 @@ public class FileIOUtil {
     }
 
     public static void copyFileContent(File baseFile, File file) {
-        FileReader fr=null;
-        FileWriter fw=null;
-        try {
-            fr=new FileReader(baseFile);
-            fw=new FileWriter(file);
+        try(FileReader fr=new FileReader(baseFile); FileWriter fw=new FileWriter(file)) {
             int b=0;
             while ((b=fr.read())!=-1){
                 fw.write(b);
@@ -95,22 +91,6 @@ public class FileIOUtil {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
-            if (fr != null) {
-                try {
-                    fr.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (fw != null) {
-                try {
-                    fw.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
     }

@@ -31,8 +31,7 @@ public class AuditLogMongoConfig extends AbstractMongoConfiguration implements E
     @Override
     @Bean("AuditLoggingMongoTemplate")
     public MongoTemplate mongoTemplate() throws Exception {
-        MongoTemplate mongoTemplate = new MongoTemplate(this.mongoDbFactory(), this.mappingMongoConverter());
-        return mongoTemplate;
+        return new MongoTemplate(this.mongoDbFactory(), this.mappingMongoConverter());
     }
 
     @Bean
