@@ -75,8 +75,9 @@ public class VrpTaskPlanningSolver {
             log.info("city---street:     "+b);
         });
         printProblemInfo(problem);
-        if(addBreaks)
-        addBreaks(problem);
+        if(addBreaks) {
+            addBreaks(problem);
+        }
         AtomicInteger at=new AtomicInteger(0);
         problem.getTasks().forEach(t->{
             at.addAndGet(t.getDuration());

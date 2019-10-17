@@ -471,7 +471,7 @@ public class OrganizationActivityService extends MongoBaseService {
     }
 
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
-        logger.info("I am going to create default data or organization " + unitId);
+        logger.info("I am going to create default data or organization {}" , unitId);
         //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
 
         List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());

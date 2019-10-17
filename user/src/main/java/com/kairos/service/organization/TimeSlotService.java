@@ -335,10 +335,11 @@ public class TimeSlotService {
         timeSlotSetTimeSlotRelationships.addAll(setTimeSlotSet(timeSlots, timeSlotSets.get(1)));
         timeSlotRelationshipGraphRepository.saveAll(timeSlotSetTimeSlotRelationships);
         organization.setTimeSlotSets(timeSlotSets);
-        if(organization instanceof Organization)
-        organizationGraphRepository.save((Organization)organization);
-        else
+        if(organization instanceof Organization) {
+            organizationGraphRepository.save((Organization) organization);
+        } else {
             unitGraphRepository.save((Unit) organization);
+        }
     }
 
 
