@@ -27,7 +27,7 @@ public class StompClientWebSocketHandler implements StompSessionHandler {
 
     @Override
     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-        logger.info("is stomp connected ? "+session.isConnected());
+        logger.info("is stomp connected ?{} ",session.isConnected());
 
         session.send("/api/v1/ws/planner/dynamic/"+this.unitId,jsonObject.toString().getBytes());
         session.disconnect();
@@ -35,7 +35,7 @@ public class StompClientWebSocketHandler implements StompSessionHandler {
 
     @Override
     public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
-        logger.info("there was an exception"+exception.getMessage());
+        logger.info("there was an exception{}",exception.getMessage());
     }
 
     @Override

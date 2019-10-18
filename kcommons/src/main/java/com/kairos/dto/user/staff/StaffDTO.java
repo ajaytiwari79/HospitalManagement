@@ -65,5 +65,8 @@ public class StaffDTO {
         this.lastName = lastName;
         this.profilePic = profilePic;
     }
+    public String getFullName(){
+        return this.firstName+" "+this.getLastName();
+    }
 
 }

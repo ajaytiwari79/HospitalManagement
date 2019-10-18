@@ -25,7 +25,7 @@ public final class FourWeekFrequency {
     private LocalDateTime endOfThirdWeek;
     private LocalDateTime endOfFourWeek;
 
-    private FourWeekFrequency(){};
+    private FourWeekFrequency(){}
 
     private static LocalDate getMondayOfThisWeek(){
         return (LocalDate.now().getDayOfWeek().equals(DayOfWeek.MONDAY)) ? LocalDate.now() : DateUtils.getDateForPreviousDay(LocalDate.now(), DayOfWeek.MONDAY);

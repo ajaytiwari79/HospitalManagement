@@ -37,5 +37,9 @@ public class EmploymentLinesDTO {
         return isNull(endDate) ? LocalDate.now() : endDate;
     }
 
+    public DateTimeInterval getInterval(){
+        return endDate==null ? null : new DateTimeInterval(DateUtils.asDate(startDate),DateUtils.asDate(endDate));
+    }
+
 
 }

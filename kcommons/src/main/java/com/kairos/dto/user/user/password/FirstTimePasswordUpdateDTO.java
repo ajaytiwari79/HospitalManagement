@@ -1,5 +1,7 @@
 package com.kairos.dto.user.user.password;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.AssertTrue;
@@ -9,6 +11,8 @@ import java.util.Arrays;
 /**
  * Created by prabjot on 6/10/17.
  */
+@Getter
+@Setter
 public class FirstTimePasswordUpdateDTO {
 
     @Size(min = 6,max = 50)
@@ -16,31 +20,8 @@ public class FirstTimePasswordUpdateDTO {
     @Size(min = 6,max = 50)
     private char[] repeatPassword;
     @Email
-    String email;
+    private String email;
 
-    public char[] getPassword() {
-        return password;
-    }
-
-    public void setPassword(char[] password) {
-        this.password = password;
-    }
-
-    public char[] getRepeatPassword() {
-        return repeatPassword;
-    }
-
-    public void setRepeatPassword(char[] repeatPassword) {
-        this.repeatPassword = repeatPassword;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     @AssertTrue(message="The password fields mush match")
     private boolean isValid() {

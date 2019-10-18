@@ -34,6 +34,9 @@ public class OrganizationTypeDTO {
         this.name = name;
         this.levels = levels;
     }
+    public OrganizationTypeDTO(Long id) {
+        this.id = id;
+    }
 
 }
 

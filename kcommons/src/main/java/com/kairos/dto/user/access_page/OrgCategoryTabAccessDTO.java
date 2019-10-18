@@ -21,4 +21,8 @@ public class OrgCategoryTabAccessDTO {
     private OrganizationCategory organizationCategory;
     @NotNull(message = "error.org.access.status.notnull")
     private Boolean accessStatus;
+
+    public Boolean isAccessStatus() {
+        return accessStatus;
+    }
 }

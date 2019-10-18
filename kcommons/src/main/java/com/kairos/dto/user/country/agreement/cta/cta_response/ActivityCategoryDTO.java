@@ -20,6 +20,11 @@ public class ActivityCategoryDTO {
     private String name;
     private BigInteger id;
 
+    public ActivityCategoryDTO(BigInteger id, String name) {
+        this.name = name;
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

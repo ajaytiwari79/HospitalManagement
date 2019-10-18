@@ -1,7 +1,9 @@
 package com.kairos.dto.activity.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
@@ -15,6 +17,8 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class StaffingLevelPlanningDTO {
     private BigInteger id;
     @NotNull

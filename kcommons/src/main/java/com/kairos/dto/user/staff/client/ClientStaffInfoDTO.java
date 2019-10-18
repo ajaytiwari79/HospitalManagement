@@ -12,4 +12,8 @@ import lombok.Setter;
 public class ClientStaffInfoDTO {
     private Long clientId;
     private Long staffId;
+
+    public ClientStaffInfoDTO(Long staffId) {
+        this.staffId = staffId;
+    }
 }

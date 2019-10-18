@@ -41,4 +41,11 @@ public class ShiftDTO {
         this.endTime = endTime;
         this.name = name;
     }
+
+    public Long getStartTime() {
+        return startTime.getTime();
+    }
+    public Long getEndTime() {
+        return endTime.getTime();
+    }
 }
