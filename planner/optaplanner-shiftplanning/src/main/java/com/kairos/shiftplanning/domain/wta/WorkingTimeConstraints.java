@@ -38,6 +38,7 @@ public class WorkingTimeConstraints {
             case 1:return maximumShiftLength.checkConstraints(shift);
             case 2:return minimumShiftLength.checkConstraints(shift);
             case 5:return maximumNightShiftLength.checkConstraints(shift);
+            default:break;
         }
         return 0;
     }

@@ -22,7 +22,6 @@ public class ShiftState extends Shift {
         this.shiftId = shiftId;
         this.accessGroupRole = accessGroupRole;
         this.validated = validated;
-        //this.actualPhaseState = actualPhaseState;
         super.setStartDate(startDate) ;
         super.setEndDate(endDate);
         super.setUnitId(unitId);

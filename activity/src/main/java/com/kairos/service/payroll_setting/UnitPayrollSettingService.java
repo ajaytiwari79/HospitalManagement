@@ -44,7 +44,6 @@ public class UnitPayrollSettingService extends MongoBaseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UnitPayrollSettingService.class);
     @Inject
     private UnitPayrollSettingMongoRepository unitPayrollSettingMongoRepository;
-
     @Inject
     private ExceptionService exceptionService;
     @Inject

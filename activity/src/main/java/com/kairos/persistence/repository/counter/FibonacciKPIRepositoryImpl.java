@@ -24,6 +24,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
  */
 public class FibonacciKPIRepositoryImpl implements CustomFibonacciKPIRepository{
 
+    private static final String TITLE = "title";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -34,9 +35,9 @@ public class FibonacciKPIRepositoryImpl implements CustomFibonacciKPIRepository{
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup("counter", "activeKpiId", "_id", "kpi"),
-                project("title","fibonacciKPIConfigs").and("kpi").arrayElementAt(0).as("kpi"),
+                project(TITLE,"fibonacciKPIConfigs").and("kpi").arrayElementAt(0).as("kpi"),
                 match(Criteria.where("kpi.fibonacciKPI").is(true)),
-                project("title","fibonacciKPIConfigs").and("kpi._id").as("_id").and("kpi.type").as("type")
+                project(TITLE,"fibonacciKPIConfigs").and("kpi._id").as("_id").and("kpi.type").as("type")
                         .and("kpi.calculationFormula").as("calculationFormula").and("kpi.counter").as("counter").
                         and("kpi.fibonacciKPI").as("fibonacciKPI").and("kpi.description").as("kpi.description")
                         .and("kpi.referenceId").as("referenceId")
@@ -47,7 +48,7 @@ public class FibonacciKPIRepositoryImpl implements CustomFibonacciKPIRepository{
 
     @Override
     public boolean existByName(BigInteger fibonacciId,String title,ConfLevel confLevel,Long referenceId) {
-        Criteria criteria = Criteria.where("deleted").is(false).and("confLevel").is(confLevel).and("referenceId").is(referenceId).and("title").regex(Pattern.compile("^" + title + "$", Pattern.CASE_INSENSITIVE));
+        Criteria criteria = Criteria.where("deleted").is(false).and("confLevel").is(confLevel).and("referenceId").is(referenceId).and(TITLE).regex(Pattern.compile("^" + title + "$", Pattern.CASE_INSENSITIVE));
         if(isNotNull(fibonacciId)){
             criteria.and("_id").ne(fibonacciId);
         }

@@ -34,6 +34,11 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Repository
 public class ActivityMongoRepository {
 
+    public static final String UNIT_ID = "unitId";
+    public static final String END_DATE = "endDate";
+    public static final String EMPLOYMENT_ID = "employmentId";
+    public static final String START_DATE = "startDate";
+    public static final String PHASES = "phases";
     @Autowired
     @Qualifier("ActivityMongoTemplate")
     private MongoTemplate mongoTemplate;
@@ -49,7 +54,7 @@ public class ActivityMongoRepository {
      */
     public List<ShiftPlanningStaffingLevelDTO> getShiftPlanningStaffingLevelDTOByUnitId(Long unitId, Date fromDate, Date toDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId).and("currentDate").gte(fromDate).lte(toDate)));
+                match(Criteria.where(UNIT_ID).is(unitId).and("currentDate").gte(fromDate).lte(toDate)));
         AggregationResults<ShiftPlanningStaffingLevelDTO> aggregationResults = mongoTemplate.aggregate(aggregation, STAFFING_LEVEL, ShiftPlanningStaffingLevelDTO.class);
         return aggregationResults.getMappedResults();
     }
@@ -65,8 +70,7 @@ public class ActivityMongoRepository {
                 project("id","name","expertises","countryId","parentId","employmentTypes")
                         .and("timeTypes").arrayElementAt(0).as("timeType"));
         AggregationResults<ActivityDTO> aggregationResults = mongoTemplate.aggregate(aggregation, ACTIVITIES, ActivityDTO.class);
-        List<ActivityDTO> activityDTOS=aggregationResults.getMappedResults();
-        return activityDTOS;
+        return aggregationResults.getMappedResults();
     }
 /*******************************************CTA********************************************/
     /**
@@ -74,10 +78,10 @@ public class ActivityMongoRepository {
      * @return
      */
     public List<CTAResponseDTO> getCTARuleTemplateByEmploymentIds(List<Long> employmentIds, Date fromPlanningDate, Date toPlanningDate) {
-        Criteria endDateCriteria1 = Criteria.where("endDate").exists(false);
-        Criteria endDateCriteria2 = Criteria.where("endDate").gte(fromPlanningDate);
+        Criteria endDateCriteria1 = Criteria.where(END_DATE).exists(false);
+        Criteria endDateCriteria2 = Criteria.where(END_DATE).gte(fromPlanningDate);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("employmentId").in(employmentIds).and("startDate").lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
+                match(Criteria.where(EMPLOYMENT_ID).in(employmentIds).and(START_DATE).lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
                 lookup(CTA_RULE_TEMPLATE, "ruleTemplateIds", "_id", "ruleTemplates"));
         AggregationResults<CTAResponseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, COST_TIME_AGGREMENET, CTAResponseDTO.class);
 
@@ -89,12 +93,12 @@ public class ActivityMongoRepository {
      * @return
      */
     public List<WorkingTimeAgreement> getWTARuleTemplateByEmploymentIds(List<Long> employmentIds, Date fromPlanningDate, Date toPlanningDate) {
-        Criteria endDateCriteria1 = Criteria.where("endDate").exists(false);
-        Criteria endDateCriteria2 = Criteria.where("endDate").gte(fromPlanningDate);
+        Criteria endDateCriteria1 = Criteria.where(END_DATE).exists(false);
+        Criteria endDateCriteria2 = Criteria.where(END_DATE).gte(fromPlanningDate);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("employmentId").in(employmentIds).and("startDate").lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
+                match(Criteria.where(EMPLOYMENT_ID).in(employmentIds).and(START_DATE).lte(toPlanningDate).orOperator(endDateCriteria1, endDateCriteria2)),
                 lookup(WTABASE_TEMPLATE, "ruleTemplateIds", "_id", "ruleTemplates"));
-        AggregationResults<WorkingTimeAgreement> aggregationResults = mongoTemplate.aggregate(aggregation, Working_Time_AGREEMENT, WorkingTimeAgreement.class);
+        AggregationResults<WorkingTimeAgreement> aggregationResults = mongoTemplate.aggregate(aggregation, WORKING_TIME_AGREEMENT, WorkingTimeAgreement.class);
 
         return aggregationResults.getMappedResults();
     }
@@ -107,12 +111,10 @@ public class ActivityMongoRepository {
      */
     public List<Shift> getAllShiftsByEmploymentIds(List<Long> employmentIds, Date fromDate, Date toDate) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("employmentId").in(employmentIds).and("startDate").gte(fromDate).and("endDate").lte(toDate))
+                match(Criteria.where(EMPLOYMENT_ID).in(employmentIds).and(START_DATE).gte(fromDate).and(END_DATE).lte(toDate))
         );
         AggregationResults<Shift> aggregationResults = mongoTemplate.aggregate(aggregation, SHIFTS, Shift.class);
-        //return aggregationResults.getMappedResults();
-        List<Shift> shifts=aggregationResults.getMappedResults();
-        return shifts;
+        return aggregationResults.getMappedResults();
     }
 
 
@@ -121,30 +123,30 @@ public class ActivityMongoRepository {
     public List<PhaseDTO> getAllPhasesByCountryId(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("countryId").is(countryId)));
-        AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "phases", PhaseDTO.class);
+        AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, PHASES, PhaseDTO.class);
         return aggregationResults.getMappedResults();
     }
 
     public PhaseDTO getOnePhaseById(BigInteger phaseId) {
-        return mongoTemplate.findOne(new Query(Criteria.where("_id").is(phaseId)),PhaseDTO.class,"phases");
+        return mongoTemplate.findOne(new Query(Criteria.where("_id").is(phaseId)),PhaseDTO.class, PHASES);
     }
    //For Unit(Unit)
     public List<PhaseDTO> getAllPhasesByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("organizationId").is(unitId)));
-        AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "phases", PhaseDTO.class);
+        AggregationResults<PhaseDTO> aggregationResults = mongoTemplate.aggregate(aggregation, PHASES, PhaseDTO.class);
         return aggregationResults.getMappedResults();
     }
 
     public List<PhaseDTO> getPhaseByUnitIdAndPhaseEnum(List<Long> unitIds, PhaseDefaultName phaseEnum) {
-        return mongoTemplate.find(new Query(Criteria.where("phaseEnum").is(phaseEnum).and("organizationId").in(unitIds)), PhaseDTO.class,"phases" );
+        return mongoTemplate.find(new Query(Criteria.where("phaseEnum").is(phaseEnum).and("organizationId").in(unitIds)), PhaseDTO.class, PHASES);
     }
 
     //For Unit(Unit
     public List<PlanningPeriodDTO> getAllPlanningPeriodByUnitId(Long unitId)
     {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("unitId").is(unitId)));
+                match(Criteria.where(UNIT_ID).is(unitId)));
         AggregationResults<PlanningPeriodDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "planningPeriod", PlanningPeriodDTO.class);
         return aggregationResults.getMappedResults();
     }
@@ -152,7 +154,7 @@ public class ActivityMongoRepository {
     //
     public com.kairos.dto.planner.planninginfo.PlanningProblemDTO getPlanningPeriod(BigInteger planningPeriodId,Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("_id").is(planningPeriodId).and("unitId").is(unitId)));
+                match(Criteria.where("_id").is(planningPeriodId).and(UNIT_ID).is(unitId)));
         AggregationResults<com.kairos.dto.planner.planninginfo.PlanningProblemDTO> aggregationResults = mongoTemplate.aggregate(aggregation, "planningPeriod", com.kairos.dto.planner.planninginfo.PlanningProblemDTO.class);
         return aggregationResults.getMappedResults().get(0);
     }

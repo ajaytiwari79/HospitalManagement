@@ -42,6 +42,11 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Service
 @Transactional
 public class TasksMergingService extends MongoBaseService {
+    public static final String JOIN_EVENT_ID = "joinEventId";
+    public static final String CITIZEN_ID = "citizenId";
+    public static final String UNIT_ID = "unitId";
+    public static final String DATE_FROM = "dateFrom";
+    public static final String IS_DELETED = "isDeleted";
     @Inject
     TaskMongoRepository taskMongoRepository;
 
@@ -87,8 +92,8 @@ public class TasksMergingService extends MongoBaseService {
     public List<Task> mergeRepetitions(List<String> taskIds, List<String> jointEventsIds, Date dateFrom,Long  citizenId, long unitId, String mainTaskName, boolean isActualPlanningScreen) throws CloneNotSupportedException {
 
         List<Task> taskList = new ArrayList<>();
-        //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        //Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
+        //Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
+        //Map<String, String> flsCredentials = integrationService.getFLSCredentials(unitId);
         TaskDemandVisitWrapper taskDemandVisitWrapper= userIntegrationService.
                 getPrerequisitesForTaskCreation(citizenId,unitId);
 
@@ -107,7 +112,7 @@ public class TasksMergingService extends MongoBaseService {
 
         if(!isActualPlanningScreen) {
 
-            Criteria criteria = Criteria.where("joinEventId").in(jointEventsIds).and("citizenId").is(citizenId).and("unitId").is(unitId).and("dateFrom").gt(dateFrom).and("isDeleted").is(false);
+            Criteria criteria = Criteria.where(JOIN_EVENT_ID).in(jointEventsIds).and(CITIZEN_ID).is(citizenId).and(UNIT_ID).is(unitId).and(DATE_FROM).gt(dateFrom).and(IS_DELETED).is(false);
 
             String projection = "{   $project : { date : {$substr: ['$dateFrom', 0, 10] }}}";
 
@@ -120,15 +125,15 @@ public class TasksMergingService extends MongoBaseService {
                     match(criteria),
                     new CustomAggregationOperation(projectionObject),
                     new CustomAggregationOperation(groupObject),
-                    sort(Sort.Direction.DESC, "dateFrom")
+                    sort(Sort.Direction.DESC, DATE_FROM)
             );
-            LOGGER.debug("Merge Repetitions Query: " + aggregation.toString());
+            LOGGER.debug("Merge Repetitions Query: {}" ,aggregation.toString());
 
             // Result
             AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
 
             List<Map> taskIdsGroupByDate = finalResult.getMappedResults();
-            LOGGER.debug("taskIdsGroupByDate: " + taskIdsGroupByDate);
+            LOGGER.debug("taskIdsGroupByDate: {}" , taskIdsGroupByDate);
 
             for (Map map : taskIdsGroupByDate) {
 
@@ -333,9 +338,9 @@ public class TasksMergingService extends MongoBaseService {
         if( !mainTask.isSingleTask() ) {
             if(isActualPlanningScreen){
                 Date unmergeTillDate = DateUtils.convertToOnlyDate(tasksData.get("unmergeTillDate").toString(), ISO_FORMAT);
-                criteria = Criteria.where("joinEventId").in(jointEventsIds).and("citizenId").is(citizenId).and("unitId").is(unitId).and("dateFrom").gt(mainTask.getDateFrom()).and("dateTo").lte(unmergeTillDate).and("isDeleted").is(false);
+                criteria = Criteria.where(JOIN_EVENT_ID).in(jointEventsIds).and(CITIZEN_ID).is(citizenId).and(UNIT_ID).is(unitId).and(DATE_FROM).gt(mainTask.getDateFrom()).and("dateTo").lte(unmergeTillDate).and(IS_DELETED).is(false);
             }else{
-                criteria = Criteria.where("joinEventId").in(jointEventsIds).and("citizenId").is(citizenId).and("unitId").is(unitId).and("dateFrom").gt(mainTask.getDateFrom()).and("isDeleted").is(false);
+                criteria = Criteria.where(JOIN_EVENT_ID).in(jointEventsIds).and(CITIZEN_ID).is(citizenId).and(UNIT_ID).is(unitId).and(DATE_FROM).gt(mainTask.getDateFrom()).and(IS_DELETED).is(false);
             }
 
             String projection = "{   $project : { date : {$substr: ['$dateFrom', 0, 10] }}}";
@@ -348,7 +353,7 @@ public class TasksMergingService extends MongoBaseService {
                     match(criteria),
                     new CustomAggregationOperation(projectionObject),
                     new CustomAggregationOperation(groupObject),
-                    sort(Sort.Direction.DESC, "dateFrom")
+                    sort(Sort.Direction.DESC, DATE_FROM)
             );
             // Result
             AggregationResults<Map> finalResult = mongoTemplate.aggregate(aggregation, Task.class, Map.class);
@@ -378,7 +383,7 @@ public class TasksMergingService extends MongoBaseService {
             }
         }
 
-        Map<String, String> flsCredentials = userIntegrationService.getFLS_Credentials(unitId);
+        Map<String, String> flsCredentials = userIntegrationService.getFLSCredentials(unitId);
        /* if (tasksToCreate.size() > 0) {
             taskConverterService.createFlsCallFromTasks(tasksToCreate, flsCredentials);
         } else {

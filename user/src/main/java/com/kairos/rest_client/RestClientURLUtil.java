@@ -9,6 +9,7 @@ import java.util.Optional;
 @Component
 public class RestClientURLUtil {
 
+    public static final String UNIT = "unit/";
     private static String userServiceUrl;
     private static String plannerServiceUrl;
     private static String schedulerServiceUrl;
@@ -36,26 +37,20 @@ public class RestClientURLUtil {
 
     public final static String getBaseUrl(boolean hasUnitInUrl) {
         if (hasUnitInUrl) {
-            String baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append(UserContext.getUnitId()).toString();
-            return baseUrl;
+            return new StringBuilder(userServiceUrl).append("/unit/").append(UserContext.getUnitId()).toString();
         } else {
-            String baseUrl = new StringBuilder(userServiceUrl).toString();
-            return baseUrl;
-        }
+            return new StringBuilder(userServiceUrl).toString();        }
     }
 
     public final static String getBaseUrl(boolean hasUnitInUrl, Long id) {
         if (!Optional.ofNullable(id).isPresent()) {
-            String baseUrl = userServiceUrl;
-            return baseUrl;
+            return userServiceUrl;
         } else {
             if (hasUnitInUrl) {
-                String baseUrl = new StringBuilder(userServiceUrl)
+                return new StringBuilder(userServiceUrl)
                         .append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
-                return baseUrl;
             } else {
-                String baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
-                return baseUrl;
+                return new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
             }
         }
 
@@ -66,33 +61,26 @@ public class RestClientURLUtil {
     }
 
     public static final String getPlannerBaseUrl() {
-        String baseUrl = new StringBuilder(plannerServiceUrl + "unit/").toString();
-        return baseUrl;
-
+        return new StringBuilder(plannerServiceUrl + UNIT).toString();
     }
 
     public final static String getSchedulerBaseUrl(boolean hasUnitInUrl, Long id) {
         if (hasUnitInUrl) {
 
-            String baseUrl = new StringBuilder(schedulerServiceUrl).append("unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
-            return baseUrl;
+            return new StringBuilder(schedulerServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
         } else {
-            String baseUrl = schedulerServiceUrl;
-            return baseUrl;
+            return schedulerServiceUrl;
         }
     }
 
     public final static String getGdprServiceBaseUrl(boolean hasUnitInUrl, Long id) {
         if (!Optional.ofNullable(id).isPresent()) {
-            String baseUrl = gdprServiceUrl;
-            return baseUrl;
+            return gdprServiceUrl;
         } else {
             if (hasUnitInUrl) {
-                String baseUrl = new StringBuilder(gdprServiceUrl).append("unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
-                return baseUrl;
+                return new StringBuilder(gdprServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             } else {
-                String baseUrl = new StringBuilder(gdprServiceUrl + "unit/").append(Optional.ofNullable(UserContext.getOrgId()).isPresent() ? UserContext.getOrgId() : "24").append("/country/").append(id).toString();
-                return baseUrl;
+                return new StringBuilder(gdprServiceUrl + UNIT).append(Optional.ofNullable(UserContext.getOrgId()).isPresent() ? UserContext.getOrgId() : "24").append("/country/").append(id).toString();
             }
         }
 

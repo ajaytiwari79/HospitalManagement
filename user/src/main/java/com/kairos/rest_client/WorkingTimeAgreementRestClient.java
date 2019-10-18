@@ -32,6 +32,8 @@ import static com.kairos.rest_client.RestClientURLUtil.getBaseUrl;
 public class WorkingTimeAgreementRestClient {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkingTimeAgreementRestClient.class);
+    public static final String STATUS = "status {}";
+    public static final String RESPONSE = "response {}";
 
     @Inject
     private RestTemplate restTemplate;
@@ -41,7 +43,6 @@ public class WorkingTimeAgreementRestClient {
     public CTAWTAAndAccumulatedTimebankWrapper getWTAByExpertise(Long expertiseId) {
         String baseUrl = getBaseUrl(true);
         try {
-            //HttpEntity<Long> request = new HttpEntity<>(expertiseId);
             ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>> typeReference = new ParameterizedTypeReference<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>>() {
             };
             ResponseEntity<RestTemplateResponseEnvelope<CTAWTAAndAccumulatedTimebankWrapper>> restExchange =
@@ -57,8 +58,8 @@ public class WorkingTimeAgreementRestClient {
             }
         } catch (HttpClientErrorException e) {
 
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
+            logger.info(STATUS, e.getStatusCode());
+            logger.info(RESPONSE, e.getResponseBodyAsString());
             throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
         }
     }
@@ -82,8 +83,8 @@ public class WorkingTimeAgreementRestClient {
             }
         } catch (HttpClientErrorException e) {
 
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
+            logger.info(STATUS, e.getStatusCode());
+            logger.info(RESPONSE, e.getResponseBodyAsString());
             exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(), ResponseEnvelope.class).getMessage());
             throw new RuntimeException("exception occurred in task micro service " + e.getMessage());
         }
@@ -108,8 +109,8 @@ public class WorkingTimeAgreementRestClient {
             }
         } catch (HttpClientErrorException e) {
 
-            logger.info("status {}", e.getStatusCode());
-            logger.info("response {}", e.getResponseBodyAsString());
+            logger.info(STATUS, e.getStatusCode());
+            logger.info(RESPONSE, e.getResponseBodyAsString());
             exceptionService.exceptionWithoutConvertInRestClient(ObjectMapperUtils.jsonStringToObject(e.getResponseBodyAsString(),ResponseEnvelope.class).getMessage());
         }
         return null;

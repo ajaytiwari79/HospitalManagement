@@ -24,6 +24,7 @@ import static com.kairos.constants.AppConstant.NEW_DATA_LIST;
 public class TemplateTypeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateTypeService.class);
+    public static final String MESSAGE_TEMPLATE_TYPE = "message.templateType";
 
     @Inject
     private TemplateTypeRepository templateTypeRepository;
@@ -80,11 +81,11 @@ public class TemplateTypeService {
 
         TemplateType previousTemplateType = templateTypeRepository.findByCountryIdAndName(countryId, templateType.getName());
         if (Optional.ofNullable(previousTemplateType).isPresent() && !templateId.equals(previousTemplateType.getId())) {
-            exceptionService.duplicateDataException("message.duplicate", "message.templateType", templateType.getName());
+            exceptionService.duplicateDataException("message.duplicate", MESSAGE_TEMPLATE_TYPE, templateType.getName());
         }
         Integer resultCount = templateTypeRepository.updateMasterMetadataName(templateType.getName(), templateId, countryId);
         if (resultCount <= 0) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.templateType", templateId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_TEMPLATE_TYPE, templateId);
         } else {
             LOGGER.info("Data updated successfully for id : {} and name updated name is : {}", templateId, templateType.getName());
         }
@@ -102,7 +103,7 @@ public class TemplateTypeService {
     public Boolean deleteTemplateType(Long templateId, Long countryId) {
         TemplateType templateType = templateTypeRepository.findByIdAndCountryIdAndDeletedFalse(templateId, countryId);
         if (!Optional.ofNullable(templateType).isPresent()) {
-            exceptionService.dataNotFoundByIdException("message.dataNotFound", "message.templateType", templateId);
+            exceptionService.dataNotFoundByIdException("message.dataNotFound", MESSAGE_TEMPLATE_TYPE, templateId);
         }
         templateType.delete();
         templateTypeRepository.save(templateType);

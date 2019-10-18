@@ -30,6 +30,7 @@ import static com.kairos.utils.RestClientUrlUtil.getUserServiceBaseUrl;
 
 @Service
 public class UserRestClientForScheduler {
+    public static final String AUTHORIZATION = "Authorization";
     private static Logger logger = LoggerFactory.getLogger(UserRestClientForScheduler.class);
 
 
@@ -63,7 +64,7 @@ public class UserRestClientForScheduler {
         try {
             ResponseEntity<RestTemplateResponseEnvelope<V>> restExchange;
                 HttpHeaders headers = new HttpHeaders();
-                headers.add("Authorization","bearer "+ tokenAuthService.getAuthToken());
+                headers.add(AUTHORIZATION,"bearer "+ tokenAuthService.getAuthToken());
                 HttpEntity<T> httpEntity= new HttpEntity<T>(t,headers);
                 restExchange = schedulerServiceRestTemplate.exchange(
                         url,
@@ -71,8 +72,8 @@ public class UserRestClientForScheduler {
                         httpEntity, typeReference,pathParams);
                 if(restExchange.getStatusCode().value()==401) {
                     tokenAuthService.getNewAuthToken();
-                    headers.remove("Authorization");
-                    headers.add("Authorization","bearer "+ tokenAuthService.getNewAuthToken());
+                    headers.remove(AUTHORIZATION);
+                    headers.add(AUTHORIZATION,"bearer "+ tokenAuthService.getNewAuthToken());
                     httpEntity= new HttpEntity<T>(t,headers);
                     restExchange = schedulerServiceRestTemplate.exchange(
                             url,

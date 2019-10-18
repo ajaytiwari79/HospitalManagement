@@ -465,13 +465,12 @@ public class OrganizationActivityService extends MongoBaseService {
         UnitSettingDTO minOpenShiftHours = unitSettingRepository.getMinOpenShiftHours(unitId);
         List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
 
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
+        return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
                 minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(), counters);
-        return activityWithTimeTypeDTO;
     }
 
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
-        logger.info("I am going to create default data or organization " + unitId);
+        logger.info("I am going to create default data or organization {}" , unitId);
         //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
 
         List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());

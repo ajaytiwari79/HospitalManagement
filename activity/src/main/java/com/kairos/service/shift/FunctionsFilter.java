@@ -18,8 +18,8 @@ import static com.kairos.enums.FilterType.FUNCTIONS;
  **/
 public class FunctionsFilter implements ShiftFilter {
     private Map<FilterType, Set<String>> filterCriteriaMap;
-    private List<LocalDate> functionDates;
-    public FunctionsFilter(Map<FilterType, Set<String>> filterCriteriaMap, List<LocalDate> functionDates) {
+    private Set<LocalDate> functionDates;
+    public FunctionsFilter(Map<FilterType, Set<String>> filterCriteriaMap, Set<LocalDate> functionDates) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.functionDates = functionDates;
     }
@@ -30,8 +30,9 @@ public class FunctionsFilter implements ShiftFilter {
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             for (ShiftDTO shiftDTO : shiftDTOS) {
-                if(functionDates.contains(asLocalDate(shiftDTO.getStartDate())))
-                    filteredShifts.add((T)shiftDTO);
+                if(functionDates.contains(asLocalDate(shiftDTO.getStartDate()))) {
+                    filteredShifts.add((T) shiftDTO);
+                }
             }
         }
         return filteredShifts;

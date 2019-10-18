@@ -26,10 +26,7 @@ public class TaskDemandValidator {
 
     private static Map<String,Object> validateGender(Client client, TaskType taskType){
 
-        Map<String,Object> response = new HashMap(2);
-
-
-        return response;
+        return new HashMap(2);
     }
 
     public Map<String,Object> validate(TaskDemand taskDemand){

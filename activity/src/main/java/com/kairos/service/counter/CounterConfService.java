@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.distribution.category.KPICategoryDTO;
@@ -68,7 +69,7 @@ public class CounterConfService extends MongoBaseService {
                 duplicateEntries.add(category);
             }
         });
-        if (duplicateEntries.size() > 0) exceptionService.duplicateDataException(ERROR_DASHBOARD_NAME_DUPLICATE);
+        if (ObjectUtils.isCollectionEmpty(duplicateEntries)) exceptionService.duplicateDataException(ERROR_DASHBOARD_NAME_DUPLICATE);
     }
 
     private List<String> getTrimmedNames(List<KPICategoryDTO> categories) {
@@ -89,9 +90,7 @@ public class CounterConfService extends MongoBaseService {
         List<String> names = getTrimmedNames(categories);
         verifyForCategoryAvailability(names, refId, level);
         List<KPICategory> kpiCategories = new ArrayList<>();
-        categories.stream().forEach(kpiCategoryDTO -> {
-            kpiCategories.add(new KPICategory(kpiCategoryDTO.getName(), countryId, unitId, level));
-        });
+        categories.stream().forEach(kpiCategoryDTO -> kpiCategories.add(new KPICategory(kpiCategoryDTO.getName(), countryId, unitId, level)));
         if (!kpiCategories.isEmpty()) {
             save(kpiCategories);
         }
@@ -113,8 +112,8 @@ public class CounterConfService extends MongoBaseService {
         if (existingAssignmentDTOs.isEmpty()) {
             return new ArrayList<>();
         }
-        Map<BigInteger, KPICategoryDTO> categoryDTOMapById = changedCategories.parallelStream().collect(Collectors.toMap(kPICategoryDTO -> kPICategoryDTO.getId(), kPICategoryDTO -> kPICategoryDTO));
-        List<BigInteger> categoriesIds = changedCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
+        Map<BigInteger, KPICategoryDTO> categoryDTOMapById = changedCategories.parallelStream().collect(Collectors.toMap(KPICategoryDTO::getId, kPICategoryDTO -> kPICategoryDTO));
+        List<BigInteger> categoriesIds = changedCategories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
         List<KPICategory> kpiCategories = counterRepository.getKPICategoryByIds(categoriesIds, level, refId);
         for (KPICategory kpiCategory : kpiCategories) {
             KPICategoryDTO kpiCategoryDTO = categoryDTOMapById.get(kpiCategory.getId());
@@ -133,7 +132,7 @@ public class CounterConfService extends MongoBaseService {
         List<KPICategoryDTO> deletableCategories = getExistingCategories(categories.getDeletedCategories(), level, refId, true);
         List<KPICategoryDTO> existingCategories = getExistingCategories(categories.getUpdatedCategories(), level, refId, false);
         List<KPICategory> kpiCategories = modifyCategories(categories.getUpdatedCategories(), existingCategories, level, refId);
-        List<BigInteger> deletableCategoryIds = deletableCategories.stream().map(kpiCategoryDTO -> kpiCategoryDTO.getId()).collect(Collectors.toList());
+        List<BigInteger> deletableCategoryIds = deletableCategories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
         linkKpiToUncategorized(deletableCategoryIds, level, refId);
         counterRepository.removeAll("id", deletableCategoryIds, KPICategory.class, level);
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiCategories, KPICategoryDTO.class);

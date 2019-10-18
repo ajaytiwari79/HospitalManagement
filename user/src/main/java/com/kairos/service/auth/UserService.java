@@ -75,6 +75,7 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Service
 public class UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    public static final String ACCESS_TOKEN = "accessToken";
 
     @Inject
     private UserGraphRepository userGraphRepository;
@@ -312,7 +313,7 @@ public class UserService {
         map.put("id", currentUser.getId());
         map.put("userName", currentUser.getUserName());
         map.put("email", currentUser.getEmail());
-        map.put("accessToken", currentUser.getAccessToken());
+        map.put(ACCESS_TOKEN, currentUser.getAccessToken());
         if (currentUser.getCountryList() != null) {
             map.put("countryId", currentUser.getCountryList().get(0).getId());
         }
@@ -343,7 +344,7 @@ public class UserService {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("id", currentUser.getId());
-        map.put("accessToken", currentUser.getAccessToken());
+        map.put(ACCESS_TOKEN, currentUser.getAccessToken());
         map.put("name", currentUser.getFirstName());
         map.put("appId", org.getEstimoteAppId());
         map.put("appToken", org.getEstimoteAppToken());
@@ -374,7 +375,7 @@ public class UserService {
             }
             Map<String, Object> map = new HashMap<>();
             map.put("id", currentUser.getId());
-            map.put("accessToken", currentUser.getAccessToken());
+            map.put(ACCESS_TOKEN, currentUser.getAccessToken());
             map.put("name", currentUser.getFirstName());
             map.put("organization", org.getId());
             map.put("appId", org.getEstimoteAppId());

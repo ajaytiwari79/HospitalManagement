@@ -67,8 +67,7 @@ public class AccountTypeService {
     public List<AccountTypeDTO> getAllAccountTypeByCountryId(Long countryId) {
         List<AccountType> accountTypes = accountTypeRepository.getAllAccountTypeByCountryId(countryId);
         // converted due to USE in both Microservice.
-        List<AccountTypeDTO> accountTypeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(accountTypes, AccountTypeDTO.class);
-        return accountTypeDTOS;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(accountTypes, AccountTypeDTO.class);
     }
 
 

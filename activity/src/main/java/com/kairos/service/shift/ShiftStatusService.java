@@ -157,7 +157,7 @@ public class ShiftStatusService {
             draftShift=shift.isDraft();
             shift.setDraftShift(null);
         }
-        if (validAccessGroup && validateShiftActivityStatus & !draftShift) {
+        if (validAccessGroup && validateShiftActivityStatus && !draftShift) {
             removeOppositeStatus(shift, shiftActivity, shiftPublishDTO.getStatus());
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, shiftActivity.getStatus()));
         } else if (validAccessGroup && !validateShiftActivityStatus) {

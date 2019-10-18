@@ -40,8 +40,7 @@ public class CitizenController {
     public String preferences(@PathVariable long unitId)  {
         authService.kmdAuth();
         logger.info("Importing Citizen from KMD Nexus !!!!----> " );
-        String status = citizenService.getCitizensFromKMD(unitId);
-        return status;
+        return citizenService.getCitizensFromKMD(unitId);
     }
 
     /**

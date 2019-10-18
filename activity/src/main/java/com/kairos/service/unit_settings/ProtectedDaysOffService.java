@@ -1,38 +1,31 @@
 package com.kairos.service.unit_settings;
 
-import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.ActivityMessagesConstants;
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
+import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
+import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.shift.Shift;
+import com.kairos.enums.scheduler.JobSubType;
+import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.unit_settings.ProtectedDaysOffSetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ProtectedDaysOffRepository;
+import com.kairos.rest_client.RestTemplateResponseEnvelope;
+import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getCutoffInterval;
-import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created By G.P.Ranjan on 1/7/19
@@ -47,6 +40,8 @@ public class ProtectedDaysOffService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private SchedulerServiceRestClient schedulerRestClient;
 
     public ProtectedDaysOffSettingDTO saveProtectedDaysOff(Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = new ProtectedDaysOffSettingDTO(unitId, protectedDaysOffUnitSettings);
@@ -74,8 +69,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
         if(!Optional.ofNullable(protectedDaysOffSetting).isPresent()) {
             exceptionService.dataNotFoundException(ActivityMessagesConstants.MESSAGE_ORGANIZATION_PROTECTED_DAYS_OFF,unitId);
         }
-        ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO =new ProtectedDaysOffSettingDTO(protectedDaysOffSetting.getId(), protectedDaysOffSetting.getUnitId(), protectedDaysOffSetting.getProtectedDaysOffUnitSettings());
-        return protectedDaysOffSettingDTO;
+        return new ProtectedDaysOffSettingDTO(protectedDaysOffSetting.getId(), protectedDaysOffSetting.getUnitId(), protectedDaysOffSetting.getProtectedDaysOffUnitSettings());
     }
 
     public List<ProtectedDaysOffSettingDTO> getAllProtectedDaysOffByUnitIds(List<Long> unitIds){
@@ -85,53 +79,14 @@ public class ProtectedDaysOffService extends MongoBaseService {
 
     public Boolean createAutoProtectedDaysOffOfAllUnits(Long countryId){
         List<Long> units=userIntegrationService.getUnitIds(countryId);
-        units.forEach(unit->{ saveProtectedDaysOff(unit,ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR);});
+        units.forEach(unit-> saveProtectedDaysOff(unit,ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR));
         return true;
     }
 
-    public void updateProtectedDaysOffDetails(){
-        List<Long> unitIds = new ArrayList<>();
-        List<ProtectedDaysOffSetting> protectedDaysOffSettings = protectedDaysOffRepository.getAllProtectedDaysOffByUnitIdsAndDeletedFalse(unitIds);
-        Map<Long,ProtectedDaysOffUnitSettings> unitIdProtectedDaysOffUnitSettingsMap = protectedDaysOffSettings.stream().collect(Collectors.toMap(k->k.getUnitId(), v->v.getProtectedDaysOffUnitSettings()));
-        for (Long unitId : unitIds) {
-            ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings = unitIdProtectedDaysOffUnitSettingsMap.get(unitId);
-            switch (protectedDaysOffUnitSettings){
-                case ONCE_IN_A_YEAR:updateProtectedDaysOffByOnceInAYear();
-                    break;
-                case ACTIVITY_CUT_OFF_INTERVAL:updateProtectedDaysOffByActivityCutOff();
-                    break;
-                case UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR:updateProtectedDaysOffByFirstDayOfTheYear();
-                    break;
-                default:
-                    break;
-            }
-        }
+
+    public void registerJobForProtectedDaysOff() {
+        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 5), JobType.SYSTEM, JobSubType.PROTECTED_DAYS_OFF, ZoneId.systemDefault().toString());
+        schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
     }
 
-    private void updateProtectedDaysOffByOnceInAYear(){
-        if(LocalDate.now().equals(LocalDate.now().with(TemporalAdjusters.firstDayOfYear()))){
-            List<Activity> activities = activityMongoRepository.findAllBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF);
-            List<BigInteger> activityIds = activities.stream().map(activity -> activity.getId()).collect(Collectors.toList());
-            ZonedDateTime startDate = ZonedDateTime.now().minusYears(1).with(TemporalAdjusters.firstDayOfYear()).truncatedTo(ChronoUnit.DAYS);
-            ZonedDateTime endDate = startDate.with(TemporalAdjusters.lastDayOfYear()).plusDays(1);
-            List<Shift> shifts = shiftMongoRepository.findAllShiftByActivityIdAndBetweenDuration(any(Long.class),asDate(startDate),asDate(endDate),activityIds);
-           /* if(shifts.size()<publicHolidayCount){
-
-            }*/
-        }
-    }
-
-    private void updateProtectedDaysOffByActivityCutOff(){
-        List<Activity> activities = activityMongoRepository.findAllBySecondLevelTimeType(TimeTypeEnum.PROTECTED_DAYS_OFF);
-        for (Activity activity : activities) {
-            DateTimeInterval dateTimeInterval = getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(), activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue(),asDate(LocalDate.now()));
-            List<Shift> shifts = shiftMongoRepository.findAllShiftByActivityIdAndBetweenDuration(any(Long.class),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate(),newArrayList(activity.getId()));
-        }
-    }
-
-    private void updateProtectedDaysOffByFirstDayOfTheYear(){
-        if(LocalDate.now().equals(LocalDate.now().with(TemporalAdjusters.firstDayOfYear()))){
-
-        }
-    }
 }

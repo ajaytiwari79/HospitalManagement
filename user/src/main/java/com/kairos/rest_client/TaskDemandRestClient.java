@@ -27,6 +27,8 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_EXCEPTION_TASKM
 @Component
 public class TaskDemandRestClient {
     private static final Logger logger = LoggerFactory.getLogger(TaskDemandRestClient.class);
+    public static final String STATUS = "status {}";
+    public static final String RESPONSE = "response {}";
     @Autowired
     RestTemplate restTemplate;
     @Autowired
@@ -59,8 +61,8 @@ public class TaskDemandRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
             //throw new RuntimeException("exception occurred in task micro service "+e.getMessage());
         }
@@ -94,8 +96,8 @@ public class TaskDemandRestClient {
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
@@ -132,8 +134,8 @@ return null;
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
@@ -169,8 +171,8 @@ return null;
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
@@ -203,8 +205,8 @@ return null;
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
@@ -239,8 +241,8 @@ return null;
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }
@@ -272,8 +274,8 @@ return null;
             }
         }catch (HttpClientErrorException e) {
 
-            logger.info("status {}",e.getStatusCode());
-            logger.info("response {}",e.getResponseBodyAsString());
+            logger.info(STATUS,e.getStatusCode());
+            logger.info(RESPONSE,e.getResponseBodyAsString());
             exceptionService.runtimeException(MESSAGE_EXCEPTION_TASKMICROSERVICE,e.getMessage());
 
         }

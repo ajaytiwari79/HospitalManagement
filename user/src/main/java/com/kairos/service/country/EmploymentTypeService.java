@@ -250,8 +250,7 @@ public class EmploymentTypeService {
         List<DayType>  dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
 
         List<com.kairos.dto.user.country.day_type.DayType> dayTypesDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, com.kairos.dto.user.country.day_type.DayType.class);
-        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper= new DayTypeEmploymentTypeWrapper(dayTypesDTOS,employmentTypeDTOS);
-        return  dayTypeEmploymentTypeWrapper;
+        return new DayTypeEmploymentTypeWrapper(dayTypesDTOS,employmentTypeDTOS);
 
     }
 

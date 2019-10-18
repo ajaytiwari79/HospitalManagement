@@ -16,7 +16,10 @@ import java.util.TreeSet;
  */
 public class FibonacciCalculationUtil {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(FibonacciCalculationUtil.class);
+    private FibonacciCalculationUtil() {
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FibonacciCalculationUtil.class);
 
     public static TreeSet<FibonacciKPICalculation> getFibonacciCalculation(Map<Long,Integer> staffIdAndKPIDataMap, Direction sortingOrder){
         Comparator<FibonacciKPICalculation> fibonacciKPICalculationComparator = sortingOrder.isAscending() ? Comparator.naturalOrder() : Comparator.reverseOrder();

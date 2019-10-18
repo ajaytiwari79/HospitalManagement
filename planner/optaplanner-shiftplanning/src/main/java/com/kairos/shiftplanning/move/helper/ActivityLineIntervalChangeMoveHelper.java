@@ -18,6 +18,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ActivityLineIntervalChangeMoveHelper {
+    public static final String SHIFT = "shift";
+    public static final String FORMAT = "{} {{}} -> {{}}";
     private static Logger log= LoggerFactory.getLogger(ActivityLineIntervalChangeMoveHelper.class);
 
     /**
@@ -37,19 +39,19 @@ public class ActivityLineIntervalChangeMoveHelper {
                 if(Objects.equals(existingActivityLineInterval.getShift(),exActivityLineIntervalShift)){
                     continue;
                 }
-                scoreDirector.beforeVariableChanged(existingActivityLineInterval, "shift");
+                scoreDirector.beforeVariableChanged(existingActivityLineInterval, SHIFT);
                 log.debug("X {} {{}} -> {{}}",existingActivityLineInterval,existingActivityLineInterval.getShift(),exActivityLineIntervalShift);
                 existingActivityLineInterval.setShift(exActivityLineIntervalShift);
-                scoreDirector.afterVariableChanged(existingActivityLineInterval, "shift");
+                scoreDirector.afterVariableChanged(existingActivityLineInterval, SHIFT);
             }
         }
         if(Objects.equals(activityLineInterval.getShift(), shiftImp)){
             return;
         }
-        scoreDirector.beforeVariableChanged(activityLineInterval, "shift");
-        log.debug("{} {{}} -> {{}}",activityLineInterval,activityLineInterval.getShift(), shiftImp);
+        scoreDirector.beforeVariableChanged(activityLineInterval, SHIFT);
+        log.debug(FORMAT,activityLineInterval,activityLineInterval.getShift(), shiftImp);
         activityLineInterval.setShift(shiftImp);
-        scoreDirector.afterVariableChanged(activityLineInterval, "shift");
+        scoreDirector.afterVariableChanged(activityLineInterval, SHIFT);
         log.debug("**********************END********************");
         /*if(shiftImp!=null && shiftImp.getActivityLineIntervalsList().size()==1 && shiftImp.getInterval().toDuration().getStandardMinutes()!=15l){
             log.info("+++++++++++++++++++++++++"+ShiftPlanningUtility.getIntervalAsString(shiftImp.getInterval()));
@@ -81,11 +83,11 @@ public class ActivityLineIntervalChangeMoveHelper {
     public static void assignActivityIntervalToShift(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, ActivityLineInterval activityLineInterval,
                                                      ShiftImp shiftImp, ActivityLineInterval activityLineInterval2, ShiftImp shiftImp2){
         //checkSanity(scoreDirector);
-        scoreDirector.beforeVariableChanged(activityLineInterval2, "shift");
-        log.debug("{} {{}} -> {{}}",activityLineInterval2,activityLineInterval2.getShift(), shiftImp2);
+        scoreDirector.beforeVariableChanged(activityLineInterval2, SHIFT);
+        log.debug(FORMAT,activityLineInterval2,activityLineInterval2.getShift(), shiftImp2);
         activityLineInterval2.setShift(shiftImp2);
 
-        scoreDirector.afterVariableChanged(activityLineInterval2, "shift");
+        scoreDirector.afterVariableChanged(activityLineInterval2, SHIFT);
 
 
         /*if(Objects.equals(activityLineInterval.getShift(),shiftImp)){
@@ -94,10 +96,10 @@ public class ActivityLineIntervalChangeMoveHelper {
         if(Objects.equals(activityLineInterval.getShift(), shiftImp)){
             log.info("HOW");
         }
-        scoreDirector.beforeVariableChanged(activityLineInterval, "shift");
-        log.debug("{} {{}} -> {{}}",activityLineInterval,activityLineInterval.getShift(), shiftImp);
+        scoreDirector.beforeVariableChanged(activityLineInterval, SHIFT);
+        log.debug(FORMAT,activityLineInterval,activityLineInterval.getShift(), shiftImp);
         activityLineInterval.setShift(shiftImp);
-        scoreDirector.afterVariableChanged(activityLineInterval, "shift");
+        scoreDirector.afterVariableChanged(activityLineInterval, SHIFT);
         log.debug("**********************END********************");
     }
     public static void assignActivityIntervalToShift(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, ActivityLineInterval activityLineInterval,
@@ -109,10 +111,10 @@ public class ActivityLineIntervalChangeMoveHelper {
         if(Objects.equals(activityLineInterval.getShift(), shiftImp)){
             return;
         }
-        scoreDirector.beforeVariableChanged(activityLineInterval, "shift");
-        log.debug("{} {{}} -> {{}}", activityLineInterval,activityLineInterval.getShift(), shiftImp);
+        scoreDirector.beforeVariableChanged(activityLineInterval, SHIFT);
+        log.debug(FORMAT, activityLineInterval,activityLineInterval.getShift(), shiftImp);
         activityLineInterval.setShift(shiftImp);
-        scoreDirector.afterVariableChanged(activityLineInterval, "shift");
+        scoreDirector.afterVariableChanged(activityLineInterval, SHIFT);
         //log.info("*P*********************END********************");
     }
     public static void checkSanity(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector){

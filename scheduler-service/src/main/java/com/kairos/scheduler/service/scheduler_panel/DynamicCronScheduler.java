@@ -34,6 +34,7 @@ import java.util.concurrent.ScheduledFuture;
 public class DynamicCronScheduler{
 
 
+    public static final String SCHEDULER = "scheduler";
     @Inject
     private SchedulerPanelService schedulerPanelService;
 
@@ -50,7 +51,7 @@ public class DynamicCronScheduler{
     private static final Logger logger = LoggerFactory.getLogger(DynamicCronScheduler.class);
 
     public String setCronScheduling(SchedulerPanel schedulerPanel, String timezone) {
-        logger.debug("cron----> " + schedulerPanel.getCronExpression());
+        logger.debug("cron----> {}" , schedulerPanel.getCronExpression());
         CronTrigger trigger = null;
         if (!schedulerPanel.isOneTimeTrigger()) {
             trigger = new CronTrigger(schedulerPanel.getCronExpression(), TimeZone.getTimeZone(timezone));
@@ -68,10 +69,10 @@ public class DynamicCronScheduler{
         }
 
         logger.info("Name of cron job is --> {} scheduler {}",schedulerPanel.getId(),TimeZone.getDefault());
-        BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
-        logger.info("Name of cron job is --> " + "scheduler" + schedulerPanel.getId());
+        BeanFactoryUtil.registerSingleton(SCHEDULER + schedulerPanel.getId(), future);
+        logger.info("Name of cron job is --> " + SCHEDULER + schedulerPanel.getId());
 
-        return "scheduler" + schedulerPanel.getId();
+        return SCHEDULER + schedulerPanel.getId();
 
 
     }
@@ -109,7 +110,7 @@ public class DynamicCronScheduler{
 
     public void startCronJob(SchedulerPanel schedulerPanel, String timezone) {
 
-        String scheduler = "scheduler" + schedulerPanel.getId();
+        String scheduler = SCHEDULER + schedulerPanel.getId();
         logger.info("Start scheduler from BootStrap--> " + scheduler);
         CronTrigger trigger = null;
         if (!schedulerPanel.isOneTimeTrigger()) {
@@ -126,7 +127,7 @@ public class DynamicCronScheduler{
             future = threadPoolTaskScheduler.schedule(task, DateUtils.asDate(schedulerPanel.getOneTimeTriggerDate().atZone(ZoneId.of(timezone))));
         }
 
-        BeanFactoryUtil.registerSingleton("scheduler" + schedulerPanel.getId(), future);
+        BeanFactoryUtil.registerSingleton(SCHEDULER + schedulerPanel.getId(), future);
 
     }
 

@@ -4,6 +4,7 @@ package com.kairos.controller.time_bank;
 import com.kairos.constants.ApiConstants;
 import com.kairos.controller.task.TaskController;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Map;
@@ -27,6 +29,8 @@ public class TimeBankController {
 
     @Autowired
     private TimeBankService timeBankService;
+    @Inject
+    private TimeBankCalculationService timeBankCalculationService;
 
     @GetMapping(value = "/employment/{employmentId}/")
     public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@PathVariable Long employmentId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
@@ -94,7 +98,12 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getCTARultemplateByEmploymentId(employmentId));
     }
 
-
+    //remove after test qa
+    @ApiOperation("update time bank of protected days off")
+    @GetMapping("/test_timebank")
+    public ResponseEntity<Map<String,Object>> testApiForProtecrtedDaysOFf(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankCalculationService.updateTimeBankAgainstProtectedDaysOffSetting());
+    }
 
 
 }

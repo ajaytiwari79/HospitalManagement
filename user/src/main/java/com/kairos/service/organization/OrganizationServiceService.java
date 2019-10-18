@@ -11,6 +11,7 @@ import com.kairos.persistence.model.organization.services.OrganizationServiceQue
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.GdprIntegrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -29,6 +31,9 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Service
 public class OrganizationServiceService {
 
+    public static final String RESULT = "result";
+    public static final String AVAILABLE_SERVICES = "availableServices";
+    public static final String SELECTED_SERVICES = "selectedServices";
     @Inject
     private OrganizationTypeGraphRepository organizationTypeGraphRepository;
     @Inject
@@ -49,6 +54,8 @@ public class OrganizationServiceService {
 
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private GdprIntegrationService gdprIntegrationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
@@ -80,7 +87,7 @@ public class OrganizationServiceService {
         List<Map<String, Object>> map = organizationServiceRepository.getOrganizationServicesByCountryId(countryId);
         List<Object> objectList = new ArrayList<>();
         for (Map<String, Object> result : map) {
-            objectList.add(result.get("result"));
+            objectList.add(result.get(RESULT));
         }
         return objectList;
     }
@@ -184,6 +191,9 @@ public class OrganizationServiceService {
                 unitGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
             }
             addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
+            //call to create asset for org.
+            List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(unitSubType -> unitSubType.getId()).collect(Collectors.toList());
+            gdprIntegrationService.createDefaultAssetForUnit(unit.getId(), orgSubTypeIds,organizationServiceId);
         } else {
             unitGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
         }
@@ -196,7 +206,7 @@ public class OrganizationServiceService {
         if (organizationServices != null) {
             List<Object> objectList = new ArrayList<>();
             for (Map<String, Object> map : organizationServices) {
-                Object o = map.get("result");
+                Object o = map.get(RESULT);
                 objectList.add(o);
             }
             return objectList;
@@ -213,7 +223,7 @@ public class OrganizationServiceService {
                 organizationTypeGraphRepository.deleteService(orgTypeId, serviceId);
                 List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
                 for (Map<String, Object> map : mapList) {
-                    Object o = map.get("result");
+                    Object o = map.get(RESULT);
                     objectList.add(o);
 
                 }
@@ -223,7 +233,7 @@ public class OrganizationServiceService {
                 organizationTypeGraphRepository.selectService(orgTypeId, serviceId);
                 List<Map<String, Object>> mapList = organizationServiceRepository.getOrgServicesByOrgType(orgTypeId);
                 for (Map<String, Object> map : mapList) {
-                    Object o = map.get("result");
+                    Object o = map.get(RESULT);
                     objectList.add(o);
                 }
                 return objectList;
@@ -266,11 +276,11 @@ public class OrganizationServiceService {
     private Map<String, Object> filterSkillData(List<Map<String, Object>> skillData) {
         Map<String, Object> response = new HashMap<>();
         for (Map<String, Object> map : skillData) {
-            if (((Map<String, Object>) map.get("data")).get("availableServices") != null) {
-                response.put("availableServices", ((Map<String, Object>) map.get("data")).get("availableServices"));
+            if (((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES) != null) {
+                response.put(AVAILABLE_SERVICES, ((Map<String, Object>) map.get("data")).get(AVAILABLE_SERVICES));
             }
-            if (((Map<String, Object>) map.get("data")).get("selectedServices") != null) {
-                response.put("selectedServices", ((Map<String, Object>) map.get("data")).get("selectedServices"));
+            if (((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES) != null) {
+                response.put(SELECTED_SERVICES, ((Map<String, Object>) map.get("data")).get(SELECTED_SERVICES));
             }
         }
 
@@ -288,7 +298,7 @@ public class OrganizationServiceService {
         if (organizationServices != null) {
             List<Object> objectList = new ArrayList<>();
             for (Map<String, Object> map : organizationServices) {
-                Object o = map.get("result");
+                Object o = map.get(RESULT);
                 objectList.add(o);
             }
             return objectList;

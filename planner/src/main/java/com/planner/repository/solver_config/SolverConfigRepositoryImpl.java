@@ -5,8 +5,6 @@ import com.kairos.dto.planner.solverconfig.country.CountrySolverConfigDTO;
 import com.kairos.dto.planner.solverconfig.unit.UnitSolverConfigDTO;
 import com.planner.domain.solverconfig.common.SolverConfig;
 import com.planner.domain.solverconfig.unit.UnitSolverConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -27,7 +25,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
  */
 @Repository
 public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository {
-    private static final Logger logger = LoggerFactory.getLogger(SolverConfigRepositoryImpl.class);
+    public static final String SOLVER_CONFIG = "solverConfig";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -36,7 +34,7 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
         public SolverConfigDTO getSolverConfigWithConstraints(BigInteger solverConfigId){
             Aggregation aggregation = Aggregation.newAggregation(
                     match(Criteria.where("_id").is(solverConfigId)),
-                    lookup("solverConfig", "constraintIds", "_id", "constraints"));
+                    lookup(SOLVER_CONFIG, "constraintIds", "_id", "constraints"));
             AggregationResults<SolverConfigDTO> result = mongoTemplate.aggregate(aggregation, SolverConfig.class, SolverConfigDTO.class);
             return result.getMappedResults().isEmpty() ? null : result.getMappedResults().get(0);
         }
@@ -54,12 +52,12 @@ public class SolverConfigRepositoryImpl implements CustomSolverConfigRepository 
 
     public SolverConfig getSolverConfigById(BigInteger solverConfigId,boolean checkForCountry){
         Class className = checkForCountry ? CountrySolverConfigDTO.class : UnitSolverConfigDTO.class;
-        return (SolverConfig) mongoTemplate.findOne(new Query(Criteria.where("_id").is(solverConfigId)), className,"solverConfig");
+        return (SolverConfig) mongoTemplate.findOne(new Query(Criteria.where("_id").is(solverConfigId)), className, SOLVER_CONFIG);
     }
 
 
     public List<UnitSolverConfig> getAllSolverConfigByParentId(BigInteger solverConfigId){
-        return mongoTemplate.find(new Query(Criteria.where("parentCountrySolverConfigId").is(solverConfigId).and("deleted").is(false)), UnitSolverConfig.class,"solverConfig");
+        return mongoTemplate.find(new Query(Criteria.where("parentCountrySolverConfigId").is(solverConfigId).and("deleted").is(false)), UnitSolverConfig.class, SOLVER_CONFIG);
     }
 
 

@@ -70,7 +70,7 @@ public class ShiftFilterService {
             shiftStateIds=shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toList());
         }
         ShiftFilter TimeAndAttendanceFilter=new TimeAndAttendanceFilter(filterTypeMap,shiftStateIds);
-        List<LocalDate> functionDates = new ArrayList<>();
+        Set<LocalDate> functionDates = new HashSet<>();
         if(filterTypeMap.containsKey(FilterType.FUNCTIONS)) {
             List<Long> functionIds = filterTypeMap.get(FUNCTIONS).stream().map(s -> new Long(s)).collect(Collectors.toList());
             functionDates = userIntegrationService.getAllDateByFunctionIds(shiftWithActivityDTOS.get(0).getUnitId(), functionIds);

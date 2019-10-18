@@ -10,6 +10,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
@@ -38,6 +39,8 @@ import static com.kairos.service.activity.ActivityUtil.getCutoffInterval;
 
 @Service
 public class TimeTypeService extends MongoBaseService {
+    public static final String PRESENCE = "Presence";
+    public static final String ABSENCE = "Absence";
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
@@ -67,9 +70,7 @@ public class TimeTypeService extends MongoBaseService {
             if (timeTypeDTO.getTimeTypes() != null && timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                 timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(), timeTypeDTO.getBackgroundColor(), upperTimeType.getSecondLevelType(), countryId, timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy());
                 timeType.setCountryId(countryId);
-                //if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                 timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
-                //}
                 timeType = save(timeType);
                 if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                     upperTimeType.getChildTimeTypeIds().add(timeType.getId());
@@ -243,14 +244,14 @@ public class TimeTypeService extends MongoBaseService {
         Map<BigInteger, List<TimeType>> timeTypeMap = timeTypes.stream().filter(t -> t.getUpperLevelTimeTypeId() != null).collect(Collectors.groupingBy(TimeType::getUpperLevelTimeTypeId, Collectors.toList()));
         Map<String, List<TimeType>> presenceAbsenceTimeTypeMap = new HashMap<>();
         timeTypes.forEach(t -> {
-            if (t.getLabel().equals("Presence")) {
+            if (t.getLabel().equals(PRESENCE)) {
                 List<TimeType> presenceTimeTypes = getChildOfTimeType(t, timeTypeMap);
                 presenceTimeTypes.add(t);
-                presenceAbsenceTimeTypeMap.put("Presence", presenceTimeTypes);
-            } else if (t.getLabel().equals("Absence")) {
+                presenceAbsenceTimeTypeMap.put(PRESENCE, presenceTimeTypes);
+            } else if (t.getLabel().equals(ABSENCE)) {
                 List<TimeType> absenceTimeTypes = getChildOfTimeType(t, timeTypeMap);
                 absenceTimeTypes.add(t);
-                presenceAbsenceTimeTypeMap.put("Absence", absenceTimeTypes);
+                presenceAbsenceTimeTypeMap.put(ABSENCE, absenceTimeTypes);
             }
         });
         return presenceAbsenceTimeTypeMap;
@@ -326,8 +327,8 @@ public class TimeTypeService extends MongoBaseService {
     public Boolean createDefaultTimeTypes(Long countryId) {
         List<TimeType> allTimeTypes = new ArrayList<>();
         List<TimeType> workingTimeTypes = new ArrayList<>();
-        TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Presence", "", AppConstants.WORKING_TYPE_COLOR, PRESENCE, countryId, Collections.EMPTY_SET);
-        TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Absence", "", AppConstants.WORKING_TYPE_COLOR, ABSENCE, countryId, Collections.EMPTY_SET);
+        TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, PRESENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.PRESENCE, countryId, Collections.EMPTY_SET);
+        TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, ABSENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.ABSENCE, countryId, Collections.EMPTY_SET);
         TimeType breakTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR, PAID_BREAK, countryId, Collections.EMPTY_SET);
         workingTimeTypes.add(presenceTimeType);
         workingTimeTypes.add(absenceTimeType);
@@ -430,7 +431,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,BigInteger timeTypeId) {
-        activityService.validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(), rulesActivityDTO.getLatestStartTime(), rulesActivityDTO.getMaximumEndTime(), rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
+        activityService.validateActivityTimeRules(rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
@@ -534,5 +535,6 @@ public class TimeTypeService extends MongoBaseService {
         return organizationMappingDTO;
 
     }
+
 
 }

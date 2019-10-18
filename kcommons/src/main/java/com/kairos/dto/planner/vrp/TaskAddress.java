@@ -19,6 +19,13 @@ public class TaskAddress {
     private String block;
     private int floorNo;
 
+    public TaskAddress(String country, Integer zip, String city, String street, String houseNumber){
+        this.country = country;
+        this.city = city;
+        this.zip = zip;
+        this.street = street;
+        this.houseNumber = houseNumber;
+    }
 
     public TaskAddress(Integer zip, String city, String street, String houseNumber, String longitude, String latitude, String block, int floorNo) {
         this.zip = zip;

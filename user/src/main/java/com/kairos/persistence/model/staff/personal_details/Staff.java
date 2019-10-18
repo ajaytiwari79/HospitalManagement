@@ -34,7 +34,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Staff extends UserBaseEntity implements Cloneable {
+public class Staff extends UserBaseEntity {
     @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
@@ -142,9 +142,4 @@ public class Staff extends UserBaseEntity implements Cloneable {
         staffFavouriteFilterList.add(staffFavouriteFilter);
         this.staffFavouriteFilterList = staffFavouriteFilterList;
     }
-
-    public Staff clone()throws CloneNotSupportedException{
-        return (Staff)super.clone();
-    }
-
 }
