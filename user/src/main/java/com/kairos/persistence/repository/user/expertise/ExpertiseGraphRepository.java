@@ -2,10 +2,8 @@ package com.kairos.persistence.repository.user.expertise;
 
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseTagDTO;
+import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
+import com.kairos.persistence.model.user.expertise.Response.*;
 import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
@@ -38,6 +36,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "WITH expertise,tag\n" +
             "RETURN id(expertise) as id, expertise.name as name, expertise.description as description,CASE when tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag})  END as tags")
     List<ExpertiseTagDTO> getAllExpertiseWithTagsByCountry(long countryId);
+
+
 
     @Override
     @Query("MATCH (expertise:Expertise{deleted:false,published:true}) RETURN expertise")
@@ -246,4 +246,9 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+SUPPORTS_SERVICES+"]->(os)<-[:"+PROVIDE_SERVICE+"{isEnabled:true}]-(unit:Unit) WHERE expertise.endDateMillis IS NULL OR expertise.endDateMillis >= TIMESTAMP()\n" +
             "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnitIds")
     List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
+
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(protectedSetting:ProtectedDaysOffSetting)\n" +
+            "RETURN protectedSetting")
+    List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(Long ExpertiseId);
+
 }

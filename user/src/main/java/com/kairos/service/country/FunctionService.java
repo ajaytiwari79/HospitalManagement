@@ -216,4 +216,9 @@ public class FunctionService {
         }
         return dateWiseFunctionMap;
     }
+
+    public List<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
+        List<LocalDate> allDateByFunctionIds= functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds);
+        return allDateByFunctionIds;
+    }
 }

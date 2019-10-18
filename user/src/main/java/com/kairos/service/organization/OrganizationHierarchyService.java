@@ -4,7 +4,10 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.filter.FilterAndFavouriteFilterDTO;
 import com.kairos.dto.gdpr.filter.FilterAttributes;
 import com.kairos.dto.gdpr.filter.FilterResponseDTO;
+import com.kairos.dto.user.organization.CompanyType;
+import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
+import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.common.QueryResult;
@@ -26,6 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.*;
+import static com.kairos.dto.user.organization.CompanyType.*;
 import static java.util.stream.Collectors.toList;
 
 
@@ -189,6 +193,7 @@ public class OrganizationHierarchyService {
 
     private void setPermission(QueryResult queryResult, Map<Long, Boolean> unitPermissionMap, boolean countryAdmin, int hubCount,Long hubId,boolean isUnit) {
         queryResult.setAccessable(true);
+        //queryResult.setType(getCompanyType(hubCount,isUnit,queryResult));
         queryResult.setKairosHub((++hubCount == 1));
         queryResult.setUnion(queryResult.isUnion());
         queryResult.setHubId(hubId);
@@ -210,6 +215,19 @@ public class OrganizationHierarchyService {
         }
 
 
+    }
+
+    private CompanyType getCompanyType(int hubCount,boolean isUnit,QueryResult queryResult){
+        if(++hubCount==1){
+            return HUB;
+        }
+        else if(queryResult.isUnion()){
+            return UNION;
+        }
+        else if(isUnit){
+            return UNIT;
+        }
+        return COMPANY;
     }
 
 }

@@ -1,3 +1,4 @@
+/*
 package com.kairos.utils;
 
 import org.slf4j.Logger;
@@ -9,9 +10,11 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
+*/
 /**
  * Created by oodles on 27/4/17.
- */
+ *//*
+
 public class IPAddressUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IPAddressUtil.class);
@@ -53,3 +56,4 @@ public class IPAddressUtil {
         return ipAddress;
     }
 }
+*/

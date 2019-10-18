@@ -394,10 +394,6 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     List<Long> findAllOrganizationIds();
 
 
-    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(o:Unit) WHERE id(o)={0}  RETURN id(country) ")
-    Long getCountryId(Long organizationId);
-
-
     @Query("MATCH (organization:Organization) - [:" + BELONGS_TO + "] -> (country:Country)-[:" + HAS_EMPLOYMENT_TYPE + "]-> (et:EmploymentType)\n" +
             "WHERE id(organization)={0} AND et.deleted={1}\n" +
             "RETURN id(et) as id, et.name as name, et.description as description, \n" +
@@ -425,10 +421,6 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             " RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")
     OrganizationServiceQueryResult addCustomNameOfServiceForOrganization(Long serviceId, Long organizationId, String customName);
 
-    @Query("MATCH (organization:Unit) - [r:BELONGS_TO] -> (country:Country)\n" +
-            "WHERE id(organization)={0}\n" +
-            "RETURN country")
-    Country getCountry(Long organizationId);
 
     @Query("MATCH (org:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY',union:true})-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(subType) IN {0} " +
             "RETURN  id(org) as id,org.name as name")
@@ -573,6 +565,15 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit:Unit) where id(staff)={0} RETURN id(unit) as id,unit.name as name")
     List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
+
+    @Query("MATCH (org:Organization{isEnable:true,union:false})-[:" + HAS_SUB_ORGANIZATION + "*]->(sub:Organization)  WHERE id(org)={0}  \n" +
+            "OPTIONAL MATCH (sub)-[:" + TYPE_OF + "]->(ot:OrganizationType) WITH sub,ot\n" +
+            "OPTIONAL MATCH (sub)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WITH COLLECT(id(subType)) as organizationSubTypeIds,sub,ot\n" +
+            "OPTIONAL MATCH (sub)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH organizationSubTypeIds,sub,ot,zipCode\n" +
+            "OPTIONAL MATCH (sub)-[:" + HAS_ACCOUNT_TYPE + "]-(accountType:AccountType)\n" +
+            "RETURN id(sub) as id,sub.name as name,sub.description as description,sub.boardingCompleted as boardingCompleted,id(ot) as typeId,organizationSubTypeIds as subTypeId," +
+            "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY sub.name")
+    List<OrganizationBasicResponse> getAllOrganizationOfOrganization(Long orgId);
 
 }
 

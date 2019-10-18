@@ -1,8 +1,9 @@
 package com.kairos.rest_client;
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.RestClientUrlUtil;
-import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingActivityDTO;
+import com.kairos.dto.activity.activity.activity_tabs.OrganizationMappingDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.StaffIdsDTO;
 import com.kairos.dto.activity.counter.distribution.org_type.OrgTypeDTO;
@@ -115,6 +116,14 @@ public class UserIntegrationService {
         }, expertiseId);
 
     }
+
+    public List<StaffEmploymentDetails> getStaffsMainEmployment() {
+
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, STAFF_AND_MAIN_EMPLOYMENTS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffEmploymentDetails>>>() {
+        });
+
+    }
+
 
     public UserAccessRoleDTO getAccessRolesOfStaff(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ACCESS_ROLES, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<UserAccessRoleDTO>>() {
@@ -376,6 +385,12 @@ public class UserIntegrationService {
         }, staffId);
     }
 
+    public StaffEmploymentDetails mainUnitEmploymentOfStaff(Long staffId, Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, MAIN_UNIT_EMPLOYEMNT_BY_STAFF_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentDetails>>() {
+        }, staffId);
+    }
+
+
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaff(LocalDate shiftDate, Long staffId, Long unitEmploymentId, Set<Long> reasonCodeIds) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("shiftDate", shiftDate != null ? shiftDate.toString() : DateUtils.getCurrentLocalDate().toString()));
@@ -629,8 +644,8 @@ public class UserIntegrationService {
         });
     }
 
-    public boolean verifyOrganizationExpertizeAndRegions(OrganizationMappingActivityDTO organizationMappingActivityDTO) {
-        return genericRestClient.publishRequest(organizationMappingActivityDTO, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, VERIFY_ORGANIZATION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
+    public boolean verifyOrganizationExpertizeAndRegions(OrganizationMappingDTO organizationMappingDTO) {
+        return genericRestClient.publishRequest(organizationMappingDTO, null, RestClientUrlType.ORGANIZATION, HttpMethod.POST, VERIFY_ORGANIZATION_EXPERTISE, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {
         });
     }
 
@@ -811,6 +826,23 @@ public class UserIntegrationService {
 
     public List<EmploymentTypeDTO> getEmploymentTypeByCountry(Long countryId) {
         return genericRestClient.publishRequest(null, countryId, RestClientUrlType.COUNTRY, HttpMethod.GET, "/employment_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EmploymentTypeDTO>>>() {});
+    }
+
+
+    public List<EmploymentTypeDTO> getEmploymentTypeByUnitId(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/employment_type", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EmploymentTypeDTO>>>() {
+        });
+    }
+
+    public List<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
+
+        List<Object> data= genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Object>>>() {});
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(data,LocalDate.class);
+    }
+
+    public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/sick_settings/default", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {});
+
     }
 }
 

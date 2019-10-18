@@ -306,8 +306,8 @@ public class OrganizationController {
 
     @GetMapping("/parent/{countryId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getParentOrganization(@PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOrganization(countryId));
+    public ResponseEntity<Map<String, Object>> getParentOrganization(@PathVariable long countryId,@RequestParam("viaCountry") boolean viaCountry) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationService.getParentOrganization(countryId,viaCountry));
     }
 
     @GetMapping("/parent/{orgId}/country/{countryId}/gdpr_workcenter")

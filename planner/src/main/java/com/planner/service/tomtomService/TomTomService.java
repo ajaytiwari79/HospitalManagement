@@ -168,17 +168,15 @@ public class TomTomService {
             ObjectMapper mapper = new ObjectMapper();
             TomTomResponse tomTomResponse = null;
             if(response.getHeaders("Location")!=null && tomTomResponse==null && response.getStatusLine().getStatusCode()==202){
-                try {
-                    Thread.sleep(180000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                Thread.sleep(180000);
                 Header header[] = response.getHeaders("Location");
                 tomTomResponse = getfromTomtom(header[0].getValue());
             }else {
                 tomTomResponse = mapper.readValue(response.getEntity().getContent(), TomTomResponse.class);
             }
             return tomTomResponse;
+        }catch (InterruptedException e) {
+            e.printStackTrace();
         } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }finally {
@@ -209,11 +207,6 @@ public class TomTomService {
             return route;
         } catch (URISyntaxException | IOException e) {
             log.error(fromLat+","+fromLong+":"+toLat+","+toLong+":::::");
-            try {
-                Thread.currentThread().sleep(10000l);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
             e.printStackTrace();
         }finally {
             ((CloseableHttpClient) httpclient).close();

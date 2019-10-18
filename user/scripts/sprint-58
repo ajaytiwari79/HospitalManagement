@@ -1,0 +1,9 @@
+//Add Filter Group
+MATCH (n:FilterGroup) where id(n)=18649 set n.filterTypes=["PLANNED_TIME_TYPE","EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS", "EXPERTISE", "TIME_TYPE", "ACTIVITY_TIMECALCULATION_TYPE", "ACTIVITY_STATUS", "REAL_TIME_STATUS", "TIME_SLOT","TEAM","ABSENCE_ACTIVITY","VALIDATED_BY","SKILLS","FUNCTIONS"] return n;
+
+// Used to create Organization tab
+Match(ap:AccessPage) where ap.moduleId="tab_14" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Organizations",isModule:false,moduleId:"tab_430",active:true});
+
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+       Match (ap:AccessPage)
+       CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);

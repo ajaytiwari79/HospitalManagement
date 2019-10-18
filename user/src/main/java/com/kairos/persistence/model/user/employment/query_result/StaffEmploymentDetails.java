@@ -7,6 +7,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -42,6 +43,15 @@ public class StaffEmploymentDetails {
     private Staff staff;
     private List<EmploymentLinesQueryResult> employmentLines;
     private List<FunctionDTO> appliedFunctions;
+    private EmploymentSubType employmentSubType;
+
+    public EmploymentSubType getEmploymentSubType() {
+        return employmentSubType;
+    }
+
+    public void setEmploymentSubType(EmploymentSubType employmentSubType) {
+        this.employmentSubType = employmentSubType;
+    }
 
     public StaffEmploymentDetails() {
         //Default Constructor

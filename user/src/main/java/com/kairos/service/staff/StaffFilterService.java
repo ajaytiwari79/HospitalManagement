@@ -11,19 +11,16 @@ import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.enums.Employment;
-import com.kairos.enums.FilterType;
-import com.kairos.enums.Gender;
-import com.kairos.enums.StaffStatusEnum;
+import com.kairos.enums.*;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.filter.*;
+import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -40,6 +37,7 @@ import com.kairos.service.country.FunctionService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.skill.SkillService;
 import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.map.HashedMap;
@@ -106,6 +104,8 @@ public class StaffFilterService {
     private TeamGraphRepository teamGraphRepository;
     @Inject
     private FunctionService functionService;
+    @Inject
+    private SkillService skillService;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
 
@@ -168,14 +168,18 @@ public class StaffFilterService {
                 return getAllTimeType(countryId);
             case ACTIVITY_STATUS:
                 return getStatusFilter();
+            case REAL_TIME_STATUS:
+                return dtoToQueryesultConverter(RealTimeStatus.getListOfRealtimeStatusForFilters(), objectMapper);
             case TIME_SLOT:
                 return getTimeSlots();
             case ABSENCE_ACTIVITY:
                 return getAnsenceActivity(unitId);
             case  PLANNED_TIME_TYPE:
-             return getPlannedTimeType(countryId);
+                return getPlannedTimeType(countryId);
             case FUNCTIONS:
                 return getAllFunctions(countryId);
+            case SKILLS:
+                return getAllSkills(unitId);
             case VALIDATED_BY:
                 return getTAStatus();
             case TEAM:
@@ -195,6 +199,17 @@ public class StaffFilterService {
     private  List<FilterSelectionQueryResult> getAllFunctions(Long countryId){
         List<FunctionDTO> functionDTOS=functionService.getFunctionsByCountry(countryId);
         return functionDTOS.stream().map(functionDTO  -> new FilterSelectionQueryResult(functionDTO.getId().toString(),functionDTO.getName())).collect(Collectors.toList());
+    }
+
+    private  List<FilterSelectionQueryResult> getAllSkills(Long unitId){
+        List<Map<String, Object>> skillsMaps = skillService.getSkillsOfOrganization(unitId);
+        List<FilterSelectionQueryResult> filterSkillData = new ArrayList<>();
+        for (Map<String, Object> map : skillsMaps) {
+            for (Map<String, Object> skill : ((List<Map<String, Object>>)((Map<String, Object>) map.get("data")).get("skills"))) {
+                filterSkillData.add(new FilterSelectionQueryResult(skill.get("id").toString(), skill.get("name").toString()));
+            }
+        }
+        return filterSkillData;
     }
 
     private List<FilterSelectionQueryResult> getPlannedTimeType(Long countryId){
@@ -224,7 +239,20 @@ public class StaffFilterService {
 
     private List<FilterSelectionQueryResult> getAllTimeType(Long countryId){
         List<TimeTypeDTO> timeTypeDTOS = activityIntegrationService.getAllTimeType(countryId);
-        return timeTypeDTOS.stream().flatMap(timeTypeDTO -> timeTypeDTO.getChildren().stream()).map(timeTypeDTO -> new FilterSelectionQueryResult(timeTypeDTO.getSecondLevelType().toString(),timeTypeDTO.getLabel())).collect(Collectors.toList());
+        List<FilterSelectionQueryResult> filterSelectionQueryResults = new ArrayList<>();
+        convertTimeTypeDTOSToFilterSelectionQueryResult(timeTypeDTOS.get(0).getChildren(), filterSelectionQueryResults);
+        convertTimeTypeDTOSToFilterSelectionQueryResult(timeTypeDTOS.get(1).getChildren(), filterSelectionQueryResults);
+        return filterSelectionQueryResults;
+        //return timeTypeDTOS.stream().flatMap(timeTypeDTO -> timeTypeDTO.getChildren().stream()).map(timeTypeDTO -> new FilterSelectionQueryResult(timeTypeDTO.getSecondLevelType().toString(),timeTypeDTO.getLabel())).collect(Collectors.toList());
+    }
+
+    private void convertTimeTypeDTOSToFilterSelectionQueryResult(List<TimeTypeDTO> timeTypeDTOS, List<FilterSelectionQueryResult> filterSelectionQueryResults){
+        for(TimeTypeDTO timeTypeDTO : timeTypeDTOS) {
+            filterSelectionQueryResults.add(new FilterSelectionQueryResult(timeTypeDTO.getId().toString(),timeTypeDTO.getLabel()));
+            if(isCollectionNotEmpty(timeTypeDTO.getChildren())){
+                convertTimeTypeDTOSToFilterSelectionQueryResult(timeTypeDTO.getChildren(),filterSelectionQueryResults);
+            }
+        }
     }
 
     private FilterQueryResult getFilterDataByFilterType(FilterType filterType, Long countryId, Long unitId) {

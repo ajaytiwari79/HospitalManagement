@@ -178,4 +178,5 @@ public class ActivityConfigurationController {
     public ResponseEntity<Map<String, Object>> copyNonWorkingActivityConfigurationFromAbsence() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityConfigurationService.copyNonWorkingActivityConfigurationFromAbsence());
     }
+
 }

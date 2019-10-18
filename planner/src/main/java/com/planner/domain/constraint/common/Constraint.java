@@ -103,7 +103,7 @@ public class Constraint extends MongoBaseEntity{
     }
 
     public boolean isEqualsWithSpecificField(ConstraintDTO constraintDTO) {
-        return constraintType.equals(constraintDTO.getConstraintType()) && constraintSubType.equals(constraintDTO.getConstraintSubType()) && constraintLevel.equals(constraintDTO.getConstraintLevel()) && penalty==penalty;
+        return constraintType.equals(constraintDTO.getConstraintType()) && constraintSubType.equals(constraintDTO.getConstraintSubType()) && constraintLevel.equals(constraintDTO.getConstraintLevel()) && penalty == constraintDTO.getPenalty();
     }
 
 

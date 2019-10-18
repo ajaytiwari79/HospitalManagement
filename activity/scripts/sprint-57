@@ -4,7 +4,7 @@
 db.getCollection('kairos_sequence').find({ "sequenceName" : "KPISequence"})
 
 db.getCollection('counter').insert({
-    "_id" : "37",
+    "_id" : "33",
     "type" : "PLANNED_TIME_PERCENTAGE",
     "title" : "Planned Time Percentage",
     "createdAt" : ISODate("2018-09-03T09:37:10.374Z"),
@@ -22,19 +22,19 @@ db.getCollection('counter').insert({
 "PLANNED_TIME_TYPE"
     ],
     "multiDimensional" : true
-})
+});
 
 
-db.getCollection('kairos_sequence').update({ "sequenceName" : "KPISequence"},{"$set":{"sequenceNumber" : 32}})
+db.getCollection('kairos_sequence').update({ "sequenceName" : "KPISequence"},{"$set":{"sequenceNumber" : 33}})
 
 
 //
 db.getCollection('kairos_sequence').find({ "sequenceName" : "ApplicableKPISequence"})
 
 db.getCollection('applicableKPI').insert({
-    "_id" : "1466",
-    "activeKpiId" : "37",
-    "baseKpiId" : "37",
+    "_id" : "1775",
+    "activeKpiId" : "33",
+    "baseKpiId" : "33",
     "countryId" : NumberLong(18712),
     "level" : "COUNTRY",
     "createdAt" : ISODate("2018-09-03T09:37:10.397Z"),
@@ -49,7 +49,7 @@ db.getCollection('applicableKPI').insert({
 });
 
 
-db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 1468}})
+db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 1775}})
 
 
 //find
@@ -57,13 +57,13 @@ db.getCollection('kPICategory').find({"countryId":18712,"name":"Uncategorized"})
 
 db.getCollection('kairos_sequence').find({ "sequenceName" : "CategoryKPIConfSequence"})
 
-db.getCollection('kairos_sequence').update({ "sequenceName" : "CategoryKPIConfSequence"},{"$set":{"sequenceNumber" : 613}})
+db.getCollection('kairos_sequence').update({ "sequenceName" : "CategoryKPIConfSequence"},{"$set":{"sequenceNumber" : 899}})
 
 
 db.getCollection('categoryKPIConf').insert({
-    "_id" : "613",
-    "kpiId" : "37",
-    "categoryId" : "71",
+    "_id" : "899",
+    "kpiId" : "33",
+    "categoryId" : "115",
     "countryId" : NumberLong(18712),
     "level" : "COUNTRY",
     "createdAt" : ISODate("2019-08-06T12:48:45.413Z"),

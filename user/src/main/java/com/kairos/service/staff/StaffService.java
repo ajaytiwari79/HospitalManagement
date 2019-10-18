@@ -16,6 +16,7 @@ import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -39,6 +40,7 @@ import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
@@ -885,8 +887,28 @@ public class StaffService {
         return staffPersonalDetailList;
     }
 
+    public StaffEmploymentDetails getMainEmploymentOfStaff(long staffId, long unitId) {
+        StaffEmploymentDetails employmentDetails = null;
+        List<EmploymentQueryResult> employmentQueryResults =  employmentGraphRepository.getAllEmploymentsForCurrentOrganization(staffId, unitId);
+        if(isCollectionNotEmpty(employmentQueryResults)) {
+            EmploymentQueryResult employment = employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().orElse(null);
+            if (isNotNull(employment)) {
+                List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
+                employment.getExpertise().setProtectedDaysOffSettings(protectedDaysOffSettings);
+                employmentDetails = new StaffEmploymentDetails(employment.getId(), ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class), employment.getEndDate(), employment.getStartDate(), employment.getUnitId(), employment.getEmploymentSubType());
+            }
+        }
+        return employmentDetails;
+    }
+
+
     public StaffEmploymentDetails getEmploymentOfStaff(long staffId, long unitId) {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentOfStaff(staffId, unitId);
+        StaffEmploymentDetails employmentDetails = getStaffEmploymentDetails(unitId, employment);
+        return employmentDetails;
+    }
+
+    private StaffEmploymentDetails getStaffEmploymentDetails(long unitId, EmploymentQueryResult employment) {
         StaffEmploymentDetails employmentDetails = null;
         if (Optional.ofNullable(employment).isPresent()) {
             employmentDetails = convertEmploymentObject(employment);
@@ -940,9 +962,7 @@ public class StaffService {
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
-            if (isNull(staff.getAccess_token())) {
                 addStaffInChatServer(staff);
-            }
         });
         staffGraphRepository.saveAll(staffList);
         return true;

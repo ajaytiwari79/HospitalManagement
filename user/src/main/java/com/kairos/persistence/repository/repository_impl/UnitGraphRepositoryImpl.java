@@ -116,6 +116,10 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
             queryParameters.put("expertiseIds",
                     convertListOfStringIntoLong(filters.get(FilterType.EXPERTISE)));
         }
+        if (Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()) {
+            queryParameters.put("skillIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.SKILLS)));
+        }
         if (Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
             queryParameters.put("teamIds",
                     convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
@@ -129,8 +133,11 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
         if (ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
+            if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()) {
+                query += " MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
+            }
             if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
-                query += "Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} " +
+                query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} " +
                         " WITH user, staff, employment,organization ";
             }
         } else if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT)).isPresent() && filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITH_EMPLOYMENT.name()) && !filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
