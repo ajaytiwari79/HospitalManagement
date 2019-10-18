@@ -3,7 +3,6 @@ package com.kairos.service.night_worker;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;

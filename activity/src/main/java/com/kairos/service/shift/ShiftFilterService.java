@@ -38,7 +38,7 @@ public class ShiftFilterService {
     private TimeTypeService timeTypeService;
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
-        Long unitId = UserContext.getUnitId();
+        Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
         if (isNull(staffFilterDTO)) {
             staffFilterDTO = new StaffFilterDTO();
             staffFilterDTO.setFiltersData(new ArrayList<>());
@@ -47,7 +47,7 @@ public class ShiftFilterService {
         Map<FilterType, Set<String>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         List<BigInteger> timeTypeIds = new ArrayList<>();
         if(filterTypeMap.containsKey(TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(TIME_TYPE))) {
-            List<BigInteger> ids = filterTypeMap.get(TIME_TYPE).stream().map(s -> new BigInteger(s)).collect(Collectors.toList());
+            List<BigInteger> ids = getBigInteger(filterTypeMap.get(TIME_TYPE));
             timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), ids);
         }
         ShiftFilter timeTypeFilter = new TimeTypeFilter(filterTypeMap, timeTypeIds);
@@ -85,6 +85,15 @@ public class ShiftFilterService {
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter)
                                     .and(functionsFilter).and(realTimeStatusFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
+    }
+
+    private <T> List<BigInteger> getBigInteger(Collection<T> objects) {
+        List<BigInteger> ids = new ArrayList<>();
+        for (T object : objects) {
+            String id = (object instanceof String) ? (String) object : ""+object;
+            ids.add(new BigInteger(id));
+        }
+        return ids;
     }
 
 

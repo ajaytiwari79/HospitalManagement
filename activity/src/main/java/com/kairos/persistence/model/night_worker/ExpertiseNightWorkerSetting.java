@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.night_worker;
 
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -16,7 +16,7 @@ public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
     private DurationType intervalUnitToCheckNightWorker;
     private Integer intervalValueToCheckNightWorker;
     private Integer minShiftsValueToCheckNightWorker;
-    private CalculationUnit minShiftsUnitToCheckNightWorker;
+    private DisplayUnit minShiftsUnitToCheckNightWorker;
     private Long countryId;
     private Long unitId;
     private Long expertiseId;
@@ -26,7 +26,7 @@ public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
     }
 
     public ExpertiseNightWorkerSetting(TimeSlot timeSlot, Integer minMinutesToCheckNightShift, DurationType intervalUnitToCheckNightWorker, Integer intervalValueToCheckNightWorker,
-                                       Integer minShiftsValueToCheckNightWorker, CalculationUnit minShiftsUnitToCheckNightWorker, Long countryId, Long expertiseId){
+                                       Integer minShiftsValueToCheckNightWorker, DisplayUnit minShiftsUnitToCheckNightWorker, Long countryId, Long expertiseId){
         this.timeSlot = timeSlot;
         this.minMinutesToCheckNightShift = minMinutesToCheckNightShift;
         this.intervalUnitToCheckNightWorker = intervalUnitToCheckNightWorker;
@@ -37,7 +37,7 @@ public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
         this.expertiseId = expertiseId;
     }
 
-    public ExpertiseNightWorkerSetting(Long unitId, Long expertiseId,TimeSlot timeSlot, Integer minMinutesToCheckNightShift, DurationType intervalUnitToCheckNightWorker, Integer intervalValueToCheckNightWorker, Integer minShiftsValueToCheckNightWorker, CalculationUnit minShiftsUnitToCheckNightWorker) {
+    public ExpertiseNightWorkerSetting(Long unitId, Long expertiseId,TimeSlot timeSlot, Integer minMinutesToCheckNightShift, DurationType intervalUnitToCheckNightWorker, Integer intervalValueToCheckNightWorker, Integer minShiftsValueToCheckNightWorker, DisplayUnit minShiftsUnitToCheckNightWorker) {
         this.timeSlot = timeSlot;
         this.minMinutesToCheckNightShift = minMinutesToCheckNightShift;
         this.intervalUnitToCheckNightWorker = intervalUnitToCheckNightWorker;
