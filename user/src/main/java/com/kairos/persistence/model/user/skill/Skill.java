@@ -5,6 +5,9 @@ import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.tag.Tag;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -19,10 +22,13 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Skill Domain extends UserBaseEntity
- * SKill has relationship with SkillLevel Domain
+ * SKill has relationship with com.kairos.enums.SkillLevel Domain
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Skill extends UserBaseEntity {
     @NotBlank(message = "error.Skill.name.notEmpty")
     private String name;
@@ -46,53 +52,10 @@ public class Skill extends UserBaseEntity {
         this.skillCategory = skillCategory;
     }
 
-    public Skill() {
-    }
-
     public Skill(SkillDTO skillDTO){
         this.name = skillDTO.getName();
         this.description = skillDTO.getDescription();
         this.shortName = skillDTO.getShortName();
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
-    public SkillCategory getSkillCategory() {
-        return skillCategory;
-    }
-
-    public void setSkillCategory(SkillCategory skillCategory) {
-        this.skillCategory = skillCategory;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Map<String, Object> retrieveDetails() {
@@ -102,65 +65,6 @@ public class Skill extends UserBaseEntity {
         data.put("description",this.description);
         data.put("shortName",this.shortName);
         return data;
-    }
-
-    public enum SkillLevel {
-
-        BASIC("Basic"), ADVANCE("Advance"), EXPERT("Expert");
-        public String value;
-
-        SkillLevel(String value) {
-            this.value = value;
-        }
-
-        public static SkillLevel getByValue(String value) {
-            for (SkillLevel skillLevel : SkillLevel.values()) {
-                if (skillLevel.value.equals(value)) {
-                    return skillLevel;
-                }
-            }
-            return null;
-        }
-    }
-
-    public SkillStatus getSkillStatus() {
-        return skillStatus;
-    }
-
-    public void setSkillStatus(SkillStatus skillStatus) {
-        this.skillStatus = skillStatus;
-    }
-
-    public User getRequestedBy() {
-        return requestedBy;
-    }
-
-    public User getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setRequestedBy(User requestedBy) {
-        this.requestedBy = requestedBy;
-    }
-
-    public void setApprovedBy(User approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
     }
 
     public enum SkillStatus {

@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * Skill Domain extends UserBaseEntity
- * SKill has relationship with SkillLevel Domain
+ * SKill has relationship with com.kairos.enums.SkillLevel Domain
  */
 public class Skill {
     @NotEmpty(message = "error.Skill.name.notEmpty") @NotNull(message = "error.Skill.name.notnull")
