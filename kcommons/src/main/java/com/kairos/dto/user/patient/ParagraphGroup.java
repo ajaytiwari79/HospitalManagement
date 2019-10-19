@@ -1,7 +1,11 @@
 package com.kairos.dto.user.patient;
 
 import com.kairos.dto.user.visitation.VisitationType;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ParagraphGroup {
     private String id;
 
@@ -9,35 +13,6 @@ public class ParagraphGroup {
 
     private String name;
 
-    public String getId ()
-    {
-        return id;
-    }
-
-    public void setId (String id)
-    {
-        this.id = id;
-    }
-
-    public VisitationType getVisitationType ()
-    {
-        return visitationType;
-    }
-
-    public void setVisitationType (VisitationType visitationType)
-    {
-        this.visitationType = visitationType;
-    }
-
-    public String getName ()
-    {
-        return name;
-    }
-
-    public void setName (String name)
-    {
-        this.name = name;
-    }
 
     @Override
     public String toString()

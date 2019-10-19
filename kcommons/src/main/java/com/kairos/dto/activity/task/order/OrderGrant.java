@@ -1,8 +1,12 @@
 package com.kairos.dto.activity.task.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class OrderGrant {
 
     private String id;
@@ -16,64 +20,6 @@ public class OrderGrant {
     private Integer originatorId;
 
     private String version;
-
-    public String getId ()
-    {
-        return id;
-    }
-
-    public void setId (String id)
-    {
-        this.id = id;
-    }
-
-    public String getModel ()
-    {
-        return model;
-    }
-
-    public void setModel (String model)
-    {
-        this.model = model;
-    }
-
-    public String getName ()
-    {
-        return name;
-    }
-
-    public void setName (String name)
-    {
-        this.name = name;
-    }
-
-    public String getPackageId ()
-    {
-        return packageId;
-    }
-
-    public void setPackageId (String packageId)
-    {
-        this.packageId = packageId;
-    }
-
-    public Integer getOriginatorId() {
-        return originatorId;
-    }
-
-    public void setOriginatorId(Integer originatorId) {
-        this.originatorId = originatorId;
-    }
-
-    public String getVersion ()
-    {
-        return version;
-    }
-
-    public void setVersion (String version)
-    {
-        this.version = version;
-    }
 
     @Override
     public String toString()

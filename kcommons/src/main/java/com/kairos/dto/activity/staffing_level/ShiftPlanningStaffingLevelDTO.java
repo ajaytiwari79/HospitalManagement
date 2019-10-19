@@ -3,6 +3,9 @@ package com.kairos.dto.activity.staffing_level;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -10,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class ShiftPlanningStaffingLevelDTO {
     private BigInteger id;
     private BigInteger phaseId;
@@ -19,9 +25,6 @@ public class ShiftPlanningStaffingLevelDTO {
     private StaffingLevelSetting staffingLevelSetting;
     private List<StaffingLevelTimeSlotDTO> staffingLevelInterval=new ArrayList<>();
 
-    public ShiftPlanningStaffingLevelDTO() {
-        //default constructor
-    }
 
     public ShiftPlanningStaffingLevelDTO(BigInteger phaseId, LocalDate currentDate,Integer weekCount,
                                          StaffingLevelSetting staffingLevelSetting) {
@@ -31,51 +34,4 @@ public class ShiftPlanningStaffingLevelDTO {
         this.staffingLevelSetting = staffingLevelSetting;
     }
 
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-    public LocalDate getCurrentDate() {
-        return currentDate;
-    }
-
-    public void setCurrentDate(LocalDate currentDate) {
-        this.currentDate = currentDate;
-    }
-
-    public Integer getWeekCount() {
-        return weekCount;
-    }
-
-    public void setWeekCount(Integer weekCount) {
-        this.weekCount = weekCount;
-    }
-
-    public StaffingLevelSetting getStaffingLevelSetting() {
-        return staffingLevelSetting;
-    }
-
-    public void setStaffingLevelSetting(StaffingLevelSetting staffingLevelSetting) {
-        this.staffingLevelSetting = staffingLevelSetting;
-    }
-
-    public List<StaffingLevelTimeSlotDTO> getStaffingLevelInterval() {
-        return staffingLevelInterval;
-    }
-
-    public void setStaffingLevelInterval(List<StaffingLevelTimeSlotDTO> staffingLevelInterval) {
-        this.staffingLevelInterval = staffingLevelInterval;
-    }
 }

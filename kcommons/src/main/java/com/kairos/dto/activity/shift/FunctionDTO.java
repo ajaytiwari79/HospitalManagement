@@ -2,6 +2,9 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
@@ -13,6 +16,9 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class FunctionDTO {
     private Long id;
     @NotBlank(message = "error.function.name.notEmpty")
@@ -25,94 +31,17 @@ public class FunctionDTO {
     private String icon;
     private List<LocalDate> appliedDates;
     private Long employmentId;
-
-    public FunctionDTO() {
-        //Default Constructor
-    }
+    private int code;
 
     public FunctionDTO(Long id, String name, String icon) {
-        this.id = id;
-        this.name = name;
+        this.id = id;this.name = name;
         this.icon = icon;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
 
     public void setName(String name) {
         this.name = StringUtils.trim(name);
     }
 
-    public String getDescription() {
-        return description;
-    }
 
-    public void setDescription(String description) {
-        this.description = StringUtils.trim(description);
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public List<Long> getUnionIds() {
-        return unionIds;
-    }
-
-    public void setUnionIds(List<Long> unionIds) {
-        this.unionIds = unionIds;
-    }
-
-    public List<Long> getOrganizationLevelIds() {
-        return organizationLevelIds;
-    }
-
-    public void setOrganizationLevelIds(List<Long> organizationLevelIds) {
-        this.organizationLevelIds = organizationLevelIds;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = StringUtils.trim(icon);
-    }
-
-    public List<LocalDate> getAppliedDates() {
-        return appliedDates;
-    }
-
-    public void setAppliedDates(List<LocalDate> appliedDates) {
-        this.appliedDates = appliedDates;
-    }
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
 }

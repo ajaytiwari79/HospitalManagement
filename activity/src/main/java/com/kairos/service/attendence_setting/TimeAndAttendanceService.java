@@ -43,7 +43,6 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
-
 @Service
 public class TimeAndAttendanceService extends MongoBaseService {
 

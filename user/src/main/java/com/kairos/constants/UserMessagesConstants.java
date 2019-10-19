@@ -442,4 +442,8 @@ public class UserMessagesConstants {
     public static final String MESSAGE_DRAFT_COPY_CREATED = "message.draft.copy.exists";
     public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
     public static final String MESSAGE_STAFF_NOT_NIGHT_WORKER = "message.staff.not.night.worker";
+    public static final String PLEASE_PROVIDE_THE_VALID_LINE_ID = "message.invalid.line";
+    public static final String PLEASE_SELECT_PUBLISHED_DATE_LESS_AFTER_CURRENT_LINE_START_DATE = "publish_date.less.line_date";
+    public static final String PLEASE_SELECT_PUBLISHED_DATE_BEFORE_EXPERTISE_END_DATE = "publish_date.greater.expertise_startdate";
+    public static final String PLEASE_ENTER_VALID_SENIORITY_LEVELS = "invalid.seniority_level";
 }

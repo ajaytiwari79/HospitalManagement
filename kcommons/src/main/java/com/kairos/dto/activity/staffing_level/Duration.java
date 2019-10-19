@@ -1,6 +1,10 @@
 package com.kairos.dto.activity.staffing_level;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -9,23 +13,16 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-//import org.springframework.format.annotation.DateTimeFormat;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Duration {
-    //@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime from;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime to;
 
-    public Duration() {
-        //default constructor
-    }
-
-    public Duration(LocalTime from, LocalTime to) {
-        this.from = from;
-        this.to = to;
-    }
 
     public int getDuration() {
         if (Optional.ofNullable(to).isPresent() && Optional.ofNullable(from).isPresent())
@@ -33,21 +30,7 @@ public class Duration {
         else
             return 0;
     }
-    public LocalTime getFrom() {
-        return from;
-    }
 
-    public void setFrom(LocalTime from) {
-        this.from = from;
-    }
-
-    public LocalTime getTo() {
-        return to;
-    }
-
-    public void setTo(LocalTime to) {
-        this.to = to;
-    }
 
     @Override
     public boolean equals(Object o) {

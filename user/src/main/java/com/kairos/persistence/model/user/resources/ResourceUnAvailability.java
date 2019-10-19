@@ -3,6 +3,9 @@ package com.kairos.persistence.model.user.resources;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.service.exception.ExceptionService;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 
@@ -18,6 +21,9 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATE_SOMETHINGW
  */
 
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class ResourceUnAvailability extends UserBaseEntity {
 
     @Inject
@@ -27,43 +33,8 @@ public class ResourceUnAvailability extends UserBaseEntity {
     private Long endTime;
     private boolean fullDay;
 
-    public ResourceUnAvailability() {
-        //default constructor
-    }
 
     public ResourceUnAvailability(boolean fullDay) {
-        this.fullDay = fullDay;
-    }
-
-    public Long getDate() {
-        return date;
-    }
-
-    public void setDate(Long date) {
-        this.date = date;
-    }
-
-    public Long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Long startTime) {
-        this.startTime = startTime;
-    }
-
-    public Long getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Long endTime) {
-        this.endTime = endTime;
-    }
-
-    public boolean isFullDay() {
-        return fullDay;
-    }
-
-    public void setFullDay(boolean fullDay) {
         this.fullDay = fullDay;
     }
 

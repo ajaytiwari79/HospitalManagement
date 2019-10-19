@@ -2,6 +2,8 @@ package com.kairos.dto.planner.solverconfig;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -11,32 +13,10 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
 public class DefaultContraintsDTO {
 
     private String category;
     private List<ConstraintDTO> constraints;
-
-    public DefaultContraintsDTO() {
-    }
-
-    public DefaultContraintsDTO(String category, List<ConstraintDTO> constraints) {
-        this.category = category;
-        this.constraints = constraints;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public List<ConstraintDTO> getConstraints() {
-        return constraints;
-    }
-
-    public void setConstraints(List<ConstraintDTO> constraints) {
-        this.constraints = constraints;
-    }
 }

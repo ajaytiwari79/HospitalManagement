@@ -2,25 +2,18 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
-import com.kairos.persistence.model.country.tag.Tag;
-import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.services.OrganizationService;
-import com.kairos.persistence.model.organization.union.Sector;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import java.util.*;
 
-import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTEMPTY;
 import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -38,37 +31,13 @@ public class Expertise extends UserBaseEntity {
     @NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL)
     private String name;
     private String description;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
     @Relationship(type = BELONGS_TO)
     private Country country;
 
-    @Relationship(type = BELONGS_TO_SECTOR)
-    private Sector sector;
-
-    @Relationship(type = HAS_TAG)
-    private List<Tag> tags = new ArrayList<>();
-    @DateLong
-    private Date startDateMillis;
-    @DateLong
-    private Date endDateMillis;
-    @Relationship(type = IN_ORGANIZATION_LEVEL)
-    private Level organizationLevel;
-
-    @Relationship(type = SUPPORTS_SERVICES)
-    private Set<OrganizationService> organizationServices;
-
-    @Relationship(type = SUPPORTED_BY_UNION)
-    private Organization union;
-    private int fullTimeWeeklyMinutes; // This is equals to 37 hours
-    private Integer numberOfWorkingDaysInWeek; // 5 or 7
-    private BreakPaymentSetting breakPaymentSetting;
-    @Relationship(type = VERSION_OF)
-    private Expertise parentExpertise;
-
     private boolean published;
-    private boolean hasDraftCopy;
-    private boolean history;
-
 
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private List<SeniorityLevel> seniorityLevel;
@@ -77,10 +46,13 @@ public class Expertise extends UserBaseEntity {
     private List<CareDays> seniorDays;
 
     @Relationship(type = HAS_PROTECTED_DAYS_OFF_SETTINGS)
-    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings=new ArrayList<>();
 
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
+
+    @Relationship(type = HAS_EXPERTISE_LINES)
+    private List<ExpertiseLine> expertiseLines=new ArrayList<>();
 
     public Expertise(String name, Country country) {
         this.name = name;
@@ -88,13 +60,26 @@ public class Expertise extends UserBaseEntity {
     }
 
 
-    public List<SeniorityLevel> getSeniorityLevel() {
-        return seniorityLevel = Optional.ofNullable(seniorityLevel).orElse(new ArrayList<>());
+    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country, boolean published, List<SeniorityLevel> seniorityLevel, List<ExpertiseLine> expertiseLines) {
+        this.name = name;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.country = country;
+        this.published = published;
+        this.seniorityLevel = seniorityLevel;
+        this.expertiseLines = expertiseLines;
     }
 
-
-    public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
-        getSeniorityLevel().add(seniorityLevel);
+    public Expertise(Long id,@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, boolean published, List<SeniorityLevel> seniorityLevel,List<ExpertiseLine> expertiseLines) {
+        this.id=id;
+        this.name = name;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.published = published;
+        this.seniorityLevel = seniorityLevel;
+        this.expertiseLines=expertiseLines;
     }
 
     public List<CareDays> getSeniorDays() {
@@ -116,47 +101,12 @@ public class Expertise extends UserBaseEntity {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
     }
 
-    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
-        return protectedDaysOffSettings = Optional.ofNullable(protectedDaysOffSettings).orElse(new ArrayList<>());
+    public List<SeniorityLevel> getSeniorityLevel() {
+        return seniorityLevel = Optional.ofNullable(seniorityLevel).orElse(new ArrayList<>());
     }
 
-    public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, boolean published) {
-        this.name = name;
-        this.id = id;
-        this.description = description;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-        this.published = published;
-    }
-
-    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, Country country, Date startDateMillis, Date endDateMillis, int fullTimeWeeklyMinutes, Integer numberOfWorkingDaysInWeek, BreakPaymentSetting breakPaymentSetting, boolean published, boolean hasDraftCopy, boolean history,Sector sector) {
-        this.name = name;
-        this.description = description;
-        this.country = country;
-        this.startDateMillis = startDateMillis;
-        this.endDateMillis = endDateMillis;
-        this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
-        this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
-        this.breakPaymentSetting = breakPaymentSetting;
-        this.published = published;
-        this.hasDraftCopy = hasDraftCopy;
-        this.history = history;
-        this.sector = sector;
-    }
-
-    public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTEMPTY)  String name, String description) {
-
-        this.name = name;
-        this.id = id;
-        this.description = description;
-    }
-
-
-    public Expertise retrieveBasicDetails() {
-        return new Expertise(this.id, this.name, this.description, this.startDateMillis, this.endDateMillis, this.fullTimeWeeklyMinutes, this.numberOfWorkingDaysInWeek, this.published);
-
+    public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
+        getSeniorityLevel().add(seniorityLevel);
     }
 
     public Map<String, Object> retrieveDetails() {
@@ -169,6 +119,5 @@ public class Expertise extends UserBaseEntity {
         map.put("creationDate", this.getCreationDate());
         return map;
     }
-
 
 }

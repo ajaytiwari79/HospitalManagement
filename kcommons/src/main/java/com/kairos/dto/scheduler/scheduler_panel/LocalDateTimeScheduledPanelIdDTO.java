@@ -1,35 +1,19 @@
 package com.kairos.dto.scheduler.scheduler_panel;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LocalDateTimeScheduledPanelIdDTO {
     private LocalDateTime dateTime;
     private BigInteger id;
-
-    public LocalDateTimeScheduledPanelIdDTO() {
-    }
-
-    public LocalDateTimeScheduledPanelIdDTO(BigInteger id, LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-        this.id = id;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
 }
 

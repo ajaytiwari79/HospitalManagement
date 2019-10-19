@@ -2,6 +2,8 @@ package com.kairos.persistence.model.user.region;
 
 import com.kairos.config.neo4j.converter.LocalTimeConverter;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.typeconversion.Convert;
 
@@ -13,6 +15,8 @@ import java.time.LocalTime;
  * @date - 11/6/18
  */
 @NodeEntity
+@Getter
+@Setter
 public class DayTimeWindow extends UserBaseEntity {
 
     private DayOfWeek dayOfWeek;
@@ -21,27 +25,4 @@ public class DayTimeWindow extends UserBaseEntity {
     @Convert(LocalTimeConverter.class)
     private LocalTime toTime;
 
-    public DayOfWeek getDayOfWeek() {
-        return dayOfWeek;
-    }
-
-    public void setDayOfWeek(DayOfWeek dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-    }
-
-    public LocalTime getFromTime() {
-        return fromTime;
-    }
-
-    public void setFromTime(LocalTime fromTime) {
-        this.fromTime = fromTime;
-    }
-
-    public LocalTime getToTime() {
-        return toTime;
-    }
-
-    public void setToTime(LocalTime toTime) {
-        this.toTime = toTime;
-    }
 }

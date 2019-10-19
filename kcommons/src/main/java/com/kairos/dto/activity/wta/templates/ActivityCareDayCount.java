@@ -1,5 +1,8 @@
 package com.kairos.dto.activity.wta.templates;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigInteger;
 import java.util.Objects;
 
@@ -7,26 +10,12 @@ import java.util.Objects;
  * @author pradeep
  * @date - 10/10/18
  */
-
+@Getter
+@Setter
 public class ActivityCareDayCount {
     private BigInteger activityId;
     private int count;
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
 
     @Override
     public boolean equals(Object o) {
