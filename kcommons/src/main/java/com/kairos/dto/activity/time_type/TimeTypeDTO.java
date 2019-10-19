@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
@@ -17,6 +18,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class TimeTypeDTO {
     private BigInteger id;
     private String timeTypes;
@@ -33,36 +35,17 @@ public class TimeTypeDTO {
     private List<TimeTypeDTO> parent = new ArrayList<>();
     private boolean allowedConflicts;
     private boolean breakNotHeldValid;
-
-    public TimeTypeDTO() {
-    }
-
-
+    private BigInteger activityPriorityId;
 
     public TimeTypeDTO(String timeTypes, String backgroundColor) {
         this.timeTypes = timeTypes;
         this.backgroundColor = backgroundColor;
     }
 
-
     public TimeTypeDTO(BigInteger id, String timeTypes, BigInteger upperLevelTimeTypeId) {
         this.id = id;
         this.timeTypes = timeTypes;
         this.upperLevelTimeTypeId = upperLevelTimeTypeId;
     }
-
-    public TimeTypeDTO(BigInteger id, String timeTypes, String label, String description,String backgroundColor,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy, boolean partOfTeam, boolean allowChildActivities,boolean allowedConflicts,boolean breakNotHeldValid) {
-        this.id = id;
-        this.timeTypes = timeTypes;
-        this.label = label;
-        this.description = description;
-        this.backgroundColor=backgroundColor;
-        this.activityCanBeCopiedForOrganizationHierarchy = activityCanBeCopiedForOrganizationHierarchy;
-        this.partOfTeam = partOfTeam;
-        this.allowChildActivities = allowChildActivities;
-        this.allowedConflicts=allowedConflicts;
-        this.breakNotHeldValid = breakNotHeldValid;
-    }
-
 
 }

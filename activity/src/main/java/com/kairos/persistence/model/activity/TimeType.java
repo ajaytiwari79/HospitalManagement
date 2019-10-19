@@ -48,7 +48,7 @@ public class TimeType extends MongoBaseEntity{
     private List<Long> levels;
     private List<Long> employmentTypes;
     private boolean breakNotHeldValid;
-
+    private BigInteger activityPriorityId;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;
