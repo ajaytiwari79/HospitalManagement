@@ -5,6 +5,9 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
@@ -25,6 +28,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_P
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class AccessGroup extends UserBaseEntity {
 
     @NotBlank(message = ERROR_NAME_NOTNULL)
@@ -44,10 +50,6 @@ public class AccessGroup extends UserBaseEntity {
     private List<DayType> dayTypes;
     @Relationship(type = HAS_PARENT_ACCESS_GROUP)
     private AccessGroup parentAccessGroup;
-
-    public AccessGroup() {
-        //Default Constructor
-    }
 
     public AccessGroup(@NotBlank(message = ERROR_NAME_NOTNULL) String name, String description, AccessGroupRole role) {
         this.name = name;
@@ -72,94 +74,5 @@ public class AccessGroup extends UserBaseEntity {
         this.dayTypes=dayTypes;
         this.startDate=startDate;
         this.endDate=endDate;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public boolean isTypeOfTaskGiver() {
-        return typeOfTaskGiver;
-    }
-
-    public void setTypeOfTaskGiver(boolean typeOfTaskGiver) {
-        this.typeOfTaskGiver = typeOfTaskGiver;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public AccessGroupRole getRole() {
-        return role;
-    }
-
-    public void setRole(AccessGroupRole role) {
-        this.role = role;
-    }
-
-    public List<AccountType> getAccountType() {
-        return accountType;
-    }
-
-    public void setAccountType(List<AccountType> accountType) {
-        this.accountType = accountType;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public List<DayType> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<DayType> dayTypes) {
-        this.dayTypes = dayTypes;
-    }
-
-    public AccessGroup getParentAccessGroup() {
-        return parentAccessGroup;
-    }
-
-    public void setParentAccessGroup(AccessGroup parentAccessGroup) {
-        this.parentAccessGroup = parentAccessGroup;
-    }
-
-    public boolean isAllowedDayTypes() {
-        return allowedDayTypes;
-    }
-
-    public void setAllowedDayTypes(boolean allowedDayTypes) {
-        this.allowedDayTypes = allowedDayTypes;
     }
 }

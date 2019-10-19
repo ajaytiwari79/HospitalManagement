@@ -1,92 +1,19 @@
 package com.kairos.dto.activity.staffing_level;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
-
+@Getter
+@Setter
 public class StaffingLevelGraphDTO {
     private StaffingLevelSetting staffingLevelSetting;
     private List<Integer> minNoOfStaff=new ArrayList();
     private List <Integer>maxNoOfStaff=new ArrayList<>();
     private List<Integer> availableNoOfStaff=new ArrayList<>();
 
-
-    public StaffingLevelGraphDTO() {
-        //Not in use
-    }
-
-    public StaffingLevelSetting getStaffingLevelSetting() {
-        return staffingLevelSetting;
-    }
-
-    public void setStaffingLevelSetting(StaffingLevelSetting staffingLevelSetting) {
-        this.staffingLevelSetting = staffingLevelSetting;
-    }
-
-    public class StaffingLevelGraphDetail{
-        private Integer minNoOfStaff;
-        private Integer maxNoOfStaff;
-        private Integer availableNoOfStaff;
-        private Duration staffingLevelDuration;
-
-        public StaffingLevelGraphDetail() {
-
-        }
-
-        public StaffingLevelGraphDetail(Integer minNoOfStaff, Integer maxNoOfStaff,
-                                     Integer availableNoOfStaff, Duration staffingLevelDuration) {
-            this.minNoOfStaff = minNoOfStaff;
-            this.maxNoOfStaff = maxNoOfStaff;
-            this.availableNoOfStaff = availableNoOfStaff;
-            this.staffingLevelDuration = staffingLevelDuration;
-        }
-
-        public Integer getMinNoOfStaff() {
-            return minNoOfStaff;
-        }
-
-        public void setMinNoOfStaff(Integer minNoOfStaff) {
-            this.minNoOfStaff = minNoOfStaff;
-        }
-
-        public Integer getMaxNoOfStaff() {
-            return maxNoOfStaff;
-        }
-
-        public void setMaxNoOfStaff(Integer maxNoOfStaff) {
-            this.maxNoOfStaff = maxNoOfStaff;
-        }
-
-        public Integer getAvailableNoOfStaff() {
-            return availableNoOfStaff;
-        }
-
-        public void setAvailableNoOfStaff(Integer availableNoOfStaff) {
-            this.availableNoOfStaff = availableNoOfStaff;
-        }
-
-        public Duration getStaffingLevelDuration() {
-            return staffingLevelDuration;
-        }
-
-        public void setStaffingLevelDuration(Duration staffingLevelDuration) {
-            this.staffingLevelDuration = staffingLevelDuration;
-        }
-
-    }
-
-    public List<Integer> getMinNoOfStaff() {
-        return minNoOfStaff;
-    }
-
-    public List<Integer> getMaxNoOfStaff() {
-        return maxNoOfStaff;
-    }
-
-    public List<Integer> getAvailableNoOfStaff() {
-        return availableNoOfStaff;
-    }
 
     @Override
     public String toString() {

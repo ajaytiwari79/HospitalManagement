@@ -1,7 +1,9 @@
 package com.kairos.dto.user.country.time_slot;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 
@@ -10,6 +12,8 @@ import javax.validation.constraints.NotBlank;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
+@Getter
+@Setter
 public class TimeSlotDTO {
     @NotBlank(message = "error.name.notnull")
     private String name;
@@ -29,68 +33,4 @@ public class TimeSlotDTO {
         this.endMinute = endMinute;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getStartHour() {
-        return startHour;
-    }
-
-    public int getStartMinute() {
-        return startMinute;
-    }
-
-    public int getEndHour() {
-        return endHour;
-    }
-
-    public int getEndMinute() {
-        return endMinute;
-    }
-
-    public void setStartHour(int startHour) {
-        this.startHour = startHour;
-    }
-
-    public void setStartMinute(int startMinute) {
-        this.startMinute = startMinute;
-    }
-
-    public void setEndHour(int endHour) {
-        this.endHour = endHour;
-    }
-
-    public void setEndMinute(int endMinute) {
-        this.endMinute = endMinute;
-    }
-
-    public boolean isShiftStartTime() {
-        return shiftStartTime;
-    }
-
-    public void setShiftStartTime(boolean shiftStartTime) {
-        this.shiftStartTime = shiftStartTime;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-
-        return id;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
 }

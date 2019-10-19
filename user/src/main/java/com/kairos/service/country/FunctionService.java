@@ -69,12 +69,11 @@ public class FunctionService {
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
-        Function function = new Function(functionDTO.getName(), functionDTO.getDescription(), functionDTO.getStartDate(), functionDTO.getEndDate(), unions, levels, country, functionDTO.getIcon());
+        Function function = new Function(functionDTO.getName(), functionDTO.getDescription(), functionDTO.getStartDate(), functionDTO.getEndDate(), unions, levels, country, functionDTO.getIcon(),functionDTO.getCode());
         functionGraphRepository.save(function);
-        com.kairos.persistence.model.country.functions.FunctionDTO functionResponseDTO = new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
-                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon());
+        return new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
+                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon(),function.getCode());
 
-        return functionResponseDTO;
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByCountry(long countryId) {
@@ -84,7 +83,6 @@ public class FunctionService {
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsIdAndNameByCountry(long countryId) {
         return functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
-
     }
 
     public com.kairos.persistence.model.country.functions.FunctionDTO updateFunction(Long countryId, FunctionDTO functionDTO) {
@@ -94,7 +92,7 @@ public class FunctionService {
 
         }
         Function function = functionGraphRepository.findOne(functionDTO.getId());
-        if (!Optional.ofNullable(function).isPresent() || function.isDeleted() == true) {
+        if (!Optional.ofNullable(function).isPresent() || function.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTION_ID_NOTFOUND, functionDTO.getId());
 
         }
@@ -119,11 +117,11 @@ public class FunctionService {
         function.setUnions(unions);
         function.setOrganizationLevels(levels);
         function.setIcon(functionDTO.getIcon());
+        function.setCode(functionDTO.getCode());
         functionGraphRepository.save(function);
-        com.kairos.persistence.model.country.functions.FunctionDTO functionResponseDTO = new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
-                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon());
 
-        return functionResponseDTO;
+        return new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
+                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon(),function.getCode());
     }
 
     public boolean deleteFunction(long functionId) {
@@ -218,7 +216,6 @@ public class FunctionService {
     }
 
     public List<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
-        List<LocalDate> allDateByFunctionIds= functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds);
-        return allDateByFunctionIds;
+        return functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds);
     }
 }

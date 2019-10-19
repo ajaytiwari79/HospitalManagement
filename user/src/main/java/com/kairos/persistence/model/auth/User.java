@@ -1,8 +1,6 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.kairos.commons.annotation.EnableStringTrimer;
-import com.kairos.commons.annotation.IgnoreStringTrimer;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
@@ -14,7 +12,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
-import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,5 +1,10 @@
 package com.kairos.dto.activity.time_bank.time_bank_basic.time_bank;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigInteger;
 
 /**
@@ -7,42 +12,14 @@ import java.math.BigInteger;
  * @date - 20/8/18
  */
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ScheduledActivitiesDTO {
 
     private BigInteger id;
     private String name;
     private long scheduledMinutes;
 
-    public ScheduledActivitiesDTO(BigInteger id, String name, long scheduledMinutes) {
-        this.id = id;
-        this.name = name;
-        this.scheduledMinutes = scheduledMinutes;
-    }
-
-    public ScheduledActivitiesDTO() {
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getScheduledMinutes() {
-        return scheduledMinutes;
-    }
-
-    public void setScheduledMinutes(long scheduledMinutes) {
-        this.scheduledMinutes = scheduledMinutes;
-    }
 }

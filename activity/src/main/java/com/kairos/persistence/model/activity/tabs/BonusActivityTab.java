@@ -1,37 +1,21 @@
 package com.kairos.persistence.model.activity.tabs;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.io.Serializable;
 
 /**
  * Created by vipul on 24/8/17.
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class BonusActivityTab implements Serializable{
     private String bonusHoursType;
     private boolean overRuleCtaWta;
 
-
-    public BonusActivityTab() {
-        //default constructor
-    }
-
-    public BonusActivityTab(String bonusHoursType, boolean overRuleCtaWta) {
-        this.bonusHoursType = bonusHoursType;
-        this.overRuleCtaWta = overRuleCtaWta;
-    }
-
-    public String getBonusHoursType() {
-        return bonusHoursType;
-    }
-
-    public void setBonusHoursType(String bonusHoursType) {
-        this.bonusHoursType = bonusHoursType;
-    }
-
-    public boolean isOverRuleCtaWta() {
-        return overRuleCtaWta;
-    }
-
-    public void setOverRuleCtaWta(boolean overRuleCtaWta) {
-        this.overRuleCtaWta = overRuleCtaWta;
-    }
 }

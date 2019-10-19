@@ -97,8 +97,7 @@ public class OrderService extends MongoBaseService {
 
 
     public List<Order> getOrdersByUnitId(Long unitId) {
-       List<Order> orders = orderMongoRepository.findOrdersByUnitId(unitId);
-        return orders;
+        return orderMongoRepository.findOrdersByUnitId(unitId);
     }
 
    public OrderOpenshiftResponseDTO getPriorityGroupAndOpenShiftsByOrderId(Long unitId,BigInteger orderId){

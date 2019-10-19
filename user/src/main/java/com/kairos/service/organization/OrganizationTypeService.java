@@ -158,8 +158,7 @@ public class OrganizationTypeService{
         }
 
         // TODO remove As per request of FE its added for now
-        List<OrgTypeSkillQueryResult> orgTypeSkillQueryResult = organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
-        return orgTypeSkillQueryResult;
+        return organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
     }
 
     /**
@@ -169,8 +168,7 @@ public class OrganizationTypeService{
      * @return
      */
     public List<OrgTypeSkillQueryResult> getSkillsByOrganizationTypeId(long countryId, long orgTypeId) {
-        List<OrgTypeSkillQueryResult> orgTypeSkillQueryResult = organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
-        return orgTypeSkillQueryResult;
+        return organizationTypeGraphRepository.getSkillsOfOrganizationType(orgTypeId);
     }
 
     public OrganizationTypeHierarchyQueryResult getOrganizationTypeHierarchy(long countryId, Set<Long> orgSubServiceId) {

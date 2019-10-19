@@ -2,6 +2,8 @@ package com.kairos.dto.activity.task;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
@@ -13,6 +15,8 @@ import java.util.List;
  * Created by oodles on 8/2/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class TaskDTO {
 
     private String id;
@@ -41,184 +45,6 @@ public class TaskDTO {
     private List<String> skillsList;
     private String team;
     private List<BigInteger> taskIds;
-
-    public void setTaskIds(List<BigInteger> taskIds) {
-        this.taskIds = taskIds;
-    }
-
-    public List<BigInteger> getTaskIds() {
-
-        return taskIds;
-    }
-
-    public List<Long> getForbiddenStaff() {
-        return forbiddenStaff;
-    }
-
-    public void setForbiddenStaff(List<Long> forbiddenStaff) {
-        this.forbiddenStaff = forbiddenStaff;
-    }
-
-    public List<Long> getPrefferedStaff() {
-        return prefferedStaff;
-    }
-
-    public void setPrefferedStaff(List<Long> prefferedStaff) {
-        this.prefferedStaff = prefferedStaff;
-    }
-
-    public List<String> getSkillsList() {
-        return skillsList;
-    }
-
-    public void setSkillsList(List<String> skillsList) {
-        this.skillsList = skillsList;
-    }
-
-    public String getTeam() {
-        return team;
-    }
-
-    public void setTeam(String team) {
-        this.team = team;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Long getResource() {
-        return resource;
-    }
-
-    public void setResource(Long resource) {
-        this.resource = resource;
-    }
-
-    public String getStart() {
-        return start;
-    }
-
-    public void setStart(String start) {
-        this.start = start;
-    }
-
-    public String getEnd() {
-        return end;
-    }
-
-    public void setEnd(String end) {
-        this.end = end;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getInfo1() {
-        return info1;
-    }
-
-    public void setInfo1(String info1) {
-        this.info1 = info1;
-    }
-
-    public String getInfo2() {
-        return info2;
-    }
-
-    public void setInfo2(String info2) {
-        this.info2 = info2;
-    }
-
-    public String getTaskTypeId() {
-        return taskTypeId;
-    }
-
-    public void setTaskTypeId(String taskTypeId) {
-        this.taskTypeId = taskTypeId;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public String getStartAddress() {
-        return startAddress;
-    }
-
-    public void setStartAddress(String startAddress) {
-        this.startAddress = startAddress;
-    }
-
-    public String getEndAddress() {
-        return endAddress;
-    }
-
-    public void setEndAddress(String endAddress) {
-        this.endAddress = endAddress;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
-    }
-
-    public Long getAnonymousStaffId() {
-        return anonymousStaffId;
-    }
-
-    public void setAnonymousStaffId(Long anonymousStaffId) {
-        this.anonymousStaffId = anonymousStaffId;
-    }
-
-    public String getTaskTypeName() {
-        return taskTypeName;
-    }
-
-    public void setTaskTypeName(String taskTypeName) {
-        this.taskTypeName = taskTypeName;
-    }
-
-    public AbsencePlanningStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AbsencePlanningStatus status) {
-        this.status = status;
-    }
 
     @Override
     public String toString() {

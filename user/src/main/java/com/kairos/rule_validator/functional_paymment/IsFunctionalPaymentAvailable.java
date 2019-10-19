@@ -1,7 +1,7 @@
 package com.kairos.rule_validator.functional_paymment;
 
 import com.kairos.persistence.model.user.expertise.FunctionalPayment;
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
 

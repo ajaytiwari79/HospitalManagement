@@ -125,9 +125,8 @@ public class PriorityGroupRulesDataGetterService {
         }
         filterShiftStartDate = DateUtils.getDateFromLocalDate(filterShiftStartLocalDate);
         filterShiftEndDate = DateUtils.getDateFromLocalDate(maxDate.plusDays(1));
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentIds(commonEmploymentIds, filterShiftStartDate, filterShiftEndDate);
+        return shiftMongoRepository.findShiftBetweenDurationByEmploymentIds(commonEmploymentIds, filterShiftStartDate, filterShiftEndDate);
 
-        return shifts;
     }
 //flagged to be changed after accumulatedtimebank has been
     public void calculateTimeBankAndPlannedHours(Long unitId, Map<Long, List<DailyTimeBankEntry>> employmentDailyTimeBankEntryMap, Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, Map<BigInteger,OpenShift> openShiftMap) {

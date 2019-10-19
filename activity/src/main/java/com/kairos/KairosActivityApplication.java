@@ -116,40 +116,33 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 	@Primary
 	@Bean
 	public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
-		RestTemplate template =restTemplateBuilder
-				.interceptors(new UserContextInterceptor())
-				.messageConverters(mappingJackson2HttpMessageConverter())
-				.build();
-		return template;
+		return restTemplateBuilder.interceptors(new UserContextInterceptor()).messageConverters(mappingJackson2HttpMessageConverter()).build();
 	}
 
 	@Profile({"development","qa","production"})
 	@LoadBalanced
 	@Bean(name ="restTemplateWithoutAuth")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
-		RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
 				.messageConverters(mappingJackson2HttpMessageConverter())
 				.build();
-		return template;
 	}
 
     @Profile({"local", "test"})
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
 	@Profile({"local", "test"})
     @Bean(name ="restTemplateWithoutAuth")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 }

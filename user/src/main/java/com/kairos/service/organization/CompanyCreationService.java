@@ -8,7 +8,6 @@ import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -23,7 +22,6 @@ import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -239,8 +237,9 @@ public class CompanyCreationService {
                 organizationIds.add(unit.getId());
                 accessGroupService.removeDefaultCopiedAccessGroup(organizationIds);
 
-                if(unit instanceof Organization)
-                accessGroupService.createDefaultAccessGroups(((Organization) unit), ((Organization) unit).getUnits());
+                if(unit instanceof Organization) {
+                    accessGroupService.createDefaultAccessGroups(((Organization) unit), ((Organization) unit).getUnits());
+                }
             }
         }
         setCompanyData(unit, orgDetails);

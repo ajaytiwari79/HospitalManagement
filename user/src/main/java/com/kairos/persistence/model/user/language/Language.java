@@ -2,6 +2,9 @@ package com.kairos.persistence.model.user.language;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -16,6 +19,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.BELON
  * Created by prabjot on 19/10/16.
  */
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Language extends UserBaseEntity {
 
     @NotBlank(message = "error.Language.name.notEmpty")
@@ -33,73 +39,6 @@ public class Language extends UserBaseEntity {
     private long readLevel;
     private long writeLevel;
     private long speakLevel;
-
-
-    public long getReadLevel() {
-        return readLevel;
-    }
-
-    public void setReadLevel(long readLevel) {
-        this.readLevel = readLevel;
-    }
-
-    public long getWriteLevel() {
-        return writeLevel;
-    }
-
-    public void setWriteLevel(long writeLevel) {
-        this.writeLevel = writeLevel;
-    }
-
-    public long getSpeakLevel() {
-        return speakLevel;
-    }
-
-    public void setSpeakLevel(long speakLevel) {
-        this.speakLevel = speakLevel;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = StringUtils.trim(description);
-    }
-
-    public boolean isInactive() {
-        return inactive;
-    }
-
-    public void setInactive(boolean inactive) {
-        this.inactive = inactive;
-    }
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public Language(){}
-
-    public void setName(String name) {
-        this.name = StringUtils.trim(name);
-    }
-
-    public String getName() {
-        return name;
-    }
 
     public Language(String name, boolean inactive) {
         this.name = name;

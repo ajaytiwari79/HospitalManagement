@@ -4,36 +4,16 @@ package com.kairos.dto.activity.staffing_level;
  *
  */
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigInteger;
 import java.util.List;
 
+@Getter
+@Setter
 public class StaffingLevelFromTemplateDTO {
 
     private BigInteger templateId;
     private List<DateWiseActivityDTO> activitiesByDate;
-
-    public StaffingLevelFromTemplateDTO() {
-        //Default Constructor
-    }
-
-    public StaffingLevelFromTemplateDTO(BigInteger templateId, List<DateWiseActivityDTO> activitiesByDate) {
-        this.templateId = templateId;
-        this.activitiesByDate = activitiesByDate;
-    }
-
-    public BigInteger getTemplateId() {
-        return templateId;
-    }
-
-    public void setTemplateId(BigInteger templateId) {
-        this.templateId = templateId;
-    }
-
-    public List<DateWiseActivityDTO> getActivitiesByDate() {
-        return activitiesByDate;
-    }
-
-    public void setActivitiesByDate(List<DateWiseActivityDTO> activitiesByDate) {
-        this.activitiesByDate = activitiesByDate;
-    }
 }

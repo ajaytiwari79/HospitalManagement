@@ -1,8 +1,13 @@
 package com.kairos.dto.user.staff;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Created by oodles on 19/4/17.
  */
+@Getter
+@Setter
 public class GeoCoordinates {
     private String present;
 
@@ -10,35 +15,6 @@ public class GeoCoordinates {
 
     private String x;
 
-    public String getPresent ()
-    {
-        return present;
-    }
-
-    public void setPresent (String present)
-    {
-        this.present = present;
-    }
-
-    public String getY ()
-    {
-        return y;
-    }
-
-    public void setY (String y)
-    {
-        this.y = y;
-    }
-
-    public String getX ()
-    {
-        return x;
-    }
-
-    public void setX (String x)
-    {
-        this.x = x;
-    }
 
     @Override
     public String toString()

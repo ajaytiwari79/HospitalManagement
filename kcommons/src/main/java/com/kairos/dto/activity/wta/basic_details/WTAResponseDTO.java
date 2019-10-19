@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -18,6 +21,9 @@ import java.util.Map;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
+@NoArgsConstructor
 public class WTAResponseDTO {
 
     private List<WTABaseRuleTemplateDTO> ruleTemplates;
@@ -39,10 +45,6 @@ public class WTAResponseDTO {
     private List<TagDTO> tags;
     private Map<String, Object> unitInfo;
 
-    public WTAResponseDTO() {
-        //default
-    }
-
     public WTAResponseDTO(String name, BigInteger id,BigInteger parentId) {
         this.name = name;
         this.id = id;
@@ -57,141 +59,6 @@ public class WTAResponseDTO {
         this.description = description;
 
 
-    }
-    public Map<String, Object> getUnitInfo() {
-        return unitInfo;
-    }
-
-    public void setUnitInfo(Map<String, Object> unitInfo) {
-        this.unitInfo = unitInfo;
-    }
-
-    public List<WTAResponseDTO> getVersions() {
-        return versions;
-    }
-
-    public void setVersions(List<WTAResponseDTO> versions) {
-        this.versions = versions;
-    }
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
-
-    public WTAResponseDTO getParentWTAResponse() {
-        return parentWTAResponse;
-    }
-
-    public void setParentWTAResponse(WTAResponseDTO parentWTAResponse) {
-        this.parentWTAResponse = parentWTAResponse;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public Long getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Long expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public ExpertiseResponseDTO getExpertise() {
-        return expertise;
-    }
-
-    public void setExpertise(ExpertiseResponseDTO expertise) {
-        this.expertise = expertise;
-    }
-
-    public OrganizationTypeDTO getOrganizationType() {
-        return organizationType;
-    }
-
-    public void setOrganizationType(OrganizationTypeDTO organizationType) {
-        this.organizationType = organizationType;
-    }
-
-    public OrganizationTypeDTO getOrganizationSubType() {
-        return organizationSubType;
-    }
-
-    public void setOrganizationSubType(OrganizationTypeDTO organizationSubType) {
-        this.organizationSubType = organizationSubType;
-    }
-
-    public List<WTABaseRuleTemplateDTO> getRuleTemplates() {
-        return ruleTemplates;
-    }
-
-    public void setRuleTemplates(List<WTABaseRuleTemplateDTO> ruleTemplates) {
-        this.ruleTemplates = ruleTemplates;
-    }
-
-    public List<TagDTO> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<TagDTO> tags) {
-        this.tags = tags;
-    }
-
-    public BigInteger getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(BigInteger parentId) {
-        this.parentId = parentId;
-    }
-
-    public BigInteger getOrganizationParentId() {
-        return organizationParentId;
-    }
-
-    public void setOrganizationParentId(BigInteger organizationParentId) {
-        this.organizationParentId = organizationParentId;
     }
 
     public WTAResponseDTO(BigInteger id, LocalDate startDate, LocalDate endDate, String name, String description, ExpertiseResponseDTO expertise, OrganizationTypeDTO organizationType, OrganizationTypeDTO organizationSubType, List<TagDTO> tags) {

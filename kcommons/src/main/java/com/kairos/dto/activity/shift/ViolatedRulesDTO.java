@@ -1,5 +1,8 @@
 package com.kairos.dto.activity.shift;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -10,6 +13,8 @@ import java.util.Optional;
  * @date - 29/8/18
  */
 
+@Getter
+@Setter
 public class ViolatedRulesDTO {
 
     private List<WorkTimeAgreementRuleViolation> workTimeAgreements = new ArrayList<>();
@@ -21,15 +26,4 @@ public class ViolatedRulesDTO {
         return workTimeAgreements;
     }
 
-    public void setWorkTimeAgreements(List<WorkTimeAgreementRuleViolation> workTimeAgreements) {
-        this.workTimeAgreements = workTimeAgreements;
-    }
-
-    public List<ActivityRuleViolation> getActivities() {
-        return Optional.ofNullable(activities).orElse(new ArrayList<>());
-    }
-
-    public void setActivities(List<ActivityRuleViolation> activities) {
-        this.activities = activities;
-    }
 }

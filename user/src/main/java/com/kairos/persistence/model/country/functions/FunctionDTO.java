@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Unit;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
@@ -16,6 +19,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @QueryResult
+@Getter
+@Setter
+@NoArgsConstructor
 public class FunctionDTO {
     private Long id;
     private String name;
@@ -29,14 +35,10 @@ public class FunctionDTO {
     private String icon;
     private List<LocalDate> appliedDates;
     private Long employmentId;
+    private int code;
 
 
-
-    public FunctionDTO() {
-        //Default Constructor
-    }
-
-    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Unit> unions, List<Level> organizationLevels, String icon) {
+    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Unit> unions, List<Level> organizationLevels, String icon,int code) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -45,101 +47,6 @@ public class FunctionDTO {
         this.unions = unions;
         this.organizationLevels = organizationLevels;
         this.icon = icon;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public List<Unit> getUnions() {
-        return unions;
-    }
-
-    public void setUnions(List<Unit> unions) {
-        this.unions = unions;
-    }
-
-    public List<Level> getOrganizationLevels() {
-        return organizationLevels;
-    }
-
-    public void setOrganizationLevels(List<Level> organizationLevels) {
-        this.organizationLevels = organizationLevels;
-    }
-
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public boolean isAmountEditableAtUnit() {
-        return amountEditableAtUnit;
-    }
-
-    public void setAmountEditableAtUnit(boolean amountEditableAtUnit) {
-        this.amountEditableAtUnit = amountEditableAtUnit;
-    }
-
-    public List<LocalDate> getAppliedDates() {
-        return appliedDates;
-    }
-
-    public void setAppliedDates(List<LocalDate> appliedDates) {
-        this.appliedDates = appliedDates;
-    }
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
+        this.code=code;
     }
 }

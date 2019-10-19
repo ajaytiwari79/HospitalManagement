@@ -56,9 +56,7 @@ public class SkillServiceTemplateClient {
 
             if (restExchange.getStatusCode().is2xxSuccessful()) {
 
-                Map<String, Object> taskTypeListInfo = (Map<String, Object>)response.getData();
-
-                return taskTypeListInfo;
+                return (Map<String, Object>)response.getData();
 
             } else {
                 throw new RuntimeException(response.getMessage());

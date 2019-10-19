@@ -24,7 +24,7 @@ import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseDTO;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseDTO;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationTypeGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -46,7 +46,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -213,7 +212,7 @@ public class EmploymentTypeService {
         return employmentSettingForOrganization;
     }
 
-    public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId,String selectedDate) throws ParseException {
+    public OrganizationMappingDTO getOrganizationMappingDetails(Long countryId,String selectedDate) {
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         // Set employment type
         organizationMappingDTO.setEmploymentTypes(getEmploymentTypeList(countryId, false));
@@ -250,8 +249,7 @@ public class EmploymentTypeService {
         List<DayType>  dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
 
         List<com.kairos.dto.user.country.day_type.DayType> dayTypesDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(dayTypes, com.kairos.dto.user.country.day_type.DayType.class);
-        DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper= new DayTypeEmploymentTypeWrapper(dayTypesDTOS,employmentTypeDTOS);
-        return  dayTypeEmploymentTypeWrapper;
+        return new DayTypeEmploymentTypeWrapper(dayTypesDTOS,employmentTypeDTOS);
 
     }
 

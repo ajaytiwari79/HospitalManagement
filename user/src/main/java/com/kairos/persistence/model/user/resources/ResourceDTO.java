@@ -1,5 +1,8 @@
 package com.kairos.persistence.model.user.resources;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.validation.constraints.NotNull;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_DESCRIPTION_NOTNULL;
@@ -7,6 +10,8 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_DESCRIPTION_NOTNU
 /**
  * Created by prabjot on 13/10/17.
  */
+@Getter
+@Setter
 public class ResourceDTO {
 
     @NotNull(message = "Registration number can't be empty")
@@ -21,77 +26,6 @@ public class ResourceDTO {
     private Long vehicleTypeId;
     private String decommissionDate;
 
-    public ResourceDTO() {
-        //default constructor
-    }
-
-    public ResourceDTO(String registrationNumber, String number, String modelDescription, float costPerKM,
-                       FuelType fuelType, Long vehicleTypeId) {
-        this.registrationNumber = registrationNumber;
-        this.number = number;
-        this.modelDescription = modelDescription;
-        this.costPerKM = costPerKM;
-        this.fuelType = fuelType;
-        this.vehicleTypeId = vehicleTypeId;
-    }
-
-    public Long getVehicleTypeId() {
-        return vehicleTypeId;
-    }
-
-    public void setVehicleTypeId(Long vehicleTypeId) {
-        this.vehicleTypeId = vehicleTypeId;
-    }
-
-
-
-    public String getRegistrationNumber() {
-        return registrationNumber;
-    }
-
-    public void setRegistrationNumber(String registrationNumber) {
-        this.registrationNumber = registrationNumber;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getModelDescription() {
-        return modelDescription;
-    }
-
-    public void setModelDescription(String modelDescription) {
-        this.modelDescription = modelDescription;
-    }
-
-    public float getCostPerKM() {
-        return costPerKM;
-    }
-
-    public void setCostPerKM(float costPerKM) {
-        this.costPerKM = costPerKM;
-    }
-
-    public FuelType getFuelType() {
-        return fuelType;
-    }
-
-    public void setFuelType(FuelType fuelType) {
-        this.fuelType = fuelType;
-    }
-
-    public String getDecommissionDate() {
-        return decommissionDate;
-    }
-
-    public void setDecommissionDate(String decommissionDate) {
-        this.decommissionDate = decommissionDate;
-    }
 
     @Override
     public String toString() {

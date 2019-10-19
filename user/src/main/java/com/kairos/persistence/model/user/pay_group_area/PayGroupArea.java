@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.Level;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -17,15 +20,14 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.IN_LE
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class PayGroupArea extends UserBaseEntity {
     private String name;
     private String description;
     @Relationship(type = IN_LEVEL)
     private Level level;
-
-    public PayGroupArea() {
-        //default constructor
-    }
 
     public PayGroupArea(String name, String description, Level level) {
         this.name = name;
@@ -38,27 +40,4 @@ public class PayGroupArea extends UserBaseEntity {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Level getLevel() {
-        return level;
-    }
-
-    public void setLevel(Level level) {
-        this.level = level;
-    }
 }

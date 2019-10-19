@@ -670,8 +670,8 @@ public class WorkTimeAgreementService extends MongoBaseService {
         List<CTAWTAResponseDTO> ctaWtas = new ArrayList<>();
         for (WorkingTimeAgreement wta : newWtas) {
 
-            CTAWTAResponseDTO ctaWTAResponseDTO = new CTAWTAResponseDTO(wta.getId(), wta.getName(), wta.getEmploymentId(), ctaMap.get(wta.getEmploymentId()).getId(),
-                    ctaMap.get(wta.getEmploymentId()).getName());
+            CTAWTAResponseDTO ctaWTAResponseDTO = new CTAWTAResponseDTO( ctaMap.get(wta.getEmploymentId()).getId(),
+                    ctaMap.get(wta.getEmploymentId()).getName(),wta.getId(), wta.getName(), wta.getEmploymentId());
             ctaWtas.add(ctaWTAResponseDTO);
 
         }

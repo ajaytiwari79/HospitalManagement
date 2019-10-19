@@ -33,7 +33,6 @@ import org.javers.repository.jql.QueryBuilder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
