@@ -1023,7 +1023,7 @@ public class ClientService {
         ClientHomeAddressQueryResult addressOfHouseHoldPerson = clientGraphRepository.getHomeAddress(houseHoldPeople.getId());
         boolean hasSameAddress = false;
         if (Optional.ofNullable(addressOfClient).isPresent() && Optional.ofNullable(addressOfHouseHoldPerson).isPresent()) {
-            hasSameAddress = (addressOfClient.getHomeAddress().getStreet().equalsIgnoreCase(addressOfHouseHoldPerson.getHomeAddress().getStreet()) && addressOfClient.getHomeAddress().getHouseNumber().equalsIgnoreCase(addressOfHouseHoldPerson.getHomeAddress().getHouseNumber()) && addressOfClient.getZipCode().getZipCode()==addressOfHouseHoldPerson.getHomeAddress().getZipCode().getZipCode());
+            hasSameAddress = (addressOfClient.getHomeAddress().getStreet().equalsIgnoreCase(addressOfHouseHoldPerson.getHomeAddress().getStreet()) && addressOfClient.getHomeAddress().getHouseNumber().equalsIgnoreCase(addressOfHouseHoldPerson.getHomeAddress().getHouseNumber()) && addressOfClient.getZipCode().getZipCode() == addressOfHouseHoldPerson.getHomeAddress().getZipCode().getZipCode());
         }
         return hasSameAddress;
     }
