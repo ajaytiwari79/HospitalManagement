@@ -1,5 +1,7 @@
 package com.kairos.dto.user.skill;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
@@ -10,6 +12,8 @@ import java.util.Map;
  * Skill Domain extends UserBaseEntity
  * SKill has relationship with SkillLevel Domain
  */
+@Getter
+@Setter
 public class Skill {
     @NotEmpty(message = "error.Skill.name.notEmpty") @NotNull(message = "error.Skill.name.notnull")
     private String name;
@@ -32,48 +36,6 @@ public class Skill {
         this.skillCategory = skillCategory;
     }
 
-    public Skill() {
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
-    public SkillCategory getSkillCategory() {
-        return skillCategory;
-    }
-
-    public void setSkillCategory(SkillCategory skillCategory) {
-        this.skillCategory = skillCategory;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public Map<String, Object> retrieveDetails() {
         Map<String,Object> data = new HashMap<>();
@@ -100,14 +62,6 @@ public class Skill {
             }
             return null;
         }
-    }
-
-    public SkillStatus getSkillStatus() {
-        return skillStatus;
-    }
-
-    public void setSkillStatus(SkillStatus skillStatus) {
-        this.skillStatus = skillStatus;
     }
 
     public enum SkillStatus {

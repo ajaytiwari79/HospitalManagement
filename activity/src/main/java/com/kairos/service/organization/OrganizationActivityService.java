@@ -271,7 +271,7 @@ public class OrganizationActivityService extends MongoBaseService {
         BalanceSettingsActivityTab balanceSettingsActivityTab = activity.getBalanceSettingsActivityTab();
         generalActivityTabWithTagDTO.setAddTimeTo(balanceSettingsActivityTab.getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(balanceSettingsActivityTab.getTimeTypeId());
-        generalActivityTabWithTagDTO.setOnCallTimePresent(balanceSettingsActivityTab.getOnCallTimePresent());
+        generalActivityTabWithTagDTO.setOnCallTimePresent(balanceSettingsActivityTab.isOnCallTimePresent());
         generalActivityTabWithTagDTO.setNegativeDayBalancePresent(balanceSettingsActivityTab.getNegativeDayBalancePresent());
         generalActivityTabWithTagDTO.setTimeType(balanceSettingsActivityTab.getTimeType());
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
@@ -364,7 +364,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityMongoRepository.save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
+        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().isOnCallTimePresent());
         generalActivityTabWithTagDTO.setNegativeDayBalancePresent(activity.getBalanceSettingsActivityTab().getNegativeDayBalancePresent());
         generalActivityTabWithTagDTO.setTimeType(activity.getBalanceSettingsActivityTab().getTimeType());
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
@@ -530,43 +530,9 @@ public class OrganizationActivityService extends MongoBaseService {
             save(activityCopiedList);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
-            updateCompositeActivitiesIds(activityCopiedList);
         }
     }
 
-    /**
-     * This method is used to update all composite activities Ids
-     * which is initially set as country level composite activities,
-     * after update all composite activities will be updated
-     * as per Organizational level composite activities Ids.
-     * CalledBy {#createDefaultDataForOrganization}
-     *
-     * @param activities{after copied into database}
-     * @author mohit
-     * @date 5-10-2018
-     */
-    private void updateCompositeActivitiesIds(List<Activity> activities) {
-       /* Map<BigInteger, BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k -> k.getParentId(), v -> v.getId()));
-        for (Activity activity : activities) {
-            Iterator<CompositeActivity> compositeActivityIterator = activity.getCompositeActivities().iterator();
-            while (compositeActivityIterator.hasNext()) {
-                CompositeActivity compositeActivity = compositeActivityIterator.next();
-                if (activityIdMap.containsKey(compositeActivity.getActivityId())) {
-                    compositeActivity.setActivityId(activityIdMap.get(compositeActivity.getActivityId()));
-                } else {
-                    compositeActivityIterator.remove();
-                }
-            }
-            List<BigInteger> copyChildActivtiies = new CopyOnWriteArrayList<>(activity.getChildActivityIds());
-            for (BigInteger childActivityId : copyChildActivtiies) {
-                if (activityIdMap.containsKey(childActivityId)) {
-                    activity.getChildActivityIds().add(activityIdMap.get(childActivityId));
-                }
-                activity.getChildActivityIds().remove(childActivityId);
-            }
-        }
-        save(activities);*/
-    }
 
 
     /**

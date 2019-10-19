@@ -1,37 +1,23 @@
 package com.kairos.dto.user.organization;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 /**
  * @author pradeep
  * @date - 12/6/18
  */
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrganizationSettingDTO {
 
     /*Walking Time setting*/
     private int walkingMeter;
     private int walkingMinutes;
 
-    public OrganizationSettingDTO() {
-    }
-
-    public OrganizationSettingDTO(int walkingMeter, int walkingMinutes) {
-        this.walkingMeter = walkingMeter;
-        this.walkingMinutes = walkingMinutes;
-    }
-
-    public int getWalkingMeter() {
-        return walkingMeter;
-    }
-
-    public void setWalkingMeter(int walkingMeter) {
-        this.walkingMeter = walkingMeter;
-    }
-
-    public int getWalkingMinutes() {
-        return walkingMinutes;
-    }
-
-    public void setWalkingMinutes(int walkingMinutes) {
-        this.walkingMinutes = walkingMinutes;
-    }
 }

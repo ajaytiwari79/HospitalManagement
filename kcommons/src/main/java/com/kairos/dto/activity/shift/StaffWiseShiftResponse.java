@@ -1,37 +1,19 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.dto.user.staff.staff.Staff;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class StaffWiseShiftResponse {
     private Staff staff;
-
     private List<ShiftResponse> shiftResponses;
 
-    public StaffWiseShiftResponse() {
-        //DC
-    }
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Staff staff) {
-        this.staff = staff;
-    }
-
-
-    public List<ShiftResponse> getShiftResponses() {
-        return shiftResponses;
-    }
-
-    public void setShiftResponses(List<ShiftResponse> shiftResponses) {
-        this.shiftResponses = shiftResponses;
-    }
-
-    public StaffWiseShiftResponse(Staff staff,  List<ShiftResponse> shiftResponses) {
-        this.staff = staff;
-        this.shiftResponses = shiftResponses;
-    }
 }

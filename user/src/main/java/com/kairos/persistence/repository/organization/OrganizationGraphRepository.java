@@ -88,4 +88,20 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "unwind units as x with distinct x \n" +
             "RETURN x")
     List<Long> getAllUnitsByCountryId(Long countryId);
+
+    @Query("MATCH(exl:ExpertiseLine)  WHERE id(exl)={0} " +
+            "OPTIONAL MATCH(exl)-[rel:"+BELONGS_TO_SECTOR+"]-(sector:Sector)\n" +
+            "with exl,rel  " +
+            "MATCH(newSector:Sector) where id(newSector) = {1} \n" +
+            "DETACH delete rel \n" +
+            "CREATE UNIQUE(exl)-[:"+BELONGS_TO_SECTOR+"]-(newSector) ")
+    void addSector(Long expertiseLineId,Long sectorId);
+
+    @Query("MATCH(exl:ExpertiseLine)  WHERE id(exl)={0} " +
+            "OPTIONAL MATCH(exl)-[rel:"+SUPPORTED_BY_UNION+"]-(union:Organization)\n" +
+            "with exl,rel  " +
+            "MATCH(newUnion:Organization) where id(newUnion) = {1} \n" +
+            "DETACH delete rel \n" +
+            "CREATE UNIQUE(exl)-[:"+SUPPORTED_BY_UNION+"]-(newUnion) ")
+    void addUnion(Long expertiseLineId,Long unionId);
 }

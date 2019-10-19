@@ -2,6 +2,8 @@ package com.kairos.persistence.model.user.integration;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
@@ -9,36 +11,10 @@ import org.neo4j.ogm.annotation.NodeEntity;
  */
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class TimeCare  extends UserBaseEntity {
     private Integer integrationId;
     private Long organizationId;
     private String timeCareExternalId;
-
-    public TimeCare() {
-        //Default Constructor
-    }
-
-    public Integer getIntegrationId() {
-        return integrationId;
-    }
-
-    public void setIntegrationId(Integer integrationId) {
-        this.integrationId = integrationId;
-    }
-
-    public Long getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(Long organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    public String getTimeCareExternalId() {
-        return timeCareExternalId;
-    }
-
-    public void setTimeCareExternalId(String timeCareExternalId) {
-        this.timeCareExternalId = timeCareExternalId;
-    }
 }

@@ -328,30 +328,6 @@ public class TaskExceptionService extends MongoBaseService {
         Task task =  taskService.findOne(String.valueOf(taskId));
 
         return new HashMap<>();
-
-        /*Map<String, String> flsCredentials = integrationServiceRestClient.getFLSCredentials(unitId);
-
-        Map <String,Object> callMetaData = new HashMap<>();
-        callMetaData.put("functionCode",1);
-
-        *//*callMetaData.put("extID","88068"); // for single suggestion
-        callMetaData.put("vtid",88068);*//*
-
-        *//*callMetaData.put("extID","1656293"); // for two suggestions
-        callMetaData.put("vtid",51120);*//*
-
-        *//*callMetaData.put("extID","1581097"); // no suggestion
-        callMetaData.put("vtid",93359);*//*
-
-        callMetaData.put("extID", task.getId());
-        callMetaData.put("vtid", task.getVisitourId());
-
-        List<TaskAppointmentSuggestionDTO> taskAppointmentSuggestionDTOList = scheduler.getAppointmentSuggestions(callMetaData,flsCredentials);
-        logger.debug("taskAppointmentSuggestionDTOList >>>>>>  "+taskAppointmentSuggestionDTOList);
-
-        returnData.put("taskId",taskId);
-        returnData.put("taskAppointmentSuggestionList",taskAppointmentSuggestionDTOList);*/
-
     }
 
     public List<TaskGanttDTO> confirmAppointmentSuggestion(long unitId,long taskId, @RequestBody Map<String, Object> payload) throws ParseException {

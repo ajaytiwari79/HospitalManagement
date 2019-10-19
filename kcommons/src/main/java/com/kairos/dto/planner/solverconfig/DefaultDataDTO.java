@@ -7,11 +7,14 @@ import com.kairos.dto.user.organization.OrganizationServiceDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.constraint.ConstraintType;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+@Getter
+@Setter
 public class DefaultDataDTO {
 
     private List<OrganizationServiceDTO> organizationServices;
@@ -20,54 +23,6 @@ public class DefaultDataDTO {
     private List<TimeTypeEnum> timeTypeEnums;
     private Map<ConstraintType, Set<ConstraintSubType>> constraintTypes;
     private List<PlanningProblemDTO> planningProblems;
-
-    public Map<ConstraintType, Set<ConstraintSubType>> getConstraintTypes() {
-        return constraintTypes;
-    }
-
-    public void setConstraintTypes(Map<ConstraintType, Set<ConstraintSubType>> constraintTypes) {
-        this.constraintTypes = constraintTypes;
-    }
-
-    public List<OrganizationServiceDTO> getOrganizationServices() {
-        return organizationServices;
-    }
-
-    public void setOrganizationServices(List<OrganizationServiceDTO> organizationServices) {
-        this.organizationServices = organizationServices;
-    }
-
-    public List<PhaseDTO> getPhases() {
-        return phases;
-    }
-
-    public void setPhases(List<PhaseDTO> phases) {
-        this.phases = phases;
-    }
-
-    public List<PlanningPeriodDTO> getPlanningPeriods() {
-        return planningPeriods;
-    }
-
-    public void setPlanningPeriods(List<PlanningPeriodDTO> planningPeriods) {
-        this.planningPeriods = planningPeriods;
-    }
-
-    public List<TimeTypeEnum> getTimeTypeEnums() {
-        return timeTypeEnums;
-    }
-
-    public void setTimeTypeEnums(List<TimeTypeEnum> timeTypeEnums) {
-        this.timeTypeEnums = timeTypeEnums;
-    }
-
-    public List<PlanningProblemDTO> getPlanningProblems() {
-        return planningProblems;
-    }
-
-    public void setPlanningProblems(List<PlanningProblemDTO> planningProblems) {
-        this.planningProblems = planningProblems;
-    }
 
     public DefaultDataDTO setPlanningProblemsBuilder(List<PlanningProblemDTO> planningProblems) {
         this.planningProblems = planningProblems;

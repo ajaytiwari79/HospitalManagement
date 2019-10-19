@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.constants.CommonConstants.DELETED;
-import static com.kairos.constants.CommonConstants.UNIT_ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**

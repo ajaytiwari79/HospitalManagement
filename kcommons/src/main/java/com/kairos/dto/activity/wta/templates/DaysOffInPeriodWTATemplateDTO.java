@@ -27,66 +27,6 @@ public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private int restingTime;
     private float recommendedValue;
 
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-
-    public boolean isRestingTimeAllowed() {
-        return restingTimeAllowed;
-    }
-
-    public void setRestingTimeAllowed(boolean restingTimeAllowed) {
-        this.restingTimeAllowed = restingTimeAllowed;
-    }
-    public int getRestingTime() {
-        return restingTime;
-    }
-
-    public void setRestingTime(int restingTime) {
-        this.restingTime = restingTime;
-    }
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
-
-
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(long intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-
     public DaysOffInPeriodWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.DAYS_OFF_IN_PERIOD;
     }

@@ -1,27 +1,17 @@
 package com.kairos.dto.user.organization.skill;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Skill Level Domain
  */
-
+@Getter
+@Setter
 public class SkillLevel {
     private Long id;
 
     private String name;
 
-    public SkillLevel() {
-    }
-
-    public SkillLevel(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }
