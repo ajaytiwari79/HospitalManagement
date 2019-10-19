@@ -2,6 +2,9 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.pay_table.PayGrade;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -14,6 +17,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_B
  * Created by vipul on 27/3/18.
  */
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel>,Serializable {
     private Integer from; // this is stored as years
     private Integer to;   // this is stored as years
@@ -27,65 +33,6 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
     private BigDecimal freeChoiceToPension;
     private boolean published;
 
-    public SeniorityLevel() {
-        // de
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public Integer getFrom() {
-        return from;
-    }
-
-    public void setFrom(Integer from) {
-        this.from = from;
-    }
-
-    public Integer getTo() {
-        return to;
-    }
-
-    public void setTo(Integer to) {
-        this.to = to;
-    }
-
-    public PayGrade getPayGrade() {
-        return payGrade;
-    }
-
-    public void setPayGrade(PayGrade payGrade) {
-        this.payGrade = payGrade;
-    }
-
-    public BigDecimal getPensionPercentage() {
-        return pensionPercentage;
-    }
-
-    public void setPensionPercentage(BigDecimal pensionPercentage) {
-        this.pensionPercentage = pensionPercentage;
-    }
-
-    public BigDecimal getFreeChoicePercentage() {
-        return freeChoicePercentage;
-    }
-
-    public void setFreeChoicePercentage(BigDecimal freeChoicePercentage) {
-        this.freeChoicePercentage = freeChoicePercentage;
-    }
-
-    public BigDecimal getFreeChoiceToPension() {
-        return freeChoiceToPension;
-    }
-
-    public void setFreeChoiceToPension(BigDecimal freeChoiceToPension) {
-        this.freeChoiceToPension = freeChoiceToPension;
-    }
 
     public SeniorityLevel(Integer from, Integer to, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension, boolean published) {
         this.from = from;
@@ -96,7 +43,7 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
         this.published = published;
     }
 
-    public SeniorityLevel(Integer from, Integer to, PayGrade payGrade, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension, boolean published) {
+    public SeniorityLevel(Long id,Integer from, Integer to, PayGrade payGrade, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension, boolean published) {
         this.from = from;
         this.to = to;
         this.payGrade = payGrade;

@@ -1,21 +1,13 @@
 package com.kairos.dto.user.country.tag;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Created by prerna on 13/11/17.
  */
+@Getter
+@Setter
 public class ShowCountryTagSetting {
     boolean showCountryTags;
-
-    public boolean isShowCountryTags() {
-        return showCountryTags;
-    }
-
-    public void setShowCountryTags(boolean showCountryTags) {
-        this.showCountryTags = showCountryTags;
-    }
-
-    public ShowCountryTagSetting(boolean showCountryTags){
-        this.showCountryTags = showCountryTags;
-    }
-    ShowCountryTagSetting(){ }
 }

@@ -61,38 +61,6 @@ public class TimeBankDTO {
     private LocalDate planningPeriodStartDate;
     private LocalDate planningPeriodEndDate;
 
-    public TimeBankDTO(Long employmentId, Long staffId, int workingDaysInWeek, int totalWeeklyMins)
-     {
-        this.employmentId = employmentId;
-        this.staffId = staffId;
-        this.workingDaysInWeek = workingDaysInWeek;
-        this.totalWeeklyMin = totalWeeklyMins;
-    }
-
-
-    public float getHourlyCost() {
-        return hourlyCost;
-    }
-
-    public void setHourlyCost(float hourlyCost) {
-        this.hourlyCost = hourlyCost;
-    }
-
-    public long getTotalDeltaBalanceCorrection() {
-        return totalDeltaBalanceCorrection;
-    }
-
-    public void setTotalDeltaBalanceCorrection(long totalDeltaBalanceCorrection) {
-        this.totalDeltaBalanceCorrection = totalDeltaBalanceCorrection;
-    }
-
-    public String getPhaseName() {
-        return phaseName;
-    }
-
-    public void setPhaseName(String phaseName) {
-        this.phaseName = phaseName;
-    }
 
     public TimeBankDTO() {
         this.phaseName = "Total";

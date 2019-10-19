@@ -2,12 +2,12 @@ package com.kairos.service.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
-import com.kairos.rest_client.UserIntegrationService;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;

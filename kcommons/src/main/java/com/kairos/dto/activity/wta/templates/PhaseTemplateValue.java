@@ -1,13 +1,19 @@
 package com.kairos.dto.activity.wta.templates;
 
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigInteger;
 import java.util.Objects;
 
 /**
  * Created by pavan on 18/1/18.
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class PhaseTemplateValue {
     private BigInteger phaseId;
     private String phaseName;
@@ -18,21 +24,6 @@ public class PhaseTemplateValue {
     private boolean staffCanIgnore;
     private boolean managementCanIgnore;
 
-
-    public BigInteger getPhaseId() {
-        return phaseId;
-    }
-
-    public void setPhaseId(BigInteger phaseId) {
-        this.phaseId = phaseId;
-    }
-
-
-
-
-    public PhaseTemplateValue() {
-        //Default Constructor
-    }
 
     public PhaseTemplateValue(BigInteger phaseId, String phaseName, short staffValue, short managementValue, boolean disabled, boolean staffCanIgnore, boolean managementCanIgnore, int sequence) {
         this.phaseId = phaseId;
@@ -45,62 +36,6 @@ public class PhaseTemplateValue {
         this.sequence = sequence;
     }
 
-    public String getPhaseName() {
-        return phaseName;
-    }
-
-    public void setPhaseName(String phaseName) {
-        this.phaseName = phaseName;
-    }
-
-    public short getStaffValue() {
-        return staffValue;
-    }
-
-    public void setStaffValue(short staffValue) {
-        this.staffValue = staffValue;
-    }
-
-    public short getManagementValue() {
-        return managementValue;
-    }
-
-    public void setManagementValue(short managementValue) {
-        this.managementValue = managementValue;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-
-    public int getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
-    }
-
-    public boolean isStaffCanIgnore() {
-        return staffCanIgnore;
-    }
-
-    public void setStaffCanIgnore(boolean staffCanIgnore) {
-        this.staffCanIgnore = staffCanIgnore;
-    }
-
-    public boolean isManagementCanIgnore() {
-        return managementCanIgnore;
-    }
-
-    public void setManagementCanIgnore(boolean managementCanIgnore) {
-        this.managementCanIgnore = managementCanIgnore;
-    }
 
     @Override
     public boolean equals(Object o) {

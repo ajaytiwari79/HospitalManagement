@@ -3,6 +3,9 @@ package com.kairos.persistence.model.activity.tabs;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -17,6 +20,9 @@ import java.math.BigInteger;
 @Document(collection = "activity_category")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class ActivityCategory extends MongoBaseEntity{
 
     private String name;
@@ -25,14 +31,6 @@ public class ActivityCategory extends MongoBaseEntity{
     private BigInteger timeTypeId;
 
 
-    public ActivityCategory() {
-        //Default Constructor
-    }
-
-    public ActivityCategory(BigInteger id, String name) {
-        setId(id);
-        this.name = name;
-    }
 
     public ActivityCategory(String name, String description, Long countryId, BigInteger timeTypeId) {
         this.name = name;
@@ -41,30 +39,6 @@ public class ActivityCategory extends MongoBaseEntity{
         this.timeTypeId = timeTypeId;
     }
 
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -97,11 +71,4 @@ public class ActivityCategory extends MongoBaseEntity{
                 .toString();
     }
 
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
-    }
-
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
-    }
 }

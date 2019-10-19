@@ -1,10 +1,8 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.client.ContactAddress;
-import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.employment_type.EmploymentType;
 import com.kairos.persistence.model.organization.*;
-import com.kairos.persistence.model.organization.company.CompanyValidationQueryResult;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.organization.union.UnionDataQueryResult;
 import com.kairos.persistence.model.organization.union.UnionQueryResult;

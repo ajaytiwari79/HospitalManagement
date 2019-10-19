@@ -6,6 +6,8 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -19,6 +21,8 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
 
@@ -31,75 +35,6 @@ public class ConsecutiveWorkWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private int intervalLength;//
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
-
-
-    public int getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(int intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
-
-    public List<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(List<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
-
-    public List<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(List<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
-
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
-
-
 
     public ConsecutiveWorkWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.CONSECUTIVE_WORKING_PARTOFDAY;

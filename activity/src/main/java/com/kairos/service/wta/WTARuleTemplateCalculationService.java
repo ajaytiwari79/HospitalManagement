@@ -8,12 +8,10 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.time_bank.TimeBankIntervalDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -23,7 +21,6 @@ import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
-import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.wta.StaffWTACounter;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -35,7 +32,6 @@ import com.kairos.persistence.repository.night_worker.NightWorkerMongoRepository
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.wta.StaffWTACounterRepository;
-import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
@@ -45,7 +41,6 @@ import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -64,7 +59,6 @@ import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValueByPhase;
 import static java.util.Comparator.comparing;
-import static java.util.Comparator.nullsFirst;
 
 @Service
 public class WTARuleTemplateCalculationService {

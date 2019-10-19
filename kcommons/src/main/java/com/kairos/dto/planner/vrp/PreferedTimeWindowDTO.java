@@ -1,5 +1,8 @@
 package com.kairos.dto.planner.vrp;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalTime;
 
 /**
@@ -7,6 +10,8 @@ import java.time.LocalTime;
  * @date - 28/6/18
  */
 
+@Getter
+@Setter
 public class PreferedTimeWindowDTO {
 
 
@@ -16,45 +21,4 @@ public class PreferedTimeWindowDTO {
     private LocalTime toTime;
 
     private String timeWindow;
-
-
-    public String getTimeWindow() {
-        return timeWindow;
-    }
-
-    public void setTimeWindow(String timeWindow) {
-        this.timeWindow = timeWindow;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalTime getFromTime() {
-        return fromTime;
-    }
-
-    public void setFromTime(LocalTime fromTime) {
-        this.fromTime = fromTime;
-    }
-
-    public LocalTime getToTime() {
-        return toTime;
-    }
-
-    public void setToTime(LocalTime toTime) {
-        this.toTime = toTime;
-    }
 }

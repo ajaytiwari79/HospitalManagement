@@ -1,9 +1,13 @@
 package com.kairos.controller.expertise;
 
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.dto.user.country.experties.*;
-import com.kairos.persistence.model.user.expertise.Response.FunctionalPaymentDTO;
-import com.kairos.persistence.model.user.expertise.Response.ProtectedDaysOffSettingDTO;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user.country.experties.AgeRangeDTO;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
+import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
+import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
+import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
+import com.kairos.persistence.model.user.expertise.response.ProtectedDaysOffSettingDTO;
 import com.kairos.service.employment.EmploymentCTAWTAService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.expertise.ExpertiseService;
@@ -26,6 +30,7 @@ import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.*;
 
+
 /**
  * Created by prabjot on 28/10/16.
  */
@@ -43,7 +48,7 @@ public class ExpertiseController {
     @Inject
     private FunctionalPaymentService functionalPaymentService;
     @Inject
-    ExpertiseUnitService expertiseUnitService;
+    private ExpertiseUnitService expertiseUnitService;
     @Inject private EmploymentCTAWTAService employmentCTAWTAService;
 
     @ApiOperation(value = "Assign Staff expertise")
@@ -80,6 +85,9 @@ public class ExpertiseController {
     @RequestMapping(value =  UNIT_URL + "/expertise/{expertiseId}/cta_wta")
     ResponseEntity<Map<String, Object>> getCtaAndWtaByExpertiseId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestParam("staffId") Long staffId,
                                                                   @RequestParam(value = "selectedDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate selectedDate,@RequestParam(name="employmentId",required = false) Long employmentId) throws Exception {
+        if (selectedDate == null) {
+            selectedDate = DateUtils.getCurrentLocalDate();
+        }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getCtaAndWtaWithExpertiseDetailByExpertiseId(unitId, expertiseId, staffId, selectedDate,employmentId));
     }
 
@@ -184,8 +192,8 @@ public class ExpertiseController {
 
     @ApiOperation(value = "copy Expertise")
     @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/copy")
-    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid CopyExpertiseDTO copyExpertiseDTO, @PathVariable long countryId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, copyExpertiseDTO, countryId));
+    public ResponseEntity<Map<String, Object>> copyExpertise(@PathVariable Long expertiseId, @RequestBody @Valid ExpertiseDTO expertiseDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.copyExpertise(expertiseId, expertiseDTO));
     }
 
     @ApiOperation(value = "add proteched days off setting")

@@ -6,7 +6,6 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.conn.HttpHostConnectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
-import java.net.ConnectException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;

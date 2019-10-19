@@ -80,20 +80,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.ACTIVITY_END_DATE_LESS_THAN_START_DATE;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.country.agreement.cta.CalculationFor.*;
 import static com.kairos.enums.cta.AccountType.PAID_OUT;
 import static com.kairos.enums.cta.AccountType.TIMEBANK_ACCOUNT;
-import static com.kairos.enums.phase.PhaseDefaultName.*;
 import static com.kairos.enums.phase.PhaseDefaultName.PAYROLL;
 import static com.kairos.enums.phase.PhaseDefaultName.REALTIME;
+import static com.kairos.enums.phase.PhaseDefaultName.*;
 import static com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService.getCutoffInterval;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.stream.Collectors.*;
-import static java.util.stream.Collectors.groupingBy;
 
 /*
  * Created By Pradeep singh rajawat

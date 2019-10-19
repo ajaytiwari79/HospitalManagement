@@ -38,7 +38,7 @@ public interface PositionGraphRepository extends Neo4jBaseRepository<Position,Lo
 
 
     @Query("MATCH(position:Position)-[r1:" + BELONGS_TO + "]->(staff:Staff) WHERE id(position) in {0} \n" +
-            "MATCH(position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org:Unit) RETURN position, \n" +
+            "MATCH(position)-[:" + HAS_UNIT_PERMISSIONS + "]->(unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(org) RETURN position, \n" +
             "CASE WHEN org IS NOT NULL THEN COLLECT( DISTINCT org) else[] end AS organizations, \n" +
             "CASE WHEN unitPermission is NOT null THEN COLLECT(DISTINCT unitPermission) else[] end AS unitPermissions")
     List<ExpiredPositionsQueryResult> findExpiredPositionsAccessGroupsAndOrganizationsByEndDate(List<Long> positionIds);

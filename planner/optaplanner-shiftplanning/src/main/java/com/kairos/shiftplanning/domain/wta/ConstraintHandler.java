@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public interface ConstraintHandler {
-    //int checkConstraints(List<Shift> shifts);
-    //int checkConstraints(Shift shift);
-    final static Logger log= LoggerFactory.getLogger(ConstraintHandler.class);
+
+     Logger log= LoggerFactory.getLogger(ConstraintHandler.class);
 
     ScoreLevel getLevel();
     int getWeight();
@@ -23,6 +22,8 @@ public interface ConstraintHandler {
                 break;
             case SOFT:scoreHolder.addSoftConstraintMatch(kContext,getWeight()*contraintPenality);
                 log.debug("breaking constraint Soft: {}",getWeight()*contraintPenality);
+                break;
+            default:
                 break;
         }
     }

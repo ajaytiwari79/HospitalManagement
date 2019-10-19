@@ -1,6 +1,8 @@
 package com.kairos.dto.user.country.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
@@ -13,6 +15,8 @@ import java.util.Optional;
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class PayTableDTO {
     private Long id;
     @NotNull(message = "name can't be null")
@@ -32,75 +36,6 @@ public class PayTableDTO {
     private String paymentUnit;
 
     private BigDecimal percentageValue; // this value is being used to update paygrade and functional amount
-
-    public PayTableDTO() {
-        //Not in use
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
-    public LocalDate getStartDateMillis() {
-        return startDateMillis;
-    }
-
-    public void setStartDateMillis(LocalDate startDateMillis) {
-        this.startDateMillis = startDateMillis;
-    }
-
-    public LocalDate getEndDateMillis() {
-        return endDateMillis;
-    }
-
-    public void setEndDateMillis(LocalDate endDateMillis) {
-        this.endDateMillis = endDateMillis;
-    }
-
-    public Long getLevelId() {
-        return levelId;
-    }
-
-    public void setLevelId(Long levelId) {
-        this.levelId = levelId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPercentageValue() {
-        return percentageValue;
-    }
-
-    public void setPercentageValue(BigDecimal percentageValue) {
-        this.percentageValue = percentageValue;
-    }
-
 
     @Override
     public String toString() {

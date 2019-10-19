@@ -5,7 +5,6 @@ import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;

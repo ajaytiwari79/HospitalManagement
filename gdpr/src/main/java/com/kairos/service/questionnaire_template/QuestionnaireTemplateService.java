@@ -1,7 +1,6 @@
 package com.kairos.service.questionnaire_template;
 
 
-import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.gdpr.master_data.QuestionnaireAssetTypeDTO;
 import com.kairos.dto.gdpr.questionnaire_template.QuestionnaireTemplateDTO;

@@ -131,16 +131,6 @@ public class OrganizationMetadataService {
         return organizationMetadataRepository.save(existingLocalAreaTag);
     }
 
-    /*public LocalAreaTagDTO updateBusiestTimeWindow(Long localAreaTagId, List<DayTimeWindowDTO> dayTimeWindowDTOS){
-        LocalAreaTag existingLocalAreaTag = organizationMetadataRepository.findOne(localAreaTagId);
-        List<DayTimeWindow> dayTimeWindows = ObjectMapperUtils.copyPropertiesOfListByMapper(dayTimeWindowDTOS,DayTimeWindow.class);
-        save(dayTimeWindows);
-        existingLocalAreaTag.getDayTimeWindows().addAll(dayTimeWindows);
-        save(existingLocalAreaTag);
-        return ObjectMapperUtils.copyPropertiesByMapper(existingLocalAreaTag,LocalAreaTagDTO.class);
-    }*/
-
-
     public boolean deleteTagData(Long localAreaTagId) {
         LocalAreaTag localAreaTag = organizationMetadataRepository.findOne(localAreaTagId);
         localAreaTag.setDeleted(true);

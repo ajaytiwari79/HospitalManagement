@@ -124,7 +124,7 @@ public class CounterDataService extends MongoBaseService {
                 kpiResults.add(responseData);
             }
         }
-        List<CommonRepresentationData> kpisData = new ArrayList();
+        List<CommonRepresentationData> kpisData = new ArrayList<>();
         for (Future<CommonRepresentationData> data : kpiResults) {
             try {
                 if(isNotNull(data))kpisData.add(data.get());
