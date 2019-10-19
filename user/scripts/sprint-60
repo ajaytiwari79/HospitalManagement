@@ -1,6 +1,5 @@
 
-MATCH(e:Expertise) where e.hasDraftCopy=true OR e.published=false OR e.deleted=true
-DETACH DELETE e;
+MATCH(e:Expertise)-[r:VERSION_OF]-(p:Expertise) DETACH delete r;
 
 
 MATCH (e:Expertise)
