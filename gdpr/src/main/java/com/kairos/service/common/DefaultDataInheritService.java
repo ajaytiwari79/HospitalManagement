@@ -463,7 +463,7 @@ public class DefaultDataInheritService {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Error in constructing the objects::" + ex.getMessage());
+            LOGGER.error("Error in constructing the objects::{}" , ex.getMessage());
         }
         return baseEntityList;
     }
