@@ -2,6 +2,7 @@ package com.kairos.dto.activity.shift;
 
 import com.kairos.enums.DurationType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
@@ -13,6 +14,7 @@ import java.math.BigInteger;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class WorkTimeAgreementRuleViolation {
 
     private BigInteger ruleTemplateId;
