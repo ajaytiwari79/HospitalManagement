@@ -34,13 +34,13 @@ public class TimeSlotFilter implements ShiftFilter {
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         List<TimeInterval> timeIntervals = new ArrayList<>();
         if(validFilter){
-            for (String timeSlotName : filterCriteriaMap.get(TIME_SLOT)) {
+            filterCriteriaMap.get(TIME_SLOT).forEach(timeSlot->{
                 for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
-                    if(timeSlotName.equals(timeSlotDTO.getName())){
+                    if(timeSlot.equals(timeSlotDTO.getName()) || timeSlot.equals(timeSlotDTO.getId().intValue())){
                         timeIntervals.add(new TimeInterval((timeSlotDTO.getStartHour()* AppConstants.ONE_HOUR_MINUTES)+timeSlotDTO.getStartMinute(),(timeSlotDTO.getEndHour()*AppConstants.ONE_HOUR_MINUTES)+timeSlotDTO.getEndMinute()-1));
                     }
                 }
-            }
+            });
             for (ShiftDTO shiftDTO : shiftDTOS) {
                 for (TimeInterval timeInterval : timeIntervals) {
                     if (timeInterval.contains(asZoneDateTime(shiftDTO.getStartDate()).get(ChronoField.MINUTE_OF_DAY))) {

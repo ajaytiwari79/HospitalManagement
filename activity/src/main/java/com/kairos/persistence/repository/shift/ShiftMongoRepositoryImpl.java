@@ -482,6 +482,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         aggregationOperation.add(new CustomAggregationOperation(Document.parse(groupByShiftAndActivity())));
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperation);
         AggregationResults<ShiftWithActivityDTO> result = mongoTemplate.aggregate(aggregation, Shift.class, ShiftWithActivityDTO.class);
+        updateActivityInShift(result.getMappedResults());
         return result.getMappedResults();
     }
 
@@ -539,6 +540,13 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "         '_id' : 1,\n" +
                 "    'name' : 1,\n" +
                 "    'durationMinutes' : 1,\n" +
+                "        'scheduledMinutes':1,\n" +
+                "        'timeBankCtaBonusMinutes':1,\n" +
+                "        'scheduledMinutesOfTimebank':1,\n" +
+                "        'scheduledMinutesOfPayout':1,\n" +
+                "        'plannedMinutesOfPayout':1,\n" +
+                "        'plannedMinutesOfTimebank':1,\n" +
+                "        'payoutCtaBonusMinutes':1,\n" +
                 "    'staffId' : 1,\n" +
                 "    'startDate' : 1,\n" +
                 "    'endDate' : 1,\n" +
@@ -546,7 +554,14 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "\t'activities.id' : 1,\n" +
                 "        'activities.activityId' : 1,\n" +
                 "        'activities.durationMinutes' : 1,\n" +
+                "        'activities.scheduledMinutes':1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.timeBankCtaBonusMinutes':1,\n" +
+                "        'activities.scheduledMinutesOfTimebank':1,\n" +
+                "        'activities.scheduledMinutesOfPayout':1,\n" +
+                "        'activities.plannedMinutesOfPayout':1,\n" +
+                "        'activities.plannedMinutesOfTimebank':1,\n" +
+                "        'activities.payoutCtaBonusMinutes':1,\n" +
                 "        'activities.plannedTimes':1,\n" +
                 "        'activities.backgroundColor':{  \n" +
                 "            '$arrayElemAt':[  \n" +
@@ -617,6 +632,11 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     private <T extends ShiftDTO> List<T> getShiftWithActivityByCriteria(Criteria criteria,boolean replaceDraftShift,Class classType,String... shiftProjection){
         List<AggregationOperation> aggregationOperations = getShiftWithActivityAggregationOperations(criteria, replaceDraftShift, shiftProjection);
         List<T> shiftWithActivityDTOS = mongoTemplate.aggregate(Aggregation.newAggregation(aggregationOperations),Shift.class ,classType).getMappedResults();
+        updateActivityInShift(shiftWithActivityDTOS);
+        return shiftWithActivityDTOS;
+    }
+
+    private <T extends ShiftDTO> void updateActivityInShift(List<T> shiftWithActivityDTOS) {
         Set<BigInteger> activityIds = new HashSet<>();
         for (T shift : shiftWithActivityDTOS) {
             activityIds.addAll(getActivityIdsByShift(shift));
@@ -626,15 +646,14 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         }
         Map<BigInteger, ActivityDTO> activityDTOMap = getActivityDTOMap(activityIds);
         shiftWithActivityDTOS.forEach(shift -> {
-            updateActivityInShift(activityDTOMap, shift);
+            updateActivityInShiftActivities(activityDTOMap, shift);
             if(isNotNull(shift.getDraftShift())){
-                updateActivityInShift(activityDTOMap, shift.getDraftShift());
+                updateActivityInShiftActivities(activityDTOMap, shift.getDraftShift());
             }
         });
-        return shiftWithActivityDTOS;
     }
 
-    private <T extends ShiftDTO> void updateActivityInShift(Map<BigInteger, ActivityDTO> activityDTOMap, T shift) {
+    private <T extends ShiftDTO> void updateActivityInShiftActivities(Map<BigInteger, ActivityDTO> activityDTOMap, T shift) {
         shift.getActivities().forEach(shiftActivityDTO -> {
             shiftActivityDTO.setActivity(activityDTOMap.get(shiftActivityDTO.getActivityId()));
             shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> childActivityDTO.setActivity(activityDTOMap.get(childActivityDTO.getActivityId())));

@@ -19,6 +19,7 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.activity.counter.distribution.tab.KPIPosition;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
@@ -26,7 +27,6 @@ import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationBasedOn;
@@ -335,8 +335,8 @@ public class CounterDataService extends MongoBaseService {
 
     private void getCalculationUnitData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
-        for (CalculationUnit calculationType : CalculationUnit.values()) {
-            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(calculationType.toString(), calculationType.value));
+        for (DisplayUnit displayUnit : DisplayUnit.values()) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(displayUnit.toString(), displayUnit.getDisplayValue()));
         }
         criteriaList.add(new FilterCriteria(CALCULATION_UNIT.value, CALCULATION_UNIT, (List) kpiFilterDefaultDataDTOS));
     }

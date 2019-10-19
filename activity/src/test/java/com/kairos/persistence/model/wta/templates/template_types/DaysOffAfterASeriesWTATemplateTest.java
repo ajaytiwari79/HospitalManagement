@@ -6,7 +6,6 @@ import com.kairos.dto.activity.shift.ViolatedRulesDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
