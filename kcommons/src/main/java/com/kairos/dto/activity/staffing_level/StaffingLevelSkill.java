@@ -5,20 +5,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
 public class StaffingLevelSkill {
     private Long skillId;
-    private int noOfStaff;
-    private SkillLevel skillLevel;
+    private Set<SkillLevelSetting> skillLevelSettings;
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("skillId", skillId)
-                .append("noOfStaff", noOfStaff)
-                .append("skillLevel", skillLevel.value)
                 .toString();
     }
 }
