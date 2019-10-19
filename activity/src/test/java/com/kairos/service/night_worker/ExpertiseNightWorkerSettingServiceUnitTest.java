@@ -1,5 +1,6 @@
 package com.kairos.service.night_worker;
 
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
@@ -37,8 +38,8 @@ public class ExpertiseNightWorkerSettingServiceUnitTest {
     ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO=null;
     @Before
     public void setUp() {
-        expertiseNightWorkerSetting= new ExpertiseNightWorkerSetting(null,300,DurationType.DAYS,15,15,CalculationUnit.HOURS,null,1075L);
-        expertiseNightWorkerSettingDTO=new ExpertiseNightWorkerSettingDTO(null,300,DurationType.DAYS,15,15,CalculationUnit.HOURS,null,1075L);
+        expertiseNightWorkerSetting= new ExpertiseNightWorkerSetting(null,300,DurationType.DAYS,15,15, DisplayUnit.HOURS,null,1075L);
+        expertiseNightWorkerSettingDTO=new ExpertiseNightWorkerSettingDTO(null,300,DurationType.DAYS,15,15,DisplayUnit.HOURS,null,1075L);
         expertiseNightWorkerSetting.setId(new BigInteger("10"));
         expertiseNightWorkerSettingDTO.setId(new BigInteger("10"));
     }
