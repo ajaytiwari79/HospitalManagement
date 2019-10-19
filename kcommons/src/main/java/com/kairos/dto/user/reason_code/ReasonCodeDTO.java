@@ -3,6 +3,10 @@ package com.kairos.dto.user.reason_code;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -15,6 +19,9 @@ import java.math.BigInteger;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class ReasonCodeDTO {
     private Long id;
     @NotBlank(message = "message.reasonCode.name.notEmpty")
@@ -25,9 +32,6 @@ public class ReasonCodeDTO {
     //this is only persist when we create any Absence type reason code
     private BigInteger timeTypeId;
 
-    public ReasonCodeDTO() {
-        //Default Constructor
-    }
 
     public ReasonCodeDTO(Long id, @NotBlank(message = "message.reasonCode.name.notEmpty") String name) {
         this.id = id;
@@ -43,53 +47,6 @@ public class ReasonCodeDTO {
         this.timeTypeId=timeTypeId;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = StringUtils.trim(name);
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = StringUtils.trim(code);
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = StringUtils.trim(description);
-    }
-
-    public ReasonCodeType getReasonCodeType() {
-        return reasonCodeType;
-    }
-
-    public void setReasonCodeType(ReasonCodeType reasonCodeType) {
-        this.reasonCodeType = reasonCodeType;
-    }
-
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
-    }
-
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
-    }
 
     @Override
     public boolean equals(Object o) {

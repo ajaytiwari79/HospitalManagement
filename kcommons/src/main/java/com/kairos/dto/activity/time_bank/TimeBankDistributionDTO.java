@@ -20,10 +20,4 @@ public class TimeBankDistributionDTO {
     private LocalDate ctaDate;
     private int minutes;
 
-    public TimeBankDistributionDTO(String ctaName, BigInteger ctaRuleTemplateId, LocalDate ctaDate) {
-        this.ctaName = ctaName;
-        this.ctaRuleTemplateId = ctaRuleTemplateId;
-        this.ctaDate = ctaDate;
-    }
-
 }

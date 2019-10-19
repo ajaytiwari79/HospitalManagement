@@ -734,10 +734,6 @@ public class AbsencePlanningService {
         workScheduleMetaData.put("fmvtid", staff.getId());
         if (taskType.getTaskTypeVisibility() == "Absent") {
             Map<String, Object> response = userIntegrationService.getAbsenceTypeByName(taskType.getTitle());
-          /*  AbsenceTypes absenceTypes = absenceTypesService.getAbsenceTypeByName(taskType.getTitle());
-            logger.info("absenceTypes--ATVTID---> " + absenceTypes.getATVTID());
-            if (absenceTypes == null) workScheduleMetaData.put("type", 6);
-            else workScheduleMetaData.put("type", absenceTypes.getATVTID());*/
             workScheduleMetaData.putAll(response);
         } else {
             workScheduleMetaData.put("type", -1);

@@ -1,11 +1,17 @@
 package com.kairos.dto.activity.staffing_level;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.math.BigInteger;
 import java.util.Objects;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class StaffingLevelActivity {
 
     private String name;
@@ -15,26 +21,6 @@ public class StaffingLevelActivity {
     private int maxNoOfStaff;
     private int availableNoOfStaff;
 
-    public int getMinNoOfStaff() {
-        return minNoOfStaff;
-    }
-
-    public void setMinNoOfStaff(int minNoOfStaff) {
-        this.minNoOfStaff = minNoOfStaff;
-    }
-
-    public int getMaxNoOfStaff() {
-        return maxNoOfStaff;
-    }
-
-    public void setMaxNoOfStaff(int maxNoOfStaff) {
-        this.maxNoOfStaff = maxNoOfStaff;
-    }
-
-
-    public StaffingLevelActivity() {
-        //default constructor
-    }
 
     public StaffingLevelActivity(String name, int minNoOfStaff, int maxNoOfStaff) {
         this.name = name;
@@ -55,29 +41,6 @@ public class StaffingLevelActivity {
         this.maxNoOfStaff = maxNoOfStaff;
     }
 
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
-
-    public boolean isIncludeInMin() {
-        return includeInMin;
-    }
-
-    public void setIncludeInMin(boolean includeInMin) {
-        this.includeInMin = includeInMin;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -105,12 +68,4 @@ public class StaffingLevelActivity {
                 .toString();
     }
 
-
-    public int getAvailableNoOfStaff() {
-        return availableNoOfStaff;
-    }
-
-    public void setAvailableNoOfStaff(int availableNoOfStaff) {
-        this.availableNoOfStaff = availableNoOfStaff;
-    }
 }

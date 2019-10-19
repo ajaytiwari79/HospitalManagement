@@ -25,8 +25,4 @@ public class ExpertiseLineSeniorityLevelRelationship extends UserBaseEntity {
     private SeniorityLevel seniorityLevel;
     private Long payGradeId;
     private Long payGradeLevel;
-
-    public boolean isUpdated(ExpertiseLineSeniorityLevelRelationship expertiseLineSeniorityLevelRelationship){
-        return !this.payGradeLevel.equals(expertiseLineSeniorityLevelRelationship.payGradeLevel);
-    }
 }

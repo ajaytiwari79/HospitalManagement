@@ -498,7 +498,7 @@ public class UnionService {
     public void updateMunicipalities(List<MunicipalityDTO> municipalities, Map<Long, MunicipalityQueryResult> municipalityMap) {
         for (MunicipalityDTO municipalityDTO : municipalities) {
             MunicipalityQueryResult currentMunicipality = municipalityMap.get(municipalityDTO.getId());
-            RegionDTO regionDTO = new RegionDTO(currentMunicipality.getRegion().getId(), currentMunicipality.getRegion().getName());
+            RegionDTO regionDTO = new RegionDTO( currentMunicipality.getRegion().getName(),currentMunicipality.getRegion().getId());
             ProvinceDTO province = new ProvinceDTO(currentMunicipality.getProvince().getId(), currentMunicipality.getProvince().getName(), regionDTO);
             municipalityDTO.setProvince(province);
         }

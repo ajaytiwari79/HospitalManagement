@@ -11,6 +11,7 @@ import com.kairos.persistence.model.organization.services.OrganizationServiceQue
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.GdprIntegrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -52,6 +54,8 @@ public class OrganizationServiceService {
 
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private GdprIntegrationService gdprIntegrationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceService.class);
 
@@ -187,6 +191,9 @@ public class OrganizationServiceService {
                 unitGraphRepository.updateServiceFromOrganization(id, organizationService.getId());
             }
             addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
+            //call to create asset for org.
+            List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(unitSubType -> unitSubType.getId()).collect(Collectors.toList());
+            gdprIntegrationService.createDefaultAssetForUnit(unit.getId(), orgSubTypeIds,organizationServiceId);
         } else {
             unitGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
         }

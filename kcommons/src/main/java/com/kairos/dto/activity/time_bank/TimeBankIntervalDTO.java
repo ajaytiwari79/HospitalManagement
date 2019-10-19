@@ -41,7 +41,6 @@ public class TimeBankIntervalDTO {
     private long accumulatedTimebankMinutes;
     private long expectedTimebankMinutes;
     private long publishedBalancesMinutes;
-    private long protectedDaysOffMinutes;
 
     public TimeBankIntervalDTO(String title) {
         this.title = title;

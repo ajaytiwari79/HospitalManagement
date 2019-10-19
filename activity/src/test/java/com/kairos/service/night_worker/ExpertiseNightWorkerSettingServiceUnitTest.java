@@ -1,7 +1,6 @@
 package com.kairos.service.night_worker;
 
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;

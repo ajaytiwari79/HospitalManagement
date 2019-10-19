@@ -1025,8 +1025,6 @@ public class ClientService {
         if (Optional.ofNullable(addressOfClient).isPresent() && Optional.ofNullable(addressOfHouseHoldPerson).isPresent()) {
             hasSameAddress = (addressOfClient.getHomeAddress().getStreet().equalsIgnoreCase(addressOfHouseHoldPerson.getHomeAddress().getStreet()) && addressOfClient.getHomeAddress().getHouseNumber().equalsIgnoreCase(addressOfHouseHoldPerson.getHomeAddress().getHouseNumber()) && addressOfClient.getZipCode().getZipCode() == addressOfHouseHoldPerson.getHomeAddress().getZipCode().getZipCode());
         }
-                    //zipCodeOfClient.getZipCode().equals(zipCodeOfHouseHoldPerson.getZipCode()));
-
         return hasSameAddress;
     }
 

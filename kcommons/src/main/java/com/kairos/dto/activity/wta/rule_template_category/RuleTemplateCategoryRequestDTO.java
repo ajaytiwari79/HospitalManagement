@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.kairos.enums.RuleTemplateCategoryType;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
@@ -20,6 +22,8 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class RuleTemplateCategoryRequestDTO {
 
 
@@ -38,65 +42,6 @@ public class RuleTemplateCategoryRequestDTO {
     private List<BigInteger> tags = new ArrayList<>();
 
 
-    public RuleTemplateCategoryRequestDTO(String name, String description, boolean deleted) {
-        this.name = name;
-        this.description = description;
-        this.deleted = deleted;
-    }
-
-    public RuleTemplateCategoryRequestDTO(@NotNull(message = "error.RuleTemplateCategory.name.notnull") String name, String description, Long country, BigInteger id) {
-        this.name = name;
-        this.description = description;
-        this.country = country;
-        this.id = id;
-    }
-
-    public RuleTemplateCategoryRequestDTO() {
-        //default
-    }
-
-    public List<BigInteger> getRuleTemplateIds() {
-        return ruleTemplateIds;
-    }
-
-    public void setRuleTemplateIds(List<BigInteger> ruleTemplateIds) {
-        this.ruleTemplateIds = ruleTemplateIds;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public RuleTemplateCategoryRequestDTO(String name) {
-        this.name = name;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
     @JsonSetter("categoryName")
     public void setCategoryategoryName(String name) {
         if (this.name == null) {
@@ -108,41 +53,5 @@ public class RuleTemplateCategoryRequestDTO {
     public void setName(String name) {
         this.name = name.trim();
     }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public RuleTemplateCategoryType getRuleTemplateCategoryType() {
-        return ruleTemplateCategoryType;
-    }
-
-    public void setRuleTemplateCategoryType(RuleTemplateCategoryType ruleTemplateCategoryType) {
-        this.ruleTemplateCategoryType = ruleTemplateCategoryType;
-    }
-
-    public Long getCountry() {
-        return country;
-    }
-
-    public void setCountry(Long country) {
-        this.country = country;
-    }
-
-    public List<BigInteger> getTags() { return tags; }
-
-    public void setTags(List<BigInteger> tags) { this.tags = tags; }
 }
 

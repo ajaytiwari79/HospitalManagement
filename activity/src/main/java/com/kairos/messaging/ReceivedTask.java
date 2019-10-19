@@ -2,6 +2,8 @@ package com.kairos.messaging;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -11,6 +13,8 @@ import java.util.Date;
 
 
 @JacksonXmlRootElement(localName = "DynamicChange")
+@Getter
+@Setter
 public class ReceivedTask {
 
     @JacksonXmlProperty(localName = "VTID")
@@ -45,95 +49,6 @@ public class ReceivedTask {
 
     @JacksonXmlProperty(localName = "Infotext")
     private String infoText;
-
-
-    public String getVtid() {
-        return vtid;
-    }
-
-    public void setVtid(String vtid) {
-        this.vtid = vtid;
-    }
-
-    public String getExtid() {
-        return extid;
-    }
-
-    public void setExtid(String extid) {
-        this.extid = extid;
-    }
-
-    public String getFucntionCode() {
-        return fucntionCode;
-    }
-
-    public void setFucntionCode(String fucntionCode) {
-        this.fucntionCode = fucntionCode;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getFMExtID() {
-        return FMExtID;
-    }
-
-    public void setFMExtID(String FMExtID) {
-        this.FMExtID = FMExtID;
-    }
-
-    public Date getEarliestStartTime() {
-        return earliestStartTime;
-    }
-
-    public void setEarliestStartTime(Date earliestStartTime) {
-        this.earliestStartTime = earliestStartTime;
-    }
-
-    public Date getLatestStartTime() {
-        return latestStartTime;
-    }
-
-    public void setLatestStartTime(Date latestStartTime) {
-        this.latestStartTime = latestStartTime;
-    }
-
-    public int getPlannedDuration() {
-        return plannedDuration;
-    }
-
-    public void setPlannedDuration(int plannedDuration) {
-        this.plannedDuration = plannedDuration;
-    }
-
-    public int getVisitDuration() {
-        return visitDuration;
-    }
-
-    public void setVisitDuration(int visitDuration) {
-        this.visitDuration = visitDuration;
-    }
-
-    public String getPlannedArrival() {
-        return plannedArrival;
-    }
-
-    public void setPlannedArrival(String plannedArrival) {
-        this.plannedArrival = plannedArrival;
-    }
-
-    public String getInfoText() {
-        return infoText;
-    }
-
-    public void setInfoText(String infoText) {
-        this.infoText = infoText;
-    }
 
 
 

@@ -42,6 +42,9 @@ public class KPIUtils {
     public static List<BigInteger> getBigIntegerValue(List<Object> objects) {
         return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toList());
     }
+    public static Set<BigInteger> getBigIntegerSet(List<Object> objects) {
+        return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toSet());
+    }
 
     public static Set<DayOfWeek> getDaysOfWeeksfromString(List<Object> objects) {
         return objects.stream().map(o -> DayOfWeek.valueOf((o.toString()))).collect(Collectors.toSet());

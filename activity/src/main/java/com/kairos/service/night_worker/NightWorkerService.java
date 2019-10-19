@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
 import com.kairos.dto.activity.night_worker.QuestionAnswerDTO;
 import com.kairos.dto.activity.night_worker.QuestionnaireAnswerResponseDTO;
@@ -13,7 +14,6 @@ import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -365,7 +365,7 @@ public class NightWorkerService {
             if (nightInterval.overlaps(shiftDTO.getInterval())) {
                 int overlapMinutes = (int) nightInterval.overlap(shiftDTO.getInterval()).getMinutes();
                 if (overlapMinutes >= expertiseNightWorkerSetting.getMinMinutesToCheckNightShift()) {
-                    if (expertiseNightWorkerSetting.getMinShiftsUnitToCheckNightWorker().equals(CalculationUnit.HOURS)) {
+                    if (expertiseNightWorkerSetting.getMinShiftsUnitToCheckNightWorker().equals(DisplayUnit.HOURS)) {
                         minutesOrCount += (int) shiftDTO.getInterval().getMinutes();
                     } else {
                         minutesOrCount++;
@@ -377,10 +377,10 @@ public class NightWorkerService {
     }
 
     private boolean isNightWorker(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, int minutesOrCount, int shiftCount) {
-        return isNightHoursValid(expertiseNightWorkerSetting, minutesOrCount, CalculationUnit.HOURS) || isNightHoursValid(expertiseNightWorkerSetting, (minutesOrCount * 100) / shiftCount, CalculationUnit.PERCENTAGE);
+        return isNightHoursValid(expertiseNightWorkerSetting, minutesOrCount, DisplayUnit.HOURS) || isNightHoursValid(expertiseNightWorkerSetting, (minutesOrCount * 100) / shiftCount, DisplayUnit.PERCENTAGE);
     }
 
-    private boolean isNightHoursValid(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, int minutesOrCount, CalculationUnit calculationUnit) {
+    private boolean isNightHoursValid(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, int minutesOrCount, DisplayUnit calculationUnit) {
         return expertiseNightWorkerSetting.getMinShiftsUnitToCheckNightWorker().equals(calculationUnit) && minutesOrCount >= expertiseNightWorkerSetting.getMinShiftsValueToCheckNightWorker();
     }
 

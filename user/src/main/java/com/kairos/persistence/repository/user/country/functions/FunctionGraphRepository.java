@@ -25,11 +25,11 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "OPTIONAL MATCH(function)-[:" + HAS_UNION + "]->(union:Organization{union:true}) " +
             "with country,function, collect(DISTINCT level) as organizationLevels, collect(DISTINCT union) as unions   " +
             "RETURN id(function) as id,function.name as name,function.description as description," +
-            "function.startDate as startDate,function.endDate as endDate,unions,organizationLevels,function.icon as icon ORDER BY function.creationDate  DESC")
+            "function.startDate as startDate,function.endDate as endDate,function.code as code,unions,organizationLevels,function.icon as icon ORDER BY function.creationDate  DESC")
     List<FunctionDTO> findFunctionsByCountry(long countryId);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(function:Function{deleted:false}) where id(country)={0} " +
-            "RETURN id(function) as id,function.name as name ORDER BY function.creationDate  DESC")
+            "RETURN id(function) as id,function.code as code,function.name as name ORDER BY function.creationDate  DESC")
     List<FunctionDTO> findFunctionsIdAndNameByCountry(long countryId);
 
 
@@ -44,14 +44,14 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
     List<Function> findAllFunctionsById(Set<Long> functionIds);
 
     @Query("MATCH (level:Level)<-[:" + HAS_ORGANIZATION_LEVEL + "]-(function:Function{deleted:false}) where id(level)={0} " +
-            "RETURN id(function) as id,function.name as name")
+            "RETURN id(function) as id,function.code as code,function.name as name")
     List<FunctionDTO> getFunctionsByOrganizationLevel(Long organizationLevelId);
 
     @Query("MATCH(expertise:Expertise{deleted:false,published:true}) where id(expertise)={0}\n" +
             "MATCH(expertise)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(:FunctionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(fpm:FunctionalPaymentMatrix) \n" +
             "MATCH(fpm)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(slf:SeniorityLevelFunction) " +
             "MATCH(slf)-[:" + HAS_FUNCTIONAL_AMOUNT + "]-(fn:Function) \n" +
-            "RETURN distinct id(fn) as id ,fn.name as name")
+            "RETURN distinct id(fn) as id ,fn.code as code,fn.name as name")
     List<FunctionDTO> getFunctionsByExpertiseId(Long expertiseId);
 
     @Query("MATCH (unit:Unit) where id(unit)={3} \n" +
@@ -62,7 +62,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "MATCH(sl)<-[:" + FOR_SENIORITY_LEVEL + "]-(slf:SeniorityLevelFunction)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(fpm:FunctionalPaymentMatrix)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPayment) \n" +
             "MATCH (fpm)-[:" + HAS_PAY_GROUP_AREA + "]-(payGroupArea) \n" +
             "with slf,fpm  MATCH(slf)-[rel:" + HAS_FUNCTIONAL_AMOUNT + "]-(function:Function) \n" +
-            "RETURN distinct id(function) as id,function.name as name,rel.amount as amount,function.icon as icon,rel.amountEditableAtUnit as amountEditableAtUnit")
+            "RETURN distinct id(function) as id,function.name as name,function.code as code,rel.amount as amount,function.icon as icon,rel.amountEditableAtUnit as amountEditableAtUnit")
     List<FunctionDTO> getFunctionsByExpertiseAndSeniorityLevel(Long expertiseId, String selectedDate, Long seniorityLevelId, Long unitId);
 
 
@@ -81,7 +81,7 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "({2} IS NULL AND (employment.endDate IS NULL OR date(employment.endDate) > DATE({1})))\n" +
             "OR \n" +
             "(DATE({2}) IS NOT NULL AND  (DATE({1}) < date(employment.endDate) OR DATE({2})>date(employment.startDate)))\n" +
-            "WITH employment,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions\n" +
+            "WITH employment,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,code:appliedFunction.code,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions\n" +
             " RETURN  id(employment) as id , appliedFunctions as appliedFunctions")
     List<EmploymentQueryResult> findAppliedFunctionsAtEmpployment(Long unitId, String startDate, String endDate);
 
