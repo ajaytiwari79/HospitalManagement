@@ -279,7 +279,6 @@ public class StaffingLevelService extends MongoBaseService {
         return staffingLevel;
     }
 
-
     /**
      * @param unitId
      * @return
@@ -713,6 +712,7 @@ public class StaffingLevelService extends MongoBaseService {
         Map[] activityAndParentActivityMap = getActivityAndParentActivityMap(shifts);
         Map<BigInteger,BigInteger> childAndParentActivityIdMap = activityAndParentActivityMap[0];
         Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
+
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 Activity activity = activityMap.get(shiftActivity.getActivityId());
@@ -720,7 +720,7 @@ public class StaffingLevelService extends MongoBaseService {
                     updateAbsenceStaffingLevelAvailableStaffCount(staffingLevel);
                 }else {
                     int durationMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
-                    updateStaffingLevelInterval(shift.getBreakActivities(),durationMinutes,staffingLevel, shiftActivity, childAndParentActivityIdMap);
+                    updateStaffingLevelInterval(shift.getBreakActivities(),durationMinutes,staffingLevel, shiftActivity, childAndParentActivityIdMap, );
                 }
             }
         }
@@ -756,6 +756,13 @@ public class StaffingLevelService extends MongoBaseService {
                 updateShiftActivityStaffingLevel(durationMinutes, childActivity, staffingLevelInterval, interval,breakActivities);
             }
             staffingLevelInterval.setAvailableNoOfStaff(availableNoOfStaff);
+            updateStaffingLevelSkills(staffingLevelInterval);
+        }
+    }
+
+    private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval){
+        for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
+
         }
     }
 

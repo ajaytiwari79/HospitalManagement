@@ -21,7 +21,7 @@ public class StaffingLevelInterval {
     private int availableNoOfStaff;
     private Duration staffingLevelDuration;
     private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
-    private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>(3);
+    private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
 
 
 
