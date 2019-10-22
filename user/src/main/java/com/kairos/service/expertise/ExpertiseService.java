@@ -265,7 +265,7 @@ public class ExpertiseService {
         }
         if(seniorityLevels.size()>1){
             for (int i = 0; i < seniorityLevels.size()-1; i++) {
-                if(seniorityLevels.get(i).getTo()!=null &&seniorityLevels.get(i).getTo()>seniorityLevels.get(i).getFrom() || !seniorityLevels.get(i).getTo().equals(seniorityLevels.get(i+1).getFrom())){
+                if(seniorityLevels.get(i).getTo()!=null &&seniorityLevels.get(i).getTo()<=seniorityLevels.get(i).getFrom() || !seniorityLevels.get(i).getTo().equals(seniorityLevels.get(i+1).getFrom())){
                     exceptionService.actionNotPermittedException(PLEASE_ENTER_VALID_SENIORITY_LEVELS);
                 }
             }
