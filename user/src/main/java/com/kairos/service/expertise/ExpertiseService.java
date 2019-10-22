@@ -198,8 +198,8 @@ public class ExpertiseService {
     public ExpertiseQueryResult updateExpertiseLine(Long countryId,ExpertiseDTO expertiseDTO,Long expertiseId,Long expertiseLineId){
         expertiseDTO.setExpertiseLineId(expertiseLineId);
         Country country = countryGraphRepository.findById(countryId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, COUNTRY, countryId)));
+        expertiseGraphRepository.removeSeniorityLevel(expertiseId);
         Expertise expertise = expertiseGraphRepository.findById(expertiseId,2).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId())));
-        expertiseGraphRepository.removeSeniorityLevel(expertise.getId());
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class));
         addSeniorityLevelsInExpertise(expertise,expertiseDTO);
         expertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
@@ -660,8 +660,12 @@ public class ExpertiseService {
     private void initializeExpertiseLine(ExpertiseLine expertiseLine,ExpertiseDTO expertiseDTO){
         countryGraphRepository.addLevel(expertiseLine.getId(),expertiseDTO.getOrganizationLevelId());
         organizationServiceRepository.addServices(expertiseLine.getId(),expertiseDTO.getOrganizationServiceIds());
-        organizationGraphRepository.addSector(expertiseLine.getId(),expertiseDTO.getSector().getId());
-        organizationGraphRepository.addUnion(expertiseLine.getId(),expertiseDTO.getUnion().getId());
+        if(expertiseDTO.getSector()!=null){
+            organizationGraphRepository.addSector(expertiseLine.getId(),expertiseDTO.getSector().getId());
+        }
+        if(expertiseDTO.getUnion()!=null){
+            organizationGraphRepository.addUnion(expertiseLine.getId(),expertiseDTO.getUnion().getId());
+        }
         expertiseLine.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertiseLine.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
         expertiseLine.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
@@ -705,7 +709,6 @@ public class ExpertiseService {
         List<PayGrade> payGrades = payGradeGraphRepository.getAllPayGradesById(payGradeIds);
         Map<Long, PayGrade> payGradeMap = payGrades.stream().collect(Collectors.toMap(PayGrade::getId, v -> v));
         List<SeniorityLevel> seniorityLevels=new ArrayList<>();
-        Map<Integer,SeniorityLevel> seniorityLevelMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(k->k.getFrom(),Function.identity()));
         expertiseDTO.getSeniorityLevels().forEach(seniorityLevelDTO -> {
             SeniorityLevel seniorityLevel = new SeniorityLevel(seniorityLevelDTO.getId(),seniorityLevelDTO.getFrom(), seniorityLevelDTO.getTo(), payGradeMap.get(seniorityLevelDTO.getPayGradeId()), seniorityLevelDTO.getPensionPercentage(), seniorityLevelDTO.getFreeChoicePercentage(),
                     seniorityLevelDTO.getFreeChoiceToPension(), false);
