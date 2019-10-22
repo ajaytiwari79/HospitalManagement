@@ -55,7 +55,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
 
-    private double timeBankCtaBonusMinutes;
+    private int timeBankCtaBonusMinutes;
     private List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions;
     private Map<String, Object> location;// location where this activity needs to perform
@@ -169,9 +169,14 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         return asLocalDate(this.endDate);
     }
 
+    @JsonIgnore
+    public int getMinutes(){
+        return (int)getInterval().getMinutes();
+    }
+
     public void resetTimebankDetails(){
         this.plannedMinutesOfTimebank = 0;
-        this.timeBankCtaBonusMinutes = 0d;
+        this.timeBankCtaBonusMinutes = 0;
         this.timeBankCTADistributions = new ArrayList<>();
         this.getChildActivities().forEach(shiftActivityDTO -> shiftActivityDTO.resetTimebankDetails());
     }

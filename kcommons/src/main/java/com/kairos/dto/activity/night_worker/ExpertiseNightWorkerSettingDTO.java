@@ -1,7 +1,7 @@
 package com.kairos.dto.activity.night_worker;
 
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,13 +18,13 @@ public class ExpertiseNightWorkerSettingDTO {
     private DurationType intervalUnitToCheckNightWorker;
     private Integer intervalValueToCheckNightWorker;
     private Integer minShiftsValueToCheckNightWorker;
-    private CalculationUnit minShiftsUnitToCheckNightWorker;
+    private DisplayUnit minShiftsUnitToCheckNightWorker;
     private Long countryId;
     private Long expertiseId;
 
 
     public ExpertiseNightWorkerSettingDTO(TimeSlot timeSlot, Integer minMinutesToCheckNightShift, DurationType intervalUnitToCheckNightWorker, Integer intervalValueToCheckNightWorker,
-                                       Integer minShiftsValueToCheckNightWorker, CalculationUnit minShiftsUnitToCheckNightWorker, Long countryId, Long expertiseId){
+                                       Integer minShiftsValueToCheckNightWorker, DisplayUnit minShiftsUnitToCheckNightWorker, Long countryId, Long expertiseId){
         this.timeSlot = timeSlot;
         this.minMinutesToCheckNightShift = minMinutesToCheckNightShift;
         this.intervalUnitToCheckNightWorker = intervalUnitToCheckNightWorker;
