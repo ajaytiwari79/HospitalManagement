@@ -129,7 +129,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("MATCH(organizationType:OrganizationType) WHERE id(organizationType)={1}\n" +
             "MATCH(organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService)\n" +
-            " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())\n" +
+            " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(exl:ExpertiseLine)-["+HAS_EXPERTISE_LINES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())\n" +
             "RETURN distinct id(expertise) as id,expertise.name as name")
     List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
 
@@ -168,5 +168,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) = {0} AND (DATE(exl.startDate)<=DATE({1}) AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE({1})))" +
             "RETURN exl LIMIT 1")
     ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
+
+    @Query("MATCH(e:Expertise)-[rel:"+FOR_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) WHERE id(e)={0} DETACH DELETE rel")
+    void removeSeniorityLevel(Long expertiseId);
 
  }
