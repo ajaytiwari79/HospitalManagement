@@ -27,7 +27,7 @@ import java.util.Optional;
 @Setter
 @NoArgsConstructor
 @QueryResult
-public class ExpertiseDTO {
+public class ExpertiseResponseDTO {
     private Long id;
     @NotBlank(message = "error.Expertise.name.notEmpty")
     private String name;
