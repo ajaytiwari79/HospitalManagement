@@ -188,6 +188,9 @@ public class ExpertiseService {
         currentExpertise.setName(expertiseDTO.getName());
         currentExpertise.setStartDate(expertiseDTO.getStartDate());
         currentExpertise.setEndDate(expertiseDTO.getEndDate());
+        if(!currentExpertise.isPublished()){
+            currentExpertise.getExpertiseLines().get(0).setEndDate(currentExpertise.getEndDate());
+        }
         expertiseGraphRepository.save(currentExpertise);
         return ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO,ExpertiseResponseDTO.class);
     }

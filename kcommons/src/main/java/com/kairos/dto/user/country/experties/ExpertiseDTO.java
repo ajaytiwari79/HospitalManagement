@@ -50,7 +50,7 @@ public class ExpertiseDTO {
         if (!Optional.ofNullable(this.startDate).isPresent() && Optional.ofNullable(this.endDate).isPresent()) {
             return false;
         } else if (Optional.ofNullable(this.startDate).isPresent() && (Optional.ofNullable(this.endDate).isPresent())) {
-            return startDate.isAfter(endDate);
+            return !startDate.isAfter(endDate);
         }
         return true;
     }
