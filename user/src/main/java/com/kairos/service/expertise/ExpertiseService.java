@@ -169,7 +169,7 @@ public class ExpertiseService {
         return updatedExpertiseData(expertise);
     }
 
-    public ExpertiseResponseDTO updateExpertise(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId){
+    public ExpertiseQueryResult updateExpertise(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId){
         expertiseDTO.setId(expertiseId);
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -192,7 +192,7 @@ public class ExpertiseService {
             currentExpertise.getExpertiseLines().get(0).setEndDate(currentExpertise.getEndDate());
         }
         expertiseGraphRepository.save(currentExpertise);
-        return ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO,ExpertiseResponseDTO.class);
+        return updatedExpertiseData(currentExpertise);
     }
 
     public ExpertiseQueryResult updateExpertiseLine(Long countryId,ExpertiseDTO expertiseDTO,Long expertiseId,Long expertiseLineId){
