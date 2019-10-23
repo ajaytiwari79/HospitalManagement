@@ -22,6 +22,7 @@ import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO
 import com.kairos.dto.user.skill.Skill;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -216,16 +217,9 @@ public class StaffingLevelService  {
             LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), presenceStaffingLevelDTO.getCurrentDate());
             exceptionService.unsupportedOperationException(MESSAGE_STAFFLEVEL_CURRENTDATE_UPDATE);
         }
-        //List<ActivityDTO> activityDTOS = activityMongoRepository.findChildActivityActivityIds(presenceStaffingLevelDTO.getStaffingLevelSetting().getActivitiesRank().keySet());
         Map<BigInteger, BigInteger> childAndParentActivityIdMap = new HashMap<>();
-//        activityDTOS.forEach(activityDTO -> {
-//            if (isCollectionNotEmpty(activityDTO.getChildActivityIds())) {
-//                activityDTO.getChildActivityIds().forEach(childActivityId -> childAndParentActivityIdMap.put(childActivityId, activityDTO.getId()));
-//            }
-//        });
         staffingLevel = StaffingLevelUtil.updateStaffingLevels(staffingLevelId, presenceStaffingLevelDTO, unitId, staffingLevel, childAndParentActivityIdMap);
         staffingLevelMongoRepository.save(staffingLevel);
-        //staffingLevelActivityRankService.updateStaffingLevelActivityRank(DateUtils.asLocalDate(staffingLevel.getCurrentDate()), staffingLevel.getId(), staffingLevel.getStaffingLevelSetting().getActivitiesRank());
         Collections.sort(presenceStaffingLevelDTO.getPresenceStaffingLevelInterval(), Comparator.comparing(StaffingLevelTimeSlotDTO::getSequence));
         StaffingLevelPlanningDTO staffingLevelPlanningDTO = new StaffingLevelPlanningDTO(staffingLevel.getId(), staffingLevel.getPhaseId(), staffingLevel.getCurrentDate(), staffingLevel.getWeekCount(), staffingLevel.getStaffingLevelSetting(), staffingLevel.getPresenceStaffingLevelInterval(), null);
         plannerSyncService.publishStaffingLevel(unitId, staffingLevelPlanningDTO, IntegrationOperation.UPDATE);
@@ -766,21 +760,23 @@ public class StaffingLevelService  {
 
     private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, Map<Long, List<Map<String,Object>>> staffSkillsMap){
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
-            for(SkillLevelSetting skillLevelSetting : staffingLevelSkill.getSkillLevelSettings()){
-                updateNoOfStaffInSkill(staffingLevelSkill.getSkillId(), skillLevelSetting, staffSkillsMap.get(staffId));
-            }
-        }
-    }
-
-    private void updateNoOfStaffInSkill(Long skillId,SkillLevelSetting skillLevelSetting,List<Map<String,Object>> stafSkillMap){
-        for(Map<String,Object> staffSkill : stafSkillMap){
-            if(skillId == staffSkill.get("skillId") && skillLevelSetting.getSkillLevel().equals(staffSkill.get("level"))){
-                if(skillLevelSetting.getNoOfStaff() > skillLevelSetting.getAvailableNoOfStaff()) {
-                    skillLevelSetting.setAvailableNoOfStaff(skillLevelSetting.getAvailableNoOfStaff() + 1);
+            for(Map<String,Object> staffSkill : staffSkillsMap.get(staffId)){
+                if(staffingLevelSkill.getSkillId() == staffSkill.get("skillId")){
+                    addAvailableNoOfStaffAtSkill(staffingLevelSkill, staffSkill);
                 }
             }
         }
     }
+
+    private void addAvailableNoOfStaffAtSkill(StaffingLevelSkill staffingLevelSkill, Map<String, Object> staffSkill) {
+        for(SkillLevelSetting skillLevelSetting : staffingLevelSkill.getSkillLevelSettings()){
+            if (skillLevelSetting.getNoOfStaff() > skillLevelSetting.getAvailableNoOfStaff() && (skillLevelSetting.getSkillLevel().equals(staffSkill.get("level")) || SkillLevel.BASIC.equals(skillLevelSetting.getSkillLevel()) || (SkillLevel.ADVANCE.equals(skillLevelSetting.getSkillLevel()) && SkillLevel.EXPERT.equals(staffSkill.get("level"))))) {
+                skillLevelSetting.setAvailableNoOfStaff(skillLevelSetting.getAvailableNoOfStaff() + 1);
+                break;
+            }
+        }
+    }
+
     private void updateShiftActivityStaffingLevel(int durationMinutes, ShiftActivity shiftActivity, StaffingLevelInterval staffingLevelInterval, DateTimeInterval interval,List<ShiftActivity> breakActivities) {
         boolean breakValid = breakActivities.stream().anyMatch(shiftActivity1 -> !shiftActivity1.isBreakNotHeld() && interval.overlaps(shiftActivity1.getInterval()) && interval.overlap(shiftActivity1.getInterval()).getMinutes()>=durationMinutes);
         if(!breakValid && interval.overlaps(shiftActivity.getInterval()) && interval.overlap(shiftActivity.getInterval()).getMinutes()>=durationMinutes){
