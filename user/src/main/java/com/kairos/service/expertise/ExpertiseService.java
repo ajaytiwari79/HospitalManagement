@@ -636,9 +636,9 @@ public class ExpertiseService {
     }
 
     private boolean isPayGradeChanged(List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationships,List<SeniorityLevelDTO> seniorityLevelDTOS){
-        Map<Integer,Long> fromAndPayGradeLevelMap=seniorityLevelDTOS.stream().collect(Collectors.toMap(SeniorityLevelDTO::getFrom,SeniorityLevelDTO::getPayGradeLevel));
+        Map<Integer,Long> fromAndPayGradeIdMap=seniorityLevelDTOS.stream().collect(Collectors.toMap(SeniorityLevelDTO::getFrom,SeniorityLevelDTO::getPayGradeId));
         for (ExpertiseLineSeniorityLevelRelationship seniorityLevelRelationship:expertiseLineSeniorityLevelRelationships){
-            if(fromAndPayGradeLevelMap.get(seniorityLevelRelationship.getSeniorityLevel().getFrom()).equals(seniorityLevelRelationship.getPayGradeLevel())){
+            if(fromAndPayGradeIdMap.get(seniorityLevelRelationship.getSeniorityLevel().getFrom()).equals(seniorityLevelRelationship.getPayGradeId())){
                 return true;
             }
         }
