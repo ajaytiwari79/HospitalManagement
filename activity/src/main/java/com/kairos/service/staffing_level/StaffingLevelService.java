@@ -766,13 +766,21 @@ public class StaffingLevelService  {
 
     private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, Map<Long, List<Map<String,Object>>> staffSkillsMap){
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
-            List<Map<String,Object>> stafSkillMap = staffSkillsMap.get(staffId);
             for(SkillLevelSetting skillLevelSetting : staffingLevelSkill.getSkillLevelSettings()){
-                
+                updateNoOfStaffInSkill(staffingLevelSkill.getSkillId(), skillLevelSetting, staffSkillsMap.get(staffId));
             }
         }
     }
 
+    private void updateNoOfStaffInSkill(Long skillId,SkillLevelSetting skillLevelSetting,List<Map<String,Object>> stafSkillMap){
+        for(Map<String,Object> staffSkill : stafSkillMap){
+            if(skillId == staffSkill.get("skillId") && skillLevelSetting.getSkillLevel().equals(staffSkill.get("level"))){
+                if(skillLevelSetting.getNoOfStaff() > skillLevelSetting.getAvailableNoOfStaff()) {
+                    skillLevelSetting.setAvailableNoOfStaff(skillLevelSetting.getAvailableNoOfStaff() + 1);
+                }
+            }
+        }
+    }
     private void updateShiftActivityStaffingLevel(int durationMinutes, ShiftActivity shiftActivity, StaffingLevelInterval staffingLevelInterval, DateTimeInterval interval,List<ShiftActivity> breakActivities) {
         boolean breakValid = breakActivities.stream().anyMatch(shiftActivity1 -> !shiftActivity1.isBreakNotHeld() && interval.overlaps(shiftActivity1.getInterval()) && interval.overlap(shiftActivity1.getInterval()).getMinutes()>=durationMinutes);
         if(!breakValid && interval.overlaps(shiftActivity.getInterval()) && interval.overlap(shiftActivity.getInterval()).getMinutes()>=durationMinutes){
