@@ -2,6 +2,7 @@ package com.kairos.persistence.model.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.enums.RankingAtTimeTypeEnum;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
@@ -49,6 +50,7 @@ public class TimeType extends MongoBaseEntity{
     private List<Long> employmentTypes;
     private boolean breakNotHeldValid;
     private BigInteger activityPriorityId;
+    private RankingAtTimeTypeEnum rankingAtTimeTypeEnum;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;

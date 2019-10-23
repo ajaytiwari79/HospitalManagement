@@ -112,6 +112,7 @@ public class TimeTypeService extends MongoBaseService {
         }
         timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+        timeType.setRankingAtTimeTypeEnum(timeTypeDTO.getRankingAtTimeTypeEnum());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
         timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
@@ -167,6 +168,7 @@ public class TimeTypeService extends MongoBaseService {
         boolean partOfTeamUpdated = false;
         boolean allowedChildActivityUpdated = false;
         boolean allowedConflictsUpdate = false;
+        boolean rankingAtTimeTypeEnumUpdate = false;
         for (TimeType childTimeType : childTimeTypeList) {
             if (childTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && childTimeType.getChildTimeTypeIds().isEmpty()) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
@@ -180,17 +182,20 @@ public class TimeTypeService extends MongoBaseService {
                 childTimeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
                 allowedConflictsUpdate = true;
             }
-
+            if (childTimeType.getRankingAtTimeTypeEnum().equals(timeTypeDTO.getRankingAtTimeTypeEnum()) && childTimeType.getChildTimeTypeIds().isEmpty()) {
+                childTimeType.setRankingAtTimeTypeEnum(timeTypeDTO.getRankingAtTimeTypeEnum());
+                rankingAtTimeTypeEnumUpdate = true;
+            }
             childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
             if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
-                setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, childTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, childTimeType);
+                setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, childTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, rankingAtTimeTypeEnumUpdate, childTimeType);
                 timeTypes.addAll(leafTimeTypeList);
             }
         }
     }
 
-    private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, TimeType childTimeType) {
+    private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, boolean rankingAtTimeTypeEnumUpdate, TimeType childTimeType) {
         for (TimeType leafTimeType : childTimeTypeList) {
             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             if (leafTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId() != null) {
@@ -201,6 +206,9 @@ public class TimeTypeService extends MongoBaseService {
             }
             if (leafTimeType.isAllowedConflicts() != timeTypeDTO.isAllowedConflicts() && !allowedConflictsUpdate && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
+            }
+            if (leafTimeType.getRankingAtTimeTypeEnum().equals(timeTypeDTO.getRankingAtTimeTypeEnum()) && !rankingAtTimeTypeEnumUpdate && timeType.getUpperLevelTimeTypeId() != null) {
+                childTimeType.setRankingAtTimeTypeEnum(timeTypeDTO.getRankingAtTimeTypeEnum());
             }
         }
     }

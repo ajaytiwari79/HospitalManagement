@@ -3,6 +3,7 @@ package com.kairos.dto.activity.time_type;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.enums.RankingAtTimeTypeEnum;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class TimeTypeDTO {
     private boolean allowedConflicts;
     private boolean breakNotHeldValid;
     private BigInteger activityPriorityId;
+    private RankingAtTimeTypeEnum rankingAtTimeTypeEnum;
 
     public TimeTypeDTO(String timeTypes, String backgroundColor) {
         this.timeTypes = timeTypes;
