@@ -53,6 +53,7 @@ import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -170,6 +171,9 @@ public class ExpertiseService {
     }
 
     public ExpertiseQueryResult updateExpertise(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId){
+        if(StringUtils.isBlank(expertiseDTO.getName())){
+            exceptionService.actionNotPermittedException("error.Expertise.name.notEmpty");
+        }
         expertiseDTO.setId(expertiseId);
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
