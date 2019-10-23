@@ -174,6 +174,9 @@ public class ExpertiseService {
         if(StringUtils.isBlank(expertiseDTO.getName())){
             exceptionService.actionNotPermittedException("error.Expertise.name.notEmpty");
         }
+        if(expertiseDTO.getEndDate()!=null && expertiseDTO.getStartDate().isAfter(expertiseDTO.getEndDate())){
+            exceptionService.actionNotPermittedException("message.start_date.less_than.end_date");
+        }
         expertiseDTO.setId(expertiseId);
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
