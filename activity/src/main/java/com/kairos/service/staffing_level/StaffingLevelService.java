@@ -768,7 +768,7 @@ public class StaffingLevelService  {
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
             List<Map<String,Object>> stafSkillMap = staffSkillsMap.get(staffId);
             for(SkillLevelSetting skillLevelSetting : staffingLevelSkill.getSkillLevelSettings()){
-
+                
             }
         }
     }
