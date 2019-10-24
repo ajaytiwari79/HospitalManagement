@@ -49,7 +49,7 @@ public class AbsencePlanningController {
     @RequestMapping(value = "/update_task",method = RequestMethod.PUT)
     ResponseEntity<Map<String, Object>> updateTask(@PathVariable long unitId, @RequestBody List<TaskDTO> taskData  )  {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, absencePlanningService.updateTask(unitId,taskData));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, absencePlanningService.updateTask(taskData));
 
     }
 
