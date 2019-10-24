@@ -127,7 +127,7 @@ public class ShiftStateService {
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v));
         List<ShiftState> timeAndAttendanceShiftStates = getShiftStateLists( shifts, phase.getId(), timeAndAttendanceShiftStateMap);
         for (ShiftState timeAndAttendanceShiftState : timeAndAttendanceShiftStates) {
-            if(isNull(timeAndAttendanceShiftStateMap.get(timeAndAttendanceShiftState.getShiftId())) || !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftStateMap.get(timeAndAttendanceShiftState.getShiftId()).getAccessGroupRole())){
+            if(shiftValidatorService.validateGracePeriod(ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState, ShiftDTO.class),true,timeAndAttendanceShiftState.getUnitId(),phase)){
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
