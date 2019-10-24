@@ -1,13 +1,15 @@
-package com.kairos.dto.user.country.experties;
+package com.kairos.persistence.model.user.employment.query_result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
+import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.neo4j.annotation.QueryResult;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
@@ -24,7 +26,8 @@ import java.util.Optional;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ExpertiseDTO {
+@QueryResult
+public class ExpertiseResponseDTO {
     private Long id;
     @NotBlank(message = "error.Expertise.name.notEmpty")
     private String name;
@@ -50,7 +53,7 @@ public class ExpertiseDTO {
         if (!Optional.ofNullable(this.startDate).isPresent() && Optional.ofNullable(this.endDate).isPresent()) {
             return false;
         } else if (Optional.ofNullable(this.startDate).isPresent() && (Optional.ofNullable(this.endDate).isPresent())) {
-            return !startDate.isAfter(endDate);
+            return startDate.isAfter(endDate);
         }
         return true;
     }

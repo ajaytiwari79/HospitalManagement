@@ -44,6 +44,7 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
     }
 
     public SeniorityLevel(Long id,Integer from, Integer to, PayGrade payGrade, BigDecimal pensionPercentage, BigDecimal freeChoicePercentage, BigDecimal freeChoiceToPension, boolean published) {
+        this.id=id;
         this.from = from;
         this.to = to;
         this.payGrade = payGrade;

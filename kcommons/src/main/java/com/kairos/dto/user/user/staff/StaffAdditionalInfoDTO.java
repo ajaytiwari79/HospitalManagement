@@ -45,7 +45,7 @@ public class StaffAdditionalInfoDTO {
     private Long staffUserId;
     private String cprNumber;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
-    private List<ReasonCodeDTO> reasonCodes;
+    private List<ReasonCodeDTO> reasonCodes=new ArrayList<>();
     private UserAccessRoleDTO userAccessRoleDTO;
 
 

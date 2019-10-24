@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class ActivityLineIntervalChangeMoveHelper {
     public static final String SHIFT = "shift";
     public static final String FORMAT = "{} {{}} -> {{}}";
-    private static Logger log= LoggerFactory.getLogger(ActivityLineIntervalChangeMoveHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityLineIntervalChangeMoveHelper.class);
 
     /**
      *
@@ -33,14 +33,14 @@ public class ActivityLineIntervalChangeMoveHelper {
         //checkSanity(scoreDirector);
         //(existingActivityLineIntervals= ShiftPlanningUtility.getOverlappingActivityLineIntervals
         //(shiftImp.getActivityLineIntervalsList(),activityLineInterval)
-        log.debug("**********************STARTS********************");
+        LOGGER.debug("**********************STARTS********************");
         if(CollectionUtils.isNotEmpty(exActivityLineIntervalsForThisShift)){
             for(ActivityLineInterval existingActivityLineInterval: exActivityLineIntervalsForThisShift){
                 if(Objects.equals(existingActivityLineInterval.getShift(),exActivityLineIntervalShift)){
                     continue;
                 }
                 scoreDirector.beforeVariableChanged(existingActivityLineInterval, SHIFT);
-                log.debug("X {} {{}} -> {{}}",existingActivityLineInterval,existingActivityLineInterval.getShift(),exActivityLineIntervalShift);
+                LOGGER.debug("X {} {{}} -> {{}}",existingActivityLineInterval,existingActivityLineInterval.getShift(),exActivityLineIntervalShift);
                 existingActivityLineInterval.setShift(exActivityLineIntervalShift);
                 scoreDirector.afterVariableChanged(existingActivityLineInterval, SHIFT);
             }
@@ -49,10 +49,10 @@ public class ActivityLineIntervalChangeMoveHelper {
             return;
         }
         scoreDirector.beforeVariableChanged(activityLineInterval, SHIFT);
-        log.debug(FORMAT,activityLineInterval,activityLineInterval.getShift(), shiftImp);
+        LOGGER.debug(FORMAT,activityLineInterval,activityLineInterval.getShift(), shiftImp);
         activityLineInterval.setShift(shiftImp);
         scoreDirector.afterVariableChanged(activityLineInterval, SHIFT);
-        log.debug("**********************END********************");
+        LOGGER.debug("**********************END********************");
         /*if(shiftImp!=null && shiftImp.getActivityLineIntervalsList().size()==1 && shiftImp.getInterval().toDuration().getStandardMinutes()!=15l){
             log.info("+++++++++++++++++++++++++"+ShiftPlanningUtility.getIntervalAsString(shiftImp.getInterval()));
         }*/
@@ -66,12 +66,10 @@ public class ActivityLineIntervalChangeMoveHelper {
                 notifiableList.setAccessible(true);
                 List<VariableListenerNotifiable> list = (List<VariableListenerNotifiable>) notifiableList.get(vls);
                 for (VariableListenerNotifiable vn : list) {
-                    log.info(vn.getVariableListener() + "--" + vn.getNotificationQueue().size());
+                    LOGGER.info(vn.getVariableListener() + "--" + vn.getNotificationQueue().size());
                 }
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                LOGGER.error(e.getMessage());
             }
         }
         //IRSV is triggered in beforeVariableChanged() so if exiting shift is null IRSV wont be triggered because shift would be null for it. it wont know what collection to add to
@@ -84,7 +82,7 @@ public class ActivityLineIntervalChangeMoveHelper {
                                                      ShiftImp shiftImp, ActivityLineInterval activityLineInterval2, ShiftImp shiftImp2){
         //checkSanity(scoreDirector);
         scoreDirector.beforeVariableChanged(activityLineInterval2, SHIFT);
-        log.debug(FORMAT,activityLineInterval2,activityLineInterval2.getShift(), shiftImp2);
+        LOGGER.debug(FORMAT,activityLineInterval2,activityLineInterval2.getShift(), shiftImp2);
         activityLineInterval2.setShift(shiftImp2);
 
         scoreDirector.afterVariableChanged(activityLineInterval2, SHIFT);
@@ -94,13 +92,13 @@ public class ActivityLineIntervalChangeMoveHelper {
             return;
         }*/
         if(Objects.equals(activityLineInterval.getShift(), shiftImp)){
-            log.info("HOW");
+            LOGGER.info("HOW");
         }
         scoreDirector.beforeVariableChanged(activityLineInterval, SHIFT);
-        log.debug(FORMAT,activityLineInterval,activityLineInterval.getShift(), shiftImp);
+        LOGGER.debug(FORMAT,activityLineInterval,activityLineInterval.getShift(), shiftImp);
         activityLineInterval.setShift(shiftImp);
         scoreDirector.afterVariableChanged(activityLineInterval, SHIFT);
-        log.debug("**********************END********************");
+        LOGGER.debug("**********************END********************");
     }
     public static void assignActivityIntervalToShift(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector, ActivityLineInterval activityLineInterval,
                                                      ShiftImp shiftImp) {
@@ -112,19 +110,17 @@ public class ActivityLineIntervalChangeMoveHelper {
             return;
         }
         scoreDirector.beforeVariableChanged(activityLineInterval, SHIFT);
-        log.debug(FORMAT, activityLineInterval,activityLineInterval.getShift(), shiftImp);
+        LOGGER.debug(FORMAT, activityLineInterval,activityLineInterval.getShift(), shiftImp);
         activityLineInterval.setShift(shiftImp);
         scoreDirector.afterVariableChanged(activityLineInterval, SHIFT);
         //log.info("*P*********************END********************");
     }
     public static void checkSanity(ScoreDirector<ShiftRequestPhasePlanningSolution> scoreDirector){
         scoreDirector.getWorkingSolution().getShifts().forEach(s->{
-            if(new HashSet<>(s.getActivityLineIntervals().stream().map(a->a.getStart()).collect(Collectors.toList())).size()!=s.getActivityLineIntervals().size()){
-                log.info(s.toString());
-                s.getActivityLineIntervals().stream().sorted().forEach(a->{
-                    log.info(a.getLabel());
-                });
-                log.info("messed up");
+            if(new HashSet<>(s.getActivityLineIntervals().stream().map(ActivityLineInterval::getStart).collect(Collectors.toList())).size()!=s.getActivityLineIntervals().size()){
+                LOGGER.info(s.toString());
+                s.getActivityLineIntervals().stream().sorted().forEach(a-> LOGGER.info(a.getLabel()));
+                LOGGER.info("messed up");
                 throw new IllegalStateException();
             }
         });

@@ -463,14 +463,14 @@ public class DefaultDataInheritService {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.error("Error in constructing the objects::" + ex.getMessage());
+            LOGGER.error("Error in constructing the objects:: {}", ex.getMessage());
         }
         return baseEntityList;
     }
 
-    public boolean copyMasterAssetToUnitAsset(long unitId, List<Long> orgSubTypeId, long OrgSubServiceId){
-        Long countryId = UserContext.getUserDetails().getCountryId();
-        List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrgSubTypeAndOrgSubService(countryId, orgSubTypeId, OrgSubServiceId);
+    public boolean copyMasterAssetToUnitAsset(Long countryId, Long unitId, List<Long> orgSubTypeId, Long orgSubServiceId){
+        //Long countryId = UserContext.getUserDetails().getCountryId();
+        List<MasterAsset> masterAssets = masterAssetRepository.findAllByCountryIdAndOrgSubTypeAndOrgSubService(countryId, orgSubTypeId, orgSubServiceId);
         if(isCollectionNotEmpty(masterAssets)) {
             Map<Long, AssetType> longAssetTypeMap = copyAssetTypeFromCountry(unitId, assetTypeRepository.getAllAssetTypeByCountryId(countryId));
             copyMasterAssetAndAssetTypeFromCountryToUnit(unitId, masterAssets, longAssetTypeMap);

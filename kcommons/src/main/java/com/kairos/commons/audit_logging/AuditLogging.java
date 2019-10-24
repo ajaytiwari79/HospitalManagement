@@ -100,7 +100,7 @@ public class AuditLogging {
                     try {
                         oldValue = newValue.getClass().newInstance();
                     } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                 }
                 result.put(properteyName, checkDifferences(oldValue, newValue));

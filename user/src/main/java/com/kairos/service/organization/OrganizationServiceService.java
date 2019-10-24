@@ -12,6 +12,7 @@ import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.GdprIntegrationService;
+import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -193,7 +194,7 @@ public class OrganizationServiceService {
             addDefaultCustomNameRelationShipOfServiceForOrganization(organizationService.getId(), id);
             //call to create asset for org.
             List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(unitSubType -> unitSubType.getId()).collect(Collectors.toList());
-            gdprIntegrationService.createDefaultAssetForUnit(unit.getId(), orgSubTypeIds,organizationServiceId);
+            gdprIntegrationService.createDefaultAssetForUnit(UserContext.getUserDetails().getCountryId(),unit.getId(), orgSubTypeIds,organizationServiceId);
         } else {
             unitGraphRepository.removeServiceFromOrganization(id, organizationService.getId());
         }

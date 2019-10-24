@@ -13,6 +13,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @Getter
 @Setter
 public class ExpertiseDTO  {
+    private Long id;
     private String name;
     private String description;
 }

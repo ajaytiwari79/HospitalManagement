@@ -101,7 +101,6 @@ public class PermissionService {
     }
 
     public List<ModelDTO> getPermissionSchema(){
-        Map<String, Object> permissionSchemaMap = new HashMap<>();
         List<KPermissionModel> kPermissionModels = new ArrayList();
         permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
         kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
@@ -168,7 +167,7 @@ public class PermissionService {
             String jsonData = objectMapper.writerWithDefaultPrettyPrinter()
                     .writeValueAsString(dtoObject);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return null;
     }
@@ -185,7 +184,7 @@ public class PermissionService {
             kPermissionSubModelFieldQueryResults.add(new KPermissionSubModelFieldQueryResult(modelClass.getSimpleName(),permissionFields.get(0)));
             kPermissionModelFieldDTO = ObjectMapperUtils.copyPropertiesOfListByMapper(kPermissionSubModelFieldQueryResults,KPermissionModelFieldDTO.class );
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return kPermissionModelFieldDTO;
     }
