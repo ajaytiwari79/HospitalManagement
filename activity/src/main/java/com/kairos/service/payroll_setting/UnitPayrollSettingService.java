@@ -191,7 +191,7 @@ public class UnitPayrollSettingService extends MongoBaseService {
                     newUnitPayrollSetting = null;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
         }
 
