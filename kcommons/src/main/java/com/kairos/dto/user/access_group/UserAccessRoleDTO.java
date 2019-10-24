@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,7 +15,7 @@ public class UserAccessRoleDTO {
     private Boolean staff;
     private Boolean management;
     private Long staffId;
-
+    private List<Long> accessGroupIds;
 
     public UserAccessRoleDTO(Boolean staff,Boolean management) {
         this.staff = staff;
