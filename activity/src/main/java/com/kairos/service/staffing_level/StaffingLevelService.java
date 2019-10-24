@@ -88,6 +88,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.LEVEL;
+import static com.kairos.constants.AppConstants.SKILL_ID;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
@@ -709,7 +711,7 @@ public class StaffingLevelService  {
         Map<BigInteger,BigInteger> childAndParentActivityIdMap = activityAndParentActivityMap[0];
         Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
         List<Long> staffIds = shifts.stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
-        List<StaffDTO> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(staffIds);
+        List<StaffDTO> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds);
         Map<Long, List<Map<String,Object>>> staffSkillsMap = staffDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v.getSkillInfo()));
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -764,7 +766,7 @@ public class StaffingLevelService  {
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
             if(staffSkillsMap.containsKey(staffId)) {
                 for (Map<String, Object> staffSkill : staffSkillsMap.get(staffId)) {
-                    if (staffingLevelSkill.getSkillId() == staffSkill.get("skillId")) {
+                    if (staffingLevelSkill.getSkillId() == staffSkill.get(SKILL_ID)) {
                         updateAvailableNoOfStaff(staffingLevelSkill, staffSkill);
                     }
                 }
@@ -773,9 +775,9 @@ public class StaffingLevelService  {
     }
 
     private void updateAvailableNoOfStaff(StaffingLevelSkill staffingLevelSkill, Map<String, Object> staffSkill) {
-        if(SkillLevel.BASIC.equals(staffSkill.get("level"))){
+        if(SkillLevel.BASIC.equals(staffSkill.get(LEVEL))){
             staffingLevelSkill.getSkillLevelSettings().get(2).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()+1);
-        }else if(SkillLevel.ADVANCE.equals(staffSkill.get("level"))){
+        }else if(SkillLevel.ADVANCE.equals(staffSkill.get(LEVEL))){
             if(staffingLevelSkill.getSkillLevelSettings().get(1).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff() || staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()){
                 staffingLevelSkill.getSkillLevelSettings().get(1).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff()+1);
             }else{

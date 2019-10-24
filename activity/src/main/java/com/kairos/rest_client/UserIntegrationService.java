@@ -844,8 +844,8 @@ public class UserIntegrationService {
 
     }
 
-    public List<StaffDTO> getSkillIdAndLevelByStaffIds(List<Long> staffIds) {
-        return genericRestClient.publishRequest(staffIds, 18172L, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {});
+    public List<StaffDTO> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds) {
+        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {});
     }
 }
 

@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.TimeTypeEnum.*;
 import static com.kairos.service.activity.ActivityUtil.getCutoffInterval;
@@ -168,7 +169,7 @@ public class TimeTypeService extends MongoBaseService {
         boolean partOfTeamUpdated = false;
         boolean allowedChildActivityUpdated = false;
         boolean allowedConflictsUpdate = false;
-        boolean rankingAtTimeTypeEnumUpdate = false;
+        boolean priorityForUpdate = false;
         for (TimeType childTimeType : childTimeTypeList) {
             if (childTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && childTimeType.getChildTimeTypeIds().isEmpty()) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
@@ -182,20 +183,20 @@ public class TimeTypeService extends MongoBaseService {
                 childTimeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
                 allowedConflictsUpdate = true;
             }
-            if (childTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && childTimeType.getChildTimeTypeIds().isEmpty()) {
+            if (isNotNull(childTimeType.getPriorityFor()) && isNotNull(timeTypeDTO.getPriorityFor()) && !childTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && childTimeType.getChildTimeTypeIds().isEmpty()) {
                 childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
-                rankingAtTimeTypeEnumUpdate = true;
+                priorityForUpdate = true;
             }
             childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
             if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
-                setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, childTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, rankingAtTimeTypeEnumUpdate, childTimeType);
+                setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, childTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, priorityForUpdate, childTimeType);
                 timeTypes.addAll(leafTimeTypeList);
             }
         }
     }
 
-    private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, boolean rankingAtTimeTypeEnumUpdate, TimeType childTimeType) {
+    private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, boolean priorityForUpdate, TimeType childTimeType) {
         for (TimeType leafTimeType : childTimeTypeList) {
             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             if (leafTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId() != null) {
@@ -207,7 +208,7 @@ public class TimeTypeService extends MongoBaseService {
             if (leafTimeType.isAllowedConflicts() != timeTypeDTO.isAllowedConflicts() && !allowedConflictsUpdate && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
             }
-            if (leafTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && !rankingAtTimeTypeEnumUpdate && timeType.getUpperLevelTimeTypeId() != null) {
+            if (leafTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && !priorityForUpdate && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
             }
         }

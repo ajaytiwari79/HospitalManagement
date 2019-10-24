@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.kairos.enums.PriorityFor.PRESENCE;
+
 @Document(collection = "time_Type")
 @Getter
 @Setter
@@ -50,7 +52,7 @@ public class TimeType extends MongoBaseEntity{
     private List<Long> employmentTypes;
     private boolean breakNotHeldValid;
     private BigInteger activityPriorityId;
-    private PriorityFor priorityFor;
+    private PriorityFor priorityFor = PRESENCE;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;
