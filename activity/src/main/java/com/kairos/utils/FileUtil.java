@@ -26,7 +26,7 @@ public class FileUtil {
                 fileOutputStream.write(buf, 0, numRead);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
