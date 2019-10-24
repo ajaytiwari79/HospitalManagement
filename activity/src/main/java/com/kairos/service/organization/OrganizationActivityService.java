@@ -298,16 +298,14 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
         //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
-        if (isNotNull(activity.getActivityPriorityId())) {
-            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(activity.getActivityPriorityId());
-            if (activityPriority != null) {
-                ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
-                if (unitActivityPriority != null) {
-                    activityCopied.setActivityPriorityId(unitActivityPriority.getId());
-                }
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
+        if (isNotNull(activityPriority)) {
+            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
+            if (isNotNull(unitActivityPriority)) {
+                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
             }
         }
-
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
