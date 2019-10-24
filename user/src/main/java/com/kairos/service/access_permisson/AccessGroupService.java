@@ -801,7 +801,7 @@ public class AccessGroupService {
                 String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
                 boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
                 boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
-                List<Long> accessGroupIds = accessGroupQueryResult.getDayTypesByAccessGroup().stream().map(dayTypesByAccessGroup -> dayTypesByAccessGroup.getAccessGroup().getId()).collect(Collectors.toList());
+                Set<Long> accessGroupIds = accessGroupQueryResult.getDayTypesByAccessGroup().stream().map(dayTypesByAccessGroup -> dayTypesByAccessGroup.getAccessGroup().getId()).collect(Collectors.toSet());
                 userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management, accessGroupIds);
                 userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
 
