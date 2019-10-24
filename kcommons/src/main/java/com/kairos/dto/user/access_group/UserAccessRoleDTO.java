@@ -29,6 +29,14 @@ public class UserAccessRoleDTO {
         this.management = management;
     }
 
+    public UserAccessRoleDTO(Long userId, Long unitId, Boolean staff, Boolean management, List<Long> accessGroupIds){
+        this.userId = userId;
+        this.unitId = unitId;
+        this.staff = staff;
+        this.management = management;
+        this.accessGroupIds = accessGroupIds;
+    }
+
     public UserAccessRoleDTO(Long unitId, Boolean staff, Boolean management, Long staffId) {
         this.unitId = unitId;
         this.staff = staff;

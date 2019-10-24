@@ -54,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -800,7 +801,8 @@ public class AccessGroupService {
                 String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
                 boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
                 boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
-                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
+                List<Long> accessGroupIds = accessGroupQueryResult.getDayTypesByAccessGroup().stream().map(dayTypesByAccessGroup -> dayTypesByAccessGroup.getAccessGroup().getId()).collect(Collectors.toList());
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management, accessGroupIds);
                 userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
 
             }
