@@ -112,6 +112,7 @@ public class TimeTypeService extends MongoBaseService {
             updateColorInActivity(timeTypeDTO, timeType);
         }
         timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+        timeType.setActivityPriorityId(timeTypeDTO.getActivityPriorityId());
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
         timeType.setPriorityFor(timeTypeDTO.getPriorityFor());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());

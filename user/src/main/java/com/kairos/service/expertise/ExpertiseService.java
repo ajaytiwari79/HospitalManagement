@@ -155,7 +155,6 @@ public class ExpertiseService {
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO, country);
         Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),country,expertiseDTO.isPublished(),null,Collections.singletonList(expertiseLine));
         addSeniorityLevelsInExpertise(expertise,expertiseDTO);
-        expertiseGraphRepository.save(expertise);
         linkProtectedDaysOffSetting(new ArrayList<>(),Arrays.asList(expertise));
         Map<Integer,PayGrade> fromAndPayGradeLevelMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(SeniorityLevel::getFrom, SeniorityLevel::getPayGrade));
         List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationships =new ArrayList<>();
