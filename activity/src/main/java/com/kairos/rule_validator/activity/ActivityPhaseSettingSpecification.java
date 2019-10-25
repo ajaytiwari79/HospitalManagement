@@ -70,7 +70,7 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
                     throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
                 }
             }
-            if(CollectionUtils.containsAny(phase.getAccessGroupIds(),staffAdditionalInfoDTO.getUserAccessRoleDTO().getAccessGroupIds())){
+            if(!CollectionUtils.containsAny(phase.getAccessGroupIds(),staffAdditionalInfoDTO.getUserAccessRoleDTO().getAccessGroupIds())){
                 throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
             }
         });
