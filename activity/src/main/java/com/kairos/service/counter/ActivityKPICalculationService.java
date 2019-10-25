@@ -135,7 +135,8 @@ public class ActivityKPICalculationService implements CounterService {
                 break;
             case TOTAL_MINUTES:methodParam = ShiftActivityDTO::getMinutes;
                 break;
-                default:break;
+                default:
+                    break;
         }
         return getTotalByType(filterBasedCriteria,shiftWithActivityDTOS,shiftActivityDTOS,methodParam);
     }

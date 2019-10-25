@@ -199,7 +199,7 @@ public class KPISetService {
                         applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_INTERVAL);
                     }
                 }
-                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId(), startDate);
+                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
                 if (isNotNull(kpiResponseDTO)) {
                     kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(), kpiResponseDTO);
                 }
