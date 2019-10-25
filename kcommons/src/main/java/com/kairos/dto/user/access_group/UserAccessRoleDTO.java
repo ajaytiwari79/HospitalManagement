@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,7 +17,7 @@ public class UserAccessRoleDTO {
     private Boolean staff;
     private Boolean management;
     private Long staffId;
-    private Set<Long> accessGroupIds;
+    private Set<Long> accessGroupIds = new HashSet<>();
 
     public UserAccessRoleDTO(Boolean staff,Boolean management) {
         this.staff = staff;
