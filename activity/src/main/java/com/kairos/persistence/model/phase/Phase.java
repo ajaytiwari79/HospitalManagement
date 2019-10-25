@@ -7,6 +7,7 @@ import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -28,6 +29,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class Phase extends MongoBaseEntity {
     @NotNull(message = "error.phase.name.notnull")
     private String name;
