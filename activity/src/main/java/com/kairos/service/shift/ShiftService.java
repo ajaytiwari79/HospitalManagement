@@ -185,7 +185,7 @@ public class ShiftService extends MongoBaseService {
         mainShift.setPhaseId(phase.getId());
         List<ShiftActivity>[] shiftActivities = mainShift.getShiftActivitiesForValidatingStaffingLevel(null);
         for (ShiftActivity shiftActivity : shiftActivities[0]) {
-            shiftValidatorService.validateStaffingLevel(phase, mainShift, activityWrapperMap, true, staffAdditionalInfoDTO, shiftActivity,false,null);
+            shiftValidatorService.validateStaffingLevel(phase, mainShift, activityWrapperMap, true, staffAdditionalInfoDTO, shiftActivity,false);
         }
         List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,mainShift, activityWrapperMap, staffAdditionalInfoDTO, wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
         mainShift.setBreakActivities(breakActivities);
@@ -300,7 +300,7 @@ public class ShiftService extends MongoBaseService {
         for (Shift shift : shifts) {
             List<ShiftActivity>[] shiftActivities = shift.getShiftActivitiesForValidatingStaffingLevel(null);
             for (ShiftActivity shiftActivity : shiftActivities[0]) {
-                shiftValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, staffAdditionalInfoDTO, shiftActivity,false,null);
+                shiftValidatorService.validateStaffingLevel(phaseListByDate.get(shift.getStartDate()), shift, activityWrapperMap, true, staffAdditionalInfoDTO, shiftActivity,false);
             }
             int scheduledMinutes = 0;
             int durationMinutes = 0;
@@ -792,7 +792,7 @@ public class ShiftService extends MongoBaseService {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getActivities().get(0).getStartDate(), null);
         List<ShiftActivity>[] shiftActivities = shift.getShiftActivitiesForValidatingStaffingLevel(shift);
         for (ShiftActivity shiftActivity : shiftActivities[1]) {
-            shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, shiftActivity,false,null);
+            shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, shiftActivity,false);
         }
         Specification<BigInteger> activitySpecification = new ShiftAllowedToDelete(activityWrapper.getActivity().getPhaseSettingsActivityTab().getPhaseTemplateValues(), staffAdditionalInfoDTO.getUserAccessRoleDTO());
         List<String> messages = activitySpecification.isSatisfiedString(phase.getId());
@@ -835,8 +835,8 @@ public class ShiftService extends MongoBaseService {
                     if(!oldStateShift.getActivities().get(i).getActivityId().equals(shift.getActivities().get(i).getActivityId())){
                         List<ActivityPriority> activityPriorities=activityPriorityMongoRepository.findAllByIdAndDeletedFalse(activityWrapperMap.keySet());
                         Map<BigInteger,ActivityPriority> activityPriorityMap=activityPriorities.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
-                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i),true,staffingLevelForOld);
-                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i),true,staffingLevelForNew);
+                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i),true);
+                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i),true);
                         int rankOfOld=activityPriorityMap.get(oldStateShift.getActivities().get(i)).getSequence();
                         int rankOfNew=activityPriorityMap.get(shift.getActivities().get(i)).getSequence();
                         long durationMinutesOfOld=oldStateShift.getActivities().get(i).getInterval().getMinutes();
