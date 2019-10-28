@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -42,4 +43,6 @@ public interface ActivityPriorityMongoRepository extends MongoBaseRepository<Act
 
     @Query("{deleted:false,organizationId:?1,name:?0}")
     ActivityPriority findByNameAndOrganizationId(String name,Long organizationId);
+
+    List<ActivityPriority> findAllByIdAndDeletedFalse(Set<BigInteger> ids);
 }
