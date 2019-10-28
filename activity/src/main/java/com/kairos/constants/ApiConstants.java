@@ -37,6 +37,7 @@ public final class ApiConstants {
     //RestClientURL
     public static final String CTA_BASIC_INFO = "/cta_basic_info";
     public static final String GET_EMPLOYMENT = "/employment/{employmentId}";
+    public static final String GET_ALL_EMPLOYMENT_BY_UNIT_ID = "/get_all_employment_by_unit_id";
     public static final String GET_REASONCODE = "/reason_codes";
     public static final String REMOVE_FUNCTIONS_BY_EMPLOYMENT_ID = "/employment/{employmentId}/remove_functions";
     public static final String RESTORE_FUNCTIONS_BY_EMPLOYMENT_ID = "/employment/{employmentId}/restore_functions";

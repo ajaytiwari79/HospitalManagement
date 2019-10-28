@@ -842,6 +842,13 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/sick_settings/default", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {});
 
     }
+
+    public List<EmploymentWithCtaDetailsDTO> getAllEmploymentByUnitId(Long unitId) {
+        List<EmploymentWithCtaDetailsDTO> employmentDetails = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_ALL_EMPLOYMENT_BY_UNIT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EmploymentWithCtaDetailsDTO>>>() {
+        });
+        return employmentDetails;
+    }
+
 }
 
 
