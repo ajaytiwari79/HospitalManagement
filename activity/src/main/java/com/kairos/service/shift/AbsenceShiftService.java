@@ -89,7 +89,7 @@ public class AbsenceShiftService {
             } else {
                 newShiftDTO = calculateAverageShiftByActivity(shifts, activityWrapper.getActivity(),staffAdditionalInfoDTO, absenceReasonCodeId,shiftDTO.getShiftDate(),shiftDTO.getActivities().get(0));
             }
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), newShiftDTO.getActivities().get(newShiftDTO.getActivities().size() - 1).getEndDate());
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(staffAdditionalInfoDTO.getUnitId(), newShiftDTO.getActivities().get(0).getStartDate(), newShiftDTO.getActivities().get(newShiftDTO.getActivities().size() - 1).getEndDate());
             newShiftDTO.setId(shiftDTO.getId());
             newShiftDTO.setShiftType(ShiftType.ABSENCE);
             shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, newShiftDTO, phase, shiftOverlappedWithNonWorkingType, shiftActionType);

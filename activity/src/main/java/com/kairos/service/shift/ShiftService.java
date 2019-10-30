@@ -565,7 +565,6 @@ public class ShiftService extends MongoBaseService {
             shiftMongoRepository.delete(shift);
             return new ShiftWithViolatedInfoDTO();
         }
-
         boolean ruleCheckRequired = shift.isShiftUpdated(ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class));
         Date currentShiftStartDate = shift.getStartDate();
         Date currentShiftEndDate = shift.getEndDate();
