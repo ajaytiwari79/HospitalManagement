@@ -125,8 +125,6 @@ public class StaffingLevelService extends MongoBaseService {
     @Inject
     private StaffingLevelTemplateService staffingLevelTemplateService;
     @Inject
-    private StaffingLevelActivityRankService staffingLevelActivityRankService;
-    @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private ShiftService shiftService;

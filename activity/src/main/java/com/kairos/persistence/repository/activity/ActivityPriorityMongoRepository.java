@@ -44,5 +44,5 @@ public interface ActivityPriorityMongoRepository extends MongoBaseRepository<Act
     @Query("{deleted:false,organizationId:?1,name:?0}")
     ActivityPriority findByNameAndOrganizationId(String name,Long organizationId);
 
-    List<ActivityPriority> findAllByIdAndDeletedFalse(Set<BigInteger> ids);
+    List<ActivityPriority> findAllByIdInAndDeletedFalse(Set<BigInteger> ids);
 }
