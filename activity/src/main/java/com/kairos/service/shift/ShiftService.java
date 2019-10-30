@@ -837,8 +837,8 @@ public class ShiftService extends MongoBaseService {
                         Map<BigInteger,ActivityPriority> activityPriorityMap=activityPriorities.stream().collect(Collectors.toMap(k->k.getId(),Function.identity()));
                         shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i),true);
                         shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i),true);
-                        int rankOfOld=activityPriorityMap.get(oldStateShift.getActivities().get(i).getActivityId()).get;
-                        int rankOfNew=activityPriorityMap.get(shift.getActivities().get(i).getActivityId()).getSequence();
+                        int rankOfOld=activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
+                        int rankOfNew=activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
                         long durationMinutesOfOld=oldStateShift.getActivities().get(i).getInterval().getMinutes();
                         long durationMinutesOfNew=shift.getActivities().get(i).getInterval().getMinutes();
                         boolean allowedForReplace=true;
