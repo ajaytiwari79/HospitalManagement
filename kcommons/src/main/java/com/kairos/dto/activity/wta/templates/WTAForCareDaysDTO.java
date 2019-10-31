@@ -18,4 +18,8 @@ public class WTAForCareDaysDTO extends WTABaseRuleTemplateDTO{
 
     private List<ActivityCareDayCount> careDayCounts = new ArrayList<>();
 
+    public WTAForCareDaysDTO() {
+        wtaTemplateType = WTATemplateType.WTA_FOR_CARE_DAYS;
+    }
+
 }

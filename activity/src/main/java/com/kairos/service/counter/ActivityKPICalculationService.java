@@ -11,7 +11,10 @@ import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
+import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
@@ -24,16 +27,20 @@ import com.kairos.enums.kpi.CalculationBasedOn;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.utils.counter.KPIUtils;
+import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
@@ -73,6 +80,7 @@ public class ActivityKPICalculationService implements CounterService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private ExceptionService exceptionService;
     @Inject private CostCalculationKPIService costCalculationKPIService;
+    @Inject private PhaseService phaseService;
 
 
 
@@ -86,6 +94,11 @@ public class ActivityKPICalculationService implements CounterService {
         Set<BigInteger> activityIds = filterBasedCriteria.containsKey(ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ACTIVITY_IDS)) : new HashSet<>();
         if(filterBasedCriteria.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterBasedCriteria.get(ABSENCE_ACTIVITY))){
             activityIds.addAll(KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ABSENCE_ACTIVITY)));
+        }
+        if(filterBasedCriteria.containsKey(TEAM)){
+            Set<String> teamIds = (Set<String>)filterBasedCriteria.get(TEAM);
+            ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUserDetails().getLastSelectedOrganizationId(),teamIds));
+            activityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
         }
         List<ShiftActivityDTO> shiftActivityDTOS = shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).filter(shiftActivityDTO->isShiftActivityValid(shiftActivityDTO,timeTypeIds,activityIds,plannedTimeIds)).collect(Collectors.toList());
         double total = 0;
@@ -181,7 +194,6 @@ public class ActivityKPICalculationService implements CounterService {
     }
 
     private List<CommonKpiDataUnit> getTotalHoursKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI) {
-        // TO BE USED FOR AVERAGE CALCULATION.
         double multiplicationFactor = 1;
         Object[] objects = getKpiData(filterBasedCriteria, organizationId, applicableKPI);
         List<ShiftWithActivityDTO> shifts = (List<ShiftWithActivityDTO>) objects[0];
@@ -225,14 +237,14 @@ public class ActivityKPICalculationService implements CounterService {
         Set<DayOfWeek> daysOfWeeks = (Set<DayOfWeek>)filterCriteria[4];
         daysOfWeeks.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-        StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS);
+        StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS,organizationId);
         shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
         return new Object[]{shifts, staffIds, dateTimeIntervals, staffKpiFilterDTOS};
     }
 
-    private StaffFilterDTO getStaffFilterDto(Map<FilterType, List> filterBasedCriteria, List<TimeSlotDTO> timeSlotDTOS) {
+    private StaffFilterDTO getStaffFilterDto(Map<FilterType, List> filterBasedCriteria, List<TimeSlotDTO> timeSlotDTOS,Long organizationId) {
         StaffFilterDTO staffFilterDTO = new StaffFilterDTO();
-        staffFilterDTO.setFiltersData(filterBasedCriteria.entrySet().stream().map(filterTypeListEntry -> {
+        List<FilterSelectionDTO> filterData = filterBasedCriteria.entrySet().stream().map(filterTypeListEntry -> {
             if(filterTypeListEntry.getKey().equals(TIME_SLOT)){
                 Set<String> timeSlotName = new HashSet<>();
                 for (Object timeSlotId : filterTypeListEntry.getValue()) {
@@ -246,7 +258,17 @@ public class ActivityKPICalculationService implements CounterService {
             }else {
                 return new FilterSelectionDTO(filterTypeListEntry.getKey(), new HashSet<String>(filterTypeListEntry.getValue()));
             }
-        }).collect(Collectors.toList()));
+        }).collect(Collectors.toList());
+        if(filterBasedCriteria.containsKey(PHASE)){
+            List<PhaseDTO> phases = phaseService.getPhasesByUnit(organizationId);
+            Set<PhaseDefaultName> phaseDefaultNames = (Set<PhaseDefaultName>)filterBasedCriteria.get(FilterType.PHASE).stream().map(value-> PhaseDefaultName.valueOf(value.toString())).collect(Collectors.toSet());
+            Set<String> phaseIds = phases.stream().filter(phaseDTO -> phaseDefaultNames.contains(phaseDTO.getPhaseEnum())).map(phaseDTO -> phaseDTO.getId().toString()).collect(Collectors.toSet());
+            filterData.add(new FilterSelectionDTO(PHASE, phaseIds));
+        }
+        if(filterBasedCriteria.containsKey(TEAM)){
+            filterData.add(new FilterSelectionDTO(TEAM, (Set<String>)filterBasedCriteria.get(TEAM)));
+        }
+        staffFilterDTO.setFiltersData(filterData);
         return staffFilterDTO;
     }
 

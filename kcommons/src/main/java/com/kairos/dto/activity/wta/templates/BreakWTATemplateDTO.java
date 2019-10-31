@@ -18,5 +18,9 @@ public class BreakWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private short breakGapMinutes;
     @Valid
     private Set<BreakAvailabilitySettings> breakAvailability;
+    public BreakWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.WTA_FOR_BREAKS_IN_SHIFT;
+
+    }
 
 }

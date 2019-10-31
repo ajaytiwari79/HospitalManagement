@@ -23,4 +23,7 @@ public class TimeBankWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
 
+    public TimeBankWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.TIME_BANK;
+    }
 }

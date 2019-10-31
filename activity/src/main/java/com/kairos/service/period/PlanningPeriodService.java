@@ -890,4 +890,9 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId) {
         return planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
     }
+
+    public PlanningPeriod findOneByUnitIdAndDate(Long unitId, Date startDate) {
+        return planningPeriodMongoRepository.findOneByUnitIdAndDate(unitId,startDate);
+    }
+
 }

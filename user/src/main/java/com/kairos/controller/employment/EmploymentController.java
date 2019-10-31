@@ -210,6 +210,12 @@ public class EmploymentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, initialTimeBankLogService.getInitialTimeBalanceByEmployment(employmentId));
     }
 
+    @ApiOperation("Get All Employment by unit id")
+    @GetMapping("/get_all_employment_by_unit_id")
+    public ResponseEntity<Map<String, Object>> getAllEmploymentByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.findEmploymentByUnitId(unitId));
+    }
+
 
 
 

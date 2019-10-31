@@ -20,5 +20,6 @@ public class CTADistributionDTO {
     private BigInteger id;
     private String name;
     private int minutes;
+    private float cost;
 
 }

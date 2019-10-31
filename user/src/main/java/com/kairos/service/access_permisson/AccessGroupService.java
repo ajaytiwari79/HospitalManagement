@@ -798,6 +798,7 @@ public class AccessGroupService {
                 if (isNull(accessGroupQueryResult)) {
                     exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
                 }
+                accessGroupQueryResult=ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult,AccessGroupStaffQueryResult.class);
                 String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
                 boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
                 boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
