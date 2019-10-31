@@ -52,7 +52,7 @@ import static com.kairos.utils.FileUtil.createDirectory;
  */
 @Service
 public class TaskTypeService extends MongoBaseService {
-    private static final Logger logger = LoggerFactory.getLogger(TaskTypeService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTypeService.class);
     public static final String ORGANIZATION_TYPES = "organizationTypes";
     public static final String IS_ARRIVAL = "isArrival";
     @Inject
@@ -899,7 +899,7 @@ public class TaskTypeService extends MongoBaseService {
         try {
             FileUtil.writeFile(path, multipartFile);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         taskType.setIcon(fileName);
         save(taskType);
@@ -986,7 +986,7 @@ public class TaskTypeService extends MongoBaseService {
     public List<TaskTypeDTO> createCopiesForTaskType(BigInteger taskTypeId, List<String> taskTypeNames) {
         TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
         if (!Optional.ofNullable(taskType).isPresent()) {
-            logger.error("Incorrect task type id " + taskType);
+            LOGGER.error("Incorrect task type id " + taskType);
             exceptionService.dataNotFoundByIdException(MEASSAGE_TASK_TYPE_ID);
         }
         List<TaskType> newTaskTypes = new ArrayList<>(taskTypeNames.size());

@@ -1,15 +1,18 @@
 package com.kairos.commons.annotation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 public class StringTrimerConfiguration implements ConstraintValidator<EnableStringTrimer, Object> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringTrimerConfiguration.class);
     @Override
     public void initialize(EnableStringTrimer constraintAnnotation) {
         //This is Override method
-        System.out.println("test");
     }
 
     @Override
@@ -27,7 +30,7 @@ public class StringTrimerConfiguration implements ConstraintValidator<EnableStri
                         field.set(object, value.trim());
                     }
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOGGER.error(e.getMessage());
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.enums.shift.BreakPaymentSetting;
@@ -53,6 +54,7 @@ public class ExpertiseQueryResult {
     private Set<Long> supportedUnitIds;
     private List<ExpertiseLineQueryResult> expertiseLines;
 
+    @JsonIgnore
     public ExpertiseLineQueryResult getCurrentlyActiveLine(){
         ExpertiseLineQueryResult currentExpertiseLineQueryResult=null;
         for (ExpertiseLineQueryResult expertiseLineQueryResult:this.getExpertiseLines()) {

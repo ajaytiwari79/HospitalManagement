@@ -53,6 +53,7 @@ import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -155,7 +156,6 @@ public class ExpertiseService {
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO, country);
         Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),country,expertiseDTO.isPublished(),null,Collections.singletonList(expertiseLine));
         addSeniorityLevelsInExpertise(expertise,expertiseDTO);
-        expertiseGraphRepository.save(expertise);
         linkProtectedDaysOffSetting(new ArrayList<>(),Arrays.asList(expertise));
         Map<Integer,PayGrade> fromAndPayGradeLevelMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(SeniorityLevel::getFrom, SeniorityLevel::getPayGrade));
         List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationships =new ArrayList<>();
@@ -169,7 +169,13 @@ public class ExpertiseService {
         return updatedExpertiseData(expertise);
     }
 
-    public ExpertiseResponseDTO updateExpertise(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId){
+    public ExpertiseQueryResult updateExpertise(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId){
+        if(StringUtils.isBlank(expertiseDTO.getName())){
+            exceptionService.actionNotPermittedException("error.Expertise.name.notEmpty");
+        }
+        if(expertiseDTO.getEndDate()!=null && expertiseDTO.getStartDate().isAfter(expertiseDTO.getEndDate())){
+            exceptionService.actionNotPermittedException("message.start_date.less_than.end_date");
+        }
         expertiseDTO.setId(expertiseId);
         Country country = countryGraphRepository.findOne(countryId);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -188,13 +194,17 @@ public class ExpertiseService {
         currentExpertise.setName(expertiseDTO.getName());
         currentExpertise.setStartDate(expertiseDTO.getStartDate());
         currentExpertise.setEndDate(expertiseDTO.getEndDate());
+        if(!currentExpertise.isPublished()){
+            currentExpertise.getExpertiseLines().get(0).setEndDate(currentExpertise.getEndDate());
+        }
         expertiseGraphRepository.save(currentExpertise);
-        return ObjectMapperUtils.copyPropertiesByMapper(expertiseDTO,ExpertiseResponseDTO.class);
+        return updatedExpertiseData(currentExpertise);
     }
 
     public ExpertiseQueryResult updateExpertiseLine(Long countryId,ExpertiseDTO expertiseDTO,Long expertiseId,Long expertiseLineId){
         expertiseDTO.setExpertiseLineId(expertiseLineId);
         Country country = countryGraphRepository.findById(countryId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, COUNTRY, countryId)));
+        expertiseGraphRepository.removeSeniorityLevel(expertiseId);
         Expertise expertise = expertiseGraphRepository.findById(expertiseId,2).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId())));
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class));
         addSeniorityLevelsInExpertise(expertise,expertiseDTO);
@@ -261,7 +271,7 @@ public class ExpertiseService {
         }
         if(seniorityLevels.size()>1){
             for (int i = 0; i < seniorityLevels.size()-1; i++) {
-                if(seniorityLevels.get(i).getTo()!=null &&seniorityLevels.get(i).getTo()>seniorityLevels.get(i).getFrom() || !seniorityLevels.get(i).getTo().equals(seniorityLevels.get(i+1).getFrom())){
+                if(seniorityLevels.get(i).getTo()!=null &&seniorityLevels.get(i).getTo()<=seniorityLevels.get(i).getFrom() || !seniorityLevels.get(i).getTo().equals(seniorityLevels.get(i+1).getFrom())){
                     exceptionService.actionNotPermittedException(PLEASE_ENTER_VALID_SENIORITY_LEVELS);
                 }
             }
@@ -632,9 +642,9 @@ public class ExpertiseService {
     }
 
     private boolean isPayGradeChanged(List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationships,List<SeniorityLevelDTO> seniorityLevelDTOS){
-        Map<Integer,Long> fromAndPayGradeLevelMap=seniorityLevelDTOS.stream().collect(Collectors.toMap(SeniorityLevelDTO::getFrom,SeniorityLevelDTO::getPayGradeLevel));
+        Map<Integer,Long> fromAndPayGradeIdMap=seniorityLevelDTOS.stream().collect(Collectors.toMap(SeniorityLevelDTO::getFrom,SeniorityLevelDTO::getPayGradeId));
         for (ExpertiseLineSeniorityLevelRelationship seniorityLevelRelationship:expertiseLineSeniorityLevelRelationships){
-            if(fromAndPayGradeLevelMap.get(seniorityLevelRelationship.getSeniorityLevel().getFrom()).equals(seniorityLevelRelationship.getPayGradeLevel())){
+            if(fromAndPayGradeIdMap.get(seniorityLevelRelationship.getSeniorityLevel().getFrom()).equals(seniorityLevelRelationship.getPayGradeId())){
                 return true;
             }
         }
@@ -656,15 +666,19 @@ public class ExpertiseService {
     private void initializeExpertiseLine(ExpertiseLine expertiseLine,ExpertiseDTO expertiseDTO){
         countryGraphRepository.addLevel(expertiseLine.getId(),expertiseDTO.getOrganizationLevelId());
         organizationServiceRepository.addServices(expertiseLine.getId(),expertiseDTO.getOrganizationServiceIds());
-        organizationGraphRepository.addSector(expertiseLine.getId(),expertiseDTO.getSector().getId());
-        organizationGraphRepository.addUnion(expertiseLine.getId(),expertiseDTO.getUnion().getId());
+        if(expertiseDTO.getSector()!=null){
+            organizationGraphRepository.addSector(expertiseLine.getId(),expertiseDTO.getSector().getId());
+        }
+        if(expertiseDTO.getUnion()!=null){
+            organizationGraphRepository.addUnion(expertiseLine.getId(),expertiseDTO.getUnion().getId());
+        }
         expertiseLine.setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes());
         expertiseLine.setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek());
         expertiseLine.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
 
     }
 
-    public ExpertiseQueryResult publishExpertise(Long expertiseId) {
+    public boolean publishExpertise(Long expertiseId) {
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId,2);
         if (!Optional.ofNullable(expertise).isPresent() || expertise.isDeleted()) {
@@ -693,7 +707,7 @@ public class ExpertiseService {
         catch (Exception e){
             LOGGER.info("Exception occured in scheduling job for unassign experties from activity");
         }
-        return new ExpertiseQueryResult();
+        return true;
     }
 
     private void addSeniorityLevelsInExpertise(Expertise expertise, ExpertiseDTO expertiseDTO) {
@@ -707,7 +721,7 @@ public class ExpertiseService {
             seniorityLevels.add(seniorityLevel);
         });
         expertise.setSeniorityLevel(seniorityLevels);
-        expertiseGraphRepository.save(expertise);
+        expertiseGraphRepository.save(expertise,2);
     }
     public boolean linkProtectedDaysOffSetting(List<CountryHolidayCalendarQueryResult> countryHolidayCalendarQueryResults,List<Expertise> expertises){
         if(ObjectUtils.isCollectionEmpty(expertises)) {

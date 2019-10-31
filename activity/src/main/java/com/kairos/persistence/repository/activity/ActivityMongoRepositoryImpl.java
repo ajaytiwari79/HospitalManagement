@@ -477,9 +477,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("id").in(activityIds).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
                         TIME_TYPE1),
+                lookup("activityPriority", "activityPriorityId", "_id",
+                        "activityPriority"),
                 project().and("id").as(ACTIVITY_ID).and("name").as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
                         .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
-                        .and("id").as("activity.id")
+                        .and("id").as("activity.id").and("activityPriorityId").as("activity.activityPriorityId")
                         .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
                         .and("regions").as("activity.regions").and("levels").as("activity.levels")
                         .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
@@ -498,6 +500,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         .and(PHASE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_PHASE_SETTINGS_ACTIVITY_TAB)
                         .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1)
                         .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
+                        .and("activityPriority").arrayElementAt(0).as("activityPriority")
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
         return result.getMappedResults();

@@ -10,7 +10,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -102,7 +101,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("MATCH(expertise:Expertise{deleted:false})  WHERE id(expertise) = {0} " +
             "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
-            "expertise.endDate as endDate ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published ORDER BY expertise.name")
+            "expertise.endDate as endDate ,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek,expertise.description as description ,expertise.published as published ORDER BY expertise.name")
     ExpertiseQueryResult getExpertiseById(Long expertiseId);
 
     @Query("MATCH(expertise:Expertise{deleted:false,history:false})-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level) WHERE id(level)={0} AND expertise.name={1}  AND id(expertise)<> {2}" +
@@ -129,7 +128,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("MATCH(organizationType:OrganizationType) WHERE id(organizationType)={1}\n" +
             "MATCH(organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService)\n" +
-            " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())\n" +
+            " MATCH(os)<-[:"+SUPPORTS_SERVICES+"]-(exl:ExpertiseLine)-["+HAS_EXPERTISE_LINES+"]-(expertise:Expertise{deleted:false}) WHERE expertise.published AND  (expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE())\n" +
             "RETURN distinct id(expertise) as id,expertise.name as name")
     List<ExpertiseDTO> getExpertiseByOrganizationSubType(Long countryId, Long organizationSubTypeId);
 
@@ -143,11 +142,11 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "MATCH(expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
             "OPTIONAL MATCH(expertise)-[:" + HAS_SENIOR_DAYS + "]->(seniorDays:CareDays) \n " +
             "OPTIONAL MATCH(expertise)-[:" + HAS_CHILD_CARE_DAYS + "]->(childCareDays:CareDays) \n" +
-            "with expertise,seniorityLevel, " +
+            "with expertise,exl,seniorityLevel, " +
             "CASE WHEN seniorDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE WHEN childCareDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays ORDER BY  seniorityLevel.from \n" +
-            "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate ," +
-            "expertise.endDate as endDate ,expertise.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,expertise.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek," +
+            "RETURN DISTINCT expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate ," +
+            "expertise.endDate as endDate ,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek," +
              " seniorDays,childCareDays order by expertise.name")
     List<ExpertiseQueryResult> findExpertiseByOrganizationServicesForUnit(Long countryId, Set<Long> organizationServicesIds);
 
@@ -155,7 +154,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             " RETURN location as name ORDER BY location.name ASC" )
     List<Location> findAllLocationsOfUnionInExpertise(Long expertiseId);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine)->[:"+SUPPORTS_SERVICES+"]->(os)<-[:"+PROVIDE_SERVICE+"{isEnabled:true}]-(unit:Unit) WHERE expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE()\n" +
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine)-[:"+SUPPORTS_SERVICES+"]->(os)<-[:"+PROVIDE_SERVICE+"{isEnabled:true}]-(unit:Unit) WHERE expertise.endDate IS NULL OR DATE(expertise.endDate) >= DATE()\n" +
             "RETURN id(expertise) as id,expertise.name as name, collect(id(unit)) as supportedUnitIds")
     List<ExpertiseQueryResult> findAllExpertiseWithUnitIds();
 
@@ -168,5 +167,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) = {0} AND (DATE(exl.startDate)<=DATE({1}) AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE({1})))" +
             "RETURN exl LIMIT 1")
     ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
+
+    @Query("MATCH(e:Expertise)-[rel:"+FOR_SENIORITY_LEVEL+"]-(sl:SeniorityLevel)-[pgRel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) WHERE id(e)={0} DETACH DELETE rel,pgRel")
+    void removeSeniorityLevel(Long expertiseId);
 
  }

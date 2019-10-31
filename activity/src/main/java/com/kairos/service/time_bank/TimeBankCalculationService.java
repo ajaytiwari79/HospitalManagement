@@ -177,8 +177,12 @@ public class TimeBankCalculationService {
 
     private List<TimeBankCTADistribution> getProtectedDaysOffTimeBankCTADistributions(DailyTimeBankEntry dailyTimeBankEntry) {
         CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(dailyTimeBankEntry.getEmploymentId(), asDate(java.time.LocalDate.now()));
-        Set<BigInteger> unusedCtaRuleTemplateId= ctaResponseDTO.getRuleTemplates().stream().filter(ctaRuleTemplateDTO -> UNUSED_DAYOFF_LEAVES.equals(ctaRuleTemplateDTO.getCalculationFor())).map(CTARuleTemplateDTO::getId).collect(toSet());
         List<TimeBankCTADistribution> timeBankCTADistributionList=new ArrayList<>();
+        if(isNull(ctaResponseDTO)){
+            return timeBankCTADistributionList;
+        }
+        Set<BigInteger> unusedCtaRuleTemplateId= ctaResponseDTO.getRuleTemplates().stream().filter(ctaRuleTemplateDTO -> UNUSED_DAYOFF_LEAVES.equals(ctaRuleTemplateDTO.getCalculationFor())).map(CTARuleTemplateDTO::getId).collect(toSet());
+
         if(isCollectionNotEmpty(dailyTimeBankEntry.getTimeBankCTADistributionList())){
             for (TimeBankCTADistribution timeBankCTADistribution : dailyTimeBankEntry.getTimeBankCTADistributionList()) {
                 if(unusedCtaRuleTemplateId.contains(timeBankCTADistribution.getCtaRuleTemplateId())){

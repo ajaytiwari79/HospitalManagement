@@ -60,4 +60,12 @@ public class SkillController {
     public ResponseEntity<Map<String,Object>> getSkillsByName(@RequestBody Set<String> skillsName){
         return ResponseHandler.generateResponse(HttpStatus.OK,true,skillService.getSkillsByName(skillsName));
     }
+
+
+
+    @PostMapping("/country/{countryId}/get_Skill_and_level_by_staff_ids")
+    @ApiOperation("Get Staff's SkillId And Level")
+    public ResponseEntity<Map<String, Object>> getStaffSkillAndLevelByStaffIds(@RequestBody List<Long> StaffIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffSkillAndLevelByStaffIds(StaffIds));
+    }
 }

@@ -37,4 +37,8 @@ public class WeeklyRestPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private long intervalLength;//
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
+
+    public WeeklyRestPeriodWTATemplateDTO() {
+        this.wtaTemplateType = WTATemplateType.WEEKLY_REST_PERIOD;;
+    }
 }

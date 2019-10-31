@@ -380,6 +380,7 @@ public class ActivityService {
             activity.setSkillActivityTab(timeType.getSkillActivityTab());
             activity.setRegions(timeType.getRegions());
             activity.setLevels(timeType.getLevels());
+            activity.setActivityPriorityId(timeType.getActivityPriorityId());
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);

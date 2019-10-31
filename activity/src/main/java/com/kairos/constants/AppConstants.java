@@ -244,4 +244,7 @@ public class AppConstants {
     public static final String PENDING_COLOR_CODE="#f5f591";
 
 
+    public static final String LEVEL = "level";
+    public static final String SKILL_ID = "skillId";
+
 }
