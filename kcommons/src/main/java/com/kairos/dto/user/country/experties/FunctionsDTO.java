@@ -16,12 +16,13 @@ import java.math.BigDecimal;
 public class FunctionsDTO {
     private Long id;
     private String name; // THIS is used for FE compactibility
-    private BigDecimal amount; // amount which is added to this function;
+    private BigDecimal amount; // amount which is added to this function
     private boolean amountEditableAtUnit;
+    private Long functionId;
 
 
     public Long getFunctionId() {
-        return id;
+        return functionId!=null?functionId:id;
     } // THIS IS for FE compactibility We need to remove this Impact on FUNCTION inside expertise
 
 

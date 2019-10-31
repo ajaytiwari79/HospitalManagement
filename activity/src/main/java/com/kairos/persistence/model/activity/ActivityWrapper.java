@@ -11,6 +11,7 @@ public class ActivityWrapper {
     private Activity activity;
     private String timeType;
     private TimeType timeTypeInfo;
+    private ActivityPriority activityPriority;
 
     public ActivityWrapper(Activity activity, String timeType) {
         this.activity = activity;
