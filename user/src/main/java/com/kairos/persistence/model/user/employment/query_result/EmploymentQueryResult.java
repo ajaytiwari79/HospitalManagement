@@ -51,6 +51,7 @@ public class EmploymentQueryResult {
     private long totalShifts;
 
 
+
     /**
      *  Please do not use in backend its just only for FE compactibility
      */
