@@ -5,6 +5,7 @@ import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationship;
@@ -65,7 +66,7 @@ public class FunctionService {
         if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
             levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
         }
-        List<Unit> unions = new ArrayList<>();
+        List<Organization> unions = new ArrayList<>();
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
@@ -105,7 +106,7 @@ public class FunctionService {
         if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
             levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
         }
-        List<Unit> unions = new ArrayList<>();
+        List<Organization> unions = new ArrayList<>();
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }

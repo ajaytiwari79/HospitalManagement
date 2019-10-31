@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,7 +36,7 @@ public class Function extends UserBaseEntity {
     private LocalDate endDate;
 
     @Relationship(type = HAS_UNION)
-    private List<Unit> unions;
+    private List<Organization> unions;
 
     @Relationship(type = HAS_ORGANIZATION_LEVEL)
     private List<Level> organizationLevels;
