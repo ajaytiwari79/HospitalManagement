@@ -141,5 +141,5 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "RETURN count(team)>0")
     boolean activityExistInTeamByActivityId(BigInteger activityId);
 
-    List<Team> findAllByDeletedFalseAndIsEnabledTrue(Long teamId);
+    List<Team> findAllByDeletedFalseAndIsEnabledTrue();
 }
