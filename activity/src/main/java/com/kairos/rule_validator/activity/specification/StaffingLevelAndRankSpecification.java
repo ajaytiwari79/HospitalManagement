@@ -43,7 +43,7 @@ public class StaffingLevelAndRankSpecification extends AbstractSpecification<Shi
 
     @Override
     public void validateRules(ShiftWithActivityDTO shiftWithActivityDTO) {
-      shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities,unitId,activities,phase,userAccessRoleDTO);
+      //shiftValidatorService.verifyRankAndStaffingLevel(shiftActivities,unitId,activities,phase,userAccessRoleDTO);
     }
 
 

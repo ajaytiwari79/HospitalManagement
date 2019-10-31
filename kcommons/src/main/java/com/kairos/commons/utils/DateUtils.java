@@ -118,7 +118,7 @@ public  class DateUtils {
     }
 
     public static Date getDeductionInTimeDuration(Date startDate, Date endDate, int dayShiftPercentage, int nightShiftPercentage) {
-        int percentage = 4;
+        int percentage;
         DateTime startTime = new DateTime(startDate).toDateTime(DateTimeZone.UTC);
         int startHour = startTime.getHourOfDay();
         DateTime endTime = new DateTime(endDate).toDateTime(DateTimeZone.UTC);

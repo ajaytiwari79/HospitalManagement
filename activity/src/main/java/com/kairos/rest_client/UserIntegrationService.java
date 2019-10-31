@@ -35,6 +35,7 @@ import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.dto.user.skill.Skill;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.OrganizationStaffWrapper;
 import com.kairos.dto.user.staff.StaffDTO;
@@ -841,6 +842,10 @@ public class UserIntegrationService {
     public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/sick_settings/default", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {});
 
+    }
+
+    public List<StaffDTO> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds) {
+        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {});
     }
 }
 

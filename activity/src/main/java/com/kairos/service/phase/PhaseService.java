@@ -218,12 +218,14 @@ public class PhaseService extends MongoBaseService {
         phase.setColor(phaseDTO.getColor());
         phase.setFlippingDefaultTime(phaseDTO.getFlippingDefaultTime());
         phase.setShortName(phaseDTO.getShortName());
+        phase.setAccessGroupIds(phaseDTO.getAccessGroupIds());
 
     }
 
    private void prepareActualPhase(Phase phase,PhaseDTO phaseDTO){
        phase.setColor(phaseDTO.getColor());
        phase.setShortName(phaseDTO.getShortName());
+       phase.setAccessGroupIds(phaseDTO.getAccessGroupIds());
        if(PhaseDefaultName.REALTIME.equals(phaseDTO.getPhaseEnum())) {
            phase.setRealtimeDuration(phaseDTO.getRealtimeDuration());
        }else if(PhaseDefaultName.TENTATIVE.equals(phaseDTO.getPhaseEnum())) {

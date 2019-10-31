@@ -12,6 +12,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -58,7 +59,12 @@ public class StaffDTO {
     private LocalDate dateOfBirth;
     private Set<Long> expertiseIds;
     private Long employmentTypeId;
+    private List<Map<String,Object>> skillInfo;
 
+    public StaffDTO(Long id, List<Map<String,Object>> skillInfo){
+        this.id = id;
+        this.skillInfo = skillInfo;
+    }
     public StaffDTO(Long id, String firstName, String lastName, String profilePic) {
         this.id = id;
         this.firstName = firstName;

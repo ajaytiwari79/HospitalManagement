@@ -1,5 +1,7 @@
 package com.kairos.persistence.repository.user.skill;
 
+import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.persistence.model.staff.StaffQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -84,4 +86,11 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
 
     @Query("MATCH (skill:Skill{isEnabled:true})-[:HAS_CATEGORY]->(skillCategory:SkillCategory)-[:"+BELONGS_TO+"]->(country:Country) where id(country)={0} return skill")
     List<Skill> findAllSkillsByCountryId(long countryId);
+
+    @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff) IN {0} \n" +
+            "MATCH (staff)-[rel:" + STAFF_HAS_SKILLS + "]->(skill) \n" +
+            "WITH staff, collect({level:rel.skillLevel,skillId:id(skill)}) AS skillInfo \n" +
+            "RETURN staff,skillInfo")
+    List<StaffQueryResult> getStaffSkillAndLevelByStaffIds(List<Long> staffIds);
+
 }
