@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.skill.Skill;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +26,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.TEAM_
 @NodeEntity
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class Team extends UserBaseEntity {
 
     private String name;
@@ -34,10 +41,7 @@ public class Team extends UserBaseEntity {
     private ContactAddress contactAddress;
 
     private boolean isEnabled = true;
-    private Set<BigInteger> activityIds;
-
-    public Team() {
-    }
+    private Set<BigInteger> activityIds=new HashSet<>();
 
     public Team(String name, String description,  ContactAddress contactAddress) {
         this.name = name;
@@ -45,57 +49,5 @@ public class Team extends UserBaseEntity {
         this.contactAddress = contactAddress;
     }
 
-    public List<Skill> getSkillList() {
-        return skillList;
-    }
-
-    public void setSkillList(List<Skill> skillList) {
-        this.skillList = skillList;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setContactAddress(ContactAddress contactAddress) {
-        this.contactAddress = contactAddress;
-    }
-
-    public ContactAddress getContactAddress() {
-        return contactAddress;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public Set<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(Set<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
 
 }

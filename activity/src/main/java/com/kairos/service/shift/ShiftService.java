@@ -856,8 +856,6 @@ public class ShiftService extends MongoBaseService {
                 }catch (IndexOutOfBoundsException e){
                     //Intentionally left blank
                 }
-
-
         }
     }
 

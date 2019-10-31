@@ -140,4 +140,6 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     @Query("MATCH(team:Team{deleted:false}) WHERE ANY(activity IN team.activityIds WHERE activity=toString({0})) " +
             "RETURN count(team)>0")
     boolean activityExistInTeamByActivityId(BigInteger activityId);
+
+    List<Team> findAllByDeletedFalseAndIsEnabledTrue();
 }
