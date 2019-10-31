@@ -8,7 +8,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_Of_MODULE;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_ACCESS_OF_MODULE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.IN_COUNTRY;
 
 //  Created By vipul   On 9/8/18
@@ -18,7 +18,7 @@ public class UnitType extends UserBaseEntity {
     private String description;
     @Relationship(type = IN_COUNTRY)
     private Country country;
-    @Relationship(type = HAS_ACCESS_Of_MODULE)
+    @Relationship(type = HAS_ACCESS_OF_MODULE)
     private List<AccessPage> accessPage;
     public UnitType() {
         // dc

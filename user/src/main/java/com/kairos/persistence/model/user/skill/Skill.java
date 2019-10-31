@@ -22,7 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Skill Domain extends UserBaseEntity
- * SKill has relationship with SkillLevel Domain
+ * SKill has relationship with com.kairos.enums.SkillLevel Domain
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
@@ -52,7 +52,6 @@ public class Skill extends UserBaseEntity {
         this.skillCategory = skillCategory;
     }
 
-
     public Skill(SkillDTO skillDTO){
         this.name = skillDTO.getName();
         this.description = skillDTO.getDescription();
@@ -66,25 +65,6 @@ public class Skill extends UserBaseEntity {
         data.put("description",this.description);
         data.put("shortName",this.shortName);
         return data;
-    }
-
-    public enum SkillLevel {
-
-        BASIC("Basic"), ADVANCE("Advance"), EXPERT("Expert");
-        public String value;
-
-        SkillLevel(String value) {
-            this.value = value;
-        }
-
-        public static SkillLevel getByValue(String value) {
-            for (SkillLevel skillLevel : SkillLevel.values()) {
-                if (skillLevel.value.equals(value)) {
-                    return skillLevel;
-                }
-            }
-            return null;
-        }
     }
 
     public enum SkillStatus {

@@ -6,6 +6,7 @@ import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
+import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
@@ -13,7 +14,6 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDetail;
-import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.EmploymentTypeService;
 import com.kairos.service.employment.EmploymentJobService;
@@ -314,7 +314,7 @@ public class StaffController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateStaffSkillLevel(@PathVariable long unitId, @PathVariable long staffId, @PathVariable long skillId,
                                                                      @RequestBody Map<String, Object> skillInfo) throws ParseException {
-        Skill.SkillLevel level = Skill.SkillLevel.valueOf((String) skillInfo.get("level"));
+        SkillLevel level = SkillLevel.valueOf((String) skillInfo.get("level"));
         long startDate = parseDate((String) skillInfo.get("startDate")).getTime();
         long endDate = parseDate((String) skillInfo.get("endDate")).getTime();
         boolean status = (boolean) skillInfo.get("status");
