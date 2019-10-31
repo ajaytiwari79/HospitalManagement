@@ -1012,6 +1012,12 @@ public class EmploymentService {
     public List<EmploymentQueryResult> getMainEmploymentOfStaffs(){
         return employmentGraphRepository.getMainEmploymentOfStaffs(EmploymentSubType.MAIN);
     }
+
+    public List<EmploymentQueryResult> findEmploymentByUnitId(Long unitId){
+        return employmentGraphRepository.findEmploymentByUnitId(unitId);
+    }
+
+
 }
 
 

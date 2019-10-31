@@ -33,5 +33,9 @@ public class VetoAndStopBricksWTATemplateDTO extends WTABaseRuleTemplateDTO {
     @Positive(message = "message.ruleTemplate.blocking.point")
     private float totalBlockingPoints; // It's for a duration from @validationStartDate  till the @numberOfWeeks
 
+    public VetoAndStopBricksWTATemplateDTO(){
+        this.wtaTemplateType = WTATemplateType.VETO_AND_STOP_BRICKS;
+    }
+
 
 }

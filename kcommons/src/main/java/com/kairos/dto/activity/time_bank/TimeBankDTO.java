@@ -60,6 +60,10 @@ public class TimeBankDTO {
     private long actualTimebankMinutes;
     private LocalDate planningPeriodStartDate;
     private LocalDate planningPeriodEndDate;
+    private long totalContractedCost;
+    private long totalPlannedCost;
+    private long totalTimeBankDiffCost;
+
 
 
     public TimeBankDTO() {
