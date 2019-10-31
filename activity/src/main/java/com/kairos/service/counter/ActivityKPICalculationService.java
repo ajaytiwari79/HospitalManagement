@@ -70,7 +70,7 @@ public class ActivityKPICalculationService implements CounterService {
     @Inject private UserIntegrationService userIntegrationService;
     @Inject private ExceptionService exceptionService;
 
-    public double getTotal(List<ShiftWithActivityDTO> shifts,Map<FilterType, List> filterBasedCriteria) {
+    public double getTotal(List<ShiftWithActivityDTO> shifts,Map<FilterType, List> filterBasedCriteria,DateTimeInterval dateTimeInterval) {
         if(isCollectionEmpty(filterBasedCriteria.get(CALCULATION_BASED_ON))){
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
@@ -89,6 +89,9 @@ public class ActivityKPICalculationService implements CounterService {
                 break;
             case PLANNED_TIME: total = getTotalByPlannedTime(shifts,filterBasedCriteria,shiftActivityDTOS,plannedTimeIds);
                 break;
+            case VARIABLE_COST:
+
+            break;
             default:break;
         }
         return total;
@@ -299,7 +302,7 @@ public class ActivityKPICalculationService implements CounterService {
             for (Long staffId : staffIds) {
                 List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffShiftMapping.getOrDefault(staffId, new ArrayList<>());
                 shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
-                totalHours += getTotal(shiftWithActivityDTOS,filterBasedCriteria);
+                totalHours += getTotal(shiftWithActivityDTOS,filterBasedCriteria,dateTimeInterval);
             }
         }
         staffTotalHours.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), totalHours);
@@ -314,7 +317,7 @@ public class ActivityKPICalculationService implements CounterService {
         for (Long staffId : staffIds) {
             List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffShiftMapping.getOrDefault(staffId, new ArrayList<>());
             shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
-            totalHours = getTotal(shiftWithActivityDTOS,filterBasedCriteria);
+            totalHours = getTotal(shiftWithActivityDTOS,filterBasedCriteria,dateTimeInterval);
             staffTotalHours.put(staffId, totalHours);
         }
         return staffTotalHours;
@@ -330,7 +333,7 @@ public class ActivityKPICalculationService implements CounterService {
             totalHours = 0d;
             staffShiftMapping = dateTimeIntervalListMap1.get(dateTimeInterval);
             for (Long staffId : staffIds) {
-                totalHours += getTotal(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()).stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList()),filterBasedCriteria);
+                totalHours += getTotal(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()).stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList()),filterBasedCriteria,dateTimeInterval);
             }
             staffTotalHours.put(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), totalHours);
         }

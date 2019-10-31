@@ -186,6 +186,7 @@ public class KPISetService {
 
     private List<KPIResponseDTO> getKPISetCalculation(Long unitId, LocalDate startDate, LocalDate endDate, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, KPISetDTO kpiSet, Map<BigInteger, KPIResponseDTO> kpiResponseDTOMap) {
         List<ApplicableKPI> applicableKPIS = getApplicableKPIS(accessGroupPermissionCounterDTO, kpiSet);
+        KPIResponseDTO kpiResponseDTO=null;
         for (ApplicableKPI applicableKPI : applicableKPIS) {
             if (isNotNull(applicableKPI)) {
                 FilterCriteriaDTO filterCriteriaDTO = null;
@@ -197,9 +198,12 @@ public class KPISetService {
                         filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), IntervalUnit.CURRENT, startDate.isEqual(endDate)? DurationType.HOURS:DurationType.DAYS, applicableKPI.getValue(), unitId);
                         filterCriteriaDTO.getFilters().add(new FilterCriteria(null, FilterType.TIME_INTERVAL,Arrays.asList(startDate,endDate)));
                         applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_INTERVAL);
+                        applicableKPI.setFrequencyType(DurationType.HOURS);
                     }
                 }
-                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                if(isNotNull(filterCriteriaDTO)) {
+                    kpiResponseDTO  = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                }
                 if (isNotNull(kpiResponseDTO)) {
                     kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(), kpiResponseDTO);
                 }
