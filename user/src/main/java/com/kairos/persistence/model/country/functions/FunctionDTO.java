@@ -3,6 +3,7 @@ package com.kairos.persistence.model.country.functions;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +31,7 @@ public class FunctionDTO {
     private LocalDate endDate;
     private boolean amountEditableAtUnit;
     private BigDecimal amount;
-    private List<Unit> unions;
+    private List<Organization> unions;
     private List<Level> organizationLevels;
     private String icon;
     private List<LocalDate> appliedDates;
@@ -38,7 +39,7 @@ public class FunctionDTO {
     private int code;
 
 
-    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Unit> unions, List<Level> organizationLevels, String icon,int code) {
+    public FunctionDTO(Long id, String name, String description, LocalDate startDate, LocalDate endDate, List<Organization> unions, List<Level> organizationLevels, String icon,int code) {
         this.id = id;
         this.name = name;
         this.description = description;

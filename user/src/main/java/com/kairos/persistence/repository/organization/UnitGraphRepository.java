@@ -438,7 +438,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     //for getting Unions by Ids
 
     @Query("MATCH (union:Organization{union:true,isEnable:true}) WHERE id (union) IN {0}  RETURN union")
-    List<Unit> findUnionsByIdsIn(List<Long> unionIds);
+    List<Organization> findUnionsByIdsIn(List<Long> unionIds);
 
     @Query("MATCH (union:Organization{isEnable:true,union:true})-[:" + BELONGS_TO + "]->(country:Country)  WHERE id(country)={0} RETURN id(union) as id, union.name as name")
     List<UnionQueryResult> findAllUnionsByCountryId(Long countryId);
