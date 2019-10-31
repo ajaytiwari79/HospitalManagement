@@ -142,13 +142,15 @@ public class TeamService {
     }
 
     public boolean updateActivitiesOfTeam(Long teamId, Set<BigInteger> activityIds) {
-        Team team = teamGraphRepository.findOne(teamId);
-        if (team != null) {
-            team.setActivityIds(activityIds);
-            teamGraphRepository.save(team);
-        } else {
-            exceptionService.dataNotFoundByIdException(MESSAGE_TEAMSERVICE_TEAM_NOTFOUND);
-        }
+        List<Team> teams=teamGraphRepository.findAllByDeletedFalseAndIsEnabledTrue(teamId);
+        teams.forEach(team -> {
+            if(team.getId().equals(teamId)){
+                team.setActivityIds(activityIds);
+            }else {
+                team.getActivityIds().removeAll(activityIds);
+            }
+        });
+        teamGraphRepository.saveAll(teams);
         return true;
     }
 
