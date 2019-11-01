@@ -27,6 +27,7 @@ import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationBasedOn;
@@ -268,6 +269,9 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(CALCULATION_UNIT)) {
             getCalculationUnitData(criteriaList, defaultKpiDataDTO);
         }
+        if (kpi.getFilterTypes().contains(TEAM)) {
+            getTeamUnitData(criteriaList,unitIds.get(0));
+        }
     }
 
     private void getActivityDefaultData(List<FilterCriteria> criteriaList, List<Long> unitIds) {
@@ -331,6 +335,15 @@ public class CounterDataService extends MongoBaseService {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(calculationType.toString(), calculationType.value));
         }
         criteriaList.add(new FilterCriteria(CALCULATION_TYPE.value, CALCULATION_TYPE, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getTeamUnitData(List<FilterCriteria> criteriaList, Long unitId) {
+        List<TeamDTO> teamDTOS = userIntegrationService.getTeamByUnitId(unitId);
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        for (TeamDTO teamDTO : teamDTOS) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(teamDTO.getId(), teamDTO.getName()));
+        }
+        criteriaList.add(new FilterCriteria(TEAM.value, TEAM, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getCalculationUnitData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
