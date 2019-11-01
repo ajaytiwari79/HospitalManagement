@@ -545,6 +545,7 @@ public class CounterDataService extends MongoBaseService {
                     kpiResponseDTO.setKpiId(data.get().getKpiId());
                     kpiResponseDTO.setKpiName(data.get().getKpiName());
                     kpiResponseDTO.setStaffKPIValue(data.get().getStaffKPIValue());
+                    kpiResponseDTO.setKpiValue(data.get().getKpiValue());
                 }
             } catch (InterruptedException|ExecutionException e) {
                 LOGGER.error("error while generate KPI calculation data",e);

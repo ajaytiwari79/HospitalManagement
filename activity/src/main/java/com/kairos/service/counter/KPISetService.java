@@ -105,6 +105,14 @@ public class KPISetService {
     }
 
     private void verifyDetails(Long referenceId, ConfLevel confLevel, KPISetDTO kpiSetDTO) {
+       if(KPISetType.VERTICAL.equals(kpiSetDTO.getKpiSetType())) {
+           if (isNull(kpiSetDTO.getTimeType())) {
+               exceptionService.dataNotFoundByIdException("message.time_type.absent");
+           }
+           if (isNull(kpiSetDTO.getPhaseId())) {
+               exceptionService.dataNotFoundByIdException("message.phase.absent");
+           }
+       }
         if (confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID);
         } else if (confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)) {
@@ -154,6 +162,7 @@ public class KPISetService {
             if (isCollectionNotEmpty(kpiSetDTOList)) {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
                     KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+                    kpiSetResponseDTO.setKpiSetType(kpiSet.getKpiSetType());
                     List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
                     Map<BigInteger, KPIResponseDTO> kpiResponseDTOMap = new HashMap<>();
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
@@ -195,7 +204,7 @@ public class KPISetService {
                     applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
                 }else {
                     if(isNotNull(startDate) && isNotNull( endDate)) {
-                        filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), IntervalUnit.CURRENT, startDate.isEqual(endDate)? DurationType.HOURS:DurationType.DAYS, applicableKPI.getValue(), unitId);
+                        filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_INTERVAL, applicableKPI.getApplicableFilter().getCriteriaList(), IntervalUnit.CURRENT, DurationType.HOURS, applicableKPI.getValue(), unitId);
                         filterCriteriaDTO.getFilters().add(new FilterCriteria(null, FilterType.TIME_INTERVAL,Arrays.asList(startDate,endDate)));
                         applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_INTERVAL);
                         applicableKPI.setFrequencyType(DurationType.HOURS);

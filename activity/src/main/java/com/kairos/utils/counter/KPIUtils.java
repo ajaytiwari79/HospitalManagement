@@ -55,7 +55,7 @@ public class KPIUtils {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         if (isCollectionNotEmpty(filterDates)) {
             if(DurationType.HOURS.equals(frequencyType)){
-                dateTimeIntervals=getDateTimeIntervalByDates(filterDates.get(0),filterDates.get(1));
+                dateTimeIntervals= filterDates.get(0).equals(filterDates.get(1)) ?getDateTimeIntervalByDates(filterDates.get(0),filterDates.get(1)):getDateIntervalByDates(filterDates.get(0),filterDates.get(1));
             }else{
                 dateTimeIntervals.add(new DateTimeInterval(asLocalDate(filterDates.get(0).toString()), asLocalDate(filterDates.get(1).toString())));
             }
@@ -94,6 +94,15 @@ public class KPIUtils {
         while (!startOfTheDay.isAfter(endOfTheDay)) {
             dateTimeIntervals.add(new DateTimeInterval(asDate(startOfTheDay), asDate(startOfTheDay.plusHours(1))));
            startOfTheDay=startOfTheDay.plusHours(1);
+        }
+        return dateTimeIntervals;
+    }
+
+    public static  List<DateTimeInterval>  getDateIntervalByDates(LocalDate startDate,LocalDate endDate) {
+        List<DateTimeInterval> dateTimeIntervals=new ArrayList<>();
+        while (!startDate.isAfter(endDate)) {
+            dateTimeIntervals.add(new DateTimeInterval(asDate(startDate), asDate(startDate.plusDays(1))));
+            startDate=startDate.plusDays(1);
         }
         return dateTimeIntervals;
     }

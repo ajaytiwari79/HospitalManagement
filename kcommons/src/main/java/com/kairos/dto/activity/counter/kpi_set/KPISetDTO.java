@@ -25,9 +25,7 @@ public class KPISetDTO {
     private String name;
     @NotEmpty(message = "message.kpi.absent")
     private Set<BigInteger> kpiIds;
-    @NotNull(message = "message.time_type.absent")
     private TimeTypeEnum timeType;
-    @NotNull(message = "message.phase.absent")
     private BigInteger phaseId;
     private Long referenceId;
     private ConfLevel confLevel;

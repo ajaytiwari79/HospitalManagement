@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
@@ -17,6 +18,8 @@ public class KPIResponseDTO {
     private String kpiName;
 
     private Map<Long, Double> staffKPIValue;
+
+    private Map<LocalDateTime, Double> kpiValue;
 
     public KPIResponseDTO() {
         //DC
