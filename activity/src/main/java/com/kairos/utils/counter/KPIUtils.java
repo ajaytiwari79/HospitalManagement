@@ -93,7 +93,7 @@ public class KPIUtils {
         LocalDateTime endOfTheDay=getEndOfDayFromLocalDate(endDate);
         while (!startOfTheDay.isAfter(endOfTheDay)) {
             dateTimeIntervals.add(new DateTimeInterval(asDate(startOfTheDay), asDate(startOfTheDay.plusHours(1))));
-            startOfTheDay.plusHours(1);
+           startOfTheDay=startOfTheDay.plusHours(1);
         }
         return dateTimeIntervals;
     }

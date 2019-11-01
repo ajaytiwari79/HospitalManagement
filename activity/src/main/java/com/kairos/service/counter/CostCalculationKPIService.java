@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 @Service
 public class CostCalculationKPIService {
@@ -36,11 +37,10 @@ public class CostCalculationKPIService {
           for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
               totalCtaBonus += (double) timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(),employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()),employmentWithCtaDetailsDTO.getEmploymentLines()));
           }
-          timeBankCalculationService.getHourlyCostByDate(employmentWithCtaDetailsDTO.getEmploymentLines(),shiftActivityDTO.getStartLocalDate());
-          totalCost=totalCtaBonus*employmentWithCtaDetailsDTO.getHourlyCost();
+          totalCost=(totalCtaBonus/60)*timeBankCalculationService.getHourlyCostByDate(employmentWithCtaDetailsDTO.getEmploymentLines(),shiftActivityDTO.getStartLocalDate()).doubleValue();
       }
 
-   return totalCost;
+   return getValueWithDecimalFormat(totalCost);
   }
 
 }

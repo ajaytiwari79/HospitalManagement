@@ -294,7 +294,7 @@ public class ActivityKPICalculationService implements CounterService {
         List<Long> staffIds = (List<Long>) objects[1];
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) objects[2];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) objects[3];
-        Map<Object, Double> totalHoursMap = calculateDataByKpiRepresentation(filterBasedCriteria,staffIds, null, dateTimeIntervals, applicableKPI, shifts,staffKpiFilterDTOS);
+        Map<Object, Double> totalHoursMap = calculateTotalHours(filterBasedCriteria,staffIds, applicableKPI, dateTimeIntervals, shifts,staffKpiFilterDTOS);
         Map<Long, Integer> staffAndTotalHoursMap = totalHoursMap.entrySet().stream().collect(Collectors.toMap(k -> (Long) k.getKey(), v -> v.getValue().intValue()));
         return staffAndTotalHoursMap;
     }
