@@ -550,6 +550,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "    'staffId' : 1,\n" +
                 "    'startDate' : 1,\n" +
                 "    'endDate' : 1,\n" +
+                "    'employmentId' : 1,\n" +
                 " 'dayOfWeek': { '$dayOfWeek': '$startDate' }\n" +
                 "\t'activities.id' : 1,\n" +
                 "        'activities.activityId' : 1,\n" +
@@ -563,6 +564,8 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.plannedMinutesOfTimebank':1,\n" +
                 "        'activities.payoutCtaBonusMinutes':1,\n" +
                 "        'activities.plannedTimes':1,\n" +
+                "        'activities.startDate' : 1,\n" +
+                "        'activities.endDate' : 1,\n" +
                 "        'activities.backgroundColor':{  \n" +
                 "            '$arrayElemAt':[  \n" +
                 "               '$activity.generalActivityTab.backgroundColor',\n" +
@@ -577,7 +580,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private String groupByShiftAndActivity() {
         return "{'$group':{'_id':'$_id', 'durationMinutes':{'$first':'$durationMinutes'},\n" +
-                "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'endDate':{'$first':'$endDate'}'activities':{'$addToSet':'$activities'}}}";
+                "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'activities':{'$addToSet':'$activities'}}}";
     }
 
 
@@ -655,6 +658,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private <T extends ShiftDTO> void updateActivityInShiftActivities(Map<BigInteger, ActivityDTO> activityDTOMap, T shift) {
         shift.getActivities().forEach(shiftActivityDTO -> {
+            shiftActivityDTO.setEmploymentId(shift.getEmploymentId());
             shiftActivityDTO.setActivity(activityDTOMap.get(shiftActivityDTO.getActivityId()));
             shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> childActivityDTO.setActivity(activityDTOMap.get(childActivityDTO.getActivityId())));
         });

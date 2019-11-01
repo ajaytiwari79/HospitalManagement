@@ -89,4 +89,10 @@ public class StaffEmploymentDetails {
         this.totalWeeklyMinutes = totalWeeklyMinutes;
     }
 
+    public StaffEmploymentDetails( Long staffId, List<CTARuleTemplateDTO> ctaRuleTemplates, BigDecimal hourlyCost, List<EmploymentLinesDTO> employmentLines) {
+        this.staffId = staffId;
+        this.ctaRuleTemplates = ctaRuleTemplates;
+        this.hourlyCost = hourlyCost;
+        this.employmentLines = employmentLines;
+    }
 }

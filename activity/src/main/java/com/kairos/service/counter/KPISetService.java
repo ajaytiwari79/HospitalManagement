@@ -6,13 +6,18 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.counter.data.FilterCriteria;
 import com.kairos.dto.activity.counter.data.FilterCriteriaDTO;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.KPISetType;
 import com.kairos.dto.activity.counter.kpi_set.KPISetDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
+import com.kairos.enums.DurationType;
+import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.KPIRepresentation;
+import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.KPISet;
 import com.kairos.persistence.model.phase.Phase;
@@ -67,14 +72,14 @@ public class KPISetService {
     }
 
     public KPISetDTO updateKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
-        verifyDetails(referenceId, confLevel, kpiSetDTO);
         KPISet kpiSet = kpiSetRepository.findOne(kpiSetDTO.getId());
         if (isNull(kpiSet)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "KPISet", kpiSetDTO.getId());
         }
+        verifyDetails(referenceId, confLevel, kpiSetDTO);
         kpiSetDTO.setReferenceId(referenceId);
         kpiSetDTO.setConfLevel(confLevel);
-        kpiSet=ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO,KPISet.class);
+        kpiSet = ObjectMapperUtils.copyPropertiesByMapper(kpiSetDTO, KPISet.class);
         kpiSetRepository.save(kpiSet);
         return kpiSetDTO;
     }
@@ -100,22 +105,34 @@ public class KPISetService {
     }
 
     private void verifyDetails(Long referenceId, ConfLevel confLevel, KPISetDTO kpiSetDTO) {
+       if(KPISetType.VERTICAL.equals(kpiSetDTO.getKpiSetType())) {
+           if (isNull(kpiSetDTO.getTimeType())) {
+               exceptionService.dataNotFoundByIdException("message.time_type.absent");
+           }
+           if (isNull(kpiSetDTO.getPhaseId())) {
+               exceptionService.dataNotFoundByIdException("message.phase.absent");
+           }
+       }
         if (confLevel.equals(ConfLevel.COUNTRY) && !userIntegrationService.isCountryExists(referenceId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID);
-        }else if (confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)) {
+        } else if (confLevel.equals(ConfLevel.UNIT) && !userIntegrationService.isExistOrganization(referenceId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID);
         }
         boolean existByName = kpiSetRepository.existsByNameIgnoreCaseAndDeletedFalseAndReferenceIdAndIdNot(kpiSetDTO.getName().trim(), referenceId, kpiSetDTO.getId());
         if (existByName) {
             exceptionService.duplicateDataException("message.kpi_set.name.duplicate");
         }
-        boolean existsByPhaseAndTimeType = kpiSetRepository.existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(kpiSetDTO.getPhaseId(), kpiSetDTO.getTimeType(),kpiSetDTO.getId());
-        if (existsByPhaseAndTimeType) {
-            exceptionService.duplicateDataException("message.kpi_set.exist.phase_and_time_type");
+        if (KPISetType.VERTICAL.equals(kpiSetDTO.getKpiSetType())) {
+            boolean existsByPhaseAndTimeType = kpiSetRepository.existsByPhaseIdAndTimeTypeAndDeletedFalseAndIdNot(kpiSetDTO.getPhaseId(), kpiSetDTO.getTimeType(), kpiSetDTO.getId());
+            if (existsByPhaseAndTimeType) {
+                exceptionService.duplicateDataException("message.kpi_set.exist.phase_and_time_type");
+            }
         }
-        boolean kpisBelongsToIndividual=counterRepository.allKPIsBelongsToIndividualType(kpiSetDTO.getKpiIds(),confLevel,referenceId);
-        if(!kpisBelongsToIndividual){
+        List<ApplicableKPI> applicableKPIs = counterRepository.getApplicableKPIByReferenceId(new ArrayList<>(kpiSetDTO.getKpiIds()), newArrayList(referenceId), confLevel);
+        if (KPISetType.VERTICAL.equals(kpiSetDTO.getKpiSetType()) && applicableKPIs.stream().noneMatch(applicableKPI -> KPIRepresentation.INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation()))) {
             exceptionService.actionNotPermittedException("message.kpi_set.belongs_to.individual");
+        } else if (KPISetType.HORIZONTAL.equals(kpiSetDTO.getKpiSetType()) && applicableKPIs.stream().anyMatch(applicableKPI -> KPIRepresentation.INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation()))) {
+            exceptionService.actionNotPermittedException("message.kpi_set.belongs_to.unit");
         }
 
     }
@@ -126,8 +143,8 @@ public class KPISetService {
         Map<BigInteger, Phase> unitPhaseMap = unitPhaseList.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId, Function.identity()));
         List<KPISet> unitKPISets = new ArrayList<>();
         kpiSets.forEach(kpiSet -> {
-            if(isCollectionNotEmpty(kpiSet.getKpiIds())) {
-                unitKPISets.add(new KPISet(null,kpiSet.getName(),unitPhaseMap.get(kpiSet.getPhaseId()).getId(),unitId,ConfLevel.UNIT,kpiSet.getTimeType(),kpiSet.getKpiIds()));
+            if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
+                unitKPISets.add(new KPISet(null, kpiSet.getName(), unitPhaseMap.get(kpiSet.getPhaseId()).getId(), unitId, ConfLevel.UNIT, kpiSet.getTimeType(), kpiSet.getKpiIds()));
             }
         });
         if (isCollectionNotEmpty(unitKPISets)) {
@@ -136,50 +153,71 @@ public class KPISetService {
     }
 
 
-    public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, LocalDate startDate) {
+    public List<KPISetResponseDTO> getKPISetCalculationData(Long unitId, LocalDate startDate, LocalDate endDate) {
         List<KPISetResponseDTO> kpiSetResponseDTOList = new ArrayList<>();
-        List<ApplicableKPI>  applicableKPIS;
         AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(UserContext.getUserDetails().getLastSelectedOrganizationId());
-        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, DateUtils.asDate(startDate),
-                asDate(startDate.atTime(LocalTime.MAX)));
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, DateUtils.asDate(startDate), asDate(startDate.atTime(LocalTime.MAX)));
         if (isNotNull(phase)) {
-            List<KPISetDTO> kpiSetDTOList = kpiSetRepository.findByPhaseIdAndReferenceIdAndConfLevel(phase.getId(),
-                    unitId,ConfLevel.UNIT);
+            List<KPISetDTO> kpiSetDTOList = kpiSetRepository.findByPhaseIdAndReferenceIdAndConfLevel(phase.getId(),unitId, ConfLevel.UNIT);
             if (isCollectionNotEmpty(kpiSetDTOList)) {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
                     KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
+                    kpiSetResponseDTO.setKpiSetType(kpiSet.getKpiSetType());
                     List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
-                    Map<BigInteger,KPIResponseDTO> kpiResponseDTOMap = new HashMap<>();
+                    Map<BigInteger, KPIResponseDTO> kpiResponseDTOMap = new HashMap<>();
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
                         kpiSetResponseDTO.setKpiSetName(kpiSet.getName());
                         kpiSetResponseDTO.setKpiSetId(kpiSet.getId());
-                        List<BigInteger> kpiIds = kpiSet.getKpiIds().stream().collect(Collectors.toList());
-                        if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
-                            applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.COUNTRY, accessGroupPermissionCounterDTO.getCountryId());
-                        } else {
-                            applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
-                        }
-                        for (ApplicableKPI applicableKPI : applicableKPIS) {
-                            if(isNotNull(applicableKPI)) {
-                                applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
-                                FilterCriteriaDTO filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(),accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
-                                KPIResponseDTO kpiResponseDTO = counterDataService.generateKPICalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId(),startDate);
-                                if (isNotNull(kpiResponseDTO)) {
-                                    kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(),kpiResponseDTO);
-                                }
-                            }
-                        }
-                        kpiResponseDTOList=kpiResponseDTOMap.values().stream().collect(Collectors.toList());
+                        kpiResponseDTOList = getKPISetCalculation(unitId, startDate, endDate, accessGroupPermissionCounterDTO, kpiSet, kpiResponseDTOMap);
                     }
-                    if(isCollectionNotEmpty(kpiResponseDTOList)) {
+                    if (isCollectionNotEmpty(kpiResponseDTOList)) {
                         kpiSetResponseDTO.setKpiData(kpiResponseDTOList);
                     }
-                    if(isCollectionNotEmpty(kpiSetResponseDTO.getKpiData())) {
+                    if (isCollectionNotEmpty(kpiSetResponseDTO.getKpiData())) {
                         kpiSetResponseDTOList.add(kpiSetResponseDTO);
                     }
                 }
             }
         }
         return kpiSetResponseDTOList;
+    }
+
+    private List<ApplicableKPI> getApplicableKPIS(AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, KPISetDTO kpiSet) {
+        List<ApplicableKPI> applicableKPIS;
+        List<BigInteger> kpiIds = kpiSet.getKpiIds().stream().collect(Collectors.toList());
+        if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
+            applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.COUNTRY, accessGroupPermissionCounterDTO.getCountryId());
+        } else {
+            applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
+        }
+        return applicableKPIS;
+    }
+
+    private List<KPIResponseDTO> getKPISetCalculation(Long unitId, LocalDate startDate, LocalDate endDate, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, KPISetDTO kpiSet, Map<BigInteger, KPIResponseDTO> kpiResponseDTOMap) {
+        List<ApplicableKPI> applicableKPIS = getApplicableKPIS(accessGroupPermissionCounterDTO, kpiSet);
+        KPIResponseDTO kpiResponseDTO=null;
+        for (ApplicableKPI applicableKPI : applicableKPIS) {
+            if (isNotNull(applicableKPI)) {
+                FilterCriteriaDTO filterCriteriaDTO = null;
+                if (KPISetType.VERTICAL.equals(kpiSet.getKpiSetType())) {
+                    filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
+                    applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
+                }else {
+                    if(isNotNull(startDate) && isNotNull( endDate)) {
+                        filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_INTERVAL, applicableKPI.getApplicableFilter().getCriteriaList(), IntervalUnit.CURRENT, DurationType.HOURS, applicableKPI.getValue(), unitId);
+                        filterCriteriaDTO.getFilters().add(new FilterCriteria(null, FilterType.TIME_INTERVAL,Arrays.asList(startDate,endDate)));
+                        applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_INTERVAL);
+                        applicableKPI.setFrequencyType(DurationType.HOURS);
+                    }
+                }
+                if(isNotNull(filterCriteriaDTO)) {
+                    kpiResponseDTO  = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                }
+                if (isNotNull(kpiResponseDTO)) {
+                    kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(), kpiResponseDTO);
+                }
+            }
+        }
+        return kpiResponseDTOMap.values().stream().collect(Collectors.toList());
     }
 }
