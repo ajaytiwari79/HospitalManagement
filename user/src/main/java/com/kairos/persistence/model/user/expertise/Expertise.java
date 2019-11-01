@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
+import com.kairos.persistence.model.organization.Level;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.services.OrganizationService;
+import com.kairos.persistence.model.organization.union.Sector;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,8 +43,7 @@ public class Expertise extends UserBaseEntity {
 
     private boolean published;
 
-    @Relationship(type = FOR_SENIORITY_LEVEL)
-    private List<SeniorityLevel> seniorityLevel;
+
 
     @Relationship(type = HAS_SENIOR_DAYS)
     private List<CareDays> seniorDays;
@@ -54,31 +57,41 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = HAS_EXPERTISE_LINES)
     private List<ExpertiseLine> expertiseLines=new ArrayList<>();
 
+    @Relationship(type = BELONGS_TO_SECTOR)
+    private Sector sector;
+
+    @Relationship(type = IN_ORGANIZATION_LEVEL)
+    private Level organizationLevel;
+
+    @Relationship(type = SUPPORTS_SERVICES)
+    private List<OrganizationService> organizationServices;
+
+    @Relationship(type = SUPPORTED_BY_UNION)
+    private Organization union;
+
     public Expertise(String name, Country country) {
         this.name = name;
         this.country = country;
     }
 
-
-    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country, boolean published, List<SeniorityLevel> seniorityLevel, List<ExpertiseLine> expertiseLines) {
+,
+    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country, boolean published, List<ExpertiseLine> expertiseLines) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.country = country;
         this.published = published;
-        this.seniorityLevel = seniorityLevel;
         this.expertiseLines = expertiseLines;
     }
 
-    public Expertise(Long id,@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, boolean published, List<SeniorityLevel> seniorityLevel,List<ExpertiseLine> expertiseLines) {
+    public Expertise(Long id,@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, boolean published,List<ExpertiseLine> expertiseLines) {
         this.id=id;
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.published = published;
-        this.seniorityLevel = seniorityLevel;
         this.expertiseLines=expertiseLines;
     }
 
@@ -101,13 +114,7 @@ public class Expertise extends UserBaseEntity {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
     }
 
-    public List<SeniorityLevel> getSeniorityLevel() {
-        return seniorityLevel = Optional.ofNullable(seniorityLevel).orElse(new ArrayList<>());
-    }
 
-    public void addSeniorityLevel(SeniorityLevel seniorityLevel) {
-        getSeniorityLevel().add(seniorityLevel);
-    }
 
     public Map<String, Object> retrieveDetails() {
         Map<String, Object> map = new HashMap<>(6);

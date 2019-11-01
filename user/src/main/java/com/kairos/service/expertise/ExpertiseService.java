@@ -154,7 +154,7 @@ public class ExpertiseService {
         });
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(),SeniorityLevel.class));
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO, country);
-        Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),country,expertiseDTO.isPublished(),null,Collections.singletonList(expertiseLine));
+        Expertise expertise=new Expertise(expertiseDTO.getName(),expertiseDTO.getDescription(),expertiseDTO.getStartDate(),expertiseDTO.getEndDate(),country,expertiseDTO.isPublished(),Collections.singletonList(expertiseLine));
         addSeniorityLevelsInExpertise(expertise,expertiseDTO);
         linkProtectedDaysOffSetting(new ArrayList<>(),Arrays.asList(expertise));
         Map<Integer,PayGrade> fromAndPayGradeLevelMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(SeniorityLevel::getFrom, SeniorityLevel::getPayGrade));
@@ -403,13 +403,13 @@ public class ExpertiseService {
             exceptionService.invalidRequestException(MESSAGE_STARTDATEMILLIS_NULL);
         } else if (!Optional.ofNullable(expertise.getExpertiseLines().get(0).getBreakPaymentSetting()).isPresent()) {
             exceptionService.invalidRequestException(MESSAGE_BREAKPAYMENTTYPE_NULL);
-        } else if (!Optional.ofNullable(expertise.getExpertiseLines().get(0).getUnion()).isPresent()) {
+        } else if (!Optional.ofNullable(expertise.getUnion()).isPresent()) {
             exceptionService.invalidRequestException(MESSAGE_UNION_NULL);
-        } else if (!Optional.ofNullable(expertise.getExpertiseLines().get(0).getOrganizationServices()).isPresent()) {
+        } else if (!Optional.ofNullable(expertise.getOrganizationServices()).isPresent()) {
             exceptionService.invalidRequestException(MESSAGE_SERVICE_ABSENT);
-        } else if (!Optional.ofNullable(expertise.getExpertiseLines().get(0).getOrganizationLevel()).isPresent()) {
+        } else if (!Optional.ofNullable(expertise.getOrganizationLevel()).isPresent()) {
             exceptionService.invalidRequestException(MESSAGE_ORGANIZATIONLEVEL_NULL);
-        } else if (!Optional.ofNullable(expertise.getExpertiseLines().get(0).getSector()).isPresent()) {
+        } else if (!Optional.ofNullable(expertise.getSector()).isPresent()) {
             exceptionService.actionNotPermittedException(MESSAGE_SECTOR_ABSENT);
         } else if (isCollectionEmpty(expertise.getSeniorityLevel())) {
             exceptionService.actionNotPermittedException(MESSAGE_SENIORITY_LEVEL_ABSENT);
@@ -631,15 +631,11 @@ public class ExpertiseService {
     private boolean isExpertiseLineChanged(ExpertiseLine expertiseLine, Long levelId, List<Long> organizationServiceIds, Long sectorId, Long unionId,ExpertiseDTO expertiseDTO){
         List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationships=expertiseLineAndSeniorityLevelRelationshipRepository.findAllByLineId(expertiseLine.getId());
 
-        return !expertiseLine.getOrganizationLevel().getId().equals(levelId) || isServiceChanged(organizationServiceIds, expertiseLine) || !expertiseLine.getSector().getId().equals(sectorId) ||
-                !expertiseLine.getUnion().getId().equals(unionId) || expertiseLine.getFullTimeWeeklyMinutes()!=expertiseDTO.getFullTimeWeeklyMinutes() ||
+        return expertiseLine.getFullTimeWeeklyMinutes()!=expertiseDTO.getFullTimeWeeklyMinutes() ||
                 expertiseLine.getNumberOfWorkingDaysInWeek()!=expertiseDTO.getNumberOfWorkingDaysInWeek()||
                 isPayGradeChanged(expertiseLineSeniorityLevelRelationships,expertiseDTO.getSeniorityLevels());
     }
 
-    private boolean isServiceChanged(List<Long> organizationServiceIds,ExpertiseLine expertiseLine) {
-        return (expertiseLine.getOrganizationServices().size() != organizationServiceIds.size() || !expertiseLine.getOrganizationServices().stream().map(OrganizationService::getId).collect(Collectors.toList()).containsAll(organizationServiceIds));
-    }
 
     private boolean isPayGradeChanged(List<ExpertiseLineSeniorityLevelRelationship> expertiseLineSeniorityLevelRelationships,List<SeniorityLevelDTO> seniorityLevelDTOS){
         Map<Integer,Long> fromAndPayGradeIdMap=seniorityLevelDTOS.stream().collect(Collectors.toMap(SeniorityLevelDTO::getFrom,SeniorityLevelDTO::getPayGradeId));
@@ -659,8 +655,8 @@ public class ExpertiseService {
         if(expertiseDTO.getUnion()!=null){
             union=getUnion(expertiseDTO.getUnion().getId(),expertiseDTO.getUnion().getName(),country);
         }
-        return new ExpertiseLine.ExpertiseLineBuilder().setStartDate(expertiseDTO.getStartDate()).setEndDate(expertiseDTO.getEndDate()).setOrganizationLevel(level).setSector(sector).setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting())
-                .setUnion(union).setOrganizationServices(organizationServices).setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek()).setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes()).createLine();
+        return new ExpertiseLine.ExpertiseLineBuilder().setStartDate(expertiseDTO.getStartDate()).setEndDate(expertiseDTO.getEndDate()).setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting())
+                .setNumberOfWorkingDaysInWeek(expertiseDTO.getNumberOfWorkingDaysInWeek()).setFullTimeWeeklyMinutes(expertiseDTO.getFullTimeWeeklyMinutes()).createLine();
     }
 
     private void initializeExpertiseLine(ExpertiseLine expertiseLine,ExpertiseDTO expertiseDTO){
@@ -749,16 +745,16 @@ public class ExpertiseService {
     public ExpertiseQueryResult copyExpertise(Long expertiseId,ExpertiseDTO expertiseDTO){
         Expertise expertise=expertiseGraphRepository.findById(expertiseId,2).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("Data not found")));
         ExpertiseLine expertiseLine=(expertise.getExpertiseLines().get(expertise.getExpertiseLines().size()-1));
-        expertiseDTO.setUnion(ObjectMapperUtils.copyPropertiesByMapper(expertiseLine.getUnion(),UnionIDNameDTO.class));
+        expertiseDTO.setUnion(ObjectMapperUtils.copyPropertiesByMapper(expertise.getUnion(),UnionIDNameDTO.class));
         Map<Long,Long> seniorityLevelAndPayGradeIdMap=expertise.getSeniorityLevel().stream().collect(Collectors.toMap(UserBaseEntity::getId, v->v.getPayGrade().getId()));
         expertiseDTO.setSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorityLevel(),SeniorityLevelDTO.class));
         expertiseDTO.getSeniorityLevels().forEach(s->{
             s.setPayGradeId(seniorityLevelAndPayGradeIdMap.get(s.getId()));
             s.setId(null);
         });
-        expertiseDTO.setOrganizationLevelId(isNull(expertiseLine.getOrganizationLevel())?null:expertiseLine.getOrganizationLevel().getId());
-        expertiseDTO.setOrganizationServiceIds(isCollectionEmpty(expertiseLine.getOrganizationServices())?null:expertiseLine.getOrganizationServices().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
-        expertiseDTO.setSector(ObjectMapperUtils.copyPropertiesByMapper(expertiseLine.getSector(),SectorDTO.class));
+        expertiseDTO.setOrganizationLevelId(isNull(expertise.getOrganizationLevel())?null:expertise.getOrganizationLevel().getId());
+        expertiseDTO.setOrganizationServiceIds(isCollectionEmpty(expertise.getOrganizationServices())?null:expertise.getOrganizationServices().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
+        expertiseDTO.setSector(ObjectMapperUtils.copyPropertiesByMapper(expertise.getSector(),SectorDTO.class));
         expertiseDTO.setBreakPaymentSetting(expertiseLine.getBreakPaymentSetting());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
