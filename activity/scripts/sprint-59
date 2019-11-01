@@ -29,7 +29,9 @@ db.getCollection('counter').insertOne(
         "VALIDATED_BY",
         "CALCULATION_TYPE",
         "CALCULATION_BASED_ON",
-        "CALCULATION_UNIT"
+        "CALCULATION_UNIT",
+        "PHASE",
+        "TEAM"
     ],
     "multiDimensional" : false
 });

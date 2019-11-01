@@ -183,7 +183,6 @@ public class ActivityKPICalculationService implements CounterService {
     }
 
     private List<CommonKpiDataUnit> getTotalHoursKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI) {
-        // TO BE USED FOR AVERAGE CALCULATION.
         double multiplicationFactor = 1;
         Object[] objects = getKpiData(filterBasedCriteria, organizationId, applicableKPI);
         List<ShiftWithActivityDTO> shifts = (List<ShiftWithActivityDTO>) objects[0];
