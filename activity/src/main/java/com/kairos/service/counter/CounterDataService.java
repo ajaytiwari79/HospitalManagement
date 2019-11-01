@@ -528,7 +528,7 @@ public class CounterDataService extends MongoBaseService {
         return tabKPIDTO;
     }
 
-    public  KPIResponseDTO generateKPICalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId, LocalDate startDate) {
+    public  KPIResponseDTO generateKPISetCalculationData(FilterCriteriaDTO filters, Long organizationId, Long staffId) {
         Map<BigInteger,ApplicableKPI> kpiIdAndApplicableKPIMap=new HashMap<>();
         List<KPI> kpis = counterRepository.getKPIsByIds(filters.getKpiIds());
         Map<BigInteger, KPI> kpiMap = kpis.stream().collect(Collectors.toMap(MongoBaseEntity::getId, kpi -> kpi));
@@ -545,7 +545,7 @@ public class CounterDataService extends MongoBaseService {
         }
         for (BigInteger kpiId : filters.getKpiIds()) {
             if(!counterRepository.getKPIByid(kpiId).isMultiDimensional() && isNotNull(kpiIdAndApplicableKPIMap.get(kpiId))) {
-                kpiIdAndApplicableKPIMap.get(kpiId).setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
+                kpiIdAndApplicableKPIMap.get(kpiId).setKpiRepresentation(DurationType.HOURS.equals(filters.getFrequencyType())?KPIRepresentation.REPRESENT_PER_INTERVAL:KPIRepresentation.REPRESENT_PER_STAFF);
                 Callable<KPIResponseDTO> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedDataOfKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
                 Future<KPIResponseDTO> responseData = executorService.submit(data);
                 kpiResults.add(responseData);
@@ -558,6 +558,7 @@ public class CounterDataService extends MongoBaseService {
                     kpiResponseDTO.setKpiId(data.get().getKpiId());
                     kpiResponseDTO.setKpiName(data.get().getKpiName());
                     kpiResponseDTO.setStaffKPIValue(data.get().getStaffKPIValue());
+                    kpiResponseDTO.setKpiValue(data.get().getKpiValue());
                 }
             } catch (InterruptedException|ExecutionException e) {
                 LOGGER.error("error while generate KPI calculation data",e);

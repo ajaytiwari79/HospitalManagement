@@ -240,14 +240,14 @@ public class ShiftStateService {
         endDate = endDate.after(shiftEndDate) ? endDate : shiftEndDate;
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(employmentIds, startDate, endDate);
         Map<Long, List<CTAResponseDTO>> employmentAndCTAResponseMap = ctaResponseDTOS.stream().collect(groupingBy(CTAResponseDTO::getEmploymentId));
-        staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
+        /*staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
             if (employmentAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId()) != null) {
                 List<CTAResponseDTO> ctaResponseDTOSList = employmentAndCTAResponseMap.get(staffAdditionalInfoDTO.getEmployment().getId());
                 List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = ctaResponseDTOSList.stream().flatMap(ctaResponseDTO -> ctaResponseDTO.getRuleTemplates().stream()).collect(Collectors.toList());
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaRuleTemplateDTOS);
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             }
-        });
+        });*/
         timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, activityWrapperMap, startDate, endDate);
 
     }

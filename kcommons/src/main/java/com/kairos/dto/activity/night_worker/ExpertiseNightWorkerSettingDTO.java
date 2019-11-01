@@ -35,6 +35,7 @@ public class ExpertiseNightWorkerSettingDTO {
         this.expertiseId = expertiseId;
     }
 
+
     @Override
     public String toString() {
         return "ExpertiseNightWorkerSettingDTO{" +
