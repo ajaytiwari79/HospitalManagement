@@ -269,7 +269,7 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(CALCULATION_UNIT)) {
             getCalculationUnitData(criteriaList, defaultKpiDataDTO);
         }
-        if (kpi.getFilterTypes().contains(TEAM)) {
+        if (kpi.getFilterTypes().contains(TEAM) && isCollectionNotEmpty(unitIds)) {
             getTeamUnitData(criteriaList,unitIds.get(0));
         }
     }
