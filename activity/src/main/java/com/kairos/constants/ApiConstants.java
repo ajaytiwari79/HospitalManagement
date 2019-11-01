@@ -138,6 +138,7 @@ public final class ApiConstants {
     public static final String DAY_TYPE = "/dayType";
     public static final String SHOW_COUNTRY_TAGS = "/show_country_tags";
     public static final String TEAM_ORGANIZATION_ID = "/team/organizationId";
+    public static final String TEAMS = "/teams";
     public static final String COUNTRY_GLIDE_TIME_SETTINGS = "/country/{countryId}/glide_time";
     public static final String RESTORE_FUNCTION_ON_PHASE_RESTORATION = "/updateFunctionOnPhaseRestoration";
     public static final String GET_FUNCTIONS_OF_EMPLOYMENT = STAFF_WITH_STAFF_ID + "/employment/{employmentId}/functions";
