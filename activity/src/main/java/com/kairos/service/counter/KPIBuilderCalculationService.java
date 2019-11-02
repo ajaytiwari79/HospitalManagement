@@ -65,7 +65,7 @@ import static java.util.Map.Entry.comparingByKey;
 
 
 @Service
-public class ActivityKPICalculationService implements CounterService {
+public class KPIBuilderCalculationService implements CounterService {
 
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
@@ -95,7 +95,7 @@ public class ActivityKPICalculationService implements CounterService {
         switch (calculationBasedOn) {
             case ACTIVITY:
             case TIME_TYPE:
-                total = getActivityAndTimeTypeTotalByCalulationType(kpiCalculationRelatedInfo);
+                total = getActivityAndTimeTypeTotalByCalulationType(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
                 break;
             case PLANNED_TIME:
                 total = getTotalByPlannedTime(shifts, filterBasedCriteria, shiftActivityDTOS, plannedTimeIds);
@@ -134,7 +134,7 @@ public class ActivityKPICalculationService implements CounterService {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
         CalculationType calculationType = (CalculationType) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_TYPE), CalculationType.class).get(0);
-
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
         Function<ShiftActivityDTO, Integer> methodParam = ShiftActivityDTO::getScheduledMinutes;
         switch (calculationType) {
             case PLANNED_HOURS_TIMEBANK:
@@ -453,8 +453,11 @@ public class ActivityKPICalculationService implements CounterService {
         }
 
         public List<ShiftWithActivityDTO> getShiftsByStaffIdAndInterval(Long staffId,DateTimeInterval dateTimeInterval){
-            List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffIdAndShiftsMap.getOrDefault(staffId, new ArrayList<>());
-            return shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
+            List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffIdAndShiftsMap.getOrDefault(staffId, shifts);
+            if(isNotNull(dateTimeInterval)){
+                shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
+            }
+            return shiftWithActivityDTOS;
         }
     }
 }
