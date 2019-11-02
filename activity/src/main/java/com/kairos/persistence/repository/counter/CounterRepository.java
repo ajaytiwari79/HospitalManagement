@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.counter;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
@@ -54,7 +53,6 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.dto.activity.counter.enums.ConfLevel.COUNTRY;
-import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
 import static com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl.SEQUENCE_POST_FIX;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 

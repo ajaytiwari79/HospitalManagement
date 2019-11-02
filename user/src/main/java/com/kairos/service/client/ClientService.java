@@ -79,6 +79,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import javax.inject.Inject;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -88,6 +89,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+
 import static com.kairos.commons.utils.DateUtils.MONGODB_QUERY_DATE_FORMAT;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;

@@ -57,7 +57,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -322,7 +321,7 @@ public class CounterDataService extends MongoBaseService {
     private void getTodoStatusDefaultData(List<FilterCriteria> criteriaList) {
         List<TodoStatus> todoStatuses = TodoStatus.getAllStatusExceptViewed();
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
-        todoStatuses.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toValue())));
+        todoStatuses.forEach(shiftStatus -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(shiftStatus.toString(), shiftStatus.toString())));
         criteriaList.add(new FilterCriteria(FilterType.ACTIVITY_STATUS.value, FilterType.ACTIVITY_STATUS, (List) kpiFilterDefaultDataDTOS));
     }
 

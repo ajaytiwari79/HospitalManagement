@@ -3,7 +3,6 @@ package com.kairos.service.shift;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -40,7 +39,6 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_SHIFT_IDS;
 import static com.kairos.constants.ActivityMessagesConstants.PAST_DATE_ALLOWED;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.util.stream.Collectors.groupingBy;
 
 /*
@@ -126,7 +124,7 @@ public class ShiftStateService {
         Map<BigInteger,ShiftState> timeAndAttendanceShiftStateMap=oldTimeAndAttendanceShiftStates.stream().filter(shiftState -> shiftState.getShiftStatePhaseId().equals(phase.getId())).collect(Collectors.toMap(ShiftState::getShiftId, v->v));
         List<ShiftState> timeAndAttendanceShiftStates = getShiftStateLists( shifts, phase.getId(), timeAndAttendanceShiftStateMap);
         for (ShiftState timeAndAttendanceShiftState : timeAndAttendanceShiftStates) {
-            if(isNull(timeAndAttendanceShiftStateMap.get(timeAndAttendanceShiftState.getShiftId())) || !AccessGroupRole.MANAGEMENT.equals(timeAndAttendanceShiftStateMap.get(timeAndAttendanceShiftState.getShiftId()).getAccessGroupRole())){
+            if(shiftValidatorService.validateGracePeriod(ObjectMapperUtils.copyPropertiesByMapper(timeAndAttendanceShiftState, ShiftDTO.class),true,timeAndAttendanceShiftState.getUnitId(),phase)){
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.STAFF);
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);

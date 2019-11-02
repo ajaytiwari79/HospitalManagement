@@ -387,15 +387,15 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeMongoRepository.existsByIdAndCountryIdAndDeletedFalse(id, countryId);
     }
 
-    public List<BigInteger> getAllTimeTypeWithItsLowerLevel(Long countryId, List<BigInteger> timeTypeIds){
+    public Set<BigInteger> getAllTimeTypeWithItsLowerLevel(Long countryId, List<BigInteger> timeTypeIds){
         List<TimeTypeDTO> timeTypeDTOS =  getAllTimeType(null,countryId);
-        List<BigInteger> resultTimeTypeDTOS = new ArrayList<>();
+        Set<BigInteger> resultTimeTypeDTOS = new HashSet<>();
         updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTOS.get(0).getChildren(), timeTypeIds,false);
         updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTOS.get(1).getChildren(), timeTypeIds,false);
         return resultTimeTypeDTOS;
     }
 
-    private void updateTimeTypeList(List<BigInteger> resultTimeTypeDTOS, List<TimeTypeDTO> timeTypeDTOS, List<BigInteger> timeTypeIds, boolean addAllLowerLevelChildren){
+    private void updateTimeTypeList(Set<BigInteger> resultTimeTypeDTOS, List<TimeTypeDTO> timeTypeDTOS, List<BigInteger> timeTypeIds, boolean addAllLowerLevelChildren){
         for(TimeTypeDTO timeTypeDTO : timeTypeDTOS) {
             if(timeTypeIds.indexOf(timeTypeDTO.getId())>=0){
                 resultTimeTypeDTOS.add(timeTypeDTO.getId());

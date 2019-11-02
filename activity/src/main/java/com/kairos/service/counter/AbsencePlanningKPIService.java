@@ -156,10 +156,10 @@ public class AbsencePlanningKPIService implements CounterService {
                     break;
             }
         }
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toValue(), AppConstants.REQUESTED_COLOR_CODE, Double.valueOf(requested)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toValue(), AppConstants.PENDING_COLOR_CODE, Double.valueOf(pending)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toValue(), AppConstants.APPROVE_COLOR_CODE, Double.valueOf(approve)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toValue(), AppConstants.DISAPPROVE_COLOR_CODE, Double.valueOf(disapprove)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toString(), AppConstants.REQUESTED_COLOR_CODE, Double.valueOf(requested)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toString(), AppConstants.PENDING_COLOR_CODE, Double.valueOf(pending)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toString(), AppConstants.APPROVE_COLOR_CODE, Double.valueOf(approve)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toString(), AppConstants.DISAPPROVE_COLOR_CODE, Double.valueOf(disapprove)));
         return clusteredBarChartKpiDataUnits;
     }
 
