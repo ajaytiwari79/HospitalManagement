@@ -9,7 +9,6 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
@@ -17,11 +16,9 @@ import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationBasedOn;
@@ -32,8 +29,6 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
-import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.PlannedTimeTypeService;
@@ -42,8 +37,9 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.utils.counter.KPIUtils;
 import com.kairos.utils.user_context.UserContext;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -65,7 +61,6 @@ import static com.kairos.enums.kpi.CalculationType.TOTAL_MINUTES;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.util.Map.Entry.comparingByKey;
 
 
@@ -90,19 +85,17 @@ public class ActivityKPICalculationService implements CounterService {
     private PhaseService phaseService;
 
 
-    public double getTotal(List<ShiftWithActivityDTO> shifts, Map<FilterType, List> filterBasedCriteria, DateTimeInterval dateTimeInterval, StaffKpiFilterDTO staffKpiFilterDTO) {
-        if (isCollectionEmpty(filterBasedCriteria.get(CALCULATION_BASED_ON))) {
+    public double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_BASED_ON))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
         CalculationBasedOn calculationBasedOn = (CalculationBasedOn) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_BASED_ON),CalculationBasedOn.class).get(0);
-        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shifts, filterBasedCriteria).invoke();
-        Set<BigInteger> plannedTimeIds = filterShiftActivity.getPlannedTimeIds();
-        List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
+
         double total = 0;
         switch (calculationBasedOn) {
             case ACTIVITY:
             case TIME_TYPE:
-                total = getActivityAndTimeTypeTotalByCalulationType(filterBasedCriteria, shifts, shiftActivityDTOS);
+                total = getActivityAndTimeTypeTotalByCalulationType(kpiCalculationRelatedInfo);
                 break;
             case PLANNED_TIME:
                 total = getTotalByPlannedTime(shifts, filterBasedCriteria, shiftActivityDTOS, plannedTimeIds);
@@ -136,11 +129,12 @@ public class ActivityKPICalculationService implements CounterService {
         return total;
     }
 
-    private double getActivityAndTimeTypeTotalByCalulationType(Map<FilterType, List> filterBasedCriteria, List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<ShiftActivityDTO> shiftActivityDTOS) {
+    private double getActivityAndTimeTypeTotalByCalulationType(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (isCollectionEmpty(filterBasedCriteria.get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
         CalculationType calculationType = (CalculationType) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_TYPE), CalculationType.class).get(0);
+
         Function<ShiftActivityDTO, Integer> methodParam = ShiftActivityDTO::getScheduledMinutes;
         switch (calculationType) {
             case PLANNED_HOURS_TIMEBANK:
@@ -170,10 +164,14 @@ public class ActivityKPICalculationService implements CounterService {
         return DateUtils.getHoursByMinutes(getTotalByType(filterBasedCriteria,shiftWithActivityDTOS,shiftActivityDTOS,methodParam));
     }
 
-    private double getTotalByType(Map<FilterType, List> filterBasedCriteria, List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<ShiftActivityDTO> shiftActivityDTOS, Function<ShiftActivityDTO, Integer> methodParam) {
+    private double getTotalValueByByType(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, Function<ShiftActivityDTO, Integer> methodParam) {
         if (isCollectionEmpty(filterBasedCriteria.get(CALCULATION_UNIT))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
+        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shifts, filterBasedCriteria).invoke();
+        Set<BigInteger> plannedTimeIds = filterShiftActivity.getPlannedTimeIds();
+        List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
         int valuesSumInMinutes = shiftActivityDTOS.stream().mapToInt(shiftActivityDTO -> methodParam.apply(shiftActivityDTO)).sum();
         double total = valuesSumInMinutes;
         DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
@@ -186,24 +184,12 @@ public class ActivityKPICalculationService implements CounterService {
         return total;
     }
 
-    public Map<Object, Double> calculateTotalHours(Map<FilterType, List> filterBasedCriteria,List<Long> staffIds, ApplicableKPI applicableKPI, List<DateTimeInterval> dateTimeIntervals, List<ShiftWithActivityDTO> shifts,List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
-        Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap = new HashMap<>();
-        for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-            dateTimeIntervalListMap.put(dateTimeInterval, shifts.stream().filter(shift -> DurationType.HOURS.equals(applicableKPI.getFrequencyType()) ? dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate())) : dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
-        }
-        return calculateDataByKpiRepresentation(filterBasedCriteria, staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI, shifts, staffKpiFilterDTOS);
-    }
-
     private List<CommonKpiDataUnit> getTotalHoursKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI) {
         double multiplicationFactor = 1;
-        Object[] objects = getKpiData(filterBasedCriteria, organizationId, applicableKPI);
-        List<ShiftWithActivityDTO> shifts = (List<ShiftWithActivityDTO>) objects[0];
-        List<Long> staffIds = (List<Long>) objects[1];
-        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) objects[2];
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) objects[3];
+        KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPICalculationRelatedInfo(filterBasedCriteria,organizationId,applicableKPI);
+        Map<Object, Double> staffTotalHours =  calculateDataByKpiRepresentation(kpiCalculationRelatedInfo);
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
-        Map<Object, Double> staffTotalHours = calculateTotalHours(filterBasedCriteria, staffIds, applicableKPI, dateTimeIntervals, shifts, staffKpiFilterDTOS);
-        getKpiDataUnits(multiplicationFactor, staffTotalHours, kpiDataUnits, applicableKPI, staffKpiFilterDTOS);
+        getKpiDataUnits(multiplicationFactor, staffTotalHours, kpiDataUnits, applicableKPI, kpiCalculationRelatedInfo.staffKpiFilterDTOS);
         sortKpiDataByDateTimeInterval(kpiDataUnits);
         return kpiDataUnits;
     }
@@ -222,57 +208,6 @@ public class ActivityKPICalculationService implements CounterService {
             }
         }
     }
-
-    private Object[] getKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI) {
-        Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
-        List<Long> staffIds = (List<Long>) filterCriteria[0];
-        List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
-        List<Long> unitIds = (List<Long>) filterCriteria[2];
-        List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
-        List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(organizationId);
-        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
-        staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
-        List<Integer> dayOfWeeksNo = new ArrayList<>();
-        Set<DayOfWeek> daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
-        daysOfWeeks.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
-        List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-        StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
-        shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
-        return new Object[]{shifts, staffIds, dateTimeIntervals, staffKpiFilterDTOS};
-    }
-
-    private StaffFilterDTO getStaffFilterDto(Map<FilterType, List> filterBasedCriteria, List<TimeSlotDTO> timeSlotDTOS, Long organizationId) {
-        StaffFilterDTO staffFilterDTO = new StaffFilterDTO();
-        List<FilterSelectionDTO> filterData = filterBasedCriteria.entrySet().stream().map(filterTypeListEntry -> {
-            if (filterTypeListEntry.getKey().equals(TIME_SLOT)) {
-                Set<String> timeSlotName = new HashSet<>();
-                for (Object timeSlotId : filterTypeListEntry.getValue()) {
-                    for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
-                        if (timeSlotDTO.getId().equals(((Integer) timeSlotId).longValue())) {
-                            timeSlotName.add(timeSlotDTO.getName());
-                        }
-                    }
-                }
-                return new FilterSelectionDTO(filterTypeListEntry.getKey(), timeSlotName);
-            } else {
-                return new FilterSelectionDTO(filterTypeListEntry.getKey(), new HashSet<String>(filterTypeListEntry.getValue()));
-            }
-        }).collect(Collectors.toList());
-        if (filterBasedCriteria.containsKey(PHASE)) {
-            List<PhaseDTO> phases = phaseService.getPhasesByUnit(organizationId);
-            Set<PhaseDefaultName> phaseDefaultNames = (Set<PhaseDefaultName>) filterBasedCriteria.get(FilterType.PHASE).stream().map(value -> PhaseDefaultName.valueOf(value.toString())).collect(Collectors.toSet());
-            Set<String> phaseIds = phases.stream().filter(phaseDTO -> phaseDefaultNames.contains(phaseDTO.getPhaseEnum())).map(phaseDTO -> phaseDTO.getId().toString()).collect(Collectors.toSet());
-            filterData.add(new FilterSelectionDTO(PHASE, phaseIds));
-        }
-        if (filterBasedCriteria.containsKey(TEAM)) {
-            filterData.add(new FilterSelectionDTO(TEAM, (Set<String>) filterBasedCriteria.get(TEAM)));
-        }
-        staffFilterDTO.setFiltersData(filterData);
-        return staffFilterDTO;
-    }
-
 
     @Override
     public KPIRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
@@ -296,12 +231,8 @@ public class ActivityKPICalculationService implements CounterService {
     }
 
     private Map<Object, Double> getTotalHoursMap(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI) {
-        Object[] objects = getKpiData(filterBasedCriteria, organizationId, applicableKPI);
-        List<ShiftWithActivityDTO> shifts = (List<ShiftWithActivityDTO>) objects[0];
-        List<Long> staffIds = (List<Long>) objects[1];
-        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) objects[2];
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) objects[3];
-        return calculateTotalHours(filterBasedCriteria, staffIds, applicableKPI, dateTimeIntervals, shifts, staffKpiFilterDTOS);
+        KPICalculationRelatedInfo kpiCalculationRelatedInfo = new KPICalculationRelatedInfo(filterBasedCriteria,organizationId,applicableKPI);
+        return calculateDataByKpiRepresentation(kpiCalculationRelatedInfo);
     }
 
 
@@ -311,68 +242,71 @@ public class ActivityKPICalculationService implements CounterService {
         return getFibonacciCalculation(staffAndTotalHoursMap, sortingOrder);
     }
 
-    private Map<Object, Double> calculateDataByKpiRepresentation(Map<FilterType, List> filterBasedCriteria, List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<ShiftWithActivityDTO> shifts, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
-        Map<Long, StaffKpiFilterDTO> staffIdAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+    private Map<Object, Double> calculateDataByKpiRepresentation(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         Map<Object, Double> staffTotalHours;
-        Double totalHours = 0d;
-        switch (applicableKPI.getKpiRepresentation()) {
+        switch (kpiCalculationRelatedInfo.getApplicableKPI().getKpiRepresentation()) {
             case REPRESENT_PER_STAFF:
-                staffTotalHours = getStaffTotalByRepresentPerStaff(filterBasedCriteria, staffIds, dateTimeIntervals, shifts, staffIdAndStaffKpiFilterMap);
+                staffTotalHours = getStaffTotalByRepresentPerStaff(kpiCalculationRelatedInfo);
                 break;
             case REPRESENT_TOTAL_DATA:
-                staffTotalHours = getStaffTotalByRepresentTotalData(filterBasedCriteria, staffIds, dateTimeIntervals, shifts, totalHours, staffIdAndStaffKpiFilterMap);
+                staffTotalHours = getStaffTotalByRepresentTotalData(kpiCalculationRelatedInfo);
                 break;
             default:
-                staffTotalHours = getStaffTotalByRepresentPerInterval(filterBasedCriteria, staffIds, dateTimeIntervalListMap, dateTimeIntervals, applicableKPI.getFrequencyType(), staffIdAndStaffKpiFilterMap);
+                staffTotalHours = getStaffTotalByRepresentPerInterval(kpiCalculationRelatedInfo);
                 break;
         }
         return verifyKPIResponseData(staffTotalHours) ? staffTotalHours : new HashMap<>();
     }
 
-    private Map<Object, Double> getStaffTotalByRepresentTotalData(Map<FilterType, List> filterBasedCriteria, List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<ShiftWithActivityDTO> shifts, Double totalHours, Map<Long, StaffKpiFilterDTO> staffIdAndStaffKpiFilterMap) {
+    private Map<Object, Double> getStaffTotalByRepresentTotalData(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        double totalHours = 0;
         Map<Object, Double> staffTotalHours = new HashMap<>();
-        Map<Long, List<ShiftWithActivityDTO>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
-        for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-            for (Long staffId : staffIds) {
-                List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffShiftMapping.getOrDefault(staffId, new ArrayList<>());
-                shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
-                totalHours += getTotal(shiftWithActivityDTOS, filterBasedCriteria, dateTimeInterval, staffIdAndStaffKpiFilterMap.get(staffId));
+        for (DateTimeInterval dateTimeInterval : kpiCalculationRelatedInfo.getDateTimeIntervals()) {
+            for (Long staffId : kpiCalculationRelatedInfo.getStaffIds()) {
+                List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
+                totalHours += getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
             }
         }
-        staffTotalHours.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), totalHours);
+        staffTotalHours.put(getDateTimeintervalString(new DateTimeInterval(kpiCalculationRelatedInfo.getDateTimeIntervals().get(0).getStartDate(), kpiCalculationRelatedInfo.getDateTimeIntervals().get(kpiCalculationRelatedInfo.getDateTimeIntervals().size() - 1).getEndDate())), totalHours);
         return staffTotalHours;
     }
 
-    private Map<Object, Double> getStaffTotalByRepresentPerStaff(Map<FilterType, List> filterBasedCriteria, List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, List<ShiftWithActivityDTO> shifts, Map<Long, StaffKpiFilterDTO> staffIdAndStaffKpiFilterMap) {
+    private Map<Object, Double> getStaffTotalByRepresentPerStaff(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         Double totalHours;
         Map<Object, Double> staffTotalHours = new HashMap<>();
-        Map<Long, List<ShiftWithActivityDTO>> staffShiftMapping = shifts.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
-        DateTimeInterval dateTimeInterval = new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-        for (Long staffId : staffIds) {
-            List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffShiftMapping.getOrDefault(staffId, new ArrayList<>());
-            shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
-            totalHours = getTotal(shiftWithActivityDTOS, filterBasedCriteria, dateTimeInterval, staffIdAndStaffKpiFilterMap.get(staffId));
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(kpiCalculationRelatedInfo.getDateTimeIntervals().get(0).getStartDate(), kpiCalculationRelatedInfo.getDateTimeIntervals().get(kpiCalculationRelatedInfo.getDateTimeIntervals().size() - 1).getEndDate());
+        for (Long staffId : kpiCalculationRelatedInfo.getStaffIds()) {
+            List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
+            totalHours = getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
             staffTotalHours.put(staffId, totalHours);
         }
         return staffTotalHours;
     }
 
-    private Map<Object, Double> getStaffTotalByRepresentPerInterval(Map<FilterType, List> filterBasedCriteria, List<Long> staffIds, Map<DateTimeInterval, List<ShiftWithActivityDTO>> dateTimeIntervalListMap, List<DateTimeInterval> dateTimeIntervals, DurationType frequencyType, Map<Long, StaffKpiFilterDTO> staffIdAndStaffKpiFilterMap) {
-        Double totalHours;
+    private Map<Object, Double> getStaffTotalByRepresentPerInterval(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         Map<Object, Double> staffTotalHours = new HashMap<>();
-        Map<Long, List<ShiftWithActivityDTO>> staffShiftMapping;
-        Map<DateTimeInterval, Map<Long, List<ShiftWithActivityDTO>>> dateTimeIntervalListMap1 = new HashedMap();
-        dateTimeIntervalListMap.keySet().stream().forEach(dateTimeInterval -> dateTimeIntervalListMap1.put(dateTimeInterval, dateTimeIntervalListMap.get(dateTimeInterval).stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()))));
-        for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-            totalHours = 0d;
-            staffShiftMapping = dateTimeIntervalListMap1.get(dateTimeInterval);
-            for (Long staffId : staffIds) {
-                totalHours += getTotal(staffShiftMapping.getOrDefault(staffId, new ArrayList<>()), filterBasedCriteria, dateTimeInterval, staffIdAndStaffKpiFilterMap.get(staffId));
+        for (DateTimeInterval dateTimeInterval : kpiCalculationRelatedInfo.getDateTimeIntervals()) {
+            double totalHours = 0d;
+            for (Long staffId : kpiCalculationRelatedInfo.getStaffIds()) {
+                List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
+                totalHours += getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
             }
-            String key = DurationType.HOURS.equals(frequencyType) ? getLocalTimeByFormat(asLocalDateTime(dateTimeInterval.getStartDate())) : DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval);
+            String key = getKeyByStaffRepresentation(kpiCalculationRelatedInfo, dateTimeInterval);
             staffTotalHours.put(key, totalHours);
         }
         return staffTotalHours;
+    }
+
+    private String getKeyByStaffRepresentation(KPICalculationRelatedInfo kpiCalculationRelatedInfo, DateTimeInterval dateTimeInterval) {
+        String key;
+        if(DurationType.HOURS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
+            key = getLocalTimeByFormat(asLocalDateTime(dateTimeInterval.getStartDate()));
+        }else if(DurationType.DAYS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
+            key = getStartDateTimeintervalString(dateTimeInterval);
+        }else {
+            key = getDateTimeintervalString(dateTimeInterval);
+        }
+        return key;
     }
 
     public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
@@ -433,6 +367,94 @@ public class ActivityKPICalculationService implements CounterService {
             boolean validActivity = isCollectionEmpty(activityIds) || activityIds.contains(shiftActivityDTO.getActivityId());
             boolean validPlannedTime = isCollectionEmpty(plannedTimeIds) || CollectionUtils.containsAny(plannedTimeIds,shiftActivityDTO.getPlannedTimes().stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
             return validActivity && validTimeType && validPlannedTime && CollectionUtils.containsAny(filterBasedCriteria.get(ACTIVITY_STATUS),shiftActivityDTO.getStatus());
+        }
+    }
+
+    @Getter
+    @Setter
+    private class KPICalculationRelatedInfo{
+        private Map<FilterType, List> filterBasedCriteria;
+        private List<ShiftWithActivityDTO> shifts;
+        private List<Long> staffIds;
+        private List<DateTimeInterval> dateTimeIntervals;
+        private List<StaffKpiFilterDTO> staffKpiFilterDTOS;
+        private Long organizationId;
+        private ApplicableKPI applicableKPI;
+        private Map<DateTimeInterval, List<ShiftWithActivityDTO>> intervalShiftsMap;
+        private Map<Long, StaffKpiFilterDTO> staffIdAndStaffKpiFilterMap;
+        private Map<Long, List<ShiftWithActivityDTO>> staffIdAndShiftsMap;
+
+        public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI) {
+            this.filterBasedCriteria = filterBasedCriteria;
+            this.organizationId = organizationId;
+            this.applicableKPI = applicableKPI;
+            loadKpiCalculationRelatedInfo(filterBasedCriteria,organizationId,applicableKPI);
+            updateIntervalShiftsMap(applicableKPI);
+            staffIdAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+            staffIdAndShiftsMap = shifts.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
+
+        }
+
+        private void updateIntervalShiftsMap(ApplicableKPI applicableKPI) {
+            intervalShiftsMap = new HashMap<>();
+            for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
+                intervalShiftsMap.put(dateTimeInterval, shifts.stream().filter(shift -> DurationType.HOURS.equals(applicableKPI.getFrequencyType()) ? dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate())) : dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList()));
+            }
+        }
+
+
+        private void loadKpiCalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI) {
+            Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
+            List<Long> staffIds = (List<Long>) filterCriteria[0];
+            List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
+            List<Long> unitIds = (List<Long>) filterCriteria[2];
+            List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
+            Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+            List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(organizationId);
+            List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
+            List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
+            staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
+            List<Integer> dayOfWeeksNo = new ArrayList<>();
+            Set<DayOfWeek> daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
+            daysOfWeeks.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
+            shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
+            shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
+        }
+
+        private StaffFilterDTO getStaffFilterDto(Map<FilterType, List> filterBasedCriteria, List<TimeSlotDTO> timeSlotDTOS, Long organizationId) {
+            StaffFilterDTO staffFilterDTO = new StaffFilterDTO();
+            List<FilterSelectionDTO> filterData = filterBasedCriteria.entrySet().stream().map(filterTypeListEntry -> {
+                if (filterTypeListEntry.getKey().equals(TIME_SLOT)) {
+                    Set<String> timeSlotName = new HashSet<>();
+                    for (Object timeSlotId : filterTypeListEntry.getValue()) {
+                        for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
+                            if (timeSlotDTO.getId().equals(((Integer) timeSlotId).longValue())) {
+                                timeSlotName.add(timeSlotDTO.getName());
+                            }
+                        }
+                    }
+                    return new FilterSelectionDTO(filterTypeListEntry.getKey(), timeSlotName);
+                } else {
+                    return new FilterSelectionDTO(filterTypeListEntry.getKey(), new HashSet<String>(filterTypeListEntry.getValue()));
+                }
+            }).collect(Collectors.toList());
+            if (filterBasedCriteria.containsKey(PHASE)) {
+                List<PhaseDTO> phases = phaseService.getPhasesByUnit(organizationId);
+                Set<PhaseDefaultName> phaseDefaultNames = (Set<PhaseDefaultName>) filterBasedCriteria.get(FilterType.PHASE).stream().map(value -> PhaseDefaultName.valueOf(value.toString())).collect(Collectors.toSet());
+                Set<String> phaseIds = phases.stream().filter(phaseDTO -> phaseDefaultNames.contains(phaseDTO.getPhaseEnum())).map(phaseDTO -> phaseDTO.getId().toString()).collect(Collectors.toSet());
+                filterData.add(new FilterSelectionDTO(PHASE, phaseIds));
+            }
+            if (filterBasedCriteria.containsKey(TEAM)) {
+                filterData.add(new FilterSelectionDTO(TEAM, (Set<String>) filterBasedCriteria.get(TEAM)));
+            }
+            staffFilterDTO.setFiltersData(filterData);
+            return staffFilterDTO;
+        }
+
+        public List<ShiftWithActivityDTO> getShiftsByStaffIdAndInterval(Long staffId,DateTimeInterval dateTimeInterval){
+            List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffIdAndShiftsMap.getOrDefault(staffId, new ArrayList<>());
+            return shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
         }
     }
 }
