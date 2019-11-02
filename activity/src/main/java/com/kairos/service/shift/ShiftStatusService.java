@@ -13,7 +13,6 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
@@ -51,7 +50,6 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.MAIL_SUBJECT;
 import static com.kairos.constants.CommonConstants.EMAIL_GREETING;
 import static com.kairos.constants.CommonConstants.SHIFT_NOTIFICATION_EMAIL_TEMPLATE;
-import static com.kairos.enums.phase.PhaseDefaultName.DRAFT;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 @Service

@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,6 +43,9 @@ public class KPIUtils {
     public static List<BigInteger> getBigIntegerValue(List<Object> objects) {
         return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toList());
     }
+    public static Set<BigInteger> getBigIntegerSet(List<Object> objects) {
+        return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toSet());
+    }
 
     public static Set<DayOfWeek> getDaysOfWeeksfromString(List<Object> objects) {
         return objects.stream().map(o -> DayOfWeek.valueOf((o.toString()))).collect(Collectors.toSet());
@@ -50,13 +54,16 @@ public class KPIUtils {
     public static List<DateTimeInterval> getDateTimeIntervals(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates, LocalDate localDate) {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         if (isCollectionNotEmpty(filterDates)) {
-            dateTimeIntervals.add(new DateTimeInterval(asLocalDate(filterDates.get(0).toString()), asLocalDate(filterDates.get(1).toString())));
+            if(DurationType.HOURS.equals(frequencyType)){
+                dateTimeIntervals= filterDates.get(0).equals(filterDates.get(1)) ?getDateTimeIntervalByDates(filterDates.get(0),filterDates.get(1)):getDateIntervalByDates(filterDates.get(0),filterDates.get(1));
+            }else{
+                dateTimeIntervals.add(new DateTimeInterval(asLocalDate(filterDates.get(0).toString()), asLocalDate(filterDates.get(1).toString())));
+            }
             return dateTimeIntervals;
         }
         if (isNull(localDate)) {
             localDate = DateUtils.getCurrentLocalDate();
         }
-
         switch (interval) {
             case LAST:
                 localDate = localDate.minusDays(1);
@@ -80,6 +87,25 @@ public class KPIUtils {
         return dateTimeIntervals;
     }
 
+    public static  List<DateTimeInterval>  getDateTimeIntervalByDates(LocalDate startDate,LocalDate endDate) {
+        List<DateTimeInterval> dateTimeIntervals=new ArrayList<>();
+        LocalDateTime startOfTheDay=startDate.atStartOfDay();
+        LocalDateTime endOfTheDay=getEndOfDayFromLocalDate(endDate);
+        while (!startOfTheDay.isAfter(endOfTheDay)) {
+            dateTimeIntervals.add(new DateTimeInterval(asDate(startOfTheDay), asDate(startOfTheDay.plusHours(1))));
+           startOfTheDay=startOfTheDay.plusHours(1);
+        }
+        return dateTimeIntervals;
+    }
+
+    public static  List<DateTimeInterval>  getDateIntervalByDates(LocalDate startDate,LocalDate endDate) {
+        List<DateTimeInterval> dateTimeIntervals=new ArrayList<>();
+        while (!startDate.isAfter(endDate)) {
+            dateTimeIntervals.add(new DateTimeInterval(asDate(startDate), asDate(startDate.plusDays(1))));
+            startDate=startDate.plusDays(1);
+        }
+        return dateTimeIntervals;
+    }
 
     public static LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
         LocalDate currentDate = date;

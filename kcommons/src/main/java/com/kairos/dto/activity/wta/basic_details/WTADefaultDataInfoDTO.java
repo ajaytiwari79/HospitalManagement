@@ -5,6 +5,9 @@ import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +17,9 @@ import java.util.List;
  * @date - 26/4/18
  */
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class WTADefaultDataInfoDTO {
     private List<ActivityDTO> activityList = new ArrayList<>();
     private List<TimeTypeDTO> timeTypes = new ArrayList<>();
@@ -23,24 +29,6 @@ public class WTADefaultDataInfoDTO {
     private Long countryID;
 
 
-    public WTADefaultDataInfoDTO() {
-    }
-
-    public Long getCountryID() {
-        return countryID;
-    }
-
-    public void setCountryID(Long countryID) {
-        this.countryID = countryID;
-    }
-
-    public List<TimeSlotDTO> getTimeSlots() {
-        return timeSlots;
-    }
-
-    public void setTimeSlots(List<TimeSlotDTO> timeSlots) {
-        this.timeSlots = timeSlots;
-    }
 
     public WTADefaultDataInfoDTO(List<DayTypeDTO> dayTypes, List<PresenceTypeDTO> presenceTypes, List<TimeSlotDTO> timeSlots, Long countryID) {
         this.dayTypes = dayTypes;
@@ -50,35 +38,4 @@ public class WTADefaultDataInfoDTO {
     }
 
 
-    public List<ActivityDTO> getActivityList() {
-        return activityList;
-    }
-
-    public void setActivityList(List<ActivityDTO> activityList) {
-        this.activityList = activityList;
-    }
-
-    public List<TimeTypeDTO> getTimeTypes() {
-        return timeTypes;
-    }
-
-    public void setTimeTypes(List<TimeTypeDTO> timeTypes) {
-        this.timeTypes = timeTypes;
-    }
-
-    public List<DayTypeDTO> getDayTypes() {
-        return dayTypes;
-    }
-
-    public void setDayTypes(List<DayTypeDTO> dayTypes) {
-        this.dayTypes = dayTypes;
-    }
-
-    public List<PresenceTypeDTO> getPresenceTypes() {
-        return presenceTypes;
-    }
-
-    public void setPresenceTypes(List<PresenceTypeDTO> presenceTypes) {
-        this.presenceTypes = presenceTypes;
-    }
 }

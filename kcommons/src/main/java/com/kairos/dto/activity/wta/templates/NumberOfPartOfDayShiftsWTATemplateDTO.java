@@ -6,6 +6,8 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -22,6 +24,8 @@ import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     @Positive(message = "message.ruleTemplate.interval.notNull")
@@ -34,74 +38,6 @@ public class NumberOfPartOfDayShiftsWTATemplateDTO extends WTABaseRuleTemplateDT
     private List<PartOfDay> partOfDays = new ArrayList<>();
     private float recommendedValue;
     private MinMaxSetting minMaxSetting;
-
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-
-    public Set<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
-
-    public Set<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-
-
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(long intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
 
     public NumberOfPartOfDayShiftsWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.NUMBER_OF_PARTOFDAY;

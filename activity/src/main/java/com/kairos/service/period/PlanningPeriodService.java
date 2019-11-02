@@ -446,7 +446,7 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public void updateSchedularFlippingDateById(BigInteger schedulerPanelId, Long unitId, LocalDate localDate, LocalTime localTime) {
-        LocalDateTimeScheduledPanelIdDTO localDateTimeScheduledPanelIdDTO = new LocalDateTimeScheduledPanelIdDTO(schedulerPanelId, LocalDateTime.of(localDate, localTime));
+        LocalDateTimeScheduledPanelIdDTO localDateTimeScheduledPanelIdDTO = new LocalDateTimeScheduledPanelIdDTO( LocalDateTime.of(localDate, localTime),schedulerPanelId);
         if (Optional.ofNullable(schedulerPanelId).isPresent())
             schedulerRestClient.publishRequest(Arrays.asList(localDateTimeScheduledPanelIdDTO), unitId, true, IntegrationOperation.UPDATE, "/scheduler_panel/update_date_only", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<LocalDateTimeScheduledPanelIdDTO>>>() {
             }, null, null);
@@ -890,4 +890,9 @@ public class PlanningPeriodService extends MongoBaseService {
     public PlanningPeriod findFirstRequestPhasePlanningPeriodByUnitId(Long unitId) {
         return planningPeriodMongoRepository.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
     }
+
+    public PlanningPeriod findOneByUnitIdAndDate(Long unitId, Date startDate) {
+        return planningPeriodMongoRepository.findOneByUnitIdAndDate(unitId,startDate);
+    }
+
 }

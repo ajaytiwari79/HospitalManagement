@@ -2,6 +2,8 @@ package com.kairos.persistence.model.user.region;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -17,6 +19,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.REGIO
  */
 @NodeEntity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class Province extends UserBaseEntity {
     @NotBlank(message = ERROR_PROVINCE_NAME_NOTEMPTY)
     private String name;
@@ -41,57 +45,9 @@ public class Province extends UserBaseEntity {
 
     private boolean isEnable = true;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getGeoFence() {
-        return geoFence;
-    }
-
-    public void setGeoFence(String geoFence) {
-        this.geoFence = geoFence;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public float getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(float latitude) {
-        this.latitude = latitude;
-    }
-
-    public float getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(float longitude) {
-        this.longitude = longitude;
-    }
-
-    public boolean isEnable() {
-        return isEnable;
-    }
-
-    public void setEnable(boolean enable) {
-        isEnable = enable;
-    }
-
 
     public Map<String,Object> retrieveDetails() {
-        Map<String,Object> response = new HashMap();
+        Map<String,Object> response = new HashMap<>(4);
         response.put("id",this.id);
         response.put("name",this.name);
         response.put("code",this.code);

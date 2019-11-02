@@ -19,12 +19,14 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+
 import javax.inject.Inject;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 
 /**

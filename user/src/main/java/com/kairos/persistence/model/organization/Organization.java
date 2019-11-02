@@ -12,7 +12,6 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
-import com.kairos.persistence.model.country.default_data.KairosStatus;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;

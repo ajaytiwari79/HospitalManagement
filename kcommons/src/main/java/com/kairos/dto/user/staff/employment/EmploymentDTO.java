@@ -6,6 +6,9 @@ import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.employment_type.EmploymentCategory;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
@@ -20,6 +23,9 @@ import java.util.Set;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
+@NoArgsConstructor
 public class EmploymentDTO {
 
     @NotNull(message = "expertise is required for position")
@@ -79,22 +85,6 @@ public class EmploymentDTO {
     private LocalDate accumulatedTimebankDate;
 
 
-
-
-
-    public EmploymentDTO() {
-        //default cons
-    }
-
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
     public EmploymentDTO(Long expertiseId, LocalDate startDate, LocalDate endDate, int totalWeeklyMinutes,
                          float avgDailyWorkingHours, BigDecimal hourlyCost, Double salary, Long employmentTypeId) {
         this.salary = salary;
@@ -122,251 +112,5 @@ public class EmploymentDTO {
         this.timeCareExternalId = timeCareExternalId;
         this.unitId = unitId;
 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public Long getAccessGroupId() {
-        return accessGroupId;
-    }
-
-    public void setAccessGroupId(Long accessGroupId) {
-        this.accessGroupId = accessGroupId;
-    }
-
-    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-    }
-
-    public int getTotalWeeklyHours() {
-        return totalWeeklyHours;
-    }
-
-    public void setTotalWeeklyHours(int totalWeeklyHours) {
-        this.totalWeeklyHours = totalWeeklyHours;
-    }
-
-    public void setEmploymentTypeId(Long employmentTypeId) {
-        this.employmentTypeId = employmentTypeId;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-    public Long getExpertiseId() {
-        return expertiseId;
-    }
-
-    public void setExpertiseId(Long expertiseId) {
-        this.expertiseId = expertiseId;
-    }
-
-    public Integer getTotalWeeklyMinutes() {
-        return totalWeeklyMinutes;
-    }
-
-    public void setTotalWeeklyMinutes(Integer totalWeeklyMinutes) {
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-    }
-
-    public float getAvgDailyWorkingHours() {
-        return avgDailyWorkingHours;
-    }
-
-    public void setAvgDailyWorkingHours(float avgDailyWorkingHours) {
-        this.avgDailyWorkingHours = avgDailyWorkingHours;
-    }
-
-    public BigDecimal getHourlyCost() {
-        return hourlyCost;
-    }
-
-    public void setHourlyCost(BigDecimal hourlyCost) {
-        this.hourlyCost = hourlyCost;
-    }
-
-    public BigInteger getWtaId() {
-        return wtaId;
-    }
-
-    public void setWtaId(BigInteger wtaId) {
-        this.wtaId = wtaId;
-    }
-
-    public BigInteger getCtaId() {
-        return ctaId;
-    }
-
-    public void setCtaId(BigInteger ctaId) {
-        this.ctaId = ctaId;
-    }
-
-    public Double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Double salary) {
-        this.salary = salary;
-    }
-
-
-    public Long getEmploymentTypeId() {
-        return employmentTypeId;
-    }
-
-
-    /*public void setEmploymentTypeId(long employmentTypeId) {
-        this.employmentTypeId = employmentTypeId;
-    }*/
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public Long getUnionId() {
-        return unionId;
-    }
-
-    public void setUnionId(Long unionId) {
-        this.unionId = unionId;
-    }
-
-    public LocalDate getLastWorkingDate() {
-        return lastWorkingDate;
-    }
-
-    public void setLastWorkingDate(LocalDate lastWorkingDate) {
-        this.lastWorkingDate = lastWorkingDate;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Long getTimeCareExternalId() {
-        return timeCareExternalId;
-    }
-
-    public void setTimeCareExternalId(Long timeCareExternalId) {
-        this.timeCareExternalId = timeCareExternalId;
-    }
-
-    public Long getParentUnitId() {
-        return parentUnitId;
-    }
-
-    public void setParentUnitId(Long parentUnitId) {
-        this.parentUnitId = parentUnitId;
-    }
-
-    public EmploymentCategory getEmploymentTypeCategory() {
-        return employmentTypeCategory;
-    }
-
-    public void setEmploymentTypeCategory(EmploymentCategory employmentTypeCategory) {
-        this.employmentTypeCategory = employmentTypeCategory;
-    }
-
-    public Long getReasonCodeId() {
-        return reasonCodeId;
-    }
-
-    public void setReasonCodeId(Long reasonCodeId) {
-        this.reasonCodeId = reasonCodeId;
-    }
-
-    public Long getSeniorityLevelId() {
-        return seniorityLevelId;
-    }
-
-    public void setSeniorityLevelId(Long seniorityLevelId) {
-        this.seniorityLevelId = seniorityLevelId;
-    }
-
-
-    public Set<FunctionsDTO> getFunctions() {
-        return functions;
-    }
-
-    public void setFunctions(Set<FunctionsDTO> functions) {
-        this.functions = functions;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public Long getEmploymentLineId() {
-        return employmentLineId;
-    }
-
-    public void setEmploymentLineId(Long employmentLineId) {
-        this.employmentLineId = employmentLineId;
-    }
-
-    public EmploymentSubType getEmploymentSubType() { return employmentSubType; }
-
-    public void setEmploymentSubType(EmploymentSubType employmentSubType) { this.employmentSubType = employmentSubType; }
-
-    public float getTaxDeductionPercentage() {
-        return taxDeductionPercentage;
-    }
-
-    public void setTaxDeductionPercentage(float taxDeductionPercentage) {
-        this.taxDeductionPercentage = taxDeductionPercentage;
-    }
-
-    public ExpertiseResponseDTO getExpertise() {
-        return expertise;
-    }
-
-    public void setExpertise(ExpertiseResponseDTO expertise) {
-        this.expertise = expertise;
-    }
-
-    public long getAccumulatedTimebankMinutes() {
-        return accumulatedTimebankMinutes;
-    }
-
-    public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
-        this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
-    }
-
-    public LocalDate getAccumulatedTimebankDate() {
-        return accumulatedTimebankDate;
-    }
-
-    public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
-        this.accumulatedTimebankDate = accumulatedTimebankDate;
     }
 }

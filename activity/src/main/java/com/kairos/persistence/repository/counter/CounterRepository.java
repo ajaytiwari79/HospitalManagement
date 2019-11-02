@@ -53,7 +53,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.AppConstants.DELETED;
 import static com.kairos.dto.activity.counter.enums.ConfLevel.COUNTRY;
 import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
 import static com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl.SEQUENCE_POST_FIX;
@@ -673,12 +672,12 @@ Criteria.where(LEVEL).is(ConfLevel.COUNTRY.toString()),Criteria.where(LEVEL).is(
         return ObjectMapperUtils.copyPropertiesOfListByMapper(mongoTemplate.find(query, KPIDashboard.class), KPIDashboard.class);
     }
 
-    public boolean allKPIsBelongsToIndividualType(Set<BigInteger> kpiIds, ConfLevel confLevel, Long referenceId) {
-        String queryField = getRefQueryField(confLevel);
-        Criteria matchCriteria = Criteria.where(ACTIVE_KPI_ID).in(kpiIds).and(KPI_REPRESENTATION).is(INDIVIDUAL_STAFF).and(AppConstants.DELETED).is(false).and(queryField).is(referenceId).and(LEVEL).is(confLevel);
-        Query query = new Query(matchCriteria);
-        return mongoTemplate.find(query, ApplicableKPI.class).size() == kpiIds.size();
-    }
+//    public boolean allKPIsBelongsToIndividualType(Set<BigInteger> kpiIds, ConfLevel confLevel, Long referenceId) {
+//        String queryField = getRefQueryField(confLevel);
+//        Criteria matchCriteria = Criteria.where(ACTIVE_KPI_ID).in(kpiIds).and(KPI_REPRESENTATION).is(INDIVIDUAL_STAFF).and(AppConstants.DELETED).is(false).and(queryField).is(referenceId).and(LEVEL).is(confLevel);
+//        Query query = new Query(matchCriteria);
+//        return mongoTemplate.find(query, ApplicableKPI.class).size() == kpiIds.size();
+//    }
 
     public <S extends MongoBaseEntity> S save(@Valid S entity) {
         Assert.notNull(entity, "Entity must not be null!");

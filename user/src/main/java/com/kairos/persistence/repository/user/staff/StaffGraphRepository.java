@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.user.staff;
 
+import com.kairos.enums.SkillLevel;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -13,7 +14,7 @@ import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQu
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDTO;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseLocationStaffQueryResult;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
@@ -61,13 +62,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndEmploymentId(long employmentId);
 
 
-    @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} WITH unitPermission,organization " +
+    @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit)<-[:"+IN_UNIT+"]-(employment:Employment) WHERE id(organization)={0} AND id(employment)={2} AND (employment.endDate is null OR date(employment.endDate) >= date({3})) WITH unitPermission,organization " +
             "MATCH (staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(up:UnitPermission) WHERE id(staff)={1} WITH staff,organization " +
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WITH staff,organization,user " +
             "OPTIONAL MATCH (staff)-[:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skills:Skill{isEnabled:true}) WITH staff,collect(id(skills)) AS skills,organization,user" +
             " OPTIONAL MATCH (teams:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH staff,skills,collect(id(teams)) AS teams,organization,user" +
             " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.profilePic AS profilePic,teams,skills,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber order by name")
-    StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId);
+    StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId,long employmentId,String startDate );
 
     @Query("MATCH (staff:Staff) WHERE id(staff) IN {1}  " +
             "MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} \n" +
@@ -174,7 +175,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "Merge (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)\n" +
             "ON CREATE SET r.creationDate={2},r.lastModificationDate={3},r.startDate={3},r.endDate=0,r.skillLevel={4},r.isEnabled={5}\n" +
             "ON MATCH SET r.lastModificationDate={3},r.startDate={3},r.endDate=0,r.skillLevel={4},r.isEnabled={5} RETURN true")
-    void addSkillInStaff(long staffId, List<Long> skillId, long creationDate, long lastModificationDate, Skill.SkillLevel skillLevel, boolean isEnabled);
+    void addSkillInStaff(long staffId, List<Long> skillId, long creationDate, long lastModificationDate, SkillLevel skillLevel, boolean isEnabled);
 
     @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} and id(skill) IN {1}\n" +
             "MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory) WITH skill, staff, skillCategory, r\n" +
@@ -187,7 +188,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MERGE (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)\n" +
             "ON CREATE SET r.creationDate ={2},r.lastModificationDate ={3},r.isEnabled=true,r.skillLevel={4}\n" +
             "ON MATCH SET r.lastModificationDate = {3},r.skillLevel={4},r.isEnabled=true")
-    void updateSkillsByExpertise(long staffId, List<Long> expertiseId, long creationDate, long lastModificationDate, Skill.SkillLevel skillLevel);
+    void updateSkillsByExpertise(long staffId, List<Long> expertiseId, long creationDate, long lastModificationDate, SkillLevel skillLevel);
 
     @Query("MATCH (staff:Staff) WHERE id(staff)={0} WITH staff\n" +
             "MATCH (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) WHERE id(expertise) IN {1} WITH staff,skill\n" +
@@ -360,9 +361,9 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH(staff:Staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise) WHERE id(expertise)={1} AND id(staff) IN {2}\n" +
             "MATCH(employment)-[:" + IN_UNIT + "]-(organization:Unit) WHERE id(organization)={0}   \n" +
-            "AND employment.startDateMillis<={3} AND  (employment.endDateMillis IS NULL or employment.endDateMillis>={3})  \n" +
+            "AND employment.startDate<=DATE() AND  (employment.endDate IS NULL or employment.endDate>=DATE())  \n" +
             "RETURN id(employment) AS id , id(staff) AS staffId")
-    List<StaffEmploymentDetails> getStaffIdAndEmploymentId(Long unitId, Long expertiseId, List<Long> staffIds, Long currentMillis);
+    List<StaffEmploymentDetails> getStaffIdAndEmploymentId(Long unitId, Long expertiseId, List<Long> staffIds);
 
     @Query("MATCH(staff:Staff) WHERE id(staff) in {0} RETURN staff.email")
     List<String> getEmailsOfStaffByStaffIds(List<Long> staffIds);

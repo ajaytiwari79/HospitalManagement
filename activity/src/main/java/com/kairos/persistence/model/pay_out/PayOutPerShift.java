@@ -11,8 +11,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
-
 /*
 * Created By Pradeep singh rajawat
 *  Date-27/01/2018
@@ -40,6 +38,7 @@ public class PayOutPerShift extends MongoBaseEntity{
     //It Includes CTAcompensation of Function and Bonus Ruletemplate which accountType is equal to PAID_OUT
     private List<PayOutPerShiftCTADistribution> payOutPerShiftCTADistributions = new ArrayList<>();
     private long protectedDaysOffMinutes;
+    private transient float cost;
 
 
     public PayOutPerShift(BigInteger shiftId, Long employmentId, Long staffId, LocalDate date, Long unitId) {

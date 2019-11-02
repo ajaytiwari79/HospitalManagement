@@ -34,8 +34,6 @@ import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.wrapper.ShiftResponseDTO;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

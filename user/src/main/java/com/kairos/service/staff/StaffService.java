@@ -18,6 +18,7 @@ import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.Gender;
+import com.kairos.enums.SkillLevel;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.auth.User;
@@ -45,7 +46,6 @@ import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.region.ZipCode;
-import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -311,7 +311,7 @@ public class StaffService {
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
-        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), Skill.SkillLevel.ADVANCE);
+        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE);
         // Set if user is female and pregnant
         User user = userGraphRepository.getUserByStaffId(staffId);
         if (!user.getCprNumber().equals(staffPersonalDetail.getCprNumber())) {
@@ -894,7 +894,7 @@ public class StaffService {
             EmploymentQueryResult employment = employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().orElse(null);
             if (isNotNull(employment)) {
                 List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-                employment.getExpertise().setProtectedDaysOffSettings(protectedDaysOffSettings);
+                employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyPropertiesOfListByMapper(protectedDaysOffSettings,ProtectedDaysOffSetting.class));
                 employmentDetails = new StaffEmploymentDetails(employment.getId(), ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class), employment.getEndDate(), employment.getStartDate(), employment.getUnitId(), employment.getEmploymentSubType());
             }
         }
@@ -904,8 +904,7 @@ public class StaffService {
 
     public StaffEmploymentDetails getEmploymentOfStaff(long staffId, long unitId) {
         EmploymentQueryResult employment = employmentGraphRepository.getEmploymentOfStaff(staffId, unitId);
-        StaffEmploymentDetails employmentDetails = getStaffEmploymentDetails(unitId, employment);
-        return employmentDetails;
+        return getStaffEmploymentDetails(unitId, employment);
     }
 
     private StaffEmploymentDetails getStaffEmploymentDetails(long unitId, EmploymentQueryResult employment) {

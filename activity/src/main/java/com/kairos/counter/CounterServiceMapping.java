@@ -81,6 +81,13 @@ public class CounterServiceMapping {
         this.counters.put(CounterType.PLANNED_TIME_PERCENTAGE, plannedTimePercentageKPIService);
     }
 
+    @Inject
+    public void setActivityKPIService(ActivityKPICalculationService activityKPICalculationService) {
+        LOGGER.info("Enum mapping for absences per interval : "+this.counters);
+        this.counters.put(CounterType.ACTIVITY_KPI, activityKPICalculationService);
+    }
+
+
     public CounterService getService(CounterType counterType){
         return (CounterService) this.counters.get(counterType);
     }

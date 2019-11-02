@@ -41,7 +41,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.utils.counter.KPIUtils.*;
 

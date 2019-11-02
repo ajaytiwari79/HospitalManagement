@@ -1,5 +1,9 @@
 package com.kairos.dto.activity.shift;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +12,9 @@ import java.util.List;
  * @author pradeep
  * @date - 19/9/18
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class ShiftActivityResponseDTO {
 
     private BigInteger id;
@@ -18,22 +24,4 @@ public class ShiftActivityResponseDTO {
         this.id = id;
     }
 
-    public ShiftActivityResponseDTO() {
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public List<ShiftActivityDTO> getActivities() {
-        return activities;
-    }
-
-    public void setActivities(List<ShiftActivityDTO> activities) {
-        this.activities = activities;
-    }
 }

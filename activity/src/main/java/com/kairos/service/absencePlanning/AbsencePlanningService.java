@@ -89,7 +89,7 @@ public class AbsencePlanningService {
     private TaskService taskService;
     @Inject
     private ExceptionService exceptionService;
-     @Autowired
+    @Autowired
     private UserIntegrationService userIntegrationService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -363,20 +363,17 @@ public class AbsencePlanningService {
     }
 
 
-    public List<TaskDTO> updateTask(long unitId, List<TaskDTO> taskList) {
+    public List<TaskDTO> updateTask(List<TaskDTO> taskList) {
 
         try {
             OrganizationDTO organization = userIntegrationService.getOrganization();
-            // Organization organization = organizationGraphRepository.findOne(unitId, 2);
             for (TaskDTO taskData : taskList) {
 
                 Task task = taskMongoRepository.findOne(new BigInteger(taskData.getId()));
                 // create daily report of changes done;
                 createReport(task, taskData);
-
                 TaskType taskType1 = taskTypeMongoRepository.findOne(new BigInteger(task.getTaskTypeId().toString()));
-                TaskType taskType2 = taskTypeMongoRepository.findOne(new BigInteger(taskData.getTaskTypeId().toString()));
-
+                TaskType taskType2 = taskTypeMongoRepository.findOne(new BigInteger(taskData.getTaskTypeId()));
                 BigInteger taskTypeId = new BigInteger(taskData.getTaskTypeId());
                 // here we are checking if task's taskType is changed then we need to create new task with new taskType and old task remain in system with old taskType & inactive state.
                 if (!taskType1.getTaskTypeVisibility().equals(taskType2.getTaskTypeVisibility()) || !taskType1.getTaskTypeSchedule().equals(taskType2.getTaskTypeSchedule())) {
@@ -734,10 +731,6 @@ public class AbsencePlanningService {
         workScheduleMetaData.put("fmvtid", staff.getId());
         if (taskType.getTaskTypeVisibility() == "Absent") {
             Map<String, Object> response = userIntegrationService.getAbsenceTypeByName(taskType.getTitle());
-          /*  AbsenceTypes absenceTypes = absenceTypesService.getAbsenceTypeByName(taskType.getTitle());
-            logger.info("absenceTypes--ATVTID---> " + absenceTypes.getATVTID());
-            if (absenceTypes == null) workScheduleMetaData.put("type", 6);
-            else workScheduleMetaData.put("type", absenceTypes.getATVTID());*/
             workScheduleMetaData.putAll(response);
         } else {
             workScheduleMetaData.put("type", -1);

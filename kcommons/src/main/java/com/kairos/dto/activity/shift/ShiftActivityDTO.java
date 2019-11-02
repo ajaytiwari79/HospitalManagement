@@ -3,7 +3,6 @@ package com.kairos.dto.activity.shift;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.pay_out.PayOutCTADistributionDTO;
 import com.kairos.dto.activity.pay_out.PayOutPerShiftCTADistributionDTO;
 import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
@@ -56,7 +55,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private ReasonCodeDTO reasonCode;
     private Long allowedBreakDurationInMinute;
 
-    private double timeBankCtaBonusMinutes;
+    private int timeBankCtaBonusMinutes;
     private List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions;
     private Map<String, Object> location;// location where this activity needs to perform
@@ -77,7 +76,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private int payoutCtaBonusMinutes;
     private List<ShiftActivityDTO> childActivities = new ArrayList<>();
     private boolean breakNotHeld;
-
+    private Long employmentId;
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
@@ -170,9 +169,14 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         return asLocalDate(this.endDate);
     }
 
+    @JsonIgnore
+    public int getMinutes(){
+        return (int)getInterval().getMinutes();
+    }
+
     public void resetTimebankDetails(){
         this.plannedMinutesOfTimebank = 0;
-        this.timeBankCtaBonusMinutes = 0d;
+        this.timeBankCtaBonusMinutes = 0;
         this.timeBankCTADistributions = new ArrayList<>();
         this.getChildActivities().forEach(shiftActivityDTO -> shiftActivityDTO.resetTimebankDetails());
     }

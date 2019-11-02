@@ -1,10 +1,14 @@
 package com.kairos.dto.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class AvailableContacts {
     private String id;
 
@@ -12,33 +16,6 @@ public class AvailableContacts {
 
     private String version;
 
-    public String getId ()
-    {
-        return id;
-    }
-
-    public void setId (String id)
-    {
-        this.id = id;
-    }
-
-    public List<RelativeContacts> getRelativeContacts() {
-        return relativeContacts;
-    }
-
-    public void setRelativeContacts(List<RelativeContacts> relativeContacts) {
-        this.relativeContacts = relativeContacts;
-    }
-
-    public String getVersion ()
-    {
-        return version;
-    }
-
-    public void setVersion (String version)
-    {
-        this.version = version;
-    }
 
     @Override
     public String toString()

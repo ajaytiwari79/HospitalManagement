@@ -2,6 +2,9 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -14,6 +17,9 @@ import java.util.Optional;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class FunctionalPayment extends UserBaseEntity {
     @Relationship(type = APPLICABLE_FOR_EXPERTISE)
     private Expertise expertise;
@@ -33,11 +39,6 @@ public class FunctionalPayment extends UserBaseEntity {
     private BigDecimal percentageValue;
     private boolean oneTimeUpdatedAfterPublish;
 
-
-    public FunctionalPayment() {
-
-    }
-
     public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paymentUnit) {
         this.expertise = expertise;
         this.startDate = startDate;
@@ -47,84 +48,9 @@ public class FunctionalPayment extends UserBaseEntity {
         this.paymentUnit = paymentUnit;
     }
 
-    public Expertise getExpertise() {
-        return expertise;
-    }
-
-    public void setExpertise(Expertise expertise) {
-        this.expertise = expertise;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public LocalDate getStartDate() {
-
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
-    public PaidOutFrequencyEnum getPaymentUnit() {
-        return paymentUnit;
-    }
-
-    public void setPaymentUnit(PaidOutFrequencyEnum paymentUnit) {
-        this.paymentUnit = paymentUnit;
-    }
-
     public List<FunctionalPaymentMatrix> getFunctionalPaymentMatrices() {
         return Optional.ofNullable(functionalPaymentMatrices).orElse(new ArrayList<>());
     }
 
-    public void setFunctionalPaymentMatrices(List<FunctionalPaymentMatrix> functionalPaymentMatrices) {
-        this.functionalPaymentMatrices = functionalPaymentMatrices;
-    }
 
-    public FunctionalPayment getParentFunctionalPayment() {
-        return parentFunctionalPayment;
-    }
-
-    public void setParentFunctionalPayment(FunctionalPayment parentFunctionalPayment) {
-        this.parentFunctionalPayment = parentFunctionalPayment;
-    }
-
-    public boolean isHasDraftCopy() {
-        return hasDraftCopy;
-    }
-
-    public void setHasDraftCopy(boolean hasDraftCopy) {
-        this.hasDraftCopy = hasDraftCopy;
-    }
-
-    public BigDecimal getPercentageValue() {
-        return percentageValue;
-    }
-
-    public void setPercentageValue(BigDecimal percentageValue) {
-        this.percentageValue = percentageValue;
-    }
-
-    public boolean isOneTimeUpdatedAfterPublish() {
-        return oneTimeUpdatedAfterPublish;
-    }
-
-    public void setOneTimeUpdatedAfterPublish(boolean oneTimeUpdatedAfterPublish) {
-        this.oneTimeUpdatedAfterPublish = oneTimeUpdatedAfterPublish;
-    }
 }

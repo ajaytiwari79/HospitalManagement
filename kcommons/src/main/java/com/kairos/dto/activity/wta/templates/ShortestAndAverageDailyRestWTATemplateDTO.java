@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.WTATemplateType;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -17,6 +19,8 @@ import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     @Positive(message = "message.ruleTemplate.interval.notNull")
@@ -26,58 +30,6 @@ public class ShortestAndAverageDailyRestWTATemplateDTO extends WTABaseRuleTempla
     private Set<BigInteger> plannedTimeIds = new HashSet<>();
     private Set<BigInteger> timeTypeIds = new HashSet<>();
     private float recommendedValue;
-
-
-    public Set<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
-
-    public Set<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(long intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
 
     public ShortestAndAverageDailyRestWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.SHORTEST_AND_AVERAGE_DAILY_REST;

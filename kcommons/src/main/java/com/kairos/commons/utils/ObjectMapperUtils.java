@@ -8,7 +8,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.kairos.dto.kpermissions.KPermissionModelFieldDTO;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 
@@ -55,7 +54,7 @@ public class ObjectMapperUtils {
     }
 */
 
-    public static <T extends Object,E extends Object> List<E> copyPropertiesOfListByMapper(Collection<T> objects, Class className) {
+    public static <T,E> List<E> copyPropertiesOfListByMapper(Collection<T> objects, Class className) {
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
                     List.class, className));

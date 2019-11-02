@@ -29,12 +29,14 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.filter.FilterDetailDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.organization.skill.OrganizationClientWrapper;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.dto.user.skill.Skill;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.OrganizationStaffWrapper;
 import com.kairos.dto.user.staff.StaffDTO;
@@ -42,6 +44,7 @@ import com.kairos.dto.user.staff.employment.StaffEmploymentQueryResult;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
@@ -842,6 +845,22 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/sick_settings/default", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<BigInteger>>>() {});
 
     }
+
+    public List<StaffDTO> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds) {
+        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {});
+    }
+
+    public List<EmploymentWithCtaDetailsDTO> getAllEmploymentByUnitId(Long unitId) {
+        List<EmploymentWithCtaDetailsDTO> employmentDetails = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_ALL_EMPLOYMENT_BY_UNIT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EmploymentWithCtaDetailsDTO>>>() {
+        });
+        return employmentDetails;
+    }
+
+    public List<TeamDTO> getTeamByUnitId(Long unitId) {
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, TEAMS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TeamDTO>>>() {
+        });
+    }
+
 }
 
 

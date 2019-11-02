@@ -1,24 +1,17 @@
 package com.kairos.dto.activity.wta;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class WorkTimeAgreementBalance {
 
     private List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances;
-
-
-    public WorkTimeAgreementBalance() {
-    }
-
-    public WorkTimeAgreementBalance(List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances) {
-        this.workTimeAgreementRuleTemplateBalances = workTimeAgreementRuleTemplateBalances;
-    }
-
-    public List<WorkTimeAgreementRuleTemplateBalancesDTO> getWorkTimeAgreementRuleTemplateBalances() {
-        return workTimeAgreementRuleTemplateBalances;
-    }
-
-    public void setWorkTimeAgreementRuleTemplateBalances(List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances) {
-        this.workTimeAgreementRuleTemplateBalances = workTimeAgreementRuleTemplateBalances;
-    }
 }

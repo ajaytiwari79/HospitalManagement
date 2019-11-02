@@ -5,8 +5,6 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import org.joda.time.DateTime;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 

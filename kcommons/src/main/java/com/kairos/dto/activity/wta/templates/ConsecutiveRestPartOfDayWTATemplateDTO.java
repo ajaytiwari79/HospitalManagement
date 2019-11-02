@@ -6,6 +6,8 @@ import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     protected List<PartOfDay> partOfDays = new ArrayList<>();
@@ -28,58 +32,6 @@ public class ConsecutiveRestPartOfDayWTATemplateDTO extends WTABaseRuleTemplateD
     private Set<BigInteger> timeTypeIds = new HashSet<>();
     protected float recommendedValue;
     private MinMaxSetting minMaxSetting;
-
-
-    public MinMaxSetting getMinMaxSetting() {
-        return minMaxSetting;
-    }
-
-    public void setMinMaxSetting(MinMaxSetting minMaxSetting) {
-        this.minMaxSetting = minMaxSetting;
-    }
-
-
-    public Set<BigInteger> getPlannedTimeIds() {
-        return plannedTimeIds;
-    }
-
-    public void setPlannedTimeIds(Set<BigInteger> plannedTimeIds) {
-        this.plannedTimeIds = plannedTimeIds;
-    }
-
-    public Set<BigInteger> getTimeTypeIds() {
-        return timeTypeIds;
-    }
-
-    public void setTimeTypeIds(Set<BigInteger> timeTypeIds) {
-        this.timeTypeIds = timeTypeIds;
-    }
-
-    public List<PartOfDay> getPartOfDays() {
-        return partOfDays;
-    }
-
-    public void setPartOfDays(List<PartOfDay> partOfDays) {
-        this.partOfDays = partOfDays;
-    }
-
-    public float getRecommendedValue() {
-        return recommendedValue;
-    }
-
-    public void setRecommendedValue(float recommendedValue) {
-        this.recommendedValue = recommendedValue;
-    }
-
-
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
-
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
 
     public ConsecutiveRestPartOfDayWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.REST_IN_CONSECUTIVE_DAYS_AND_NIGHTS;

@@ -1,12 +1,12 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
+import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.ViolatedRulesDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -45,7 +45,7 @@ public class DaysOffAfterASeriesWTATemplateTest {
     public void init(){
         daysOffAfterASeriesWTATemplate = new DaysOffAfterASeriesWTATemplate("Night shifts in sequence", false, "Night shifts in sequence", 1, WEEKS, 3);
         daysOffAfterASeriesWTATemplate.setPhaseTemplateValues(newArrayList(new PhaseTemplateValue(new BigInteger("15"), "DRAFT", (short) 2, (short) 5, true, false, false,4)));
-        expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(23,7),120, DurationType.WEEKS,1,2760, CalculationUnit.HOURS,180l,156l);
+        expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(23,7),120, DurationType.WEEKS,1,2760, DisplayUnit.HOURS,180l,156l);
         shiftWithActivityDTOS = new ArrayList();
         shiftWithActivityDTOS.add(new ShiftWithActivityDTO(asDate(LocalDate.now().minusDays(4), LocalTime.of(15,0)),asDate(LocalDate.now().minusDays(3), LocalTime.of(3,0)),newArrayList(new ShiftActivityDTO(asDate(LocalDate.now().minusDays(4), LocalTime.of(15,0)),asDate(LocalDate.now().minusDays(3), LocalTime.of(3,0))))));
         shiftWithActivityDTOS.add(new ShiftWithActivityDTO(asDate(LocalDate.now().minusDays(3), LocalTime.of(18,0)),asDate(LocalDate.now().minusDays(3), LocalTime.of(23,0)),newArrayList(new ShiftActivityDTO(asDate(LocalDate.now().minusDays(3), LocalTime.of(18,0)),asDate(LocalDate.now().minusDays(3), LocalTime.of(23,0))))));

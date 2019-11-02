@@ -3,6 +3,9 @@ package com.kairos.dto.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -11,14 +14,13 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class OrganizationCommonDTO {
     private String name;
     private Long id;
     List<OrganizationCommonDTO> children;
-
-    public OrganizationCommonDTO() {
-
-    }
 
     public OrganizationCommonDTO(Long id,String name ) {
         this.id = id;
@@ -26,29 +28,6 @@ public class OrganizationCommonDTO {
 
     }
 
-    public List<OrganizationCommonDTO> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<OrganizationCommonDTO> children) {
-        this.children = children;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
 
 }

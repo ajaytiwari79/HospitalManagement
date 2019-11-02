@@ -6,7 +6,6 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -50,7 +49,7 @@ public class EmploymentQueryResult {
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
     private long totalShifts;
-    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+
 
 
     /**

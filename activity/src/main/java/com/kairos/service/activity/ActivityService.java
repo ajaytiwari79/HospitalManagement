@@ -311,7 +311,7 @@ public class ActivityService {
         activityMongoRepository.save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
+        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().isOnCallTimePresent());
         generalActivityTabWithTagDTO.setNegativeDayBalancePresent(activity.getBalanceSettingsActivityTab().getNegativeDayBalancePresent());
         generalActivityTabWithTagDTO.setTimeType(activity.getBalanceSettingsActivityTab().getTimeType());
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
@@ -336,7 +336,7 @@ public class ActivityService {
         }
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
+        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().isOnCallTimePresent());
         generalActivityTabWithTagDTO.setNegativeDayBalancePresent(activity.getBalanceSettingsActivityTab().getNegativeDayBalancePresent());
         generalActivityTabWithTagDTO.setTimeType(activity.getBalanceSettingsActivityTab().getTimeType());
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
@@ -380,6 +380,7 @@ public class ActivityService {
             activity.setSkillActivityTab(timeType.getSkillActivityTab());
             activity.setRegions(timeType.getRegions());
             activity.setLevels(timeType.getLevels());
+            activity.setActivityPriorityId(timeType.getActivityPriorityId());
         }
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);

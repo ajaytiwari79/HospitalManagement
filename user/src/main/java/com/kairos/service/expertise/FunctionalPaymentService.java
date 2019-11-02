@@ -8,7 +8,7 @@ import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.country.experties.SeniorityLevelFunctionDTO;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.user.expertise.*;
-import com.kairos.persistence.model.user.expertise.Response.*;
+import com.kairos.persistence.model.user.expertise.response.*;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.expertise.*;
@@ -145,7 +145,7 @@ public class FunctionalPaymentService {
 
             currentSRLevelFunction.getFunctions().forEach(currentFunction -> {
                 Function function = functions.stream().
-                        filter(function1 -> function1.getId().equals(currentFunction.getId())).findAny().get();
+                        filter(function1 -> function1.getId().equals(currentFunction.getFunctionId())).findAny().get();
                 SeniorityLevelFunctionsRelationship seniorityLevelFunctionsRelationship = new SeniorityLevelFunctionsRelationship(function, seniorityLevelFunction, currentFunction.getAmount(), currentFunction.isAmountEditableAtUnit());
                 seniorityLevelFunctionsRelationships.add(seniorityLevelFunctionsRelationship);
             });
