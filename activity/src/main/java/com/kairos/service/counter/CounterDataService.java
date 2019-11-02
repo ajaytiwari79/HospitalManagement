@@ -269,6 +269,9 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(CALCULATION_UNIT)) {
             getCalculationUnitData(criteriaList, defaultKpiDataDTO);
         }
+        if (kpi.getFilterTypes().contains(REASON_CODE)) {
+            getReasonCodeData(criteriaList, defaultKpiDataDTO);
+        }
         if (kpi.getFilterTypes().contains(TEAM) && isCollectionNotEmpty(unitIds)) {
             getTeamUnitData(criteriaList,unitIds.get(0));
         }
@@ -352,6 +355,12 @@ public class CounterDataService extends MongoBaseService {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(displayUnit.toString(), displayUnit.getDisplayValue()));
         }
         criteriaList.add(new FilterCriteria(CALCULATION_UNIT.value, CALCULATION_UNIT, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getReasonCodeData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        defaultKpiDataDTO.getReasonCodeDTOS().forEach(reasonCodeDTO ->  kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(reasonCodeDTO.getId(), reasonCodeDTO.getName())));
+        criteriaList.add(new FilterCriteria(REASON_CODE.value, REASON_CODE, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getCalculationBasedOnData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {

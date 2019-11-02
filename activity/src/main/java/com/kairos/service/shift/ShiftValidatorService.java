@@ -251,7 +251,7 @@ public class ShiftValidatorService {
             for (ShiftActivityDTO childActivity : shiftActivity.getChildActivities()) {
                 Activity activity = activityWrapperMap.get(childActivity.getActivityId()).getActivity();
                 ActivityRuleViolation activityRuleViolation;
-                if (activity.getRulesActivityTab().isReasonCodeRequired() && activity.getRulesActivityTab().getReasonCodeRequiredState().
+                if (activity.getRulesActivityTab().getReasonCodeRequiredState().
                         equals(ReasonCodeRequiredState.MANDATORY) && !Optional.ofNullable(childActivity.getAbsenceReasonCodeId()).isPresent()) {
 
                     activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().orElse(null);
