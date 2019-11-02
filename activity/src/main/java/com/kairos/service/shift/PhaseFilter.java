@@ -24,7 +24,7 @@ public class PhaseFilter implements ShiftFilter {
 
     @Override
     public <T extends ShiftDTO> List<T> meetCriteria(List<T> shiftDTOS) {
-        boolean validFilter = filterCriteriaMap.containsKey(PHASE) && isCollectionNotEmpty(filterCriteriaMap.get(ACTIVITY_STATUS));
+        boolean validFilter = filterCriteriaMap.containsKey(PHASE) && isCollectionNotEmpty(filterCriteriaMap.get(PHASE));
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
             Set<BigInteger> phaseIds = filterCriteriaMap.get(PHASE).stream().map(s -> new BigInteger(s)).collect(Collectors.toSet());
