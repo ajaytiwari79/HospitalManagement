@@ -11,17 +11,7 @@ import java.util.stream.Stream;
  * Created at 13/6/19
  **/
 public enum TodoStatus {
-    PENDING("Pending"),VIEWED("Viewed"),DISAPPROVE("Disapproved"),APPROVE("Approved"),REQUESTED("Requested");
-
-    private String value;
-    TodoStatus(String value) {
-        this.value = value;
-    }
-
-    @JsonValue
-    public String toValue() {
-        return value;
-    }
+    PENDING,VIEWED,DISAPPROVE,APPROVE,REQUESTED;
 
     public static List<TodoStatus> getAllStatusExceptViewed() {
         return Stream.of(TodoStatus.values()).filter(todoStatus ->(!(todoStatus.equals(VIEWED)))).collect(Collectors.toList());
