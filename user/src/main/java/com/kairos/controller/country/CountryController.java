@@ -323,12 +323,6 @@ public class CountryController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.publishExpertise(expertiseId));
     }
 
-    @ApiOperation(value = "Delete expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/seniority_level/{seniorityLevelId}", method = RequestMethod.DELETE)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> removeSeniorityLevelFromExpertise(@PathVariable Long expertiseId, @PathVariable Long seniorityLevelId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.removeSeniorityLevelFromExpertise(expertiseId, seniorityLevelId));
-    }
 
     @ApiOperation(value = "Add/remove expertise skill")
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/skill", method = RequestMethod.POST)

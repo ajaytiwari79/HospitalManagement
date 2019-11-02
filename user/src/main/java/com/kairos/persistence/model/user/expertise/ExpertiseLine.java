@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import com.kairos.persistence.model.organization.services.OrganizationService;
 import lombok.Getter;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_SENIORITY_LEVEL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.SUPPORTS_SERVICES;
 
 @NodeEntity
 @Getter
@@ -21,6 +23,8 @@ public class ExpertiseLine extends UserBaseEntity {
 
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private List<SeniorityLevel> seniorityLevel;
+    @Relationship(type = SUPPORTS_SERVICES)
+    private List<OrganizationService> organizationServices;
     private BreakPaymentSetting breakPaymentSetting;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private int numberOfWorkingDaysInWeek; // 5 or 7
@@ -45,6 +49,8 @@ public class ExpertiseLine extends UserBaseEntity {
         private BreakPaymentSetting breakPaymentSetting;
         private int fullTimeWeeklyMinutes; // This is equals to 37 hours
         private Integer numberOfWorkingDaysInWeek; // 5 or 7
+        private List<OrganizationService> organizationServices;
+        private List<SeniorityLevel> seniorityLevel;
 
 
         public ExpertiseLineBuilder setStartDate(LocalDate startDate) {
@@ -62,12 +68,21 @@ public class ExpertiseLine extends UserBaseEntity {
             return this;
         }
 
-        public ExpertiseLineBuilder setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
-            this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+        public ExpertiseLineBuilder setSeniorityLevel(List<SeniorityLevel> seniorityLevel) {
+            this.seniorityLevel = seniorityLevel;
             return this;
         }
         public ExpertiseLineBuilder setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
             this.numberOfWorkingDaysInWeek = numberOfWorkingDaysInWeek;
+            return this;
+        }
+
+        public ExpertiseLineBuilder setFullTimeWeeklyMinutes(int fullTimeWeeklyMinutes) {
+            this.fullTimeWeeklyMinutes = fullTimeWeeklyMinutes;
+            return this;
+        }
+        public ExpertiseLineBuilder setOrganizationServices(List<OrganizationService> organizationServices) {
+            this.organizationServices = organizationServices;
             return this;
         }
 

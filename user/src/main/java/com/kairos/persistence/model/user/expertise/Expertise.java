@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Level;
@@ -18,6 +19,8 @@ import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
+import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDate;
 import static com.kairos.constants.UserMessagesConstants.ERROR_EXPERTISE_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
@@ -63,9 +66,6 @@ public class Expertise extends UserBaseEntity {
     @Relationship(type = IN_ORGANIZATION_LEVEL)
     private Level organizationLevel;
 
-    @Relationship(type = SUPPORTS_SERVICES)
-    private List<OrganizationService> organizationServices;
-
     @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
 
@@ -74,7 +74,6 @@ public class Expertise extends UserBaseEntity {
         this.country = country;
     }
 
-,
     public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country, boolean published, List<ExpertiseLine> expertiseLines) {
         this.name = name;
         this.description = description;
@@ -112,6 +111,18 @@ public class Expertise extends UserBaseEntity {
 
     public List<CareDays> getChildCareDays() {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
+    }
+
+    public ExpertiseLine getCurrentlyActiveLine(){
+        ExpertiseLine currentExpertiseLine=null;
+        for (ExpertiseLine expertiseLine:this.getExpertiseLines()) {
+            if(startDateIsEqualsOrBeforeEndDate(expertiseLine.getStartDate(),getCurrentLocalDate()) &&
+                    (expertiseLine.getEndDate()==null || startDateIsEqualsOrBeforeEndDate(getCurrentLocalDate(),expertiseLine.getEndDate()))){
+                currentExpertiseLine=expertiseLine;
+                break;
+            }
+        }
+        return currentExpertiseLine;
     }
 
 

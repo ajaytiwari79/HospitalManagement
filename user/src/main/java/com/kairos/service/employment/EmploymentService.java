@@ -905,13 +905,14 @@ public class EmploymentService {
 
     public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId, Expertise currentExpertise) {
         StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, currentExpertise.getId());
-        if (!Optional.ofNullable(staffSelectedExpertise).isPresent() || !Optional.ofNullable(currentExpertise).isPresent()) {
+        if (!Optional.ofNullable(staffSelectedExpertise).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EXPERTISE_NOTASSIGNED);
         }
         Integer experienceInMonth = (int) ChronoUnit.MONTHS.between(DateUtils.asLocalDate(staffSelectedExpertise.getExpertiseStartDate()), LocalDate.now());
         LOGGER.info("user has current experience in months :{}", experienceInMonth);
         SeniorityLevel appliedSeniorityLevel = null;
-        for (SeniorityLevel seniorityLevel : currentExpertise.getSeniorityLevel()) {
+        ExpertiseLine expertiseLine=currentExpertise.getCurrentlyActiveLine();
+        for (SeniorityLevel seniorityLevel : expertiseLine.getSeniorityLevel()) {
             if (seniorityLevel.getTo() == null) {
                 // more than  is set if
                 if (experienceInMonth >= seniorityLevel.getFrom() * 12) {

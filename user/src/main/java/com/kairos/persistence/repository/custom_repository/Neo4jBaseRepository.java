@@ -11,6 +11,7 @@ public interface Neo4jBaseRepository<T , ID extends Serializable> extends Neo4jR
 	 T findOne(ID id);
 	 T findOne(ID id,int depth);
 	 List<T> findAllById(List<ID> ids);
+	 List<T> findAllById(List<ID> ids,int depth);
 	 T findByIdAndDeletedFalse(ID id);
 
 }
