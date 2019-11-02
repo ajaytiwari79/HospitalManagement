@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise;
 
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import lombok.Getter;
@@ -57,5 +58,9 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
     @Override
     public int compareTo(SeniorityLevel seniorityLevel) {
         return this.from - seniorityLevel.from;
+    }
+
+    public boolean isSeniorityLevelChanged(SeniorityLevel seniorityLevel){
+        if(!ObjectUtils.isEquals(this.from,seniorityLevel.from) || )
     }
 }

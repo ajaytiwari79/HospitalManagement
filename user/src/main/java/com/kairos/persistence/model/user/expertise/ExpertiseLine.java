@@ -93,5 +93,19 @@ public class ExpertiseLine extends UserBaseEntity {
         }
     }
 
+    public boolean seniorityLevelChanged(ExpertiseLine expertiseLine){
+        if(this.getSeniorityLevel().size()!=expertiseLine.getSeniorityLevel().size()){
+            return true;
+        }
+        for (int i = 0; i < expertiseLine.getSeniorityLevel().size(); i++) {
+            SeniorityLevel thisSeniorityLevel = this.getSeniorityLevel().get(i);
+            SeniorityLevel seniorityLevel = expertiseLine.getSeniorityLevel().get(i);
+            if (thisSeniorityLevel.isSeniorityLevelChanged(seniorityLevel)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

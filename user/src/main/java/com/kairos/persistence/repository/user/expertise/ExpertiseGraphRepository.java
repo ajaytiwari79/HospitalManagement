@@ -80,19 +80,15 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<ExpertiseQueryResult> getAllExpertise(long countryId, boolean[] published);
 
     @Query("MATCH(expertise:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) IN {0} " +
-            "OPTIONAL MATCH(exl)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)\n" +
-            "OPTIONAL MATCH(exl)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)\n" +
             "OPTIONAL MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService)\n" +
-            "OPTIONAL MATCH(exl)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) " +
-            "with expertise,exl,union,level, Collect(orgService) as services,sector \n" +
-            "OPTIONAL MATCH(exl)-[slRel:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)" +
-            "OPTIONAL MATCH(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable) WHERE id(payGradeData)=slRel.payGradeId" +
-            " with expertise,exl,union,level,services,sector,Collect(payTable) as payTables, CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage," +
+            "with expertise,exl, Collect(orgService) as services \n" +
+            "OPTIONAL MATCH(exl)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:"+HAS_BASE_PAY_GRADE+"]->(payGradeData:PayGrade)<-[:" + HAS_PAY_GRADE + "]-(payTable:PayTable)" +
+            " with expertise,exl,services,Collect(payTable) as payTables, CASE when seniorityLevel IS NULL THEN [] ELSE collect({id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage," +
             "   freeChoicePercentage:seniorityLevel.freeChoicePercentage,freeChoiceToPension:seniorityLevel.freeChoiceToPension, " +
             "   to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels "+
             "RETURN id(exl) as id ,id(expertise) as expertiseId, exl.startDate as startDate , " +
             "exl.endDate as endDate ,exl.breakPaymentSetting as breakPaymentSetting,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek, " +
-            "services as organizationServices,level as organizationLevel,payTables[0] as payTable,union as union,seniorityLevels,sector ORDER BY exl.startDate")
+            "services as organizationServices,payTables[0] as payTable,seniorityLevels ORDER BY exl.startDate")
     List<ExpertiseLineQueryResult> findAllExpertiseLines(List<Long> expertiseIds);
 
     @Query("MATCH (expertise:Expertise{deleted:false}) WHERE id(expertise) IN {0} \n" +
