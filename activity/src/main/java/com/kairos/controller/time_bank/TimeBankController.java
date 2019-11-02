@@ -2,14 +2,11 @@ package com.kairos.controller.time_bank;
 
 
 import com.kairos.constants.ApiConstants;
-import com.kairos.controller.task.TaskController;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -25,15 +22,14 @@ import java.util.Map;
 @RequestMapping(ApiConstants.TIMEBANK_URL)
 public class TimeBankController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     private TimeBankService timeBankService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
 
-    @GetMapping(value = "/employment/{employmentId}/")
-    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@RequestParam(required = false) Long employmentId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    @GetMapping(value = "/employment")
+    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@RequestParam(required = false) Long employmentId, @RequestParam(value = "query",required = false) String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getAdvanceViewTimeBank
                 (unitId,employmentId,query,startDate,endDate));
     }

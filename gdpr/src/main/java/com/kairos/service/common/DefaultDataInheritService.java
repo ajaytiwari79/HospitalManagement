@@ -51,7 +51,6 @@ import com.kairos.service.data_subject_management.DataCategoryService;
 import com.kairos.service.data_subject_management.DataSubjectService;
 import com.kairos.service.master_data.asset_management.AssetTypeService;
 import com.kairos.service.questionnaire_template.QuestionnaireTemplateService;
-import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

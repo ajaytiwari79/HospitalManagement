@@ -2,7 +2,6 @@ package com.kairos.dto.activity.wta.version;
 
 import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -6,7 +6,6 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationship;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationshipQueryResult;

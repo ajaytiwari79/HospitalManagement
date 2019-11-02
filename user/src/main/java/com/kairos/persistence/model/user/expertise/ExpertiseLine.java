@@ -13,7 +13,6 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 

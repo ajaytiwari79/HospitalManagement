@@ -5,7 +5,6 @@ import com.kairos.dto.activity.time_bank.CTARuleTemplateCalulatedTimeBankDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.joda.time.DateTimeZone;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
