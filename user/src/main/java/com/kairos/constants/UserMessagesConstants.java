@@ -339,6 +339,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_EXTERNALID_NOTFOUND = "message.externalid.notfound";
     public static final String MESSAGE_STAFF_INVALID_UNIT = "message.staff.invalid.unit";
     public static final String MESSAGE_STAFF_UNIT_PERMISSION_NOTFOUND = "message.staff.unit.permission.notfound";
+    public static final String MESSAGE_STAFF_UNIT_EMPLOYMENT_NOTFOUND = "message.staff.unit.employment.notfound";
     public static final String MESSAGE_STAFF_NOTFOUND = "message.staff.notfound";
     public static final String MESSAGE_STAFF_USER_ID_NOTFOUND = "message.staff.user.id.notfound";
     public static final String MESSAGE_STAFF_USER_PASSCODE_NOTMATCH = "message.staff.user.password.notmatch";
