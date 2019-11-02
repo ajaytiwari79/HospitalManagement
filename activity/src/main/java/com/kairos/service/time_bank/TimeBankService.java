@@ -65,8 +65,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_CTA_NOTFOUND;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFFEMPLOYMENT_NOTFOUND;
-import static com.kairos.constants.AppConstants.ONE_DAY_MINUTES;
-import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -278,7 +277,7 @@ public class TimeBankService{
             intervals = timeBankCalculationService.getAllIntervalsBetweenDates(startDate, endDate, query);
         }else {
             endDate = asDate(planningPeriod.getEndDate());
-            Interval todayInterval = new Interval(startDate.getTime(),getEndOfDay(endDate).getTime());
+            Interval todayInterval = new Interval(startDate.getTime(),query.equals(WEEK) ? asDate(asZoneDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY))).getTime() : getEndOfDay(endDate).getTime());
             Interval planningPeriodInterval = new Interval(asDate(planningPeriod.getStartDate()).getTime(),asDate(planningPeriod.getEndDate()).getTime());
             Interval yearTillDate = new Interval(asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())).getTime(),asDate(planningPeriod.getStartDate().with(TemporalAdjusters.lastDayOfYear()).plusDays(1)).getTime());
             intervals = newArrayList(todayInterval,planningPeriodInterval,yearTillDate);
@@ -315,7 +314,7 @@ public class TimeBankService{
         ZonedDateTime endZonedDate = null;
         ZonedDateTime startZonedDate = null;
         if(StringUtils.isNotEmpty(query)) {
-            if(query.equals(AppConstants.WEEK)) {
+            if(query.equals(WEEK)) {
                 startZonedDate = ZonedDateTime.now().with(ChronoField.ALIGNED_WEEK_OF_YEAR, value).with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)).truncatedTo(ChronoUnit.DAYS);
                 endZonedDate = startZonedDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
 

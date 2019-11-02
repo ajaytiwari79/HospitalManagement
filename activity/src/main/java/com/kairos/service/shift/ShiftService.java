@@ -829,32 +829,37 @@ public class ShiftService extends MongoBaseService {
 
     private void validateStaffingLevel(Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap, Phase phase, Shift oldStateShift) {
 
-            for (int i = 0; i < oldStateShift.getActivities().size(); i++) {
-                try {
-                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i),true);
-                        shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, staffAdditionalInfoDTO, shift.getActivities().get(i),true);
-                        int rankOfOld=activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
-                        int rankOfNew=activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
-                        long durationMinutesOfOld=oldStateShift.getActivities().get(i).getInterval().getMinutes();
-                        long durationMinutesOfNew=shift.getActivities().get(i).getInterval().getMinutes();
-                        boolean allowedForReplace=true;
-                        if(BALANCED.equals(staffingLevelForNew) && UNDERSTAFFING.equals(staffingLevelForOld) ){
-                            if(!(rankOfNew > rankOfOld || (rankOfNew==rankOfOld && durationMinutesOfNew > durationMinutesOfOld))){
-                                allowedForReplace=false;
-                            }
+        for (int i = 0; i < oldStateShift.getActivities().size(); i++) {
+            try {
+                if (activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor().equals(activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().getPriorityFor())) {
+                    shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i), true);
+                    shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, staffAdditionalInfoDTO, shift.getActivities().get(i), true);
+                    int rankOfOld = activityWrapperMap.get(oldStateShift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
+                    int rankOfNew = activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivityPriority().getSequence();
+                    long durationMinutesOfOld = oldStateShift.getActivities().get(i).getInterval().getMinutes();
+                    long durationMinutesOfNew = shift.getActivities().get(i).getInterval().getMinutes();
+                    boolean allowedForReplace = true;
+                    if (BALANCED.equals(staffingLevelForNew) && UNDERSTAFFING.equals(staffingLevelForOld)) {
+                        if (!(rankOfNew > rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
+                            allowedForReplace = false;
                         }
-                        if(BALANCED.equals(staffingLevelForOld) && OVERSTAFFING.equals(staffingLevelForNew)){
-                            if(!(rankOfNew > rankOfOld || (rankOfNew==rankOfOld && durationMinutesOfNew > durationMinutesOfOld))){
-                                allowedForReplace=false;
-                            }
+                    }
+                    if (BALANCED.equals(staffingLevelForOld) && OVERSTAFFING.equals(staffingLevelForNew)) {
+                        if (!(rankOfNew > rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
+                            allowedForReplace = false;
                         }
+                    }
 
-                        if(!allowedForReplace){
-                            exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelForNew);
-                        }
-                }catch (IndexOutOfBoundsException e){
-                    //Intentionally left blank
+                    if (!allowedForReplace) {
+                        exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelForNew);
+                    }
+                } else {
+                    shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i), false);
+                    shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, staffAdditionalInfoDTO, shift.getActivities().get(i), false);
                 }
+            } catch (IndexOutOfBoundsException e) {
+                //Intentionally left blank
+            }
         }
     }
 
