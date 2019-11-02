@@ -36,6 +36,10 @@ public class KPIUtils {
         return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toList()) : new ArrayList<>();
     }
 
+    public static Set<Long> getLongValueSet(List<Object> objects) {
+        return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toSet()) : new HashSet<>();
+    }
+
     public static List<LocalDate> getLocalDate(List<Object> objects) {
         return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> (o instanceof LocalDate) ? (LocalDate) o : DateUtils.asLocalDate((String) o)).collect(Collectors.toList()) : Arrays.asList(DateUtils.getStartDateOfWeek(), DateUtils.getEndDateOfWeek());
     }

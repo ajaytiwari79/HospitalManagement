@@ -416,7 +416,7 @@ public class ActivityKPICalculationService implements CounterService {
             Set<BigInteger> timeTypeIds = filterBasedCriteria.containsKey(TIME_TYPE) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(TIME_TYPE)) : new HashSet<>();
             plannedTimeIds = filterBasedCriteria.containsKey(PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(PLANNED_TIME_TYPE)) : new HashSet<>();
             Set<BigInteger> activityIds = filterBasedCriteria.containsKey(ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ACTIVITY_IDS)) : new HashSet<>();
-            Set<BigInteger> reasonCodeIds = filterBasedCriteria.containsKey(REASON_CODE) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(REASON_CODE)) : new HashSet<>();
+            Set<Long> reasonCodeIds = filterBasedCriteria.containsKey(REASON_CODE) ? KPIUtils.getLongValueSet(filterBasedCriteria.get(REASON_CODE)) : new HashSet<>();
             if(filterBasedCriteria.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterBasedCriteria.get(ABSENCE_ACTIVITY))){
                 activityIds.addAll(KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ABSENCE_ACTIVITY)));
             }
@@ -429,7 +429,7 @@ public class ActivityKPICalculationService implements CounterService {
             return this;
         }
 
-        private boolean isShiftActivityValid(Map<FilterType, List> filterBasedCriteria, ShiftActivityDTO shiftActivityDTO, Set<BigInteger> timeTypeIds, Set<BigInteger> activityIds,Set<BigInteger> reasonCodeIds, Set<BigInteger> plannedTimeIds){
+        private boolean isShiftActivityValid(Map<FilterType, List> filterBasedCriteria, ShiftActivityDTO shiftActivityDTO, Set<BigInteger> timeTypeIds, Set<BigInteger> activityIds,Set<Long> reasonCodeIds, Set<BigInteger> plannedTimeIds){
             boolean validTimeType = isCollectionEmpty(timeTypeIds) || timeTypeIds.contains(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId());
             boolean validActivity = isCollectionEmpty(activityIds) || activityIds.contains(shiftActivityDTO.getActivityId());
             boolean validReasonCode = isCollectionEmpty(reasonCodeIds) || reasonCodeIds.contains(shiftActivityDTO.getAbsenceReasonCodeId());
