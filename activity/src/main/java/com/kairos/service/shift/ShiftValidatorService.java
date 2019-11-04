@@ -248,25 +248,30 @@ public class ShiftValidatorService {
 
     private void validateAbsenceReasonCodeRule(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shift, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
         for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
+            validateActivityReasonCode(activityWrapperMap, ruleTemplateSpecificInfo, shiftActivity);
             for (ShiftActivityDTO childActivity : shiftActivity.getChildActivities()) {
-                Activity activity = activityWrapperMap.get(childActivity.getActivityId()).getActivity();
-                ActivityRuleViolation activityRuleViolation;
-                if (activity.getRulesActivityTab().getReasonCodeRequiredState().
-                        equals(ReasonCodeRequiredState.MANDATORY) && !Optional.ofNullable(childActivity.getAbsenceReasonCodeId()).isPresent()) {
-
-                    activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().orElse(null);
-                    if (activityRuleViolation == null) {
-                        activityRuleViolation = new ActivityRuleViolation(activity.getId(), activity.getName(), 0, singletonList(exceptionService.
-                                convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId())));
-                        ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
-                    } else {
-                        ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().get().getErrorMessages().add(exceptionService.
-                                convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId()));
-                    }
-                }
+                validateActivityReasonCode(activityWrapperMap, ruleTemplateSpecificInfo, childActivity);
             }
         }
 
+    }
+
+    private void validateActivityReasonCode(Map<BigInteger, ActivityWrapper> activityWrapperMap, RuleTemplateSpecificInfo ruleTemplateSpecificInfo, ShiftActivityDTO childActivity) {
+        Activity activity = activityWrapperMap.get(childActivity.getActivityId()).getActivity();
+        ActivityRuleViolation activityRuleViolation;
+        if (activity.getRulesActivityTab().getReasonCodeRequiredState().
+                equals(ReasonCodeRequiredState.MANDATORY) && !Optional.ofNullable(childActivity.getAbsenceReasonCodeId()).isPresent()) {
+
+            activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().orElse(null);
+            if (activityRuleViolation == null) {
+                activityRuleViolation = new ActivityRuleViolation(activity.getId(), activity.getName(), 0, singletonList(exceptionService.
+                        convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId())));
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+            } else {
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().get().getErrorMessages().add(exceptionService.
+                        convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId()));
+            }
+        }
     }
 
     public void validateShiftViolatedRules(Shift shift, boolean shiftOverlappedWithNonWorkingType, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO, ShiftActionType actionType) {
