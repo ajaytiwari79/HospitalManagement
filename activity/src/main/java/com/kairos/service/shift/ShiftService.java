@@ -841,6 +841,9 @@ public class ShiftService extends MongoBaseService {
                     long durationMinutesOfNew = shift.getActivities().get(i).getInterval().getMinutes();
                     boolean allowedForReplace = true;
                     String staffingLevelState=null;
+                    if(UNDERSTAFFING.equals(staffingLevelForOld) && OVERSTAFFING.equals(staffingLevelForNew)){
+                        exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, OVERSTAFFING);
+                    }
                     if (BALANCED.equals(staffingLevelForNew) && UNDERSTAFFING.equals(staffingLevelForOld)) {
                         if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
                             allowedForReplace = false;
