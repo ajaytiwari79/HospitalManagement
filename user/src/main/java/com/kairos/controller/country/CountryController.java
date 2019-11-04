@@ -324,20 +324,6 @@ public class CountryController {
     }
 
 
-    @ApiOperation(value = "Add/remove expertise skill")
-    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/skill", method = RequestMethod.POST)
-    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSkillInExpertise(@PathVariable long expertiseId, @RequestBody ExpertiseSkillDTO expertiseSkillDTO) {
-        expertiseService.addSkillInExpertise(expertiseId, expertiseSkillDTO.getSkillIds(), expertiseSkillDTO.isSelected());
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
-    }
-
-    @ApiOperation(value = "get expertise skills")
-    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/skill", method = RequestMethod.GET)
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> addSkillInExpertise(@PathVariable long countryId, @PathVariable long expertiseId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseSkills(expertiseId, countryId));
-    }
 
     @RequestMapping(value = COUNTRY_URL + "/organization_type/{orgTypeId}/skill_category", method = RequestMethod.POST)
     @ApiOperation("linking of skill with an organization type")

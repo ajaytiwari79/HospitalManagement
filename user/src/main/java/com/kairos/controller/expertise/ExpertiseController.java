@@ -51,17 +51,6 @@ public class ExpertiseController {
     private ExpertiseUnitService expertiseUnitService;
     @Inject private EmploymentCTAWTAService employmentCTAWTAService;
 
-    @ApiOperation(value = "Assign Staff expertise")
-    @PutMapping(value = "/expertise/staff/{staffId}")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> setExpertiseToStaff(@PathVariable Long staffId, @RequestBody List<Long> expertiseIds) {
-
-        Map<String, Object> expertiseObj = expertiseService.setExpertiseToStaff(staffId, expertiseIds);
-        if (expertiseObj == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, expertiseObj);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseIds);
-    }
 
     @ApiOperation(value = "find an expertise by id")
     @GetMapping(value = "country/{countryId}/expertise/{expertiseId}")
@@ -70,16 +59,6 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseById(expertiseId));
     }
 
-    @ApiOperation(value = "Get Staff expertise")
-    @GetMapping(value = "/expertise/staff/{staffId}")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getExpertiseToStaff(@PathVariable Long staffId) {
-        Map<String, Object> expertise = expertiseService.getExpertiseToStaff(staffId);
-        if (expertise == null) {
-            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, expertise);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertise);
-    }
 
     @ApiOperation(value = "Get cta and wta by expertise")
     @RequestMapping(value =  UNIT_URL + "/expertise/{expertiseId}/cta_wta")

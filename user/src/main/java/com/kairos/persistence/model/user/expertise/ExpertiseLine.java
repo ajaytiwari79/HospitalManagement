@@ -40,6 +40,8 @@ public class ExpertiseLine extends UserBaseEntity {
         this.breakPaymentSetting=expertiseLineBuilder.breakPaymentSetting;
         this.fullTimeWeeklyMinutes=expertiseLineBuilder.fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek=expertiseLineBuilder.numberOfWorkingDaysInWeek;
+        this.seniorityLevel=expertiseLineBuilder.seniorityLevel;
+        this.organizationServices=expertiseLineBuilder.organizationServices;
     }
 
 
@@ -100,7 +102,7 @@ public class ExpertiseLine extends UserBaseEntity {
         for (int i = 0; i < expertiseLine.getSeniorityLevel().size(); i++) {
             SeniorityLevel thisSeniorityLevel = this.getSeniorityLevel().get(i);
             SeniorityLevel seniorityLevel = expertiseLine.getSeniorityLevel().get(i);
-            if (thisSeniorityLevel.isSeniorityLevelChanged(seniorityLevel)) {
+            if (thisSeniorityLevel.isSeniorityLevelUpdated(seniorityLevel)) {
                 return true;
             }
         }

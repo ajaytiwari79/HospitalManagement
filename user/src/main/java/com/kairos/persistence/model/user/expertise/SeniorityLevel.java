@@ -12,6 +12,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import static com.kairos.commons.utils.ObjectUtils.isEquals;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BASE_PAY_GRADE;
 
 /**
@@ -60,7 +61,7 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
         return this.from - seniorityLevel.from;
     }
 
-    public boolean isSeniorityLevelChanged(SeniorityLevel seniorityLevel){
-        if(!ObjectUtils.isEquals(this.from,seniorityLevel.from) || )
+    public boolean isSeniorityLevelUpdated(SeniorityLevel seniorityLevel){
+        return !isEquals(this.from, seniorityLevel.getFrom()) || !isEquals(this.to, seniorityLevel.getTo()) || !this.getPayGrade().equals(seniorityLevel.getPayGrade());
     }
 }

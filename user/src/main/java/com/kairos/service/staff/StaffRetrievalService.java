@@ -209,7 +209,6 @@ public class StaffRetrievalService {
             expertises.forEach(expertiseQueryResult -> {
                 expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId()));
                 ExpertiseLineQueryResult expertiseLine=expertiseQueryResult.getCurrentlyActiveLine();
-                expertiseQueryResult.setSector(expertiseLine.getSector());
                 expertiseQueryResult.setSeniorityLevels(expertiseLine.getSeniorityLevels());
             });
             return expertises;
