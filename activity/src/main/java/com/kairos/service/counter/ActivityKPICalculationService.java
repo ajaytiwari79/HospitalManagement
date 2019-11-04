@@ -122,7 +122,7 @@ public class ActivityKPICalculationService implements CounterService {
             exceptionService.illegalArgumentException(CALCULATION_TYPE_NOT_VALID);
         }
         int valuesSumInMinutes = shiftActivityDTOS.stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
-        double total = DateUtils.getHoursByMinutes(valuesSumInMinutes);
+        double total = getHoursByMinutes(valuesSumInMinutes);
         DisplayUnit calculationUnit = (DisplayUnit) filterBasedCriteria.get(CALCULATION_UNIT).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
@@ -172,7 +172,7 @@ public class ActivityKPICalculationService implements CounterService {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
         int valuesSumInMinutes = shiftActivityDTOS.stream().mapToInt(shiftActivityDTO -> methodParam.apply(shiftActivityDTO)).sum();
-        double total = DateUtils.getHoursByMinutes(valuesSumInMinutes);
+        double total = getHoursByMinutes(valuesSumInMinutes);
         DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).mapToInt(shiftActivityDTO -> methodParam.apply(shiftActivityDTO)).sum();
