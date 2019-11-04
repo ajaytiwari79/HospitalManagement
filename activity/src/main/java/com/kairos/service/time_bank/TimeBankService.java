@@ -269,7 +269,7 @@ public class TimeBankService{
                 //totaltimebank is timebank without daily timebank entries
                 List<DailyTimeBankEntry> dailyTimeBanksBeforeStartDate = timeBankRepository.findAllByEmploymentIdAndStartDate(employmentId, new DateTime(startDate).toDate());
                 DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-                int totalTimeBank = timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, interval, employmentWithCtaDetailsDTO, false, dailyTimeBanksBeforeStartDate, false);
+                int totalTimeBank = (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, interval, employmentWithCtaDetailsDTO, false, dailyTimeBanksBeforeStartDate, false)[0];
                 totalTimeBankBeforeStartDate = isCollectionNotEmpty(dailyTimeBanksBeforeStartDate) ? dailyTimeBanksBeforeStartDate.stream().mapToInt(DailyTimeBankEntry::getDeltaTimeBankMinutes).sum() : 0;
                 totalTimeBankBeforeStartDate = totalTimeBankBeforeStartDate - totalTimeBank;
             }
@@ -281,7 +281,13 @@ public class TimeBankService{
             Interval planningPeriodInterval = new Interval(asDate(planningPeriod.getStartDate()).getTime(),asDate(planningPeriod.getEndDate()).getTime());
             Interval yearTillDate = new Interval(asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())).getTime(),asDate(planningPeriod.getStartDate().with(TemporalAdjusters.lastDayOfYear()).plusDays(1)).getTime());
             intervals = newArrayList(todayInterval,planningPeriodInterval,yearTillDate);
-            employmentDetails = userIntegrationService.getAllEmploymentByUnitId(unitId);
+            if(isNotNull(employmentId)){
+                EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = updateCostTimeAgreementDetails(employmentId, startDate, endDate);
+                employmentDetails = newArrayList(employmentWithCtaDetailsDTO);
+            }else {
+                employmentDetails = userIntegrationService.getAllEmploymentByUnitId(unitId);
+                employmentDetails.forEach(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.setCtaRuleTemplates(updateCostTimeAggrement(employmentWithCtaDetailsDTO.getId(),startDate,planningPeriodInterval.getEnd().toDate(),employmentWithCtaDetailsDTO)));
+            }
             shiftQueryResultWithActivities = new ArrayList<>();
         }
         List<Long> employmentIds = isNotNull(employmentId) ? newArrayList(employmentId) : employmentDetails.stream().map(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId()).collect(toList());

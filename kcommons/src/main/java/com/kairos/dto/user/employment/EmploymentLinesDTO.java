@@ -41,5 +41,8 @@ public class EmploymentLinesDTO {
         return endDate==null ? null : new DateTimeInterval(DateUtils.asDate(startDate),DateUtils.asDate(endDate));
     }
 
+    public BigDecimal getHourlyCost() {
 
+        return isNull(hourlyCost) ? new BigDecimal(0): hourlyCost;
+    }
 }
