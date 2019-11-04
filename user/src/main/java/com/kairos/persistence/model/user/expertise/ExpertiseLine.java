@@ -21,10 +21,12 @@ public class ExpertiseLine extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    @Relationship(type = FOR_SENIORITY_LEVEL)
-    private List<SeniorityLevel> seniorityLevel;
     @Relationship(type = SUPPORTS_SERVICES)
     private List<OrganizationService> organizationServices;
+
+    @Relationship(type = FOR_SENIORITY_LEVEL)
+    private List<SeniorityLevel> seniorityLevel;
+
     private BreakPaymentSetting breakPaymentSetting;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private int numberOfWorkingDaysInWeek; // 5 or 7

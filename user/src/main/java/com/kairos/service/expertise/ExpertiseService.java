@@ -88,6 +88,8 @@ public class ExpertiseService {
     private
     ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
+    private ExpertiseLineGraphRepository expertiseLineGraphRepository;
+    @Inject
     private ExpertiseLineAndSeniorityLevelRelationshipRepository expertiseLineAndSeniorityLevelRelationshipRepository;
     @Inject
     private CountryService countryService;
@@ -259,7 +261,7 @@ public class ExpertiseService {
     }
 
     private boolean validateSeniorityLevels(List<SeniorityLevel> seniorityLevels) {
-        Collections.sort(seniorityLevels);
+        //Collections.sort(seniorityLevels);
         if (isCollectionNotEmpty(seniorityLevels) && seniorityLevels.get(0).getTo() != null && seniorityLevels.get(0).getTo() <= seniorityLevels.get(0).getFrom()) {
             exceptionService.actionNotPermittedException(PLEASE_ENTER_VALID_SENIORITY_LEVELS);
         }
@@ -559,7 +561,12 @@ public class ExpertiseService {
 
     public boolean publishExpertise(Long expertiseId) {
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
-        Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_EXPERTISE_ID_NOTFOUND,expertiseId)));
+        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_EXPERTISE_ID_NOTFOUND,expertiseId)));
+        List<ExpertiseLine> expertiseLines=expertiseLineGraphRepository.findAllById(expertise.getExpertiseLines().stream().map(k->k.getId()).collect(Collectors.toList()));
+        ExpertiseLine expertiseLine=expertiseLineGraphRepository.findOne(expertiseLines.get(0).getId());
+
+        expertise.setExpertiseLines(expertiseLines);
+
         validateExpertiseBeforePublishing(expertise);
         List<Long> seniorityLevelId = new ArrayList<>();
         for (SeniorityLevel seniorityLevel : expertise.getExpertiseLines().get(0).getSeniorityLevel()) {
