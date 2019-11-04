@@ -26,8 +26,11 @@ import com.kairos.persistence.repository.counter.KPISetRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.user_context.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -60,6 +63,8 @@ public class KPISetService {
     private PhaseService phaseService;
     @Inject
     private CounterDataService counterDataService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(KPISetService.class);
 
     public KPISetDTO createKPISet(Long referenceId, KPISetDTO kpiSetDTO, ConfLevel confLevel) {
         verifyDetails(referenceId, confLevel, kpiSetDTO);
@@ -197,25 +202,29 @@ public class KPISetService {
         List<ApplicableKPI> applicableKPIS = getApplicableKPIS(accessGroupPermissionCounterDTO, kpiSet);
         KPIResponseDTO kpiResponseDTO=null;
         for (ApplicableKPI applicableKPI : applicableKPIS) {
-            if (isNotNull(applicableKPI)) {
-                FilterCriteriaDTO filterCriteriaDTO = null;
-                if (KPISetType.VERTICAL.equals(kpiSet.getKpiSetType())) {
-                    filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
-                    applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
-                }else {
-                    if(isNotNull(startDate) && isNotNull( endDate)) {
-                        filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_INTERVAL, applicableKPI.getApplicableFilter().getCriteriaList(), IntervalUnit.CURRENT, DurationType.HOURS, applicableKPI.getValue(), unitId);
-                        filterCriteriaDTO.getFilters().add(new FilterCriteria(null, FilterType.TIME_INTERVAL,Arrays.asList(startDate,endDate)));
-                        applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_INTERVAL);
-                        applicableKPI.setFrequencyType(DurationType.HOURS);
+            try {
+                if (isNotNull(applicableKPI)) {
+                    FilterCriteriaDTO filterCriteriaDTO = null;
+                    if (KPISetType.VERTICAL.equals(kpiSet.getKpiSetType())) {
+                        filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_STAFF, applicableKPI.getApplicableFilter().getCriteriaList(), applicableKPI.getInterval(), applicableKPI.getFrequencyType(), applicableKPI.getValue(), unitId);
+                        applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_STAFF);
+                    } else {
+                        if (isNotNull(startDate) && isNotNull(endDate)) {
+                            filterCriteriaDTO = new FilterCriteriaDTO(accessGroupPermissionCounterDTO.isCountryAdmin(), accessGroupPermissionCounterDTO.getCountryId(), accessGroupPermissionCounterDTO.getStaffId(), Arrays.asList(applicableKPI.getActiveKpiId()), KPIRepresentation.REPRESENT_PER_INTERVAL, applicableKPI.getApplicableFilter().getCriteriaList(), IntervalUnit.CURRENT, DurationType.HOURS, applicableKPI.getValue(), unitId);
+                            filterCriteriaDTO.getFilters().add(new FilterCriteria(null, FilterType.TIME_INTERVAL, Arrays.asList(startDate, endDate)));
+                            applicableKPI.setKpiRepresentation(KPIRepresentation.REPRESENT_PER_INTERVAL);
+                            applicableKPI.setFrequencyType(DurationType.HOURS);
+                        }
+                    }
+                    if (isNotNull(filterCriteriaDTO)) {
+                        kpiResponseDTO = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                    }
+                    if (isNotNull(kpiResponseDTO)) {
+                        kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(), kpiResponseDTO);
                     }
                 }
-                if(isNotNull(filterCriteriaDTO)) {
-                    kpiResponseDTO  = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
-                }
-                if (isNotNull(kpiResponseDTO)) {
-                    kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(), kpiResponseDTO);
-                }
+            }catch (Exception e){
+            LOGGER.error(e.getMessage());
             }
         }
         return kpiResponseDTOMap.values().stream().collect(Collectors.toList());
