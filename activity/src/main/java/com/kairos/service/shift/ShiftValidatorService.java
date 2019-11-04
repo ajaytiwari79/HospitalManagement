@@ -259,9 +259,7 @@ public class ShiftValidatorService {
     private void validateActivityReasonCode(Map<BigInteger, ActivityWrapper> activityWrapperMap, RuleTemplateSpecificInfo ruleTemplateSpecificInfo, ShiftActivityDTO childActivity) {
         Activity activity = activityWrapperMap.get(childActivity.getActivityId()).getActivity();
         ActivityRuleViolation activityRuleViolation;
-        if (activity.getRulesActivityTab().getReasonCodeRequiredState().
-                equals(ReasonCodeRequiredState.MANDATORY) && !Optional.ofNullable(childActivity.getAbsenceReasonCodeId()).isPresent()) {
-
+        if (ReasonCodeRequiredState.MANDATORY.equals(activity.getRulesActivityTab().getReasonCodeRequiredState()) && !Optional.ofNullable(childActivity.getAbsenceReasonCodeId()).isPresent()) {
             activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().orElse(null);
             if (activityRuleViolation == null) {
                 activityRuleViolation = new ActivityRuleViolation(activity.getId(), activity.getName(), 0, singletonList(exceptionService.
