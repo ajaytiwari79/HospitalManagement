@@ -37,7 +37,7 @@ db.getCollection('counter').insertOne(
 });
 db.getCollection('applicableKPI').insertOne(
 {
-    "_id" : "2740",
+    "_id" : "2674",
     "activeKpiId" : "55",
     "baseKpiId" : "55",
     "countryId" : NumberLong(18712),
@@ -56,7 +56,7 @@ db.getCollection('applicableKPI').insertOne(
 db.getCollection('kairos_sequence').find({ "sequenceName" : "CategoryKPIConfSequence"})
 db.getCollection('categoryKPIConf').insertOne(
 {
-    "_id" : "1078",
+    "_id" : "1060",
     "kpiId" : "55",
     "categoryId" : "115",
     "countryId" : NumberLong(18712),

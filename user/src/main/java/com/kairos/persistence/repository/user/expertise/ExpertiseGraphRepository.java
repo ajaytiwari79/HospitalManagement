@@ -168,7 +168,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN exl LIMIT 1")
     ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
 
-    @Query("MATCH(e:Expertise)-[rel:"+FOR_SENIORITY_LEVEL+"]-(sl:SeniorityLevel)-[pgRel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) WHERE id(e)={0} DETACH DELETE rel,pgRel")
+    @Query("MATCH(exl:ExpertiseLine)-[rel:"+FOR_SENIORITY_LEVEL+"]-(sl:SeniorityLevel)-[pgRel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) WHERE id(exl)={0} DETACH DELETE rel,pgRel")
     void removeSeniorityLevel(Long expertiseId);
 
  }

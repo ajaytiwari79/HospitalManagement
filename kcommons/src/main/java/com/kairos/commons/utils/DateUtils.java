@@ -726,6 +726,7 @@ public  class DateUtils {
         return date;
     }
 
+
     public static Long getCurrentDateMillis() {
         DateTime date = new DateTime().withTime(0, 0, 0, 0);
         return date.getMillis();
@@ -855,6 +856,10 @@ public  class DateUtils {
         return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+"";
     }
 
+    public static String getLocalTimeByFormat(LocalDateTime localDateTime){
+        return localDateTime.format(DateTimeFormatter.ofPattern(ISO_FORMAT));
+    }
+
     public static long getMinutesBetweenDate(Date toDate,Date fromDate){
         return Duration.between(asLocalDateTime(toDate),asLocalDateTime(fromDate)).toMinutes();
     }
@@ -887,4 +892,7 @@ public  class DateUtils {
         }
         return dayOfWeeks;
     }
+
+    public static LocalDateTime getLocaDateTimebyString(String localdate){
+        return LocalDateTime.parse(localdate,DateTimeFormatter.ofPattern(ISO_FORMAT));}
 }

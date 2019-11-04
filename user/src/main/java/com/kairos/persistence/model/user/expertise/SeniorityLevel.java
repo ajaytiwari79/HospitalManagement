@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -30,6 +31,7 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
     private PayGrade payGrade;  // this is payGrade which is coming from payTable
 
     // TODO We are unclear about this just adding and make sure this will utilize in future.
+    @Email
     private BigDecimal pensionPercentage;
     private BigDecimal freeChoicePercentage;
     private BigDecimal freeChoiceToPension;

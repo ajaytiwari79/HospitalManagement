@@ -876,19 +876,25 @@ public class ShiftService extends MongoBaseService {
                     long durationMinutesOfOld = oldStateShift.getActivities().get(i).getInterval().getMinutes();
                     long durationMinutesOfNew = shift.getActivities().get(i).getInterval().getMinutes();
                     boolean allowedForReplace = true;
+                    String staffingLevelState=null;
+                    if(UNDERSTAFFING.equals(staffingLevelForOld) && OVERSTAFFING.equals(staffingLevelForNew)){
+                        exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, OVERSTAFFING);
+                    }
                     if (BALANCED.equals(staffingLevelForNew) && UNDERSTAFFING.equals(staffingLevelForOld)) {
-                        if (!(rankOfNew > rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
+                        if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
                             allowedForReplace = false;
+                            staffingLevelState=UNDERSTAFFING;
                         }
                     }
                     if (BALANCED.equals(staffingLevelForOld) && OVERSTAFFING.equals(staffingLevelForNew)) {
-                        if (!(rankOfNew > rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
+                        if (!(rankOfNew < rankOfOld || (rankOfNew == rankOfOld && durationMinutesOfNew > durationMinutesOfOld))) {
                             allowedForReplace = false;
+                            staffingLevelState=OVERSTAFFING;
                         }
                     }
 
                     if (!allowedForReplace) {
-                        exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelForNew);
+                        exceptionService.actionNotPermittedException(SHIFT_CAN_NOT_MOVE, staffingLevelState);
                     }
                 } else {
                     shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, oldStateShift.getActivities().get(i), false);
