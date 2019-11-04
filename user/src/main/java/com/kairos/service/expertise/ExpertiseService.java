@@ -564,6 +564,8 @@ public class ExpertiseService {
         Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_EXPERTISE_ID_NOTFOUND,expertiseId)));
         List<ExpertiseLine> expertiseLines=expertiseLineGraphRepository.findAllById(expertise.getExpertiseLines().stream().map(k->k.getId()).collect(Collectors.toList()));
         ExpertiseLine expertiseLine=expertiseLineGraphRepository.findOne(expertiseLines.get(0).getId());
+        ExpertiseLine expertiseLine1=expertiseLineGraphRepository.findOneByLineId(expertiseLines.get(0).getId());
+        SeniorityLevel seniorityLevel3=seniorityLevelGraphRepository.findById(21745l).orElse(null);
 
         expertise.setExpertiseLines(expertiseLines);
 
