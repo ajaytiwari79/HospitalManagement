@@ -225,9 +225,6 @@ public class ShiftStateService {
         requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
         requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
-        List<BigInteger> activityIdsList = shifts.stream().flatMap(s -> s.getActivities().stream().map(ShiftActivity::getActivityId)).distinct().collect(Collectors.toList());
-        List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         shifts.sort(Comparator.comparing(Shift::getStartDate));
         shiftsList.sort((shift, shiftSecond) -> shift.getStartDate().compareTo(shiftSecond.getStartDate()));
         Date startDate = shifts.get(0).getStartDate();
@@ -246,7 +243,7 @@ public class ShiftStateService {
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             }
         });*/
-        timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, activityWrapperMap, startDate, endDate);
+        timeBankService.saveTimeBanksAndPayOut(staffAdditionalInfoDTOS, startDate, endDate);
 
     }
 
