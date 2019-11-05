@@ -1,5 +1,6 @@
 package com.kairos.controller.staff;
 
+import com.google.common.primitives.Chars;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.employment.PositionDTO;
@@ -36,10 +37,13 @@ import javax.validation.Valid;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
+import static java.util.stream.Collectors.summingInt;
 
 /**
  * Created by prabjot on 24/10/16.
@@ -639,6 +643,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
+    @GetMapping(value = "/get_Staff_By_UnitId")
+    @ApiOperation("get staffs by unitId")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffsByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffPersonalDetailsByUnit(unitId));
+    }
 
 
 }
