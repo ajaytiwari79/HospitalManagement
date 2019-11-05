@@ -156,7 +156,7 @@ public class TodoService {
         return todoDTOS;
     }
 
-    public <T> T updateTodoStatus(BigInteger todoId, TodoStatus status, BigInteger shiftId) {
+    public <T> T updateTodoStatus(BigInteger todoId, TodoStatus status, BigInteger shiftId,String comment) {
         T response = null;
         Todo todo = isNotNull(todoId) ? todoRepository.findOne(todoId) : todoRepository.findByEntityIdAndType(shiftId, TodoType.REQUEST_ABSENCE);
         if (isNull(todo)) {
@@ -165,7 +165,9 @@ public class TodoService {
         todo.setStatus(status);
         if (status.equals(APPROVE)) {
             todo.setApprovedOn(new Date());
-
+        }
+        if (status.equals(DISAPPROVE)) {
+            todo.setComment(comment);
         }
         if (newHashSet(APPROVE, DISAPPROVE,PENDING).contains(status)) {
             response = approveAndDisapproveTodo(todo);
