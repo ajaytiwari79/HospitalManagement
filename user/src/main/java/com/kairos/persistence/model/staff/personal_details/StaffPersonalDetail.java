@@ -7,6 +7,9 @@ import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.staff.SectorAndStaffExpertiseQueryResult;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -21,6 +24,9 @@ import java.util.Set;
  * Created by prabjot on 10/1/17.
  */
 @QueryResult
+@Getter
+@Setter
+@NoArgsConstructor
 public class StaffPersonalDetail {
 
     private Long id;
@@ -61,274 +67,11 @@ public class StaffPersonalDetail {
     private String userName;
     private boolean userNameUpdated;
     private List<StaffTeamDTO> teamDetails;
-
-    public StaffPersonalDetail() {
-        //Default Constructor
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getEmploymentTypeId() {
-        return employmentTypeId;
-    }
-
-    public void setEmploymentTypeId(Long employmentTypeId) {
-        this.employmentTypeId = employmentTypeId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
-    }
-
-    public long getVisitourId() {
-        return visitourId;
-    }
-
-    public void setVisitourId(long visitourId) {
-        this.visitourId = visitourId;
-    }
-
-    public ContactDetail getContactDetail() {
-        return contactDetail;
-    }
-
-    public void setContactDetail(ContactDetail contactDetail) {
-        this.contactDetail = contactDetail;
-    }
-
-    public String getInactiveFrom() {
-        return inactiveFrom;
-    }
-
-    public void setInactiveFrom(String inactiveFrom) {
-        this.inactiveFrom = inactiveFrom;
-    }
-
-    public long getLanguageId() {
-        return languageId;
-    }
-
-    public void setLanguageId(long languageId) {
-        this.languageId = languageId;
-    }
-
-    public List<Long> getExpertiseIds() {
-        return expertiseIds;
-    }
-
-    public void setExpertiseIds(List<Long> expertiseIds) {
-        this.expertiseIds = expertiseIds;
-    }
-
-    public String getCprNumber() {
-        return cprNumber;
-    }
-
-    public void setCprNumber(String cprNumber) {
-        this.cprNumber = cprNumber;
-    }
-
-    public String getFamilyName() {
-        return familyName;
-    }
-
-    public void setFamilyName(String familyName) {
-        this.familyName = familyName;
-    }
-
-    public Integer getSpeedPercent() {
-        return speedPercent;
-    }
-
-    public void setSpeedPercent(Integer speedPercent) {
-        this.speedPercent = speedPercent;
-    }
-
-    public Integer getWorkPercent() {
-        return workPercent;
-    }
-
-    public void setWorkPercent(Integer workPercent) {
-        this.workPercent = workPercent;
-    }
-
-    public Integer getOvertime() {
-        return overtime;
-    }
-
-    public void setOvertime(Integer overtime) {
-        this.overtime = overtime;
-    }
-
-    public Float getCostDay() {
-        return costDay;
-    }
-
-    public void setCostDay(Float costDay) {
-        this.costDay = costDay;
-    }
-
-    public Float getCostCall() {
-        return costCall;
-    }
-
-    public void setCostCall(Float costCall) {
-        this.costCall = costCall;
-    }
-
-    public Float getCostKm() {
-        return costKm;
-    }
-
-    public void setCostKm(Float costKm) {
-        this.costKm = costKm;
-    }
-
-    public Float getCostHour() {
-        return costHour;
-    }
-
-    public void setCostHour(Float costHour) {
-        this.costHour = costHour;
-    }
-
-    public Float getCostHourOvertime() {
-        return costHourOvertime;
-    }
-
-    public void setCostHourOvertime(Float costHourOvertime) {
-        this.costHourOvertime = costHourOvertime;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getCareOfName() {
-        return careOfName;
-    }
-
-    public void setCareOfName(String careOfName) {
-        this.careOfName = careOfName;
-    }
-
-    public StaffStatusEnum getCurrentStatus() {
-        return currentStatus;
-    }
-
-    public void setCurrentStatus(StaffStatusEnum currentStatus) {
-        this.currentStatus = currentStatus;
-    }
-
-    public List<StaffExperienceInExpertiseDTO> getExpertiseWithExperience() {
-        return expertiseWithExperience;
-    }
-
-    public void setExpertiseWithExperience(List<StaffExperienceInExpertiseDTO> expertiseWithExperience) {
-        this.expertiseWithExperience = expertiseWithExperience;
-    }
-
-    public boolean isPregnant() {
-        return pregnant;
-    }
-
-    public void setPregnant(boolean pregnant) {
-        this.pregnant = pregnant;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public List<SectorAndStaffExpertiseQueryResult> getSectorWiseExpertise() {
-        return sectorWiseExpertise;
-    }
-
-    public void setSectorWiseExpertise(List<SectorAndStaffExpertiseQueryResult> sectorWiseExpertise) {
-        this.sectorWiseExpertise = sectorWiseExpertise;
-    }
-
-    public AddressDTO getPrimaryAddress() {
-        return primaryAddress;
-    }
+    private List<StaffChildDetailDTO> staffChildDetailDTOS;
 
     public void setPrimaryAddress(AddressDTO primaryAddress) {
         this.primaryAddress = primaryAddress;
         this.primaryAddress.setPrimary(true);
-    }
-
-    public AddressDTO getSecondaryAddress() {
-        return secondaryAddress;
-    }
-
-    public void setSecondaryAddress(AddressDTO secondaryAddress) {
-        this.secondaryAddress = secondaryAddress;
-    }
-
-    public Set<Long> getTeamIdsOfStaff() {
-        return teamIdsOfStaff;
-    }
-
-    public void setTeamIdsOfStaff(Set<Long> teamIdsOfStaff) {
-        this.teamIdsOfStaff = teamIdsOfStaff;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = StringUtils.trim(userName);
-    }
-
-    public boolean isUserNameUpdated() {
-        return userNameUpdated;
-    }
-
-    public void setUserNameUpdated(boolean userNameUpdated) {
-        this.userNameUpdated = userNameUpdated;
-    }
-
-    public List<StaffTeamDTO> getTeamDetails() {
-        return teamDetails;
-    }
-
-    public void setTeamDetails(List<StaffTeamDTO> teamDetails) {
-        this.teamDetails = teamDetails;
     }
 
     @Override

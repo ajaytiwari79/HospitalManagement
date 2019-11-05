@@ -123,6 +123,8 @@ public abstract class RelationshipConstants {
     public static final  String HAS_SUB_TYPE = "HAS_SUB_TYPE";
     public static final  String HAS_CONTACT_ADDRESS = "HAS_CONTACT_ADDRESS";
     public static final  String DAY_TYPE = "DAY_TYPE";
+    public static final  String HAS_CHILDREN = "HAS_CHILDREN";
+
 
     //TimeCare
     public static final  String CONTACT_DETAIL = "CONTACT_DETAIL";

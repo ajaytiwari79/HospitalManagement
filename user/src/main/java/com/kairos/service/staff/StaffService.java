@@ -34,6 +34,7 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffChildDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.staff.position.Position;
@@ -288,6 +289,7 @@ public class StaffService {
         staffToUpdate.setLanguage(language);
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
+        setStaffChildDetails(staffToUpdate, staffPersonalDetail);
 
         if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
             if (!staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffPersonalDetail.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
@@ -327,6 +329,16 @@ public class StaffService {
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
         teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
         return staffPersonalDetail;
+    }
+
+    private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
+        if(isCollectionNotEmpty(staffPersonalDetail.getStaffChildDetailDTOS())){
+            staffPersonalDetail.getStaffChildDetailDTOS().forEach(staffChildDetailDTO -> {
+                staffChildDetailDTO.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffChildDetailDTO.getCprNumber()));
+                staffChildDetailDTO.setGender(CPRUtil.getGenderFromCPRNumber(staffChildDetailDTO.getCprNumber()));
+            });
+        }
+        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetailDTOS(), StaffChildDetail.class));
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
