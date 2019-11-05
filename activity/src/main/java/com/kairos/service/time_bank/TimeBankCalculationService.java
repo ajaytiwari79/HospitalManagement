@@ -1082,7 +1082,7 @@ public class TimeBankCalculationService {
 
     public BigDecimal getCostByByMinutes(List<EmploymentLinesDTO> employmentLinesDTOS, int minutes, java.time.LocalDate date){
         BigDecimal hourlyCost = getHourlyCostByDate(employmentLinesDTOS,date);
-        return hourlyCost.divide(new BigDecimal(60),5,RoundingMode.UP).multiply(new BigDecimal(minutes));
+        return hourlyCost.multiply(new BigDecimal(getHoursByMinutes(minutes)));
     }
     private Object[] getSumOfPayoutValues(List<PayOutPerShift> payOutPerShifts,Map<Long,List<EmploymentLinesDTO>> employmentWithCtaDetailsDTOMap) {
         long plannedMinutesOfPayout = 0l;

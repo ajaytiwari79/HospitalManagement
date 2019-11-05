@@ -643,7 +643,7 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
     }
 
-    @GetMapping(value = "/get_Staff_By_UnitId")
+    @GetMapping(value = "/get_staff_by_unitId")
     @ApiOperation("get staffs by unitId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffsByUnitId(@PathVariable Long unitId) {

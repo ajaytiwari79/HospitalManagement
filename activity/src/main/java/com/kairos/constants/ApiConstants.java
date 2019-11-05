@@ -114,7 +114,7 @@ public final class ApiConstants {
     public static final String GET_UNIT_IDS_BY_CLIENT_IDS = "/client/client_ids_by_unitIds";
     public static final String API_EXPERTISE_URL = "/expertise/{expertiseId}";
     public static final String API_EXPERTISE_BREAK_URL = "/expertise/{expertiseId}/break";
-    public static final String GET_STAFF_BY_UNITID = "/staff/get_Staff_By_UnitId";
+    public static final String GET_STAFF_BY_UNITID = "/staff/get_staff_by_unitId";
 
     public static final String GET_ORGANIZATION_WITH_COUNTRY_ID = "/getOrganizationWithCountryId";
     public static final String COMMON_DATA = "/common_data";
