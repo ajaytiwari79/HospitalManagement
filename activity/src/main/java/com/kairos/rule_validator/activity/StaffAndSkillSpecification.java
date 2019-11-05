@@ -1,8 +1,12 @@
 package com.kairos.rule_validator.activity;
 
+import com.kairos.dto.activity.activity.activity_tabs.ActivitySkill;
+import com.kairos.dto.activity.activity.activity_tabs.SkillActivityDTO;
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.user.skill.SkillLevelDTO;
+import com.kairos.enums.SkillLevel;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -19,12 +23,12 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_SK
  */
 public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithActivityDTO> {
 
-    private List<Long> staffSkills;
+    private List<SkillLevelDTO> skillLevelDTOS;
     private RuleTemplateSpecificInfo ruleTemplateSpecificInfo;
     private ExceptionService exceptionService;
 
-    public StaffAndSkillSpecification(List<Long> staffSkills, RuleTemplateSpecificInfo ruleTemplateSpecificInfo,ExceptionService exceptionService) {
-        this.staffSkills = staffSkills;
+    public StaffAndSkillSpecification(List<SkillLevelDTO> skillLevelDTOS, RuleTemplateSpecificInfo ruleTemplateSpecificInfo,ExceptionService exceptionService) {
+        this.skillLevelDTOS = skillLevelDTOS;
         this.ruleTemplateSpecificInfo = ruleTemplateSpecificInfo;
         this.exceptionService=exceptionService;
     }
@@ -57,7 +61,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
     private void validateStaffSkills(List<String> errorMessages, ShiftActivityDTO shiftActivityDTO) {
         ActivityRuleViolation activityRuleViolation;
         if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
-                (CollectionUtils.isEmpty(staffSkills) || !CollectionUtils.containsAny(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds(), staffSkills))) {
+                (CollectionUtils.isEmpty(skillLevelDTOS) || !isSkillSatisfied(shiftActivityDTO.getActivity().getSkillActivityTab()))) {
             errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
             activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
             if(activityRuleViolation==null){
@@ -68,6 +72,20 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
                 activityRuleViolation.getErrorMessages().addAll(errorMessages);
             }
         }
+    }
+
+    private boolean isSkillSatisfied(SkillActivityDTO skillActivityDTO) {
+        for (ActivitySkill activitySkill : skillActivityDTO.getActivitySkills()){
+            for (SkillLevelDTO skillLevelDTO : skillLevelDTOS) {
+                if (activitySkill.getSkillId() == skillLevelDTO.getSkillId() &&
+                        (SkillLevel.BASIC.toString().equals(activitySkill.getLevel()) ||
+                                (SkillLevel.ADVANCE.toString().equals(activitySkill.getLevel()) && !SkillLevel.BASIC.toString().equals(skillLevelDTO.getSkillLevel())) ||
+                                activitySkill.getLevel().equals(skillLevelDTO.getSkillLevel()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
