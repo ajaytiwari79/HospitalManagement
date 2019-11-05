@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ExpertiseLineGraphRepository extends Neo4jBaseRepository<ExpertiseLine,Long> {
 
-    @Query("MATCH(exl:ExpertiseLine)-[r:FOR_SENIORITY_LEVEL]->(sl:SeniorityLevel) WHERE ID(exl)={0} return exl,r,sl")
+    @Query("MATCH(exl:ExpertiseLine)-[r:FOR_SENIORITY_LEVEL]->(sl:SeniorityLevel) WHERE ID(exl)={0} return exl,collect(r),collect(sl)")
     ExpertiseLine findOneByLineId(Long id);
 }

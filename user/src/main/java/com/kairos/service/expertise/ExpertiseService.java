@@ -90,8 +90,6 @@ public class ExpertiseService {
     @Inject
     private ExpertiseLineGraphRepository expertiseLineGraphRepository;
     @Inject
-    private ExpertiseLineAndSeniorityLevelRelationshipRepository expertiseLineAndSeniorityLevelRelationshipRepository;
-    @Inject
     private CountryService countryService;
     @Inject
     private
@@ -561,14 +559,7 @@ public class ExpertiseService {
 
     public boolean publishExpertise(Long expertiseId) {
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
-        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_EXPERTISE_ID_NOTFOUND,expertiseId)));
-        List<ExpertiseLine> expertiseLines=expertiseLineGraphRepository.findAllById(expertise.getExpertiseLines().stream().map(k->k.getId()).collect(Collectors.toList()));
-        ExpertiseLine expertiseLine=expertiseLineGraphRepository.findOne(expertiseLines.get(0).getId());
-        ExpertiseLine expertiseLine1=expertiseLineGraphRepository.findOneByLineId(expertiseLines.get(0).getId());
-        SeniorityLevel seniorityLevel3=seniorityLevelGraphRepository.findById(21745l).orElse(null);
-
-        expertise.setExpertiseLines(expertiseLines);
-
+        Expertise expertise = expertiseGraphRepository.findById(expertiseId,2).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_EXPERTISE_ID_NOTFOUND,expertiseId)));
         validateExpertiseBeforePublishing(expertise);
         List<Long> seniorityLevelId = new ArrayList<>();
         for (SeniorityLevel seniorityLevel : expertise.getExpertiseLines().get(0).getSeniorityLevel()) {

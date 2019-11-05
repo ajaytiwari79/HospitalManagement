@@ -4,6 +4,7 @@ import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -17,6 +18,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SUPPO
 @NodeEntity
 @Getter
 @Setter
+@NoArgsConstructor
 public class ExpertiseLine extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
@@ -31,9 +33,9 @@ public class ExpertiseLine extends UserBaseEntity {
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private int numberOfWorkingDaysInWeek; // 5 or 7
 
-    private ExpertiseLine(){
+    /*private ExpertiseLine(){
 
-    }
+    }*/
 
 
     private ExpertiseLine(ExpertiseLineBuilder expertiseLineBuilder) {
@@ -42,7 +44,7 @@ public class ExpertiseLine extends UserBaseEntity {
         this.breakPaymentSetting=expertiseLineBuilder.breakPaymentSetting;
         this.fullTimeWeeklyMinutes=expertiseLineBuilder.fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek=expertiseLineBuilder.numberOfWorkingDaysInWeek;
-        this.seniorityLevel=expertiseLineBuilder.seniorityLevel;
+        this.seniorityLevel=null;//expertiseLineBuilder.seniorityLevel;
         this.organizationServices=expertiseLineBuilder.organizationServices;
     }
 
@@ -54,7 +56,7 @@ public class ExpertiseLine extends UserBaseEntity {
         private int fullTimeWeeklyMinutes; // This is equals to 37 hours
         private Integer numberOfWorkingDaysInWeek; // 5 or 7
         private List<OrganizationService> organizationServices;
-        private List<SeniorityLevel> seniorityLevel;
+        //private List<SeniorityLevel> seniorityLevel;
 
 
         public ExpertiseLineBuilder setStartDate(LocalDate startDate) {
@@ -73,7 +75,7 @@ public class ExpertiseLine extends UserBaseEntity {
         }
 
         public ExpertiseLineBuilder setSeniorityLevel(List<SeniorityLevel> seniorityLevel) {
-            this.seniorityLevel = seniorityLevel;
+            //this.seniorityLevel = seniorityLevel;
             return this;
         }
         public ExpertiseLineBuilder setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {
