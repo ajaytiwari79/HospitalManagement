@@ -251,13 +251,14 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN  distinct id(staff) AS id,case  WHEN employment > 0 then TRUE else false end AS employment , contactAddress.city AS city,contactAddress.province AS province ,staff.firstName AS firstName,staff.lastName AS lastName,staff.employedSince AS employedSince,staff.badgeNumber AS badgeNumber, staff.userName AS userName,staff.externalId AS externalId,user.cprNumber AS cprNumber,staff.visitourTeamId AS visitourTeamId,staff.familyName AS familyName, user.gender AS gender, {1} + staff.profilePic AS profilePic, id(engineerType) AS engineerType")
     List<StaffPersonalDetailDTO> getAllStaffByUnitId(Long unitId, String imageUrl);
 
-    @Query("MATCH (org:Unit)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE id(org)={0}  \n" +
-            "MATCH(accessGroup)-[:" + HAS_ACCESS_GROUP + "]-(unitPermission:UnitPermission)  \n" +
-            "MATCH(unitPermission)-[:" + HAS_UNIT_PERMISSIONS + "]-(position:Position)  \n" +
-            "MATCH (position)-[:" + BELONGS_TO + "]-(staff:Staff)" +
-            "OPTIONAL MATCH(staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{published:true})-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)-[:" + HAS_EMPLOYMENT_TYPE + "]-(et:EmploymentType) \n" +
-            "WITH  CASE WHEN et IS NOT NULL THEN collect(DISTINCT {id:id(et),name:et.name}) ELSE [] END as employmentTypes,accessGroup,staff"+
-            " RETURN  distinct collect(distinct accessGroup.role) AS roles, id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName,employmentTypes as employmentTypes, staff.userName AS userName, {1} + staff.profilePic AS profilePic ")
+    @Query("MATCH (org:Unit)-[:" +ORGANIZATION_HAS_ACCESS_GROUPS+ "]-(accessGroup:AccessGroup{deleted:false,enabled:true}) WHERE id(org)={0}  \n" +
+            "MATCH(accessGroup)-[:" +HAS_ACCESS_GROUP+ "]-(unitPermission:UnitPermission)  \n" +
+            "MATCH(unitPermission)-[:" +HAS_UNIT_PERMISSIONS+ "]-(position:Position)  \n" +
+            "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)\n" +
+            "OPTIONAL MATCH(user:User)<-[:"+BELONGS_TO+"]-(staff)\n" +
+            "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]-(employment:Employment{published:true})-[:"+HAS_EMPLOYMENT_LINES+"]-(employmentLine:EmploymentLine)-[:HAS_EMPLOYMENT_TYPE]-(et:EmploymentType) \n" +
+            "WITH  CASE WHEN et IS NOT NULL THEN collect(DISTINCT {id:id(et),name:et.name}) ELSE [] END as employmentTypes,accessGroup,staff,user\n" +
+            " RETURN  distinct collect(distinct accessGroup.role) AS roles, id(staff) AS id, staff.firstName AS firstName,staff.lastName AS lastName,employmentTypes as employmentTypes, staff.userName AS userName, {1} + staff.profilePic AS profilePic,id(user) as staffUserId")
     List<StaffPersonalDetailDTO> getAllStaffPersonalDetailsByUnit(long unitId, String imageUrl);
 
     @Query("MATCH (staff:Staff)-[:ENGINEER_TYPE]->(engineerType:EngineerType) WHERE id(staff)={0} RETURN id(engineerType)")

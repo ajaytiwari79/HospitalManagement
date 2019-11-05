@@ -176,7 +176,7 @@ public class ActivityKPICalculationService implements CounterService {
         DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).mapToInt(shiftActivityDTO -> methodParam.apply(shiftActivityDTO)).sum();
-            total = sumOfShifts > 0 ? (valuesSumInMinutes / sumOfShifts) * 100 : sumOfShifts;
+            total = sumOfShifts > 0 ? (valuesSumInMinutes * 100 / sumOfShifts) : sumOfShifts;
         } else if (DisplayUnit.COUNT.equals(calculationUnit)) {
             total = shiftActivityDTOS.size();
         }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
@@ -86,6 +87,7 @@ public class ShiftDTO {
     protected RequestAbsenceDTO requestAbsence;
     protected List<ShiftActivityDTO> breakActivities;
     protected boolean hasOriginalShift;
+    protected UserInfo createdBy;
 
 
     public ShiftDTO() {
