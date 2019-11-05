@@ -553,8 +553,9 @@ public class ShiftService extends MongoBaseService {
 
             }
             shiftDTO.setUnitId(staffAdditionalInfoDTO.getUnitId());
-            shiftDTO.setShiftType(ShiftType.PRESENCE);
+
             shift = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO, Shift.class);
+            updateShiftType(activityWrapperMap,shift);
             shift.setPhaseId(phase.getId());
             if (byTAndAView) {
                 shift.setId(shiftDTO.getShiftId());
