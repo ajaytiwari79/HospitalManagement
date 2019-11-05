@@ -765,7 +765,7 @@ public class PlanningPeriodService extends MongoBaseService {
 
     //get current date for test use after test getLocalDateTime(getFirstDayOfMonth(getLocalDate()), 02, 00, 00)
     public boolean createJobOfPlanningPeriod() {
-        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PLANNING_PERIOD, JobFrequencyType.MONTHLY, getLocalDateTime((getLocalDate()), 06, 00, 00), false));
+        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PLANNING_PERIOD, JobFrequencyType.MONTHLY, getLocalDateTime((getLocalDate()), 07, 00, 00), false));
         LOGGER.info("create job for add planning period");
         schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
