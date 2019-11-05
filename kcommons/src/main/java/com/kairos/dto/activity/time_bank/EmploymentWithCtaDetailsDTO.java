@@ -2,6 +2,7 @@ package com.kairos.dto.activity.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
