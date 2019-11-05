@@ -32,8 +32,6 @@ import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.organization.AbsenceTypes;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;

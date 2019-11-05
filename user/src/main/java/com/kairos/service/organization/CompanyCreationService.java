@@ -20,7 +20,6 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.permission.UnitPermission;

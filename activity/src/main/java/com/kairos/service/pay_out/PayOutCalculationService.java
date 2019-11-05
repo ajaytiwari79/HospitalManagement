@@ -17,6 +17,7 @@ import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_bank.time_bank_basic.time_bank.CTADistributionDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -213,13 +214,13 @@ public class PayOutCalculationService {
      */
     private List<PayOutIntervalDTO> getPayoutIntervals(List<Interval> intervals, Map<Interval, List<PayOutPerShift>> payoutsIntervalMap, long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query) {
         List<PayOutIntervalDTO> payOutIntervalDTOS = new ArrayList<>(intervals.size());
-        Map<Long,Float> employmentWithCtaDetailsHourlyCostMap = employmentWithCtaDetailsDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v.getHourlyCost()));
+        Map<Long,List<EmploymentLinesDTO>> employmentWithCtaDetailsHourlyCostMap = employmentWithCtaDetailsDTOS.stream().filter(distinctByKey(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId())).collect(Collectors.toMap(k->k.getId(), v->v.getEmploymentLines()));
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = employmentWithCtaDetailsDTOS.stream().flatMap(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getCtaRuleTemplates().stream()).filter(distinctByKey(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getName())).collect(Collectors.toList());
         for (Interval interval : intervals) {
             List<PayOutPerShift> payOutPerShifts = payoutsIntervalMap.get(interval);
             List<PayOutTransaction> payOutTransactionList = payoutTransactionAndIntervalMap.get(interval);
             Long payoutChange = payOutPerShifts.stream().mapToLong(PayOutPerShift::getTotalPayOutMinutes).sum();
-            Double payoutCost = payOutPerShifts.stream().mapToDouble(payOutPerShift -> timeBankCalculationService.getCostByByMinutes(employmentWithCtaDetailsHourlyCostMap.get(payOutPerShift.getEmploymentId()),(int)payOutPerShift.getTotalPayOutMinutes()).doubleValue()).sum();
+            Double payoutCost = payOutPerShifts.stream().mapToDouble(payOutPerShift -> timeBankCalculationService.getCostByByMinutes(employmentWithCtaDetailsHourlyCostMap.get(payOutPerShift.getEmploymentId()),(int)payOutPerShift.getTotalPayOutMinutes(),payOutPerShift.getDate()).doubleValue()).sum();
             Long approvePayOut = payOutTransactionList.stream().filter(p -> p.getPayOutTrasactionStatus().equals(PayOutTrasactionStatus.APPROVED)).mapToLong(p -> (long) p.getMinutes()).sum();
             payoutChange += approvePayOut;
             Long payoutAfter = payoutMinutesBefore + payoutChange;
@@ -238,10 +239,10 @@ public class PayOutCalculationService {
         return payOutIntervalDTOS;
     }
 
-    private void updateCostInDistribution(Map<Long, Float> employmentWithCtaDetailsHourlyCostMap, List<PayOutPerShift> payOutPerShifts) {
+    private void updateCostInDistribution(Map<Long, List<EmploymentLinesDTO>> employmentWithCtaDetailsHourlyCostMap, List<PayOutPerShift> payOutPerShifts) {
         payOutPerShifts.forEach(payOutPerShift -> {
     payOutPerShift.getPayOutPerShiftCTADistributions().forEach(payOutPerShiftCTADistribution -> {
-        timeBankCalculationService.getCostByByMinutes(employmentWithCtaDetailsHourlyCostMap.get(payOutPerShift.getEmploymentId()),payOutPerShiftCTADistribution.getMinutes());
+        timeBankCalculationService.getCostByByMinutes(employmentWithCtaDetailsHourlyCostMap.get(payOutPerShift.getEmploymentId()),payOutPerShiftCTADistribution.getMinutes(),payOutPerShift.getDate());
     });
 });
     }
