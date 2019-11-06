@@ -141,10 +141,8 @@ public class PlanningPeriodService extends MongoBaseService {
     // To fetch list of planning periods
     public List<PlanningPeriodDTO> getPlanningPeriods(Long unitId, LocalDate startDate, LocalDate endDate) {
         List<PhaseDTO> phases = phaseService.getPlanningPhasesByUnit(unitId);
-
         // Prepare map for phases with id as key and sequence as value
         Map<BigInteger, Integer> phaseIdAndSequenceMap = getMapOfPhasesIdAndSequence(phases);
-
         // Fetch planning periods
         List<PlanningPeriodDTO> planningPeriods = null;
         if (Optional.ofNullable(startDate).isPresent() || Optional.ofNullable(endDate).isPresent()) {
@@ -152,9 +150,10 @@ public class PlanningPeriodService extends MongoBaseService {
         } else {
             planningPeriods = planningPeriodMongoRepository.findAllPeriodsOfUnit(unitId);
         }
-
+        Set<LocalDateTime> localDateTimes=planningPeriods.stream().map(planningPeriodDTO -> asLocalDateTime(asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toSet());
+        Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, localDateTimes);
         for (PlanningPeriodDTO planningPeriod : planningPeriods) {
-            Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(planningPeriod.getUnitId(),asDate(planningPeriod.getEndDate()),null);
+            Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
             if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
                 planningPeriod.setCurrentPhase(phase.getName());
             }
@@ -587,8 +586,10 @@ public class PlanningPeriodService extends MongoBaseService {
 
     public List<PeriodDTO> getPeriodOfInterval(Long unitId, LocalDate startDate, LocalDate endDate) {
         List<PeriodDTO> periodDTOS=planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, startDate, endDate);
+        Set<LocalDateTime> localDateTimes=periodDTOS.stream().map(planningPeriodDTO -> asLocalDateTime(asDate(planningPeriodDTO.getEndDate()))).collect(Collectors.toSet());
+        Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, localDateTimes);
         for (PeriodDTO planningPeriod : periodDTOS) {
-            Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(unitId,asDate(planningPeriod.getEndDate()),null);
+            Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
             if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
                 planningPeriod.setCurrentPhaseName(phase.getName());
                 planningPeriod.setPhaseEnum(phase.getPhaseEnum().toString());
