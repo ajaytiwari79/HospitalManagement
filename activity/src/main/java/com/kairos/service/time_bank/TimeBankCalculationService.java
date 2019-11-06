@@ -233,7 +233,7 @@ public class TimeBankCalculationService {
                             break;
                         } else if (CompensationMeasurementType.FIXED_VALUE.equals(ctaInterval.getCompensationMeasurementType())) {
                             double value = ((double) overlapTimeInMin / ctaRuleTemplateDTO.getCompensationTable().getGranularityLevel()) * ctaInterval.getValue();
-                            ctaTimeBankMin += (double) (!getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) ? BigDecimal.valueOf(value).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0);
+                            ctaTimeBankMin += (double) (!getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(new BigDecimal(0)) && staffEmploymentDetails.getHourlyCost().equals(0)? BigDecimal.valueOf(value).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0);
                         }
 
                     }
@@ -307,7 +307,7 @@ public class TimeBankCalculationService {
         return ctaRuleTemplateDTO.isRuleTemplateValid(staffEmploymentDetails.getEmploymentType().getId(), shiftPhaseId, activityId, timeTypeId, plannedTimes) && isDayTypeValid(shiftDate, ctaRuleTemplateDTO, dayTypeDTOMap);
     }
 
-    private boolean isDayTypeValid(Date shiftDate, CTARuleTemplateDTO ruleTemplateDTO, Map<Long, DayTypeDTO> dayTypeDTOMap) {
+    public boolean isDayTypeValid(Date shiftDate, CTARuleTemplateDTO ruleTemplateDTO, Map<Long, DayTypeDTO> dayTypeDTOMap) {
         List<DayTypeDTO> dayTypeDTOS = ruleTemplateDTO.getDayTypeIds().stream().map(dayTypeDTOMap::get).collect(Collectors.toList());
         boolean valid = false;
         for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
@@ -1082,7 +1082,7 @@ public class TimeBankCalculationService {
 
     public BigDecimal getCostByByMinutes(List<EmploymentLinesDTO> employmentLinesDTOS, int minutes, java.time.LocalDate date){
         BigDecimal hourlyCost = getHourlyCostByDate(employmentLinesDTOS,date);
-        return hourlyCost.divide(new BigDecimal(60),5,RoundingMode.UP).multiply(new BigDecimal(minutes));
+        return hourlyCost.multiply(new BigDecimal(getHoursByMinutes(minutes)));
     }
     private Object[] getSumOfPayoutValues(List<PayOutPerShift> payOutPerShifts,Map<Long,List<EmploymentLinesDTO>> employmentWithCtaDetailsDTOMap) {
         long plannedMinutesOfPayout = 0l;

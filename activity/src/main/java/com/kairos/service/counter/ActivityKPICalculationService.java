@@ -17,8 +17,10 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.enums.Day;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationBasedOn;
@@ -122,11 +124,11 @@ public class ActivityKPICalculationService implements CounterService {
             exceptionService.illegalArgumentException(CALCULATION_TYPE_NOT_VALID);
         }
         int valuesSumInMinutes = shiftActivityDTOS.stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
-        double total = valuesSumInMinutes;
-        DisplayUnit calculationUnit = (DisplayUnit) filterBasedCriteria.get(CALCULATION_UNIT).get(0);
+        double total = getHoursByMinutes(valuesSumInMinutes);
+        DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
-            total = (valuesSumInMinutes / sumOfShifts) * 100;
+            total = sumOfShifts > 0 ? (valuesSumInMinutes / sumOfShifts) * 100 : valuesSumInMinutes;
         } else if (DisplayUnit.COUNT.equals(calculationUnit)) {
             total = shiftActivityDTOS.stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).count();
         }
@@ -164,7 +166,7 @@ public class ActivityKPICalculationService implements CounterService {
             default:
                 break;
         }
-        return DateUtils.getHoursByMinutes(getTotalByType(filterBasedCriteria,shiftWithActivityDTOS,shiftActivityDTOS,methodParam));
+        return getTotalByType(filterBasedCriteria,shiftWithActivityDTOS,shiftActivityDTOS,methodParam);
     }
 
     private double getTotalByType(Map<FilterType, List> filterBasedCriteria, List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<ShiftActivityDTO> shiftActivityDTOS, Function<ShiftActivityDTO, Integer> methodParam) {
@@ -172,11 +174,11 @@ public class ActivityKPICalculationService implements CounterService {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
         int valuesSumInMinutes = shiftActivityDTOS.stream().mapToInt(shiftActivityDTO -> methodParam.apply(shiftActivityDTO)).sum();
-        double total = valuesSumInMinutes;
+        double total = getHoursByMinutes(valuesSumInMinutes);
         DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).mapToInt(shiftActivityDTO -> methodParam.apply(shiftActivityDTO)).sum();
-            total = sumOfShifts > 0 ? (valuesSumInMinutes / sumOfShifts) * 100 : sumOfShifts;
+            total = sumOfShifts > 0 ? (valuesSumInMinutes * 100 / sumOfShifts) : valuesSumInMinutes;
         } else if (DisplayUnit.COUNT.equals(calculationUnit)) {
             total = shiftActivityDTOS.size();
         }
