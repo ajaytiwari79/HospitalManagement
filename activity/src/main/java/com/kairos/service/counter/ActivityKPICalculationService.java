@@ -53,15 +53,13 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfListByMapper;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.CALCULATION_TYPE_NOT_VALID;
 import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST;
 import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.TOTAL_MINUTES;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
-import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
+import static com.kairos.utils.counter.KPIUtils.*;
 import static java.util.Map.Entry.comparingByKey;
 
 
@@ -242,7 +240,8 @@ public class ActivityKPICalculationService implements CounterService {
 
     private StaffFilterDTO getStaffFilterDto(Map<FilterType, List> filterBasedCriteria, List<TimeSlotDTO> timeSlotDTOS, Long organizationId) {
         StaffFilterDTO staffFilterDTO = new StaffFilterDTO();
-        List<FilterSelectionDTO> filterData = filterBasedCriteria.entrySet().stream().map(filterTypeListEntry -> {
+        List<FilterSelectionDTO> filterData = new ArrayList<>();
+        filterBasedCriteria.entrySet().forEach(filterTypeListEntry -> {
             if (filterTypeListEntry.getKey().equals(TIME_SLOT)) {
                 Set<String> timeSlotName = new HashSet<>();
                 for (Object timeSlotId : filterTypeListEntry.getValue()) {
@@ -252,11 +251,11 @@ public class ActivityKPICalculationService implements CounterService {
                         }
                     }
                 }
-                return new FilterSelectionDTO(filterTypeListEntry.getKey(), timeSlotName);
-            } else {
-                return new FilterSelectionDTO(filterTypeListEntry.getKey(), new HashSet<String>(filterTypeListEntry.getValue()));
+                filterData.add(new FilterSelectionDTO(filterTypeListEntry.getKey(), timeSlotName));
+            } else if(!newHashSet(PHASE,TEAM).contains(filterTypeListEntry.getKey())){
+                filterData.add(new FilterSelectionDTO(filterTypeListEntry.getKey(), new HashSet<String>(filterTypeListEntry.getValue())));
             }
-        }).collect(Collectors.toList());
+        });
         if (filterBasedCriteria.containsKey(PHASE)) {
             List<PhaseDTO> phases = phaseService.getPhasesByUnit(organizationId);
             Set<PhaseDefaultName> phaseDefaultNames = (Set<PhaseDefaultName>) filterBasedCriteria.get(FilterType.PHASE).stream().map(value -> PhaseDefaultName.valueOf(value.toString())).collect(Collectors.toSet());
@@ -264,7 +263,7 @@ public class ActivityKPICalculationService implements CounterService {
             filterData.add(new FilterSelectionDTO(PHASE, phaseIds));
         }
         if (filterBasedCriteria.containsKey(TEAM)) {
-            filterData.add(new FilterSelectionDTO(TEAM, (Set<String>) filterBasedCriteria.get(TEAM)));
+            filterData.add(new FilterSelectionDTO(TEAM, new HashSet<>((List<String>) filterBasedCriteria.get(TEAM))));
         }
         staffFilterDTO.setFiltersData(filterData);
         return staffFilterDTO;
@@ -418,7 +417,7 @@ public class ActivityKPICalculationService implements CounterService {
                 activityIds.addAll(KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ABSENCE_ACTIVITY)));
             }
             if(filterBasedCriteria.containsKey(TEAM) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM))){
-                Set<String> teamIds = (Set<String>)filterBasedCriteria.get(TEAM);
+                Set<String> teamIds = getStringByList(new HashSet<>(filterBasedCriteria.get(TEAM)));
                 ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUserDetails().getLastSelectedOrganizationId(),teamIds));
                 activityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
             }
