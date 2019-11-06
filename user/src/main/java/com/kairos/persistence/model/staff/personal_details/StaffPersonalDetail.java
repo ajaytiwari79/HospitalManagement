@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.staff.personal_details;
 
 import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.client.ContactDetail;

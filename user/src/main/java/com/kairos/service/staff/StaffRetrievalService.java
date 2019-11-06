@@ -18,6 +18,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.StaffWithSkillDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -629,6 +630,7 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
             staffAdditionalInfoDTO.setUnitId(unit.getId());
             staffAdditionalInfoDTO.setEmployment(employment);
+            staffAdditionalInfoDTO.setStaffChildDetailDTOS(ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult.getStaffChildDetails(), StaffChildDetailDTO.class));
         }
         return staffAdditionalInfoDTO;
     }

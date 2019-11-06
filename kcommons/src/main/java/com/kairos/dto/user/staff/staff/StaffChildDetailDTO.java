@@ -1,4 +1,4 @@
-package com.kairos.persistence.model.staff.personal_details;
+package com.kairos.dto.user.staff.staff;
 
 import com.kairos.enums.Gender;
 import com.kairos.utils.CPRUtil;
