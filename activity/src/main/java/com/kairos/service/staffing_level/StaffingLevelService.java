@@ -762,7 +762,7 @@ public class StaffingLevelService  {
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
             if(staffSkillsMap.containsKey(staffId)) {
                 for (Map<String, Object> staffSkill : staffSkillsMap.get(staffId)) {
-                    if (staffingLevelSkill.getSkillId() == staffSkill.get(SKILL_ID)) {
+                    if (staffingLevelSkill.getSkillId().equals(Long.valueOf(staffSkill.get(SKILL_ID).toString()))) {
                         updateAvailableNoOfStaff(staffingLevelSkill, staffSkill);
                     }
                 }
@@ -771,21 +771,25 @@ public class StaffingLevelService  {
     }
 
     private void updateAvailableNoOfStaff(StaffingLevelSkill staffingLevelSkill, Map<String, Object> staffSkill) {
-        if(SkillLevel.BASIC.equals(staffSkill.get(LEVEL))){
+        if(SkillLevel.BASIC.toString().equals(staffSkill.get(LEVEL))){
             staffingLevelSkill.getSkillLevelSettings().get(2).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()+1);
-        }else if(SkillLevel.ADVANCE.equals(staffSkill.get(LEVEL))){
+        }else if(SkillLevel.ADVANCE.toString().equals(staffSkill.get(LEVEL))){
             if(staffingLevelSkill.getSkillLevelSettings().get(1).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff() || staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()){
                 staffingLevelSkill.getSkillLevelSettings().get(1).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff()+1);
-            }else{
+            }else if(staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()){
                 staffingLevelSkill.getSkillLevelSettings().get(2).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()+1);
+            }else{
+                staffingLevelSkill.getSkillLevelSettings().get(1).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff()+1);
             }
         }else{
             if(staffingLevelSkill.getSkillLevelSettings().get(0).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(0).getAvailableNoOfStaff() || (staffingLevelSkill.getSkillLevelSettings().get(1).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff() && staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff())){
                 staffingLevelSkill.getSkillLevelSettings().get(0).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(0).getAvailableNoOfStaff()+1);
             }else if(staffingLevelSkill.getSkillLevelSettings().get(1).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff() || staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()){
                 staffingLevelSkill.getSkillLevelSettings().get(1).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff()+1);
-            }else{
+            }else if(staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()){
                 staffingLevelSkill.getSkillLevelSettings().get(2).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()+1);
+            }else{
+                staffingLevelSkill.getSkillLevelSettings().get(0).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(0).getAvailableNoOfStaff()+1);
             }
         }
     }
