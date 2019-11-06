@@ -40,6 +40,8 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.utils.counter.KPIUtils;
 import com.kairos.utils.user_context.UserContext;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
@@ -391,15 +393,20 @@ public class ActivityKPICalculationService implements CounterService {
         return kpiResponseDTO;
     }
 
+    @Getter
+    @Setter
     private class FilterShiftActivity {
         private List<ShiftWithActivityDTO> shifts;
         private Map<FilterType, List> filterBasedCriteria;
         private Set<BigInteger> plannedTimeIds;
+        private Set<BigInteger> teamActivityIds;
         private List<ShiftActivityDTO> shiftActivityDTOS;
+        private Set<BigInteger> timeTypeIdSet;
 
         public FilterShiftActivity(List<ShiftWithActivityDTO> shifts, Map<FilterType, List> filterBasedCriteria) {
             this.shifts = shifts;
             this.filterBasedCriteria = filterBasedCriteria;
+            this.teamActivityIds = new HashSet<>();
         }
 
         public Set<BigInteger> getPlannedTimeIds() {
@@ -412,7 +419,7 @@ public class ActivityKPICalculationService implements CounterService {
 
         public FilterShiftActivity invoke() {
             List<BigInteger> timeTypeIds = filterBasedCriteria.containsKey(TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(TIME_TYPE)) : new ArrayList<>();
-            Set<BigInteger> timeTypeIdSet = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), new ArrayList<>(timeTypeIds));
+            timeTypeIdSet = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), new ArrayList<>(timeTypeIds));
             plannedTimeIds = filterBasedCriteria.containsKey(PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(PLANNED_TIME_TYPE)) : new HashSet<>();
             Set<BigInteger> activityIds = filterBasedCriteria.containsKey(ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ACTIVITY_IDS)) : new HashSet<>();
             if(filterBasedCriteria.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterBasedCriteria.get(ABSENCE_ACTIVITY))){
@@ -421,7 +428,7 @@ public class ActivityKPICalculationService implements CounterService {
             if(filterBasedCriteria.containsKey(TEAM) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM))){
                 Set<String> teamIds = getStringByList(new HashSet<>(filterBasedCriteria.get(TEAM)));
                 ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUserDetails().getLastSelectedOrganizationId(),teamIds));
-                activityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
+                teamActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
             }
             shiftActivityDTOS = shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).filter(shiftActivityDTO -> isShiftActivityValid(filterBasedCriteria, shiftActivityDTO, timeTypeIdSet, activityIds, plannedTimeIds)).collect(Collectors.toList());
             return this;
@@ -432,7 +439,8 @@ public class ActivityKPICalculationService implements CounterService {
             boolean validActivity = isCollectionEmpty(activityIds) || activityIds.contains(shiftActivityDTO.getActivityId());
             boolean validPlannedTime = isCollectionEmpty(plannedTimeIds) || CollectionUtils.containsAny(plannedTimeIds,shiftActivityDTO.getPlannedTimes().stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
             boolean validStatus = isCollectionEmpty(filterBasedCriteria.get(ACTIVITY_STATUS)) || CollectionUtils.containsAny(filterBasedCriteria.get(ACTIVITY_STATUS),shiftActivityDTO.getStatus());
-            return validActivity && validTimeType && validPlannedTime && validStatus;
+            boolean validTeamActivity = isCollectionEmpty(teamActivityIds) || teamActivityIds.contains(shiftActivityDTO.getActivityId());
+            return validActivity && validTimeType && validPlannedTime && validStatus && validTeamActivity;
         }
     }
 }
