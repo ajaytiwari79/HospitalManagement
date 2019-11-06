@@ -884,4 +884,8 @@ public class AccessGroupService {
     private List<AccessGroupQueryResult> getOrganizationAccessGroups(Long parentOrganizationId) {
         return accessGroupRepository.getAccessGroupsForUnit(parentOrganizationId);
     }
+
+    public AccessGroupStaffQueryResult getAccessGroupDayTypesAndUserId(){
+        return accessGroupRepository.getAccessGroupDayTypesAndUserId(UserContext.getUserDetails().getLastSelectedOrganizationId(), UserContext.getUserDetails().getId());
+    }
 }

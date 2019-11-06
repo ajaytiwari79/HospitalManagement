@@ -859,6 +859,11 @@ public class UserIntegrationService {
         });
     }
 
+    public List<StaffDTO> getStaffByUnitId(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_STAFF_BY_UNITID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {
+        });
+    }
+
 }
 
 

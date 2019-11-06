@@ -59,6 +59,7 @@ public class StaffPersonalDetailDTO {
     private Staff staff;
     private Set<AccessGroupRole> roles;
     private List<EmploymentTypeDTO> employmentTypes;
+    private Long staffUserId;
 
     public Integer getAge() {
         this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():null;

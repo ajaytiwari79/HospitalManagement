@@ -5,6 +5,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
@@ -537,26 +538,30 @@ public class RuletemplateUtils {
     public static void setDayTypeToCTARuleTemplate(StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<Long, List<Day>> daytypesMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
         staffAdditionalInfoDTO.getEmployment().getCtaRuleTemplates().forEach(ctaRuleTemplateDTO -> {
-            Set<DayOfWeek> dayOfWeeks = new HashSet<>();
-            List<LocalDate> publicHolidays = new ArrayList<>();
-            for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
-                List<Day> currentDay = daytypesMap.get(dayTypeId);
-                if (currentDay == null) {
-                    throwException(ERROR_DAYTYPE_NOTFOUND, dayTypeId);
-                }
-                currentDay.forEach(day -> {
-                    if (!day.name().equals(EVERYDAY)) {
-                        dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
-                    }
-                });
-                /*List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
-                if (CollectionUtils.isNotEmpty(publicHoliday)) {
-                    publicHolidays.addAll(publicHoliday);
-                }*/
-            }
-            ctaRuleTemplateDTO.setPublicHolidays(publicHolidays);
-            ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
+            updateDayTypeDetailInCTARuletemplate(daytypesMap, ctaRuleTemplateDTO);
         });
+    }
+
+    public static void updateDayTypeDetailInCTARuletemplate(Map<Long, List<Day>> daytypesMap, CTARuleTemplateDTO ctaRuleTemplateDTO) {
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        List<LocalDate> publicHolidays = new ArrayList<>();
+        for (Long dayTypeId : ctaRuleTemplateDTO.getDayTypeIds()) {
+            List<Day> currentDay = daytypesMap.get(dayTypeId);
+            if (currentDay == null) {
+                throwException(ERROR_DAYTYPE_NOTFOUND, dayTypeId);
+            }
+            currentDay.forEach(day -> {
+                if (!day.name().equals(EVERYDAY)) {
+                    dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
+                }
+            });
+            /*List<LocalDate> publicHoliday = staffAdditionalInfoDTO.getPublicHoliday().get(dayTypeId);
+            if (CollectionUtils.isNotEmpty(publicHoliday)) {
+                publicHolidays.addAll(publicHoliday);
+            }*/
+        }
+        ctaRuleTemplateDTO.setPublicHolidays(publicHolidays);
+        ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
     }
 
     public static Integer getValueByPhase(UserAccessRoleDTO userAccessRole, List<PhaseTemplateValue> phaseTemplateValues,BigInteger phaseId) {

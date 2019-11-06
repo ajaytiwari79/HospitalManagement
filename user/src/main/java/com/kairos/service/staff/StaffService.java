@@ -1043,5 +1043,10 @@ public class StaffService {
         return newUserName;
     }
 
+    public List<com.kairos.dto.user.staff.StaffDTO> getAllStaffPersonalDetailsByUnit(Long unitId){
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetailDTOS,com.kairos.dto.user.staff.StaffDTO.class);
+    }
+
 
 }

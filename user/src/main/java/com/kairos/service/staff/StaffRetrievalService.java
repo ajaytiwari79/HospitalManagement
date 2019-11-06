@@ -616,12 +616,7 @@ public class StaffRetrievalService {
                 exceptionService.actionNotPermittedException("timeslot.not.found");
             }
             staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
-            List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
-            Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get(DAY_TYPE_ID) != null).collect(Collectors.groupingBy(k -> ((Long) k.get(DAY_TYPE_ID)), Collectors.toList()));
-            List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-            List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
-                    new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyPropertiesOfListByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
-            ).collect(Collectors.toList());
+            List<DayTypeDTO> dayTypeDTOS = getDayTypeDTOS(countryId);
             staffAdditionalInfoDTO.setDayTypes(dayTypeDTOS);
             staffAdditionalInfoDTO.setUnitTimeZone(unit.getTimeZone());
             UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unit.getId());
@@ -633,6 +628,15 @@ public class StaffRetrievalService {
             staffAdditionalInfoDTO.setStaffChildDetailDTOS(ObjectMapperUtils.copyPropertiesOfListByMapper(staffAdditionalInfoQueryResult.getStaffChildDetails(), StaffChildDetailDTO.class));
         }
         return staffAdditionalInfoDTO;
+    }
+
+    private List<DayTypeDTO> getDayTypeDTOS(Long countryId) {
+        List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
+        Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get(DAY_TYPE_ID) != null).collect(Collectors.groupingBy(k -> ((Long) k.get(DAY_TYPE_ID)), Collectors.toList()));
+        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
+        return dayTypes.stream().map(dayType ->
+                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyPropertiesOfListByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
+        ).collect(Collectors.toList());
     }
 
     public void setRequiredDataForShiftCreationInWrapper(StaffEmploymentUnitDataWrapper staffEmploymentUnitDataWrapper, Unit unit, Long countryId, Long expertiseId) {
@@ -683,12 +687,7 @@ public class StaffRetrievalService {
             employmentIds = employmentGraphRepository.getEmploymentIdsByStaffIds(staffIds);
         }
         List<StaffEmploymentDetails> employmentDetails = employmentService.getEmploymentDetails(employmentIds, organizationBaseEntity, countryId);
-        List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
-        Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get(DAY_TYPE_ID) != null).collect(Collectors.groupingBy(k -> ((Long) k.get(DAY_TYPE_ID)), Collectors.toList()));
-        List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
-                new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyPropertiesOfListByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings())
-        ).collect(Collectors.toList());
+        List<DayTypeDTO> dayTypeDTOS = getDayTypeDTOS(countryId);
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(organizationBaseEntity.getId());
         // TODO incorrect we dont need to set in all staff
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {

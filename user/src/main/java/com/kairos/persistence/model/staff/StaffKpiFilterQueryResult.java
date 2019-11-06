@@ -1,11 +1,16 @@
 package com.kairos.persistence.model.staff;
 
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 
 @QueryResult
+@Getter
+@Setter
 public class StaffKpiFilterQueryResult {
     private Long id;
     private String firstName;
@@ -14,64 +19,10 @@ public class StaffKpiFilterQueryResult {
     private Long unitId;
     private String unitName;
     private List<EmploymentQueryResult> employment;
+    private List<DayTypeDTO> dayTypeDTOS;
 
     public StaffKpiFilterQueryResult() {
         //Default Constructor
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public List<EmploymentQueryResult> getEmployment() {
-        return employment;
-    }
-
-    public void setEmployment(List<EmploymentQueryResult> employment) {
-        this.employment = employment;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public String getUnitName() {
-        return unitName;
-    }
-
-    public void setUnitName(String unitName) {
-        this.unitName = unitName;
-    }
-
-    public List<Long> getUnitIds() {
-        return unitIds;
-    }
-
-    public void setUnitIds(List<Long> unitIds) {
-        this.unitIds = unitIds;
-    }
 }

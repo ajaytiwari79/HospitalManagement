@@ -31,7 +31,8 @@ db.getCollection('counter').insertOne(
         "CALCULATION_BASED_ON",
         "CALCULATION_UNIT",
         "PHASE",
-        "TEAM"
+        "TEAM",
+        "PLANNED_BY"
     ],
     "multiDimensional" : false
 });
