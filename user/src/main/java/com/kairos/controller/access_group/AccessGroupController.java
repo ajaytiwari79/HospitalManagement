@@ -265,9 +265,9 @@ public class AccessGroupController {
     }
 
     @ApiOperation("Get unit Access Groups by parent Access Group")
-    @PostMapping(value = UNIT_URL + "/get_access_group_by_unitId" )
+    @GetMapping(value = UNIT_URL + "/get_access_group_by_unitId" )
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAccessGroupDayTypesAndUserId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupDayTypesAndUserId());
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupIdsByStaffIdAndUnitId(unitId));
     }
 }
