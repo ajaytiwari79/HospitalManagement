@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.user.skill;
 
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.persistence.model.staff.StaffQueryResult;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;

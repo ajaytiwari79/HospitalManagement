@@ -11,8 +11,6 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
-import com.kairos.persistence.model.shift.Shift;
-import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;

@@ -184,11 +184,11 @@ public class TimeBankKpiCalculationService implements CounterService {
         Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
         Map<Long, StaffKpiFilterDTO> staffAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v->v));
         Map<Long,List<DailyTimeBankEntry>> staffIdAndDailyTimeBankMap = getDailyTimeBankEntryByStaffId(staffIds,employmentAndDailyTimeBank);
-        for (Long staffId :staffIds) {
-            staffAndDailyTimeBankMap =staffIdAndDailyTimeBankMap.getOrDefault(staffId,new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
-                Long totalTimeBankOfUnit = 0l;
-                    StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
-                    DateTimeInterval dateTimeInterval=new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate()));
+        for (Long staffId : staffIds) {
+            staffAndDailyTimeBankMap = staffIdAndDailyTimeBankMap.getOrDefault(staffId, new ArrayList<>()).stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toList()));
+            Long totalTimeBankOfUnit = 0l;
+            StaffKpiFilterDTO staffKpiFilterDTO = staffAndStaffKpiFilterMap.get(staffId);
+            DateTimeInterval dateTimeInterval = new DateTimeInterval(DateUtils.getLongFromLocalDate(dateTimeIntervals.get(0).getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate()));
             totalTimeBankOfUnit = getTotalTimeBank(staffAndDailyTimeBankMap, dateTimeInterval, totalTimeBankOfUnit, staffKpiFilterDTO);
             staffIdAndTimeBankMap.put(staffId, Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(staffId), null, DateUtils.getHoursByMinutes(totalTimeBankOfUnit))));
         }
@@ -237,7 +237,7 @@ public class TimeBankKpiCalculationService implements CounterService {
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(staffKpiFilterDTO.getUnitId());
         for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
             List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
-            int timeBankOfInterval = timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false);
+            int timeBankOfInterval = (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false)[0];
             int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(DailyTimeBankEntry::getDeltaTimeBankMinutes).sum();
             int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
             totalTimeBankOfUnit += totalTimeBank;

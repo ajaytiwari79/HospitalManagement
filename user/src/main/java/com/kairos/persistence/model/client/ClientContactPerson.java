@@ -3,7 +3,6 @@ package com.kairos.persistence.model.client;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -11,7 +11,6 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.rule_validator.AbstractSpecification;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.*;

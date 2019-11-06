@@ -19,10 +19,10 @@ import static com.kairos.enums.FilterType.TIME_TYPE;
  **/
 
 public class TimeTypeFilter implements ShiftFilter{
-    private List<BigInteger> selectedTimeTypes;
+    private Set<BigInteger> selectedTimeTypes;
     private Map<FilterType, Set<String>> filterCriteriaMap;
 
-    public TimeTypeFilter(Map<FilterType, Set<String>> filterCriteriaMap, List<BigInteger> selectedTimeTypes) {
+    public TimeTypeFilter(Map<FilterType, Set<String>> filterCriteriaMap, Set<BigInteger> selectedTimeTypes) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.selectedTimeTypes = selectedTimeTypes;
     }
