@@ -154,7 +154,10 @@ public class PlanningPeriodService extends MongoBaseService {
         }
 
         for (PlanningPeriodDTO planningPeriod : planningPeriods) {
-
+            Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(planningPeriod.getUnitId(),asDate(planningPeriod.getEndDate()),null);
+            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
+                planningPeriod.setCurrentPhase(phase.getName());
+            }
             // Set duration of period
             planningPeriod.setPeriodDuration(DateUtils.getDurationOfTwoLocalDates(planningPeriod.getStartDate(), planningPeriod.getEndDate().plusDays(1)));
 
@@ -583,7 +586,15 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public List<PeriodDTO> getPeriodOfInterval(Long unitId, LocalDate startDate, LocalDate endDate) {
-        return planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, startDate, endDate);
+        List<PeriodDTO> periodDTOS=planningPeriodMongoRepository.findAllPeriodsByStartDateAndLastDate(unitId, startDate, endDate);
+        for (PeriodDTO planningPeriod : periodDTOS) {
+            Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(unitId,asDate(planningPeriod.getEndDate()),null);
+            if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
+                planningPeriod.setCurrentPhaseName(phase.getName());
+                planningPeriod.setPhaseEnum(phase.getPhaseEnum().toString());
+            }
+        }
+        return periodDTOS;
     }
 
     // flip phase of planning period via job
