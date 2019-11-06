@@ -51,6 +51,12 @@ public class KPIUtils {
         return objects.stream().map(o -> DayOfWeek.valueOf((o.toString()))).collect(Collectors.toSet());
     }
 
+    public static <T> Set<String> getStringByList(Set<T> objects) {
+        return objects.stream().map(o -> o.toString()).collect(Collectors.toSet());
+    }
+
+
+
     public static List<DateTimeInterval> getDateTimeIntervals(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates, LocalDate localDate) {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         if (isCollectionNotEmpty(filterDates)) {
