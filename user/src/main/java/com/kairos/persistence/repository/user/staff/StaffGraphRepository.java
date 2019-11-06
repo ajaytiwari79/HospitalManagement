@@ -156,9 +156,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (s:Staff)-[:" + HAS_POSITIONS + "]-(position:Position) WHERE id(s)={0} AND id(position)={1} DELETE rel")
     void deleteStaffEmployment(long staffId, long positionId);
 
-    @Query("MATCH (s:Staff)-[:" + HAS_CONTACT_DETAIL + "]->(contactDetail:ContactDetail) WHERE id(s)={0} RETURN contactDetail")
-    ContactDetail getContactDetail(long staffId);
-
     @Query("MATCH (c:Client) , (s:Staff) WHERE id(c)={0}  AND id(s) IN {1}  " +
             "OPTIONAL MATCH (c)-[r1:" + SERVED_BY_STAFF + "]->(s) delete r1  " +
             "  Create Unique (c)-[r:" + SERVED_BY_STAFF + "{type:'PREFERRED'}]->(s) RETURN count(r)")
