@@ -51,7 +51,7 @@ public class Phase extends MongoBaseEntity {
     private DayOfWeek untilNextDay;
     private int realtimeDuration;
     private String shortName;
-    private Set<Long> accessGroupIds = new HashSet<>();
+    private Set<Long> accessGroupIds = new HashSet<>();// for able to edit anything in the construction phase.
 
     public Phase(String name, String description, PhaseDefaultName phaseEnum, int duration, DurationType durationType, int sequence, Long countryId, Long organizationId, BigInteger parentCountryPhaseId, PhaseType phaseType, List<String> status, String color, LocalTime flippingDefaultTime) {
         this.name = name;
