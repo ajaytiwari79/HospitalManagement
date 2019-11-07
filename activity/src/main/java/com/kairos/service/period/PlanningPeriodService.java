@@ -156,6 +156,7 @@ public class PlanningPeriodService extends MongoBaseService {
             Phase phase=phaseListByDate.get(asDate(planningPeriod.getEndDate()));
             if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
                 planningPeriod.setCurrentPhase(phase.getName());
+                planningPeriod.setColor(phase.getColor());
             }
             // Set duration of period
             planningPeriod.setPeriodDuration(DateUtils.getDurationOfTwoLocalDates(planningPeriod.getStartDate(), planningPeriod.getEndDate().plusDays(1)));
@@ -593,6 +594,7 @@ public class PlanningPeriodService extends MongoBaseService {
             if(PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum())){
                 planningPeriod.setCurrentPhaseName(phase.getName());
                 planningPeriod.setPhaseEnum(phase.getPhaseEnum().toString());
+                planningPeriod.setPhaseColor(phase.getColor());
             }
         }
         return periodDTOS;
