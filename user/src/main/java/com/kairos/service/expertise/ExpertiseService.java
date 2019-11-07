@@ -426,6 +426,7 @@ public class ExpertiseService {
         }
         List<ExpertiseLineQueryResult> expertiseLineQueryResults=expertiseGraphRepository.findAllExpertiseLines(Arrays.asList(expertiseId));
         expertise.setExpertiseLines(expertiseLineQueryResults);
+        expertise.setBreakPaymentSetting(expertiseLineQueryResults.get(0).getBreakPaymentSetting());
         return expertise;
     }
 
