@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Created by prerna on 10/11/17.
  */
@@ -29,6 +31,7 @@ public class TagDTO {
 
     private long organizationId;
 
+    private List<Long> orgSubTypeIds;
 
     public TagDTO(String name, MasterDataTypeEnum masterDataType){
         this.name = name;
