@@ -9,7 +9,6 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
@@ -17,11 +16,11 @@ import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.Day;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationBasedOn;
@@ -32,16 +31,17 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
-import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
-import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.PlannedTimeTypeService;
+import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.utils.counter.KPIUtils;
 import com.kairos.utils.user_context.UserContext;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.stereotype.Service;
@@ -63,9 +63,7 @@ import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_INVALIDRE
 import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.TOTAL_MINUTES;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
-import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
+import static com.kairos.utils.counter.KPIUtils.*;
 import static java.util.Map.Entry.comparingByKey;
 
 
@@ -88,6 +86,7 @@ public class ActivityKPICalculationService implements CounterService {
     private CostCalculationKPIService costCalculationKPIService;
     @Inject
     private PhaseService phaseService;
+    @Inject private TimeTypeService timeTypeService;
 
 
     public double getTotal(List<ShiftWithActivityDTO> shifts, Map<FilterType, List> filterBasedCriteria, DateTimeInterval dateTimeInterval, StaffKpiFilterDTO staffKpiFilterDTO) {
@@ -125,11 +124,11 @@ public class ActivityKPICalculationService implements CounterService {
             exceptionService.illegalArgumentException(CALCULATION_TYPE_NOT_VALID);
         }
         int valuesSumInMinutes = shiftActivityDTOS.stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
-        double total = valuesSumInMinutes;
-        DisplayUnit calculationUnit = (DisplayUnit) filterBasedCriteria.get(CALCULATION_UNIT).get(0);
+        double total = getHoursByMinutes(valuesSumInMinutes);
+        DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
-            total = (valuesSumInMinutes / sumOfShifts) * 100;
+            total = sumOfShifts > 0 ? (valuesSumInMinutes / sumOfShifts) * 100 : valuesSumInMinutes;
         } else if (DisplayUnit.COUNT.equals(calculationUnit)) {
             total = shiftActivityDTOS.stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).count();
         }
@@ -167,7 +166,7 @@ public class ActivityKPICalculationService implements CounterService {
             default:
                 break;
         }
-        return DateUtils.getHoursByMinutes(getTotalByType(filterBasedCriteria,shiftWithActivityDTOS,shiftActivityDTOS,methodParam));
+        return getTotalByType(filterBasedCriteria,shiftWithActivityDTOS,shiftActivityDTOS,methodParam);
     }
 
     private double getTotalByType(Map<FilterType, List> filterBasedCriteria, List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<ShiftActivityDTO> shiftActivityDTOS, Function<ShiftActivityDTO, Integer> methodParam) {
@@ -175,11 +174,11 @@ public class ActivityKPICalculationService implements CounterService {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
         int valuesSumInMinutes = shiftActivityDTOS.stream().mapToInt(shiftActivityDTO -> methodParam.apply(shiftActivityDTO)).sum();
-        double total = valuesSumInMinutes;
+        double total = getHoursByMinutes(valuesSumInMinutes);
         DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).mapToInt(shiftActivityDTO -> methodParam.apply(shiftActivityDTO)).sum();
-            total = sumOfShifts > 0 ? (valuesSumInMinutes / sumOfShifts) * 100 : sumOfShifts;
+            total = sumOfShifts > 0 ? (valuesSumInMinutes * 100 / sumOfShifts) : valuesSumInMinutes;
         } else if (DisplayUnit.COUNT.equals(calculationUnit)) {
             total = shiftActivityDTOS.size();
         }
@@ -245,7 +244,8 @@ public class ActivityKPICalculationService implements CounterService {
 
     private StaffFilterDTO getStaffFilterDto(Map<FilterType, List> filterBasedCriteria, List<TimeSlotDTO> timeSlotDTOS, Long organizationId) {
         StaffFilterDTO staffFilterDTO = new StaffFilterDTO();
-        List<FilterSelectionDTO> filterData = filterBasedCriteria.entrySet().stream().map(filterTypeListEntry -> {
+        List<FilterSelectionDTO> filterData = new ArrayList<>();
+        filterBasedCriteria.entrySet().forEach(filterTypeListEntry -> {
             if (filterTypeListEntry.getKey().equals(TIME_SLOT)) {
                 Set<String> timeSlotName = new HashSet<>();
                 for (Object timeSlotId : filterTypeListEntry.getValue()) {
@@ -255,11 +255,11 @@ public class ActivityKPICalculationService implements CounterService {
                         }
                     }
                 }
-                return new FilterSelectionDTO(filterTypeListEntry.getKey(), timeSlotName);
-            } else {
-                return new FilterSelectionDTO(filterTypeListEntry.getKey(), new HashSet<String>(filterTypeListEntry.getValue()));
+                filterData.add(new FilterSelectionDTO(filterTypeListEntry.getKey(), timeSlotName));
+            } else if(!newHashSet(PHASE,TEAM).contains(filterTypeListEntry.getKey())){
+                filterData.add(new FilterSelectionDTO(filterTypeListEntry.getKey(), new HashSet<String>(filterTypeListEntry.getValue())));
             }
-        }).collect(Collectors.toList());
+        });
         if (filterBasedCriteria.containsKey(PHASE)) {
             List<PhaseDTO> phases = phaseService.getPhasesByUnit(organizationId);
             Set<PhaseDefaultName> phaseDefaultNames = (Set<PhaseDefaultName>) filterBasedCriteria.get(FilterType.PHASE).stream().map(value -> PhaseDefaultName.valueOf(value.toString())).collect(Collectors.toSet());
@@ -267,7 +267,7 @@ public class ActivityKPICalculationService implements CounterService {
             filterData.add(new FilterSelectionDTO(PHASE, phaseIds));
         }
         if (filterBasedCriteria.containsKey(TEAM)) {
-            filterData.add(new FilterSelectionDTO(TEAM, (Set<String>) filterBasedCriteria.get(TEAM)));
+            filterData.add(new FilterSelectionDTO(TEAM, new HashSet<>((List<String>) filterBasedCriteria.get(TEAM))));
         }
         staffFilterDTO.setFiltersData(filterData);
         return staffFilterDTO;
@@ -393,15 +393,20 @@ public class ActivityKPICalculationService implements CounterService {
         return kpiResponseDTO;
     }
 
+    @Getter
+    @Setter
     private class FilterShiftActivity {
         private List<ShiftWithActivityDTO> shifts;
         private Map<FilterType, List> filterBasedCriteria;
         private Set<BigInteger> plannedTimeIds;
+        private Set<BigInteger> teamActivityIds;
         private List<ShiftActivityDTO> shiftActivityDTOS;
+        private Set<BigInteger> timeTypeIdSet;
 
         public FilterShiftActivity(List<ShiftWithActivityDTO> shifts, Map<FilterType, List> filterBasedCriteria) {
             this.shifts = shifts;
             this.filterBasedCriteria = filterBasedCriteria;
+            this.teamActivityIds = new HashSet<>();
         }
 
         public Set<BigInteger> getPlannedTimeIds() {
@@ -413,18 +418,19 @@ public class ActivityKPICalculationService implements CounterService {
         }
 
         public FilterShiftActivity invoke() {
-            Set<BigInteger> timeTypeIds = filterBasedCriteria.containsKey(TIME_TYPE) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(TIME_TYPE)) : new HashSet<>();
+            List<BigInteger> timeTypeIds = filterBasedCriteria.containsKey(TIME_TYPE) ? KPIUtils.getBigIntegerValue(filterBasedCriteria.get(TIME_TYPE)) : new ArrayList<>();
+            timeTypeIdSet = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), new ArrayList<>(timeTypeIds));
             plannedTimeIds = filterBasedCriteria.containsKey(PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(PLANNED_TIME_TYPE)) : new HashSet<>();
             Set<BigInteger> activityIds = filterBasedCriteria.containsKey(ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ACTIVITY_IDS)) : new HashSet<>();
             if(filterBasedCriteria.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterBasedCriteria.get(ABSENCE_ACTIVITY))){
                 activityIds.addAll(KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ABSENCE_ACTIVITY)));
             }
-            if(filterBasedCriteria.containsKey(TEAM)){
-                Set<String> teamIds = (Set<String>)filterBasedCriteria.get(TEAM);
+            if(filterBasedCriteria.containsKey(TEAM) && isCollectionNotEmpty(filterBasedCriteria.get(TEAM))){
+                Set<String> teamIds = getStringByList(new HashSet<>(filterBasedCriteria.get(TEAM)));
                 ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUserDetails().getLastSelectedOrganizationId(),teamIds));
-                activityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
+                teamActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
             }
-            shiftActivityDTOS = shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).filter(shiftActivityDTO -> isShiftActivityValid(filterBasedCriteria, shiftActivityDTO, timeTypeIds, activityIds, plannedTimeIds)).collect(Collectors.toList());
+            shiftActivityDTOS = shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).filter(shiftActivityDTO -> isShiftActivityValid(filterBasedCriteria, shiftActivityDTO, timeTypeIdSet, activityIds, plannedTimeIds)).collect(Collectors.toList());
             return this;
         }
 
@@ -432,7 +438,9 @@ public class ActivityKPICalculationService implements CounterService {
             boolean validTimeType = isCollectionEmpty(timeTypeIds) || timeTypeIds.contains(shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId());
             boolean validActivity = isCollectionEmpty(activityIds) || activityIds.contains(shiftActivityDTO.getActivityId());
             boolean validPlannedTime = isCollectionEmpty(plannedTimeIds) || CollectionUtils.containsAny(plannedTimeIds,shiftActivityDTO.getPlannedTimes().stream().map(plannedTime -> plannedTime.getPlannedTimeId()).collect(Collectors.toSet()));
-            return validActivity && validTimeType && validPlannedTime && CollectionUtils.containsAny(filterBasedCriteria.get(ACTIVITY_STATUS),shiftActivityDTO.getStatus());
+            boolean validStatus = isCollectionEmpty(filterBasedCriteria.get(ACTIVITY_STATUS)) || CollectionUtils.containsAny(filterBasedCriteria.get(ACTIVITY_STATUS),shiftActivityDTO.getStatus());
+            boolean validTeamActivity = isCollectionEmpty(teamActivityIds) || teamActivityIds.contains(shiftActivityDTO.getActivityId());
+            return validActivity && validTimeType && validPlannedTime && validStatus && validTeamActivity;
         }
     }
 }

@@ -2,6 +2,7 @@ package com.kairos.dto.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.skill.Skill;
 import com.kairos.enums.Gender;
 import lombok.Getter;
@@ -60,6 +61,8 @@ public class StaffDTO {
     private Set<Long> expertiseIds;
     private Long employmentTypeId;
     private List<Map<String,Object>> skillInfo;
+    private Long staffUserId;
+    private Set<AccessGroupRole> roles;
 
     public StaffDTO(Long id, List<Map<String,Object>> skillInfo){
         this.id = id;

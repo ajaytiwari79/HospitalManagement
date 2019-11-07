@@ -70,7 +70,8 @@ public class ObjectUtils {
         return list;
     }
 
-    public static String getHoursByMinutes(int minutes) {
+
+    public static String getHoursStringByMinutes(int minutes){
         int hoursValue = minutes / 60; //since both are ints, you get an int
         int minutesValue = minutes % 60;
         return hoursValue + "." + minutesValue;

@@ -16,7 +16,6 @@ import com.kairos.dto.user.organization.TimeSlot;
 import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.persistence.model.task.Task;
-import com.kairos.persistence.model.task_type.TaskTypeSkill;
 import com.kairos.persistence.model.task_type.*;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
 import com.kairos.persistence.repository.tag.TagMongoRepository;

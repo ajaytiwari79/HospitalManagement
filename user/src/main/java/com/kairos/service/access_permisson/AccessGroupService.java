@@ -884,4 +884,12 @@ public class AccessGroupService {
     private List<AccessGroupQueryResult> getOrganizationAccessGroups(Long parentOrganizationId) {
         return accessGroupRepository.getAccessGroupsForUnit(parentOrganizationId);
     }
+
+    public StaffAccessGroupQueryResult getAccessGroupWithDayTypesByStaffIdAndUnitId(Long unitId){
+        Long staffId = staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
+        List<AccessGroup> accessGroups=accessGroupRepository.getAccessGroupWithDayTypesByStaffIdAndUnitId(staffId,unitId);
+        StaffAccessGroupQueryResult accessGroupStaffQueryResult=new StaffAccessGroupQueryResult();
+        accessGroupStaffQueryResult.setAccessGroups(accessGroups);
+        return  accessGroupStaffQueryResult;
+    }
 }

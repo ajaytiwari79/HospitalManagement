@@ -4,13 +4,17 @@ import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.utils.counter.KPIUtils;
 import com.kairos.utils.user_context.UserContext;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -19,8 +23,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.*;
 
 /**
@@ -53,9 +56,10 @@ public class ShiftFilterService {
         ShiftFilter TimeAndAttendanceFilter = getValidatedFilter(shiftWithActivityDTOS, shiftStateIds, filterTypeMap);
         ShiftFilter functionsFilter = getFunctionFilter(unitId, filterTypeMap);
         ShiftFilter realTimeStatusFilter = getSickTimeTypeFilter(unitId, filterTypeMap);
+        ShiftFilter plannedByFilter = getPlannedByFilter(unitId,filterTypeMap);
         ShiftFilter phaseFilter = new PhaseFilter(filterTypeMap);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter)
-                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter);
+                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
 
@@ -91,7 +95,7 @@ public class ShiftFilterService {
             selectedActivityIds.addAll(filterTypeMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s)).collect(Collectors.toList()));
         }
         if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
-            Set<String> teamIds = filterTypeMap.get(TEAM);
+            Set<String> teamIds = KPIUtils.getStringByList(filterTypeMap.get(TEAM));
             ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(unitId,teamIds));
             selectedActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
         }
@@ -99,7 +103,7 @@ public class ShiftFilterService {
     }
 
     private ShiftFilter getTimeTypeFilter(Map<FilterType, Set<String>> filterTypeMap) {
-        List<BigInteger> timeTypeIds = new ArrayList<>();
+        Set<BigInteger> timeTypeIds = new HashSet<>();
         if(filterTypeMap.containsKey(TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(TIME_TYPE))) {
             List<BigInteger> ids = getBigInteger(filterTypeMap.get(TIME_TYPE));
             timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), ids);
@@ -114,6 +118,20 @@ public class ShiftFilterService {
             ids.add(new BigInteger(id));
         }
         return ids;
+    }
+
+    private ShiftFilter getPlannedByFilter(Long unitId,Map<FilterType, Set<String>> filterTypeMap) {
+        Set<Long> staffUserIds = new HashSet<>();
+        if(filterTypeMap.containsKey(PLANNED_BY) && isCollectionNotEmpty(filterTypeMap.get(PLANNED_BY))){
+            List<StaffDTO> staffDTOS = userIntegrationService.getStaffByUnitId(unitId);
+            Set<AccessGroupRole> accessGroups = filterTypeMap.get(PLANNED_BY).stream().map(s -> AccessGroupRole.valueOf(s)).collect(Collectors.toSet());
+            for (StaffDTO staffDTO : staffDTOS) {
+                if(isNotNull(staffDTO.getRoles()) && CollectionUtils.containsAny(staffDTO.getRoles(),accessGroups)){
+                    staffUserIds.add(staffDTO.getStaffUserId());
+                }
+            }
+        }
+        return new PlannedByFilter(staffUserIds,filterTypeMap);
     }
 
 

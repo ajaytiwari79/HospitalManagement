@@ -263,4 +263,11 @@ public class AccessGroupController {
     public ResponseEntity<Map<String, Object>> getAccessGroupUsingParentId(@PathVariable Long unitId,@RequestBody Set<Long> accessGroupIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupUsingParentId(unitId,accessGroupIds));
     }
+
+    @ApiOperation("Get unit Access Groups by parent Access Group")
+    @GetMapping(value = UNIT_URL + "/get_access_group_by_unitId" )
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAccessGroupDayTypesAndUserId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,accessGroupService.getAccessGroupWithDayTypesByStaffIdAndUnitId(unitId));
+    }
 }

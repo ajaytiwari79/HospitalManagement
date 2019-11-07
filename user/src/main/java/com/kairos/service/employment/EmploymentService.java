@@ -1018,7 +1018,17 @@ public class EmploymentService {
     }
 
     public List<EmploymentQueryResult> findEmploymentByUnitId(Long unitId){
-        return employmentGraphRepository.findEmploymentByUnitId(unitId);
+        List<EmploymentQueryResult> employments = employmentGraphRepository.findEmploymentByUnitId(unitId);
+        List<EmploymentLinesQueryResult> hourlyCostPerLine = employmentGraphRepository.findFunctionalHourlyCost(employments.stream().map(employmentQueryResult -> employmentQueryResult.getId()).collect(Collectors.toList()));
+        Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
+        employments = ObjectMapperUtils.copyPropertiesOfListByMapper(employments,EmploymentQueryResult.class);
+        for (EmploymentQueryResult employmentQueryResult : employments) {
+            for (EmploymentLinesQueryResult employmentLine : employmentQueryResult.getEmploymentLines()) {
+                BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
+                employmentLine.setHourlyCost(hourlyCost);
+            }
+        }
+        return employments;
     }
 
     public void setEndDateInEmploymentOfExpertise(ExpertiseDTO expertiseDTO){
