@@ -48,7 +48,7 @@ public class EmploymentController {
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/employment")
-    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId,  @RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") Boolean saveAsDraft) throws Exception {
+    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId,  @RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") boolean saveAsDraft) throws Exception {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(unitId, employmentDTO, false, saveAsDraft));
     }
 

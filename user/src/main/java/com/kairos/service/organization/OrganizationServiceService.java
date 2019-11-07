@@ -44,8 +44,6 @@ public class OrganizationServiceService {
     @Inject
     private OrganizationBaseRepository organizationBaseRepository;
     @Inject
-    private com.kairos.service.organization.OrganizationService organizationService;
-    @Inject
     private CountryGraphRepository countryGraphRepository;
     //TODO move this dependency in task
     @Inject

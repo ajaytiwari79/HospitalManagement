@@ -23,7 +23,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_B
 @Getter
 @Setter
 @NoArgsConstructor
-public class SeniorityLevel extends UserBaseEntity{// implements Comparable<SeniorityLevel>,Serializable {
+public class SeniorityLevel extends UserBaseEntity implements Comparable<SeniorityLevel>,Serializable {
     private Integer from; // this is stored as years
     private Integer to;   // this is stored as years
 
@@ -58,10 +58,10 @@ public class SeniorityLevel extends UserBaseEntity{// implements Comparable<Seni
         this.published = published;
     }
 
-    /*@Override
+    @Override
     public int compareTo(SeniorityLevel seniorityLevel) {
         return this.from - seniorityLevel.from;
-    }*/
+    }
 
     public boolean isSeniorityLevelUpdated(SeniorityLevel seniorityLevel){
         return !isEquals(this.from, seniorityLevel.getFrom()) || !isEquals(this.to, seniorityLevel.getTo()) || !this.getPayGrade().equals(seniorityLevel.getPayGrade());
