@@ -96,7 +96,8 @@ public class EmploymentCTAWTAService {
     public CtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId,LocalDate selectedDate,Long employmentId){
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAByExpertiseAndDate(expertiseId,unitId,selectedDate,employmentId);
         Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId,2);
-        SeniorityLevel appliedSeniorityLevel = employmentService.getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
+        ExpertiseLine expertiseLine=currentExpertise.get().getCurrentlyActiveLine(selectedDate);
+        SeniorityLevel appliedSeniorityLevel = employmentService.getSeniorityLevelByStaffAndExpertise(staffId, expertiseLine,currentExpertise.get().getId());
         SeniorityLevelQueryResult seniorityLevel = null;
         if (appliedSeniorityLevel != null) {
             seniorityLevel = seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId());
@@ -104,7 +105,6 @@ public class EmploymentCTAWTAService {
             seniorityLevel.setFunctions(functionDTOs);
         }
         ExpertiseDTO expertiseDTO=ObjectMapperUtils.copyPropertiesByMapper(currentExpertise,ExpertiseDTO.class);
-        ExpertiseLine expertiseLine=expertiseService.getCurrentlyActiveExpertiseLineByDate(expertiseId,selectedDate);
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
 

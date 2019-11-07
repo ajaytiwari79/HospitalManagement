@@ -47,18 +47,17 @@ public class Expertise extends UserBaseEntity {
     private boolean published;
 
 
-
     @Relationship(type = HAS_SENIOR_DAYS)
     private List<CareDays> seniorDays;
 
     @Relationship(type = HAS_PROTECTED_DAYS_OFF_SETTINGS)
-    private List<ProtectedDaysOffSetting> protectedDaysOffSettings=new ArrayList<>();
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings = new ArrayList<>();
 
     @Relationship(type = HAS_CHILD_CARE_DAYS)
     private List<CareDays> childCareDays;
 
     @Relationship(type = HAS_EXPERTISE_LINES)
-    private List<ExpertiseLine> expertiseLines=new ArrayList<>();
+    private List<ExpertiseLine> expertiseLines = new ArrayList<>();
 
     @Relationship(type = BELONGS_TO_SECTOR)
     private Sector sector;
@@ -84,14 +83,14 @@ public class Expertise extends UserBaseEntity {
         this.expertiseLines = expertiseLines;
     }
 
-    public Expertise(Long id,@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, boolean published,List<ExpertiseLine> expertiseLines) {
-        this.id=id;
+    public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, boolean published, List<ExpertiseLine> expertiseLines) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.published = published;
-        this.expertiseLines=expertiseLines;
+        this.expertiseLines = expertiseLines;
     }
 
     public List<CareDays> getSeniorDays() {
@@ -113,18 +112,18 @@ public class Expertise extends UserBaseEntity {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
     }
 
-    public ExpertiseLine getCurrentlyActiveLine(){
-        ExpertiseLine currentExpertiseLine=null;
-        for (ExpertiseLine expertiseLine:this.getExpertiseLines()) {
-            if(startDateIsEqualsOrBeforeEndDate(expertiseLine.getStartDate(),getCurrentLocalDate()) &&
-                    (expertiseLine.getEndDate()==null || startDateIsEqualsOrBeforeEndDate(getCurrentLocalDate(),expertiseLine.getEndDate()))){
-                currentExpertiseLine=expertiseLine;
+    public ExpertiseLine getCurrentlyActiveLine(LocalDate selectedDate) {
+        selectedDate = selectedDate == null ? getCurrentLocalDate() : selectedDate;
+        ExpertiseLine currentExpertiseLine = null;
+        for (ExpertiseLine expertiseLine : this.getExpertiseLines()) {
+            if (startDateIsEqualsOrBeforeEndDate(expertiseLine.getStartDate(),selectedDate ) &&
+                    (expertiseLine.getEndDate() == null || startDateIsEqualsOrBeforeEndDate(selectedDate, expertiseLine.getEndDate()))) {
+                currentExpertiseLine = expertiseLine;
                 break;
             }
         }
         return currentExpertiseLine;
     }
-
 
 
     public Map<String, Object> retrieveDetails() {

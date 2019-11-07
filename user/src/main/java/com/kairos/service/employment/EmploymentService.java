@@ -2,6 +2,7 @@ package com.kairos.service.employment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -527,7 +528,8 @@ public class EmploymentService {
         positionQueryResult = new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd());
         // Deleting All shifts after position end date
         if (employmentDTO.getEndDate() != null) {
-            activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, employmentDTO.getEndDate(), employmentDTO.getStaffId());
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO=staffRetrievalService.getStaffEmploymentDataByEmploymentId(employmentDTO.getEndDate(),employmentDTO.getId(),employmentDTO.getUnitId(),null);
+            activityIntegrationService.deleteShiftsAfterEmploymentEndDate(unitId, employmentDTO.getEndDate(), employmentDTO.getStaffId(),staffAdditionalInfoDTO);
         }
         setHourlyCost(employmentQueryResult);
         return new PositionWrapper(employmentQueryResult, positionQueryResult);
@@ -659,26 +661,25 @@ public class EmploymentService {
             employment.setLastWorkingDate(employmentDTO.getLastWorkingDate());
         }
 
+        employment.setEmploymentLines(getEmploymentLines(employmentDTO));
 
-        SeniorityLevel seniorityLevel = getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), employment.getExpertise());
+        return employment;
+    }
 
-        if (!Optional.ofNullable(seniorityLevel).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_SENIORITYLEVEL_ID_NOTFOUND, employmentDTO.getReasonCodeId());
-        }
-        ExpertiseLine expertiseLine=expertiseService.getCurrentlyActiveExpertiseLineByDate(employment.getExpertise().getId(),employment.getStartDate());
-        EmploymentLine employmentLine = new EmploymentLine.EmploymentLineBuilder()
-                .setSeniorityLevel(seniorityLevel)
-                .setStartDate(employmentDTO.getStartDate())
-                .setEndDate(employmentDTO.getEndDate())
+    private List<EmploymentLine> getEmploymentLines(EmploymentDTO employmentDTO) {
+        List<EmploymentLine> employmentLines=new ArrayList<>();
+        Expertise expertise=expertiseGraphRepository.findOne(employmentDTO.getExpertiseId(),2);
+        expertise.getExpertiseLines().forEach(expertiseLine -> employmentLines.add(new EmploymentLine.EmploymentLineBuilder()
+                .setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employmentDTO.getStaffId(),expertiseLine,employmentDTO.getExpertiseId()))
+                .setStartDate(expertiseLine.getStartDate())
+                .setEndDate(expertiseLine.getEndDate())
                 .setTotalWeeklyMinutes(employmentDTO.getTotalWeeklyMinutes() + (employmentDTO.getTotalWeeklyHours() * 60))
                 .setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes())
                 .setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek())
                 .setAvgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
                 .setHourlyCost(employmentDTO.getHourlyCost())
-                .build();
-        employment.setEmploymentLines(Collections.singletonList(employmentLine));
-
-        return employment;
+                .build()));
+        return employmentLines;
     }
 
     /*
@@ -903,15 +904,14 @@ public class EmploymentService {
     }
 
 
-    public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId, Expertise currentExpertise) {
-        StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, currentExpertise.getId());
+    public SeniorityLevel getSeniorityLevelByStaffAndExpertise(Long staffId, ExpertiseLine expertiseLine,Long expertiseId) {
+        StaffExperienceInExpertiseDTO staffSelectedExpertise = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseId(staffId, expertiseId);
         if (!Optional.ofNullable(staffSelectedExpertise).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EXPERTISE_NOTASSIGNED);
         }
         Integer experienceInMonth = (int) ChronoUnit.MONTHS.between(DateUtils.asLocalDate(staffSelectedExpertise.getExpertiseStartDate()), LocalDate.now());
         LOGGER.info("user has current experience in months :{}", experienceInMonth);
         SeniorityLevel appliedSeniorityLevel = null;
-        ExpertiseLine expertiseLine=currentExpertise.getCurrentlyActiveLine();
         for (SeniorityLevel seniorityLevel : expertiseLine.getSeniorityLevel()) {
             if (seniorityLevel.getTo() == null) {
                 // more than  is set if
@@ -928,6 +928,9 @@ public class EmploymentService {
                     break;
                 }
             }
+        }
+        if (appliedSeniorityLevel==null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_SENIORITYLEVEL_ID_NOTFOUND);
         }
 
         return appliedSeniorityLevel;
@@ -1018,7 +1021,78 @@ public class EmploymentService {
         return employmentGraphRepository.findEmploymentByUnitId(unitId);
     }
 
+    public void setEndDateInEmploymentOfExpertise(ExpertiseDTO expertiseDTO){
+        List<Employment> employments=employmentGraphRepository.findAllEmploymentByExpertiseId(expertiseDTO.getId());
+        employments.forEach(employment -> {
+            StaffAdditionalInfoDTO staffAdditionalInfoDTO=staffRetrievalService.getStaffEmploymentDataByEmploymentId(employment.getEndDate(),employment.getId(),employment.getUnit().getId(),null);
+            employment.getEmploymentLines().forEach(employmentLine -> {
+                if(DateUtils.startDateIsEqualsOrBeforeEndDate(employmentLine.getEndDate(),expertiseDTO.getEndDate())){
+                    return;
+                }
+                if(employmentLine.getStartDate().isAfter(expertiseDTO.getEndDate())){
+                    employmentLine.setDeleted(true);
+                }
+                employmentLine.setEndDate(expertiseDTO.getEndDate());
+            });
+            activityIntegrationService.deleteShiftsAfterEmploymentEndDate(employment.getUnit().getId(), expertiseDTO.getEndDate(), employment.getId(),staffAdditionalInfoDTO);
+        });
 
+    }
+
+    public void triggerEmploymentLine(ExpertiseDTO expertiseDTO,ExpertiseLine expertiseLine){
+        Expertise expertise=expertiseGraphRepository.findOne(expertiseDTO.getId(),2);
+        List<Employment> employments=employmentGraphRepository.findAllEmploymentByExpertiseId(expertise.getId());
+        DateTimeInterval expertiseLineInterval=new DateTimeInterval(expertiseLine.getStartDate(),expertiseLine.getEndDate());
+        List<Employment> employmentList=new ArrayList<>();
+        for (Employment employment:employments) {
+            for (EmploymentLine employmentLine:employment.getEmploymentLines()) {
+                DateTimeInterval employmentLineInterval=new DateTimeInterval(employmentLine.getStartDate(),employmentLine.getEndDate());
+                if(expertiseLineInterval.overlaps(employmentLineInterval)){
+                    if(employmentLine.getStartDate().isBefore(expertiseLine.getStartDate())){
+                        employmentLine.setEndDate(expertiseLine.getStartDate().minusDays(1));
+                        EmploymentLine employmentLineToBeCreated=getEmploymentLine(expertiseLine,employment,expertiseLine.getStartDate(),employmentLine.getEndDate(),employmentLine);
+                        employment.getEmploymentLines().add(employmentLineToBeCreated);
+                        linkExistingRelations(employmentLineToBeCreated,employmentLine);
+                    }else {
+                        employmentLine.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
+                        employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(),expertiseLine,employment.getExpertise().getId()));
+                        employmentLine.setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
+                    }
+                }
+            }
+            employmentList.add(employment);
+        }
+        employmentGraphRepository.saveAll(employmentList);
+    }
+
+    public void linkExistingRelations(EmploymentLine employmentLineToBeCreated,EmploymentLine existingLine) {
+        EmploymentLineEmploymentTypeRelationShip employmentLineEmploymentTypeRelationShip=employmentAndEmploymentTypeRelationShipGraphRepository.findByEmploymentLineId(existingLine.getId());
+        EmploymentLineEmploymentTypeRelationShip relationShip = new EmploymentLineEmploymentTypeRelationShip(employmentLineToBeCreated, employmentLineEmploymentTypeRelationShip.getEmploymentType(), employmentLineEmploymentTypeRelationShip.getEmploymentTypeCategory());
+        employmentAndEmploymentTypeRelationShipGraphRepository.save(relationShip);
+        linkExistingFunctions(employmentLineToBeCreated,existingLine);
+    }
+
+    private void linkExistingFunctions(EmploymentLine employmentLineToBeCreated,EmploymentLine existingLine){
+        List<EmploymentLineFunctionRelationShip> employmentLineFunctionRelationShips=employmentLineFunctionRelationRepository.findAllByEmploymentLineId(existingLine.getId());
+        List<EmploymentLineFunctionRelationShip> employmentLineFunctionRelationShipsList=new ArrayList<>();
+        employmentLineFunctionRelationShips.forEach(employmentLineFunctionRelationShip -> {
+            employmentLineFunctionRelationShipsList.add(new EmploymentLineFunctionRelationShip(employmentLineToBeCreated,employmentLineFunctionRelationShip.getFunction(),employmentLineFunctionRelationShip.getAmount()));
+        });
+        employmentLineFunctionRelationRepository.saveAll(employmentLineFunctionRelationShipsList);
+    }
+
+    private EmploymentLine getEmploymentLine(ExpertiseLine expertiseLine,Employment employment,LocalDate startDate,LocalDate endDate,EmploymentLine employmentLine){
+        return new EmploymentLine.EmploymentLineBuilder()
+                .setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(),expertiseLine,employment.getExpertise().getId()))
+                .setStartDate(startDate)
+                .setEndDate(endDate)
+                .setTotalWeeklyMinutes(employmentLine.getTotalWeeklyMinutes())
+                .setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes())
+                .setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek())
+                .setAvgDailyWorkingHours(employmentLine.getAvgDailyWorkingHours())
+                .setHourlyCost(employmentLine.getHourlyCost())
+                .build();
+    }
 }
 
 

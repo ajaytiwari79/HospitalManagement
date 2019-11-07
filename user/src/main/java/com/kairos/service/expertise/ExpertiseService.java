@@ -42,7 +42,10 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.organization.union.SectorGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
-import com.kairos.persistence.repository.user.expertise.*;
+import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
+import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
+import com.kairos.persistence.repository.user.expertise.FunctionalPaymentGraphRepository;
+import com.kairos.persistence.repository.user.expertise.SeniorityLevelGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
@@ -50,6 +53,7 @@ import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.tag.TagService;
+import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
 import com.kairos.utils.user_context.UserContext;
@@ -88,8 +92,6 @@ public class ExpertiseService {
     private
     ExpertiseGraphRepository expertiseGraphRepository;
     @Inject
-    private ExpertiseLineGraphRepository expertiseLineGraphRepository;
-    @Inject
     private CountryService countryService;
     @Inject
     private
@@ -118,6 +120,8 @@ public class ExpertiseService {
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private EmploymentService employmentService;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -205,6 +209,14 @@ public class ExpertiseService {
         if (!currentExpertise.isPublished()) {
             currentExpertise.getExpertiseLines().get(0).setEndDate(currentExpertise.getEndDate());
             setBasicDetails(expertiseDTO, country, currentExpertise);
+        }else {
+            currentExpertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
+            LocalDate startDateOfLastLine=currentExpertise.getExpertiseLines().get(currentExpertise.getExpertiseLines().size()-1).getStartDate();
+            if(!(expertiseDTO.getEndDate()!=null &&  startDateOfLastLine.isBefore(expertiseDTO.getEndDate()))){
+                exceptionService.actionNotPermittedException("message.start_date.less_than.end_date");
+            }
+            currentExpertise.setEndDate(expertiseDTO.getEndDate());
+            employmentService.setEndDateInEmploymentOfExpertise(expertiseDTO);
         }
         expertiseGraphRepository.save(currentExpertise);
         return updatedExpertiseData(currentExpertise);
@@ -217,6 +229,8 @@ public class ExpertiseService {
         Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId())));
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine currentExpertiseLine = expertise.getExpertiseLines().stream().filter(k -> k.getId().equals(expertiseLineId)).findFirst().orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(PLEASE_PROVIDE_THE_VALID_LINE_ID)));
+        LocalDate lineStartDate=currentExpertiseLine.getStartDate();
+        LocalDate lineEndDate=currentExpertiseLine.getEndDate();
         expertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
 
 
@@ -235,6 +249,7 @@ public class ExpertiseService {
             expertise.getExpertiseLines().add(expertiseLine);
             expertiseDTO.getSeniorityLevels().forEach(k -> k.setId(null));
             addSeniorityLevelsInExpertise(expertiseLine, expertiseDTO, expertise);
+            employmentService.triggerEmploymentLine(expertiseDTO,expertiseLine);
         } else {
             addSeniorityLevelsInExpertise(currentExpertiseLine, expertiseDTO, expertise);
             updateExistingLine(expertiseDTO, expertise, currentExpertiseLine);
