@@ -253,7 +253,7 @@ public class StaffRetrievalService {
     }
 
     private Integer nextSeniorityLevelInMonths(List<SeniorityLevel> seniorityLevels, int currentExperienceInMonths) {
-        //Collections.sort(seniorityLevels);
+        Collections.sort(seniorityLevels);
         Integer nextSeniorityLevelInMonths = null;
         for (int i = 0; i < seniorityLevels.size(); i++) {
             if (currentExperienceInMonths < seniorityLevels.get(i).getFrom() * 12) {
@@ -265,7 +265,7 @@ public class StaffRetrievalService {
     }
 
     private SeniorityLevel calculateApplicableSeniorityLevel(List<SeniorityLevel> seniorityLevels, int maxExperience) {
-        //Collections.sort(seniorityLevels);
+        Collections.sort(seniorityLevels);
         SeniorityLevel seniorityLevel = null;
         for (int i = 0; i < seniorityLevels.size(); i++) {
             if (seniorityLevels.get(i).getTo() == null) {

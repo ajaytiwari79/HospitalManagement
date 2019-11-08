@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.expertise;
 
+import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.services.OrganizationService;
@@ -12,6 +13,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isEquals;
 import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_SENIORITY_LEVEL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.SUPPORTS_SERVICES;
 
@@ -97,20 +99,6 @@ public class ExpertiseLine extends UserBaseEntity {
         public ExpertiseLine createLine() {
             return new ExpertiseLine(this);
         }
-    }
-
-    public boolean seniorityLevelChanged(ExpertiseLine expertiseLine){
-        if(this.getSeniorityLevel().size()!=expertiseLine.getSeniorityLevel().size()){
-            return true;
-        }
-        for (int i = 0; i < expertiseLine.getSeniorityLevel().size(); i++) {
-            SeniorityLevel thisSeniorityLevel = this.getSeniorityLevel().get(i);
-            SeniorityLevel seniorityLevel = expertiseLine.getSeniorityLevel().get(i);
-            if (thisSeniorityLevel.isSeniorityLevelUpdated(seniorityLevel)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 

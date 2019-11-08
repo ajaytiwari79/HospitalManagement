@@ -62,8 +62,4 @@ public class SeniorityLevel extends UserBaseEntity implements Comparable<Seniori
     public int compareTo(SeniorityLevel seniorityLevel) {
         return this.from - seniorityLevel.from;
     }
-
-    public boolean isSeniorityLevelUpdated(SeniorityLevel seniorityLevel){
-        return !isEquals(this.from, seniorityLevel.getFrom()) || !isEquals(this.to, seniorityLevel.getTo()) || !this.getPayGrade().equals(seniorityLevel.getPayGrade());
-    }
 }
