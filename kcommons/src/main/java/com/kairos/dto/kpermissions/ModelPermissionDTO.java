@@ -27,5 +27,6 @@ public class ModelPermissionDTO {
     private List<ModelPermissionDTO> subModelPermissions= new ArrayList<>();
 
     @NotNull(message = "message.model.permission.id.null")
+    //use for Submodel
     private FieldLevelPermission modelPermission;
 }

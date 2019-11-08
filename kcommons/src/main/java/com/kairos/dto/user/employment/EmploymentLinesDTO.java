@@ -30,6 +30,7 @@ public class EmploymentLinesDTO {
     //This is the Intial value of accumulatedTimebank of employment
     private long accumulatedTimebankMinutes;
     private BigDecimal hourlyCost;
+    private Long employmentTypeId;
 
 
     //This getter is used for Accumulated Timebank calculation
