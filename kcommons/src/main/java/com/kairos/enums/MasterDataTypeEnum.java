@@ -16,7 +16,7 @@ public enum MasterDataTypeEnum {
         this.value = value;
     }
 
-    public MasterDataTypeEnum getByValue(String value){
+    public static MasterDataTypeEnum getByValue(String value){
         for(MasterDataTypeEnum masterDataTypeEnum : MasterDataTypeEnum.values()){
             if(masterDataTypeEnum.value.equals(value)){
                 return masterDataTypeEnum;
