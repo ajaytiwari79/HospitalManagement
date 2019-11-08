@@ -44,7 +44,7 @@ public class CostCalculationKPIService {
           for (CTARuleTemplateDTO ruleTemplate : ctaResponseDTO.getRuleTemplates()) {
               if (CalculationFor.BONUS_HOURS.equals(ruleTemplate.getCalculationFor())) {
                   RuletemplateUtils.updateDayTypeDetailInCTARuletemplate(daytypesMap, ruleTemplate);
-                  boolean valid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, new StaffEmploymentDetails(new EmploymentType(shiftActivityDTO.getEmploymentId())), shiftActivityDTO.getPhaseId(), shiftActivityDTO.getActivityId(), shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivityDTO.getStartDate(), shiftActivityDTO.getPlannedTimes());
+                  boolean valid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, new StaffEmploymentDetails(new EmploymentType(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId())), shiftActivityDTO.getPhaseId(), shiftActivityDTO.getActivityId(), shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivityDTO.getStartDate(), shiftActivityDTO.getPlannedTimes());
                   if (valid) {
                       totalCtaBonus += (double) timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()));
                   }
