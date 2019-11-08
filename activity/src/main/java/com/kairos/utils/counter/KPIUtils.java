@@ -122,15 +122,15 @@ public class KPIUtils {
 
     public static LocalDate getNextDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
         LocalDate currentDate = date;
-        LocalDate nextDate = getNextLocaDateByDurationType(date, durationType, 1);
+        LocalDate nextDate = getNextLocaDateByDurationType(date, durationType);
         dateTimeIntervals.add(new DateTimeInterval(asDate(currentDate), getEndOfDayDateFromLocalDate(nextDate)));
         return nextDate.plusDays(1);
     }
 
-    public static LocalDate getCurrentDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
-        LocalDate currentDate = getFirstLocalDateByDurationType(date, durationType);
-        dateTimeIntervals.add(new DateTimeInterval(asDate(currentDate), getEndOfDayDateFromLocalDate(currentDate)));
-        return currentDate.plusDays(1);
+    public static void getCurrentDateTimeIntervalByDate(LocalDate localDate, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
+        LocalDate firstLocalDate = getFirstLocalDateByDurationType(localDate,durationType);
+        Date date = asDate(firstLocalDate);
+        dateTimeIntervals.add(new DateTimeInterval(date, getEndOfDayDateFromLocalDate(getNextLocaDateByDurationType(firstLocalDate, durationType))));
     }
 
     public static LocalDate getLastDateTimeIntervalByDate(LocalDate date, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
