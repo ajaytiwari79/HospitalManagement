@@ -158,7 +158,7 @@ public class TodoService {
 
     public <T> T updateTodoStatus(BigInteger todoId, TodoStatus status, BigInteger shiftId,String comment) {
         T response = null;
-        Todo todo = isNotNull(todoId) ? todoRepository.findOne(todoId) : todoRepository.findByEntityIdAndType(shiftId, TodoType.REQUEST_ABSENCE);
+        Todo todo = isNotNull(todoId) ? todoRepository.findOne(todoId) : todoRepository.findByEntityIdAndTypeAndStatus(shiftId, TodoType.REQUEST_ABSENCE,newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED));
         if (isNull(todo)) {
             exceptionService.dataNotFoundException(SHIFT_NOT_EXISTS);
         }

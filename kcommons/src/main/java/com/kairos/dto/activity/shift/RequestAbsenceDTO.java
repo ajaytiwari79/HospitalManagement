@@ -22,7 +22,7 @@ public class RequestAbsenceDTO {
     private String activityName;
     private Date startDate;
     private Date endDate;
-    private TodoStatus todoStatus = TodoStatus.PENDING;
+    private TodoStatus todoStatus = TodoStatus.REQUESTED;
     private Long reasonCodeId;
     private String remarks;
 }
