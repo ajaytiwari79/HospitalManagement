@@ -460,7 +460,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (org)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) WHERE id(org)={0} RETURN orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
-    @Query("MATCH (org:Unit)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
+    @Query("MATCH (org:OrganizationBaseEntity)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
             "RETURN id(org) as unitId, COLLECT(id(organizationType)) as orgTypeIds")
     List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
 

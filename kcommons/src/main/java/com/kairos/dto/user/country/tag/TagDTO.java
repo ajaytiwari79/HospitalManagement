@@ -35,7 +35,7 @@ public class TagDTO {
 
     private List<Long> orgSubTypeIds;
 
-    private PenaltyScoreDTO penaltyScoreDTO;
+    private PenaltyScoreDTO penaltyScore;
 
     public TagDTO(String name, MasterDataTypeEnum masterDataType){
         this.name = name;

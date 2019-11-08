@@ -74,6 +74,13 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         }
 
+        if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent()) {
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + BELONGS_TO_TAGS + "]-(tag:Tag) " +
+                    "WHERE id(tag) IN {tagIds} ";
+        } else {
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  OPTIONAL MATCH (staff)-[" + BELONGS_TO_TAGS + "]-(tag:Tag) ";
+        }
+
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
             matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
                     "WHERE id(expertise) IN {expertiseIds} ";
@@ -122,6 +129,10 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
         if (Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
             queryParameters.put("teamIds",
                     convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent()) {
+            queryParameters.put("tagIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
         }
         if (StringUtils.isNotBlank(searchText)) {
             queryParameters.put("searchText", searchText);

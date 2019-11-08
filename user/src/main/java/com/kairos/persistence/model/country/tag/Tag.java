@@ -14,6 +14,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 /**
  * Created by prerna on 10/11/17.
@@ -35,12 +36,24 @@ public class Tag extends UserBaseEntity {
 
     private boolean countryTag;
 
+    private Long orgTypeId;
+
+    private List<Long> orgSubTypeIds;
+
     private PenaltyScore penaltyScore;
 
     public Tag(@NotBlank(message = "error.Tag.name.notEmptyOrNotNull") String name, MasterDataTypeEnum masterDataType, boolean countryTag) {
         this.name = name;
         this.masterDataType = masterDataType;
         this.countryTag = countryTag;
+    }
+
+    public Tag(String name, MasterDataTypeEnum masterDataType, boolean countryTag, Long orgTypeId, List<Long> orgSubTypeIds) {
+        this.name = name;
+        this.masterDataType = masterDataType;
+        this.countryTag = countryTag;
+        this.orgTypeId = orgTypeId;
+        this.orgSubTypeIds = orgSubTypeIds;
     }
 
     public Tag(String name, MasterDataTypeEnum masterDataType, boolean countryTag, PenaltyScore penaltyScore) {

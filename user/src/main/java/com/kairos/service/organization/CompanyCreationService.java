@@ -462,7 +462,8 @@ public class CompanyCreationService {
     }
 
     private void setDefaultTagFromCountry(Long countryId, Unit unit){
-        List<TagQueryResult> tagQueryResults = tagService.getCountryTagsByMasterDataType(countryId,MasterDataTypeEnum.STAFF);
+        List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
+        List<TagQueryResult> tagQueryResults = tagService.getCountryTagsByMasterDataTypeAndOrgSubTypeIds(countryId,MasterDataTypeEnum.STAFF, orgSubTypeIds);
         List<Tag> tags = new ArrayList<>();
         if(isCollectionNotEmpty(tagQueryResults)){
             for (TagQueryResult tagQueryResult : tagQueryResults) {

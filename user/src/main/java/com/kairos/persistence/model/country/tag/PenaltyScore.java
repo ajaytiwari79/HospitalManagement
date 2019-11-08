@@ -13,9 +13,6 @@ import org.neo4j.ogm.annotation.NodeEntity;
 /**
  * Created By G.P.Ranjan on 7/11/19
  **/
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
-@NodeEntity
 @Getter
 @Setter
 @NoArgsConstructor
