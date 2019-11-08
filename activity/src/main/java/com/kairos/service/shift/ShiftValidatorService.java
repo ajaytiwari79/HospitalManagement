@@ -549,7 +549,7 @@ public class ShiftValidatorService {
                     checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shiftActivities, checkOverStaffing, shiftActivity,shiftUpdate);
                 }
             } else {
-                validateStaffingLevelForAbsenceTypeOfShift(staffingLevel, shiftActivity, checkOverStaffing, shiftActivities);
+                validateStaffingLevelForAbsenceTypeOfShift(staffingLevel, shiftActivity, checkOverStaffing, shiftActivities,shiftUpdate);
             }
         }
 
@@ -812,7 +812,7 @@ public class ShiftValidatorService {
     }
 
     private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity
-            shiftActivity, boolean checkOverStaffing, List<ShiftActivity> shiftActivities) {
+            shiftActivity, boolean checkOverStaffing, List<ShiftActivity> shiftActivities,boolean shiftUpdate) {
         if (CollectionUtils.isEmpty(staffingLevel.getAbsenceStaffingLevelInterval())) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
         }
@@ -828,11 +828,18 @@ public class ShiftValidatorService {
         }
         int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
         if ((checkOverStaffing && totalCount >= 0)) {
-            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING);
-
+            if(shiftUpdate){
+                ShiftService.staffingLevelForNew=OVERSTAFFING;
+            }else {
+                exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING);
+            }
         }
         if (!checkOverStaffing && totalCount <= 0) {
-            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_UNDERSTAFFING);
+            if(shiftUpdate){
+                ShiftService.staffingLevelForOld=UNDERSTAFFING;
+            }else {
+                exceptionService.actionNotPermittedException(MESSAGE_SHIFT_UNDERSTAFFING);
+            }
 
         }
     }
