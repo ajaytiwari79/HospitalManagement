@@ -290,9 +290,9 @@ public class EmploymentService {
         List<FunctionWithAmountQueryResult> functions = functionGraphRepository.getFunctionsByExpertiseAndSeniorityLevelAndIds
                 (employmentDTO.getUnitId(), employmentDTO.getExpertiseId(), employmentDTO.getSeniorityLevelId(), employmentDTO.getStartDate().toString(),
                         funIds);
-        if (functions.size() != employmentDTO.getFunctions().size()) {
-            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_FUNCTIONS_UNABLE);
-        }
+//        if (functions.size() != employmentDTO.getFunctions().size()) {
+//            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_FUNCTIONS_UNABLE);
+//        }
         return functions;
     }
 
@@ -365,7 +365,7 @@ public class EmploymentService {
 
         List<FunctionWithAmountQueryResult> newAppliedFunctions = findAndValidateFunction(employmentDTO);
         List<FunctionWithAmountQueryResult> olderAppliesFunctions = employmentGraphRepository.findAllAppliedFunctionOnEmploymentLines(employmentDTO.getEmploymentLineId());
-        Map<Long, BigDecimal> functionAmountMap = employmentDTO.getFunctions().stream().collect(Collectors.toMap(FunctionsDTO::getId, FunctionsDTO::getAmount));
+        Map<Long, BigDecimal> functionAmountMap = employmentDTO.getFunctions().stream().collect(Collectors.toMap(FunctionsDTO::getId, FunctionsDTO::getAmount,(first,second)->first));
         // if earlier there were 3 applied function and new its 2 or 4 then simply we need to set calculative value change and
         // return it without checking its objects or values
         if (newAppliedFunctions.size() != olderAppliesFunctions.size()) {
