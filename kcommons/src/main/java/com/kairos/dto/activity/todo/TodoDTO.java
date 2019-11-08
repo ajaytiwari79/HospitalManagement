@@ -35,6 +35,6 @@ public class TodoDTO {
     private String activityName;
     private LocalDateTime approvedOn;
     private String remark;
-
+    private String comment;
 
 }

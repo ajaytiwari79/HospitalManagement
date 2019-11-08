@@ -31,8 +31,8 @@ public class TodoController {
 
     @ApiOperation("Update status Of Todo")
     @PutMapping
-    public ResponseEntity<Map<String,Object>> updateTodoStatus(@RequestParam(required = false) BigInteger todoId, @RequestParam TodoStatus status,@RequestParam(required = false) BigInteger shiftId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,todoService.updateTodoStatus(todoId,status,shiftId));
+    public ResponseEntity<Map<String,Object>> updateTodoStatus(@RequestParam(required = false) BigInteger todoId, @RequestParam TodoStatus status,@RequestParam(required = false) BigInteger shiftId,@RequestBody(required = false) String comment){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,todoService.updateTodoStatus(todoId,status,shiftId,comment));
     }
 
     @ApiOperation("get all todo of Staff")

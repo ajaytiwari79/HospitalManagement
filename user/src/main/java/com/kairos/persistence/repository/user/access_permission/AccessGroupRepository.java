@@ -323,10 +323,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     @Query("MATCH(ag:AccessGroup)-[r:" + DAY_TYPES + "]->(dayType:DayType) WHERE id(ag)={0} DETACH DELETE r\n")
     void unlinkDayTypes(Long accessGroupId);
 
-    @Query("MATCH (staff:Staff),(org) WHERE id(staff)={0} AND id(org)={1} WITH org,staff " +
-            "MATCH (staff)-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]-(up:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]-(org) " +
-            "MATCH(position)<-[:"+HAS_POSITIONS+"]-(organization:Organization)-["+BELONGS_TO+"]-(country:Country)" +
-            "MATCH (up)-[:"+HAS_ACCESS_GROUP+"]-[r:" + DAY_TYPES + "]-(dayType:DayType) RETURN ag,r,dayType")
+    @Query("MATCH (staff:Staff),(org) WHERE id(staff)={0} AND id(org)={1} \n" +
+            "WITH org,staff MATCH (staff)-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org) \n" +
+            "MATCH(position)<-[:HAS_POSITIONS]-(organization:Organization)-[:BELONGS_TO]-(country:Country) \n" +
+            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup)-[r:DAY_TYPES]->(dayType:DayType) RETURN ag,collect(r),collect(dayType)")
     List<AccessGroup> getAccessGroupWithDayTypesByStaffIdAndUnitId(Long staffId, Long unitId);
 }
 
