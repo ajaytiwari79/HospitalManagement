@@ -174,6 +174,14 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         return (int)getInterval().getMinutes();
     }
 
+    public int getTotalPlannedMinutes(){
+        return plannedMinutesOfPayout + plannedMinutesOfTimebank;
+    }
+
+    public int getTotalCtaBonusMinutes(){
+        return payoutCtaBonusMinutes + timeBankCtaBonusMinutes;
+    }
+
     public void resetTimebankDetails(){
         this.plannedMinutesOfTimebank = 0;
         this.timeBankCtaBonusMinutes = 0;
