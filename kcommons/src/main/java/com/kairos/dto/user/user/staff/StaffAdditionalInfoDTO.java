@@ -49,7 +49,7 @@ public class StaffAdditionalInfoDTO {
     private List<ReasonCodeDTO> reasonCodes=new ArrayList<>();
     private UserAccessRoleDTO userAccessRoleDTO;
     private List<SkillLevelDTO> skillLevelDTOS;
-    private boolean countryAdmin;
+
 
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
         this.employment = employment;

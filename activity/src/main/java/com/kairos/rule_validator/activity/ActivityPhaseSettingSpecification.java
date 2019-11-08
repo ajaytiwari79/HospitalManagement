@@ -11,7 +11,6 @@ import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.rule_validator.AbstractSpecification;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -70,9 +69,10 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
                     throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
                 }
             }
-            if(!staffAdditionalInfoDTO.isCountryAdmin() && !CollectionUtils.containsAny(phase.getAccessGroupIds(),staffAdditionalInfoDTO.getUserAccessRoleDTO().getAccessGroupIds())){
-                throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
-            }
+            //TODO CRITICAL DON'T REMOVE THIS COMMENTED CODE
+//            if(!CollectionUtils.containsAny(phase.getAccessGroupIds(),staffAdditionalInfoDTO.getUserAccessRoleDTO().getAccessGroupIds())){
+//                throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
+//            }
         });
     }
 
