@@ -42,6 +42,7 @@ import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
 import com.kairos.persistence.repository.activity.ActivityCategoryRepository;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -77,8 +78,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
@@ -102,6 +107,7 @@ import static com.kairos.service.activity.ActivityUtil.*;
 /**
  * Created by pawanmandhan on 17/8/17.
  */
+@Transactional
 @Service
 public class ActivityService {
     @Inject
@@ -991,6 +997,53 @@ public class ActivityService {
         List<OpenShiftIntervalDTO> intervals = openShiftIntervalRepository.getAllByCountryIdAndDeletedFalse(countryId);
         List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
+    }
+
+    public void updateBackgroundColorInShifts(String newTimeTypeColor, String existingTimeTypeColor,BigInteger timeTypeId) {
+        if(!existingTimeTypeColor.equals(newTimeTypeColor)){
+            new Thread(new Runnable() {
+                public void run() {
+                    updateColorInActivity(newTimeTypeColor, timeTypeId);
+                    updateColorInShift(newTimeTypeColor, timeTypeId);
+                }
+            }).start();
+
+        }
+    }
+
+    private void updateColorInActivity(String newTimeTypeColor,BigInteger timeTypeId) {
+        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
+        if (isCollectionNotEmpty(activities)) {
+            activities.forEach(activity -> activity.getGeneralActivityTab().setBackgroundColor(newTimeTypeColor));
+            activityMongoRepository.saveEntities(activities);
+        }
+    }
+
+    private void updateColorInShift(String newTimeTypeColor,BigInteger timeTypeId) {
+        Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeTypeId).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
+        shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
+            updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, shiftActivity);
+            if(isNotNull(shift.getDraftShift())){
+                shift.getDraftShift().getActivities().forEach(draftShiftActivity->{
+                    updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, draftShiftActivity);
+                });
+            }
+        }));
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
+        }
+    }
+
+    private void updateBackgroundColorInShiftActivity(String newTimeTypeColor, Set<BigInteger> activitiyIds, ShiftActivity shiftActivity) {
+        if(activitiyIds.contains(shiftActivity.getActivityId())){
+            shiftActivity.setBackgroundColor(newTimeTypeColor);
+        }
+        shiftActivity.getChildActivities().forEach(childActivity -> {
+            if(activitiyIds.contains(childActivity.getActivityId())){
+                childActivity.setBackgroundColor(newTimeTypeColor);
+            }
+        });
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
