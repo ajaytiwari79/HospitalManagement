@@ -82,13 +82,13 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
         }
 
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
-            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
                     "WHERE id(expertise) IN {expertiseIds} ";
         } else {
-            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  OPTIONAL MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)  ";
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  OPTIONAL MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)  ";
         }
 
-        matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, " +
+        matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, COLLECT(tag) AS tags, " +
                 "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList " +
                 " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
                 " with engineerType,employments, staff, user, employmentList, expertiseList";

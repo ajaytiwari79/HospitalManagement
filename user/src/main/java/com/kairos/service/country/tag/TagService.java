@@ -19,6 +19,7 @@ import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.staff.StaffService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,9 @@ public class TagService {
     @Inject
     private OrganizationService organizationService;
 
+    @Inject
+    private StaffService staffService;
+
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -87,7 +91,7 @@ public class TagService {
     }
 
     private void mappingTagAtOrganization(TagDTO tagDTO) {
-        List<Unit> units = unitGraphRepository.getUnitsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
+        List<Unit> units = unitGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
         if(isCollectionNotEmpty(units)) {
             for(Unit unit : units) {
                 Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0));
@@ -105,7 +109,6 @@ public class TagService {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (country == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-
         }
         Tag tag = tagGraphRepository.getCountryTagByIdAndDataType(tagId, countryId, tagDTO.getMasterDataType().toString(), false);
         if (tag == null) {
@@ -159,11 +162,9 @@ public class TagService {
         Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (!Optional.ofNullable(unit).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
-
         }
         if (tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)) {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
-
         }
         Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, ObjectMapperUtils.copyPropertiesByMapper(tagDTO.getPenaltyScore(), PenaltyScore.class));
         if (CollectionUtils.isNotEmpty(unit.getTags())) {
@@ -200,14 +201,13 @@ public class TagService {
         Unit unit = unitGraphRepository.findOne(orgId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, orgId);
-
         }
         Tag tag = tagGraphRepository.getOrganizationTag(tagId, orgId, false);
         if (tag == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TAB_ID_NOTFOUND, tagId);
-
         }
         tag.setDeleted(true);
+        staffService.unlinkTagFromStaff(orgId, tagId);
         tagGraphRepository.save(tag);
         return true;
     }
@@ -222,7 +222,6 @@ public class TagService {
         } else {
             tagsData.put("tags", tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText, masterDataType.toString()));
         }
-
         return tagsData;
     }
 
@@ -230,7 +229,6 @@ public class TagService {
         Unit unit = unitGraphRepository.findOne(organizationId, 0);
         if (unit == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
-
         }
         unit.setShowCountryTags(showCountryTags);
         unitGraphRepository.save(unit);

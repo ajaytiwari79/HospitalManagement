@@ -134,7 +134,6 @@ public class TagService extends MongoBaseService {
 
     public HashMap<String,Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType){
 
-
         if(filterText == null){
             filterText = "";
         }
