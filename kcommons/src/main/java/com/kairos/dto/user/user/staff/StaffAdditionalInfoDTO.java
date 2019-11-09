@@ -48,7 +48,7 @@ public class StaffAdditionalInfoDTO {
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private List<ReasonCodeDTO> reasonCodes=new ArrayList<>();
     private UserAccessRoleDTO userAccessRoleDTO;
-    private List<StaffChildDetailDTO> staffChildDetailDTOS;
+    private List<StaffChildDetailDTO> staffChildDetails;
 
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
         this.employment = employment;
