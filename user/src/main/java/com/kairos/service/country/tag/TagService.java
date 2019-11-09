@@ -8,10 +8,12 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.PenaltyScore;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.country.tag.TagQueryResult;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
+import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -68,6 +70,9 @@ public class TagService {
     @Inject
     private StaffService staffService;
 
+    @Inject
+    private OrganizationGraphRepository organizationGraphRepository;
+
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -91,9 +96,9 @@ public class TagService {
     }
 
     private void mappingTagAtOrganization(TagDTO tagDTO) {
-        List<Unit> units = unitGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
-        if(isCollectionNotEmpty(units)) {
-            for(Unit unit : units) {
+        List<Organization> organizations = unitGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
+        if(isCollectionNotEmpty(organizations)) {
+            for(Organization unit : organizations) {
                 Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0));
                 if (isCollectionNotEmpty(unit.getTags())) {
                     unit.getTags().add(tag);
@@ -101,7 +106,7 @@ public class TagService {
                     unit.setTags(Arrays.asList(tag));
                 }
             }
-            unitGraphRepository.saveAll(units);
+            organizationGraphRepository.saveAll(organizations);
         }
     }
 
