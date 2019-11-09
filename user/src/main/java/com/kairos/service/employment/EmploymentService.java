@@ -84,10 +84,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -1046,18 +1043,20 @@ public class EmploymentService {
 
     }
 
-    public void triggerEmploymentLine(ExpertiseDTO expertiseDTO,ExpertiseLine expertiseLine){
-        Expertise expertise=expertiseGraphRepository.findOne(expertiseDTO.getId(),2);
-        List<Employment> employments=employmentGraphRepository.findAllEmploymentByExpertiseId(expertise.getId());
+    public void triggerEmploymentLine(Long expertiseId,ExpertiseLine expertiseLine){
+        Expertise expertise=expertiseGraphRepository.findOne(expertiseId,2);
+        List<Employment> employmentsList=employmentGraphRepository.findAllEmploymentByExpertiseId(expertise.getId());
+        List<Employment> employments=new CopyOnWriteArrayList<>(employmentsList);
         DateTimeInterval expertiseLineInterval=new DateTimeInterval(expertiseLine.getStartDate(),expertiseLine.getEndDate());
         List<Employment> employmentList=new ArrayList<>();
         for (Employment employment:employments) {
-            for (EmploymentLine employmentLine:employment.getEmploymentLines()) {
+            List<EmploymentLine> employmentLines=new CopyOnWriteArrayList<>(employment.getEmploymentLines());
+            for (EmploymentLine employmentLine:employmentLines) {
                 DateTimeInterval employmentLineInterval=new DateTimeInterval(employmentLine.getStartDate(),employmentLine.getEndDate());
                 if(expertiseLineInterval.overlaps(employmentLineInterval)){
                     if(employmentLine.getStartDate().isBefore(expertiseLine.getStartDate())){
                         employmentLine.setEndDate(expertiseLine.getStartDate().minusDays(1));
-                        EmploymentLine employmentLineToBeCreated=getEmploymentLine(expertiseLine,employment,expertiseLine.getStartDate(),employmentLine.getEndDate(),employmentLine);
+                        EmploymentLine employmentLineToBeCreated=getEmploymentLine(expertiseLine,employment,expertiseLine.getStartDate(),employmentLine.getEndDate(),employmentLine,expertiseId);
                         employment.getEmploymentLines().add(employmentLineToBeCreated);
                         linkExistingRelations(employmentLineToBeCreated,employmentLine);
                     }else {
@@ -1088,9 +1087,9 @@ public class EmploymentService {
         employmentLineFunctionRelationRepository.saveAll(employmentLineFunctionRelationShipsList);
     }
 
-    private EmploymentLine getEmploymentLine(ExpertiseLine expertiseLine,Employment employment,LocalDate startDate,LocalDate endDate,EmploymentLine employmentLine){
+    private EmploymentLine getEmploymentLine(ExpertiseLine expertiseLine,Employment employment,LocalDate startDate,LocalDate endDate,EmploymentLine employmentLine,Long expertiseId){
         return new EmploymentLine.EmploymentLineBuilder()
-                .setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(),expertiseLine,employment.getExpertise().getId()))
+                .setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(),expertiseLine,expertiseId))
                 .setStartDate(startDate)
                 .setEndDate(endDate)
                 .setTotalWeeklyMinutes(employmentLine.getTotalWeeklyMinutes())

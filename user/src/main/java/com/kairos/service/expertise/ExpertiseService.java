@@ -214,7 +214,6 @@ public class ExpertiseService {
 
     public ExpertiseQueryResult updateExpertiseLine(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId, Long expertiseLineId) {
         expertiseDTO.setExpertiseLineId(expertiseLineId);
-        Country country = countryGraphRepository.findById(countryId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, COUNTRY, countryId)));
         Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId())));
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine currentExpertiseLine = expertise.getExpertiseLines().stream().filter(k -> k.getId().equals(expertiseLineId)).findFirst().orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(PLEASE_PROVIDE_THE_VALID_LINE_ID)));
@@ -235,7 +234,7 @@ public class ExpertiseService {
             expertise.getExpertiseLines().add(expertiseLine);
             expertiseDTO.getSeniorityLevels().forEach(k -> k.setId(null));
             addSeniorityLevelsInExpertise(expertiseLine, expertiseDTO, expertise);
-            employmentService.triggerEmploymentLine(expertiseDTO, expertiseLine);
+            employmentService.triggerEmploymentLine(expertiseId, expertiseLine);
         } else {
             addSeniorityLevelsInExpertise(currentExpertiseLine, expertiseDTO, expertise);
             updateExistingLine(expertiseDTO, expertise, currentExpertiseLine);

@@ -48,13 +48,13 @@ public class Expertise extends UserBaseEntity {
 
 
     @Relationship(type = HAS_SENIOR_DAYS)
-    private List<CareDays> seniorDays;
+    private List<SeniorCareDays> seniorDays;
 
     @Relationship(type = HAS_PROTECTED_DAYS_OFF_SETTINGS)
     private List<ProtectedDaysOffSetting> protectedDaysOffSettings = new ArrayList<>();
 
     @Relationship(type = HAS_CHILD_CARE_DAYS)
-    private List<CareDays> childCareDays;
+    private List<ChildCareDays> childCareDays;
 
     @Relationship(type = HAS_EXPERTISE_LINES)
     private List<ExpertiseLine> expertiseLines = new ArrayList<>();
@@ -93,22 +93,12 @@ public class Expertise extends UserBaseEntity {
         this.expertiseLines = expertiseLines;
     }
 
-    public List<CareDays> getSeniorDays() {
+    public List<SeniorCareDays> getSeniorDays() {
         return seniorDays = Optional.ofNullable(seniorDays).orElse(new ArrayList<>());
     }
 
 
-    public void addSeniorDay(CareDays seniorDays) {
-        this.seniorDays = Optional.ofNullable(this.seniorDays).orElse(new ArrayList<>());
-        this.seniorDays.add(seniorDays);
-    }
-
-    public void addChildCareDay(CareDays childCareDay) {
-        this.childCareDays = Optional.ofNullable(this.childCareDays).orElse(new ArrayList<>());
-        this.childCareDays.add(childCareDay);
-    }
-
-    public List<CareDays> getChildCareDays() {
+    public List<ChildCareDays> getChildCareDays() {
         return childCareDays = Optional.ofNullable(childCareDays).orElse(new ArrayList<>());
     }
 

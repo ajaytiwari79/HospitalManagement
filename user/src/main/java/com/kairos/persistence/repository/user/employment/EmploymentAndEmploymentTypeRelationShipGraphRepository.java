@@ -21,6 +21,6 @@ public interface EmploymentAndEmploymentTypeRelationShipGraphRepository extends 
     "set newRelation.employmentTypeCategory={2} ")
     void updateEmploymentTypeInCurrentEmploymentLine(Long employmentLineId, Long newEmploymentType, EmploymentCategory newCategory);
 
-    @Query("MATCH(employmentLine)-[rel:"+HAS_EMPLOYMENT_TYPE+"]-(empType:EmploymentType) return employmentLine,rel,empType" )
+    @Query("MATCH(employmentLine:EmploymentLine)-[rel:"+HAS_EMPLOYMENT_TYPE+"]-(empType:EmploymentType) WHERE ID(employmentLine)={0} return employmentLine,rel,empType" )
     EmploymentLineEmploymentTypeRelationShip findByEmploymentLineId(Long employmentLineId);
 }

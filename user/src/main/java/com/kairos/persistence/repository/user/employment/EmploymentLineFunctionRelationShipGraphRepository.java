@@ -10,9 +10,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.APPLI
 
 public interface EmploymentLineFunctionRelationShipGraphRepository extends Neo4jBaseRepository<EmploymentLineFunctionRelationShip, Long> {
 
-    @Query("MATCH(empLine:EmploymentLine)-[rel"+APPLICABLE_FUNCTION+"]->(function:Function) WHERE id(empLine)={0} RETURN empLine,COLLECT(rel),COLLECT(function) ")
+    @Query("MATCH(empLine:EmploymentLine)-[rel:"+APPLICABLE_FUNCTION+"]->(function:Function) WHERE id(empLine)={0} RETURN empLine,COLLECT(rel),COLLECT(function) ")
     List<EmploymentLineFunctionRelationShip> findAllByEmploymentLineId(Long employmentLineId);
 
-    @Query("MATCH(empLine:EmploymentLine)-[rel"+APPLICABLE_FUNCTION+"]->(function:Function) WHERE id(empLine)={0} RETURN empLine,COLLECT(rel),COLLECT(function) ")
+    @Query("MATCH(empLine:EmploymentLine)-[rel:"+APPLICABLE_FUNCTION+"]->(function:Function) WHERE id(empLine)={0} RETURN empLine,COLLECT(rel),COLLECT(function) ")
     void linkExistingFunction(Long existingEmploymentLineId,Long employmentLineIdToBeLinked);
 }
