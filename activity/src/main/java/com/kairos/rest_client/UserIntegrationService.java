@@ -29,6 +29,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.*;
@@ -44,10 +45,12 @@ import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
+import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
@@ -65,8 +68,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_EMPLOYMENT_NOTFOUND;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_NOT_FOUND_BY_USER;
 import static com.kairos.constants.ApiConstants.*;
@@ -864,6 +866,18 @@ public class UserIntegrationService {
         });
     }
 
+    public List<Tag> getAllStaffTagsByOrganizationId(Long organizationId) {
+        List<NameValuePair> queryParamList = new ArrayList<>();
+        queryParamList.add(new BasicNameValuePair("masterDataType", MasterDataTypeEnum.STAFF.toString()));
+        List<TagDTO> staffTags = genericRestClient.publishRequest(null, organizationId, RestClientUrlType.UNIT, HttpMethod.GET, "/tag", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TagDTO>>>() { });
+        List<Tag> tags = new ArrayList<>();
+        if(isCollectionNotEmpty(staffTags)){
+            for (TagDTO staffTag : staffTags) {
+                tags.add(new Tag(BigInteger.valueOf(staffTag.getId()), staffTag.getName(), staffTag.getMasterDataType(), staffTag.isCountryTag(), staffTag.isCountryTag() ? staffTag.getCountryId() : staffTag.getOrganizationId()));
+            }
+        }
+        return tags;
+    }
 }
 
 

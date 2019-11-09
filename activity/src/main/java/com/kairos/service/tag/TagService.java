@@ -132,7 +132,7 @@ public class TagService extends MongoBaseService {
         return tag;
     }
 
-    public HashMap<String,Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType){
+    public HashMap<String,Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType, boolean includeStaffTags){
 
         if(filterText == null){
             filterText = "";
@@ -152,6 +152,9 @@ public class TagService extends MongoBaseService {
             } else {
                 tags.addAll( tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false));
             }
+        }
+        if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.toString().equals(masterDataType)){
+            tags.addAll(userIntegrationService.getAllStaffTagsByOrganizationId(organizationId));
         }
         tagsData.put("tags",tags);
         return tagsData;

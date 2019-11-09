@@ -83,7 +83,7 @@ public class TagController {
                                                                   @RequestParam(value = "filterText",required = false) String filterText,
                                                                   @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType,
                                                                   @RequestParam(value = "includeStaffTags",required = false) boolean includeStaffTags) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType, includeStaffTags));
     }
 
     @ApiOperation(value = "Delete Organization Tag")
