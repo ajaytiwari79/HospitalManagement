@@ -244,7 +244,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<Shift> findShiftByShiftActivityIdAndBetweenDate(Collection<BigInteger> shiftActivityIds,LocalDate startDate,LocalDate endDate,Long staffId) {
-        Criteria criteria = where(ACTIVITIES_ACTIVITY_ID).in(shiftActivityIds).and(DELETED).is(false);
+        Criteria criteria = Criteria.where(DELETED).is(false).orOperator(where(ACTIVITIES_ACTIVITY_ID).in(shiftActivityIds),where("activities.childActivities.activityId").in(shiftActivityIds));
         if(isNotNull(startDate) && isNotNull(endDate)){
             criteria = criteria.and(START_DATE).gte(startDate).lte(endDate);
         }
