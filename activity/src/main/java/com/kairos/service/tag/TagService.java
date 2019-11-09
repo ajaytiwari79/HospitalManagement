@@ -153,8 +153,8 @@ public class TagService extends MongoBaseService {
                 tags.addAll( tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false));
             }
         }
-        if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.toString().equals(masterDataType)){
-            tags.addAll(userIntegrationService.getAllStaffTagsByOrganizationId(organizationId));
+        if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
+            tags.addAll(userIntegrationService.getAllStaffTagsByOrganizationId(organizationId, filterText));
         }
         tagsData.put("tags",tags);
         return tagsData;

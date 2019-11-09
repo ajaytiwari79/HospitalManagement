@@ -866,14 +866,15 @@ public class UserIntegrationService {
         });
     }
 
-    public List<Tag> getAllStaffTagsByOrganizationId(Long organizationId) {
+    public List<Tag> getAllStaffTagsByOrganizationId(Long organizationId, String filterText) {
         List<NameValuePair> queryParamList = new ArrayList<>();
         queryParamList.add(new BasicNameValuePair("masterDataType", MasterDataTypeEnum.STAFF.toString()));
-        List<TagDTO> staffTags = genericRestClient.publishRequest(null, organizationId, RestClientUrlType.UNIT, HttpMethod.GET, "/tag", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TagDTO>>>() { });
+        queryParamList.add(new BasicNameValuePair("filterText", filterText));
+        Map<String, Object> staffTags = genericRestClient.publishRequest(null, organizationId, RestClientUrlType.UNIT, HttpMethod.GET, "/tag", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, Object>>>() { });
         List<Tag> tags = new ArrayList<>();
-        if(isCollectionNotEmpty(staffTags)){
-            for (TagDTO staffTag : staffTags) {
-                tags.add(new Tag(BigInteger.valueOf(staffTag.getId()), staffTag.getName(), staffTag.getMasterDataType(), staffTag.isCountryTag(), staffTag.isCountryTag() ? staffTag.getCountryId() : staffTag.getOrganizationId()));
+        if(staffTags.containsKey("tags")){
+            for (Map<String, Object> staffTag : (List<Map<String,Object>>) staffTags.get("tags")) {
+                tags.add(new Tag(new BigInteger(staffTag.get("id").toString()), staffTag.get("name").toString(), MasterDataTypeEnum.valueOf(staffTag.get("masterDataType").toString()), (Boolean) staffTag.get("countryTag"), organizationId));
             }
         }
         return tags;
