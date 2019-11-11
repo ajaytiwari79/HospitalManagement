@@ -339,6 +339,7 @@ public class StaffService {
             });
         }
         staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
+        staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId(), staffToUpdate.getStaffChildDetails().stream().map(staffChildDetail -> staffChildDetail.getId()).collect(Collectors.toList()));
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {

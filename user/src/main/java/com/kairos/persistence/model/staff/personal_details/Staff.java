@@ -55,6 +55,9 @@ public class Staff extends UserBaseEntity {
     @Relationship(type = HAS_FAVOURITE_FILTERS)
     private List<StaffFavouriteFilter> staffFavouriteFilterList;
 
+    @Relationship(type = HAS_CHILDREN)
+    private List<StaffChildDetail> staffChildDetails;
+
     private String generalNote;
     private String reqFromPerson;
     @KPermissionField
@@ -111,8 +114,6 @@ public class Staff extends UserBaseEntity {
 
     private String access_token; // specially required for chat server only
     private String user_id; //specially required for chat server only
-    @Relationship(type = HAS_CHILDREN)
-    private List<StaffChildDetail> staffChildDetails;
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
         this.email = email;
