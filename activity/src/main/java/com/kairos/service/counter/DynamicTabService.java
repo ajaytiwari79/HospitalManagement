@@ -115,7 +115,7 @@ public class DynamicTabService extends MongoBaseService {
                 duplicateEntries.add(kpiDashboardDTO);
             }
         });
-        if (ObjectUtils.isCollectionEmpty(duplicateEntries)) {
+        if (ObjectUtils.isCollectionNotEmpty(duplicateEntries)) {
             exceptionService.duplicateDataException(ERROR_DASHBOARD_NAME_DUPLICATE);
         }
     }

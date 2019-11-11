@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,7 +49,7 @@ public class PhaseDTO {
     public Long getOrganizationId() {
         return organizationId;
     }
-    private Set<Long> accessGroupIds;
+    private Set<Long> accessGroupIds=new HashSet<>();
 
     public void setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;

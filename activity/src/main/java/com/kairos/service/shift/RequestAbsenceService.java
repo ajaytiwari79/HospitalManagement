@@ -67,6 +67,18 @@ public class RequestAbsenceService {
 
     public List<ShiftWithActivityDTO> createOrUpdateRequestAbsence(RequestAbsenceDTO requestAbsenceDTO){
         Optional<Shift> shiftOptional = shiftMongoRepository.findById(requestAbsenceDTO.getShiftId());
+        verifyRequestAbsence(requestAbsenceDTO, shiftOptional);
+        RequestAbsence requestAbsence = copyPropertiesByMapper(requestAbsenceDTO,RequestAbsence.class);
+        Activity activity = activityMongoRepository.findOne(requestAbsence.getActivityId());
+        requestAbsence.setActivityName(activity.getName());
+        Shift shift = shiftOptional.get();
+        shift.setRequestAbsence(requestAbsence);
+        shiftMongoRepository.save(shift);
+        todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE,null,true);
+        return shiftDetailsService.shiftDetailsById(shift.getUnitId(), newArrayList(shift.getId()), false);
+    }
+
+    private void verifyRequestAbsence(RequestAbsenceDTO requestAbsenceDTO, Optional<Shift> shiftOptional) {
         if(!shiftOptional.isPresent()){
             exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,requestAbsenceDTO.getShiftId());
         }
@@ -77,14 +89,12 @@ public class RequestAbsenceService {
         if(!timeTypeEnum.equals(TimeTypeEnum.ABSENCE)){
             exceptionService.actionNotPermittedException(REQUEST_ABSENCE_ACTIVITY_TYPE);
         }
-        RequestAbsence requestAbsence = copyPropertiesByMapper(requestAbsenceDTO,RequestAbsence.class);
-        Activity activity = activityMongoRepository.findOne(requestAbsence.getActivityId());
-        requestAbsence.setActivityName(activity.getName());
-        Shift shift = shiftOptional.get();
-        shift.setRequestAbsence(requestAbsence);
-        shiftMongoRepository.save(shift);
-        todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE,null,true);
-        return shiftDetailsService.shiftDetailsById(shift.getUnitId(), newArrayList(shift.getId()), false);
+        if(isNotNull(requestAbsenceDTO.getStartDate()) && isNotNull(requestAbsenceDTO.getEndDate())){
+            DateTimeInterval dateTimeInterval=new DateTimeInterval(shiftOptional.get().getStartDate(),shiftOptional.get().getEndDate());
+            if(!dateTimeInterval.containsInterval(new DateTimeInterval(requestAbsenceDTO.getStartDate(),requestAbsenceDTO.getEndDate()))){
+                exceptionService.actionNotPermittedException(REQUEST_ABSENCE_REQUESTED);
+            }
+        }
     }
 
     public Long deleteRequestAbsence(BigInteger shiftId){

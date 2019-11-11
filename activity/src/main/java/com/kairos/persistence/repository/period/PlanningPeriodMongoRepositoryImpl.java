@@ -76,6 +76,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
                 and("id").as("id").
                 andInclude("name").
                 andInclude(START_DATE).
+                andInclude(UNIT_ID).
                 andInclude(END_DATE).
                 andInclude(PHASE_FLIPPING_DATE).
                 andInclude(PUBLISH_EMPLOYMENT_IDS).
