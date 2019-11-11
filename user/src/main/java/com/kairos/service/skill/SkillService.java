@@ -1,14 +1,15 @@
 package com.kairos.service.skill;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.SkillLevel;
+import com.kairos.persistence.model.auth.StaffSkillLevelRelationship;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
@@ -19,8 +20,6 @@ import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDT
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
@@ -28,14 +27,10 @@ import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.rest_client.SkillServiceTemplateClient;
-import com.kairos.rest_client.TaskDemandRestClient;
-import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
-import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +42,10 @@ import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
+import static com.kairos.constants.UserMessagesConstants.MESSAGE_SKILL_NAME_DUPLICATE;
 
 /**
  * Created by oodles on 15/9/16.
@@ -75,23 +70,9 @@ public class SkillService {
     @Inject
     private TeamService teamService;
     @Inject
-    private TeamGraphRepository teamGraphRepository;
-    @Inject
     private MailService mailService;
     @Inject
     private UserSkillLevelRelationshipGraphRepository userSkillLevelRelationshipGraphRepository;
-    @Inject
-    private OrganizationMetadataRepository organizationMetadataRepository;
-    @Inject
-    private CitizenStatusService citizenStatusService;
-    @Inject
-    private EnvConfig envConfig;
-    @Inject
-    SkillServiceTemplateClient skillServiceTemplateClient;
-    @Inject
-    private TimeSlotService timeSlotService;
-    @Inject
-    private TaskDemandRestClient taskDemandRestClient;
     @Inject
     private TagService tagService;
     @Inject
@@ -107,13 +88,13 @@ public class SkillService {
             return null;
         }
         String name = "(?i)" + skillDTO.getName();
-        logger.info("Added regex to Name: " + name);
+        logger.info("Added regex to Name: {}" , name);
         if (skillGraphRepository.checkDuplicateSkill(skillCategoryId, name).isEmpty()) {
             logger.info("Creating unique skill");
             Skill skill = new Skill(skillDTO);
             skill.setSkillCategory(skillCategory);
             List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(skillDTO.getTags(), MasterDataTypeEnum.SKILL);
-            logger.info("tags for skill : " + tags);
+            logger.info("tags for skill : {}" , tags);
             skill.setTags(tags);
             skillGraphRepository.save(skill);
             return skill.retrieveDetails();
@@ -160,10 +141,6 @@ public class SkillService {
         return null;
     }
 
-
-    public SkillCategory safeDeleteSkill(Long categoryId, Long skillId) {
-        return skillGraphRepository.safeDelete(categoryId, skillId);
-    }
 
     public List<Skill> getSkillsByCategoryId(Long id) {
         return skillGraphRepository.skillsByCategoryId(id);
@@ -237,30 +214,12 @@ public class SkillService {
         return true;
     }
 
-    /**
-     * to update visitour id of skill for particular organization
-     *
-     * @param unitId
-     * @param skillId
-     * @return
-     */
-   /* public boolean updateVisitourIdOfSkill(long unitId, long skillId, String visitourId,String type) {
-
-        if(ORGANIZATION.equalsIgnoreCase(type)){
-            return skillGraphRepository.updateVisitourIdOfSkillInOrganization(unitId, skillId, visitourId);
-        } else if(TEAM.equalsIgnoreCase(type)) {
-            return skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,visitourId);
-        } else {
-            throw new InternalError("Type incorrect");
-        }
-    }*/
     public boolean updateSkillOfOrganization(long unitId, long skillId, OrganizationSkillDTO organizationSkillDTO) {
         Boolean skillUpdated;
 
         if (organizationSkillDTO.getCustomName() == null || organizationSkillDTO.getCustomName() == "") {
             skillUpdated = skillGraphRepository.updateSkillOfOrganization(unitId, skillId);
         } else {
-//                updateOrganizationTagsOfSkill
             skillUpdated = skillGraphRepository.updateSkillOfOrganizationWithCustomName(unitId, skillId, organizationSkillDTO.getCustomName());
         }
         if (skillUpdated) {
@@ -272,7 +231,6 @@ public class SkillService {
 
     public boolean requestForCreateNewSkill(long unitId, Skill skill) {
         Unit unit = unitGraphRepository.findOne(unitId);
-
         if (unit == null) {
             return false;
         }
@@ -314,91 +272,25 @@ public class SkillService {
         return map;
     }
 
-    /**
-     * @param
-     * @param staffId
-     * @param removedSkillIds
-     * @param isSelected
-     * @param unitId
-     * @return
-     */
-    public List assignSkillToStaff(long staffId, List<Long> removedSkillIds, boolean isSelected, long unitId) {
 
-        Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff == null) {
-            return null;
-        }
-        List<Map<String, Object>> response;
-        if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE, true);
-            response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
-        } else {
-            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
-            response = Collections.emptyList();
-        }
-        /*if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId) != 0) {
-            logger.info("Staff  is TaskGiver: Now Syncing Skills in Visitour");
-            updateSkillsOfStaffInVisitour(staff, unitId);
-        }*/
-        return response;
-
+    public void updateStaffSkillLevel(Long staffId, SkillDTO skillDTO) {
+        Skill skill=skillGraphRepository.findById(skillDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("skill not found")));
+        Staff staff=staffGraphRepository.findById(skillDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("staff not found")));
+        userSkillLevelRelationshipGraphRepository.removeExistingByStaffIdAndSkillId(staffId,skillDTO.getId());
+        List<StaffSkillLevelRelationship> staffSkillLevelRelationships=new ArrayList<>(3);
+        skillDTO.getSkillLevels().forEach(skillLevelDTO -> staffSkillLevelRelationships.add(new StaffSkillLevelRelationship(staff,skill,skillLevelDTO.getSkillLevel(),skillLevelDTO.getStartDate(),skillLevelDTO.getEndDate(),true)));
+        userSkillLevelRelationshipGraphRepository.saveAll(staffSkillLevelRelationships);
     }
 
-    private List<Map<String, Object>> prepareSelectedSkillResponse(long staffId, List<Long> skillId, long unitId) {
-
-        List<Map<String, Object>> staffSkillInfo = staffGraphRepository.getStaffSkillInfo(staffId, skillId, unitId);
-
-        List<Map<String, Object>> list = new ArrayList<>();
-
-        Map<String, Object> copyMap;
-        for (Map<String, Object> staffSkillRel : staffSkillInfo) {
-            Map<String, Object> staffSkillRelInfo = (Map<String, Object>) staffSkillRel.get("data");
-            copyMap = new HashMap<>();
-            copyMap.putAll(staffSkillRelInfo);
-            copyMap.put("startDate", getDate((long) staffSkillRelInfo.get("startDate")));
-            copyMap.put("endDate", getDate((long) staffSkillRelInfo.get("endDate")));
-            copyMap.put("lastSyncInVisitour", getDate((long) staffSkillRelInfo.get("lastSyncInVisitour")));
-            list.add(copyMap);
-        }
-        return list;
-
-    }
-
-
-    public void updateStaffSkillLevel(long staffId, long skillId, SkillLevel skillLevel, long startDate, long endDate, boolean status, long unitId) {
-        Staff staff = staffGraphRepository.findOne(staffId);
-        userSkillLevelRelationshipGraphRepository.updateStaffSkill(staffId, skillId, skillLevel, startDate, endDate, status);
-    }
-
-
-    public boolean assignSkillToStaff(long id, long staffId, long skillId, boolean isSelected) {
-
-        Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_ID_NOTFOUND);
-
-        }
-
-        long lastModificationDate = DateUtils.getCurrentDate().getTime();
-        if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, SkillLevel.ADVANCE, true);
-        } else {
-            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, SkillLevel.ADVANCE, false);
-        }
-        return true;
-    }
 
     public Map<String, Object> getStaffSkills(long id) {
 
 
         List<Map<String, Object>> skills = null;
-        List<Map<String, Object>> response = new ArrayList<>();
         List<StaffPersonalDetailDTO> staffList;
         staffList = staffRetrievalService.getStaffWithBasicInfo(id, false);
         List<Long> staffIds = new ArrayList<>(staffList.size());
-        staffList.stream().forEach(staffPersonalDetailDTO -> {
-            staffIds.add(staffPersonalDetailDTO.getId());
-        });
+        staffList.stream().forEach(staffPersonalDetailDTO -> staffIds.add(staffPersonalDetailDTO.getId()));
         skills = unitGraphRepository.getAssignedSkillsOfStaffByOrganization(id, staffIds);
 
 

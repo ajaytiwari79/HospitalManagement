@@ -155,12 +155,6 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffSkills(unitId));
     }
 
-    @ApiOperation(value = "assign skill to staff")
-    @PutMapping(UNIT_URL + "/skill/{skillId}/assign")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> assignSkillToStaff(@PathVariable long skillId,  @PathVariable long unitId, @RequestBody Map<String, Object> data) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.assignSkillToStaff(unitId, Long.valueOf((String) data.get("staffId")), skillId, (boolean) data.get(IS_SELECTED)));
-    }
 
     @ApiOperation(value = "Get Available Services")
     @GetMapping(UNIT_URL + "/service/data")
