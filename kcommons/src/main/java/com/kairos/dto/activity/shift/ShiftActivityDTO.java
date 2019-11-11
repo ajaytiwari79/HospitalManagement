@@ -77,6 +77,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private List<ShiftActivityDTO> childActivities = new ArrayList<>();
     private boolean breakNotHeld;
     private Long employmentId;
+    private BigInteger phaseId;
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = startDate;
         this.endDate = endDate;

@@ -52,7 +52,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 /**
  * Created by oodles on 30/1/17.
  */
-@Service("nametest")
+@Service
 @Transactional
 public class AbsencePlanningService {
     public static final String STAFF_LIST = "staffList";
