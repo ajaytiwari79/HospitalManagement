@@ -28,7 +28,4 @@ public class StaffChildDetail extends UserBaseEntity {
     private Gender gender;
     private boolean childCustodyRights;
 
-    public Integer getAge(){
-        return CPRUtil.getAgeFromCPRNumber(cprNumber);
-    }
 }

@@ -25,8 +25,4 @@ public class StaffChildDetailDTO {
     @JsonIgnore
     private Gender gender;
     private boolean childCustodyRights;
-
-    public Integer getAge(){
-        return CPRUtil.getAgeFromCPRNumber(cprNumber);
-    }
 }

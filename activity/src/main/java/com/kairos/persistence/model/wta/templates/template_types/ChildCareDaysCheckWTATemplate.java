@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getCareDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByActivity;
 
@@ -49,7 +48,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         if (!isDisabled()) {
             //CareDaysDTO careDays = getCareDays(infoWrapper.getChildCareDays(), infoWrapper.getStaffAge());
             if (isCollectionNotEmpty(infoWrapper.getChildCareDays())) {
-                Long leaveCount = calculateChildCareDaysLeaveCount(infoWrapper.getChildCareDays(), infoWrapper.getStaffChildAges());
+                long leaveCount = calculateChildCareDaysLeaveCount(infoWrapper.getChildCareDays(), infoWrapper.getStaffChildAges());
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
                 if (isNotNull(dateTimeInterval)) {
                     List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
@@ -65,12 +64,12 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     }
 
-    private Long calculateChildCareDaysLeaveCount(List<CareDaysDTO> careDaysDTOS, List<Integer> staffChildAges){
-        Long leaveCount = 0L;
+    private long calculateChildCareDaysLeaveCount(List<CareDaysDTO> careDaysDTOS, List<Integer> staffChildAges){
+        long leaveCount = 0L;
         if(isCollectionNotEmpty(staffChildAges)) {
             for (Integer staffChildAge : staffChildAges) {
                 for (CareDaysDTO careDaysDTO : careDaysDTOS) {
-                    if(staffChildAge >= careDaysDTO.getFrom() && staffChildAge <= careDaysDTO.getTo()) {
+                    if(staffChildAge >= careDaysDTO.getFrom() && isNull(careDaysDTO.getTo()) || staffChildAge <= careDaysDTO.getTo()) {
                         leaveCount += careDaysDTO.getLeavesAllowed();
                         break;
                     }
