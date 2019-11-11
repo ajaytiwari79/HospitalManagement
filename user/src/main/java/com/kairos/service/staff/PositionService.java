@@ -152,6 +152,7 @@ public class PositionService {
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffPositionDetail.getTimeCareExternalId());
         objectToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPositionDetail.getTags(), Tag.class));
+        staffGraphRepository.unlinkTagsFromStaff(staffId, unitId);
         staffGraphRepository.save(objectToUpdate);
         positionGraphRepository.updatePositionStartDateOfStaff(objectToUpdate.getId(), positionStartDate);
         StaffPositionDTO staffPositionDTO = new StaffPositionDTO(objectToUpdate, positionStartDate);
@@ -173,7 +174,7 @@ public class PositionService {
         map.put("timeCareExternalId", staff.getExternalId());
         LocalDate dateOfBirth = (user.getDateOfBirth());
         map.put("dateOfBirth", dateOfBirth);
-
+        map.put("tags", staff.getTags());
         return map;
     }
 

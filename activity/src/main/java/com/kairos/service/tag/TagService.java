@@ -66,7 +66,7 @@ public class TagService extends MongoBaseService {
         return tag;
     }
 
-    public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
+    public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType,boolean includeStaffTags){
         if ( !userIntegrationService.isCountryExists(countryId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID,countryId);
         }
@@ -78,12 +78,16 @@ public class TagService extends MongoBaseService {
         }*/
 
         HashMap<String,Object> tagsData = new HashMap<>();
+        List<Tag> tags;
         if(masterDataType == null){
-            tagsData.put("tags", tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false));
+            tags = tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false);
         } else {
-            tagsData.put("tags", tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false));
+            tags = tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false);
         }
-
+        if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
+            tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(countryId, filterText, true));
+        }
+        tagsData.put("tags",tags);
         return tagsData;
     }
 
@@ -149,7 +153,7 @@ public class TagService extends MongoBaseService {
             }
         }
         if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
-            tags.addAll(userIntegrationService.getAllStaffTagsByOrganizationId(organizationId, filterText));
+            tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(organizationId, filterText, false));
         }
         tagsData.put("tags",tags);
         return tagsData;

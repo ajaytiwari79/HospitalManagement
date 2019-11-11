@@ -59,7 +59,7 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
             "WHERE id(tag)={1} AND id(country) = {0} AND tag.deleted={2} return tag")
     Tag getCountryTag(long countryId, long tagId, boolean isDeleted);
 
-    @Query("Match (org:Unit)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
+    @Query("Match (org:OrganizationBaseEntity)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
             "WHERE id(tag)={0} AND id(org) = {1} AND tag.deleted={2} return tag")
     Tag getOrganizationTag(long tagId, long orgId, boolean isDeleted);
 
@@ -70,7 +70,7 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
     Tag getCountryTagByIdAndDataType(Long tagId, Long countryId, String masterDataType, boolean isDeleted);
 
     
-    @Query("Match (org:Unit)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag{countryTag:false})\n" +
+    @Query("Match (org:OrganizationBaseEntity)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag{countryTag:false})\n" +
             "WHERE id(tag)={0} AND id(org) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
             "RETURN tag")
     Tag getOrganizationTagByIdAndDataType(Long tagId, Long orgId, String masterDataType, boolean isDeleted);
@@ -82,7 +82,7 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
     boolean isCountryTagExistsWithSameNameAndDataType(String name, Long countryId, String masterDataType, boolean isDeleted);
 
     
-    @Query("Match (org:Unit)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
+    @Query("Match (org:OrganizationBaseEntity)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
             "WHERE tag.name={0} AND id(org) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
             "RETURN CASE WHEN count(tag)>0 THEN true ELSE false END")
     boolean isOrganizationTagExistsWithSameNameAndDataType(String name, Long orgId, String masterDataType, boolean isDeleted);
@@ -105,7 +105,7 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
     @Query("MATCH (s:Skill)-[hasTag:" + HAS_TAG + "]-(tag:Tag) WHERE  id(s)={0} AND tag.deleted = {1} return tag")
     List<Tag> getTagsOfSkillByDeleted(long skillId, boolean deleted);
 
-    @Query("Match (org:Unit)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag{countryTag:false})\n" +
+    @Query("Match (org:OrganizationBaseEntity)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag{countryTag:false})\n" +
             "WHERE id(org)={0} AND id(tag) IN {1} AND tag.deleted= {3} AND tag.masterDataType ={2}\n" +
             "return tag\n")
     List<Tag> getOrganizationTagsById(Long orgId, List<Long> tagIds, String masterDataType, boolean deleted);

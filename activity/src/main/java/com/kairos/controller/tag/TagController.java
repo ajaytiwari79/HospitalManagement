@@ -51,8 +51,9 @@ public class TagController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryTag(@PathVariable long countryId,
                                                              @RequestParam(value = "filterText",required = false) String filterText,
-                                                             @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfCountryTags(countryId, filterText, masterDataType));
+                                                             @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType,
+                                                             @RequestParam(value = "includeStaffTags",required = false) boolean includeStaffTags) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfCountryTags(countryId, filterText, masterDataType, includeStaffTags));
     }
 
     @ApiOperation(value = "Delete Country Tag")

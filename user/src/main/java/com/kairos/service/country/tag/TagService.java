@@ -164,26 +164,26 @@ public class TagService {
 
 
     public Tag addOrganizationTag(Long organizationId, TagDTO tagDTO) {
-        Unit unit = unitGraphRepository.findOne(organizationId, 0);
-        if (!Optional.ofNullable(unit).isPresent()) {
+        OrganizationBaseEntity org = organizationBaseRepository.findOne(organizationId, 0);
+        if (!Optional.ofNullable(org).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
         }
         if (tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)) {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
         }
         Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, ObjectMapperUtils.copyPropertiesByMapper(tagDTO.getPenaltyScore(), PenaltyScore.class));
-        if (CollectionUtils.isNotEmpty(unit.getTags())) {
-            unit.getTags().add(tag);
+        if (CollectionUtils.isNotEmpty(org.getTags())) {
+            org.getTags().add(tag);
         } else {
-            unit.setTags(Arrays.asList(tag));
+            org.setTags(Arrays.asList(tag));
         }
-        unitGraphRepository.save(unit);
+        organizationBaseRepository.save(org);
         return tag;
     }
 
     public Tag updateOrganizationTag(Long organizationId, Long tagId, TagDTO tagDTO) {
-        Unit unit = unitGraphRepository.findOne(organizationId, 0);
-        if (unit == null) {
+        OrganizationBaseEntity org = organizationBaseRepository.findOne(organizationId, 0);
+        if (org == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
 
         }
@@ -203,8 +203,8 @@ public class TagService {
     }
 
     public Boolean deleteOrganizationTag(Long orgId, Long tagId) {
-        Unit unit = unitGraphRepository.findOne(orgId, 0);
-        if (unit == null) {
+        OrganizationBaseEntity org = organizationBaseRepository.findOne(orgId, 0);
+        if (org == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, orgId);
         }
         Tag tag = tagGraphRepository.getOrganizationTag(tagId, orgId, false);
@@ -231,12 +231,12 @@ public class TagService {
     }
 
     public Boolean updateShowCountryTagSettingOfOrganization(Long organizationId, boolean showCountryTags) {
-        Unit unit = unitGraphRepository.findOne(organizationId, 0);
-        if (unit == null) {
+        OrganizationBaseEntity org = organizationBaseRepository.findOne(organizationId, 0);
+        if (org == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
         }
-        unit.setShowCountryTags(showCountryTags);
-        unitGraphRepository.save(unit);
+        org.setShowCountryTags(showCountryTags);
+        organizationBaseRepository.save(org);
         return showCountryTags;
     }
 
