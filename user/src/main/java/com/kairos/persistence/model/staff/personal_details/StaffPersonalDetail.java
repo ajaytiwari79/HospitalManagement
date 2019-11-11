@@ -68,7 +68,7 @@ public class StaffPersonalDetail {
     private String userName;
     private boolean userNameUpdated;
     private List<StaffTeamDTO> teamDetails;
-    private List<StaffChildDetailDTO> staffChildDetailDTOS;
+    private List<StaffChildDetailDTO> staffChildDetails;
 
     public void setPrimaryAddress(AddressDTO primaryAddress) {
         this.primaryAddress = primaryAddress;

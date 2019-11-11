@@ -332,13 +332,13 @@ public class StaffService {
     }
 
     private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
-        if(isCollectionNotEmpty(staffPersonalDetail.getStaffChildDetailDTOS())){
-            staffPersonalDetail.getStaffChildDetailDTOS().forEach(staffChildDetailDTO -> {
+        if(isCollectionNotEmpty(staffPersonalDetail.getStaffChildDetails())){
+            staffPersonalDetail.getStaffChildDetails().forEach(staffChildDetailDTO -> {
                 staffChildDetailDTO.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffChildDetailDTO.getCprNumber()));
                 staffChildDetailDTO.setGender(CPRUtil.getGenderFromCPRNumber(staffChildDetailDTO.getCprNumber()));
             });
         }
-        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetailDTOS(), StaffChildDetail.class));
+        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
