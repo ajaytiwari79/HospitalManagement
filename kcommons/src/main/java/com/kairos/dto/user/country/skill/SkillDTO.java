@@ -33,7 +33,7 @@ public class SkillDTO {
         this.description = description;
     }
 
-    @AssertTrue(message = "Access group can't be blank")
+    @AssertTrue(message = "Please provide valid dates")
     public boolean isValid() {
         SkillLevelDTO advanceSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.ADVANCE)).findAny().get();
         SkillLevelDTO basicSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.BASIC)).findAny().get();
