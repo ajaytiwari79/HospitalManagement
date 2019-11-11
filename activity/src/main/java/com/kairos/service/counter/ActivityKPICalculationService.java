@@ -437,7 +437,7 @@ public class ActivityKPICalculationService implements CounterService {
             boolean validPlannedTime = isCollectionEmpty(plannedTimeIds) || CollectionUtils.containsAny(plannedTimeIds,shiftActivityDTO.getPlannedTimes().stream().map(PlannedTime::getPlannedTimeId).collect(Collectors.toSet()));
             boolean validStatus = isCollectionEmpty(filterBasedCriteria.get(ACTIVITY_STATUS)) || CollectionUtils.containsAny(filterBasedCriteria.get(ACTIVITY_STATUS),shiftActivityDTO.getStatus());
             boolean validTeamActivity = isCollectionEmpty(teamActivityIds) || teamActivityIds.contains(shiftActivityDTO.getActivityId());
-            return validActivity && validTimeType && validPlannedTime && validStatus && validTeamActivity;
+            return validActivity && validTimeType && validPlannedTime && validStatus && validTeamActivity && validReasonCode;
         }
     }
 }
