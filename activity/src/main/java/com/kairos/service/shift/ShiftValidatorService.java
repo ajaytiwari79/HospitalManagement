@@ -71,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -97,7 +98,7 @@ import static java.util.Collections.singletonList;
  * @author pradeep
  * @date - 10/5/18
  */
-@Component
+@Service
 public class ShiftValidatorService {
 
     private static final Logger logger = LoggerFactory.getLogger(ShiftValidatorService.class);

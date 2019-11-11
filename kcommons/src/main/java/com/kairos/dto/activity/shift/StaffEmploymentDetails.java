@@ -94,4 +94,8 @@ public class StaffEmploymentDetails {
         this.hourlyCost = hourlyCost;
         this.employmentLines = employmentLines;
     }
+
+    public StaffEmploymentDetails(EmploymentType employmentType) {
+        this.employmentType = employmentType;
+    }
 }
