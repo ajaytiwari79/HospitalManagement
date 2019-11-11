@@ -770,7 +770,7 @@ public  class DateUtils {
         return dateTime.toDate();
     }
 
-    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
+    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType) {
         switch (durationType) {
             case MONTHS:
                 date = date.with(TemporalAdjusters.lastDayOfMonth());

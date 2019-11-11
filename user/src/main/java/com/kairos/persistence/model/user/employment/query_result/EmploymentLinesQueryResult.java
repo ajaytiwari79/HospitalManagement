@@ -30,6 +30,7 @@ public class EmploymentLinesQueryResult {
     private CTAResponseDTO costTimeAgreement;
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
+    private Long employmentTypeId;
 
     public EmploymentLinesQueryResult() {
         //DC
@@ -178,5 +179,21 @@ public class EmploymentLinesQueryResult {
 
     public void setAccumulatedTimebankMinutes(long accumulatedTimebankMinutes) {
         this.accumulatedTimebankMinutes = accumulatedTimebankMinutes;
+    }
+
+    public LocalDate getAccumulatedTimebankDate() {
+        return accumulatedTimebankDate;
+    }
+
+    public void setAccumulatedTimebankDate(LocalDate accumulatedTimebankDate) {
+        this.accumulatedTimebankDate = accumulatedTimebankDate;
+    }
+
+    public Long getEmploymentTypeId() {
+        return employmentTypeId;
+    }
+
+    public void setEmploymentTypeId(Long employmentTypeId) {
+        this.employmentTypeId = employmentTypeId;
     }
 }
