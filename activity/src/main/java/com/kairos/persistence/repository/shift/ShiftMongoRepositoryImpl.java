@@ -244,7 +244,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     @Override
     public List<Shift> findShiftByShiftActivityIdAndBetweenDate(Collection<BigInteger> shiftActivityIds,LocalDate startDate,LocalDate endDate,Long staffId) {
-        Criteria criteria = where(ACTIVITIES_ACTIVITY_ID).in(shiftActivityIds).and(DELETED).is(false);
+        Criteria criteria = Criteria.where(DELETED).is(false).orOperator(where(ACTIVITIES_ACTIVITY_ID).in(shiftActivityIds),where("activities.childActivities.activityId").in(shiftActivityIds));
         if(isNotNull(startDate) && isNotNull(endDate)){
             criteria = criteria.and(START_DATE).gte(startDate).lte(endDate);
         }
@@ -547,10 +547,12 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'plannedMinutesOfPayout':1,\n" +
                 "        'plannedMinutesOfTimebank':1,\n" +
                 "        'payoutCtaBonusMinutes':1,\n" +
+                "        'createdBy':1,\n" +
                 "    'staffId' : 1,\n" +
                 "    'startDate' : 1,\n" +
                 "    'endDate' : 1,\n" +
                 "    'employmentId' : 1,\n" +
+                "    'phaseId' : 1,\n" +
                 " 'dayOfWeek': { '$dayOfWeek': '$startDate' }\n" +
                 "\t'activities.id' : 1,\n" +
                 "        'activities.activityId' : 1,\n" +
@@ -581,7 +583,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private String groupByShiftAndActivity() {
         return "{'$group':{'_id':'$_id', 'durationMinutes':{'$first':'$durationMinutes'},\n" +
-                "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'activities':{'$addToSet':'$activities'}}}";
+                "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'createdBy':{'$first':'$createdBy'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'phaseId':{'$first':'$phaseId'},'activities':{'$addToSet':'$activities'}}}";
     }
 
 
@@ -660,6 +662,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     private <T extends ShiftDTO> void updateActivityInShiftActivities(Map<BigInteger, ActivityDTO> activityDTOMap, T shift) {
         shift.getActivities().forEach(shiftActivityDTO -> {
             shiftActivityDTO.setEmploymentId(shift.getEmploymentId());
+            shiftActivityDTO.setPhaseId(shift.getPhaseId());
             shiftActivityDTO.setActivity(activityDTOMap.get(shiftActivityDTO.getActivityId()));
             shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> childActivityDTO.setActivity(activityDTOMap.get(childActivityDTO.getActivityId())));
         });

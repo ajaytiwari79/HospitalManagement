@@ -26,6 +26,7 @@ import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.DurationType;
@@ -64,8 +65,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.dto.activity.counter.enums.CounterType.ABSENCES_PER_INTERVAL;
 import static com.kairos.enums.FilterType.*;
@@ -249,7 +249,7 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(FilterType.TIME_TYPE)) {
             getTimeTypesDefaultData(criteriaList, defaultKpiDataDTO);
         }
-        List<Long> unitIds = defaultKpiDataDTO.getOrganizationCommonDTOS().stream().map(OrganizationCommonDTO::getId).collect(toList());
+        List<Long> unitIds = isCollectionNotEmpty(defaultKpiDataDTO.getOrganizationCommonDTOS()) ? defaultKpiDataDTO.getOrganizationCommonDTOS().stream().map(OrganizationCommonDTO::getId).collect(toList()) : newArrayList(UserContext.getUserDetails().getLastSelectedOrganizationId());
         if (kpi.getFilterTypes().contains(FilterType.PHASE)) {
             getPhaseDefaultData(criteriaList);
         }
@@ -271,9 +271,20 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(REASON_CODE)) {
             getReasonCodeData(criteriaList, defaultKpiDataDTO);
         }
+        if (kpi.getFilterTypes().contains(PLANNED_BY)) {
+            getPlannedByUnitData(criteriaList);
+        }
         if (kpi.getFilterTypes().contains(TEAM) && isCollectionNotEmpty(unitIds)) {
             getTeamUnitData(criteriaList,unitIds.get(0));
         }
+    }
+
+    private void getPlannedByUnitData(List<FilterCriteria> criteriaList){
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        for (AccessGroupRole accessGroupRole : AccessGroupRole.values()) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(accessGroupRole.name(), accessGroupRole.name().toLowerCase()));
+        }
+        criteriaList.add(new FilterCriteria(PLANNED_BY.value, PLANNED_BY, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getActivityDefaultData(List<FilterCriteria> criteriaList, List<Long> unitIds) {

@@ -131,13 +131,16 @@ public class TimeBankService{
         return true;
     }
 
-    public void saveTimeBanksAndPayOut(List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, Date startDate, Date endDate) {
+    public void saveTimeBanksAndPayOut(List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS, Date startDate, Date endDate) {
         Date startDateTime = new DateTime(startDate).withTimeAtStartOfDay().toDate();
         Date endDateTime = new DateTime(endDate).plusDays(1).withTimeAtStartOfDay().toDate();
         List<Long> employmentIds = new ArrayList<>(staffAdditionalInfoDTOS.stream().map(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmployment().getId()).collect(Collectors.toSet()));
         timeBankRepository.deleteDailyTimeBank(employmentIds, startDateTime, endDateTime);
         List<Shift> shiftsList = shiftMongoRepository.findAllOverlappedShiftsAndEmploymentId(employmentIds, startDateTime, endDateTime);
         Map<Long, List<Shift>> shiftMapByEmploymentId = shiftsList.stream().collect(Collectors.groupingBy(Shift::getEmploymentId));
+        List<BigInteger> activityIdsList = shiftsList.stream().flatMap(s -> s.getActivities().stream().map(ShiftActivity::getActivityId)).distinct().collect(Collectors.toList());
+        List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
             List<Shift> shiftList = shiftMapByEmploymentId.getOrDefault(staffAdditionalInfoDTO.getEmployment().getId(), new ArrayList<>());
             for (Shift shift : shiftList) {
@@ -277,7 +280,7 @@ public class TimeBankService{
             intervals = timeBankCalculationService.getAllIntervalsBetweenDates(startDate, endDate, query);
         }else {
             endDate = asDate(planningPeriod.getEndDate());
-            Interval todayInterval = new Interval(startDate.getTime(),query.equals(WEEK) ? asDate(asZoneDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY))).getTime() : getEndOfDay(endDate).getTime());
+            Interval todayInterval = new Interval(startDate.getTime(),query.equals(WEEK) ? asDate(asZoneDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY))).getTime() : getEndOfDay(startDate).getTime());
             Interval planningPeriodInterval = new Interval(asDate(planningPeriod.getStartDate()).getTime(),asDate(planningPeriod.getEndDate()).getTime());
             Interval yearTillDate = new Interval(asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())).getTime(),asDate(planningPeriod.getStartDate().with(TemporalAdjusters.lastDayOfYear()).plusDays(1)).getTime());
             intervals = newArrayList(todayInterval,planningPeriodInterval,yearTillDate);

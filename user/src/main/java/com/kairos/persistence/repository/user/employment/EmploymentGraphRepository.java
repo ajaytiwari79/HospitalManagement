@@ -31,7 +31,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "MATCH(employmentLine)-[employmentRel:"+HAS_EMPLOYMENT_TYPE+"]->(employmentType:EmploymentType) \n" +
             "WITH expertise,employment,employmentLine, employmentRel,employmentType\n" +
             "OPTIONAL MATCH (employment)-[rel:"+APPLIED_FUNCTION+"]->(appliedFunction:Function)  \n" +
-            "WITH expertise,employment,employmentLine, employmentType,employmentRel,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,appliedDates:rel.appliedDates}) end as appliedFunctions  \n" +
+            "WITH expertise,employment,employmentLine, employmentType,employmentRel,CASE WHEN appliedFunction IS NULL THEN [] ELSE Collect({id:id(appliedFunction),name:appliedFunction.name,icon:appliedFunction.icon,code:appliedFunction.code,appliedDates:rel.appliedDates}) end as appliedFunctions  \n" +
             "with expertise,employment,appliedFunctions,\n" +
             "CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
             " avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,employmentType:{employmentTypeCategory:employmentRel.employmentTypeCategory,name:employmentType.name,id:id(employmentType)},fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines\n" +
@@ -191,7 +191,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "MATCH(employmentLine)-[employmentRel:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType) " +
             "OPTIONAL MATCH (employmentLine)-[functionalRel:" + APPLICABLE_FUNCTION + "]-(function:Function) "+
             "OPTIONAL MATCH(employment)-[:" + IN_UNIT + "]-(org:Unit)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality)-[:" + HAS_MUNICIPALITY + "]-(pga:PayGroupArea)<-[pgaRel:" + HAS_PAY_GROUP_AREA + "]-(payGrade) " +
-            " WITH  employment,employmentLine,payGrade,seniorityLevel,employmentType,employmentRel,pgaRel,functionalRel, case function when  null  then [] else collect({id:id(function),name:function.name,icon:function.icon, amount:functionalRel.amount}) end as functionData "+
+            " WITH  employment,employmentLine,payGrade,seniorityLevel,employmentType,employmentRel,pgaRel,functionalRel, case function when  null  then [] else collect({id:id(function),name:function.name,icon:function.icon,code:function.code, amount:functionalRel.amount}) end as functionData "+
             "return id(employmentLine) as id,id(employment) as employmentId," +
             "{id:id(seniorityLevel),from:seniorityLevel.from,pensionPercentage:seniorityLevel.pensionPercentage,freeChoicePercentage:seniorityLevel.freeChoicePercentage," +
             " freeChoiceToPension:seniorityLevel.freeChoiceToPension,to:seniorityLevel.to,functions:collect(functionData[0])," +

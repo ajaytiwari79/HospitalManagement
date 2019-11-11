@@ -71,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -82,7 +83,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.getHoursByMinutes;
+import static com.kairos.commons.utils.ObjectUtils.getHoursStringByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
@@ -97,7 +98,7 @@ import static java.util.Collections.singletonList;
  * @author pradeep
  * @date - 10/5/18
  */
-@Component
+@Service
 public class ShiftValidatorService {
 
     private static final Logger logger = LoggerFactory.getLogger(ShiftValidatorService.class);
@@ -205,7 +206,7 @@ public class ShiftValidatorService {
         Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
         TimeBankCalculationService.CalculatePlannedHoursAndScheduledHours calculatePlannedHoursAndScheduledHours = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours(staffAdditionalInfoDTO, dateTimeInterval, newArrayList(shift), false, false, dayTypeDTOMap).calculate();
         shift.setPlannedMinutesOfTimebank(calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes());
-        Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkills(), ruleTemplateSpecificInfo, exceptionService);
+        Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkillLevelDTOS(), ruleTemplateSpecificInfo, exceptionService);
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getEmployment().getExpertise(), ruleTemplateSpecificInfo);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
         Specification<ShiftWithActivityDTO> activitySpecification = activityExpertiseSpecification.and(activitySkillSpec).and(wtaRulesSpecification);
@@ -356,10 +357,10 @@ public class ShiftValidatorService {
 
     private void getErrorMessages(ShiftTimeDetails shiftTimeDetails, List<String> errorMessages, Short shortestTime, Short longestTime, LocalTime earliestStartTime, LocalTime latestStartTime) {
         if (shortestTime != null && shiftTimeDetails.getTotalTime() < shortestTime) {
-            errorMessages.add(exceptionService.convertMessage(ERROR_SHIFT_DURATION_LESS_THAN_SHORTEST_TIME, getHoursByMinutes(shortestTime)));
+            errorMessages.add(exceptionService.convertMessage(ERROR_SHIFT_DURATION_LESS_THAN_SHORTEST_TIME, getHoursStringByMinutes(shortestTime)));
         }
         if (longestTime != null && shiftTimeDetails.getTotalTime() > longestTime) {
-            errorMessages.add(exceptionService.convertMessage(ERROR_SHIFT_DURATION_EXCEEDS_LONGEST_TIME, getHoursByMinutes(longestTime)));
+            errorMessages.add(exceptionService.convertMessage(ERROR_SHIFT_DURATION_EXCEEDS_LONGEST_TIME, getHoursStringByMinutes(longestTime)));
         }
         if (earliestStartTime != null && earliestStartTime.isAfter(shiftTimeDetails.getActivityStartTime())) {
             errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_GREATER_THAN_EARLIEST_TIME, earliestStartTime));
@@ -552,7 +553,7 @@ public class ShiftValidatorService {
                     checkStaffingLevelInterval(lowerLimit, upperLimit, applicableIntervals, staffingLevel, shiftActivities, checkOverStaffing, shiftActivity,shiftUpdate);
                 }
             } else {
-                validateStaffingLevelForAbsenceTypeOfShift(staffingLevel, shiftActivity, checkOverStaffing, shiftActivities);
+                validateStaffingLevelForAbsenceTypeOfShift(staffingLevel, shiftActivity, checkOverStaffing, shiftActivities,shiftUpdate);
             }
         }
 
@@ -815,7 +816,7 @@ public class ShiftValidatorService {
     }
 
     private void validateStaffingLevelForAbsenceTypeOfShift(StaffingLevel staffingLevel, ShiftActivity
-            shiftActivity, boolean checkOverStaffing, List<ShiftActivity> shiftActivities) {
+            shiftActivity, boolean checkOverStaffing, List<ShiftActivity> shiftActivities,boolean shiftUpdate) {
         if (CollectionUtils.isEmpty(staffingLevel.getAbsenceStaffingLevelInterval())) {
             exceptionService.actionNotPermittedException(MESSAGE_STAFFINGLEVEL_ABSENT);
         }
@@ -831,11 +832,18 @@ public class ShiftValidatorService {
         }
         int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
         if ((checkOverStaffing && totalCount >= 0)) {
-            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING);
-
+            if(shiftUpdate){
+                ShiftService.staffingLevelForNew=OVERSTAFFING;
+            }else {
+                exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERSTAFFING);
+            }
         }
         if (!checkOverStaffing && totalCount <= 0) {
-            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_UNDERSTAFFING);
+            if(shiftUpdate){
+                ShiftService.staffingLevelForOld=UNDERSTAFFING;
+            }else {
+                exceptionService.actionNotPermittedException(MESSAGE_SHIFT_UNDERSTAFFING);
+            }
 
         }
     }
