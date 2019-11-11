@@ -210,9 +210,13 @@ public class RequestAbsenceService {
                 updatedShiftActivity.setId(null);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
                 updatedShiftActivity.setEndDate(timeInterval.getEndDate());
-                shiftActivities.add(updatedShiftActivity);
+                if(!updatedShiftActivity.getStartDate().equals(updatedShiftActivity.getEndDate())) {
+                    shiftActivities.add(updatedShiftActivity);
+                }
             }
-            shiftActivities.add(absenceActivity);
+            if(shiftActivities.stream().noneMatch(activity->activity.getActivityId().equals(absenceActivity.getActivityId()))) {
+                shiftActivities.add(absenceActivity);
+            }
         }else {
             shiftActivities.add(shiftActivity);
         }

@@ -186,7 +186,7 @@ public class StaffActivitySettingService extends MongoBaseService {
            StaffActivitySetting staffActivitySetting=new StaffActivitySetting(staffId,activitySetting.getActivityId(),activitySetting.getEmploymentId(),
                    unitId,activitySetting.getShortestTime(),activitySetting.getLongestTime(),activitySetting.getMinLength(),activitySetting.getMaxThisActivityPerShift(),
                    activitySetting.isEligibleForMove(),activitySetting.getEarliestStartTime(),activitySetting.getLatestStartTime(),activitySetting.getMaximumEndTime(),
-                   activityMap.get(activitySetting.getActivityId()).getRulesActivityTab().getDayTypes());
+                   activityMap.get(activitySetting.getActivityId()).getRulesActivityTab().getDayTypes(), activitySetting.getDefaultStartTime());
            staffActivitySettingSet.add(staffActivitySetting);
            StaffActivityResponse staffActivityResponse=new StaffActivityResponse(staffId,staffActivitySetting.getActivityId(),localeService.getMessage(DEFAULT_ADDED));
            success.add(staffActivityResponse);
