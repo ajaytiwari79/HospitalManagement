@@ -22,9 +22,9 @@ import java.util.Set;
 @QueryResult
 @Getter
 @Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
 public class StaffPersonalDetailDTO {
     private Long id;
     private String lastName;
@@ -61,11 +61,9 @@ public class StaffPersonalDetailDTO {
     private List<EmploymentTypeDTO> employmentTypes;
     private Long staffUserId;
 
-
     public Integer getAge() {
         this.age=this.cprNumber!=null?Period.between(CPRUtil.getDateOfBirthFromCPR(this.cprNumber), LocalDate.now()).getYears():null;
         return age;
     }
-
 
 }

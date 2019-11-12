@@ -55,6 +55,9 @@ public class Staff extends UserBaseEntity {
     @Relationship(type = HAS_FAVOURITE_FILTERS)
     private List<StaffFavouriteFilter> staffFavouriteFilterList;
 
+    @Relationship(type = HAS_CHILDREN)
+    private List<StaffChildDetail> staffChildDetails;
+
     private String generalNote;
     private String reqFromPerson;
     @KPermissionField
