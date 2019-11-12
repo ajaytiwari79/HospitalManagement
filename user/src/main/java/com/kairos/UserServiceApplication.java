@@ -34,7 +34,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -162,6 +164,16 @@ public class UserServiceApplication implements WebMvcConfigurer {
 				.interceptors(new SchedulerUserContextInterceptor(authorization))
 				.messageConverters(mappingJackson2HttpMessageConverter())
 				.build();
+	}
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
+			}
+		};
 	}
 
 
