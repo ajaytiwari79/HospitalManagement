@@ -447,7 +447,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN DISTINCT(staff)")
     List<Staff> getAllStaffIdsByOrganisationIdAndTagId(Long orgId, Long tagId);
 
-    @Query("MATCH (organization:Organization)-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]-(staff:Staff)-[rel:" + BELONGS_TO_TAGS + "]->(tag:Tag) where id(staff) = {0} AND id(organization) = {1} detach delete rel")
-    void unlinkTagsFromStaff(Long staffId, Long organizationId);
+    @Query("MATCH (staff:Staff)-[rel:" + BELONGS_TO_TAGS + "]->(tag:Tag) where id(staff) = {0} AND NOT id(tag) IN {1} detach delete rel")
+    void unlinkTagsFromStaff(Long staffId, List<Long> tagIds);
 }
 

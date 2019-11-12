@@ -100,6 +100,7 @@ public abstract class RelationshipConstants {
     public static final String BELONGS_TO = "BELONGS_TO";
     public static final String IS_A = "IS_A";
     public static final String BELONGS_TO_TAGS = "BELONGS_TO_TAGS";
+    public static final String HAS_PENALTY_SCORE =  "HAS_PENALTY_SCORE";
 
     public static final String HAS_ORGANIZATION_SERVICES = "HAS_ORGANIZATION_SERVICES";
     public static final String CIVILIAN_STATUS = "CIVILIAN_STATUS";

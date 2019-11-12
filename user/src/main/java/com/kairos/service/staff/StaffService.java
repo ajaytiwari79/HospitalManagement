@@ -25,6 +25,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -1040,7 +1041,9 @@ public class StaffService {
     public void unlinkTagFromStaff(Long orgId, Long tagId) {
         List<Staff> staffs = staffGraphRepository.getAllStaffIdsByOrganisationIdAndTagId(orgId, tagId);
         for (Staff staff : staffs) {
-            staff.setTags(staff.getTags().stream().filter(tag -> !tag.getId().equals(tagId)).collect(Collectors.toList()));
+            List<Tag> tags = staff.getTags().stream().filter(tag -> !tag.getId().equals(tagId)).collect(Collectors.toList());
+            staff.setTags(tags);
+            staffGraphRepository.unlinkTagsFromStaff(orgId, tags.stream().map(tag -> tagId).collect(Collectors.toList()));
         }
         staffGraphRepository.saveAll(staffs);
         //code to remove this tag id from activity tag also

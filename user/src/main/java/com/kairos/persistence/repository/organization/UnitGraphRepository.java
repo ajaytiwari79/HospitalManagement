@@ -464,9 +464,9 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "RETURN id(org) as unitId, COLLECT(id(organizationType)) as orgTypeIds")
     List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
 
-    @Query("MATCH (org:Organization)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
+    @Query("MATCH (org:OrganizationBaseEntity)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
             "RETURN org")
-    List<Organization> getOrganizationsBySubOrgTypeIds(List<Long> organizationSubTypeIds);
+    List<OrganizationBaseEntity> getOrganizationsBySubOrgTypeIds(List<Long> organizationSubTypeIds);
 
     @Query("MATCH (child:Unit) \n" +
             "OPTIONAL MATCH (child)<-[:" + HAS_SUB_ORGANIZATION + "]-(parent:Unit) WITH child,parent\n" +

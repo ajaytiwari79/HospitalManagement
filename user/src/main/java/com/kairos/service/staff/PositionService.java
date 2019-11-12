@@ -152,7 +152,7 @@ public class PositionService {
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffPositionDetail.getTimeCareExternalId());
         objectToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPositionDetail.getTags(), Tag.class));
-        staffGraphRepository.unlinkTagsFromStaff(staffId, unitId);
+        staffGraphRepository.unlinkTagsFromStaff(staffId,staffPositionDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
         staffGraphRepository.save(objectToUpdate);
         positionGraphRepository.updatePositionStartDateOfStaff(objectToUpdate.getId(), positionStartDate);
         StaffPositionDTO staffPositionDTO = new StaffPositionDTO(objectToUpdate, positionStartDate);

@@ -96,17 +96,17 @@ public class TagService {
     }
 
     private void mappingTagAtOrganization(TagDTO tagDTO) {
-        List<Organization> organizations = unitGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
+        List<OrganizationBaseEntity> organizations = unitGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
         if(isCollectionNotEmpty(organizations)) {
-            for(Organization unit : organizations) {
+            for(OrganizationBaseEntity org : organizations) {
                 Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0));
-                if (isCollectionNotEmpty(unit.getTags())) {
-                    unit.getTags().add(tag);
+                if (isCollectionNotEmpty(org.getTags())) {
+                    org.getTags().add(tag);
                 } else {
-                    unit.setTags(Arrays.asList(tag));
+                    org.setTags(Arrays.asList(tag));
                 }
             }
-            organizationGraphRepository.saveAll(organizations);
+            organizationBaseRepository.saveAll(organizations);
         }
     }
 
@@ -224,7 +224,7 @@ public class TagService {
         Map<String, Object> tagsData = new HashMap<>();
         if (masterDataType == null) {
             tagsData.put("tags", tagGraphRepository.getListOfOrganizationTags(organizationId, false, filterText));
-        } else {
+        }else {
             tagsData.put("tags", tagGraphRepository.getListOfOrganizationTagsByMasterDataType(organizationId, false, filterText, masterDataType.toString()));
         }
         return tagsData;

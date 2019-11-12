@@ -16,6 +16,8 @@ import org.neo4j.ogm.annotation.typeconversion.EnumString;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PENALTY_SCORE;
+
 /**
  * Created by prerna on 10/11/17.
  */
@@ -34,13 +36,14 @@ public class Tag extends UserBaseEntity {
     @EnumString(MasterDataTypeEnum.class)
     private MasterDataTypeEnum masterDataType;
 
+    @Relationship(type=HAS_PENALTY_SCORE)
+    private PenaltyScore penaltyScore;
+
     private boolean countryTag;
 
     private Long orgTypeId;
 
     private List<Long> orgSubTypeIds;
-
-    private PenaltyScore penaltyScore;
 
     public Tag(@NotBlank(message = "error.Tag.name.notEmptyOrNotNull") String name, MasterDataTypeEnum masterDataType, boolean countryTag) {
         this.name = name;
