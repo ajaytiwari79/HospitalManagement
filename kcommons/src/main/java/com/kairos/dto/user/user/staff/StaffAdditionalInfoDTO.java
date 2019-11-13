@@ -7,6 +7,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,6 +49,7 @@ public class StaffAdditionalInfoDTO {
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private List<ReasonCodeDTO> reasonCodes=new ArrayList<>();
     private UserAccessRoleDTO userAccessRoleDTO;
+    private List<StaffChildDetailDTO> staffChildDetails;
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
 

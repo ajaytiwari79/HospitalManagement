@@ -48,7 +48,6 @@ public class RulesActivityTab{
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --   -128 to 127
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.     -128 to 127
     private PQLSettings pqlSettings=new PQLSettings();
-    private boolean reasonCodeRequired;
     private ReasonCodeRequiredState reasonCodeRequiredState;
 
 }
