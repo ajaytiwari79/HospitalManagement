@@ -324,6 +324,10 @@ public class TagService {
     }
 
     public List<TagDTO> getTagsByOrganizationIdAndMasterDataType(Long orgId, MasterDataTypeEnum masterDataType) {
+        Unit unit = unitGraphRepository.findOne(orgId);
+        if(isNotNull(unit)){
+            orgId = organizationBaseRepository.findParentOrgId(orgId);
+        }
         List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfStaffOrganizationTags(orgId,false,"", masterDataType.toString());
         return ObjectMapperUtils.copyPropertiesOfListByMapper(tagQueryResults,TagDTO.class);
     }
