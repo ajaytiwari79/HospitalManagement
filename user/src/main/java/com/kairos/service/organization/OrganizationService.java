@@ -815,7 +815,7 @@ public class OrganizationService {
         if (CollectionUtils.isNotEmpty(unitIds)) {
             units = unitGraphRepository.findOrganizationsByIdsIn(unitIds);
         } else {
-            units = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+            units = organizationTypeGraphRepository.getOrganizationsByOrganizationTypeId(organizationSubTypeId);
         }
         units = units.stream().filter(unit -> unit.isWorkcentre()).collect(Collectors.toList());
         if (Optional.ofNullable(organizationSubType).isPresent()) {
