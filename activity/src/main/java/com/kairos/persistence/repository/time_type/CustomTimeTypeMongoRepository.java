@@ -11,5 +11,6 @@ public interface CustomTimeTypeMongoRepository {
      Set<BigInteger> findAllTimeTypeIdsByTimeTypeIds(List<BigInteger> timeTypeIds);
      Set<BigInteger> findTimeTypeIdssByTimeTypeEnum(List<String> timeTypeEnum);
      List<TimeTypeDTO> findTimeTypeWithItsParent();
+     List<BigInteger> findAllByDeletedFalseAndTimeType(String timeType);
 
 }

@@ -274,9 +274,9 @@ public class CounterDataService extends MongoBaseService {
         if (kpi.getFilterTypes().contains(PLANNED_BY)) {
             getPlannedByUnitData(criteriaList);
         }
-        if (kpi.getFilterTypes().contains(TEAM) && isCollectionNotEmpty(unitIds)) {
-            getTeamUnitData(criteriaList,unitIds.get(0));
-        }
+//        if (kpi.getFilterTypes().contains(TEAM) && isCollectionNotEmpty(unitIds)) {
+//            getTeamUnitData(criteriaList,unitIds.get(0));
+//        }
     }
 
     private void getPlannedByUnitData(List<FilterCriteria> criteriaList){

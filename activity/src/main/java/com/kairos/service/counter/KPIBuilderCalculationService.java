@@ -23,6 +23,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.kpi.CalculationBasedOn;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.Direction;
@@ -56,6 +57,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -181,10 +183,38 @@ public class KPIBuilderCalculationService implements CounterService {
                 break;
             case DELTA_TIMEBANK:
                 return getTotalTimeBank(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
+            case UNAVAILABILITY:
+                return  getUnavailabilityCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo);
             default:
                 break;
         }
         return getTotalValueByByType(staffId,dateTimeInterval,kpiCalculationRelatedInfo,methodParam);
+    }
+
+    private double getUnavailabilityCount(Long staffId, DateTimeInterval dateTimeInterval,KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        List<BigInteger> timeTypeIds =timeTypeService.getTimeTypeIdsByTimeTypeEnum(TimeTypeEnum.UNAVAILABLE_TIME.toString());
+        kpiCalculationRelatedInfo.filterBasedCriteria.put(TIME_TYPE,timeTypeIds);
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
+        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria()).invoke();
+        List<ShiftWithActivityDTO> shiftActivityDTOS=new ArrayList<>();
+        List<ShiftWithActivityDTO> shifts=new CopyOnWriteArrayList<>(filterShiftActivity.shifts);
+        double total=0;
+        for (ShiftActivityDTO shiftActivityDTO : filterShiftActivity.getShiftActivityDTOS()) {
+            for (ShiftWithActivityDTO shift : shifts) {
+                DateTimeInterval dateTimeIntervalOfShift=new DateTimeInterval(shiftActivityDTO.getStartDate(),shiftActivityDTO.getEndDate());
+                if(dateTimeIntervalOfShift.containsInterval(new DateTimeInterval(shift.getStartDate(),shift.getEndDate()))){
+                    shiftActivityDTOS.add(shift);
+                    shifts.remove(shift);
+                }
+            }
+        }
+        DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), DisplayUnit.class).get(0);
+        if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
+
+        } else if (DisplayUnit.COUNT.equals(calculationUnit)) {
+            total=shiftActivityDTOS.size();
+        }
+        return total;
     }
 
     private double getTotalTimeBank(Long staffId, DateTimeInterval dateTimeInterval,KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
