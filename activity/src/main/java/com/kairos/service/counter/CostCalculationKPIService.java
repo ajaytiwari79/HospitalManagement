@@ -33,9 +33,9 @@ public class CostCalculationKPIService {
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
 
   public double calculateTotalCostOfStaff(StaffKpiFilterDTO staffKpiFilterDTO, List<ShiftActivityDTO> shiftActivityDTOS, DateTimeInterval dateTimeInterval){
-      Map<Long,EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOMap=staffKpiFilterDTO.getEmployment().stream().collect(Collectors.toMap(k->k.getId(),v->v));
-      Map<Long, List<Day>> daytypesMap = staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
-      Map<Long, DayTypeDTO> dayTypeDTOMap =staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(k->k.getId(),v->v));
+      Map<Long,EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOMap=staffKpiFilterDTO.getEmployment().stream().collect(Collectors.toMap(EmploymentWithCtaDetailsDTO::getId, v->v));
+      Map<Long, List<Day>> daytypesMap = staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, DayTypeDTO::getValidDays));
+      Map<Long, DayTypeDTO> dayTypeDTOMap =staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v->v));
       double totalCost=0l;
       double totalCtaBonus=0l;
       for (ShiftActivityDTO shiftActivityDTO : shiftActivityDTOS) {
