@@ -31,8 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
@@ -96,7 +95,7 @@ public class TagService {
     }
 
     private void mappingTagAtOrganization(TagDTO tagDTO) {
-        List<Organization> organizations = unitGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
+        List<Organization> organizations = organizationGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
         if(isCollectionNotEmpty(organizations)) {
             for(Organization org : organizations) {
                 Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0));
@@ -218,6 +217,10 @@ public class TagService {
     }
 
     public Map<String, Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType) {
+        Unit unit = unitGraphRepository.findOne(organizationId);
+        if(isNotNull(unit)){
+            organizationId = organizationBaseRepository.findParentOrgId(organizationId);
+        }
         if (filterText == null) {
             filterText = "";
         }
@@ -321,7 +324,7 @@ public class TagService {
     }
 
     public List<TagDTO> getTagsByOrganizationIdAndMasterDataType(Long orgId, MasterDataTypeEnum masterDataType) {
-        List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfOrganizationTagsByMasterDataType(orgId,false,"", masterDataType.toString());
+        List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfStaffOrganizationTags(orgId,false,"", masterDataType.toString());
         return ObjectMapperUtils.copyPropertiesOfListByMapper(tagQueryResults,TagDTO.class);
     }
 }
