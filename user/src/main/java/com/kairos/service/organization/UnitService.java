@@ -121,7 +121,6 @@ public class UnitService {
     public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long parentOrgaziationId) {
         if (organizationBasicDTO.getId() == null) {
             companyCreationService.addNewUnit(organizationBasicDTO, parentOrgaziationId);
-
         } else {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }

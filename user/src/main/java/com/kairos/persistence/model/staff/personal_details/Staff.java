@@ -11,6 +11,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.EngineerType;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.user.language.Language;
 import lombok.Getter;
@@ -114,6 +115,9 @@ public class Staff extends UserBaseEntity {
 
     private String access_token; // specially required for chat server only
     private String user_id; //specially required for chat server only
+
+    @Relationship(type = BELONGS_TO_TAGS)
+    private List<Tag> tags;
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
         this.email = email;
