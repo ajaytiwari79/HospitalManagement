@@ -14,6 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PenaltyScoreDTO {
+    private Long id;
     private PenaltyScoreLevel penaltyScoreLevel;
     private int value;
 }

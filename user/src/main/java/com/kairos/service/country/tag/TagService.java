@@ -96,9 +96,9 @@ public class TagService {
     }
 
     private void mappingTagAtOrganization(TagDTO tagDTO) {
-        List<OrganizationBaseEntity> organizations = unitGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
+        List<Organization> organizations = unitGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
         if(isCollectionNotEmpty(organizations)) {
-            for(OrganizationBaseEntity org : organizations) {
+            for(Organization org : organizations) {
                 Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0));
                 if (isCollectionNotEmpty(org.getTags())) {
                     org.getTags().add(tag);
@@ -106,7 +106,7 @@ public class TagService {
                     org.setTags(Arrays.asList(tag));
                 }
             }
-            organizationBaseRepository.saveAll(organizations);
+            organizationGraphRepository.saveAll(organizations);
         }
     }
 
