@@ -21,6 +21,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -201,8 +202,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     Staff getStaffByUnitId(long unitId, long staffId);
 
 
-    @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE  id(staff)={0}\n" +
-            " RETURN staff, position.startDateMillis AS positionStartDate")
+    @Query("MATCH(organization:Organization)-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]->(staff:Staff)\n" +
+            "WHERE  id(staff)={0}\n"+
+            "OPTIONAL MATCH(staff)-[tagRel:" + BELONGS_TO_TAGS + "]->(tag:Tag) \n"+
+            "RETURN staff,collect(tagRel),collect(tag) AS tags, position.startDateMillis AS positionStartDate")
     StaffPositionDTO getStaffAndEmploymentByStaffId(long staffId);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} WITH unitPermission\n" +
@@ -436,6 +439,13 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (organization:Organization{deleted:false,isEnable:true,isKairosHub:true})-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WHERE id(organization)={0} AND id(user)={1} RETURN staff")
     Staff getStaffOfHubByHubIdAndUserId(Long hubId,Long userId);
+
+    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_TAGS]->(tag:Tag) WHERE id(organization)={0} AND id(tag)={1}  \n" +
+            "RETURN DISTINCT(staff)")
+    List<Staff> getAllStaffIdsByOrganisationIdAndTagId(Long orgId, Long tagId);
+
+    @Query("MATCH (staff:Staff)-[rel:" + BELONGS_TO_TAGS + "]->(tag:Tag) where id(staff) = {0} AND NOT id(tag) IN {1} detach delete rel")
+    void unlinkTagsFromStaff(Long staffId, List<Long> tagIds);
 
     @Query("MATCH (staff:Staff)-[rel:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) where id(staff) = {0} AND NOT id(staffChildDetail) IN{1} detach delete staffChildDetail")
     void unlinkStaffChilds(Long staffId, List<Long> staffChildIds);

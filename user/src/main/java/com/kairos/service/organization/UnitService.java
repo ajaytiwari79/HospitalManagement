@@ -121,7 +121,6 @@ public class UnitService {
     public OrganizationBasicDTO onBoardOrganization(OrganizationBasicDTO organizationBasicDTO, Long parentOrgaziationId) {
         if (organizationBasicDTO.getId() == null) {
             companyCreationService.addNewUnit(organizationBasicDTO, parentOrgaziationId);
-
         } else {
             companyCreationService.updateUnit(organizationBasicDTO, organizationBasicDTO.getId());
         }
@@ -152,7 +151,9 @@ public class UnitService {
         if (organization instanceof Organization) {
             organization=organizationGraphRepository.findOne(unitId);
             for (Unit unit : ((Organization) organization).getUnits()) {
-                organizationCommonDTOS.add(new OrganizationCommonDTO(unit.getId(),unit.getName()));
+                if(unit.isWorkcentre()) {
+                    organizationCommonDTOS.add(new OrganizationCommonDTO(unit.getId(), unit.getName()));
+                }
             }
         }else {
             organizationCommonDTOS.add(new OrganizationCommonDTO(organization.getId(),organization.getName()));

@@ -53,6 +53,7 @@ public class StaffAdditionalInfoDTO {
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
 
+
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
         this.employment = employment;
     }

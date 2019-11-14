@@ -82,6 +82,10 @@ public class ReasonCodeService {
         return reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, reasonCodeType);
     }
 
+    public List<ReasonCodeResponseDTO> getReasonCodesByUnitIds(List<Long> unitIds, ReasonCodeType reasonCodeType) {
+        return reasonCodeGraphRepository.findReasonCodesByUnitIdsAndReasonCodeType(unitIds, reasonCodeType);
+    }
+
     public ReasonCodeResponseDTO updateReasonCodeForCountry(long countryId, ReasonCodeDTO reasonCodeDTO) {
         boolean isNameAlreadyExists = reasonCodeGraphRepository.findByNameExcludingCurrent(countryId, reasonCodeDTO.getId(), "(?i)" + reasonCodeDTO.getName(), reasonCodeDTO.getReasonCodeType());
         if (isNameAlreadyExists) {
@@ -166,4 +170,5 @@ public class ReasonCodeService {
     public boolean anyReasonCodeLinkedWithTimeType(BigInteger timeTypeId){
         return reasonCodeGraphRepository.existsByTimeTypeIdAndDeletedFalse(timeTypeId);
     }
+
 }

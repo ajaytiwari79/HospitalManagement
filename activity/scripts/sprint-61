@@ -1,0 +1,3 @@
+//set
+db.getCollection('activities').updateMany({},{"$set":{"rulesActivityTab.reasonCodeRequiredState":"OPTIONAL"}})
+db.time_Type.updateMany({},{"$set":{"rulesActivityTab.reasonCodeRequiredState":"OPTIONAL"}})
