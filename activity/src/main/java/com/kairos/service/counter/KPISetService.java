@@ -26,6 +26,7 @@ import com.kairos.persistence.repository.counter.KPISetRepository;
 import com.kairos.persistence.repository.phase.PhaseMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;

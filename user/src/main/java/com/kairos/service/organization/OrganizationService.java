@@ -662,6 +662,7 @@ public class OrganizationService {
         }
         List<Unit> units;
         units = CollectionUtils.isNotEmpty(unitIds) ? unitGraphRepository.findOrganizationsByIdsIn(unitIds) : organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        units = units.stream().filter(unit -> unit.isWorkcentre()).collect(Collectors.toList());
         if (Optional.ofNullable(organizationSubTypeId).isPresent()) {
             OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
             if (Optional.ofNullable(organizationSubType).isPresent()) {
@@ -814,8 +815,9 @@ public class OrganizationService {
         if (CollectionUtils.isNotEmpty(unitIds)) {
             units = unitGraphRepository.findOrganizationsByIdsIn(unitIds);
         } else {
-            units = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+            units = organizationTypeGraphRepository.getOrganizationsByOrganizationTypeId(organizationSubTypeId);
         }
+        units = units.stream().filter(unit -> unit.isWorkcentre()).collect(Collectors.toList());
         if (Optional.ofNullable(organizationSubType).isPresent()) {
             OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
             BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);
