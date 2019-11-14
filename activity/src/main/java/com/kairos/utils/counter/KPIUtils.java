@@ -147,9 +147,9 @@ public class KPIUtils {
     public static void sortKpiDataByDateTimeInterval(List<CommonKpiDataUnit> kpiDataUnits) {
         if (isCollectionNotEmpty(kpiDataUnits)) {
             String label = kpiDataUnits.get(0).getLabel();
-            if (label.matches("\\d{2}-\\d{2}-\\d{4}")) {
+            if (label.matches("\\d{2}-\\D{3}-\\d{2}")) {
                 kpiDataUnits.sort(Comparator.comparing(o -> LocalDate.parse(o.getLabel(), DateTimeFormatter.ofPattern(DD_MMM_YY))));
-            } else if (label.matches("\\d{2}-\\d{2}-\\d{4} - \\d{2}-\\d{2}-\\d{4}")) {
+            } else if (label.matches("\\d{2}-\\D{3}-\\d{2} - \\d{2}-\\D{3}-\\d{2}")) {
                 kpiDataUnits.sort(Comparator.comparing(o -> LocalDate.parse(o.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern(DD_MMM_YY))));
             }
         }

@@ -53,4 +53,14 @@ public class TimeTypeMongoRepositoryImpl implements CustomTimeTypeMongoRepositor
         return results.getMappedResults();
     }
 
+    @Override
+    public List<BigInteger> findAllByDeletedFalseAndTimeType(String timeTypeEnum) {
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("secondLevelType").is(timeTypeEnum)),
+                Aggregation.project("id"),
+                Aggregation.unwind("id"));
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,TimeType.class,Map.class);
+        return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
+    }
+
 }
