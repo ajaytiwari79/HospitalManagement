@@ -20,6 +20,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -150,6 +151,8 @@ public class PositionService {
         objectToUpdate.setCopyKariosMailToLogin(staffPositionDetail.isCopyKariosMailToLogin());
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffPositionDetail.getTimeCareExternalId());
+        objectToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPositionDetail.getTags(), Tag.class));
+        staffGraphRepository.unlinkTagsFromStaff(staffId,staffPositionDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
         staffGraphRepository.save(objectToUpdate);
         positionGraphRepository.updatePositionStartDateOfStaff(objectToUpdate.getId(), positionStartDate);
         StaffPositionDTO staffPositionDTO = new StaffPositionDTO(objectToUpdate, positionStartDate);
@@ -171,7 +174,7 @@ public class PositionService {
         map.put("timeCareExternalId", staff.getExternalId());
         LocalDate dateOfBirth = (user.getDateOfBirth());
         map.put("dateOfBirth", dateOfBirth);
-
+        map.put("tags", staff.getTags());
         return map;
     }
 

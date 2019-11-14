@@ -40,4 +40,5 @@ public class StaffAdditionalInfoQueryResult {
     private String cprNumber;
     private List<StaffChildDetail> staffChildDetails;
     private List<SkillLevelDTO> skillLevelDTOS;
+    private boolean countryAdmin;
 }
