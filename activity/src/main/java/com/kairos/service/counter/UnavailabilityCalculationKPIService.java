@@ -39,11 +39,11 @@ public class UnavailabilityCalculationKPIService {
         kpiCalculationRelatedInfo.getFilterBasedCriteria().put(TIME_TYPE, timeTypeIds);
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria()).invoke();
-        return getTotalOfUnavailabilityShift(kpiCalculationRelatedInfo, filterShiftActivity);
+        return getTotalOfUnavailabilityShift(kpiCalculationRelatedInfo, filterShiftActivity,shiftWithActivityDTOS);
     }
 
-    private double getTotalOfUnavailabilityShift(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity) {
-        List<ShiftActivityDTO> shifts = new CopyOnWriteArrayList<>(filterShiftActivity.getShifts().stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).collect(Collectors.toList()));
+    private double getTotalOfUnavailabilityShift(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity,List<ShiftWithActivityDTO> shiftWithActivityDTOS) {
+        List<ShiftActivityDTO> shifts = new CopyOnWriteArrayList<>(shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).collect(Collectors.toList()));
         List<ShiftActivityDTO> shiftActivityDTOS = new ArrayList<>();
         double total = 0;
         for (ShiftActivityDTO shiftActivityDTO : filterShiftActivity.getShiftActivityDTOS()) {
