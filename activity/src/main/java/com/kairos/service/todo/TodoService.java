@@ -242,8 +242,6 @@ public class TodoService {
     //
     public List<TodoDTO> getAllTodoOfStaff(Long staffId) {
         List<TodoDTO> todoDTOS = todoRepository.findAllTodoByStaffId(staffId);
-
-
         return todoDTOS;
     }
 
