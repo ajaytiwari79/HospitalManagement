@@ -13,17 +13,12 @@ import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
-import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
-import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
-import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.kpi.CalculationBasedOn;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.Direction;
@@ -56,7 +51,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -100,6 +94,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private PlanningPeriodService planningPeriodService;
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
+    @Inject
+    private UnavailabilityCalculationKPIService unavailabilityCalculationKPIService;
 
 
     public double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -117,7 +113,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 total = getTotalByPlannedTime(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
                 break;
             case VARIABLE_COST:
-                total = 0;//costCalculationKPIService.calculateTotalCostOfStaff(staffKpiFilterDTO, shiftActivityDTOS, dateTimeInterval);
+                total = costCalculationKPIService.calculateTotalCostOfStaff(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
                 break;
             default:
                 break;
@@ -185,44 +181,13 @@ public class KPIBuilderCalculationService implements CounterService {
             case DELTA_TIMEBANK:
                 return getTotalTimeBank(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case UNAVAILABILITY:
-                return getUnavailabilityCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+                return unavailabilityCalculationKPIService.getUnavailabilityCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             default:
                 break;
         }
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
     }
 
-    private double getUnavailabilityCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        List<BigInteger> timeTypeIds = timeTypeService.getTimeTypeIdsByTimeTypeEnum(TimeTypeEnum.UNAVAILABLE_TIME.toString());
-        kpiCalculationRelatedInfo.filterBasedCriteria.put(TIME_TYPE, timeTypeIds);
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria()).invoke();
-        return getTotalOfUnavailabilityShift(kpiCalculationRelatedInfo, filterShiftActivity);
-    }
-
-    private double getTotalOfUnavailabilityShift(KPICalculationRelatedInfo kpiCalculationRelatedInfo, FilterShiftActivity filterShiftActivity) {
-        List<ShiftActivityDTO> shifts = new CopyOnWriteArrayList<>(filterShiftActivity.shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).collect(Collectors.toList()));
-        List<ShiftActivityDTO> shiftActivityDTOS = new ArrayList<>();
-        double total = 0;
-        for (ShiftActivityDTO shiftActivityDTO : filterShiftActivity.getShiftActivityDTOS()) {
-            for (ShiftActivityDTO shift : shifts) {
-                DateTimeInterval dateTimeIntervalOfUnavailabilityShift = new DateTimeInterval(shiftActivityDTO.getStartDate(), shiftActivityDTO.getEndDate());
-                DateTimeInterval dateTimeIntervalOfShift = new DateTimeInterval(shift.getStartDate(), shift.getEndDate());
-                if (!shiftActivityDTO.getActivityId().equals(shift.getActivityId()) && dateTimeIntervalOfUnavailabilityShift.overlaps(dateTimeIntervalOfShift)) {
-                    total += dateTimeIntervalOfUnavailabilityShift.overlap(dateTimeIntervalOfShift).getHours();
-                    shiftActivityDTOS.add(shift);
-                    shifts.remove(shift);
-                }
-            }
-        }
-        DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), DisplayUnit.class).get(0);
-        if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
-                //add
-        } else if (DisplayUnit.COUNT.equals(calculationUnit)) {
-            total = shiftActivityDTOS.size();
-        }
-        return total;
-    }
 
     private double getTotalTimeBank(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(kpiCalculationRelatedInfo.getOrganizationId());
@@ -398,7 +363,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Getter
     @Setter
-    private class FilterShiftActivity {
+    class FilterShiftActivity {
         private List<ShiftWithActivityDTO> shifts;
         private Map<FilterType, List> filterBasedCriteria;
         private Set<BigInteger> plannedTimeIds;
@@ -451,7 +416,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Getter
     @Setter
-    private class KPICalculationRelatedInfo {
+     class KPICalculationRelatedInfo {
         private Map<FilterType, List> filterBasedCriteria;
         private List<ShiftWithActivityDTO> shifts;
         private List<Long> staffIds;
