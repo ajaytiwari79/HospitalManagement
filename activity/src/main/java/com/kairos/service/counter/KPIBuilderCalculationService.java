@@ -195,7 +195,7 @@ public class KPIBuilderCalculationService implements CounterService {
         for (StaffKpiFilterDTO staffKpiFilterDTO : kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffId)) {
             for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
                 Collection<DailyTimeBankEntry> dailyTimeBankEntries = kpiCalculationRelatedInfo.getDailyTimeBankEntrysByEmploymentIdAndInterval(employmentWithCtaDetailsDTO.getId(), dateTimeInterval);
-                int timeBankOfInterval = (int) timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false)[0];
+                int timeBankOfInterval = (int) timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, (List)dailyTimeBankEntries, false)[0];
                 int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(DailyTimeBankEntry::getDeltaTimeBankMinutes).sum();
                 totalTimeBank += (calculatedTimeBank - timeBankOfInterval);
             }
