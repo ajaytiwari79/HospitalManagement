@@ -222,9 +222,7 @@ public class PlannedHoursVsTimeBankService implements CounterService {
         for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
             List<DailyTimeBankEntry> dailyTimeBankEntries = longListMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
             int timeBankOfInterval = (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, false, dailyTimeBankEntries, false)[0];
-            int calculatedTimeBank = dailyTimeBankEntries.stream().mapToInt(DailyTimeBankEntry::getDeltaTimeBankMinutes).sum();
-            int totalTimeBank = calculatedTimeBank - timeBankOfInterval;
-            totalDeltaTimeBankOfUnit += totalTimeBank;
+            totalDeltaTimeBankOfUnit += timeBankOfInterval;
         }
         return totalDeltaTimeBankOfUnit;
     }

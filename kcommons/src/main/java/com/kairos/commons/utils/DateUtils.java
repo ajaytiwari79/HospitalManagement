@@ -671,6 +671,14 @@ public  class DateUtils {
         return new Double(hour+"."+Math.abs(minutes));
     }
 
+    public static int getHourByMinutes(double totalMinutes){
+        return (int) totalMinutes/(60);
+    }
+
+    public static int getHourMinutesByMinutes(double totalMinutes){
+        return (int)totalMinutes % 60;
+    }
+
     public static boolean startDateIsEqualsOrBeforeEndDate(LocalDate startdate,LocalDate endDate){
         return startdate.isBefore(endDate) || startdate.equals(endDate);
     }
