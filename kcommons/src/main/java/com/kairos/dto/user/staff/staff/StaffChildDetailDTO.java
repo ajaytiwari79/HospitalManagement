@@ -21,8 +21,13 @@ public class StaffChildDetailDTO {
     private Long id;
     private String name;
     private String cprNumber;
-    private LocalDate dateOfBirth;
-    @JsonIgnore
-    private Gender gender;
     private boolean childCustodyRights;
+
+    public Gender getGender(){
+        return CPRUtil.getGenderFromCPRNumber(this.getCprNumber());
+    }
+
+    public LocalDate getDateOfBirth(){
+        return CPRUtil.fetchDateOfBirthFromCPR(this.getCprNumber());
+    }
 }

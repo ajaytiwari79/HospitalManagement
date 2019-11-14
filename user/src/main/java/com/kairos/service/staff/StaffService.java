@@ -13,6 +13,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -307,6 +308,7 @@ public class StaffService {
         //saving addresses of staff
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
         Staff staff = staffGraphRepository.save(staffToUpdate);
+        staffPersonalDetail.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staff.getStaffChildDetails(), StaffChildDetailDTO.class));
         staffPersonalDetail.setUserName(staff.getUser().getUserName());
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
@@ -332,12 +334,6 @@ public class StaffService {
     }
 
     private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
-        if(isCollectionNotEmpty(staffPersonalDetail.getStaffChildDetails())){
-            staffPersonalDetail.getStaffChildDetails().forEach(staffChildDetailDTO -> {
-                staffChildDetailDTO.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffChildDetailDTO.getCprNumber()));
-                staffChildDetailDTO.setGender(CPRUtil.getGenderFromCPRNumber(staffChildDetailDTO.getCprNumber()));
-            });
-        }
         staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
         staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId(), staffToUpdate.getStaffChildDetails().stream().map(staffChildDetail -> staffChildDetail.getId()).collect(Collectors.toList()));
     }
