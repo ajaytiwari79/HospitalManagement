@@ -2,6 +2,7 @@ package com.kairos.service.counter;
 
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.enums.DisplayUnit;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -28,10 +29,13 @@ public class UnavailabilityCalculationKPIService {
     @Inject
     private TimeTypeService timeTypeService;
     @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
+    List<BigInteger> timeTypeIds = new ArrayList<>();
 
 
     public double getUnavailabilityCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        List<BigInteger> timeTypeIds = timeTypeService.getTimeTypeIdsByTimeTypeEnum(TimeTypeEnum.UNAVAILABLE_TIME.toString());
+        if(ObjectUtils.isCollectionEmpty(timeTypeIds)) {
+            timeTypeIds = timeTypeService.getTimeTypeIdsByTimeTypeEnum(TimeTypeEnum.UNAVAILABLE_TIME.toString());
+        }
         kpiCalculationRelatedInfo.getFilterBasedCriteria().put(TIME_TYPE, timeTypeIds);
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria()).invoke();
@@ -62,7 +66,7 @@ public class UnavailabilityCalculationKPIService {
             case COUNT:
                 total = shiftActivityDTOS.size();
                 break;
-            case PERCENTAGE_OF_TIME:
+            case PERCENTAGE_OF_TIMES:
                 total = filterShiftActivity.getShiftActivityDTOS().size() > 0 ? shiftActivityDTOS.size() * 100 / filterShiftActivity.getShiftActivityDTOS().size() : filterShiftActivity.getShiftActivityDTOS().size();
                 break;
             case PERCENTAGE_OF_HOURS:
