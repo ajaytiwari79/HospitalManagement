@@ -68,7 +68,7 @@ import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -152,7 +152,11 @@ public class PositionService {
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffPositionDetail.getTimeCareExternalId());
         objectToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPositionDetail.getTags(), Tag.class));
-        staffGraphRepository.unlinkTagsFromStaff(staffId,staffPositionDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
+        if(isCollectionNotEmpty(staffPositionDetail.getTags())) {
+            staffGraphRepository.unlinkTagsFromStaff(staffId, staffPositionDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
+        }else{
+            staffGraphRepository.unlinkAllTagsFromStaff(staffId);
+        }
         staffGraphRepository.save(objectToUpdate);
         positionGraphRepository.updatePositionStartDateOfStaff(objectToUpdate.getId(), positionStartDate);
         StaffPositionDTO staffPositionDTO = new StaffPositionDTO(objectToUpdate, positionStartDate);
