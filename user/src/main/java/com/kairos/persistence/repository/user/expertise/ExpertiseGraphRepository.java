@@ -100,7 +100,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<Expertise> getExpertiseByIdsIn(List<Long> ids);
 
     @Query("MATCH(expertise:Expertise{deleted:false})  WHERE id(expertise) = {0} " +
-            "RETURN expertis/personal_infoe.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
+            "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
             "expertise.endDate as endDate ,expertise.description as description ,expertise.published as published ORDER BY expertise.name")
     ExpertiseQueryResult getExpertiseById(Long expertiseId);
 
