@@ -1,6 +1,7 @@
 package com.kairos.dto.user.staff.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kairos.commons.annotation.CPRValidation;
 import com.kairos.enums.Gender;
 import com.kairos.utils.CPRUtil;
 import lombok.Getter;
@@ -20,9 +21,15 @@ import static com.kairos.enums.Gender.MALE;
 public class StaffChildDetailDTO {
     private Long id;
     private String name;
+    @CPRValidation(message = "error.cpr.number.not.valid")
     private String cprNumber;
-    private LocalDate dateOfBirth;
-    @JsonIgnore
-    private Gender gender;
     private boolean childCustodyRights;
+
+    public Gender getGender(){
+        return CPRUtil.getGenderFromCPRNumber(this.getCprNumber());
+    }
+
+    public LocalDate getDateOfBirth(){
+        return CPRUtil.fetchDateOfBirthFromCPR(this.getCprNumber());
+    }
 }

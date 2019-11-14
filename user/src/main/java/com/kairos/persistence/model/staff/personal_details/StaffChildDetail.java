@@ -24,8 +24,6 @@ import java.time.LocalDate;
 public class StaffChildDetail extends UserBaseEntity {
     private String name;
     private String cprNumber;
-    private LocalDate dateOfBirth;
-    private Gender gender;
     private boolean childCustodyRights;
 
 }

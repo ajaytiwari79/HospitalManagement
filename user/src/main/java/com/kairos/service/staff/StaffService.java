@@ -13,6 +13,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -309,6 +310,7 @@ public class StaffService {
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
         Staff staff = staffGraphRepository.save(staffToUpdate);
         staffPersonalDetail.setUserName(staff.getUser().getUserName());
+        staffPersonalDetail.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staff.getStaffChildDetails(),StaffChildDetailDTO.class));
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
@@ -333,14 +335,8 @@ public class StaffService {
     }
 
     private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
-        if(isCollectionNotEmpty(staffPersonalDetail.getStaffChildDetails())){
-            staffPersonalDetail.getStaffChildDetails().forEach(staffChildDetailDTO -> {
-                staffChildDetailDTO.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffChildDetailDTO.getCprNumber()));
-                staffChildDetailDTO.setGender(CPRUtil.getGenderFromCPRNumber(staffChildDetailDTO.getCprNumber()));
-            });
-        }
         staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
-        staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId(), staffToUpdate.getStaffChildDetails().stream().map(staffChildDetail -> staffChildDetail.getId()).collect(Collectors.toList()));
+        staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {

@@ -447,7 +447,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (staff:Staff)-[rel:" + BELONGS_TO_TAGS + "]->(tag:Tag) where id(staff) = {0} AND NOT id(tag) IN {1} detach delete rel")
     void unlinkTagsFromStaff(Long staffId, List<Long> tagIds);
 
-    @Query("MATCH (staff:Staff)-[rel:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) where id(staff) = {0} AND NOT id(staffChildDetail) IN{1} detach delete staffChildDetail")
-    void unlinkStaffChilds(Long staffId, List<Long> staffChildIds);
+    @Query("MATCH (staff:Staff)-[rel:" + BELONGS_TO_TAGS + "]->(tag:Tag) where id(staff) = {0} detach delete rel")
+    void unlinkAllTagsFromStaff(Long staffId);
+
+    @Query("MATCH (staff:Staff)-[rel:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) where id(staff) = {0} detach delete staffChildDetail")
+    void unlinkStaffChilds(Long staffId);
 }
 

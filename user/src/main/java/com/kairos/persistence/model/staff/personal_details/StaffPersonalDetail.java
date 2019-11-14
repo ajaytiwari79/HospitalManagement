@@ -14,6 +14,7 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -68,6 +69,7 @@ public class StaffPersonalDetail {
     private String userName;
     private boolean userNameUpdated;
     private List<StaffTeamDTO> teamDetails;
+    @Valid
     private List<StaffChildDetailDTO> staffChildDetails;
 
     public void setPrimaryAddress(AddressDTO primaryAddress) {
