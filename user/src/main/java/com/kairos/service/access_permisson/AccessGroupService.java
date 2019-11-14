@@ -885,7 +885,18 @@ public class AccessGroupService {
         return accessGroupRepository.getAccessGroupsForUnit(parentOrganizationId);
     }
 
-    public AccessGroupStaffQueryResult getAccessGroupDayTypesAndUserId(){
-        return accessGroupRepository.getAccessGroupDayTypesAndUserId(UserContext.getUserDetails().getLastSelectedOrganizationId(), UserContext.getUserDetails().getId());
+    public StaffAccessGroupQueryResult getAccessGroupWithDayTypesByStaffIdAndUnitId(Long unitId){
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), UserContext.getUserDetails().getId());
+        StaffAccessGroupQueryResult accessGroupStaffQueryResult=new StaffAccessGroupQueryResult();
+        if(staffAtHub!=null){
+            accessGroupStaffQueryResult.setCountryAdmin(true);
+            return accessGroupStaffQueryResult;
+        }
+        Long staffId = staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
+        List<AccessGroup> accessGroups=accessGroupRepository.getAccessGroupWithDayTypesByStaffIdAndUnitId(staffId,unitId);
+
+        accessGroupStaffQueryResult.setAccessGroups(accessGroups);
+        return  accessGroupStaffQueryResult;
     }
 }

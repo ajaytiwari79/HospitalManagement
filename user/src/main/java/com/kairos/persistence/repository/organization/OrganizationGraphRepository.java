@@ -104,4 +104,9 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "DETACH delete rel \n" +
             "CREATE UNIQUE(exl)-[:"+SUPPORTED_BY_UNION+"]-(newUnion) ")
     void addUnion(Long expertiseLineId,Long unionId);
+
+    @Query("MATCH (org:Organization)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
+            "RETURN org")
+    List<Organization> getOrganizationsBySubOrgTypeIds(List<Long> organizationSubTypeIds);
+
 }

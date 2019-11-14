@@ -114,8 +114,6 @@ public class StaffingLevelService  {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
-    com.fasterxml.jackson.databind.ObjectMapper objectMapper;
-    @Inject
     private UserIntegrationService userIntegrationService;
     @Inject
     private ActivityMongoRepositoryImpl activityMongoRepositoryImpl;
@@ -257,18 +255,18 @@ public class StaffingLevelService  {
         TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
         int currentWeekCount = date.get(woy);
         StaffingLevel staffingLevel = new StaffingLevel(currentDate, currentWeekCount, unitId, phase.getId(), staffingLevelSetting);
-        List<StaffingLevelInterval> StaffingLevelIntervals = new ArrayList<>();
+        List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>();
         int startTimeCounter = 0;
         LocalTime startTime = LocalTime.MIN;
         for (int i = 0; i <= 95; i++) {
             StaffingLevelInterval staffingLevelInterval = new StaffingLevelInterval(i, 0, 0, new Duration(startTime.plusMinutes(startTimeCounter),
                     startTime.plusMinutes(startTimeCounter += 15)));
             staffingLevelInterval.setAvailableNoOfStaff(0);
-            StaffingLevelIntervals.add(staffingLevelInterval);
+            staffingLevelIntervals.add(staffingLevelInterval);
         }
         List<StaffingLevelInterval> absenceStaffingLevels = new ArrayList<>();
         absenceStaffingLevels.add(new StaffingLevelInterval(0, 0, duration));
-        staffingLevel.setPresenceStaffingLevelInterval(StaffingLevelIntervals);
+        staffingLevel.setPresenceStaffingLevelInterval(staffingLevelIntervals);
         staffingLevel.setAbsenceStaffingLevelInterval(absenceStaffingLevels);
         return staffingLevel;
     }
@@ -349,14 +347,13 @@ public class StaffingLevelService  {
                 activityRankMap = new HashMap<>();
 
                 seq = 0;
-                staffingDTO = new PresenceStaffingLevelDto();
-                staffingLevelTimeSlList = new ArrayList<StaffingLevelTimeSlotDTO>();
+                staffingLevelTimeSlList = new ArrayList<>();
                 duration = new Duration(LocalTime.MIN, LocalTime.MAX);
                 staffingLevelSetting = new StaffingLevelSetting(15, duration);
                 try {
                     date = sourceFormat.parse(singleData.get(FOR_DAY));
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    LOGGER.error("error {}",e.getMessage());
                 }
                 dateInLocal = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
@@ -365,35 +362,9 @@ public class StaffingLevelService  {
             } else {
                 i++;
             }
-            String fromTimeS = singleData.get("from");
-            String toTimeS = singleData.get("to");
-            switch (fromTimeS.length()) {
-                case 1:
-                    fromTimeS = "000" + fromTimeS;
-                    break;
-                case 2:
-                    fromTimeS = "00" + fromTimeS;
-                    break;
-                case 3:
-                    fromTimeS = "0" + fromTimeS;
-                    break;
-                default:
-                    break;
-            }
-            switch (toTimeS.length()) {
-                case 1:
-                    toTimeS = "000" + toTimeS;
-                    break;
-                case 2:
-                    toTimeS = "00" + toTimeS;
-                    break;
-                case 3:
-                    toTimeS = "0" + toTimeS;
-                    break;
-                default:
-                    break;
-            }
 
+            String toTimeS = updateTimeString(singleData,"to");
+            String fromTimeS = updateTimeString(singleData,"from");
             fromTime = LocalTime.parse(fromTimeS.substring(0, 2) + ":" + fromTimeS.substring(2, 4));
             toTime = LocalTime.parse(toTimeS.substring(0, 2) + ":" + toTimeS.substring(2, 4));
             duration = new Duration(fromTime, toTime);
@@ -426,6 +397,24 @@ public class StaffingLevelService  {
         staffingDtoList.forEach(staffingLevelDto -> {
             createStaffingLevel(staffingLevelDto, unitId);
         });
+    }
+
+    private String updateTimeString(Map<String, String> singleData,String time) {
+        String times = singleData.get(time);
+        switch (times.length()) {
+            case 1:
+                times = "000" + times;
+                break;
+            case 2:
+                times = "00" + times;
+                break;
+            case 3:
+                times = "0" + times;
+                break;
+            default:
+                break;
+        }
+        return times;
     }
 
     public void processStaffingLevel(MultipartFile file, long unitId) throws IOException {
@@ -553,7 +542,6 @@ public class StaffingLevelService  {
         try {
             postBody = new JSONObject(result.toString());
         } catch (JSONException ex) {
-            System.out.println("Exception in json; " + result.toString());
             return null;
         }
         return postBody.toMap();
@@ -631,7 +619,11 @@ public class StaffingLevelService  {
         List<StaffingLevel> staffingLevels = new ArrayList<StaffingLevel>();
         List<StaffingLevelPlanningDTO> staffingLevelPlanningDTOS = new ArrayList<>();
         for (AbsenceStaffingLevelDto absenceStaffingLevelDto : absenceStaffingLevelDtos) {
-            StaffingLevel staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).orElse(null);
+            StaffingLevel staffingLevel=null;
+            if(absenceStaffingLevelDto.getId()!=null){
+                staffingLevel = staffingLevelMongoRepository.findById(absenceStaffingLevelDto.getId()).orElse(null);
+            }
+
             if (isNotNull(staffingLevel)) {
                 if (!staffingLevel.getCurrentDate().equals(absenceStaffingLevelDto.getCurrentDate())) {
                     LOGGER.info("current date modified from {}  to this {}", staffingLevel.getCurrentDate(), absenceStaffingLevelDto.getCurrentDate());
@@ -762,7 +754,7 @@ public class StaffingLevelService  {
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
             if(staffSkillsMap.containsKey(staffId)) {
                 for (Map<String, Object> staffSkill : staffSkillsMap.get(staffId)) {
-                    if (staffingLevelSkill.getSkillId() == staffSkill.get(SKILL_ID)) {
+                    if (staffingLevelSkill.getSkillId().equals(Long.valueOf(staffSkill.get(SKILL_ID).toString()))) {
                         updateAvailableNoOfStaff(staffingLevelSkill, staffSkill);
                     }
                 }
@@ -771,21 +763,28 @@ public class StaffingLevelService  {
     }
 
     private void updateAvailableNoOfStaff(StaffingLevelSkill staffingLevelSkill, Map<String, Object> staffSkill) {
-        if(SkillLevel.BASIC.equals(staffSkill.get(LEVEL))){
-            staffingLevelSkill.getSkillLevelSettings().get(2).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()+1);
-        }else if(SkillLevel.ADVANCE.equals(staffSkill.get(LEVEL))){
-            if(staffingLevelSkill.getSkillLevelSettings().get(1).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff() || staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()){
-                staffingLevelSkill.getSkillLevelSettings().get(1).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff()+1);
+        SkillLevelSetting basicSkillLevelSetting = staffingLevelSkill.getSkillLevelSettingBySkillLevel(SkillLevel.BASIC);
+        SkillLevelSetting advanceSkillLevelSetting = staffingLevelSkill.getSkillLevelSettingBySkillLevel(SkillLevel.ADVANCE);
+        SkillLevelSetting expertSkillLevelSetting = staffingLevelSkill.getSkillLevelSettingBySkillLevel(SkillLevel.EXPERT);
+        if(SkillLevel.BASIC.toString().equals(staffSkill.get(LEVEL))){
+            basicSkillLevelSetting.setAvailableNoOfStaff(basicSkillLevelSetting.getAvailableNoOfStaff()+1);
+        }else if(SkillLevel.ADVANCE.toString().equals(staffSkill.get(LEVEL))){
+            if(advanceSkillLevelSetting.getNoOfStaff() > advanceSkillLevelSetting.getAvailableNoOfStaff() || basicSkillLevelSetting.getNoOfStaff() <= basicSkillLevelSetting.getAvailableNoOfStaff()){
+                advanceSkillLevelSetting.setAvailableNoOfStaff(advanceSkillLevelSetting.getAvailableNoOfStaff()+1);
+            }else if(basicSkillLevelSetting.getNoOfStaff() > basicSkillLevelSetting.getAvailableNoOfStaff()){
+                basicSkillLevelSetting.setAvailableNoOfStaff(basicSkillLevelSetting.getAvailableNoOfStaff()+1);
             }else{
-                staffingLevelSkill.getSkillLevelSettings().get(2).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()+1);
+                advanceSkillLevelSetting.setAvailableNoOfStaff(advanceSkillLevelSetting.getAvailableNoOfStaff()+1);
             }
         }else{
-            if(staffingLevelSkill.getSkillLevelSettings().get(0).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(0).getAvailableNoOfStaff() || (staffingLevelSkill.getSkillLevelSettings().get(1).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff() && staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff())){
-                staffingLevelSkill.getSkillLevelSettings().get(0).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(0).getAvailableNoOfStaff()+1);
-            }else if(staffingLevelSkill.getSkillLevelSettings().get(1).getNoOfStaff() > staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff() || staffingLevelSkill.getSkillLevelSettings().get(2).getNoOfStaff() <= staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()){
-                staffingLevelSkill.getSkillLevelSettings().get(1).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(1).getAvailableNoOfStaff()+1);
+            if(expertSkillLevelSetting.getNoOfStaff() > expertSkillLevelSetting.getAvailableNoOfStaff() || (advanceSkillLevelSetting.getNoOfStaff() <= advanceSkillLevelSetting.getAvailableNoOfStaff() && basicSkillLevelSetting.getNoOfStaff() <= basicSkillLevelSetting.getAvailableNoOfStaff())){
+                expertSkillLevelSetting.setAvailableNoOfStaff(expertSkillLevelSetting.getAvailableNoOfStaff()+1);
+            }else if(advanceSkillLevelSetting.getNoOfStaff() > advanceSkillLevelSetting.getAvailableNoOfStaff() || basicSkillLevelSetting.getNoOfStaff() <= basicSkillLevelSetting.getAvailableNoOfStaff()){
+                advanceSkillLevelSetting.setAvailableNoOfStaff(advanceSkillLevelSetting.getAvailableNoOfStaff()+1);
+            }else if(basicSkillLevelSetting.getNoOfStaff() > basicSkillLevelSetting.getAvailableNoOfStaff()){
+                basicSkillLevelSetting.setAvailableNoOfStaff(basicSkillLevelSetting.getAvailableNoOfStaff()+1);
             }else{
-                staffingLevelSkill.getSkillLevelSettings().get(2).setAvailableNoOfStaff(staffingLevelSkill.getSkillLevelSettings().get(2).getAvailableNoOfStaff()+1);
+                expertSkillLevelSetting.setAvailableNoOfStaff(expertSkillLevelSetting.getAvailableNoOfStaff()+1);
             }
         }
     }
@@ -799,13 +798,6 @@ public class StaffingLevelService  {
         }
     }
 
-    private void updateStaffingLevelOfChildAndParent(StaffingLevel staffingLevel,int currentIndex, BigInteger activityId) {
-            staffingLevel.getPresenceStaffingLevelInterval().get(currentIndex).getStaffingLevelActivities().stream().
-                    filter(staffingLevelActivity -> staffingLevelActivity.getActivityId().equals(activityId)).findFirst().
-                    ifPresent(staffingLevelActivity -> staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() + 1));
-    }
-
-
     public Map<String, Object> createStaffingLevelFromStaffingLevelTemplate(Long unitId, StaffingLevelFromTemplateDTO staffingLevelFromTemplateDTO, BigInteger templateId) {
         Map<String, Object> response = new HashMap<>();
 
@@ -817,12 +809,19 @@ public class StaffingLevelService  {
         List<BigInteger> parentActivityIds=new ArrayList<>();
         List<ActivityValidationError> activityValidationErrors = staffingLevelTemplateService.validateActivityRules(activityIds, ObjectMapperUtils.copyPropertiesByMapper(staffingLevelTemplate, StaffingLevelTemplateDTO.class),parentActivityIds);
         Map<BigInteger, ActivityValidationError> activityValidationErrorMap = activityValidationErrors.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
-        List<StaffingLevel> staffingLevels = new ArrayList<>();
         List<DateWiseActivityDTO> dateWiseActivityDTOS = staffingLevelFromTemplateDTO.getActivitiesByDate();
         filterIncorrectDataByDates(dateWiseActivityDTOS, staffingLevelTemplate.getValidity().getStartDate(), staffingLevelTemplate.getValidity().getEndDate(), activityValidationErrors);
         Set<LocalDate> dates = dateWiseActivityDTOS.stream().map(DateWiseActivityDTO::getLocalDate).collect(Collectors.toSet());
         List<StaffingLevel> allStaffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId, dates);
         Map<LocalDate, StaffingLevel> dateStaffingLevelMap = allStaffingLevels.stream().collect(Collectors.toMap(k -> asLocalDate(k.getCurrentDate()), v -> v));
+        List<StaffingLevel> staffingLevels = getStaffingLevelsByTemplate(unitId, staffingLevelTemplate, parentActivityIds, activityValidationErrorMap, dateWiseActivityDTOS, dateStaffingLevelMap);
+        response.put("success", staffingLevels);
+        response.put("errors", activityValidationErrors);
+        return response;
+    }
+
+    private List<StaffingLevel> getStaffingLevelsByTemplate(Long unitId, StaffingLevelTemplate staffingLevelTemplate, List<BigInteger> parentActivityIds, Map<BigInteger, ActivityValidationError> activityValidationErrorMap, List<DateWiseActivityDTO> dateWiseActivityDTOS, Map<LocalDate, StaffingLevel> dateStaffingLevelMap) {
+        List<StaffingLevel> staffingLevels = new ArrayList<>();
         dateWiseActivityDTOS.forEach(currentDateWiseActivities -> {
             Map<BigInteger, BigInteger> activityMap = currentDateWiseActivities.getActivityIds().stream().collect(Collectors.toMap(k -> k, v -> v));
             Set<StaffingLevelActivity> selectedActivitiesForCurrentDate = new HashSet<>();
@@ -850,13 +849,10 @@ public class StaffingLevelService  {
             StaffingLevel staffingLevel = getStaffingLevelIfExist(dateStaffingLevelMap, currentDateWiseActivities, staffingLevelIntervals, staffingLevelTemplate, unitId);
             staffingLevels.add(staffingLevel);
         });
-
         if (!staffingLevels.isEmpty()) {
             staffingLevelMongoRepository.saveEntities(staffingLevels);
         }
-        response.put("success", staffingLevels);
-        response.put("errors", activityValidationErrors);
-        return response;
+        return staffingLevels;
     }
 
 

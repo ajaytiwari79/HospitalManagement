@@ -770,19 +770,16 @@ public  class DateUtils {
         return dateTime.toDate();
     }
 
-    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
+    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType) {
         switch (durationType) {
-            case DAYS:
-                date = date.plusDays(value);
-                break;
             case MONTHS:
-                date = date.plusMonths(value);
+                date = date.with(TemporalAdjusters.lastDayOfMonth());
                 break;
             case WEEKS:
-                date = date.plusWeeks(value);
+                date = date.with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
                 break;
             case YEAR:
-                date = date.plusYears(value);
+                date = date.with(TemporalAdjusters.lastDayOfYear());
                 break;
             default:
                 break;
@@ -792,17 +789,14 @@ public  class DateUtils {
 
     public static LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
         switch (durationType) {
-            case DAYS:
-                date = date.minusDays(value);
-                break;
             case MONTHS:
-                date = date.minusMonths(value);
+                date = date.with(TemporalAdjusters.firstDayOfMonth());
                 break;
             case WEEKS:
-                date = date.minusWeeks(value);
+                date = date.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
                 break;
             case YEAR:
-                date = date.minusYears(value);
+                date = date.with(TemporalAdjusters.firstDayOfYear());
                 break;
             default:
                 break;
@@ -819,7 +813,7 @@ public  class DateUtils {
                 date = date.with(TemporalAdjusters.lastDayOfMonth());
                 break;
             case WEEKS:
-                date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
                 break;
             case YEAR:
                 date = date.with(TemporalAdjusters.lastDayOfYear());
@@ -849,8 +843,48 @@ public  class DateUtils {
         return date;
     }
 
+    public static LocalDate getLastDateByFrequencyType(DurationType durationType,LocalDate localDate){
+        switch (durationType) {
+            case DAYS:
+                localDate = localDate.minusDays(1);
+                break;
+            case MONTHS:
+                localDate = localDate.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+                break;
+            case WEEKS:
+                localDate = localDate.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+                break;
+            case YEAR:
+                localDate = localDate.minusYears(1).with(TemporalAdjusters.lastDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return localDate;
+    }
+
+    public static LocalDate getNextDateByFrequencyType(DurationType durationType,LocalDate localDate){
+        switch (durationType) {
+            case DAYS:
+                localDate = localDate.plusDays(1);
+                break;
+            case MONTHS:
+                localDate = localDate.plusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
+                break;
+            case WEEKS:
+                localDate = localDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+                break;
+            case YEAR:
+                localDate = localDate.plusYears(1).with(TemporalAdjusters.firstDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return localDate;
+    }
+
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate().minusDays(1),KPI_DATE_FORMAT);
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate(),KPI_DATE_FORMAT);
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
         return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+"";

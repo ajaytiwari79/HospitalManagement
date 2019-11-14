@@ -206,6 +206,7 @@ public class FunctionService {
                 for (LocalDate localDate : appliedFunctionDTO.getAppliedDates()) {
                     FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
                     functionDTO.setEmploymentId(employmentQueryResult.getId());
+                    functionDTO.setCode(appliedFunctionDTO.getCode());
                     List<FunctionDTO> functionDTOS = dateWiseFunctionMap.getOrDefault(localDate, new ArrayList<>());
                     functionDTOS.add(functionDTO);
                     dateWiseFunctionMap.put(localDate, functionDTOS);
