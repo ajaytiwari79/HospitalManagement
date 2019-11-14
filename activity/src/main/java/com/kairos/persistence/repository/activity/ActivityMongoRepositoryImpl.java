@@ -735,11 +735,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                     match(criteria),
                     lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
                     lookup(ACTIVITIES, "_id", CHILD_ACTIVITY_IDS, "parentActivity"),
+                    lookup("activityPriority", "activityPriorityId", "_id",
+                        "activityPriority"),
                     project("id","name", GENERAL_ACTIVITY_TAB, TIME_CALCULATION_ACTIVITY_TAB, EXPERTISES, EMPLOYMENT_TYPES, RULES_ACTIVITY_TAB, SKILL_ACTIVITY_TAB,
                             PHASE_SETTINGS_ACTIVITY_TAB,
                             BALANCE_SETTINGS_ACTIVITY_TAB,
                             UNIT_ID,
-                            CHILD_ACTIVITY_IDS).and("parentActivity._id").as("parentActivityId").and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
+                            CHILD_ACTIVITY_IDS).and("parentActivity._id").as("parentActivityId").and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES).and("activityPriority.name").arrayElementAt(0).as("activityPriorityName")
                     );
     }
 
