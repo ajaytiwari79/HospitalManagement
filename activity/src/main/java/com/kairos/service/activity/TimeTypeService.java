@@ -525,5 +525,8 @@ public class TimeTypeService extends MongoBaseService {
 
     }
 
+    public List<BigInteger> getTimeTypeIdsByTimeTypeEnum(String timeTypeEnum){
+        return timeTypeMongoRepository.findAllByDeletedFalseAndTimeType(timeTypeEnum);
+    }
 
 }

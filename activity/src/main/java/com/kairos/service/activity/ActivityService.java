@@ -41,6 +41,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
@@ -78,10 +79,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -1001,11 +999,9 @@ public class ActivityService {
 
     public void updateBackgroundColorInShifts(String newTimeTypeColor, String existingTimeTypeColor,BigInteger timeTypeId) {
         if(!existingTimeTypeColor.equals(newTimeTypeColor)){
-            new Thread(new Runnable() {
-                public void run() {
-                    updateColorInActivity(newTimeTypeColor, timeTypeId);
-                    updateColorInShift(newTimeTypeColor, timeTypeId);
-                }
+            new Thread(() -> {
+                updateColorInActivity(newTimeTypeColor, timeTypeId);
+                updateColorInShift(newTimeTypeColor, timeTypeId);
             }).start();
 
         }
@@ -1020,14 +1016,12 @@ public class ActivityService {
     }
 
     private void updateColorInShift(String newTimeTypeColor,BigInteger timeTypeId) {
-        Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeTypeId).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+        Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeTypeId).stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
         List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
         shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
             updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, shiftActivity);
             if(isNotNull(shift.getDraftShift())){
-                shift.getDraftShift().getActivities().forEach(draftShiftActivity->{
-                    updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, draftShiftActivity);
-                });
+                shift.getDraftShift().getActivities().forEach(draftShiftActivity-> updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, draftShiftActivity));
             }
         }));
         if(isCollectionNotEmpty(shifts)){

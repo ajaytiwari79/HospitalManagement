@@ -99,6 +99,8 @@ public abstract class RelationshipConstants {
 
     public static final String BELONGS_TO = "BELONGS_TO";
     public static final String IS_A = "IS_A";
+    public static final String BELONGS_TO_TAGS = "BELONGS_TO_TAGS";
+    public static final String HAS_PENALTY_SCORE =  "HAS_PENALTY_SCORE";
 
     public static final String HAS_ORGANIZATION_SERVICES = "HAS_ORGANIZATION_SERVICES";
     public static final String CIVILIAN_STATUS = "CIVILIAN_STATUS";
@@ -123,6 +125,8 @@ public abstract class RelationshipConstants {
     public static final  String HAS_SUB_TYPE = "HAS_SUB_TYPE";
     public static final  String HAS_CONTACT_ADDRESS = "HAS_CONTACT_ADDRESS";
     public static final  String DAY_TYPE = "DAY_TYPE";
+    public static final  String HAS_CHILDREN = "HAS_CHILDREN";
+
 
     //TimeCare
     public static final  String CONTACT_DETAIL = "CONTACT_DETAIL";

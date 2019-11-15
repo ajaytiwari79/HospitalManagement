@@ -10,12 +10,14 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.*;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -33,6 +35,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.FunctionService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
@@ -105,6 +108,8 @@ public class StaffFilterService {
     private FunctionService functionService;
     @Inject
     private SkillService skillService;
+    @Inject
+    private TagService tagService;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
 
@@ -183,11 +188,18 @@ public class StaffFilterService {
                 return getTAStatus();
             case TEAM:
                 return teamGraphRepository.getTeamsByUnitIdForFilters(unitId);
+            case TAGS:
+                return getTags(unitId);
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
         }
         return null;
+    }
+
+    private List<FilterSelectionQueryResult> getTags(Long orgId) {
+        List<TagDTO> tags = tagService.getTagsByOrganizationIdAndMasterDataType(orgId, MasterDataTypeEnum.STAFF);
+        return tags.stream().map(tag  -> new FilterSelectionQueryResult(tag.getId().toString(),tag.getName())).collect(Collectors.toList());
     }
 
 

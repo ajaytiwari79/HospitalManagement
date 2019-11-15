@@ -9,14 +9,14 @@ import java.util.List;
  * Created by prerna on 10/11/17.
  */
 public enum MasterDataTypeEnum {
-    SKILL("Skill"), EXPERTISE("Expertise"), ACTIVITY("Activity"), WTA("WTA"),CTA("CTA"), RULE_TEMPLATE_CATEGORY("Rule Template Category"), TASK_TYPE("Task Type");
+    SKILL("Skill"), EXPERTISE("Expertise"), ACTIVITY("Activity"), WTA("WTA"),CTA("CTA"), RULE_TEMPLATE_CATEGORY("Rule Template Category"), TASK_TYPE("Task Type"), STAFF("Staff");
     public String value;
 
     MasterDataTypeEnum(String value) {
         this.value = value;
     }
 
-    public MasterDataTypeEnum getByValue(String value){
+    public static MasterDataTypeEnum getByValue(String value){
         for(MasterDataTypeEnum masterDataTypeEnum : MasterDataTypeEnum.values()){
             if(masterDataTypeEnum.value.equals(value)){
                 return masterDataTypeEnum;

@@ -44,6 +44,9 @@ public class TaskType extends MongoBaseEntity {
     public static final String OVER_NIGHT_STAY = "overNightStay";
     public static final String COLLECTIVE_AGREEMENT = "collectiveAgreement";
     public static final String DISTANCE_RELATED_COST = "distanceRelatedCost";
+    public static final String PRE_PROCESSING_DURATION = "preProcessingDuration";
+    public static final String POST_PROCESSING_DURATION = "postProcessingDuration";
+    public static final String SETUP_DURATION = "setupDuration";
     private  String title;
     private  String shortName;
     private  String uniqueName;
@@ -448,18 +451,18 @@ public class TaskType extends MongoBaseEntity {
         this.dayType = (String) data.get("dayType");
         this.reduceBreakTime =  (boolean) data.get("reduceBreakTime");
         this.isTaskResumable = (boolean) data.get("isTaskResumable");
-        if(data.get("preProcessingDuration") != null){
-            this.preProcessingDuration = (Integer) data.get("preProcessingDuration");
+        if(data.get(PRE_PROCESSING_DURATION) != null){
+            this.preProcessingDuration = (Integer) data.get(PRE_PROCESSING_DURATION);
         }else{
             this.preProcessingDuration = 0;
         }
-        if(data.get("postProcessingDuration") != null){
-            this.postProcessingDuration = (Integer) data.get("postProcessingDuration");
+        if(data.get(POST_PROCESSING_DURATION) != null){
+            this.postProcessingDuration = (Integer) data.get(POST_PROCESSING_DURATION);
         }else{
             this.postProcessingDuration = 0;
         }
-        if(data.get("setupDuration") != null) {
-            this.setupDuration = (Integer) data.get("setupDuration");
+        if(data.get(SETUP_DURATION) != null) {
+            this.setupDuration = (Integer) data.get(SETUP_DURATION);
         }else{
             this.setupDuration = 0;
         }
@@ -485,9 +488,9 @@ public class TaskType extends MongoBaseEntity {
         map.put("dayType", this.dayType);
         map.put("reduceBreakTime", this.reduceBreakTime);
         map.put("isTaskResumable",this.isTaskResumable);
-        map.put("preProcessingDuration", this.preProcessingDuration);
-        map.put("postProcessingDuration", this.postProcessingDuration);
-        map.put("setupDuration", this.setupDuration);
+        map.put(PRE_PROCESSING_DURATION, this.preProcessingDuration);
+        map.put(POST_PROCESSING_DURATION, this.postProcessingDuration);
+        map.put(SETUP_DURATION, this.setupDuration);
         return map;
     }
 
