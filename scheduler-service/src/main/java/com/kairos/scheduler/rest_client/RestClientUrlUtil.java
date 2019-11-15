@@ -1,6 +1,6 @@
 package com.kairos.scheduler.rest_client;
 
-import com.kairos.scheduler.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 
 import java.util.Optional;
 

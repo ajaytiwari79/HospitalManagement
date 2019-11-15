@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.auth;
 
-import com.kairos.dto.CurrentUserDetails;
+import com.kairos.dto.user_context.CurrentUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

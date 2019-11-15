@@ -1,4 +1,4 @@
-package com.kairos.scheduler.utils.user_context;
+package com.kairos.dto.user_context;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
