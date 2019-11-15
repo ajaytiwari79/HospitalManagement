@@ -52,7 +52,6 @@ public class ActivityPriorityService {
         activityPriority.setCountryId(countryId);
         activityPriorityMongoRepository.save(activityPriority);
         activityPriorityDTO.setId(activityPriority.getId());
-        createActivityPriorityAtOrganizations(activityPriority, null);
         return activityPriorityDTO;
     }
 
