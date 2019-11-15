@@ -5,7 +5,7 @@ package com.kairos.enums;
  **/
 public enum SkillLevel {
 
-    BASIC("Basic"), EXPERT("Expert"), ADVANCE("Advance");
+    BASIC("Basic"), ADVANCE("Advance"), EXPERT("Expert");
     public String value;
 
     SkillLevel(String value) {

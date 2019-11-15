@@ -21,6 +21,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,7 +68,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WITH staff,organization,user " +
             "OPTIONAL MATCH (staff)-[skillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skills:Skill{isEnabled:true}) WITH staff,COLLECT(DISTINCT{skillId:id(skills),skillLevel:skillRel.skillLevel}) AS skillLevelDTOS,organization,user" +
             " OPTIONAL MATCH (teams:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH staff,skillLevelDTOS,collect(id(teams)) AS teams,organization,user" +
-            " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.profilePic AS profilePic,teams,skillLevelDTOS,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber order by name")
+            " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.profilePic AS profilePic,teams,skillLevelDTOS,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber,staff.staffChildDetails AS staffChildDetails order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndStaffId(long unitId, long staffId,long employmentId,String startDate );
 
     @Query("MATCH (staff:Staff) WHERE id(staff) IN {1}  " +
@@ -156,9 +157,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (s:Staff)-[:" + HAS_POSITIONS + "]-(position:Position) WHERE id(s)={0} AND id(position)={1} DELETE rel")
     void deleteStaffEmployment(long staffId, long positionId);
 
-    @Query("MATCH (s:Staff)-[:" + HAS_CONTACT_DETAIL + "]->(contactDetail:ContactDetail) WHERE id(s)={0} RETURN contactDetail")
-    ContactDetail getContactDetail(long staffId);
-
     @Query("MATCH (c:Client) , (s:Staff) WHERE id(c)={0}  AND id(s) IN {1}  " +
             "OPTIONAL MATCH (c)-[r1:" + SERVED_BY_STAFF + "]->(s) delete r1  " +
             "  Create Unique (c)-[r:" + SERVED_BY_STAFF + "{type:'PREFERRED'}]->(s) RETURN count(r)")
@@ -204,8 +202,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     Staff getStaffByUnitId(long unitId, long staffId);
 
 
-    @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE  id(staff)={0}\n" +
-            " RETURN staff, position.startDateMillis AS positionStartDate")
+    @Query("MATCH(organization:Organization)-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]->(staff:Staff)\n" +
+            "WHERE  id(staff)={0}\n"+
+            "OPTIONAL MATCH(staff)-[tagRel:" + BELONGS_TO_TAGS + "]->(tag:Tag) \n"+
+            "RETURN staff,collect(tagRel),collect(tag) AS tags, position.startDateMillis AS positionStartDate")
     StaffPositionDTO getStaffAndEmploymentByStaffId(long staffId);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} WITH unitPermission\n" +
@@ -440,5 +440,17 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (organization:Organization{deleted:false,isEnable:true,isKairosHub:true})-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WHERE id(organization)={0} AND id(user)={1} RETURN staff")
     Staff getStaffOfHubByHubIdAndUserId(Long hubId,Long userId);
 
+    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO_TAGS]->(tag:Tag) WHERE id(organization)={0} AND id(tag)={1}  \n" +
+            "RETURN DISTINCT(staff)")
+    List<Staff> getAllStaffIdsByOrganisationIdAndTagId(Long orgId, Long tagId);
+
+    @Query("MATCH (staff:Staff)-[rel:" + BELONGS_TO_TAGS + "]->(tag:Tag) where id(staff) = {0} AND NOT id(tag) IN {1} detach delete rel")
+    void unlinkTagsFromStaff(Long staffId, List<Long> tagIds);
+
+    @Query("MATCH (staff:Staff)-[rel:" + BELONGS_TO_TAGS + "]->(tag:Tag) where id(staff) = {0} detach delete rel")
+    void unlinkAllTagsFromStaff(Long staffId);
+
+    @Query("MATCH (staff:Staff)-[rel:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) where id(staff) = {0} detach delete staffChildDetail")
+    void unlinkStaffChilds(Long staffId);
 }
 

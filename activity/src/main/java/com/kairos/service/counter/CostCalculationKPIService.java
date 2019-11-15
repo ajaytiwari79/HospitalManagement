@@ -6,6 +6,7 @@ import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.EmploymentType;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.CalculationFor;
@@ -31,13 +32,18 @@ public class CostCalculationKPIService {
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
     @Inject private CostTimeAgreementRepository costTimeAgreementRepository;
+    @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
 
-  public double calculateTotalCostOfStaff(StaffKpiFilterDTO staffKpiFilterDTO, List<ShiftActivityDTO> shiftActivityDTOS, DateTimeInterval dateTimeInterval){
-      Map<Long,EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOMap=staffKpiFilterDTO.getEmployment().stream().collect(Collectors.toMap(k->k.getId(),v->v));
-      Map<Long, List<Day>> daytypesMap = staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getValidDays()));
-      Map<Long, DayTypeDTO> dayTypeDTOMap =staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(k->k.getId(),v->v));
+  public double calculateTotalCostOfStaff(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+      StaffKpiFilterDTO staffKpiFilterDTO = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
+      Map<Long,EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOMap = staffKpiFilterDTO.getEmployment().stream().collect(Collectors.toMap(EmploymentWithCtaDetailsDTO::getId, v->v));
+      Map<Long, List<Day>> daytypesMap = staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, DayTypeDTO::getValidDays));
+      Map<Long, DayTypeDTO> dayTypeDTOMap = staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v->v));
       double totalCost=0l;
       double totalCtaBonus=0l;
+      List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
+      KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria()).invoke();
+      List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
       for (ShiftActivityDTO shiftActivityDTO : shiftActivityDTOS) {
           EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO=employmentWithCtaDetailsDTOMap.get(shiftActivityDTO.getEmploymentId());
           CTAResponseDTO ctaResponseDTO = costTimeAgreementRepository.getCTAByEmploymentIdAndDate(shiftActivityDTO.getEmploymentId(), asDate(shiftActivityDTO.getStartLocalDate()));

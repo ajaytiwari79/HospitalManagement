@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
@@ -13,6 +14,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.EngineerType;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.UnitManagerDTO;
@@ -147,6 +149,7 @@ public class StaffCreationService {
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
         staff.setCurrentStatus(payload.getCurrentStatus());
+        staff.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(payload.getTags(), Tag.class));
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
             contactAddress.setId(staffQueryResult.getContactAddressId());
             contactDetail.setId(staffQueryResult.getContactDetailId());

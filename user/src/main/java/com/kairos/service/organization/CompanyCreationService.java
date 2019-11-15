@@ -9,6 +9,8 @@ import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.MasterDataTypeEnum;
+import com.kairos.enums.PenaltyScoreLevel;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -20,6 +22,9 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import com.kairos.persistence.model.country.tag.PenaltyScore;
+import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
@@ -51,6 +56,7 @@ import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepositor
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.ReasonCodeService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffCreationService;
@@ -149,6 +155,8 @@ public class CompanyCreationService {
     private StaffCreationService staffCreationService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    @Inject
+    private TagService tagService;
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -435,6 +443,7 @@ public class CompanyCreationService {
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
         accessGroupService.linkParentOrganizationAccessGroup(unit, parentUnit.getId());
+        setDefaultTagFromCountry(country.getId(), unit);
         unitGraphRepository.save(unit);
         organizationBasicDTO.setId(unit.getId());
         organizationBasicDTO.setKairosCompanyId(kairosCompanyId);
@@ -450,6 +459,18 @@ public class CompanyCreationService {
         //Assign Parent Organization's level to unit
         return organizationBasicDTO;
 
+    }
+
+    private void setDefaultTagFromCountry(Long countryId, Unit unit){
+        List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
+        List<TagQueryResult> tagQueryResults = tagService.getCountryTagsByMasterDataTypeAndOrgSubTypeIds(countryId,MasterDataTypeEnum.STAFF, orgSubTypeIds);
+        List<Tag> tags = new ArrayList<>();
+        if(isCollectionNotEmpty(tagQueryResults)){
+            for (TagQueryResult tagQueryResult : tagQueryResults) {
+                tags.add(new Tag(tagQueryResult.getName(),MasterDataTypeEnum.getByValue(tagQueryResult.getMasterDataType()),false,new PenaltyScore(PenaltyScoreLevel.SOFT,0)));
+            }
+        }
+        unit.setTags(tags);
     }
 
     private boolean doesUnitManagerInfoAvailable(OrganizationBasicDTO organizationBasicDTO) {

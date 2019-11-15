@@ -13,6 +13,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -25,6 +26,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -34,6 +36,7 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffChildDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.staff.position.Position;
@@ -289,6 +292,7 @@ public class StaffService {
         staffToUpdate.setLanguage(language);
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
+        setStaffChildDetails(staffToUpdate, staffPersonalDetail);
 
         if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
             if (!staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffPersonalDetail.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
@@ -307,6 +311,7 @@ public class StaffService {
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
         Staff staff = staffGraphRepository.save(staffToUpdate);
         staffPersonalDetail.setUserName(staff.getUser().getUserName());
+        staffPersonalDetail.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staff.getStaffChildDetails(),StaffChildDetailDTO.class));
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
@@ -328,6 +333,11 @@ public class StaffService {
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
         teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
         return staffPersonalDetail;
+    }
+
+    private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
+        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
+        staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
@@ -1040,4 +1050,14 @@ public class StaffService {
     }
 
 
+    public void unlinkTagFromStaff(Long orgId, Long tagId) {
+        List<Staff> staffs = staffGraphRepository.getAllStaffIdsByOrganisationIdAndTagId(orgId, tagId);
+        for (Staff staff : staffs) {
+            List<Tag> tags = staff.getTags().stream().filter(tag -> !tag.getId().equals(tagId)).collect(Collectors.toList());
+            staff.setTags(tags);
+            staffGraphRepository.unlinkTagsFromStaff(orgId, tags.stream().map(tag -> tagId).collect(Collectors.toList()));
+        }
+        staffGraphRepository.saveAll(staffs);
+        //code to remove this tag id from activity tag also
+    }
 }
