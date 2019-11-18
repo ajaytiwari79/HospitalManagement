@@ -560,7 +560,8 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Long getHubIdByOrganizationId(Long organizationId);
 
 
-    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit:Unit) where id(staff)={0} RETURN id(unit) as id,unit.name as name")
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup{deleted:false,enabled:true})  WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())" +
+            "MATCH (up)-[:"+APPLICABLE_IN_UNIT+"]-(unit:Unit) where id(staff)={0} RETURN distinct id(unit) as id,unit.name as name")
     List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
 
     @Query("MATCH (org:Organization{isEnable:true,union:false})-[:" + HAS_SUB_ORGANIZATION + "*]->(sub:Organization)  WHERE id(org)={0}  \n" +
