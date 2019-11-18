@@ -88,10 +88,9 @@ public class WidgetService {
         if (isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
             Map<Long, StaffAdditionalInfoDTO> idAndStaffMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getId())).collect(Collectors.toMap(StaffAdditionalInfoDTO::getId, v -> v));
             Map<Long, List<ShiftWithActivityDTO>> employementIdAndStaffMap = shiftDTOs.stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getEmploymentId, Collectors.toList()));
-            UserAccessRoleDTO userAccessRoleDTO = staffAdditionalInfoDTOS.get(0).getUserAccessRoleDTO();
             TimeSlotWrapper nightTimeSlotWrapper = staffAdditionalInfoDTOS.get(0).getTimeSlotSets().stream().filter(timeSlotWrapper -> timeSlotWrapper.getName().equals(PartOfDay.NIGHT.getValue())).findFirst().orElseGet(null);
             TimeSlotDTO nightTimeSlot = ObjectMapperUtils.copyPropertiesByMapper(nightTimeSlotWrapper, TimeSlotDTO.class);
-            employementIdAndStaffMap.forEach((aLong, shiftDTOS) -> wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO));
+            employementIdAndStaffMap.forEach((aLong, shiftDTOS) -> wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS));
             updateTimeTypeDetails(shiftDTOs);
             updateRestingHoursInShift(shiftDTOs);
             dashBoardWidgetDTO.setNightTimeSlot(nightTimeSlot);

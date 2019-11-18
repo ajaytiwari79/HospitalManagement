@@ -6,6 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
+import static com.kairos.dto.user.access_permission.AccessGroupRole.STAFF;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,6 +29,7 @@ public class CurrentUserDetails {
     private boolean hubMember;
     private Long languageId;
     private Long lastSelectedOrganizationId;
+    private Map<String, String> unitWiseAccessRole=new HashMap<>();
 
 
     public CurrentUserDetails(Long id, String userName, String nickName,
@@ -39,6 +46,21 @@ public class CurrentUserDetails {
     @JsonIgnore
     public String getFullName(){
         return this.firstName+" "+this.lastName;
+    }
+
+    @JsonIgnore
+    public String getAccessRole(){
+        return unitWiseAccessRole.get(lastSelectedOrganizationId.toString());
+    }
+
+    @JsonIgnore
+    public boolean isManagement(){
+        return MANAGEMENT.name().equals(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()));
+    }
+
+    @JsonIgnore
+    public boolean isStaff(){
+        return STAFF.name().equals(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()));
     }
 
 }

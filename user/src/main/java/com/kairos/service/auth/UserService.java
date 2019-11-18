@@ -593,4 +593,15 @@ public class UserService {
         userGraphRepository.save(currentUser);
         return googleCalenderTokenDTO;
     }
+
+    public boolean updateAccessRoleOfUser(Long unitId, AccessGroupRole accessGroupRole){
+        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        currentUser.getUnitWiseAccessRole().put(String.valueOf(unitId),accessGroupRole.name());
+        userGraphRepository.save(currentUser);
+        return true;
+    }
+
+    public Map<String,String> getUnitWiseLastSelectedAccessRole(){
+        return userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+    }
 }

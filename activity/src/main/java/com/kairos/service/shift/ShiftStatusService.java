@@ -119,7 +119,7 @@ public class ShiftStatusService {
             shiftMongoRepository.saveEntities(shifts);
             timeBankService.updateDailyTimeBankEntriesForStaffs(shifts,null);
         }
-        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
+        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
         return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
     }
 
@@ -310,13 +310,13 @@ public class ShiftStatusService {
         return activityShiftStatusSettings;
     }
 
-    public void updateStatusOfShiftIfPhaseValid(PlanningPeriod planningPeriod, Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActionType shiftActionType) {
+    public void updateStatusOfShiftIfPhaseValid(PlanningPeriod planningPeriod, Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
             if (planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
                 shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
-                    shiftActivity.getStatus().add(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
+                    shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
                 }
             }
         }

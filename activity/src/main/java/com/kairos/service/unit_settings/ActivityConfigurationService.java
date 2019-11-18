@@ -13,6 +13,7 @@ import com.kairos.dto.activity.unit_settings.activity_configuration.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
@@ -238,7 +239,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public List<BigInteger> addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
+        boolean managementPerson = UserContext.getUserDetails().isManagement();
         List<BigInteger> plannedTimes;
         switch (activity.getBalanceSettingsActivityTab().getTimeType()){
             case ABSENCE :
