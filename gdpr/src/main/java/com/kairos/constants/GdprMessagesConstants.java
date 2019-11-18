@@ -140,4 +140,5 @@ public class GdprMessagesConstants {
     public static final String ERROR_MESSAGE_NAME_SPECIAL_CHARACTER_NOTALLOWED = "error.message.name.special.character.notAllowed";
     public static final String MESSAGE_NAME_ALREADY_EXIST = "message.name.already.exist";
     public static final String INTERNAL_SERVER_ERROR = "internal.server.error";
+    public static final String ERROR_MESSAGE_SPECIAL_CHARACTER_NOT_ALLOWED = "error.message.special.character.notAllowed";
 }
