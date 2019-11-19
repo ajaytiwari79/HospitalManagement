@@ -81,9 +81,4 @@ public class StaffAdditionalInfoDTO {
             }
         return roles;
     }
-
-    public String getAccessRole(){
-        return UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString());
-    }
-
 }

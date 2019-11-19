@@ -125,7 +125,7 @@ public class WTARuleTemplateCalculationService {
             for (DurationBetweenShiftsWTATemplate durationBetweenShiftsWTATemplate : durationBetweenShiftsWTATemplates) {
                 boolean anyActivityValid = shift.getActivities().stream().filter(shiftActivityDTO -> durationBetweenShiftsWTATemplate.getTimeTypeIds().contains(activityIdAndTimetypeIdMap.get(shiftActivityDTO.getActivityId()))).findAny().isPresent();
                 if(anyActivityValid && phaseMapByDate.containsKey(shift.getStartDate())) {
-                    Integer currentRuletemplateRestingMinutes = getValueByPhase(shift.getUnitId(), durationBetweenShiftsWTATemplate.getPhaseTemplateValues(), phaseMapByDate.get(shift.getStartDate()).getId());
+                    Integer currentRuletemplateRestingMinutes = getValueByPhase( durationBetweenShiftsWTATemplate.getPhaseTemplateValues(), phaseMapByDate.get(shift.getStartDate()).getId());
                     if(isNotNull(currentRuletemplateRestingMinutes) && restingMinutes < currentRuletemplateRestingMinutes) {
                         restingMinutes = currentRuletemplateRestingMinutes;
                     }

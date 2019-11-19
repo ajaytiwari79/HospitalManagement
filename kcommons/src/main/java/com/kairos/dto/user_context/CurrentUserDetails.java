@@ -48,10 +48,6 @@ public class CurrentUserDetails {
         return this.firstName+" "+this.lastName;
     }
 
-    @JsonIgnore
-    public String getAccessRole(){
-        return unitWiseAccessRole.get(lastSelectedOrganizationId.toString());
-    }
 
     @JsonIgnore
     public boolean isManagement(){

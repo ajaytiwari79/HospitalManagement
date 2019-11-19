@@ -204,7 +204,7 @@ public class UserController {
 
     @PutMapping(UNIT_URL+"/update_access_role")
     @ApiOperation("update access_role")
-    public ResponseEntity<Map<String, Object>> updateAccessRole(@PathVariable Long unitId, @RequestBody AccessGroupRole accessGroupRole) {
+    public ResponseEntity<Map<String, Object>> updateAccessRole(@PathVariable Long unitId, @RequestBody String accessGroupRole) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateAccessRoleOfUser(unitId,accessGroupRole));
     }
 

@@ -250,7 +250,7 @@ public class RuletemplateUtils {
         Integer[] limitAndCounter = new Integer[3];
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (infoWrapper.getPhaseId().equals(phaseTemplateValue.getPhaseId())) {
-                limitAndCounter[0] = (int) (AccessGroupRole.STAFF.name().equals(UserContext.getUserDetails().getUnitWiseAccessRole().get(infoWrapper.getShift().getUnitId().toString())) ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
+                limitAndCounter[0] = (int) (UserContext.getUserDetails().isStaff() ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
                 Integer[] counterValue = getCounterValue(infoWrapper, phaseTemplateValue, ruleTemplate);
                 limitAndCounter[1] = counterValue[0];
                 limitAndCounter[2] = counterValue[1];
@@ -286,12 +286,12 @@ public class RuletemplateUtils {
 
     public static Integer[] getCounterValue(RuleTemplateSpecificInfo infoWrapper, PhaseTemplateValue phaseTemplateValue, WTABaseRuleTemplate ruleTemplate) {
         Integer totalCounterValue = null;
-        if (AccessGroupRole.STAFF.name().equals(UserContext.getUserDetails().getUnitWiseAccessRole().get(infoWrapper.getShift().getUnitId().toString())) && phaseTemplateValue.isStaffCanIgnore()) {
+        if (UserContext.getUserDetails().isStaff() && phaseTemplateValue.isStaffCanIgnore()) {
             totalCounterValue = ruleTemplate.getStaffCanIgnoreCounter();
             if (totalCounterValue == null) {
                 throwException(MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL, ruleTemplate.getName());
             }
-        } else if (MANAGEMENT.name().equals(UserContext.getUserDetails().getUnitWiseAccessRole().get(infoWrapper.getShift().getUnitId().toString())) && phaseTemplateValue.isManagementCanIgnore()) {
+        } else if (UserContext.getUserDetails().isManagement() && phaseTemplateValue.isManagementCanIgnore()) {
             totalCounterValue = ruleTemplate.getManagementCanIgnoreCounter();
             if (totalCounterValue == null) {
                 throwException(MESSAGE_RULETEMPLATE_COUNTER_VALUE_NOTNULL, ruleTemplate.getName());
@@ -567,11 +567,11 @@ public class RuletemplateUtils {
         ctaRuleTemplateDTO.setDays(new ArrayList<>(dayOfWeeks));
     }
 
-    public static Integer getValueByPhase(Long unitId, List<PhaseTemplateValue> phaseTemplateValues,BigInteger phaseId) {
+    public static Integer getValueByPhase( List<PhaseTemplateValue> phaseTemplateValues,BigInteger phaseId) {
         Integer limitAndCounter = null;
         for (PhaseTemplateValue phaseTemplateValue : phaseTemplateValues) {
             if (phaseId.equals(phaseTemplateValue.getPhaseId())) {
-                limitAndCounter = (int) (AccessGroupRole.STAFF.name().equals(UserContext.getUserDetails().getUnitWiseAccessRole().get(unitId.toString())) ? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
+                limitAndCounter = (int) (UserContext.getUserDetails().isStaff()? phaseTemplateValue.getStaffValue() : phaseTemplateValue.getManagementValue());
                 break;
             }
         }

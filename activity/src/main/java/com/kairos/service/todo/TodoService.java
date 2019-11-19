@@ -76,7 +76,7 @@ public class TodoService {
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
             Set<BigInteger> approvalRequiredActivityIds = activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).map(activity -> activity.getId()).collect(Collectors.toSet());
-            if (!shiftUpdate && MANAGEMENT.name().equals(UserContext.getUserDetails().getAccessRole())) {
+            if (!shiftUpdate && UserContext.getUserDetails().isManagement()) {
                 shift.getActivities().forEach(shiftActivity -> {
                     updateStatusIfApprovalRequired(approvalRequiredActivityIds, shiftActivity);
                     shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(approvalRequiredActivityIds, childActivity));

@@ -689,7 +689,7 @@ public class ShiftService extends MongoBaseService {
 
     private Shift updateShiftAfterPublish(Shift shift, ShiftActionType shiftActionType) {
         Shift originalShift = shiftMongoRepository.findOne(shift.getId());
-        boolean valid = shift.getActivities().stream().allMatch(activity -> activity.getStatus().contains(ShiftStatus.PUBLISH)) && MANAGEMENT.name().equals(UserContext.getUserDetails().getAccessRole());
+        boolean valid = shift.getActivities().stream().allMatch(activity -> activity.getStatus().contains(ShiftStatus.PUBLISH)) && UserContext.getUserDetails().isManagement();
         if (valid && ShiftActionType.SAVE_AS_DRAFT.equals(shiftActionType)) {
             Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
             draftShift.setPlannedMinutesOfTimebank(originalShift.getPlannedMinutesOfTimebank());

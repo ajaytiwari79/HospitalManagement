@@ -31,7 +31,7 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
 
     @Override
     public boolean isSatisfied(ShiftWithActivityDTO shift) {
-        if (MANAGEMENT.name().equals(staffAdditionalInfoDTO.getAccessRole())) {
+        if (UserContext.getUserDetails().isManagement()) {
             return true;
         }
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
@@ -73,10 +73,10 @@ public class StaffEmploymentSpecification extends AbstractSpecification<ShiftWit
             }
         }
         if (Optional.ofNullable(phaseTemplateValue1).isPresent()) {
-            if (MANAGEMENT.name().equals(staffAdditionalInfoDTO.getAccessRole()) && !phaseTemplateValue1.isEligibleForManagement()) {
+            if (UserContext.getUserDetails().isManagement() && !phaseTemplateValue1.isEligibleForManagement()) {
                 ShiftValidatorService.throwException(MESSAGE_MANAGEMENT_AUTHORITY_PHASE);
             }
-            if (STAFF.name().equals(staffAdditionalInfoDTO.getAccessRole()) && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
+            if (UserContext.getUserDetails().isStaff() && !phaseTemplateValue1.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
                 ShiftValidatorService.throwException(MESSAGE_STAFF_EMPLOYMENTTYPE_ABSENT);
             }
         }

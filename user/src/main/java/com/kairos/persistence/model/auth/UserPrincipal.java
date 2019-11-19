@@ -72,6 +72,7 @@ public class UserPrincipal implements UserDetails, Authentication {
         details.setAge(this.user.getAge());
         details.setLastSelectedOrganizationId(this.getUser().getLastSelectedOrganizationId());
         details.setCountryId(this.getUser().getCountryId());
+        details.setUnitWiseAccessRole(this.getUser().getUnitWiseAccessRole());
         return details;
     }
 
