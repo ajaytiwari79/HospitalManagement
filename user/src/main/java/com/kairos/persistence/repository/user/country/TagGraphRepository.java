@@ -78,7 +78,8 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
     
     @Query("Match (org:OrganizationBaseEntity)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag{countryTag:false})\n" +
             "WHERE id(tag)={0} AND id(org) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
-            "RETURN tag")
+            "OPTIONAL MATCH (tag)-[rel:" + HAS_PENALTY_SCORE + "]->(penaltyScore:PenaltyScore) \n" +
+            "RETURN tag,rel,penaltyScore")
     Tag getOrganizationTagByIdAndDataType(Long tagId, Long orgId, String masterDataType, boolean isDeleted);
 
     
