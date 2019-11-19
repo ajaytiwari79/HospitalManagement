@@ -160,7 +160,7 @@ public class KPIUtils {
                 Double.valueOf(0.0).equals(clusteredBarChartKpiDataUnit.getValue()));
     }
 
-    public static boolean verifyKPIResponseData(Map<Object, Double> objectListMap) {
+    public static <T, E> boolean verifyKPIResponseData(Map<T, E> objectListMap) {
         return objectListMap.values().stream().anyMatch(value -> !Double.valueOf(0.0).equals(value));
     }
 

@@ -60,7 +60,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
 
     private void validateStaffSkills(List<String> errorMessages, ShiftActivityDTO shiftActivityDTO) {
         ActivityRuleViolation activityRuleViolation;
-        if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
+        /*if (CollectionUtils.isNotEmpty(shiftActivityDTO.getActivity().getSkillActivityTab().getActivitySkillIds()) &&
                 (CollectionUtils.isEmpty(skillLevelDTOS) || !isSkillSatisfied(shiftActivityDTO.getActivity().getSkillActivityTab()))) {
             errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_SKILL_MATCH, shiftActivityDTO.getActivity().getName()));
             activityRuleViolation=ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k->k.getActivityId().equals(shiftActivityDTO.getActivity().getId())).findAny().orElse(null);
@@ -71,7 +71,7 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
             else {
                 activityRuleViolation.getErrorMessages().addAll(errorMessages);
             }
-        }
+        }*/
     }
 
     private boolean isSkillSatisfied(SkillActivityDTO skillActivityDTO) {
