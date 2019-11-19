@@ -1048,13 +1048,6 @@ public class StaffService {
 
 
     public void unlinkTagFromStaff(Long orgId, Long tagId) {
-        List<Staff> staffs = staffGraphRepository.getAllStaffIdsByOrganisationIdAndTagId(orgId, tagId);
-        for (Staff staff : staffs) {
-            List<Tag> tags = staff.getTags().stream().filter(tag -> !tag.getId().equals(tagId)).collect(Collectors.toList());
-            staff.setTags(tags);
-            staffGraphRepository.unlinkTagsFromStaff(orgId, tags.stream().map(tag -> tagId).collect(Collectors.toList()));
-        }
-        staffGraphRepository.saveAll(staffs);
-        //code to remove this tag id from activity tag also
+        staffGraphRepository.unlinkTagFromStaff(orgId, tagId);
     }
 }
