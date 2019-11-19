@@ -375,7 +375,6 @@ public class KPIBuilderCalculationService implements CounterService {
                     break;
                 case DELTA_TIMEBANK:
                 case UNAVAILABILITY:
-                case VARIABLE_COST:
                 case TOTAL_PLANNED_HOURS:
                     CalculationType currentCalculationType = copyPropertiesByMapper(yAxisConfig, CalculationType.class);
                     kpiCalculationRelatedInfo.setCurrentCalculationType(currentCalculationType);
