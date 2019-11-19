@@ -1,6 +1,5 @@
-package com.kairos.utils.user_context;
+package com.kairos.dto.user_context;
 
-import com.kairos.dto.user_context.UserContext;
 import org.springframework.util.Assert;
 
 public class UserContextHolder {
