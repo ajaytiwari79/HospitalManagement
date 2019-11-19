@@ -444,7 +444,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (organization:Organization{deleted:false,isEnable:true})-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]-(staff:Staff)-[rel:BELONGS_TO_TAGS]->(tag:Tag) WHERE id(organization)={0} AND id(tag)={1}  \n" +
             "detach delete rel")
-    void unlinkAllTagsFromStaff(Long orgId, Long tagId);
+    void unlinkTagFromStaff(Long orgId, Long tagId);
 
     @Query("MATCH (staff:Staff)-[rel:" + BELONGS_TO_TAGS + "]->(tag:Tag) where id(staff) = {0} AND NOT id(tag) IN {1} detach delete rel")
     void unlinkTagsFromStaff(Long staffId, List<Long> tagIds);

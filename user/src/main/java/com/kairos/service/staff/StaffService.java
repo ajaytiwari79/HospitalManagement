@@ -1048,6 +1048,6 @@ public class StaffService {
 
 
     public void unlinkTagFromStaff(Long orgId, Long tagId) {
-        staffGraphRepository.unlinkAllTagsFromStaff(orgId, tagId);
+        staffGraphRepository.unlinkTagFromStaff(orgId, tagId);
     }
 }

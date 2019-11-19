@@ -324,7 +324,7 @@ public class TagService {
         return tagGraphRepository.getListOfCountryTagsByMasterDataTypeAndOrgSubTypeIds(countryId, false,masterDataType.toString(), orgSubTypeIds);
     }
 
-    public List<TagDTO> getTagsByOrganizationIdAndMasterDataType(long orgId, MasterDataTypeEnum masterDataType) {
+    public List<TagDTO> getTagsByOrganizationIdAndMasterDataType(Long orgId, MasterDataTypeEnum masterDataType) {
         Unit unit = unitGraphRepository.findOne(orgId);
         if(isNotNull(unit)){
             orgId = organizationBaseRepository.findParentOrgId(orgId);
