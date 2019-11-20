@@ -39,6 +39,13 @@ public class GroupController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.updateGroup(unitId, groupId, groupDTO));
     }
 
+    @ApiOperation(value = "Delete Group of Unit")
+    @DeleteMapping(value = "/group/{groupId}")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> deleteGroup(@PathVariable Long groupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.deleteGroup(groupId));
+    }
+
     @ApiOperation(value = "Get Group Details")
     @GetMapping(value = "/group/{groupId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

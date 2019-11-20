@@ -1,5 +1,7 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.group.GroupDTO;
@@ -11,8 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_NOT_FOUND;
 
@@ -29,7 +31,7 @@ public class GroupService {
     private UnitGraphRepository unitGraphRepository;
 
     public GroupDTO createGroup(Long unitId, GroupDTO groupDTO) {
-        Unit unit = unitGraphRepository.getUnitWithGroupsById(unitId);
+        Unit unit = unitGraphRepository.getUnitWithGroupsByUnitId(unitId);
         if (groupGraphRepository.existsByName(unitId,-1L, groupDTO.getName())){
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }
@@ -45,10 +47,10 @@ public class GroupService {
         if (groupGraphRepository.existsByName(unitId,groupId, groupDTO.getName())){
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }
-        if(groupGraphRepository.existsById(groupId)){
+        Group group = groupGraphRepository.findGroupByIdAndDeletedFalse(groupId);
+        if(isNull(group)){
             exceptionService.dataNotFoundByIdException(MESSAGE_GROUP_NOT_FOUND,groupDTO.getName());
         }
-        Group group = groupGraphRepository.findOne(groupId);
         group.setName(groupDTO.getName());
         group.setDescription(groupDTO.getDescription());
         group.setExcludeStaffs(groupDTO.getExcludeStaffs());
@@ -58,10 +60,21 @@ public class GroupService {
     }
 
     public GroupDTO getGroupDetails(Long groupId) {
-        return groupGraphRepository.getGroupById(groupId);
+        return ObjectMapperUtils.copyPropertiesByMapper(groupGraphRepository.findGroupByIdAndDeletedFalse(groupId), GroupDTO.class);
     }
 
     public List<GroupDTO> getAllGroupsOfUnit(Long unitId) {
-        return null;
+        Unit unit = unitGraphRepository.getUnitWithGroupsByUnitId(unitId);
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(unit.getGroups(), GroupDTO.class);
+    }
+
+    public Boolean deleteGroup(Long groupId) {
+        Group group = groupGraphRepository.findGroupByIdAndDeletedFalse(groupId);
+        if(isNull(group)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_GROUP_NOT_FOUND,groupId);
+        }
+        group.setDeleted(false);
+        groupGraphRepository.save(group);
+        return true;
     }
 }
