@@ -10,6 +10,7 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.scheduler.JobSubType;
@@ -70,6 +71,7 @@ import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
@@ -254,6 +256,12 @@ public class PositionService {
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created", created + ""));
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
         }, accessGroupId);
+
+        if(unitPermissionGraphRepository.isOnlyStaff(unitId,staffId,accessGroupId)){
+            User user=userGraphRepository.findOne(UserContext.getUserDetails().getId(),0);
+            user.getUnitWiseAccessRole().put(String.valueOf(unitId),STAFF);
+            userGraphRepository.save(user);
+        }
 
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);

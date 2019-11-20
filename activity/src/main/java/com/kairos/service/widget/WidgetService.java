@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.persistence.model.phase.Phase;
@@ -25,7 +26,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
-import com.kairos.utils.user_context.UserContext;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
@@ -88,10 +88,9 @@ public class WidgetService {
         if (isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
             Map<Long, StaffAdditionalInfoDTO> idAndStaffMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getId())).collect(Collectors.toMap(StaffAdditionalInfoDTO::getId, v -> v));
             Map<Long, List<ShiftWithActivityDTO>> employementIdAndStaffMap = shiftDTOs.stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getEmploymentId, Collectors.toList()));
-            UserAccessRoleDTO userAccessRoleDTO = staffAdditionalInfoDTOS.get(0).getUserAccessRoleDTO();
             TimeSlotWrapper nightTimeSlotWrapper = staffAdditionalInfoDTOS.get(0).getTimeSlotSets().stream().filter(timeSlotWrapper -> timeSlotWrapper.getName().equals(PartOfDay.NIGHT.getValue())).findFirst().orElseGet(null);
             TimeSlotDTO nightTimeSlot = ObjectMapperUtils.copyPropertiesByMapper(nightTimeSlotWrapper, TimeSlotDTO.class);
-            employementIdAndStaffMap.forEach((aLong, shiftDTOS) -> wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO));
+            employementIdAndStaffMap.forEach((aLong, shiftDTOS) -> wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS));
             updateTimeTypeDetails(shiftDTOs);
             updateRestingHoursInShift(shiftDTOs);
             dashBoardWidgetDTO.setNightTimeSlot(nightTimeSlot);

@@ -78,7 +78,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FileUtil;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -1051,13 +1051,6 @@ public class StaffService {
 
 
     public void unlinkTagFromStaff(Long orgId, Long tagId) {
-        List<Staff> staffs = staffGraphRepository.getAllStaffIdsByOrganisationIdAndTagId(orgId, tagId);
-        for (Staff staff : staffs) {
-            List<Tag> tags = staff.getTags().stream().filter(tag -> !tag.getId().equals(tagId)).collect(Collectors.toList());
-            staff.setTags(tags);
-            staffGraphRepository.unlinkTagsFromStaff(orgId, tags.stream().map(tag -> tagId).collect(Collectors.toList()));
-        }
-        staffGraphRepository.saveAll(staffs);
-        //code to remove this tag id from activity tag also
+        staffGraphRepository.unlinkTagFromStaff(orgId, tagId);
     }
 }

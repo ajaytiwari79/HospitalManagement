@@ -1,6 +1,5 @@
-package com.kairos.scheduler.utils.user_context;
+package com.kairos.dto.user_context;
 
-import com.kairos.dto.CurrentUserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -8,20 +7,16 @@ public class UserContext {
     public static final String CORRELATION_ID = "correlation-id";
     public static final String AUTH_TOKEN     = "Authorization";
     public static final String USER_ID        = "user-id";
-    public static final String ORG_ID         = "org-id";
-    public static final String UNIT_ID         = "unit-id";
-    public static final String TAB_ID = "tab-id";
-    public static final String COUNTRY_ID  = "country-id";
 
-
-    private static final ThreadLocal<String> correlationId= new InheritableThreadLocal<String>();
+    private static final ThreadLocal<String> correlationId=  new InheritableThreadLocal<>();
     private static final ThreadLocal<String> authToken= new InheritableThreadLocal<>();
-    private static final ThreadLocal<String> userId = new InheritableThreadLocal<String>();
-    private static final ThreadLocal<Long> orgId = new InheritableThreadLocal<Long>();
-    private static final ThreadLocal<Long> unitId = new InheritableThreadLocal<Long>();
-    private static final ThreadLocal<String> tabId = new InheritableThreadLocal<String>();
-    private static final ThreadLocal<Long> countryId = new InheritableThreadLocal<Long>();
-    private static final ThreadLocal<CurrentUserDetails> userDetails = new InheritableThreadLocal<CurrentUserDetails>();
+    private static final ThreadLocal<String> userId =new InheritableThreadLocal<>();
+    private static final ThreadLocal<Long> orgId =new InheritableThreadLocal<>();
+    private static final ThreadLocal<Long> unitId =new InheritableThreadLocal<>();
+    private static final ThreadLocal<String> tabId =new InheritableThreadLocal<>();
+    private static final ThreadLocal<CurrentUserDetails> userDetails =new InheritableThreadLocal<>();
+    private static final ThreadLocal<Long> countryId = new InheritableThreadLocal<>();
+
 
     public static String getCorrelationId() { return correlationId.get(); }
     public static void setCorrelationId(String cid) {correlationId.set(cid);}
@@ -43,8 +38,10 @@ public class UserContext {
 
     public static void setUserDetails(CurrentUserDetails details) {userDetails.set(details);}
     public static CurrentUserDetails getUserDetails() {return userDetails.get();}
+
     public static void setTabId(String aTabId){tabId.set(aTabId);}
     public static String getTabId() {return tabId.get();}
+
 
 
 }

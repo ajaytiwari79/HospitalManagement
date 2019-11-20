@@ -5,6 +5,7 @@ import com.kairos.dto.activity.shift.ShiftAndActivtyStatusDTO;
 import com.kairos.dto.activity.shift.ShiftPublishDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoSubtype;
@@ -38,6 +39,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.SHIFT_NOT_EXISTS;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
+import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.enums.shift.TodoStatus.*;
 import static org.apache.commons.collections.CollectionUtils.containsAny;
 
@@ -66,7 +68,7 @@ public class TodoService {
     @Inject
     private UserIntegrationService userIntegrationService;
 
-    public void createOrUpdateTodo(Shift shift, TodoType todoType, UserAccessRoleDTO userAccessRoleDTO, boolean shiftUpdate) {
+    public void createOrUpdateTodo(Shift shift, TodoType todoType, boolean shiftUpdate) {
         List<Todo> todos = new ArrayList<>();
         if (todoType.equals(TodoType.APPROVAL_REQUIRED)) {
             Set<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivity.getStatus())).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
@@ -74,7 +76,7 @@ public class TodoService {
             List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
             Set<BigInteger> approvalRequiredActivityIds = activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).map(activity -> activity.getId()).collect(Collectors.toSet());
-            if (!shiftUpdate && userAccessRoleDTO.getManagement()) {
+            if (!shiftUpdate && UserContext.getUserDetails().isManagement()) {
                 shift.getActivities().forEach(shiftActivity -> {
                     updateStatusIfApprovalRequired(approvalRequiredActivityIds, shiftActivity);
                     shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(approvalRequiredActivityIds, childActivity));
@@ -214,7 +216,7 @@ public class TodoService {
         T response;
         Shift shift = shiftMongoRepository.findOne(todo.getEntityId());
         Activity activity = activityMongoRepository.findOne(todo.getSubEntityId());
-        List<BigInteger> shiftActivityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(todo.getSubEntityId())).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList());
+        List<BigInteger> shiftActivityIds = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(todo.getSubEntityId())).map(shiftActivity -> shiftActivity.getId()).collect(Collectors.toList());
         List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
         if (FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
             List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(newArrayList(shift.getActivities().get(0).getActivityId()), asLocalDate(shift.getStartDate()), asLocalDate(shift.getStartDate()).plusDays(7), shift.getStaffId());

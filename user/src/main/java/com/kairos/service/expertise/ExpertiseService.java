@@ -50,7 +50,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

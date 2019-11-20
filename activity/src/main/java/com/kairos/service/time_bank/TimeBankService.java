@@ -626,7 +626,7 @@ public class TimeBankService{
             ruleTemplates = ruleTemplates.stream().filter(distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
             dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, asDate(periodEndDate));
             java.time.LocalDate firstRequestPhasePlanningPeriodEndDate = planningPeriodService.findFirstRequestPhasePlanningPeriodByUnitId(unitId).getEndDate();
-            object = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)object,staffAdditionalInfoDTO.getUserAccessRoleDTO(),ruleTemplates);
+            object = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)object,ruleTemplates);
         }
         return object;
     }

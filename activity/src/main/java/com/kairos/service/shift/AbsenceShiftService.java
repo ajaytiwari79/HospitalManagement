@@ -212,7 +212,7 @@ public class AbsenceShiftService {
             }
             shift.setPlanningPeriodId(planningPeriodByShift.get().getId());
             shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
-            shiftStatusService.updateStatusOfShiftIfPhaseValid(planningPeriodByShift.get(),phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift, activityWrapperMap, staffAdditionalInfoDTO, shiftActionType);
+            shiftStatusService.updateStatusOfShiftIfPhaseValid(planningPeriodByShift.get(),phaseMapByDate.get(shiftDTO.getActivities().get(0).getStartDate()), shift, activityWrapperMap, staffAdditionalInfoDTO);
             shifts.add(shift);
             setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
             shiftWithViolatedInfoDTO.getViolatedRules().getActivities().addAll(updatedShiftWithViolatedInfoDTO.getViolatedRules().getActivities());
@@ -222,7 +222,7 @@ public class AbsenceShiftService {
         if ((PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             shiftService.saveShiftWithActivity(phaseMapByDate, shifts, staffAdditionalInfoDTO);
             shiftDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
-            shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, staffAdditionalInfoDTO.getUserAccessRoleDTO());
+            shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
             shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
         }
         shiftWithViolatedInfoDTO.setShifts(shiftDTOS);

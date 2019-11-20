@@ -162,6 +162,7 @@ public class OrganizationController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.assignSkillToStaff(unitId, Long.valueOf((String) data.get("staffId")), skillId, (boolean) data.get(IS_SELECTED)));
     }
 
+
     @ApiOperation(value = "Get Available Services")
     @GetMapping(UNIT_URL + "/service/data")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
