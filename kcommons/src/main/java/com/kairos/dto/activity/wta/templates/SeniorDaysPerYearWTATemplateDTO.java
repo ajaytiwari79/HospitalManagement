@@ -18,7 +18,6 @@ import java.util.List;
 public class SeniorDaysPerYearWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds;
-    private boolean borrowLeave;
     private CutOffIntervalUnit cutOffIntervalUnit;
     public float getRecommendedValue() {
         return recommendedValue;

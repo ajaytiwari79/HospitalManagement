@@ -37,6 +37,8 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
         wtaTemplateType = WTATemplateType.WTA_FOR_CARE_DAYS;
     }
 
+
+    // getActivityCutOffCounts().get(0) change and get count by date
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if(!isDisabled()) {
@@ -46,11 +48,11 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
                 Activity activity = infoWrapper.getActivityWrapperMap().get(shiftActivityDTO.getActivityId()).getActivity();
                     ActivityCareDayCount careDayCount = careDayCountMap.get(activity.getId());
                     List<ShiftWithActivityDTO> shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getStartDate(), infoWrapper.getShifts(), Arrays.asList(careDayCount.getActivityId()));
-                    if (careDayCount.getCount() < (shifts.size()+1)) {
+                    if (careDayCount.getActivityCutOffCounts().get(0).getCount() < (shifts.size()+1)) {
                         WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                 new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
 
-                                        DurationType.DAYS,String.valueOf(careDayCount.getCount()));
+                                        DurationType.DAYS,String.valueOf(careDayCount.getActivityCutOffCounts().get(0).getCount()));
                         infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                         break;
                     }

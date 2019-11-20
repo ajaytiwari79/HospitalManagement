@@ -2,10 +2,12 @@ package com.kairos.controller.wta;
 
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryRequestDTO;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.wta.RuleTemplateCategoryService;
 import com.kairos.service.wta.RuleTemplateService;
 import com.kairos.service.wta.WTABuilderService;
 import com.kairos.utils.response.ResponseHandler;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,8 @@ public class RuleTemplateController {
     private RuleTemplateCategoryService ruleTemplateCategoryService;
     @Inject
     private WTABuilderService wtaBuilderService;
+    @Inject
+    private ActivityService activityService;
 
     @RequestMapping(value = COUNTRY_URL + "/rule_templates", method = RequestMethod.POST)
     ResponseEntity<Map<String, Object>> createRuleTemplate(@PathVariable Long countryId) {
@@ -65,6 +69,13 @@ public class RuleTemplateController {
     ResponseEntity<Map<String, Object>> copyRuleTemplate(@PathVariable Long countryId, @RequestBody @Valid WTABaseRuleTemplateDTO template) {
         //WTABaseRuleTemplateDTO wtaBaseRuleTemplateDTO = WTABuilderService.copyRuleTemplateMapToDTO(template);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, ruleTemplateService.copyRuleTemplate(countryId, template));
+    }
+
+    @ApiOperation("get cut off interval of Activity")
+    @GetMapping(value = "/activity/{activityId}/cut_off_interval")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> getCutOffIntervalOfActivity(@PathVariable BigInteger activityId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.getCutOffInterValOfActivity(activityId));
     }
 
 

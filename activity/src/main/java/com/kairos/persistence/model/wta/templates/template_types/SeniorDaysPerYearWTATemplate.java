@@ -33,7 +33,6 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalBy
 public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
-    private boolean borrowLeave;
     private CutOffIntervalUnit cutOffIntervalUnit;
     private float recommendedValue;
 
@@ -79,7 +78,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) wtaBaseRuleTemplate;
-        return (this != seniorDaysPerYearWTATemplate) && !(borrowLeave == seniorDaysPerYearWTATemplate.borrowLeave &&
+        return (this != seniorDaysPerYearWTATemplate) && !(
                 Float.compare(seniorDaysPerYearWTATemplate.recommendedValue, recommendedValue) == 0 &&
                 Objects.equals(ageRange, seniorDaysPerYearWTATemplate.ageRange) &&
                 Objects.equals(activityIds, seniorDaysPerYearWTATemplate.activityIds) &&

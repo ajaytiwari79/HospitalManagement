@@ -614,6 +614,13 @@ public class ActivityService {
         return new ActivityTabsWrapper(activity.getNotesActivityTab());
     }
 
+
+    public List<CutOffInterval> getCutOffInterValOfActivity(BigInteger activityId) {
+        Activity activity = activityMongoRepository.findOne(activityId);
+        return ActivityUtil.getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(),activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue());
+    }
+
+
     public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO) {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab();
         validateReminderSettings(communicationActivityDTO);

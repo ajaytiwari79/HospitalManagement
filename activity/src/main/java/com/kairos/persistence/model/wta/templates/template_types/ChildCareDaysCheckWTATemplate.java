@@ -34,7 +34,6 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalBy
 @Setter
 public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> activityIds = new ArrayList<>();
-    private boolean borrowLeave;
     private float recommendedValue;
     private CutOffIntervalUnit cutOffIntervalUnit;
 
@@ -88,7 +87,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {
         ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate)wtaBaseRuleTemplate;
-        return (this != childCareDaysCheckWTATemplate) && !(borrowLeave == childCareDaysCheckWTATemplate.borrowLeave &&
+        return (this != childCareDaysCheckWTATemplate) && !(
                 Float.compare(childCareDaysCheckWTATemplate.recommendedValue, recommendedValue) == 0 &&
                 Objects.equals(activityIds, childCareDaysCheckWTATemplate.activityIds) &&
                 cutOffIntervalUnit == childCareDaysCheckWTATemplate.cutOffIntervalUnit && Objects.equals(this.phaseTemplateValues,childCareDaysCheckWTATemplate.phaseTemplateValues));

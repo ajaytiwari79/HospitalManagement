@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -15,6 +17,7 @@ import java.util.Objects;
 public class ActivityCareDayCount {
     private BigInteger activityId;
     private int count;
+    private List<ActivityCutOffCount> activityCutOffCounts=new ArrayList<>();
 
 
     @Override
@@ -22,12 +25,11 @@ public class ActivityCareDayCount {
         if (this == o) return true;
         if (!(o instanceof ActivityCareDayCount)) return false;
         ActivityCareDayCount that = (ActivityCareDayCount) o;
-        return count == that.count &&
-                Objects.equals(activityId, that.activityId);
+        return Objects.equals(activityId, that.activityId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(activityId, count);
+        return Objects.hash(activityId);
     }
 }
