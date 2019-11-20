@@ -745,16 +745,16 @@ public class StaffingLevelService  {
             }
             staffingLevelInterval.setAvailableNoOfStaff(availableNoOfStaff);
             if(isCollectionNotEmpty(staffingLevelInterval.getStaffingLevelSkills()) && isNotEmpty(staffSkillsMap)){
-                updateStaffingLevelSkills(staffingLevelInterval,staffId, staffSkillsMap);
+                updateStaffingLevelSkills(staffingLevelInterval,staffId, staffSkillsMap,interval,shiftActivity);
             }
         }
     }
 
-    private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, Map<Long, List<Map<String,Object>>> staffSkillsMap){
+    private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, Map<Long, List<Map<String,Object>>> staffSkillsMap,DateTimeInterval interval,ShiftActivity shiftActivity){
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
             if(staffSkillsMap.containsKey(staffId)) {
                 for (Map<String, Object> staffSkill : staffSkillsMap.get(staffId)) {
-                    if (staffingLevelSkill.getSkillId().equals(Long.valueOf(staffSkill.get(SKILL_ID).toString()))) {
+                    if (staffingLevelSkill.getSkillId().equals(Long.valueOf(staffSkill.get(SKILL_ID).toString())) && interval.overlaps(shiftActivity.getInterval())) {
                         updateAvailableNoOfStaff(staffingLevelSkill, staffSkill);
                     }
                 }
