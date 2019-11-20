@@ -186,7 +186,6 @@ public class SkillService {
      * @param id         {id of team or organization based on type}
      * @param skillId
      * @param isSelected {true or false if true skill will be added if not exist otherwise updated, if false skill will be removed}
-     * @param type       {organization,team}
      * @return updated skills irrespective of team or organization
      * @author prabjot
      * to add new skill based onn type of node {organization,team}

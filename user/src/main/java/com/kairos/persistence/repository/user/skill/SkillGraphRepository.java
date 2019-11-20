@@ -91,6 +91,6 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
             "MATCH (staff)-[skillRel:" + STAFF_HAS_SKILLS + "]->(skill)  \n" +
             "WITH staff, collect({level:skillRel.skillLevel,skillId:id(skill)}) AS skillInfo \n" +
             "RETURN staff,skillInfo")
-    List<StaffQueryResult> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, String selectedDate);
+    List<StaffQueryResult> getStaffSkillAndLevelByStaffIds(List<Long> staffIds);
 
 }
