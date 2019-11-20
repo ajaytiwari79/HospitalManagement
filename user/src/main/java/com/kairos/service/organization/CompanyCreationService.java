@@ -604,6 +604,7 @@ public class CompanyCreationService {
         List<OrganizationContactAddress> organizationContactAddresses = unitGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
         organization.setBoardingCompleted(true);
+        organization.setTags(tagService.getCountryTagByOrgSubTypes(countryId, organization.getOrganizationSubTypes().stream().map(orgSubtype->orgSubtype.getId()).collect(Collectors.toList())));
         organizationBaseRepository.save(organization);
         try {
             List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);

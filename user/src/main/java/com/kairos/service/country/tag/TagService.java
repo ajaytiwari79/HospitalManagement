@@ -20,6 +20,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffService;
 import org.apache.commons.collections.CollectionUtils;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -72,6 +74,9 @@ public class TagService {
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
 
+    @Inject
+    private ActivityIntegrationService activityIntegrationService;
+
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         Country country = countryGraphRepository.findOne(countryId, 0);
         if (!Optional.ofNullable(country).isPresent()) {
@@ -107,6 +112,15 @@ public class TagService {
             }
             organizationGraphRepository.saveAll(organizations);
         }
+    }
+
+    public List<Tag> getCountryTagByOrgSubTypes(Long countryId, List<Long> orgSubTypeId){
+        Country country = countryGraphRepository.findOne(countryId, 0);
+        List<Tag> tags = new ArrayList<>();
+        for (Tag tag : country.getTags().stream().filter(tag -> CollectionUtils.containsAny(tag.getOrgSubTypeIds(),orgSubTypeId)).collect(Collectors.toList())) {
+            tags.add(new Tag(tag.getName(), tag.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0)));
+        }
+        return  tags;
     }
 
     public Tag updateCountryTag(Long countryId, Long tagId, TagDTO tagDTO) {
@@ -213,6 +227,7 @@ public class TagService {
         }
         tag.setDeleted(true);
         staffService.unlinkTagFromStaff(tagId);
+        activityIntegrationService.unlinkTagFromActivity(orgId, tagId);
         tagGraphRepository.save(tag);
         return true;
     }
