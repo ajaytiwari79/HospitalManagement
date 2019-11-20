@@ -6,6 +6,7 @@ import com.kairos.dto.activity.attendance.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.LocationEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.tabs.LocationActivityTab;
@@ -25,7 +26,6 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftStateService;
-import com.kairos.utils.user_context.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

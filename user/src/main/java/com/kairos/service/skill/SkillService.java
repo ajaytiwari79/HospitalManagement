@@ -1,14 +1,15 @@
 package com.kairos.service.skill;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.SkillLevel;
+import com.kairos.persistence.model.auth.StaffSkillLevelRelationship;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
@@ -19,8 +20,6 @@ import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDT
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
-import com.kairos.persistence.repository.organization.OrganizationMetadataRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.TagGraphRepository;
@@ -28,14 +27,10 @@ import com.kairos.persistence.repository.user.skill.SkillCategoryGraphRepository
 import com.kairos.persistence.repository.user.skill.SkillGraphRepository;
 import com.kairos.persistence.repository.user.skill.UserSkillLevelRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
-import com.kairos.rest_client.SkillServiceTemplateClient;
-import com.kairos.rest_client.TaskDemandRestClient;
-import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.TeamService;
-import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,23 +71,9 @@ public class SkillService {
     @Inject
     private TeamService teamService;
     @Inject
-    private TeamGraphRepository teamGraphRepository;
-    @Inject
     private MailService mailService;
     @Inject
     private UserSkillLevelRelationshipGraphRepository userSkillLevelRelationshipGraphRepository;
-    @Inject
-    private OrganizationMetadataRepository organizationMetadataRepository;
-    @Inject
-    private CitizenStatusService citizenStatusService;
-    @Inject
-    private EnvConfig envConfig;
-    @Inject
-    SkillServiceTemplateClient skillServiceTemplateClient;
-    @Inject
-    private TimeSlotService timeSlotService;
-    @Inject
-    private TaskDemandRestClient taskDemandRestClient;
     @Inject
     private TagService tagService;
     @Inject
@@ -107,13 +89,13 @@ public class SkillService {
             return null;
         }
         String name = "(?i)" + skillDTO.getName();
-        logger.info("Added regex to Name: " + name);
+        logger.info("Added regex to Name: {}" , name);
         if (skillGraphRepository.checkDuplicateSkill(skillCategoryId, name).isEmpty()) {
             logger.info("Creating unique skill");
             Skill skill = new Skill(skillDTO);
             skill.setSkillCategory(skillCategory);
             List<Tag> tags = tagService.getCountryTagsByIdsAndMasterDataType(skillDTO.getTags(), MasterDataTypeEnum.SKILL);
-            logger.info("tags for skill : " + tags);
+            logger.info("tags for skill : {}" , tags);
             skill.setTags(tags);
             skillGraphRepository.save(skill);
             return skill.retrieveDetails();
@@ -160,7 +142,6 @@ public class SkillService {
         return null;
     }
 
-
     public SkillCategory safeDeleteSkill(Long categoryId, Long skillId) {
         return skillGraphRepository.safeDelete(categoryId, skillId);
     }
@@ -205,7 +186,6 @@ public class SkillService {
      * @param id         {id of team or organization based on type}
      * @param skillId
      * @param isSelected {true or false if true skill will be added if not exist otherwise updated, if false skill will be removed}
-     * @param type       {organization,team}
      * @return updated skills irrespective of team or organization
      * @author prabjot
      * to add new skill based onn type of node {organization,team}
@@ -237,30 +217,12 @@ public class SkillService {
         return true;
     }
 
-    /**
-     * to update visitour id of skill for particular organization
-     *
-     * @param unitId
-     * @param skillId
-     * @return
-     */
-   /* public boolean updateVisitourIdOfSkill(long unitId, long skillId, String visitourId,String type) {
-
-        if(ORGANIZATION.equalsIgnoreCase(type)){
-            return skillGraphRepository.updateVisitourIdOfSkillInOrganization(unitId, skillId, visitourId);
-        } else if(TEAM.equalsIgnoreCase(type)) {
-            return skillGraphRepository.updateVisitourIdOfSkillInTeam(unitId,skillId,visitourId);
-        } else {
-            throw new InternalError("Type incorrect");
-        }
-    }*/
     public boolean updateSkillOfOrganization(long unitId, long skillId, OrganizationSkillDTO organizationSkillDTO) {
         Boolean skillUpdated;
 
         if (organizationSkillDTO.getCustomName() == null || organizationSkillDTO.getCustomName() == "") {
             skillUpdated = skillGraphRepository.updateSkillOfOrganization(unitId, skillId);
         } else {
-//                updateOrganizationTagsOfSkill
             skillUpdated = skillGraphRepository.updateSkillOfOrganizationWithCustomName(unitId, skillId, organizationSkillDTO.getCustomName());
         }
         if (skillUpdated) {
@@ -272,7 +234,6 @@ public class SkillService {
 
     public boolean requestForCreateNewSkill(long unitId, Skill skill) {
         Unit unit = unitGraphRepository.findOne(unitId);
-
         if (unit == null) {
             return false;
         }
@@ -392,13 +353,10 @@ public class SkillService {
 
 
         List<Map<String, Object>> skills = null;
-        List<Map<String, Object>> response = new ArrayList<>();
         List<StaffPersonalDetailDTO> staffList;
         staffList = staffRetrievalService.getStaffWithBasicInfo(id, false);
         List<Long> staffIds = new ArrayList<>(staffList.size());
-        staffList.stream().forEach(staffPersonalDetailDTO -> {
-            staffIds.add(staffPersonalDetailDTO.getId());
-        });
+        staffList.stream().forEach(staffPersonalDetailDTO -> staffIds.add(staffPersonalDetailDTO.getId()));
         skills = unitGraphRepository.getAssignedSkillsOfStaffByOrganization(id, staffIds);
 
 
