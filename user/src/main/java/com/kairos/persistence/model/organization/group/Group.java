@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -23,12 +24,14 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class Group extends UserBaseEntity {
     private String name;
+    private String description;
+    private List<Long> excludeStaffs = new ArrayList<>();
 
-    @Relationship(type = GROUP_HAS_MEMBER)
-    private List<Staff> staffs;
-
-    @Relationship(type = BELONGS_TO_UNIT)
-    private Unit unit;
+    public Group(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }

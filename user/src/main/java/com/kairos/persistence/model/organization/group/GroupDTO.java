@@ -18,6 +18,6 @@ public class GroupDTO {
     private Long id;
     @NotBlank(message = ERROR_NAME_NOTNULL)
     private String name;
-    private List<Long> staffIds;
-    private Long unitId;
+    private String description;
+    private List<Long> excludeStaffs;
 }
