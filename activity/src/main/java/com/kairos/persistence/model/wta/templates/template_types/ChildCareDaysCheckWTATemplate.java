@@ -64,7 +64,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     }
 
-    private long calculateChildCareDaysLeaveCount(List<CareDaysDTO> careDaysDTOS, List<Integer> staffChildAges){
+    public long calculateChildCareDaysLeaveCount(List<CareDaysDTO> careDaysDTOS, List<Integer> staffChildAges){
         long leaveCount = 0L;
         if(isCollectionNotEmpty(staffChildAges)) {
             for (Integer staffChildAge : staffChildAges) {

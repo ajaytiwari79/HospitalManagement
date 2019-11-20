@@ -122,7 +122,8 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("MATCH (o:Unit)-[r:"+PROVIDE_SERVICE +"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) WHERE id(o)={0}\n" +
             " MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(country) = {1}\n" +
-            " MATCH(exl)-[:" + SUPPORTS_SERVICES + "]->(os) RETURN toString(id(expertise)) as id, expertise.name as value ," +
+            " MATCH(exl)-[:" + SUPPORTS_SERVICES + "]->(os) " +
+            "RETURN DISTINCT toString(id(expertise)) as id, expertise.name as value ," +
             "expertise.startDate as startDate ,expertise.endDate as endDate ORDER BY startDate")
     List<FilterSelectionQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);
 

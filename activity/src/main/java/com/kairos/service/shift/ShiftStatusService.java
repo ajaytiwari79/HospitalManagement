@@ -13,6 +13,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
@@ -32,7 +33,6 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
-import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.lang.WordUtils;
 import org.springframework.stereotype.Service;
 
@@ -119,7 +119,7 @@ public class ShiftStatusService {
             shiftMongoRepository.saveEntities(shifts);
             timeBankService.updateDailyTimeBankEntriesForStaffs(shifts,null);
         }
-        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS, userAccessRoleDTO);
+        wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
         return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
     }
 
@@ -310,13 +310,13 @@ public class ShiftStatusService {
         return activityShiftStatusSettings;
     }
 
-    public void updateStatusOfShiftIfPhaseValid(PlanningPeriod planningPeriod, Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ShiftActionType shiftActionType) {
+    public void updateStatusOfShiftIfPhaseValid(PlanningPeriod planningPeriod, Phase phase, Shift mainShift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         for (ShiftActivity shiftActivity : mainShift.getActivities()) {
             if (planningPeriod.getPublishEmploymentIds().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) {
                 shiftActivity.getStatus().add(ShiftStatus.PUBLISH);
             } else if (isCollectionNotEmpty(activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds()) && isCollectionEmpty(shiftActivity.getStatus())) {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
-                    shiftActivity.getStatus().add(staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
+                    shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.kairos.persistence.model.country.pay_table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class PayGradeDTO {
     @NotNull(message = "Pay Grade Level can not be null")
     private Long payGradeLevel;
     private Long payGradeId;
+    @Valid
     private List<PayGroupAreaDTO> payGroupAreas;
 
     public PayGradeDTO() {

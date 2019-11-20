@@ -209,7 +209,7 @@ public class AppConstants {
     public static final String STAFF_LIST = "Staff Name";
 
     public static final String DATE = "Dates";
-    public static final String LABEL = "label";
+    public static final String LABEL = "date";
     public static final String VALUE_FIELD = "value";
     //for ContractualAndPlannedHoursCalculationService
     public static final String BAR_YAXIS = "barValue";

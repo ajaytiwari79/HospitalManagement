@@ -17,6 +17,7 @@ import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.CalculationBasedOn;
@@ -38,7 +39,6 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.utils.counter.KPIUtils;
-import com.kairos.utils.user_context.UserContext;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -240,12 +240,13 @@ public class KPIBuilderCalculationService implements CounterService {
                     kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue() * multiplicationFactor))));
                     break;
                 default:
-                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), Arrays.asList(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue() * multiplicationFactor))));
+                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(getKpiDateFormatByIntervalUnit(entry.getKey().toString(),applicableKPI.getFrequencyType(),applicableKPI.getKpiRepresentation()),entry.getKey().toString(), Arrays.asList(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue() * multiplicationFactor))));
                     break;
 
             }
         }
     }
+
 
     @Override
     public KPIRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
@@ -514,9 +515,9 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         public List<ShiftWithActivityDTO> getShiftsByStaffIdAndInterval(Long staffId, DateTimeInterval dateTimeInterval) {
-            List<ShiftWithActivityDTO> shiftWithActivityDTOS = staffIdAndShiftsMap.getOrDefault(staffId, shifts);
+            List<ShiftWithActivityDTO> shiftWithActivityDTOS = isNull(staffId) ? shifts :staffIdAndShiftsMap.getOrDefault(staffId, new ArrayList<>());
             if (isNotNull(dateTimeInterval)) {
-                shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
+                shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO ->DurationType.HOURS.equals(applicableKPI.getFrequencyType()) ? dateTimeInterval.overlaps(new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate())) : dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
             }
             return shiftWithActivityDTOS;
         }

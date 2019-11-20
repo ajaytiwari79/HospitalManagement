@@ -81,7 +81,7 @@ import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

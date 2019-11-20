@@ -2,6 +2,7 @@ package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Properties;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
 
@@ -25,7 +27,10 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_SIZE;
@@ -99,6 +104,8 @@ public class User extends UserBaseEntity {
     private String googleCalenderTokenId;
     //define for personal google calender
     private String googleCalenderAccessToken;
+    @Properties
+    private Map<String, String> unitWiseAccessRole=new HashMap<>();
 
     public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;
