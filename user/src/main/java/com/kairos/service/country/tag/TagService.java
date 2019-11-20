@@ -77,7 +77,7 @@ public class TagService {
         if (!Optional.ofNullable(country).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
         }
-        if (tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false)) {
+        if (tagGraphRepository.isCountryTagExistsWithSameNameAndDataType("(?i)" +tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false)) {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
 
         }
@@ -118,7 +118,7 @@ public class TagService {
         if (tag == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TAB_ID_NOTFOUND, tagId);
         }
-        if (!(tag.getName().equalsIgnoreCase(tagDTO.getName())) && tagGraphRepository.isCountryTagExistsWithSameNameAndDataType(tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false)) {
+        if (!(tag.getName().equalsIgnoreCase(tagDTO.getName())) && tagGraphRepository.isCountryTagExistsWithSameNameAndDataType("(?i)" + tagDTO.getName(), countryId, tagDTO.getMasterDataType().toString(), false)) {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
 
         }
@@ -167,7 +167,7 @@ public class TagService {
         if (!Optional.ofNullable(org).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, organizationId);
         }
-        if (tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)) {
+        if (tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType("(?i)" + tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)) {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
         }
         Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, ObjectMapperUtils.copyPropertiesByMapper(tagDTO.getPenaltyScore(), PenaltyScore.class));
@@ -190,7 +190,7 @@ public class TagService {
         if (tag == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_TAB_ID_NOTFOUND, tagId);
         }
-        if (!(tag.getName().equalsIgnoreCase(tagDTO.getName())) && tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType(tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)) {
+        if (!(tag.getName().equalsIgnoreCase(tagDTO.getName())) && tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType("(?i)" + tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)) {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
         }
         tag.setName(tagDTO.getName());
@@ -212,7 +212,7 @@ public class TagService {
             exceptionService.dataNotFoundByIdException(MESSAGE_TAB_ID_NOTFOUND, tagId);
         }
         tag.setDeleted(true);
-        staffService.unlinkTagFromStaff(orgId, tagId);
+        staffService.unlinkTagFromStaff(tagId);
         tagGraphRepository.save(tag);
         return true;
     }

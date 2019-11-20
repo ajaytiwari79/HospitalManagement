@@ -84,13 +84,13 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
 
     
     @Query("Match (country:Country)-[r:" + COUNTRY_HAS_TAG + "]->(tag:Tag)\n" +
-            "WHERE tag.name={0} AND id(country) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
+            "WHERE tag.name=~{0} AND id(country) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
             "RETURN CASE WHEN count(tag)>0 THEN true ELSE false END")
     boolean isCountryTagExistsWithSameNameAndDataType(String name, Long countryId, String masterDataType, boolean isDeleted);
 
     
     @Query("Match (org:OrganizationBaseEntity)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
-            "WHERE tag.name={0} AND id(org) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
+            "WHERE tag.name=~{0} AND id(org) = {1} AND tag.masterDataType ={2} AND tag.deleted={3} \n" +
             "RETURN CASE WHEN count(tag)>0 THEN true ELSE false END")
     boolean isOrganizationTagExistsWithSameNameAndDataType(String name, Long orgId, String masterDataType, boolean isDeleted);
 
