@@ -51,12 +51,12 @@ public class CurrentUserDetails {
 
     @JsonIgnore
     public boolean isManagement(){
-        return MANAGEMENT.name().equals(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()));
+        return MANAGEMENT.name().equalsIgnoreCase(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()));
     }
 
     @JsonIgnore
     public boolean isStaff(){
-        return STAFF.name().equals(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()));
+        return STAFF.name().equalsIgnoreCase(unitWiseAccessRole.get(lastSelectedOrganizationId.toString()));
     }
 
 }
