@@ -444,7 +444,6 @@ public class CompanyCreationService {
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
         accessGroupService.linkParentOrganizationAccessGroup(unit, parentUnit.getId());
-        setDefaultTagFromCountry(country.getId(), unit);
         unitGraphRepository.save(unit);
         organizationBasicDTO.setId(unit.getId());
         organizationBasicDTO.setKairosCompanyId(kairosCompanyId);
@@ -460,18 +459,6 @@ public class CompanyCreationService {
         //Assign Parent Organization's level to unit
         return organizationBasicDTO;
 
-    }
-
-    private void setDefaultTagFromCountry(Long countryId, Unit unit){
-        List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
-        List<TagQueryResult> tagQueryResults = tagService.getCountryTagsByMasterDataTypeAndOrgSubTypeIds(countryId,MasterDataTypeEnum.STAFF, orgSubTypeIds);
-        List<Tag> tags = new ArrayList<>();
-        if(isCollectionNotEmpty(tagQueryResults)){
-            for (TagQueryResult tagQueryResult : tagQueryResults) {
-                tags.add(new Tag(tagQueryResult.getName(),MasterDataTypeEnum.getByValue(tagQueryResult.getMasterDataType()),false,new PenaltyScore(PenaltyScoreLevel.SOFT,0)));
-            }
-        }
-        unit.setTags(tags);
     }
 
     private boolean doesUnitManagerInfoAvailable(OrganizationBasicDTO organizationBasicDTO) {

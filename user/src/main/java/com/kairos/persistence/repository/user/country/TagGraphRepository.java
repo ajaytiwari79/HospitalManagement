@@ -28,11 +28,6 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType,tag.orgTypeId as orgTypeId,tag.orgSubTypeIds as orgSubTypeIds")
     List<TagQueryResult> getListOfCountryTagsByMasterDataType(Long countryId, boolean deleted, String searchTextRegex, String masterDataType);
 
-    @Query("Match (country:Country)-[r:" + COUNTRY_HAS_TAG + "]->(tag:Tag {countryTag:true})\n" +
-            "WHERE id(country)={0} AND tag.deleted= {1} AND tag.masterDataType ={2} AND tag.orgSubTypeIds IN {3}\n" +
-            "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType,tag.orgTypeId as orgTypeId,tag.orgSubTypeIds as orgSubTypeIds ")
-    List<TagQueryResult> getListOfCountryTagsByMasterDataTypeAndOrgSubTypeIds(Long countryId, boolean deleted, String masterDataType, List<Long> orgSubTypeIds);
-
     @Query("Match (org)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag {countryTag:false})\n" +
             "WHERE id(org)={0} AND tag.deleted= {1} AND lower(tag.name) contains lower({2})\n" +
             "return id(tag) as id, tag.name as name, tag.countryTag as countryTag, tag.masterDataType as masterDataType\n" +

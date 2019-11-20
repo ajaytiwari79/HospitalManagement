@@ -115,10 +115,11 @@ public class TagService {
     }
 
     public List<Tag> getCountryTagByOrgSubTypes(Long countryId, List<Long> orgSubTypeId){
-        Country country = countryGraphRepository.findOne(countryId, 0);
+        Country country = countryGraphRepository.findOne(countryId);
         List<Tag> tags = new ArrayList<>();
-        for (Tag tag : country.getTags().stream().filter(tag -> CollectionUtils.containsAny(tag.getOrgSubTypeIds(),orgSubTypeId)).collect(Collectors.toList())) {
-            tags.add(new Tag(tag.getName(), tag.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0)));
+        for(Tag tag : country.getTags().stream().filter(tag -> MasterDataTypeEnum.STAFF.equals(tag.getMasterDataType()) && CollectionUtils.containsAny(tag.getOrgSubTypeIds(),orgSubTypeId)).collect(Collectors.toList()))
+        {
+            tags.add(new Tag(tag.getName(),tag.getMasterDataType(),false,new PenaltyScore(PenaltyScoreLevel.SOFT,0)));
         }
         return  tags;
     }
@@ -329,14 +330,6 @@ public class TagService {
         skillGraphRepository.save(skill);
         return true;
 
-    }
-
-    public List<TagQueryResult> getCountryTagsByMasterDataTypeAndOrgSubTypeIds(long countryId, MasterDataTypeEnum masterDataType, List<Long> orgSubTypeIds) {
-        Country country = countryGraphRepository.findOne(countryId, 0);
-        if (isNull(country)) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
-        return tagGraphRepository.getListOfCountryTagsByMasterDataTypeAndOrgSubTypeIds(countryId, false,masterDataType.toString(), orgSubTypeIds);
     }
 
     public List<TagDTO> getTagsByOrganizationIdAndMasterDataType(Long orgId, MasterDataTypeEnum masterDataType) {
