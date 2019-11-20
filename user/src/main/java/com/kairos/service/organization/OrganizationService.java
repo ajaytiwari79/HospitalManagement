@@ -71,7 +71,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;

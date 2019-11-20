@@ -16,7 +16,7 @@ import com.kairos.service.client.ClientBatchService;
 import com.kairos.service.client.ClientExtendedService;
 import com.kairos.service.client.ClientService;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

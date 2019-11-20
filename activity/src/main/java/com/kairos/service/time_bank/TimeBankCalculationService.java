@@ -26,6 +26,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCale
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
@@ -1010,7 +1011,7 @@ public class TimeBankCalculationService {
         return scheduledMinutes;
     }
 
-    public TreeMap<java.time.LocalDate, TimeBankIntervalDTO> getAccumulatedTimebankDTO(java.time.LocalDate firstRequestPhasePlanningPeriodEndDate, DateTimeInterval planningPeriodInterval, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate startDate, java.time.LocalDate endDate, long actualTimebankMinutes, UserAccessRoleDTO userAccessRoleDTO, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
+    public TreeMap<java.time.LocalDate, TimeBankIntervalDTO> getAccumulatedTimebankDTO(java.time.LocalDate firstRequestPhasePlanningPeriodEndDate, DateTimeInterval planningPeriodInterval, List<DailyTimeBankEntry> dailyTimeBankEntries, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, java.time.LocalDate startDate, java.time.LocalDate endDate, long actualTimebankMinutes, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS) {
         long expectedTimebankMinutes = actualTimebankMinutes;
         java.time.LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
         Map<java.time.LocalDate, DailyTimeBankEntry> dateDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(toMap(DailyTimeBankEntry::getDate, v -> v));
@@ -1025,7 +1026,7 @@ public class TimeBankCalculationService {
             Map<String, Integer> ctaRuletemplateNameAndMinutesMap = new HashMap<>();
             if (dateDailyTimeBankEntryMap.containsKey(employmentStartDate)) {
                 dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                totalTimeBankMinutes = getDeltaTimebankByUserAccessRole(userAccessRoleDTO, dailyTimeBankEntry);
+                totalTimeBankMinutes = getDeltaTimebankByUserAccessRole(dailyTimeBankEntry);
                 publishedBalancesMinutes = dailyTimeBankEntry.getPublishedBalances().values().stream().mapToLong(value -> value).sum();
                 ctaRuletemplateNameAndMinutesMap = dailyTimeBankEntry.getTimeBankCTADistributionList().stream().collect(Collectors.groupingBy(TimeBankCTADistribution::getCtaName, Collectors.summingInt(TimeBankCTADistribution::getMinutes)));
             } else {
@@ -1044,9 +1045,9 @@ public class TimeBankCalculationService {
         return localDateTimeBankByDateDTOMap;
     }
 
-    private int getDeltaTimebankByUserAccessRole(UserAccessRoleDTO userAccessRoleDTO, DailyTimeBankEntry dailyTimeBankEntry) {
+    private int getDeltaTimebankByUserAccessRole(DailyTimeBankEntry dailyTimeBankEntry) {
         int deltaTimebankMinutes;
-        if (userAccessRoleDTO.getManagement() && isNotNull(dailyTimeBankEntry.getDraftDailyTimeBankEntry())) {
+        if (UserContext.getUserDetails().isManagement() && isNotNull(dailyTimeBankEntry.getDraftDailyTimeBankEntry())) {
             deltaTimebankMinutes = dailyTimeBankEntry.getDraftDailyTimeBankEntry().getDeltaTimeBankMinutes();
         } else {
             deltaTimebankMinutes = dailyTimeBankEntry.getDeltaTimeBankMinutes();

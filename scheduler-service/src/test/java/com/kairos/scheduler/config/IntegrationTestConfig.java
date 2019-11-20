@@ -1,6 +1,5 @@
 package com.kairos.scheduler.config;
 
-import com.kairos.scheduler.utils.user_context.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;

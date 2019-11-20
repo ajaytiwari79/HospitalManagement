@@ -1,8 +1,8 @@
 package com.kairos.utils;
 
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.rest_client.GenericRestClient;
-import com.kairos.utils.user_context.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;

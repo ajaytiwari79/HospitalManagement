@@ -15,7 +15,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
