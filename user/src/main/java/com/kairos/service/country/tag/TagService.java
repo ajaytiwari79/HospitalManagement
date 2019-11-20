@@ -194,8 +194,9 @@ public class TagService {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
         }
         tag.setName(tagDTO.getName());
-        if(MasterDataTypeEnum.STAFF.toString().equals(tagDTO.getMasterDataType())){
-            tag.setPenaltyScore(ObjectMapperUtils.copyPropertiesByMapper(tagDTO.getPenaltyScore(),PenaltyScore.class));
+        if(MasterDataTypeEnum.STAFF.equals(tagDTO.getMasterDataType())){
+            tag.getPenaltyScore().setPenaltyScoreLevel(tagDTO.getPenaltyScore().getPenaltyScoreLevel());
+            tag.getPenaltyScore().setValue(tagDTO.getPenaltyScore().getValue());
         }
         tagGraphRepository.save(tag);
         return tag;

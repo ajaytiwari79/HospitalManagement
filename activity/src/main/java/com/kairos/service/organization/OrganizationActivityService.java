@@ -347,7 +347,6 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setDescription(generalTab.getDescription());
         activity.setTags(generalDTO.getTags());
 
-
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
         Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
         generalTab.setTags(null);
