@@ -846,9 +846,8 @@ public class UserIntegrationService {
 
     }
 
-    public List<StaffDTO> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds,LocalDate selectedDate) {
-        List<NameValuePair> queryParamList =  newArrayList(new BasicNameValuePair("selectedDate", selectedDate.toString()));
-        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {});
+    public List<StaffDTO> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds) {
+        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {});
     }
 
     public List<EmploymentWithCtaDetailsDTO> getAllEmploymentByUnitId(Long unitId) {

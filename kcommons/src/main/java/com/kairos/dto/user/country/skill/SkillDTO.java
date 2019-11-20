@@ -24,7 +24,6 @@ public class SkillDTO {
     private String description;
     private String shortName;
     private List<Long> tags;
-    private Set<SkillLevelDTO> skillLevels;
 
 
     public SkillDTO(Long id, @NotBlank(message = "error.SkillCategory.name.notEmpty") String name, String description) {
@@ -32,18 +31,4 @@ public class SkillDTO {
         this.name = name;
         this.description = description;
     }
-
-    @AssertTrue(message = "Access group can't be blank")
-    public boolean isValid() {
-        SkillLevelDTO advanceSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.ADVANCE)).findAny().get();
-        SkillLevelDTO basicSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.BASIC)).findAny().get();
-        SkillLevelDTO expertSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.EXPERT)).findAny().get();
-        if(advanceSkill.getStartDate().isAfter(basicSkill.getEndDate()) && advanceSkill.getEndDate().isBefore(expertSkill.getStartDate())){
-            return true;
-        }
-        return false;
-    }
-
-
-
 }

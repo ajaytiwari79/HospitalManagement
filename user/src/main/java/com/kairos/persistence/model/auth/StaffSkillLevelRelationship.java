@@ -38,7 +38,7 @@ public class StaffSkillLevelRelationship extends UserBaseEntity {
     @EndNode
     private Skill skill;
     private SkillLevel skillLevel = SkillLevel.ADVANCE;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private long startDate;
+    private long endDate;
     private boolean isEnabled=true;
 }
