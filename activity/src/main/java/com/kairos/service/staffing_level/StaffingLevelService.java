@@ -924,7 +924,7 @@ public class StaffingLevelService  {
             List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,updatedStaffingLevels.stream().map(updatedStaffingLevelDTO -> updatedStaffingLevelDTO.getCurrentDate()).collect(Collectors.toSet()));
             Map<LocalDate,Date> staffingLevelDateMap = staffingLevels.stream().collect(Collectors.toMap(k->asLocalDate(k.getCurrentDate()),StaffingLevel::getUpdatedAt));
             for (UpdatedStaffingLevelDTO updatedStaffingLevel : updatedStaffingLevels) {
-                if(staffingLevelDateMap.containsKey(updatedStaffingLevel.getCurrentDate()) && staffingLevelDateMap.get(updatedStaffingLevel.getCurrentDate()).after(updatedStaffingLevel.getUpdatedAt())) {
+                if(isNotNull(updatedStaffingLevel.getUpdatedAt()) && staffingLevelDateMap.containsKey(updatedStaffingLevel.getCurrentDate()) && staffingLevelDateMap.get(updatedStaffingLevel.getCurrentDate()).after(updatedStaffingLevel.getUpdatedAt())) {
                     getStaffingLevelPerDate(unitId, updatedStaffingLevel.getCurrentDate(), presenceStaffingLevelMap, absenceStaffingLevelMap);
                 }
             }
