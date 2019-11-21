@@ -1,6 +1,7 @@
 package com.kairos.dto.user.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.address.AddressDTO;
 import com.kairos.enums.OrganizationLevel;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class OrganizationDTO {
     private boolean isOneTimeSyncPerformed;
     private Long countryId;
     private boolean isParentOrganization;
+    private List<TagDTO> tagDTOS;
 
 }
 
