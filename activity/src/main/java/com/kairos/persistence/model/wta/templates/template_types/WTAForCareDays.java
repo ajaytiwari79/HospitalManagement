@@ -1,13 +1,17 @@
 package com.kairos.persistence.model.wta.templates.template_types;
 
+import com.kairos.commons.config.ApplicationContextProviderNonManageBean;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
+import com.kairos.dto.activity.wta.templates.ActivityCutOffCount;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +20,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getShiftsByIntervalAndActivityIds;
 
 
@@ -41,6 +46,7 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
     // getActivityCutOffCounts().get(0) change and get count by date
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
+        WorkTimeAgreementBalancesCalculationService workTimeAgreementService= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
         if(!isDisabled()) {
             Map<BigInteger,ActivityCareDayCount> careDayCountMap = careDaysCountMap();
             for (ShiftActivityDTO shiftActivityDTO : infoWrapper.getShift().getActivities()) {
@@ -48,13 +54,16 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
                 Activity activity = infoWrapper.getActivityWrapperMap().get(shiftActivityDTO.getActivityId()).getActivity();
                     ActivityCareDayCount careDayCount = careDayCountMap.get(activity.getId());
                     List<ShiftWithActivityDTO> shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getStartDate(), infoWrapper.getShifts(), Arrays.asList(careDayCount.getActivityId()));
-                    if (careDayCount.getActivityCutOffCounts().get(0).getCount() < (shifts.size()+1)) {
-                        WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
-                                new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
-
-                                        DurationType.DAYS,String.valueOf(careDayCount.getActivityCutOffCounts().get(0).getCount()));
-                        infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
-                        break;
+                    ActivityCutOffCount leaveCount=careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(),activityCutOffCount.getEndDate()).contains(infoWrapper.getShift().getStartDate())).findFirst().get();
+                    if (leaveCount.getCount() < (shifts.size()+1)) {
+                        boolean isLeaveAvailable = workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(), careDayCount.getActivityId(), infoWrapper.getShift(), new DateTimeInterval(careDayCount.getActivityCutOffCounts().get(0).getStartDate(), careDayCount.getActivityCutOffCounts().get(0).getEndDate()), infoWrapper.getLastPlanningPeriodEndDate(), WTATemplateType.WTA_FOR_CARE_DAYS,leaveCount.getCount());
+                        if (!isLeaveAvailable) {
+                            WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
+                                    new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
+                                            DurationType.DAYS, String.valueOf(careDayCount.getActivityCutOffCounts().get(0).getCount()));
+                            infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
+                            break;
+                        }
                     }
                 }
             }

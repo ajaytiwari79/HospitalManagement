@@ -14,6 +14,7 @@ import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
@@ -45,6 +46,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.constants.AppConstants.STOP_BRICK_BLOCKING_POINT;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
+import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByActivity;
 
 
 @Service
@@ -208,6 +210,32 @@ public class WorkTimeAgreementBalancesCalculationService {
         return workTimeAgreementBalance;
     }
 
+    public boolean isLeaveCountAvailable(Map<BigInteger,ActivityWrapper> activityWrapperMap,BigInteger activityId ,ShiftWithActivityDTO shift ,DateTimeInterval dateTimeInterval ,LocalDate lastPlanningPeriodEndDat , WTATemplateType wtaTemplateType , long leaveCount){
+        boolean isLeaveCountAvailable=false;
+        List<WTAQueryResultDTO> workingTimeAgreements = wtaRepository.getWTAByEmploymentIdAndDatesWithRuleTemplateType(shift.getEmploymentId(), shift.getStartDate(), shift.getEndDate(), wtaTemplateType);
+        Activity activity = activityWrapperMap.get(activityId).getActivity();
+        if(activity.getRulesActivityTab().isBorrowLeave()) {
+            DateTimeInterval nextCutOffdateTimeInterval = getIntervalByActivity(activityWrapperMap, asDate(dateTimeInterval.getEndLocalDate().plusDays(1)), newArrayList(activityId), lastPlanningPeriodEndDat);
+            List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentAndActivityIds(shift.getEmploymentId(), DateUtils.asDate(dateTimeInterval.getStart()), DateUtils.asDate(nextCutOffdateTimeInterval.getEnd()), newHashSet(activityId));
+            for (WTABaseRuleTemplate ruleTemplate : workingTimeAgreements.get(0).getRuleTemplates()) {
+                switch (ruleTemplate.getWtaTemplateType()) {
+                    case SENIOR_DAYS_PER_YEAR:
+                        SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
+
+                        break;
+                    case CHILD_CARE_DAYS_CHECK:
+                        ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
+                        break;
+                    case WTA_FOR_CARE_DAYS:
+                        WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return isLeaveCountAvailable;
+    }
 
     public WorkTimeAgreementRuleTemplateBalancesDTO getProtectedDaysOffBalance(Long unitId, ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<BigInteger, TimeType> timeTypeMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, LocalDate startDate, LocalDate endDate, LocalDate planningPeriodEndDate) {
         ProtectedDaysOffSettingDTO protectedDaysOffSettingOfUnit = protectedDaysOffService.getProtectedDaysOffByUnitId(unitId);
