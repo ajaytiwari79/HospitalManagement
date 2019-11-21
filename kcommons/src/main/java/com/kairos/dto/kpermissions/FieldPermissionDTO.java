@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,5 +19,5 @@ public class FieldPermissionDTO {
     private Long fieldId;
 
     @NotNull(message = "message.permission.id.null")
-    private FieldLevelPermission fieldPermission;
+    private Set<FieldLevelPermission> fieldPermissions;
 }

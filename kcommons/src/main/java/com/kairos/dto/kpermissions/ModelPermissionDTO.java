@@ -10,6 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,5 +29,5 @@ public class ModelPermissionDTO {
 
     @NotNull(message = "message.model.permission.id.null")
     //use for Submodel
-    private FieldLevelPermission modelPermission;
+    private Set<FieldLevelPermission> modelPermissions;
 }

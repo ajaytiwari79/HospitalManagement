@@ -10,8 +10,6 @@ import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResul
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionFieldRelationshipGraphRepository;
-import com.kairos.persistence.repository.kpermissions.AccessGroupPermissionModelRelationshipGraphRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -27,8 +25,10 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATANOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_PERMISSION_FIELD;
@@ -51,20 +51,14 @@ public class PermissionService {
     private ExceptionService exceptionService;
 
     @Inject
-    private AccessGroupPermissionFieldRelationshipGraphRepository accessGroupPermissionFieldRelationshipGraphRepository;
-
-    @Inject
-    private AccessGroupPermissionModelRelationshipGraphRepository accessGroupPermissionModelRelationshipGraphRepository;
-
-    @Inject
     private OrganizationService organizationService;
 
     @Inject
     private StaffGraphRepository staffGraphRepository;
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
-        List<KPermissionModel> kPermissionModels = new ArrayList<>();
-        permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
+        List<KPermissionModel> kPermissionModels = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
         kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
         buildPermissionModelData(modelDTOS, kPermissionModels, false);
         permissionModelRepository.save(kPermissionModels,2);
@@ -107,24 +101,80 @@ public class PermissionService {
         return ObjectMapperUtils.copyPropertiesOfListByMapper(kPermissionModels, ModelDTO.class);
     }
 
-    public Map<String, Object> getPermissionSchema(Long accessGroupId){
+    public Map<String, Object> getPermissionSchema(List<Long> accessGroupIds){
         Map<String, Object> permissionSchemaMap = new HashMap<>();
-        List<KPermissionModel> kPermissionModels = new ArrayList();
-        permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
-        kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
-        List<ModelPermissionQueryResult> modelPermissionQueryResults = permissionModelRepository.getModelPermissionsByAccessGroupId(accessGroupId);
+        List<KPermissionModel> kPermissionModels = getkPermissionModels();
+        //List<ModelPermissionQueryResult> modelPermissionQueryResults = permissionModelRepository.getModelPermissionsByAccessGroupId(accessGroupId);
+
         permissionSchemaMap.put(PERMISSIONS_SCHEMA,ObjectMapperUtils.copyPropertiesOfListByMapper(kPermissionModels, ModelDTO.class));
-        permissionSchemaMap.put(PERMISSIONS, Stream.of(FieldLevelPermission.values()).map(FieldLevelPermission::getValue).collect(Collectors.toList()));
-        permissionSchemaMap.put(PERMISSION_DATA, modelPermissionQueryResults);
+        permissionSchemaMap.put(PERMISSIONS, FieldLevelPermission.values());
+        permissionSchemaMap.put(PERMISSION_DATA, getModelPermission(kPermissionModels,accessGroupIds));
             return permissionSchemaMap;
     }
 
-    public List<PermissionDTO> createPermissions(List<PermissionDTO> permissionDTOList){
-        permissionDTOList.forEach(permissionDTO -> {
-            //List<AccessGroup> accessGroups = accessGroupRepository.findAllById(permissionDTO.getAccessGroupIds());
-            linkAccessGroupToSubModelAndPermissionFields(permissionDTO.getModelPermissions(), permissionDTO.getAccessGroupIds());
+    private List<KPermissionModel> getkPermissionModels() {
+        List<KPermissionModel> kPermissionModels = new ArrayList();
+        permissionModelRepository.findAll().forEach(kPermissionModel -> {
+            if(!kPermissionModel.isPermissionSubModel()){
+                kPermissionModels.add(kPermissionModel);
+            }
         });
-        return permissionDTOList;
+        return kPermissionModels;
+    }
+
+    private Map[] getMapOfPermission(Collection<Long> accessGroupIds) {
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = permissionModelRepository.getAllModelPermission(accessGroupIds);
+        List<FieldPermissionQueryResult> fieldLevelPermissions = permissionModelRepository.getAllFieldPermission(accessGroupIds);
+        Map<Long,Set<FieldLevelPermission>> fieldLevelPermissionMap = new HashMap<>();
+        Map<Long,Set<FieldLevelPermission>> modelPermissionMap = new HashMap<>();
+        if(isCollectionNotEmpty(modelPermissionQueryResults)){
+            modelPermissionMap = modelPermissionQueryResults.stream().collect(Collectors.toMap(modelPermissionQueryResult -> modelPermissionQueryResult.getPermissionModelId(),v->getFieldPermissionByPriority(v.getModelPermissions())));
+        }
+        if(isCollectionNotEmpty(fieldLevelPermissions)){
+            fieldLevelPermissionMap = fieldLevelPermissions.stream().collect(Collectors.toMap(modelPermissionQueryResult -> modelPermissionQueryResult.getFieldId(),v->getFieldPermissionByPriority(v.getFieldPermissions())));
+        }
+        return new Map[]{modelPermissionMap,fieldLevelPermissionMap};
+    }
+
+    private Set<FieldLevelPermission> getFieldPermissionByPriority(Set<FieldLevelPermission> fieldLevelPermissions){
+        if(fieldLevelPermissions.size()>1){
+            if(fieldLevelPermissions.contains(FieldLevelPermission.WRITE)){
+                fieldLevelPermissions.removeIf(fieldLevelPermission->!FieldLevelPermission.WRITE.equals(fieldLevelPermission));
+            }else if(fieldLevelPermissions.contains(FieldLevelPermission.READ)){
+                fieldLevelPermissions.remove(FieldLevelPermission.HIDE);
+            }
+        }
+        return fieldLevelPermissions;
+    }
+
+    private List<ModelPermissionQueryResult> getModelPermission(List<KPermissionModel> kPermissionModels,Collection<Long> accessGroupIds){
+        Map[] permissionMap = getMapOfPermission(accessGroupIds);
+        Map<Long,Set<FieldLevelPermission>> modelPermissionMap = permissionMap[0];
+        Map<Long,Set<FieldLevelPermission>> fieldLevelPermissionMap = permissionMap[1];
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermissionQueryResults(kPermissionModels, modelPermissionMap, fieldLevelPermissionMap);
+        return modelPermissionQueryResults;
+    }
+
+    private List<ModelPermissionQueryResult> getModelPermissionQueryResults(List<KPermissionModel> kPermissionModels, Map<Long, Set<FieldLevelPermission>> modelPermissionMap, Map<Long, Set<FieldLevelPermission>> fieldLevelPermissionMap) {
+        List<ModelPermissionQueryResult> modelPermissionQueryResults = new ArrayList<>();
+        for (KPermissionModel kPermissionModel : kPermissionModels) {
+            modelPermissionQueryResults.add(new ModelPermissionQueryResult(kPermissionModel.getId(),getFieldLevelPermissionQueryResult(fieldLevelPermissionMap,kPermissionModel.getFields()),getModelPermissionQueryResults(kPermissionModel.getSubModels(),modelPermissionMap,fieldLevelPermissionMap),modelPermissionMap.get(kPermissionModel.getId())));
+        }
+        return modelPermissionQueryResults;
+    }
+
+    private List<FieldPermissionQueryResult> getFieldLevelPermissionQueryResult(Map<Long,Set<FieldLevelPermission>> fieldLevelPermissionMap,List<KPermissionField> fields){
+        List<FieldPermissionQueryResult> fieldPermissionQueryResults = new ArrayList<>();
+        for (KPermissionField field : fields) {
+            fieldPermissionQueryResults.add(new FieldPermissionQueryResult(field.getId(),fieldLevelPermissionMap.getOrDefault(field.getId(),new HashSet<>())));
+        }
+        return fieldPermissionQueryResults;
+    }
+
+    public PermissionDTO createPermissions(PermissionDTO permissionDTO){
+
+        linkAccessGroupToSubModelAndPermissionFields(permissionDTO.getModelPermissions(), permissionDTO.getAccessGroupIds());
+        return permissionDTO;
     }
 
 
@@ -141,10 +191,10 @@ public class PermissionService {
                 if(KPermissionField == null){
                     exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, MESSAGE_PERMISSION_FIELD, fieldPermissionDTO.getFieldId());
                 }else{
-                        accessGroupPermissionFieldRelationshipGraphRepository.createAccessGroupPermissionFieldRelationshipType(KPermissionField.getId(),accessGroupIds,fieldPermissionDTO.getFieldPermission());
+                        permissionModelRepository.createAccessGroupPermissionFieldRelationshipType(KPermissionField.getId(),accessGroupIds,fieldPermissionDTO.getFieldPermissions());
                 }
             }
-                accessGroupPermissionModelRelationshipGraphRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds,modelPermissionDTO.getModelPermission());
+            permissionModelRepository.createAccessGroupPermissionModelRelationship(kPermissionModel.getId(), accessGroupIds,modelPermissionDTO.getModelPermissions());
             if(!modelPermissionDTO.getSubModelPermissions().isEmpty()){
                 linkAccessGroupToSubModelAndPermissionFields(modelPermissionDTO.getSubModelPermissions(), accessGroupIds);
             }

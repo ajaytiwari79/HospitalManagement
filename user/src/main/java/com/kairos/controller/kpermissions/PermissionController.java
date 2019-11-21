@@ -1,12 +1,10 @@
 package com.kairos.controller.kpermissions;
 
-import com.kairos.dto.ValidateRequestBodyList;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.kpermissions.PermissionDTO;
 import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,19 +38,16 @@ public class PermissionController {
     }
 
     @RequestMapping(value = "/access_group_permissions",method = RequestMethod.GET)
-    public ResponseEntity getAccessGroupPermissions(@RequestParam Long accessGroupId )  {
+    public ResponseEntity getAccessGroupPermissions(@RequestParam List<Long> accessGroupIds )  {
 
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(accessGroupId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getPermissionSchema(accessGroupIds));
 
     }
 
 
     @RequestMapping(value = "/create_permission",method = RequestMethod.POST)
-    public ResponseEntity createFieldPermissions(@Valid @RequestBody ValidateRequestBodyList<PermissionDTO> permissionDTO)  {
-        if (CollectionUtils.isEmpty(permissionDTO.getRequestBody())) {
-            return ResponseHandler.generateResponseDTO(HttpStatus.BAD_REQUEST, false, null);
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO.getRequestBody()));
+    public ResponseEntity createFieldPermissions(@Valid @RequestBody PermissionDTO permissionDTO)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO));
 
     }
 
