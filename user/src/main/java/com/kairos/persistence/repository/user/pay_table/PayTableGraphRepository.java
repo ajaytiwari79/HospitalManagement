@@ -76,4 +76,11 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "MATCH(level)-[:"+IN_ORGANIZATION_LEVEL+"]-(payTables:PayTable{deleted:false}) WHERE DATE(payTables.startDateMillis)<=DATE({1}) AND (payTables.endDateMillis IS NULL OR DATE(payTables.endDateMillis)>=DATE({1})) AND id(payTables)<>{0}\n" +
             "RETURN CASE WHEN COUNT(payTables)>0 then true else false end as result")
     boolean existsByDate(Long id,String publishedDate);
+
+    @Query("MATCH(level:Level)<-[:"+IN_ORGANIZATION_LEVEL+"]-(payTable:PayTable) WHERE id(level)={0} AND  \n" +
+            "({2} IS NULL AND (payTable.endDateMillis IS NULL OR DATE(payTable.endDateMillis) > DATE({1})))\n" +
+            "OR \n" +
+            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < DATE(payTable.endDateMillis) OR DATE({2}) > DATE(payTable.startDateMillis)))\n" +
+            "RETURN payTable")
+    List<PayTable> findAllActivePayTable(Long levelId,String startDate,String endDate);
 }

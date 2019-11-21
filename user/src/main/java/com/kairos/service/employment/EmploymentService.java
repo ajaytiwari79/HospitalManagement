@@ -23,6 +23,7 @@ import com.kairos.persistence.model.country.reason_code.ReasonCode;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.pay_table.PayTable;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.TimeCareEmploymentDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -53,6 +54,7 @@ import com.kairos.persistence.repository.user.employment.EmploymentLineFunctionR
 import com.kairos.persistence.repository.user.expertise.ExpertiseEmploymentTypeRelationshipGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
+import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffExpertiseRelationShipGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
@@ -114,6 +116,8 @@ public class EmploymentService {
     private EmploymentGraphRepository employmentGraphRepository;
     @Inject
     private ExpertiseGraphRepository expertiseGraphRepository;
+    @Inject
+    private PayTableGraphRepository payTableGraphRepository;
     @Inject
     private OrganizationGraphRepository organizationGraphRepository;
     @Inject
@@ -663,8 +667,21 @@ public class EmploymentService {
     private List<EmploymentLine> getEmploymentLines(EmploymentDTO employmentDTO) {
         List<EmploymentLine> employmentLines=new ArrayList<>();
         Expertise expertise=expertiseGraphRepository.findOne(employmentDTO.getExpertiseId(),2);
-        expertise.getExpertiseLines().forEach(expertiseLine -> employmentLines.add(new EmploymentLine.EmploymentLineBuilder()
-                .setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employmentDTO.getStaffId(),expertiseLine,employmentDTO.getExpertiseId()))
+        expertise.getExpertiseLines().forEach(expertiseLine -> {
+                 List<PayTable> payTables=payTableGraphRepository.findAllActivePayTable(expertise.getOrganizationLevel().getId(),expertiseLine.getStartDate().toString(),expertiseLine.getEndDate()==null?null:expertiseLine.getEndDate().toString());
+                 if(payTables.size()>1){
+                     payTables.forEach(payTable -> {
+                         addEmploymentLines(employmentDTO, employmentLines, expertiseLine);
+                     });
+                 }else {
+                     addEmploymentLines(employmentDTO, employmentLines, expertiseLine);
+                 }});
+        return employmentLines;
+    }
+
+    private void addEmploymentLines(EmploymentDTO employmentDTO, List<EmploymentLine> employmentLines, ExpertiseLine expertiseLine) {
+        employmentLines.add(new EmploymentLine.EmploymentLineBuilder()
+                .setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employmentDTO.getStaffId(), expertiseLine, employmentDTO.getExpertiseId()))
                 .setStartDate(expertiseLine.getStartDate())
                 .setEndDate(expertiseLine.getEndDate())
                 .setTotalWeeklyMinutes(employmentDTO.getTotalWeeklyMinutes() + (employmentDTO.getTotalWeeklyHours() * 60))
@@ -672,8 +689,7 @@ public class EmploymentService {
                 .setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek())
                 .setAvgDailyWorkingHours(employmentDTO.getAvgDailyWorkingHours())
                 .setHourlyCost(employmentDTO.getHourlyCost())
-                .build()));
-        return employmentLines;
+                .build());
     }
 
     /*
