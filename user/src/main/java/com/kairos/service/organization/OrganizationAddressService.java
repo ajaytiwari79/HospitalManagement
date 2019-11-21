@@ -28,7 +28,7 @@ import com.kairos.service.country.CurrencyService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.utils.FormatUtil;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.kairos.rule_validator.activity;
 
 import com.kairos.dto.activity.activity.activity_tabs.PhaseTemplateValue;
-import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.rule_validator.AbstractSpecification;
 
 import java.math.BigInteger;
@@ -11,12 +11,10 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_PHASE_AUTHO
 
 public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
 
-    List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
-    private UserAccessRoleDTO userAccessRoleDTO;
+    private List<PhaseTemplateValue> phaseTemplateValues;
 
-    public ShiftAllowedToDelete(List<PhaseTemplateValue> phaseTemplateValues , UserAccessRoleDTO userAccessRoleDTO) {
+    public ShiftAllowedToDelete(List<PhaseTemplateValue> phaseTemplateValues) {
         this.phaseTemplateValues = phaseTemplateValues;
-        this.userAccessRoleDTO = userAccessRoleDTO;
     }
 
     @Override
@@ -40,15 +38,14 @@ public class ShiftAllowedToDelete extends AbstractSpecification<BigInteger> {
             }
         }
         if (Optional.ofNullable(currentPhase).isPresent()) {
-            if ((Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent())
-                    && ((userAccessRoleDTO.getManagement())&&userAccessRoleDTO.getStaff()) &&(currentPhase.isManagementCanDelete() ||currentPhase.isStaffCanDelete())) {
+            if (currentPhase.isManagementCanDelete() && currentPhase.isStaffCanDelete()) {
                 return Collections.emptyList();
             }
-                if ((Optional.ofNullable(userAccessRoleDTO.getManagement()).isPresent() && userAccessRoleDTO.getManagement() && !currentPhase.isManagementCanDelete()) ||
-                        (Optional.ofNullable(userAccessRoleDTO.getStaff()).isPresent() && userAccessRoleDTO.getStaff() && !currentPhase.isStaffCanDelete())) {
-                    errors  = Arrays.asList(MESSAGE_PHASE_AUTHORITY_ABSENT);
-                }
+            if (UserContext.getUserDetails().isManagement() && !currentPhase.isManagementCanDelete() ||
+                    (UserContext.getUserDetails().isStaff() && !currentPhase.isStaffCanDelete())) {
+                errors = Arrays.asList(MESSAGE_PHASE_AUTHORITY_ABSENT);
             }
+        }
         return errors;
     }
 }

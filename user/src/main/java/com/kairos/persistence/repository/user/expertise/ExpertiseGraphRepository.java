@@ -120,12 +120,11 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     List<Expertise> getExpertiseByCountryAndOrganizationServices(Long countryId, Set<Long> organizationServicesIds);
 
 
-    @Query("MATCH (o:Unit)-[r:"+PROVIDE_SERVICE +"{isEnabled:true}]->(os:OrganizationService{isEnabled:true}) WHERE id(o)={0}\n" +
-            " MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(country) = {1}\n" +
-            " MATCH(exl)-[:" + SUPPORTS_SERVICES + "]->(os) " +
-            " RETURN DISTINCT toString(id(expertise)) as id, expertise.name as value ," +
+    @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE id(country) = {0} AND (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE())) \n" +
+            "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1} \n " +
+            "RETURN DISTINCT toString(id(expertise)) as id, expertise.name as value ," +
             "expertise.startDate as startDate ,expertise.endDate as endDate ORDER BY startDate")
-    List<FilterSelectionQueryResult> getExpertiseByCountryIdForFilters(Long unitId, Long countryId);
+    List<FilterSelectionQueryResult> getExpertiseByCountryIdForFilters(Long countryId, Set<Long> servicesIds);
 
     @Query("MATCH(organizationType:OrganizationType) WHERE id(organizationType)={1}\n" +
             "MATCH(organizationType)-[:"+ORGANIZATION_TYPE_HAS_SERVICES+"]-(os:OrganizationService)\n" +
