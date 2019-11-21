@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
@@ -21,8 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_NOT_FOUND;
 
@@ -95,17 +95,27 @@ public class GroupService {
         return true;
     }
 
-    public List<Map> getStaffListByGroupId(Long unitId, Long groupId, List<FilterSelectionDTO> filterSelectionDTOS){
-//        Group group = groupGraphRepository.findGroupByIdAndDeletedFalse(groupId);
-//        if(isNull(group)){
-//            exceptionService.dataNotFoundByIdException(MESSAGE_GROUP_NOT_FOUND,groupId);
-//        }
+    public List<Map> getStaffListByGroupId(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         Map<FilterType, Set<String>> mapOfFilters = new HashMap<>();
-        filterSelectionDTOS.forEach(filterSelection -> {
+        AgeRangeDTO ageRange = null;
+        AgeRangeDTO joiningRange = null;
+        for(FilterSelectionDTO filterSelection : filterSelectionDTOS){
+            if(FilterType.AGE.equals(filterSelection.getName())){
+                ageRange = (AgeRangeDTO) filterSelection.getValue().iterator().next();
+            }else if(FilterType.NEW_TO_ORGANISATION.equals(filterSelection.getName())){
+                joiningRange = (AgeRangeDTO) filterSelection.getValue().iterator().next();
+            }else {
                 mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
-        });
+            }
+        }
         Organization organization=organizationService.fetchParentOrganization(unitId);
         List<Map> staffs = unitGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), null,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
+        if(isNotNull(ageRange)){
+           // staffs = staffs.stream().filter(map -> )
+        }
+        if(isNotNull(joiningRange)){
+
+        }
         List<Map> filteredStaff = new ArrayList<>();
         for(Map staff : staffs){
             Map<String, Object> fStaff = new HashMap<>();
