@@ -383,7 +383,7 @@ public class StaffFilterService {
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    private Map<FilterType, Set<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelectionDTO> filters) {
+    public Map<FilterType, Set<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelectionDTO> filters) {
         Map<FilterType, Set<String>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);

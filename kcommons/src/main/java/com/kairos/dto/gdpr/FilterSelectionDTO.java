@@ -14,18 +14,18 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class FilterSelectionDTO {
+public class FilterSelectionDTO<T> {
 
     private Long id;
     @NotEmpty(message = "error.message.selection.list.notNull")
     private List<FilterSelection> filtersData;
     private FilterType name;
-    private Set<String> value;
+    private Set<T> value;
 
 
     private String moduleId;
 
-    public FilterSelectionDTO(FilterType name, Set<String> value) {
+    public FilterSelectionDTO(FilterType name, Set<T> value) {
         this.name = name;
         this.value = value;
     }

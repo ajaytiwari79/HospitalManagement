@@ -1,5 +1,6 @@
 package com.kairos.controller.organization;
 
+import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.organization.group.GroupDTO;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.service.organization.GroupService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
@@ -49,8 +51,15 @@ public class GroupController {
     @ApiOperation(value = "Get Group Details")
     @GetMapping(value = "/group/{groupId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getGroupDetails(@PathVariable Long teamId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getGroupDetails( teamId));
+    public ResponseEntity<Map<String, Object>> getGroupDetails(@PathVariable Long groupId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getGroupDetails( groupId));
+    }
+
+    @ApiOperation(value = "Get Group's Staff Details")
+    @GetMapping(value = "/group/{groupId}/staffs")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffListByGroupId(@PathVariable Long unitId, @PathVariable Long groupId, @RequestBody List<FilterSelectionDTO> filtersData) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getStaffListByGroupId(unitId, groupId, filtersData));
     }
 
     @ApiOperation(value = "Get all Groups of unit")
