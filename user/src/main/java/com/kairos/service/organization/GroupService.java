@@ -47,7 +47,7 @@ public class GroupService {
     private OrganizationService organizationService;
 
     public GroupDTO createGroup(Long unitId, GroupDTO groupDTO) {
-        Unit unit = unitGraphRepository.getUnitWithGroupsByUnitId(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (groupGraphRepository.existsByName(unitId,-1L, groupDTO.getName())){
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }

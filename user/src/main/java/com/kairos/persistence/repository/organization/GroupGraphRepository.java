@@ -17,5 +17,6 @@ public interface GroupGraphRepository extends Neo4jBaseRepository<Group,Long> {
             "RETURN COUNT(group)>0")
     boolean existsByName(Long unitId, Long groupId, String name);
 
+    @Query("MATCH(group:Group{deleted:false}) WHERE id(group)={0} RETURN group")
     Group findGroupByIdAndDeletedFalse(Long groupId);
 }
