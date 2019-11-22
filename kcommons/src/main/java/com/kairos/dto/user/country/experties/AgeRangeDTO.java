@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.DurationType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -15,6 +16,7 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
+@NoArgsConstructor
 public class AgeRangeDTO implements Comparable<AgeRangeDTO>,Serializable{
     private Long id;
     private int from;
@@ -28,4 +30,9 @@ public class AgeRangeDTO implements Comparable<AgeRangeDTO>,Serializable{
         return this.from-o.from;
     }
 
+    public AgeRangeDTO(int from, Integer to, DurationType durationType){
+        this.from = from;
+        this.to = to;
+        this.durationType = durationType;
+    }
 }

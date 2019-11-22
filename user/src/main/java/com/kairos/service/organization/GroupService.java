@@ -5,6 +5,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_NOT_FOUND;
 
@@ -73,7 +75,6 @@ public class GroupService {
             group.setExcludedStaffs(groupDTO.getExcludedStaffs());
         }
         groupGraphRepository.save(group);
-        groupDTO.setId(group.getId());
         return groupDTO;
     }
 
@@ -96,28 +97,28 @@ public class GroupService {
         return true;
     }
 
-    public List<Map> getStaffListByGroupId(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
+    public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         Map<FilterType, Set<String>> mapOfFilters = new HashMap<>();
-        AgeRangeDTO ageRange = null;
-        AgeRangeDTO joiningRange = null;
+        Map ageRange = null;
+        Map joiningRange = null;
         for(FilterSelectionDTO filterSelection : filterSelectionDTOS){
             if(FilterType.AGE.equals(filterSelection.getName())){
-                ageRange = (AgeRangeDTO) filterSelection.getValue().iterator().next();
+                ageRange = (Map) filterSelection.getValue().iterator().next();
             }else if(FilterType.NEW_TO_ORGANISATION.equals(filterSelection.getName())){
-                joiningRange = (AgeRangeDTO) filterSelection.getValue().iterator().next();
+                joiningRange = (Map) filterSelection.getValue().iterator().next();
             }else {
                 mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
             }
         }
         Organization organization=organizationService.fetchParentOrganization(unitId);
         List<Map> staffs = unitGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), null,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
-        final AgeRangeDTO age = ageRange;
-        final AgeRangeDTO joining = joiningRange;
         if(isNotNull(ageRange)) {
+            final AgeRangeDTO age = new AgeRangeDTO(Integer.parseInt(ageRange.get("from").toString()), isNotNull(ageRange.get("to")) ? Integer.parseInt(ageRange.get("to").toString()) : null,DurationType.valueOf(ageRange.get("durationType").toString()));
             staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("age").toString()), age)).collect(Collectors.toList());
         }
         if(isNotNull(joiningRange)){
-            staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("joiningInYears").toString()), joining)).collect(Collectors.toList());
+            final AgeRangeDTO joining = new AgeRangeDTO(Integer.parseInt(joiningRange.get("from").toString()), isNotNull(joiningRange.get("to")) ? Integer.parseInt(joiningRange.get("to").toString()) : null,DurationType.valueOf(joiningRange.get("durationType").toString()));
+            staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("experienceInYears").toString()), joining)).collect(Collectors.toList());
         }
         List<Map> filteredStaff = new ArrayList<>();
         for(Map staff : staffs){
@@ -133,10 +134,22 @@ public class GroupService {
         }
         return filteredStaff;
     }
+
     private boolean validate(int inYears, AgeRangeDTO ageRangeDTO){
-        long inDays = Math.round(inYears *  365.242199);
-        long from = ageRangeDTO.getFrom();
-        long to = isNotNull(ageRangeDTO.getTo()) ? ageRangeDTO.getTo() : 999999999 ;
-        return inDays >= from && inDays < to;
+        long inDays = Math.round(inYears *  DAYS_IN_ONE_YEAR);
+        long from = getDataInDays(ageRangeDTO.getFrom(), ageRangeDTO.getDurationType());
+        long to = isNotNull(ageRangeDTO.getTo()) ? getDataInDays(ageRangeDTO.getTo(), ageRangeDTO.getDurationType()) : MAX_LONG_VALUE ;
+        return from <= inDays && to >= inDays;
+    }
+
+    private long getDataInDays(long value, DurationType durationType){
+        switch (durationType){
+            case YEAR :
+                return Math.round(value *  DAYS_IN_ONE_YEAR);
+            case MONTHS:
+                return Math.round(value *  DAYS_IN_ONE_MONTH);
+            default:
+                return value;
+        }
     }
 }
