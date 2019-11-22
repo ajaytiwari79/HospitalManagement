@@ -236,7 +236,7 @@ public class ShiftStatusService {
                 break;
             case DISAPPROVE:
                 updateShiftOnDisapprove(shift, shiftActivity);
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, todo.getComment());
+                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, isNotNull(todo) ? todo.getComment() : null);
                 break;
             case UNLOCK:
                 shiftActivity.getStatus().removeAll(Arrays.asList(LOCK, REQUEST));
