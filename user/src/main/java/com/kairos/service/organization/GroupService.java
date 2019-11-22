@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT;
@@ -110,11 +111,13 @@ public class GroupService {
         }
         Organization organization=organizationService.fetchParentOrganization(unitId);
         List<Map> staffs = unitGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), null,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
-        if(isNotNull(ageRange)){
-           // staffs = staffs.stream().filter(map -> )
+        final AgeRangeDTO age = ageRange;
+        final AgeRangeDTO joining = joiningRange;
+        if(isNotNull(ageRange)) {
+            staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("age").toString()), age)).collect(Collectors.toList());
         }
         if(isNotNull(joiningRange)){
-
+            staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("joiningInYears").toString()), joining)).collect(Collectors.toList());
         }
         List<Map> filteredStaff = new ArrayList<>();
         for(Map staff : staffs){
@@ -129,5 +132,11 @@ public class GroupService {
             filteredStaff.add(fStaff);
         }
         return filteredStaff;
+    }
+    private boolean validate(int inYears, AgeRangeDTO ageRangeDTO){
+        long inDays = Math.round(inYears *  365.242199);
+        long from = ageRangeDTO.getFrom();
+        long to = isNotNull(ageRangeDTO.getTo()) ? ageRangeDTO.getTo() : 999999999 ;
+        return inDays >= from && inDays < to;
     }
 }
