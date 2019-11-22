@@ -48,8 +48,34 @@ public class RulesActivityTabDTO {
     private PQLSettings pqlSettings;
     private boolean reasonCodeRequired;
     private ReasonCodeRequiredState reasonCodeRequiredState;
+    private boolean borrowLeave;
+    private boolean transferAll;
+    private int noOfTransferLeave;
 
 
+    public boolean isBorrowLeave() {
+        return borrowLeave;
+    }
+
+    public void setBorrowLeave(boolean borrowLeave) {
+        this.borrowLeave = borrowLeave;
+    }
+
+    public boolean isTransferAll() {
+        return transferAll;
+    }
+
+    public void setTransferAll(boolean transferAll) {
+        this.transferAll = transferAll;
+    }
+
+    public int getNoOfTransferLeave() {
+        return noOfTransferLeave;
+    }
+
+    public void setNoOfTransferLeave(int noOfTransferLeave) {
+        this.noOfTransferLeave = noOfTransferLeave;
+    }
 
     public LocalDate getCutOffStartFrom() {
         return cutOffStartFrom;
