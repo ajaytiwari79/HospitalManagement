@@ -45,6 +45,8 @@ public class Tag extends UserBaseEntity {
     private Long orgTypeId;
 
     private List<Long> orgSubTypeIds;
+    private LocalDate startDate=LocalDate.now();
+    private LocalDate endDate;
 
     public Tag(@NotBlank(message = "error.Tag.name.notEmptyOrNotNull") String name, MasterDataTypeEnum masterDataType, boolean countryTag) {
         this.name = name;

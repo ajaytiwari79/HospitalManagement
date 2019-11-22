@@ -1,6 +1,7 @@
 package com.kairos.dto.user.user.staff;
 
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -52,6 +53,7 @@ public class StaffAdditionalInfoDTO {
     private List<StaffChildDetailDTO> staffChildDetails;
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
+    private List<TagDTO> tags;
 
 
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
