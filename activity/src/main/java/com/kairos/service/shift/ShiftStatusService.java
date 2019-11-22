@@ -208,6 +208,15 @@ public class ShiftStatusService {
     }
 
     private void removeOppositeStatus(Shift shift, ShiftActivity shiftActivity, ShiftStatus shiftStatus) {
+        Todo todo = null;
+        if(newHashSet(APPROVE,DISAPPROVE).contains(shiftStatus)){
+            TodoStatus todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE: TodoStatus.DISAPPROVE;
+            todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED,newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED),shiftActivity.getActivityId());
+            if(isNotNull(todo)) {
+                todo.setStatus(todoStatus);
+                todoRepository.save(todo);
+            }
+        }
         switch (shiftStatus) {
             case LOCK:
                 shiftActivity.getStatus().removeAll(Arrays.asList(UNLOCK, REQUEST));
@@ -215,11 +224,11 @@ public class ShiftStatusService {
                 break;
             case FIX:
                 shiftActivity.getStatus().add(FIX);
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus);
+                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, null);
                 break;
             case UNFIX:
                 shiftActivity.getStatus().removeAll(Arrays.asList(FIX));
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus);
+                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, null);
                 break;
             case APPROVE:
                 shiftActivity.getStatus().removeAll(Arrays.asList(PENDING, REQUEST));
@@ -227,7 +236,7 @@ public class ShiftStatusService {
                 break;
             case DISAPPROVE:
                 updateShiftOnDisapprove(shift, shiftActivity);
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus);
+                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, todo.getComment());
                 break;
             case UNLOCK:
                 shiftActivity.getStatus().removeAll(Arrays.asList(LOCK, REQUEST));
@@ -241,18 +250,10 @@ public class ShiftStatusService {
             case PENDING:
                 shiftActivity.getStatus().removeAll(Arrays.asList(REQUEST));
                 shiftActivity.getStatus().add(PENDING);
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus);
+                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, null);
                 break;
             default:
                 break;
-        }
-        if(newHashSet(APPROVE,DISAPPROVE).contains(shiftStatus)){
-            TodoStatus todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE: TodoStatus.DISAPPROVE;
-            Todo todo = todoRepository.findAllByEntityIdAndSubEntityAndTypeAndStatus(shift.getId(), TodoType.APPROVAL_REQUIRED,newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED),shiftActivity.getActivityId());
-            if(isNotNull(todo)) {
-                todo.setStatus(todoStatus);
-                todoRepository.save(todo);
-            }
         }
     }
 
@@ -323,7 +324,7 @@ public class ShiftStatusService {
     }
 
 
-    public void sendMailToStaffWhenStatusChange(Shift shift, ShiftActivity activity, ShiftStatus shiftStatus) {
+    public void sendMailToStaffWhenStatusChange(Shift shift, ShiftActivity activity, ShiftStatus shiftStatus, String disapproveComments) {
         StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
         String bodyPart1 = "The status of the ";
@@ -331,6 +332,9 @@ public class ShiftStatusService {
         String bodyPart3 = " activity which is planned on " + WordUtils.capitalizeFully(getEmailDateTimeWithFormat(shiftDate)) + " has been moved to ";
         String bodyPart4 = shiftStatus.toString();
         String bodyPart5 = " by " + UserContext.getUserDetails().getFullName() + ".\n";
+        String bodyPart6 = "[ ";
+        String bodyPart7 = "Comments : ";
+        String bodyPart8 = disapproveComments + ". ]\n";
 
         Map<String, Object> templateParam = new HashMap<>();
         templateParam.put("receiverName", EMAIL_GREETING + staffDTO.getFullName());
@@ -339,6 +343,11 @@ public class ShiftStatusService {
         templateParam.put("descriptionPart3", bodyPart3);
         templateParam.put("descriptionPart4", bodyPart4);
         templateParam.put("descriptionPart5", bodyPart5);
+        if(DISAPPROVE.equals(shiftStatus)){
+            templateParam.put("descriptionPart6", bodyPart6);
+            templateParam.put("descriptionPart7", bodyPart7);
+            templateParam.put("descriptionPart8", bodyPart8);
+        }
         mailService.sendMailWithSendGrid(SHIFT_NOTIFICATION_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getEmail());
     }
 }
