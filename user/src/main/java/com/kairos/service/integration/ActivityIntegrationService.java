@@ -199,5 +199,9 @@ public class ActivityIntegrationService {
         return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/staff/{staffId}/night_worker_general", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<NightWorkerGeneralResponseDTO>>() {
         },staffId).isNightWorker();
     }
+
+    public Boolean unlinkTagFromActivity(Long unitId, Long tagId) {
+        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/tag/{tagId}/unlink", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){}, tagId);
+    }
 }
 
