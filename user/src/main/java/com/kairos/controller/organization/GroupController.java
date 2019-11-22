@@ -56,7 +56,7 @@ public class GroupController {
     }
 
     @ApiOperation(value = "Get Group's Staff Details")
-    @GetMapping(value = "/group/staffs")
+    @PostMapping(value = "/group/staffs")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffListByGroupFilter(@PathVariable Long unitId, @RequestBody List<FilterSelectionDTO> filtersData) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getStaffListByGroupFilter(unitId, filtersData));

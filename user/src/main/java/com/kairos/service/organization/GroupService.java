@@ -100,12 +100,12 @@ public class GroupService {
     public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         Map<FilterType, Set<String>> mapOfFilters = new HashMap<>();
         Map ageRange = null;
-        Map joiningRange = null;
+        Map experienceRange = null;
         for(FilterSelectionDTO filterSelection : filterSelectionDTOS){
             if(FilterType.AGE.equals(filterSelection.getName())){
                 ageRange = (Map) filterSelection.getValue().iterator().next();
-            }else if(FilterType.NEW_TO_ORGANISATION.equals(filterSelection.getName())){
-                joiningRange = (Map) filterSelection.getValue().iterator().next();
+            }else if(FilterType.ORGANIZATION_EXPERIENCE.equals(filterSelection.getName())){
+                experienceRange = (Map) filterSelection.getValue().iterator().next();
             }else {
                 mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
             }
@@ -116,8 +116,8 @@ public class GroupService {
             final AgeRangeDTO age = new AgeRangeDTO(Integer.parseInt(ageRange.get("from").toString()), isNotNull(ageRange.get("to")) ? Integer.parseInt(ageRange.get("to").toString()) : null,DurationType.valueOf(ageRange.get("durationType").toString()));
             staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("age").toString()), age)).collect(Collectors.toList());
         }
-        if(isNotNull(joiningRange)){
-            final AgeRangeDTO joining = new AgeRangeDTO(Integer.parseInt(joiningRange.get("from").toString()), isNotNull(joiningRange.get("to")) ? Integer.parseInt(joiningRange.get("to").toString()) : null,DurationType.valueOf(joiningRange.get("durationType").toString()));
+        if(isNotNull(experienceRange)){
+            final AgeRangeDTO joining = new AgeRangeDTO(Integer.parseInt(experienceRange.get("from").toString()), isNotNull(experienceRange.get("to")) ? Integer.parseInt(experienceRange.get("to").toString()) : null,DurationType.valueOf(experienceRange.get("durationType").toString()));
             staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("experienceInYears").toString()), joining)).collect(Collectors.toList());
         }
         List<Map> filteredStaff = new ArrayList<>();
