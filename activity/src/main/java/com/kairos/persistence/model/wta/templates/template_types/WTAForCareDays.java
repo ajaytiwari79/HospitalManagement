@@ -2,6 +2,7 @@ package com.kairos.persistence.model.wta.templates.template_types;
 
 import com.kairos.commons.config.ApplicationContextProviderNonManageBean;
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
@@ -33,6 +34,8 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getShiftsByIn
 public class WTAForCareDays extends WTABaseRuleTemplate{
 
     private List<ActivityCareDayCount> careDayCounts = new ArrayList<>();
+
+    private CutOffIntervalUnit cutOffIntervalUnit;
 
     public WTAForCareDays(String name, String description) {
         super(name, description);
