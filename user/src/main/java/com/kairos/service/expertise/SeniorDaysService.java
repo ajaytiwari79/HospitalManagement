@@ -37,18 +37,18 @@ public class SeniorDaysService {
         return Collections.singletonList(seniorDaysDTO);
     }
 
-    public List<SeniorDaysDTO> updateSeniorDays(SeniorDaysDTO seniorDaysDTO){
-        SeniorCareDays seniorCareDays=seniorDaysGraphRepository.findById(seniorDaysDTO.getId()).orElse(null);
-        if (seniorCareDays.isHasDraftCopy()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_DRAFT_COPY_CREATED);
-        }
-        seniorCareDays = ObjectMapperUtils.copyPropertiesByMapper(seniorDaysDTO, SeniorCareDays.class);
-        if(seniorCareDays.isPublished()){
-            seniorCareDays.setId(null);
-            seniorCareDays.setHasDraftCopy(true);
-        }
-
-    }
+//    public List<SeniorDaysDTO> updateSeniorDays(SeniorDaysDTO seniorDaysDTO){
+//        SeniorCareDays seniorCareDays=seniorDaysGraphRepository.findById(seniorDaysDTO.getId()).orElse(null);
+//        if (seniorCareDays.isHasDraftCopy()) {
+//            exceptionService.dataNotFoundByIdException(MESSAGE_DRAFT_COPY_CREATED);
+//        }
+//        seniorCareDays = ObjectMapperUtils.copyPropertiesByMapper(seniorDaysDTO, SeniorCareDays.class);
+//        if(seniorCareDays.isPublished()){
+//            seniorCareDays.setId(null);
+//            seniorCareDays.setHasDraftCopy(true);
+//        }
+//
+//    }
 
     //Validating age range
     private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
