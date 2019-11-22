@@ -130,7 +130,7 @@ public class KPIBuilderCalculationService implements CounterService {
             exceptionService.illegalArgumentException(CALCULATION_TYPE_NOT_VALID);
         }
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria()).invoke();
+        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria(),false).invoke();
         Set<BigInteger> plannedTimeIds = filterShiftActivity.getPlannedTimeIds();
         int valuesSumInMinutes = filterShiftActivity.getShiftActivityDTOS().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
         double total = getHoursByMinutes(valuesSumInMinutes);
@@ -208,7 +208,7 @@ public class KPIBuilderCalculationService implements CounterService {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria()).invoke();
+        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria(),false).invoke();
         List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
         int valuesSumInMinutes = shiftActivityDTOS.stream().mapToInt(methodParam::apply).sum();
         double total = getHoursByMinutes(valuesSumInMinutes);
@@ -369,13 +369,15 @@ public class KPIBuilderCalculationService implements CounterService {
         private Map<FilterType, List> filterBasedCriteria;
         private Set<BigInteger> plannedTimeIds;
         private Set<BigInteger> teamActivityIds;
-        private List<ShiftActivityDTO> shiftActivityDTOS;
+        private List<ShiftActivityDTO> shiftActivityDTOS = new ArrayList<>();
         private Set<BigInteger> timeTypeIdSet;
+        private boolean excludeBreak;
 
-        public FilterShiftActivity(List<ShiftWithActivityDTO> shifts, Map<FilterType, List> filterBasedCriteria) {
+        public FilterShiftActivity(List<ShiftWithActivityDTO> shifts, Map<FilterType, List> filterBasedCriteria,boolean excludeBreak) {
             this.shifts = shifts;
             this.filterBasedCriteria = filterBasedCriteria;
             this.teamActivityIds = new HashSet<>();
+            this.excludeBreak = excludeBreak;
         }
 
         public Set<BigInteger> getPlannedTimeIds() {
@@ -400,7 +402,14 @@ public class KPIBuilderCalculationService implements CounterService {
                 ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUserDetails().getLastSelectedOrganizationId(), teamIds));
                 teamActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
             }
-            shiftActivityDTOS = shifts.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).filter(shiftActivityDTO -> isShiftActivityValid(filterBasedCriteria, shiftActivityDTO, timeTypeIdSet, activityIds, reasonCodeIds, plannedTimeIds)).collect(Collectors.toList());
+
+            for (ShiftWithActivityDTO shift : shifts) {
+                List<ShiftActivityDTO> shiftActivitys = shift.getActivities();
+                if (excludeBreak) {
+                    shiftActivitys = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
+                }
+                shiftActivityDTOS.addAll(shiftActivitys.stream().filter(shiftActivityDTO -> isShiftActivityValid(filterBasedCriteria, shiftActivityDTO, timeTypeIdSet, activityIds, reasonCodeIds, plannedTimeIds)).collect(Collectors.toList()));
+            }
             return this;
         }
 
