@@ -1,7 +1,7 @@
 package com.kairos.service.wta;
 
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.CurrentUserDetails;
+import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
@@ -11,6 +11,7 @@ import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.RuleTemplateCategoryType;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
@@ -24,7 +25,6 @@ import com.kairos.persistence.repository.wta.rule_template.WTABaseRuleTemplateMo
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.tag.TagService;
-import com.kairos.utils.user_context.UserContext;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

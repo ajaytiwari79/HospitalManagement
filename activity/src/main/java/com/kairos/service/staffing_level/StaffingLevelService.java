@@ -20,6 +20,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.ActivityCategoryDT
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.organization.OrganizationSkillAndOrganizationTypesDTO;
 import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.activity.Activity;
@@ -39,7 +40,6 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.utils.service_util.StaffingLevelUtil;
-import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -745,16 +745,16 @@ public class StaffingLevelService  {
             }
             staffingLevelInterval.setAvailableNoOfStaff(availableNoOfStaff);
             if(isCollectionNotEmpty(staffingLevelInterval.getStaffingLevelSkills()) && isNotEmpty(staffSkillsMap)){
-                updateStaffingLevelSkills(staffingLevelInterval,staffId, staffSkillsMap);
+                updateStaffingLevelSkills(staffingLevelInterval,staffId, staffSkillsMap,interval,shiftActivity);
             }
         }
     }
 
-    private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, Map<Long, List<Map<String,Object>>> staffSkillsMap){
+    private void updateStaffingLevelSkills(StaffingLevelInterval staffingLevelInterval, Long staffId, Map<Long, List<Map<String,Object>>> staffSkillsMap,DateTimeInterval interval,ShiftActivity shiftActivity){
         for (StaffingLevelSkill staffingLevelSkill : staffingLevelInterval.getStaffingLevelSkills()){
             if(staffSkillsMap.containsKey(staffId)) {
                 for (Map<String, Object> staffSkill : staffSkillsMap.get(staffId)) {
-                    if (staffingLevelSkill.getSkillId().equals(Long.valueOf(staffSkill.get(SKILL_ID).toString()))) {
+                    if (staffingLevelSkill.getSkillId().equals(Long.valueOf(staffSkill.get(SKILL_ID).toString())) && interval.overlaps(shiftActivity.getInterval())) {
                         updateAvailableNoOfStaff(staffingLevelSkill, staffSkill);
                     }
                 }
@@ -924,7 +924,7 @@ public class StaffingLevelService  {
             List<StaffingLevel> staffingLevels = staffingLevelMongoRepository.findByUnitIdAndDates(unitId,updatedStaffingLevels.stream().map(updatedStaffingLevelDTO -> updatedStaffingLevelDTO.getCurrentDate()).collect(Collectors.toSet()));
             Map<LocalDate,Date> staffingLevelDateMap = staffingLevels.stream().collect(Collectors.toMap(k->asLocalDate(k.getCurrentDate()),StaffingLevel::getUpdatedAt));
             for (UpdatedStaffingLevelDTO updatedStaffingLevel : updatedStaffingLevels) {
-                if(staffingLevelDateMap.containsKey(updatedStaffingLevel.getCurrentDate()) && staffingLevelDateMap.get(updatedStaffingLevel.getCurrentDate()).after(updatedStaffingLevel.getUpdatedAt())) {
+                if(isNotNull(updatedStaffingLevel.getUpdatedAt()) && staffingLevelDateMap.containsKey(updatedStaffingLevel.getCurrentDate()) && staffingLevelDateMap.get(updatedStaffingLevel.getCurrentDate()).after(updatedStaffingLevel.getUpdatedAt())) {
                     getStaffingLevelPerDate(unitId, updatedStaffingLevel.getCurrentDate(), presenceStaffingLevelMap, absenceStaffingLevelMap);
                 }
             }

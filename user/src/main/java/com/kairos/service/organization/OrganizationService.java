@@ -17,12 +17,14 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
@@ -64,6 +66,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.country.EmploymentTypeService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.region.RegionService;
@@ -71,7 +74,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -180,6 +183,8 @@ public class OrganizationService {
     private SchedulerServiceRestClient schedulerServiceRestClient;
     @Inject
     private OrganizationMetadataRepository organizationMetadataRepository;
+    @Inject
+    private TagService tagService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
@@ -188,6 +193,7 @@ public class OrganizationService {
         OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(unit, OrganizationDTO.class);
         organizationDTO.setCountryId(countryGraphRepository.getCountryIdByUnitId(id));
         organizationDTO.setParentOrganization(unit instanceof Organization);
+        organizationDTO.setTagDTOS(tagService.getTagsByOrganizationIdAndMasterDataType(id, MasterDataTypeEnum.STAFF));
         return organizationDTO;
     }
 

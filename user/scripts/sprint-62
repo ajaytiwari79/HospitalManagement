@@ -1,0 +1,12 @@
+
+MATCH (staff)-[skillRel:STAFF_HAS_SKILLS]->(skill)
+set skillRel.startDate="1997-06-10",skillRel.endDate=null
+
+MATCH(e:Expertise) where e.published=false DETACH delete e
+
+MATCH(e:Expertise)-[:HAS_EXPERTISE_LINES]-(ecl:ExpertiseLine)
+MATCH(e)-[:FOR_SENIORITY_LEVEL]-(sl:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]-(pg:PayGrade)
+CREATE UNIQUE (ecl)-[:FOR_SENIORITY_LEVEL{payGradeId:id(pg),payGradeLevel:pg.payGradeLevel}]-(sl)
+
+MATCH(e:Expertise)-[:HAS_EXPERTISE_LINES]-(ecl:ExpertiseLine)
+Set ecl.breakPaymentSetting='PAID',ecl.fullTimeWeeklyMinutes=2220,ecl.numberOfWorkingDaysInWeek=5

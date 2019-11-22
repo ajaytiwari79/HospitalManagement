@@ -30,6 +30,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,7 @@ public class WorkTimeAgreementBalancesCalculationService {
     private TimeBankCalculationService timeBankCalculationService;
     @Inject
     private WorkingTimeAgreementMongoRepository wtaRepository;
+    @Inject private ShiftValidatorService shiftValidatorService;
 
 
 
@@ -386,10 +388,8 @@ public class WorkTimeAgreementBalancesCalculationService {
                     DateTimeInterval dateTimeInterval = getIntervalByActivity(activityWrapperMap, asDate(startDate), childCareDaysCheckWTATemplate.getActivityIds(), planningPeriodEndDate);
                     if (isNotNull(dateTimeInterval)) {
                         int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, new HashSet(childCareDaysCheckWTATemplate.getActivityIds()));
-                        CareDaysDTO careDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getStaffAge());
-                        if (isNotNull(careDays)) {
-                            intervalBalances.add(new IntervalBalance(careDays.getLeavesAllowed(), scheduledAndApproveActivityCount[0], careDays.getLeavesAllowed() - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
-                        }
+                        long totalLeaves = childCareDaysCheckWTATemplate.calculateChildCareDaysLeaveCount(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), shiftValidatorService.getChildAges(asDate(startDate), staffAdditionalInfoDTO));
+                        intervalBalances.add(new IntervalBalance(totalLeaves, scheduledAndApproveActivityCount[0], totalLeaves - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
                     }
                 }
                 startDate = startDate.plusDays(1);
