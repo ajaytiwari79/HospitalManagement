@@ -153,12 +153,6 @@ public class PositionService {
         objectToUpdate.setCopyKariosMailToLogin(staffPositionDetail.isCopyKariosMailToLogin());
         objectToUpdate.setEngineerType(engineerType);
         objectToUpdate.setExternalId(staffPositionDetail.getTimeCareExternalId());
-        objectToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPositionDetail.getTags(), Tag.class));
-        if(isCollectionNotEmpty(staffPositionDetail.getTags())) {
-            staffGraphRepository.unlinkTagsFromStaff(staffId, staffPositionDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
-        }else{
-            staffGraphRepository.unlinkAllTagsFromStaff(staffId);
-        }
         staffGraphRepository.save(objectToUpdate);
         positionGraphRepository.updatePositionStartDateOfStaff(objectToUpdate.getId(), positionStartDate);
         StaffPositionDTO staffPositionDTO = new StaffPositionDTO(objectToUpdate, positionStartDate);

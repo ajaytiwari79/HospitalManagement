@@ -150,7 +150,7 @@ public class OrganizationTypeService{
      * new relationship b/w skill and organization type will be created or updated(if relationship already exist) if parameter value is false
      * then relationship will be inactive (deleted param of relationship will set to true)
      */
-    public List<OrgTypeSkillQueryResult> addExpertiseInOrgType(long orgTypeId, long expertiseId, boolean isSelected) {
+    public List<OrgTypeSkillQueryResult> addSkillInOrgType(long orgTypeId, long expertiseId, boolean isSelected) {
         if (isSelected) {
             organizationTypeGraphRepository.addSkillInOrgType(orgTypeId, expertiseId, DateUtils.getCurrentDateMillis(), DateUtils.getCurrentDateMillis());
         } else {

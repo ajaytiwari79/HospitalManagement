@@ -27,5 +27,5 @@ public class StaffPositionDetail {
     private long engineerTypeId;
     private Long timeCareExternalId;
     private LocalDate dateOfBirth;
-    private List<TagDTO> tags;
+
 }
