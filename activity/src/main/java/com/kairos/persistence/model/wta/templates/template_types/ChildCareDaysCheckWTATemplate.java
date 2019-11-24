@@ -38,6 +38,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private List<BigInteger> activityIds = new ArrayList<>();
     private float recommendedValue;
     private CutOffIntervalUnit cutOffIntervalUnit;
+    private int transferLeaveCount;
 
 
     public ChildCareDaysCheckWTATemplate() {

@@ -13,4 +13,5 @@ public class ActivityCutOffCount {
     private LocalDate startDate;
     private LocalDate endDate;
     private int count;
+    private int transferLeaveCount;
 }

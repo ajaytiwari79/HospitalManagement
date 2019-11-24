@@ -38,6 +38,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
     private CutOffIntervalUnit cutOffIntervalUnit;
+    private int transferLeaveCount;
     private float recommendedValue;
 
     public SeniorDaysPerYearWTATemplate() {

@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getShiftsByIntervalAndActivityIds;
 
 
@@ -57,13 +58,13 @@ public class WTAForCareDays extends WTABaseRuleTemplate{
                 Activity activity = infoWrapper.getActivityWrapperMap().get(shiftActivityDTO.getActivityId()).getActivity();
                     ActivityCareDayCount careDayCount = careDayCountMap.get(activity.getId());
                     List<ShiftWithActivityDTO> shifts = getShiftsByIntervalAndActivityIds(activity, infoWrapper.getShift().getStartDate(), infoWrapper.getShifts(), Arrays.asList(careDayCount.getActivityId()));
-                    ActivityCutOffCount leaveCount=careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(),activityCutOffCount.getEndDate()).contains(infoWrapper.getShift().getStartDate())).findFirst().get();
-                    if (leaveCount.getCount() < (shifts.size()+1)) {
-                        boolean isLeaveAvailable = workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(), careDayCount.getActivityId(), infoWrapper.getShift(), new DateTimeInterval(careDayCount.getActivityCutOffCounts().get(0).getStartDate(), careDayCount.getActivityCutOffCounts().get(0).getEndDate()), infoWrapper.getLastPlanningPeriodEndDate(), WTATemplateType.WTA_FOR_CARE_DAYS,leaveCount.getCount());
+                    ActivityCutOffCount leaveCount=careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(),activityCutOffCount.getEndDate()).containsAndEqualsEndDate(asDate(asLocalDate(infoWrapper.getShift().getStartDate())))).findFirst().orElse(new ActivityCutOffCount());
+                    if (leaveCount.getCount()+leaveCount.getTransferLeaveCount() < (shifts.size()+1)) {
+                        boolean isLeaveAvailable = workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(), careDayCount.getActivityId(), infoWrapper.getShift(), new DateTimeInterval(leaveCount.getStartDate(), leaveCount.getEndDate()), infoWrapper.getLastPlanningPeriodEndDate(), WTATemplateType.WTA_FOR_CARE_DAYS,leaveCount.getCount());
                         if (!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
-                                            DurationType.DAYS, String.valueOf(careDayCount.getActivityCutOffCounts().get(0).getCount()));
+                                            DurationType.DAYS, String.valueOf(leaveCount.getCount()+leaveCount.getTransferLeaveCount()));
                             infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
                             break;
                         }
