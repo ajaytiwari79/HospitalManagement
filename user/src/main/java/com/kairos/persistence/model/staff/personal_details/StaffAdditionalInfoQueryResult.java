@@ -1,8 +1,10 @@
 package com.kairos.persistence.model.staff.personal_details;
 
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import lombok.Getter;
@@ -41,4 +43,5 @@ public class StaffAdditionalInfoQueryResult {
     private List<StaffChildDetail> staffChildDetails;
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
+    private List<Tag> tags;
 }

@@ -61,6 +61,7 @@ import static com.kairos.constants.ActivityMessagesConstants.CALCULATION_TYPE_NO
 import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST;
 import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.TOTAL_MINUTES;
+import static com.kairos.enums.kpi.CalculationType.UNAVAILABILITY;
 import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.*;
@@ -488,11 +489,11 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         private StaffFilterDTO getStaffFilterDto(Map<FilterType, List> filterBasedCriteria, List<TimeSlotDTO> timeSlotDTOS, Long organizationId) {
-            StaffFilterDTO staffFilterDTO = new StaffFilterDTO();
+          StaffFilterDTO staffFilterDTO = new StaffFilterDTO();
             List<FilterSelectionDTO> filterData = new ArrayList<>();
             filterBasedCriteria.entrySet().forEach(filterTypeListEntry -> {
                 getTimeSoltFilter(filterTypeListEntry, timeSlotDTOS, filterData);
-                if (!newHashSet(PHASE, TEAM).contains(filterTypeListEntry.getKey())) {
+                if (!newHashSet(PHASE, TEAM ,TIME_TYPE).contains(filterTypeListEntry.getKey()) || !(filterBasedCriteria.containsKey(CALCULATION_TYPE) && filterBasedCriteria.get(CALCULATION_TYPE).contains(UNAVAILABILITY.toString()))) {
                     filterData.add(new FilterSelectionDTO(filterTypeListEntry.getKey(), new HashSet<String>(filterTypeListEntry.getValue())));
                 }
             });
