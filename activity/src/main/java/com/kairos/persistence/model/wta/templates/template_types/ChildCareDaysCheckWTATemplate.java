@@ -39,6 +39,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private float recommendedValue;
     private CutOffIntervalUnit cutOffIntervalUnit;
     private int transferLeaveCount;
+    private int borrowLeaveCount;
 
 
     public ChildCareDaysCheckWTATemplate() {
@@ -55,7 +56,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
                 if (isNotNull(dateTimeInterval)) {
                         List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
-                        if (leaveCount < (shifts.size() + 1)) {
+                        if (leaveCount+transferLeaveCount-borrowLeaveCount < (shifts.size() + 1)) {
                             boolean isLeaveAvailable=workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(),activityIds.get(0),infoWrapper.getShift(), dateTimeInterval,infoWrapper.getLastPlanningPeriodEndDate(),WTATemplateType.WTA_FOR_CARE_DAYS,leaveCount);
                             if(!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
