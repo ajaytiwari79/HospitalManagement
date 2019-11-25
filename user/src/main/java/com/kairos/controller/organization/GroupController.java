@@ -37,7 +37,7 @@ public class GroupController {
     @ApiOperation(value = "Update Group of Unit")
     @PutMapping(value = "/group/{groupId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateGroup(@PathVariable Long unitId, @PathVariable Long groupId, @Validated @RequestBody GroupDTO groupDTO) {
+    public ResponseEntity<Map<String, Object>> updateGroup(@PathVariable Long unitId, @PathVariable Long groupId, @RequestBody GroupDTO groupDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.updateGroup(unitId, groupId, groupDTO));
     }
 
@@ -66,6 +66,13 @@ public class GroupController {
     @GetMapping(value = "/groups")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllGroupByUnitId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getAllGroupsOfUnit( unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getAllGroupsOfUnit(unitId));
+    }
+
+    @ApiOperation(value = "Get all StaffIds")
+    @PostMapping(value = "/groups")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getAllStaffByGroupIds(@PathVariable Long unitId, @RequestBody List<Long> groupIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getAllStaffByGroupIds(unitId, groupIds));
     }
 }

@@ -6,6 +6,8 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
@@ -17,6 +19,16 @@ public interface GroupGraphRepository extends Neo4jBaseRepository<Group,Long> {
             "RETURN COUNT(group)>0")
     boolean existsByName(Long unitId, Long groupId, String name);
 
-    @Query("MATCH(group:Group{deleted:false}) WHERE id(group)={0} RETURN group")
+    @Query("MATCH(group:Group{deleted:false}) WHERE id(group)={0} " +
+            "OPTIONAL MATCH (group)-[rel:HAS_FILTERS]->(filterSelection:FilterSelection)" +
+            "RETURN group,COLLECT(rel),COLLECT(filterSelection)")
     Group findGroupByIdAndDeletedFalse(Long groupId);
+
+    @Query("MATCH(group:Group{deleted:false}) WHERE id(group) IN {0} " +
+            "OPTIONAL MATCH (group)-[rel:HAS_FILTERS]->(filterSelection:FilterSelection)" +
+            "RETURN group,COLLECT(rel),COLLECT(filterSelection)")
+    List<Group> findAllGroupsByIdSAndDeletedFalse(List<Long> groupIds);
+
+    @Query("MATCH (group:Group)-[rel:HAS_FILTERS]->(filterSelection:FilterSelection) WHERE id(group)={0} detach delete filterSelection")
+    void deleteAllFiltersByGroupId(Long groupId);
 }

@@ -2,11 +2,9 @@ package com.kairos.persistence.model.organization.group;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.FilterSelection;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.organization.Unit;
-import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.user.filter.FilterSelection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,7 +28,8 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class Group extends UserBaseEntity {
     private String name;
     private String description;
-    private List<FilterSelectionDTO> filtersData = new ArrayList<>();
+    @Relationship(type = "HAS_FILTERS")
+    private List<FilterSelection> filtersData = new ArrayList<>();
     private List<Long> excludedStaffs = new ArrayList<>();
 
     public Group(String name, String description) {

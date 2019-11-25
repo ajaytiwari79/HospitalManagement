@@ -1,6 +1,7 @@
 package com.kairos.dto.gdpr;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.FilterType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.Set;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
