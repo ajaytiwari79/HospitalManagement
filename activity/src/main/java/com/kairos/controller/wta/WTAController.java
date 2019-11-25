@@ -4,6 +4,7 @@ import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.service.wta.WTAOrganizationService;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -36,6 +37,8 @@ public class WTAController {
 
     @Inject
     private WorkTimeAgreementService workTimeAgreementService;
+    @Inject
+    private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
     @Inject
     private WTAOrganizationService wtaOrganizationService;
 
@@ -276,6 +279,11 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getProtectedDaysOffCount(unitId,null,staffId,activityId));
     }
 
+    @ApiOperation(value = "Update Phases in Ruletemplates")
+    @GetMapping(value =  UNIT_URL+ "/test_count")
+    public ResponseEntity<Map<String, Object>> testJob(){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementBalancesCalculationService.updateLeaveCountByJob());
+    }
 
 
 }

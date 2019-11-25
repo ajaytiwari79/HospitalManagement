@@ -93,6 +93,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -694,16 +695,20 @@ public class StaffRetrievalService {
         // TODO incorrect we dont need to set in all staff
         staffAdditionalInfoDTOS.forEach(staffAdditionalInfoDTO -> {
             staffAdditionalInfoDTO.setDayTypes(dayTypeDTOS);
-
+            staffAdditionalInfoDTO.setStaffAge(CPRUtil.getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(), getLocalDate()));
             staffAdditionalInfoDTO.setUnitId(organizationBaseEntity.getId());
             staffAdditionalInfoDTO.setTimeSlotSets(ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotWrappers, com.kairos.dto.user.country.time_slot.TimeSlotWrapper.class));
             staffAdditionalInfoDTO.setUserAccessRoleDTO(userAccessRoleDTO);
         });
         Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoDTOMap = staffAdditionalInfoDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
+        Map<Long,SeniorAndChildCareDaysDTO> expertiseIdsAndSeniorAndChildCareDaysMap=expertiseService.getSeniorAndChildCareDaysMapByExpertiseIds(employmentDetails.stream().map(staffEmploymentDetails -> staffEmploymentDetails.getExpertise().getId()).collect(Collectors.toList()));
         List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOList = new ArrayList<>();
         for (StaffEmploymentDetails employmentDetail : employmentDetails) {
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = ObjectMapperUtils.copyPropertiesByMapper(staffAdditionalInfoDTOMap.get(employmentDetail.getStaffId()), StaffAdditionalInfoDTO.class);
             if (isNotNull(staffAdditionalInfoDTO)) {
+                if(expertiseIdsAndSeniorAndChildCareDaysMap.containsKey(staffAdditionalInfoDTO.getEmployment().getExpertise().getId())) {
+                    staffAdditionalInfoDTO.setSeniorAndChildCareDays(expertiseIdsAndSeniorAndChildCareDaysMap.get(staffAdditionalInfoDTO.getEmployment().getExpertise().getId()));
+                }
                 staffAdditionalInfoDTO.setEmployment(employmentDetail);
                 staffAdditionalInfoDTOList.add(staffAdditionalInfoDTO);
             }

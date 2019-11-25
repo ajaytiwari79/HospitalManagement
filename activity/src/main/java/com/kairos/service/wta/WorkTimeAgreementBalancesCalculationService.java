@@ -36,6 +36,8 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -44,11 +46,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ORGANIZATION;
 import static com.kairos.constants.AppConstants.STOP_BRICK_BLOCKING_POINT;
+import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
@@ -556,6 +559,92 @@ public class WorkTimeAgreementBalancesCalculationService {
         return dateTimeInterval;
     }
 
+    public boolean updateLeaveCountByJob(){
+        LocalDate startDate=getLocalDate();
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByDate(new Date());
+        Map<Long,List<WTAQueryResultDTO>> unitIdAndWtaMap=wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getOrganization().getId(),Collectors.toList()));
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> newHashSet(CHILD_CARE_DAYS_CHECK,SENIOR_DAYS_PER_YEAR,WTA_FOR_CARE_DAYS).contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
+        Set<BigInteger> activityIds = getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
+        List<ActivityWrapper> activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(activityIds));
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        List<WTABaseRuleTemplate> ruleTemplates=new ArrayList<>();
+        for (Long unitId : unitIdAndWtaMap.keySet()) {
+            List<WTAQueryResultDTO> wtaQueryResultDTOSOfUnit=unitIdAndWtaMap.get(unitId);
+            Map<Long,List<WTAQueryResultDTO>> employmentIdAndWtaMap = wtaQueryResultDTOSOfUnit.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(),Collectors.toList()));
+            PlanningPeriod planningPeriod = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
+            DateTimeInterval dateTimeInterval = getIntervalByRuletemplates(activityWrapperMap, wtaBaseRuleTemplates, startDate, planningPeriod.getEndDate(), unitId);
+            List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIdAndWtaMap.keySet(), dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), activityIds);
+            Map<Long,List<ShiftWithActivityDTO>> staffIdAndShiftsMap=shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(shiftWithActivityDTO -> shiftWithActivityDTO.getStaffId(),Collectors.toList()));
+            Map<Long,List<ShiftWithActivityDTO>> employmentIdAndShiftsMap=shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(shiftWithActivityDTO -> shiftWithActivityDTO.getEmploymentId(),Collectors.toList()));
+            List<Long> staffIds = new ArrayList<>(staffIdAndShiftsMap.keySet());
+            List<Long> employmentIds = new ArrayList<>(employmentIdAndWtaMap.keySet());
+            List<NameValuePair> requestParam = new ArrayList<>();
+            requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
+            requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
+            List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS =userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
+            Map<Long,StaffAdditionalInfoDTO> employmentIdAndStaffAdditionalInfoMap=new HashMap<>();
+            for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
+                employmentIdAndStaffAdditionalInfoMap.putIfAbsent(staffAdditionalInfoDTO.getEmployment().getId(),staffAdditionalInfoDTO);
+            }
 
+            for (Long employmentId : employmentIdAndWtaMap.keySet()) {
+                List<WTAQueryResultDTO> wtaQueryResuls=employmentIdAndWtaMap.get(employmentId);
+                for (WTAQueryResultDTO wtaQueryResul : wtaQueryResuls) {
+                    ruleTemplates.addAll(getRuleTemplates(activityWrapperMap,wtaQueryResul.getRuleTemplates(),employmentIdAndShiftsMap.get(employmentId),employmentIdAndStaffAdditionalInfoMap.get(employmentId),planningPeriod.getEndDate()));
+                }
+            }
+        }
+        if(isCollectionNotEmpty(ruleTemplates)){wtaBaseRuleTemplateRepository.saveEntities(ruleTemplates);}
+        return true;
+    }
+
+    public  List<WTABaseRuleTemplate> getRuleTemplates(Map<BigInteger, ActivityWrapper> activityWrapperMap, List<WTABaseRuleTemplate> ruleTemplates,List<ShiftWithActivityDTO> shiftWithActivityDTOS,StaffAdditionalInfoDTO staffAdditionalInfoDTO ,LocalDate planningPeriodEndDate){
+        Activity activity = null;
+        CutOffIntervalUnit cutOffIntervalUnit = null;
+        DateTimeInterval dateTimeInterval=null;
+        for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
+            switch (ruleTemplate.getWtaTemplateType()) {
+                case SENIOR_DAYS_PER_YEAR:
+                    SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
+                    CareDaysDTO seniorDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), staffAdditionalInfoDTO.getStaffAge());
+                    activity=activityWrapperMap.get(seniorDaysPerYearWTATemplate.getActivityIds().get(0)).getActivity();
+                    cutOffIntervalUnit = activity.getRulesActivityTab().getCutOffIntervalUnit();
+                    dateTimeInterval = getIntervalByActivity(activityWrapperMap, getDate(), seniorDaysPerYearWTATemplate.getActivityIds(), planningPeriodEndDate);
+                    if(dateTimeInterval.getEndDate().equals(getLocalDate()) && CutOffIntervalUnit.CutOffBalances.TRANSFER.equals(activity.getRulesActivityTab().getCutOffBalances())) {
+                        shiftWithActivityDTOS = filterShiftsByDateTimeIntervalAndActivityId(shiftWithActivityDTOS, dateTimeInterval, activity.getId());
+
+                    }
+                    break;
+                case CHILD_CARE_DAYS_CHECK:
+                    ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
+                    CareDaysDTO careDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getStaffAge());
+                    activity=activityWrapperMap.get(childCareDaysCheckWTATemplate.getActivityIds().get(0)).getActivity();
+                    cutOffIntervalUnit = activity.getRulesActivityTab().getCutOffIntervalUnit();
+                    dateTimeInterval = getIntervalByActivity(activityWrapperMap, getDate(), childCareDaysCheckWTATemplate.getActivityIds(), planningPeriodEndDate);
+                    if(dateTimeInterval.getEndDate().equals(getLocalDate()) && CutOffIntervalUnit.CutOffBalances.TRANSFER.equals(activity.getRulesActivityTab().getCutOffBalances())) {
+                        shiftWithActivityDTOS = filterShiftsByDateTimeIntervalAndActivityId(shiftWithActivityDTOS, dateTimeInterval, activity.getId());
+                    }
+                    break;
+                case WTA_FOR_CARE_DAYS:
+                    WTAForCareDays wtaForCareDays = (WTAForCareDays) ruleTemplate;
+                    ActivityCareDayCount careDayCount = wtaForCareDays.careDaysCountMap().get(activity.getId());
+                    ActivityCutOffCount activityLeaveCount=careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(),activityCutOffCount.getEndDate()).contains(getLocalDate())).findFirst().get();
+                    activity = activityWrapperMap.get(careDayCount.getActivityId()).getActivity();
+                    if(activityLeaveCount.getEndDate().equals(getLocalDate()) && CutOffIntervalUnit.CutOffBalances.TRANSFER.equals(activity.getRulesActivityTab().getCutOffBalances())) {
+                        shiftWithActivityDTOS = filterShiftsByDateTimeIntervalAndActivityId(shiftWithActivityDTOS, dateTimeInterval, activity.getId());
+
+
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        return ruleTemplates;
+    }
+
+    public List<ShiftWithActivityDTO> filterShiftsByDateTimeIntervalAndActivityId(List<ShiftWithActivityDTO> shiftWithActivityDTOS,DateTimeInterval dateTimeInterval,BigInteger activityId){
+        return shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())&& shiftWithActivityDTO.getActivities().stream().anyMatch(shiftActivityDTO -> shiftActivityDTO.getActivityId().equals(activityId))).collect(Collectors.toList());
+    }
 
 }
