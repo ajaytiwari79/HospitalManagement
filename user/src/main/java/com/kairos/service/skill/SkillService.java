@@ -1,6 +1,5 @@
 package com.kairos.service.skill;
 
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -9,7 +8,6 @@ import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.SkillLevel;
-import com.kairos.persistence.model.auth.StaffSkillLevelRelationship;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
@@ -39,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -367,7 +364,7 @@ public class SkillService {
 
         Map<String, Object> map = new HashMap<>();
         map.put("skills", skillsResponse);
-        map.put("staffList", ObjectMapperUtils.copyPropertiesOfListByMapper(staffList, Map.class));
+        map.put("staffList", ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffList, Map.class));
         return map;
     }
 

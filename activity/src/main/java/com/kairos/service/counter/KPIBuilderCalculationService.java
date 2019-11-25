@@ -55,7 +55,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfListByMapper;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.CALCULATION_TYPE_NOT_VALID;
 import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST;
@@ -102,7 +102,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_BASED_ON))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
-        CalculationBasedOn calculationBasedOn = (CalculationBasedOn) copyPropertiesOfListByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_BASED_ON), CalculationBasedOn.class).get(0);
+        CalculationBasedOn calculationBasedOn = ((List<CalculationBasedOn>)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_BASED_ON), CalculationBasedOn.class)).get(0);
         double total = 0;
         switch (calculationBasedOn) {
             case ACTIVITY:
@@ -125,7 +125,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
-        CalculationType calculationType = (CalculationType) copyPropertiesOfListByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE), CalculationType.class).get(0);
+        CalculationType calculationType = ((List<CalculationType>)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE), CalculationType.class)).get(0);
         if (!calculationType.equals(TOTAL_MINUTES)) {
             exceptionService.illegalArgumentException(CALCULATION_TYPE_NOT_VALID);
         }
@@ -134,7 +134,7 @@ public class KPIBuilderCalculationService implements CounterService {
         Set<BigInteger> plannedTimeIds = filterShiftActivity.getPlannedTimeIds();
         int valuesSumInMinutes = filterShiftActivity.getShiftActivityDTOS().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
         double total = getHoursByMinutes(valuesSumInMinutes);
-        DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), DisplayUnit.class).get(0);
+        DisplayUnit calculationUnit = ((List<DisplayUnit>)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), DisplayUnit.class)).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
             total = sumOfShifts > 0 ? (valuesSumInMinutes / sumOfShifts) * 100 : valuesSumInMinutes;
@@ -148,7 +148,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
-        CalculationType calculationType = (CalculationType) copyPropertiesOfListByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE), CalculationType.class).get(0);
+        CalculationType calculationType = ((List<CalculationType>) copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE), CalculationType.class)).get(0);
         Function<ShiftActivityDTO, Integer> methodParam = ShiftActivityDTO::getScheduledMinutes;
         switch (calculationType) {
             case PLANNED_HOURS_TIMEBANK:
@@ -212,7 +212,7 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
         int valuesSumInMinutes = shiftActivityDTOS.stream().mapToInt(methodParam::apply).sum();
         double total = getHoursByMinutes(valuesSumInMinutes);
-        DisplayUnit calculationUnit = (DisplayUnit) copyPropertiesOfListByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), DisplayUnit.class).get(0);
+        DisplayUnit calculationUnit = ((List<DisplayUnit>)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), DisplayUnit.class)).get(0);
         if (DisplayUnit.PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream()).mapToInt(methodParam::apply).sum();
             total = sumOfShifts > 0 ? (valuesSumInMinutes * 100 / sumOfShifts) : valuesSumInMinutes;
@@ -251,14 +251,14 @@ public class KPIBuilderCalculationService implements CounterService {
     @Override
     public KPIRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, null);
-        DisplayUnit displayUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
+        DisplayUnit displayUnit = ((List<DisplayUnit>)copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class)).get(0);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), displayUnit, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(displayUnit.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 
     @Override
     public KPIRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, applicableKPI);
-        DisplayUnit displayUnit = (DisplayUnit) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class).get(0);
+        DisplayUnit displayUnit = ((List<DisplayUnit>)copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), DisplayUnit.class)).get(0);
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), displayUnit, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(displayUnit.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 

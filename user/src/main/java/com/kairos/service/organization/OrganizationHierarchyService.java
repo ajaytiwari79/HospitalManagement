@@ -154,7 +154,7 @@ public class OrganizationHierarchyService {
                     break;
                 default:
             }
-            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyPropertiesOfListByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
+            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
             filterResponseDTO.setFilterData(filterAttributes);
             filterResponseDTOList.add(filterResponseDTO);
         }

@@ -22,7 +22,6 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.filter.*;
 import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
@@ -325,7 +324,7 @@ public class StaffFilterService {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(staffFilterDTO.getModuleId());
 
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter(staffFilterDTO.getName(),
-                ObjectMapperUtils.copyPropertiesOfListByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
+                ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         staff.addFavouriteFilters(staffFavouriteFilter);
         staffGraphRepository.save(staff);
@@ -359,7 +358,7 @@ public class StaffFilterService {
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
         List<FilterSelectionDTO> filters = favouriteFilterDTO.getFiltersData();
         filters.forEach(filterSelection -> filterSelection.setId(null));
-        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyPropertiesOfListByMapper(filters, FilterSelection.class));
+        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(filters, FilterSelection.class));
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return favouriteFilterDTO;

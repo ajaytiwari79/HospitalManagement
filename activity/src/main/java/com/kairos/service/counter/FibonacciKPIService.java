@@ -64,7 +64,7 @@ public class FibonacciKPIService implements CounterService{
         FibonacciKPI fibonacciKPI = ObjectMapperUtils.copyPropertiesByMapper(fibonacciKPIDTO, FibonacciKPI.class);
         fibonacciKPIRepository.save(fibonacciKPI);
         fibonacciKPIDTO.setId(fibonacciKPI.getId());
-        ApplicableKPI applicableKPI=new ApplicableKPI(fibonacciKPI.getId(), fibonacciKPI.getId(), COUNTRY.equals(confLevel)?referenceId:null, UNIT.equals(confLevel)?referenceId:null, null, confLevel, new ApplicableFilter(new ArrayList<>(), false), fibonacciKPI.getTitle(), false,ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIDTO.getFibonacciKPIConfigs(),FibonacciKPIConfig.class),KPIRepresentation.INDIVIDUAL_STAFF);
+        ApplicableKPI applicableKPI=new ApplicableKPI(fibonacciKPI.getId(), fibonacciKPI.getId(), COUNTRY.equals(confLevel)?referenceId:null, UNIT.equals(confLevel)?referenceId:null, null, confLevel, new ApplicableFilter(new ArrayList<>(), false), fibonacciKPI.getTitle(), false,ObjectMapperUtils.copyPropertiesOfCollectionByMapper(fibonacciKPIDTO.getFibonacciKPIConfigs(),FibonacciKPIConfig.class),KPIRepresentation.INDIVIDUAL_STAFF);
         applicableKPIRepository.save(applicableKPI);
         KPICategory kpiCategory=counterRepository.getKPICategoryByName(UNCATEGORIZED,confLevel,referenceId);
         CategoryKPIConf categoryKPIConf=new CategoryKPIConf(applicableKPI.getActiveKpiId(), kpiCategory.getId(), COUNTRY.equals(confLevel)?referenceId:null, UNIT.equals(confLevel)?referenceId:null, confLevel);
@@ -87,7 +87,7 @@ public class FibonacciKPIService implements CounterService{
         if(isNull(applicableKPI)){
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND,"FibonacciKPI",fibonacciKPIDTO.getId());
         }
-        applicableKPI.setFibonacciKPIConfigs(ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIDTO.getFibonacciKPIConfigs(),FibonacciKPIConfig.class));
+        applicableKPI.setFibonacciKPIConfigs(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(fibonacciKPIDTO.getFibonacciKPIConfigs(),FibonacciKPIConfig.class));
         applicableKPI.setTitle(fibonacciKPIDTO.getTitle());
         counterRepository.save(applicableKPI);
         return fibonacciKPIDTO;
@@ -100,8 +100,8 @@ public class FibonacciKPIService implements CounterService{
     public KPIDTO getOneFibonacciKPI(BigInteger fibonacciKPIId,Long referenceId,ConfLevel confLevel){
         KPIDTO kpidto = fibonacciKPIRepository.getOneByfibonacciId(fibonacciKPIId,referenceId,confLevel);
         if(confLevel.equals(UNIT)){
-            List<FibonacciKPIConfig> fibonacciKPIConfigs = getFibonacciKPIsByOrganizationConfig(ObjectMapperUtils.copyPropertiesOfListByMapper(kpidto.getFibonacciKPIConfigs(),FibonacciKPIConfig.class),referenceId,confLevel);
-            kpidto.setFibonacciKPIConfigs(ObjectMapperUtils.copyPropertiesOfListByMapper(fibonacciKPIConfigs, FibonacciKPIConfigDTO.class));
+            List<FibonacciKPIConfig> fibonacciKPIConfigs = getFibonacciKPIsByOrganizationConfig(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kpidto.getFibonacciKPIConfigs(),FibonacciKPIConfig.class),referenceId,confLevel);
+            kpidto.setFibonacciKPIConfigs(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(fibonacciKPIConfigs, FibonacciKPIConfigDTO.class));
         }
         kpidto.setFibonacciKPI(true);
         return kpidto;

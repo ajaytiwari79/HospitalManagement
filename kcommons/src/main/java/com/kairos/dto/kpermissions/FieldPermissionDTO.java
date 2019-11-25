@@ -1,5 +1,6 @@
 package com.kairos.dto.kpermissions;
 
+import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,4 +21,6 @@ public class FieldPermissionDTO {
 
     @NotNull(message = "message.permission.id.null")
     private Set<FieldLevelPermission> fieldPermissions;
+
+    private Set<OrganizationCategory> organizationCategories;
 }

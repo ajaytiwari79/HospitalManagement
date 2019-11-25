@@ -165,7 +165,7 @@ public class ActivityConfigurationService extends MongoBaseService {
         if(!activityConfigurationRepository.existsByCountryIdAndDeletedFalse(countryId)) {
             List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
             if (phases == null || phases.isEmpty()) {
-                phases = ObjectMapperUtils.copyPropertiesOfListByMapper(phaseMongoRepository.getPhasesByCountryId(countryId, Sort.Direction.ASC), Phase.class);
+                phases = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(phaseMongoRepository.getPhasesByCountryId(countryId, Sort.Direction.ASC), Phase.class);
             }
             List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
             Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();

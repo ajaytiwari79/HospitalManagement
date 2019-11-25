@@ -19,12 +19,13 @@ import java.util.Set;
 public class ModelPermissionQueryResult {
 
     private Long permissionModelId;
+    private String modelName;
 
     private List<FieldPermissionQueryResult> fieldPermissions= new ArrayList<>();
 
     private List<ModelPermissionQueryResult> subModelPermissions= new ArrayList<>();
 
-    private Set<FieldLevelPermission> modelPermissions;
+    private Set<FieldLevelPermission> permissions;
 
 
 }

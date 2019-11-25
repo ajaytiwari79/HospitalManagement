@@ -1,5 +1,6 @@
 package com.kairos.dto.kpermissions;
 
+import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,4 +31,5 @@ public class ModelPermissionDTO {
     @NotNull(message = "message.model.permission.id.null")
     //use for Submodel
     private Set<FieldLevelPermission> modelPermissions;
+    private Set<OrganizationCategory> organizationCategories;
 }

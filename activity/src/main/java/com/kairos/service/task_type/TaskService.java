@@ -963,7 +963,7 @@ public class TaskService extends MongoBaseService {
                 newTasks.add(task);
             }
         }
-        List<Task> tasks = ObjectMapperUtils.copyPropertiesOfListByMapper(newTasks,Task.class);//getVrpTasksByRows(rows,unitId);
+        List<Task> tasks = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(newTasks,Task.class);//getVrpTasksByRows(rows,unitId);
         save(tasks);
         return true;
     }

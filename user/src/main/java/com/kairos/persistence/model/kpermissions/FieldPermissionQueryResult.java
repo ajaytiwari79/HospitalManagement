@@ -17,6 +17,7 @@ import java.util.Set;
 public class FieldPermissionQueryResult {
 
     private Long fieldId;
+    private String fieldName;
 
-    private Set<FieldLevelPermission> fieldPermissions;
+    private Set<FieldLevelPermission> permissions;
 }

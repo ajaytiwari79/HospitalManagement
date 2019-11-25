@@ -455,7 +455,7 @@ public class TimeBankService{
         if(shiftActivityDTOMap.containsKey(shiftActivity.getActivityId()+"_"+shiftActivity.getStartDate())) {
             ShiftActivityDTO shiftActivityDTO = shiftActivityDTOMap.get(shiftActivity.getActivityId() + "_" + shiftActivity.getStartDate());
             shiftActivity.setTimeBankCtaBonusMinutes((int)shiftActivityDTO.getTimeBankCtaBonusMinutes());
-            shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
+            shiftActivity.setTimeBankCTADistributions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftActivityDTO.getTimeBankCTADistributions(), TimeBankCTADistribution.class));
             shiftActivity.setPlannedMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank() + (int)shiftActivityDTO.getTimeBankCtaBonusMinutes());
             shiftActivity.setScheduledMinutesOfTimebank(shiftActivityDTO.getScheduledMinutesOfTimebank());
         }

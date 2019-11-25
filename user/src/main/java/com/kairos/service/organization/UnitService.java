@@ -165,5 +165,9 @@ public class UnitService {
         return response;
     }
 
+    public boolean isUnit(Long organisationId){
+        return organizationBaseRepository.findOne(organisationId) instanceof Unit;
+    }
+
 
 }

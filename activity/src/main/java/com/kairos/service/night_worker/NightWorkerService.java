@@ -148,7 +148,7 @@ public class NightWorkerService {
             answerResponseDTO.setSubmitted(true);
             answerResponseDTO.setSubmittedOn(staffQuestionnaire.getSubmittedOn());
         }
-        staffQuestionnaire.setQuestionAnswerPair(ObjectMapperUtils.copyPropertiesOfListByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
+        staffQuestionnaire.setQuestionAnswerPair(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
         staffQuestionnaireMongoRepository.save(staffQuestionnaire);
         return answerResponseDTO;
     }
@@ -157,7 +157,7 @@ public class NightWorkerService {
         List<QuestionAnswerDTO> questionnaire = nightWorkerMongoRepository.getNightWorkerQuestions();
         StaffQuestionnaire staffQuestionnaire = new StaffQuestionnaire(
                 prepareNameOfQuestionnaireSet(),
-                ObjectMapperUtils.copyPropertiesOfListByMapper(questionnaire, QuestionAnswerPair.class));
+                ObjectMapperUtils.copyPropertiesOfCollectionByMapper(questionnaire, QuestionAnswerPair.class));
         staffQuestionnaireMongoRepository.save(staffQuestionnaire);
         return staffQuestionnaire;
     }

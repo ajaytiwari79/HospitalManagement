@@ -26,8 +26,6 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -39,6 +37,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.UnitService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
@@ -64,7 +63,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
-import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
@@ -115,6 +113,7 @@ public class UserService {
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     private OrganizationService organizationService;
+    @Inject private UnitService unitService;
 
     /**
      * Calls UserGraphRepository,
@@ -472,7 +471,7 @@ public class UserService {
             List<Long> accessibleModules = modules.stream().map(AccessPageDTO::getId).collect(Collectors.toList());
             for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
-                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
+                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
             }
             permissionData.setOrganizationPermissions(unitPermission);
         }
@@ -485,6 +484,7 @@ public class UserService {
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (!currentUser.getLastSelectedOrganizationId().equals(organizationId)) {
+            Organization organization = unitService.getO
             Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
             currentUser.setCountryId(countryId);
