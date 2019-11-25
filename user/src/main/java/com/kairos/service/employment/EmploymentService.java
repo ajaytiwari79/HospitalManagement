@@ -668,6 +668,7 @@ public class EmploymentService {
         Expertise expertise = expertiseGraphRepository.findOne(employmentDTO.getExpertiseId(), 2);
         expertise.getExpertiseLines().forEach(expertiseLine -> {
             List<PayTable> payTables = payTableGraphRepository.findAllActivePayTable(expertise.getOrganizationLevel().getId(), expertiseLine.getStartDate().toString(), expertiseLine.getEndDate() == null ? null : expertiseLine.getEndDate().toString());
+            payTables.sort(Comparator.comparing(PayTable::getStartDateMillis));
             payTables.forEach(payTable -> addEmploymentLines(employmentDTO, employmentLines, expertiseLine, payTable));
 
         });

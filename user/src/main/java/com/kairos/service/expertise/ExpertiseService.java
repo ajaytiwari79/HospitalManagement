@@ -206,14 +206,14 @@ public class ExpertiseService {
         }
     }
 
-    public ExpertiseQueryResult updateExpertiseLine(Long countryId, ExpertiseDTO expertiseDTO, Long expertiseId, Long expertiseLineId) {
+    public ExpertiseQueryResult updateExpertiseLine(ExpertiseDTO expertiseDTO, Long expertiseId, Long expertiseLineId) {
         expertiseDTO.setExpertiseLineId(expertiseLineId);
         Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId())));
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine currentExpertiseLine = expertise.getExpertiseLines().stream().filter(k -> k.getId().equals(expertiseLineId)).findFirst().orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(PLEASE_PROVIDE_THE_VALID_LINE_ID)));
+        expertiseGraphRepository.removeSeniorityLevel(expertiseLineId);
         expertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
         if (expertise.isPublished() && isExpertiseLineChanged(currentExpertiseLine, expertiseDTO.getOrganizationServiceIds(), expertiseDTO) && currentExpertiseLine.getStartDate().isBefore(expertiseDTO.getStartDate())) {
-            expertiseGraphRepository.removeSeniorityLevel(expertiseLineId);
             if (expertiseDTO.getStartDate().isBefore(getLocalDate()) && (currentExpertiseLine.getEndDate() == null || currentExpertiseLine.getEndDate().isAfter(getLocalDate()))) {
                 exceptionService.actionNotPermittedException(PLEASE_SELECT_PUBLISHED_DATE_LESS_AFTER_CURRENT_LINE_START_DATE);
             }
@@ -230,6 +230,7 @@ public class ExpertiseService {
             addSeniorityLevelsInExpertise(expertiseLine, expertiseDTO, expertise);
             employmentService.triggerEmploymentLine(expertiseId, expertiseLine);
         } else {
+
             addSeniorityLevelsInExpertise(currentExpertiseLine, expertiseDTO, expertise);
             updateExistingLine(expertiseDTO, expertise, currentExpertiseLine);
         }
