@@ -105,8 +105,8 @@ public class ShiftFilterService {
     private ShiftFilter getTimeTypeFilter(Map<FilterType, Set<String>> filterTypeMap) {
         Set<BigInteger> timeTypeIds = new HashSet<>();
         if(filterTypeMap.containsKey(TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(TIME_TYPE))) {
-            List<BigInteger> ids = getBigInteger(filterTypeMap.get(TIME_TYPE));
-            timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), ids);
+            Set<BigInteger> ids = new HashSet<>(getBigInteger(filterTypeMap.get(TIME_TYPE)));
+            timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), ids).keySet();
         }
         return new TimeTypeFilter(filterTypeMap, timeTypeIds);
     }
