@@ -18,7 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class ModelPermissionQueryResult {
 
-    private Long permissionModelId;
+    private Long id;
     private String modelName;
 
     private List<FieldPermissionQueryResult> fieldPermissions= new ArrayList<>();

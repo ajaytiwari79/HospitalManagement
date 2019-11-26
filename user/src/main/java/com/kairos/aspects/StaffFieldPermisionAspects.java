@@ -1,24 +1,15 @@
 package com.kairos.aspects;
 
 import com.kairos.annotations.KPermissionModel;
-import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.kpermissions.KPermissionModelFieldDTO;
 import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.common.UserBaseEntity;
-import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.kpermissions.PermissionService;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -39,7 +30,7 @@ public class StaffFieldPermisionAspects {
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffFieldPermisionAspects.class);
 
 
-    @Around("execution(public com.kairos.persistence.model.staff.personal_details.Staff com.kairos.service.staff.*.*(..))")
+  /*  @Around("execution(public com.kairos.persistence.model.staff.personal_details.Staff com.kairos.service.staff.*.*(..))")
     public <T extends UserBaseEntity> Staff validateStaffResponseAsPerPermission(ProceedingJoinPoint proceedingJoinPoint) {
         try {
             Staff staff = (Staff) proceedingJoinPoint.proceed();
@@ -86,25 +77,28 @@ public class StaffFieldPermisionAspects {
             LOGGER.error(ex.getMessage());
         }
         return null;
-    }
+    }*/
 
     //@Around("execution(public com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail com.kairos.persistence.repository.user.staff.StaffGraphRepository*.*(..))")
     @Before("execution(* com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository.save(..))")
-    public void validateStaffResponseAsPerPermissdsaadion(JoinPoint joinPoint) {
-        List<Object> objects = checkAndReturnValidModel(joinPoint);
+    public <T extends UserBaseEntity> void validateStaffResponseAsPerPermissdsaadion(JoinPoint joinPoint) {
+        List<T> objects = checkAndReturnValidModel(joinPoint);
         if(isCollectionNotEmpty(objects)) {
             permissionService.updateModelBasisOfPermission(objects);
         }
     }
 
-    private List<Object> checkAndReturnValidModel(JoinPoint joinPoint) {
-        boolean accessGroupValid = !accessPageService.isHubMember(UserContext.getUserDetails().getId());
-        boolean argsValid = joinPoint.getArgs().length!=0;
-        List<Object> validModels = new ArrayList<>();
-        if(accessGroupValid && argsValid){
-            validModels = Arrays.stream(joinPoint.getArgs()).filter(arg -> arg.getClass().isAnnotationPresent(KPermissionModel.class)).collect(Collectors.toList());
+    private <T extends UserBaseEntity> List<T> checkAndReturnValidModel(JoinPoint joinPoint) {
+        if(isNotNull(UserContext.getUserDetails())){
+            boolean accessGroupValid = !accessPageService.isHubMember(UserContext.getUserDetails().getId());
+            boolean argsValid = joinPoint.getArgs().length!=0;
+            List<T> validModels = new ArrayList<>();
+            if(accessGroupValid && argsValid){
+                validModels = Arrays.stream(joinPoint.getArgs()).filter(arg -> arg.getClass().isAnnotationPresent(KPermissionModel.class)).map(model->(T)model).collect(Collectors.toList());
+            }
+            return validModels;
         }
-        return validModels;
+        return new ArrayList();
     }
 
 

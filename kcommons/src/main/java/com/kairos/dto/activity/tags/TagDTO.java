@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,4 +25,6 @@ public class TagDTO {
     private Long orgTypeId;
     private List<Long> orgSubTypeIds;
     private PenaltyScoreDTO penaltyScore;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }

@@ -14,6 +14,7 @@ import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -484,9 +485,10 @@ public class UserService {
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (!currentUser.getLastSelectedOrganizationId().equals(organizationId)) {
-            Organization organization = unitService.getO
+            OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);
             Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
+            currentUser.setLastSelectedOrganizationCategory(organizationCategory);
             currentUser.setCountryId(countryId);
         }
         if(!currentUser.getUnitWiseAccessRole().containsKey(organizationId.toString())){

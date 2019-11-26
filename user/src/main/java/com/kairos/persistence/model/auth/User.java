@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
+import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -56,6 +57,7 @@ public class User extends UserBaseEntity {
     private String email;
     private ConfLevel confLevel;
     private Long lastSelectedOrganizationId;
+    private OrganizationCategory lastSelectedOrganizationCategory;
     private LocalDate dateOfBirth;
     @NotNull(message = ERROR_USER_PASSCODE_NOTNULL)
     @Size(min = 8, max = 50, message = ERROR_USER_PASSCODE_SIZE)

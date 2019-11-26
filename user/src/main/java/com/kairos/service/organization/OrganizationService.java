@@ -17,12 +17,14 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
@@ -64,6 +66,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.country.EmploymentTypeService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.region.RegionService;
@@ -181,6 +184,8 @@ public class OrganizationService {
     @Inject
     private OrganizationMetadataRepository organizationMetadataRepository;
     @Inject private UnitService unitService;
+    @Inject
+    private TagService tagService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
@@ -189,6 +194,7 @@ public class OrganizationService {
         OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(unit, OrganizationDTO.class);
         organizationDTO.setCountryId(countryGraphRepository.getCountryIdByUnitId(id));
         organizationDTO.setParentOrganization(unit instanceof Organization);
+        organizationDTO.setTagDTOS(tagService.getTagsByOrganizationIdAndMasterDataType(id, MasterDataTypeEnum.STAFF));
         return organizationDTO;
     }
 
@@ -901,7 +907,16 @@ public class OrganizationService {
     }
 
     public OrganizationCategory getOrganisationCategory(Long organizationId){
-        unitService.isUnit()
+        OrganizationCategory organizationCategory = null;
+        if(unitService.isUnit(organizationId)){
+            organizationCategory = OrganizationCategory.ORGANIZATION;
+        }else {
+            Optional<Organization> organizationOptional = organizationGraphRepository.findById(organizationId);
+            if(organizationOptional.isPresent()){
+                organizationCategory = organizationOptional.get().getOrganizationCategory();
+            }
+        }
+        return organizationCategory;
     }
 
 }

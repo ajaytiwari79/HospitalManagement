@@ -20,7 +20,7 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "OPTIONAL MATCH(ag)<-[fieldPermission:"+HAS_PERMISSION+"]-(field:KPermissionField)<-[:HAS_FIELD]-(model) \n" +
             "OPTIONAL MATCH(ag)<-[subModelPermission:"+HAS_PERMISSION+"]-(subModel) \n" +
             "OPTIONAL MATCH(ag)<-[subModelFieldPermission:"+HAS_PERMISSION+"]-(subModelField:KPermissionField)<-[:"+HAS_FIELD+"]-(subModel) \n" +
-            "with distinct CASE WHEN subModelField IS NULL THEN [] else collect(distinct{fieldId:id(subModelField),fieldPermission:subModelFieldPermission.fieldLevelPermissions}) END as subModelData,model,permissions, field,fieldPermission,subModel,subModelPermission WITH distinct subModelData,collect(distinct {permissionModelId:id(subModel),  modelPermission:subModelPermission.fieldLevelPermissions,  permissions:subModelData}) as subModelPermissions,model,modelPermission, field,fieldPermission return distinct id(model) as permissionModelId, modelPermission.fieldLevelPermissions as modelPermission,CASE WHEN field IS NULL THEN [] else collect( DISTINCT {fieldId:id(field),fieldPermission:fieldPermission.fieldLevelPermissions}) END as permissions,subModelPermissions")
+            "with distinct CASE WHEN subModelField IS NULL THEN [] else collect(distinct{id:id(subModelField),fieldPermission:subModelFieldPermission.fieldLevelPermissions}) END as subModelData,model,permissions, field,fieldPermission,subModel,subModelPermission WITH distinct subModelData,collect(distinct {id:id(subModel),  modelPermission:subModelPermission.fieldLevelPermissions,  permissions:subModelData}) as subModelPermissions,model,modelPermission, field,fieldPermission return distinct id(model) as id, modelPermission.fieldLevelPermissions as modelPermission,CASE WHEN field IS NULL THEN [] else collect( DISTINCT {id:id(field),fieldPermission:fieldPermission.fieldLevelPermissions}) END as permissions,subModelPermissions")
     List<ModelPermissionQueryResult> getModelPermissionsByAccessGroupId(Long accessGroupId);
 
     @Query(value = "MATCH (kPermissionField:KPermissionField),(accessGroup:AccessGroup) where id(kPermissionField)={0} AND id(accessGroup) IN{1} CREATE UNIQUE (kPermissionField)-[r:"+HAS_PERMISSION+"]->(accessGroup) SET r.fieldLevelPermissions={2}")
@@ -32,20 +32,20 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
     @Query("MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {0} MATCH (ag)<-[permission:HAS_PERMISSION]-(field:KPermissionField) WITH permission.fieldLevelPermissions AS coll,field\n" +
             "UNWIND coll AS permission\n" +
             "WITH DISTINCT permission,field\n" +
-            "RETURN collect(permission) AS permissions,id(field) as fieldId,field.fieldName as fieldName")
+            "RETURN collect(permission) AS permissions,id(field) as id,field.fieldName as fieldName")
     List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds);
 
     @Query("MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {0} MATCH (ag)<-[permission:HAS_PERMISSION]-(model:KPermissionModel) \n" +
-            "WITH permission.fieldLevelPermissions AS coll,model UNWIND coll AS permission WITH DISTINCT permission,model RETURN collect(permission) AS permissions,id(model) as permissionModelId,model.modelName as modelName")
+            "WITH permission.fieldLevelPermissions AS coll,model UNWIND coll AS permission WITH DISTINCT permission,model RETURN collect(permission) AS permissions,id(model) as id,model.modelName as modelName")
     List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds);
 
     @Query("MATCH(model:KPermissionModel{deleted:false}) \n" +
             "OPTIONAL MATCH(model)-[orgRel:HAS_SUB_MODEL*]->(subModel:KPermissionModel) \n" +
             "OPTIONAL MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField) \n" +
             "OPTIONAL MATCH(subModel)-[orgUnitRel:HAS_FIELD]->(fieldn:KPermissionField) \n" +
-            "WITH model,collect(subModel) as subModel, collect(field) as fields,collect(fieldn) as uis \n" +
+            "WITH model,collect(subModel) as subModels, collect(field) as fieldPermissions,collect(fieldn) as uis \n" +
             "where model.modelName in {0}\n" +
-            "Return model,subModel,fields,uis")
+            "Return model,subModels,fieldPermissions,uis")
     List<KPermissionModel> getAllPermissionModelByName(Collection<String> modelName);
 
 }

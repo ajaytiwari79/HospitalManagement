@@ -100,4 +100,11 @@ public class TagController {
     public ResponseEntity<Map<String, Object>> updateCountryTag(@Validated @RequestBody ShowCountryTagSetting showCountryTagSetting, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateShowCountryTagSettingOfOrganization(unitId, showCountryTagSetting.isShowCountryTags()));
     }*/
+
+    @ApiOperation(value = "Remove Tag from activity")
+    @GetMapping(value = UNIT_URL + "/tag/{tagId}/unlink")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> unlinkTagFromActivity(@PathVariable long unitId, @PathVariable BigInteger tagId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.unlinkTagFromActivity(tagId));
+    }
 }

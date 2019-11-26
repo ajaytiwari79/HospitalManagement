@@ -279,7 +279,7 @@ public class TimeBankService{
         }else {
             endDate = asDate(planningPeriod.getEndDate());
             Interval todayInterval = new Interval(startDate.getTime(),query.equals(WEEK) ? asDate(asZoneDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY))).getTime() : getEndOfDay(startDate).getTime());
-            Interval planningPeriodInterval = new Interval(asDate(planningPeriod.getStartDate()).getTime(),asDate(planningPeriod.getEndDate()).getTime());
+            Interval planningPeriodInterval = new Interval(asDate(planningPeriod.getStartDate()).getTime(),getEndOfDay(asDate(planningPeriod.getEndDate())).getTime());
             Interval yearTillDate = new Interval(asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())).getTime(),asDate(planningPeriod.getStartDate().with(TemporalAdjusters.lastDayOfYear()).plusDays(1)).getTime());
             intervals = newArrayList(todayInterval,planningPeriodInterval,yearTillDate);
             if(isNotNull(employmentId)){
