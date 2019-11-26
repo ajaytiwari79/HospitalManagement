@@ -38,6 +38,8 @@ import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -57,7 +59,7 @@ import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 @Service
 public class WorkTimeAgreementBalancesCalculationService {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkTimeAgreementBalancesCalculationService.class);
     @Inject
     private TimeBankRepository timeBankRepository;
     @Inject
@@ -599,11 +601,11 @@ public class WorkTimeAgreementBalancesCalculationService {
                             }
                         }
                     } catch (Exception e) {
-
+                        LOGGER.error("error while update wta leave count in employment  {} ,\n {}  ", employmentId, e);
                     }
                 }
             } catch (Exception e) {
-
+                LOGGER.error("error while update wta leave count in unit  {} ,\n {}  ", unitId, e);
             }
         }
         if (isCollectionNotEmpty(ruleTemplates)) {
