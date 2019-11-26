@@ -164,12 +164,13 @@ public class TodoService {
         if (isNull(todo)) {
             exceptionService.dataNotFoundException(SHIFT_NOT_EXISTS);
         }
+        if (status.equals(DISAPPROVE)) {
+            todo.setComment(comment);
+            todoRepository.save(todo);
+        }
         todo.setStatus(status);
         if (status.equals(APPROVE)) {
             todo.setApprovedOn(new Date());
-        }
-        if (status.equals(DISAPPROVE)) {
-            todo.setComment(comment);
         }
         if (newHashSet(APPROVE, DISAPPROVE,PENDING).contains(status)) {
             response = approveAndDisapproveTodo(todo);
