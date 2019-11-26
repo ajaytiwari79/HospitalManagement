@@ -3,6 +3,7 @@ package com.kairos.controller.staff;
 import com.google.common.primitives.Chars;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
+import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
@@ -111,7 +112,7 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
     @ApiOperation("update staff personal information")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @Validated @RequestBody StaffPersonalDetail staffPersonalDetail) throws ParseException {
+    public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffPersonalDetail staffPersonalDetail) throws ParseException {
         StaffPersonalDetail response = staffService.savePersonalDetail(staffId, staffPersonalDetail, unitId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, Collections.EMPTY_MAP);
@@ -288,7 +289,6 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, response);
     }
-
     // Skills
     @ApiOperation(value = "assign Skills to staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.POST)

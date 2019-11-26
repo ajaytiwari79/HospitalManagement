@@ -22,7 +22,6 @@ import java.util.List;
 @NoArgsConstructor
 public class PresenceStaffingLevelDto {
     private BigInteger id;
-    @NotNull
     private BigInteger phaseId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date currentDate;

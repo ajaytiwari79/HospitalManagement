@@ -7,9 +7,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
+import com.kairos.dto.user_context.UserContextInterceptor;
 import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
-import com.kairos.utils.user_context.UserContextInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -145,4 +145,5 @@ public class KairosActivityApplication implements WebMvcConfigurer {
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
     }
+
 }

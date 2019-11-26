@@ -307,6 +307,7 @@ public class PhaseService extends MongoBaseService {
         LocalDateTime untilTentative = DateUtils.getDateForUpcomingDay(DateUtils.getLocalDateFromTimezone(timeZone),tentativeDayOfWeek).atStartOfDay().minusSeconds(1);
         Set<LocalDate> localDates=new HashSet<>();
         dates.forEach(d->localDates.add(d.toLocalDate()));
+        if(isCollectionNotEmpty(localDates)){
         List<PlanningPeriod> planningPeriods=planningPeriodMongoRepository.findAllPeriodsByUnitIdAndDates(unitId,localDates);
         for(LocalDateTime requestedDate:dates){
             Phase phase;
@@ -319,6 +320,7 @@ public class PhaseService extends MongoBaseService {
                phase= getActualPhaseApplicableForDate(requestedDate,null,phaseMap,untilTentative,timeZone);
             }
             localDatePhaseStatusMap.put(DateUtils.asDate(requestedDate),phase);
+            }
         }
         return localDatePhaseStatusMap;
     }

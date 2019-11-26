@@ -25,5 +25,5 @@ public class StaffActivitySettingDTO {
     private LocalTime latestStartTime;
     private LocalTime maximumEndTime;
     private List<Long> dayTypeIds= new ArrayList<>();
-
+    private LocalTime defaultStartTime;
 }

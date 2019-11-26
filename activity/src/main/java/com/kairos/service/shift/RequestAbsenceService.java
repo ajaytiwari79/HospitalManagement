@@ -74,7 +74,7 @@ public class RequestAbsenceService {
         Shift shift = shiftOptional.get();
         shift.setRequestAbsence(requestAbsence);
         shiftMongoRepository.save(shift);
-        todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE,null,true);
+        todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE,true);
         return shiftDetailsService.shiftDetailsById(shift.getUnitId(), newArrayList(shift.getId()), false);
     }
 
@@ -139,7 +139,7 @@ public class RequestAbsenceService {
             response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTO);
         }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
-            todo.setDeleted(true);
+            //todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
         }
         return response;
@@ -210,9 +210,13 @@ public class RequestAbsenceService {
                 updatedShiftActivity.setId(null);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
                 updatedShiftActivity.setEndDate(timeInterval.getEndDate());
-                shiftActivities.add(updatedShiftActivity);
+                if(!updatedShiftActivity.getStartDate().equals(updatedShiftActivity.getEndDate())) {
+                    shiftActivities.add(updatedShiftActivity);
+                }
             }
-            shiftActivities.add(absenceActivity);
+            if(shiftActivities.stream().noneMatch(activity->activity.getActivityId().equals(absenceActivity.getActivityId()))) {
+                shiftActivities.add(absenceActivity);
+            }
         }else {
             shiftActivities.add(shiftActivity);
         }

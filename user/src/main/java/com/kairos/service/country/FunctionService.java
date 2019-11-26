@@ -15,7 +15,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -206,6 +206,7 @@ public class FunctionService {
                 for (LocalDate localDate : appliedFunctionDTO.getAppliedDates()) {
                     FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
                     functionDTO.setEmploymentId(employmentQueryResult.getId());
+                    functionDTO.setCode(appliedFunctionDTO.getCode());
                     List<FunctionDTO> functionDTOS = dateWiseFunctionMap.getOrDefault(localDate, new ArrayList<>());
                     functionDTOS.add(functionDTO);
                     dateWiseFunctionMap.put(localDate, functionDTOS);

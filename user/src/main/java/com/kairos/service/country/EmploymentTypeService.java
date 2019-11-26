@@ -15,7 +15,9 @@ import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
+import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.TimeSlotType;
+import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
@@ -91,6 +93,8 @@ public class EmploymentTypeService {
     private CountryService countryService;
     @Inject
     private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private ReasonCodeService reasonCodeService;
     @Inject
     private ExceptionService exceptionService;
     @Inject private DayTypeGraphRepository dayTypeGraphRepository;
@@ -290,6 +294,7 @@ public class EmploymentTypeService {
                         BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
                         employmentLine.setHourlyCost(hourlyCost);
                     }
+
                 }
             }
         }
@@ -323,7 +328,8 @@ public class EmploymentTypeService {
         List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
         List<EmploymentTypeKpiDTO> employmentTypeKpiDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(countryGraphRepository.getEmploymentTypes(countryId,false),EmploymentTypeKpiDTO.class);
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(staffGraphRepository.getAllStaffIdAndNameByUnitId(isNull(staffId)?Arrays.asList(unitId):unitIds), StaffKpiFilterDTO.class);
-        return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS,organizationCommonDTO,employmentTypeKpiDTOS);
+        List<ReasonCodeDTO> reasonCodeDTOS=ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeService.getReasonCodesByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), ReasonCodeType.FORCEPLAN),ReasonCodeDTO.class);
+        return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS,organizationCommonDTO,employmentTypeKpiDTOS,reasonCodeDTOS);
     }
 
 

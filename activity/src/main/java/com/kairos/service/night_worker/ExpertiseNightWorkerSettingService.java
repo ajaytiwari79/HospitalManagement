@@ -2,7 +2,7 @@ package com.kairos.service.night_worker;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.counter.enums.DisplayUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.night_worker.ShiftAndExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
@@ -50,7 +50,7 @@ public class ExpertiseNightWorkerSettingService{
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
         TimeSlotDTO timeSlot = userIntegrationService.getDefaultTimeSlot(countryId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
-            expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, DisplayUnit.HOURS,countryId,expertiseId);
+            expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, XAxisConfig.HOURS,countryId,expertiseId);
         }
         expertiseNightWorkerSetting.setTimeSlot(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()));
         return ObjectMapperUtils.copyPropertiesByMapper(expertiseNightWorkerSetting, ExpertiseNightWorkerSettingDTO.class);
@@ -60,7 +60,7 @@ public class ExpertiseNightWorkerSettingService{
         ExpertiseNightWorkerSetting expertiseNightWorkerSetting = expertiseNightWorkerSettingRepository.findByExpertiseIdAndCountryId(expertiseId, countryId);
         TimeSlotDTO timeSlot = userIntegrationService.getDefaultTimeSlot(countryId).stream().filter(timeSlotDTO -> timeSlotDTO.getName().equals(NIGHT)).findFirst().get();
         if (!Optional.ofNullable(expertiseNightWorkerSetting).isPresent()) {
-            expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, DisplayUnit.HOURS,countryId,expertiseId);
+            expertiseNightWorkerSetting = new ExpertiseNightWorkerSetting(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()),0, DurationType.WEEKS,0,0, XAxisConfig.HOURS,countryId,expertiseId);
         }
         expertiseNightWorkerSetting.setTimeSlot(new TimeSlot(timeSlot.getStartHour(),timeSlot.getEndHour()));
         expertiseNightWorkerSetting.setMinMinutesToCheckNightShift(nightWorkerSettingDTO.getMinMinutesToCheckNightShift());

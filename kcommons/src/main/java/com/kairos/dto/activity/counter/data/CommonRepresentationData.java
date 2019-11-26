@@ -2,7 +2,7 @@ package com.kairos.dto.activity.counter.data;
 
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.enums.ChartType;
-import com.kairos.dto.activity.counter.enums.DisplayUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 
 import java.math.BigInteger;
@@ -20,12 +20,12 @@ public class CommonRepresentationData {
 
     }
 
-    public CommonRepresentationData(BigInteger counterId, String title, ChartType chartType, DisplayUnit displayUnit, RepresentationUnit unit, List<CommonKpiDataUnit> dataList){
+    public CommonRepresentationData(BigInteger counterId, String title, ChartType chartType, XAxisConfig XAxisConfig, RepresentationUnit unit, List<CommonKpiDataUnit> dataList){
 
         this.counterId = counterId;
         this.title = title;
         this.chartType = chartType;
-        this.displayUnit = displayUnit.getDisplayValue();
+        this.displayUnit = XAxisConfig.getDisplayValue();
         this.unit = unit;
         this.dataList = dataList;
 

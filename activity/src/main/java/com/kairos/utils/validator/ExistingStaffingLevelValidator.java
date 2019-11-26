@@ -1,8 +1,8 @@
 package com.kairos.utils.validator;
 
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.repository.staffing_level.StaffingLevelMongoRepository;
-import com.kairos.utils.user_context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;

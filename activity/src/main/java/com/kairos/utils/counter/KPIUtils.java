@@ -7,8 +7,10 @@ import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.persistence.model.counter.ApplicableKPI;
+import org.springframework.util.StringUtils;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -16,25 +18,28 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 
 public class KPIUtils {
 
     public static final String DD_MM_YYYY = "dd-MM-yyyy";
     public static final String DD_MMM_YY = "dd-MMM-yy";
+    public static final String WEEk="Week-";
 
     private KPIUtils() {
     }
 
     public static List<Long> getLongValue(List<Object> objects) {
         return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toList()) : new ArrayList<>();
+    }
+
+    public static Set<Long> getLongValueSet(List<Object> objects) {
+        return !(ObjectUtils.isCollectionEmpty(objects)) ? objects.stream().map(o -> ((Integer) o).longValue()).collect(Collectors.toSet()) : new HashSet<>();
     }
 
     public static List<LocalDate> getLocalDate(List<Object> objects) {
@@ -44,6 +49,7 @@ public class KPIUtils {
     public static List<BigInteger> getBigIntegerValue(List<Object> objects) {
         return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toList());
     }
+
     public static Set<BigInteger> getBigIntegerSet(List<Object> objects) {
         return objects.stream().map(o -> new BigInteger((o).toString())).collect(Collectors.toSet());
     }
@@ -57,7 +63,6 @@ public class KPIUtils {
     }
 
 
-
     public static List<DateTimeInterval> getDateTimeIntervals(IntervalUnit interval, int value, DurationType frequencyType, List<LocalDate> filterDates, LocalDate localDate) {
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         if (isCollectionNotEmpty(filterDates)) {
@@ -68,7 +73,7 @@ public class KPIUtils {
         }
         switch (interval) {
             case LAST:
-                localDate = getLastDateByFrequencyType(frequencyType,localDate);
+                localDate = getLastDateByFrequencyType(frequencyType, localDate);
                 for (int i = 0; i < value; i++) {
                     localDate = getLastDateTimeIntervalByDate(localDate, frequencyType, dateTimeIntervals);
                 }
@@ -77,7 +82,7 @@ public class KPIUtils {
                 getCurrentDateTimeIntervalByDate(localDate, frequencyType, dateTimeIntervals);
                 break;
             case NEXT:
-                localDate = getNextDateByFrequencyType(frequencyType,localDate);
+                localDate = getNextDateByFrequencyType(frequencyType, localDate);
                 for (int i = 0; i < value; i++) {
                     localDate = getNextDateTimeIntervalByDate(localDate, frequencyType, dateTimeIntervals);
                 }
@@ -90,32 +95,31 @@ public class KPIUtils {
     }
 
 
-
     private static List<DateTimeInterval> getDateTimeIntervalsByHours(DurationType frequencyType, List<LocalDate> filterDates, List<DateTimeInterval> dateTimeIntervals) {
-        if(DurationType.HOURS.equals(frequencyType)){
-            dateTimeIntervals= filterDates.get(0).equals(filterDates.get(1)) ?getDateTimeIntervalByDates(filterDates.get(0),filterDates.get(1)):getDateIntervalByDates(filterDates.get(0),filterDates.get(1));
-        }else{
+        if (DurationType.HOURS.equals(frequencyType)) {
+            dateTimeIntervals = filterDates.get(0).equals(filterDates.get(1)) ? getDateTimeIntervalByDates(filterDates.get(0), filterDates.get(1)) : getDateIntervalByDates(filterDates.get(0), filterDates.get(1));
+        } else {
             dateTimeIntervals.add(new DateTimeInterval(asLocalDate(filterDates.get(0).toString()), asLocalDate(filterDates.get(1).toString())));
         }
         return dateTimeIntervals;
     }
 
-    public static  List<DateTimeInterval>  getDateTimeIntervalByDates(LocalDate startDate,LocalDate endDate) {
-        List<DateTimeInterval> dateTimeIntervals=new ArrayList<>();
-        LocalDateTime startOfTheDay=startDate.atStartOfDay();
-        LocalDateTime endOfTheDay=getEndOfDayFromLocalDate(endDate);
+    public static List<DateTimeInterval> getDateTimeIntervalByDates(LocalDate startDate, LocalDate endDate) {
+        List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
+        LocalDateTime startOfTheDay = startDate.atStartOfDay();
+        LocalDateTime endOfTheDay = getEndOfDayFromLocalDate(endDate);
         while (!startOfTheDay.isAfter(endOfTheDay)) {
             dateTimeIntervals.add(new DateTimeInterval(asDate(startOfTheDay), asDate(startOfTheDay.plusHours(1))));
-           startOfTheDay=startOfTheDay.plusHours(1);
+            startOfTheDay = startOfTheDay.plusHours(1);
         }
         return dateTimeIntervals;
     }
 
-    public static  List<DateTimeInterval>  getDateIntervalByDates(LocalDate startDate,LocalDate endDate) {
-        List<DateTimeInterval> dateTimeIntervals=new ArrayList<>();
+    public static List<DateTimeInterval> getDateIntervalByDates(LocalDate startDate, LocalDate endDate) {
+        List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         while (!startDate.isAfter(endDate)) {
             dateTimeIntervals.add(new DateTimeInterval(asDate(startDate), asDate(startDate.plusDays(1))));
-            startDate=startDate.plusDays(1);
+            startDate = startDate.plusDays(1);
         }
         return dateTimeIntervals;
     }
@@ -128,7 +132,7 @@ public class KPIUtils {
     }
 
     public static void getCurrentDateTimeIntervalByDate(LocalDate localDate, DurationType durationType, List<DateTimeInterval> dateTimeIntervals) {
-        LocalDate firstLocalDate = getFirstLocalDateByDurationType(localDate,durationType);
+        LocalDate firstLocalDate = getFirstLocalDateByDurationType(localDate, durationType);
         Date date = asDate(firstLocalDate);
         dateTimeIntervals.add(new DateTimeInterval(date, getEndOfDayDateFromLocalDate(getNextLocaDateByDurationType(firstLocalDate, durationType))));
     }
@@ -141,12 +145,12 @@ public class KPIUtils {
     }
 
     public static void sortKpiDataByDateTimeInterval(List<CommonKpiDataUnit> kpiDataUnits) {
-        if (isCollectionNotEmpty(kpiDataUnits)) {
-            String label = kpiDataUnits.get(0).getLabel();
-            if (label.matches("\\d{2}-\\d{2}-\\d{4}")) {
-                kpiDataUnits.sort(Comparator.comparing(o -> LocalDate.parse(o.getLabel(), DateTimeFormatter.ofPattern(DD_MMM_YY))));
-            } else if (label.matches("\\d{2}-\\d{2}-\\d{4} - \\d{2}-\\d{2}-\\d{4}")) {
-                kpiDataUnits.sort(Comparator.comparing(o -> LocalDate.parse(o.getLabel().split(" ")[0].trim(), DateTimeFormatter.ofPattern(DD_MMM_YY))));
+        if (isCollectionNotEmpty(kpiDataUnits) && isNotNull(kpiDataUnits.get(0).getDate())) {
+            String label = kpiDataUnits.get(0).getDate();
+            if (label.matches("\\d{2}-\\D{3}-\\d{2}")) {
+                kpiDataUnits.sort(Comparator.comparing(o -> LocalDate.parse(o.getDate(), DateTimeFormatter.ofPattern(DD_MMM_YY))));
+            } else if (label.matches("\\d{2}-\\D{3}-\\d{2} - \\d{2}-\\D{3}-\\d{2}")) {
+                kpiDataUnits.sort(Comparator.comparing(o -> LocalDate.parse(o.getDate().split(" ")[0].trim(), DateTimeFormatter.ofPattern(DD_MMM_YY))));
             }
         }
     }
@@ -156,7 +160,7 @@ public class KPIUtils {
                 Double.valueOf(0.0).equals(clusteredBarChartKpiDataUnit.getValue()));
     }
 
-    public static boolean verifyKPIResponseData(Map<Object, Double> objectListMap) {
+    public static <T, E> boolean verifyKPIResponseData(Map<T, E> objectListMap) {
         return objectListMap.values().stream().anyMatch(value -> !Double.valueOf(0.0).equals(value));
     }
 
@@ -171,9 +175,43 @@ public class KPIUtils {
             if (REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())) {
                 kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue()));
             } else {
-                kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue()));
+                kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(getKpiDateFormatByIntervalUnit(entry.getKey().toString(), applicableKPI.getFrequencyType(),applicableKPI.getKpiRepresentation()), entry.getKey().toString(), entry.getValue()));
             }
 
         }
+    }
+
+
+    public static String getKpiDateFormatByIntervalUnit(String receivedDate, DurationType intervalUnit, KPIRepresentation kpiRepresentation) {
+        String result = receivedDate;
+        if(!KPIRepresentation.REPRESENT_TOTAL_DATA.equals(kpiRepresentation)) {
+            LocalDate startDate = getLocalDateStringByDateFormat(receivedDate);
+            switch (intervalUnit) {
+                case DAYS:
+                    result = getDayOrMonthStringWithFormat(startDate.getDayOfWeek().toString());
+                    break;
+                case WEEKS:
+                    result = WEEk + getWeekNoByLocalDate(startDate);
+                    break;
+                case MONTHS:
+                    result = getDayOrMonthStringWithFormat(startDate.getMonth().toString());
+                    break;
+                case YEAR:
+                    result = String.valueOf(startDate.getYear());
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
+    }
+
+
+    public static String getDayOrMonthStringWithFormat(String dayOrMonth) {
+        return StringUtils.capitalize(dayOrMonth.substring(0, 3).toLowerCase());
+    }
+
+    public static LocalDate getLocalDateStringByDateFormat(String receivedDate) {
+        return LocalDate.parse(receivedDate.trim(), DateTimeFormatter.ofPattern(DD_MMM_YY));
     }
 }

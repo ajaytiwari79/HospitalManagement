@@ -3,6 +3,7 @@ package com.kairos.dto.user.staff.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import org.hibernate.validator.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by pankaj on 7/3/17.
@@ -46,6 +48,8 @@ public class StaffCreationDTO {
     @NotNull(message = "error.staff.accessGroup.id.notnull")
     private Long accessGroupId;
     private StaffStatusEnum currentStatus;
+
+    private List<TagDTO> tags;
 
 
     public Long getInactiveFrom() {
