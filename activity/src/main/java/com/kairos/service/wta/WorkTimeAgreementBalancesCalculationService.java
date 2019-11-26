@@ -569,29 +569,36 @@ public class WorkTimeAgreementBalancesCalculationService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         List<WTABaseRuleTemplate> ruleTemplates=new ArrayList<>();
         for (Long unitId : unitIdAndWtaMap.keySet()) {
-            List<WTAQueryResultDTO> wtaQueryResultDTOSOfUnit=unitIdAndWtaMap.get(unitId);
-            Map<Long,List<WTAQueryResultDTO>> employmentIdAndWtaMap = wtaQueryResultDTOSOfUnit.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(),Collectors.toList()));
-            PlanningPeriod planningPeriod = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
-            DateTimeInterval dateTimeInterval = getIntervalByRuletemplates(activityWrapperMap, wtaBaseRuleTemplates, startDate, planningPeriod.getEndDate(), unitId);
-            List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIdAndWtaMap.keySet(), dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), activityIds);
-            Map<Long,List<ShiftWithActivityDTO>> staffIdAndShiftsMap=shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(shiftWithActivityDTO -> shiftWithActivityDTO.getStaffId(),Collectors.toList()));
-            Map<Long,List<ShiftWithActivityDTO>> employmentIdAndShiftsMap=shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(shiftWithActivityDTO -> shiftWithActivityDTO.getEmploymentId(),Collectors.toList()));
-            List<Long> staffIds = new ArrayList<>(staffIdAndShiftsMap.keySet());
-            List<Long> employmentIds = new ArrayList<>(employmentIdAndWtaMap.keySet());
-            List<NameValuePair> requestParam = new ArrayList<>();
-            requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
-            requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
-            List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS =userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
-            Map<Long,StaffAdditionalInfoDTO> employmentIdAndStaffAdditionalInfoMap=new HashMap<>();
-            for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
-                employmentIdAndStaffAdditionalInfoMap.putIfAbsent(staffAdditionalInfoDTO.getEmployment().getId(),staffAdditionalInfoDTO);
-            }
-
-            for (Long employmentId : employmentIdAndWtaMap.keySet()) {
-                List<WTAQueryResultDTO> wtaQueryResuls=employmentIdAndWtaMap.get(employmentId);
-                for (WTAQueryResultDTO wtaQueryResul : wtaQueryResuls) {
-                    ruleTemplates.addAll(getRuleTemplates(activityWrapperMap,wtaQueryResul.getRuleTemplates(),employmentIdAndShiftsMap.get(employmentId),employmentIdAndStaffAdditionalInfoMap.get(employmentId),planningPeriod.getEndDate()));
+            try {
+                List<WTAQueryResultDTO> wtaQueryResultDTOSOfUnit = unitIdAndWtaMap.get(unitId);
+                Map<Long, List<WTAQueryResultDTO>> employmentIdAndWtaMap = wtaQueryResultDTOSOfUnit.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(), Collectors.toList()));
+                PlanningPeriod planningPeriod = planningPeriodMongoRepository.findLastPlaningPeriodEndDate(unitId);
+                DateTimeInterval dateTimeInterval = getIntervalByRuletemplates(activityWrapperMap, wtaBaseRuleTemplates, startDate, planningPeriod.getEndDate(), unitId);
+                List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmployments(employmentIdAndWtaMap.keySet(), dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), activityIds);
+                Map<Long, List<ShiftWithActivityDTO>> staffIdAndShiftsMap = shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(shiftWithActivityDTO -> shiftWithActivityDTO.getStaffId(), Collectors.toList()));
+                Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftsMap = shiftWithActivityDTOS.stream().collect(Collectors.groupingBy(shiftWithActivityDTO -> shiftWithActivityDTO.getEmploymentId(), Collectors.toList()));
+                List<Long> staffIds = new ArrayList<>(staffIdAndShiftsMap.keySet());
+                List<Long> employmentIds = new ArrayList<>(employmentIdAndWtaMap.keySet());
+                List<NameValuePair> requestParam = new ArrayList<>();
+                requestParam.add(new BasicNameValuePair("staffIds", staffIds.toString()));
+                requestParam.add(new BasicNameValuePair("employmentIds", employmentIds.toString()));
+                List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(unitId, requestParam);
+                Map<Long, StaffAdditionalInfoDTO> employmentIdAndStaffAdditionalInfoMap = new HashMap<>();
+                for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
+                    employmentIdAndStaffAdditionalInfoMap.putIfAbsent(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO);
                 }
+                for (Long employmentId : employmentIdAndWtaMap.keySet()) {
+                    try {
+                        List<WTAQueryResultDTO> wtaQueryResuls = employmentIdAndWtaMap.get(employmentId);
+                        for (WTAQueryResultDTO wtaQueryResul : wtaQueryResuls) {
+                            ruleTemplates.addAll(getRuleTemplates(activityWrapperMap, wtaQueryResul.getRuleTemplates(), employmentIdAndShiftsMap.get(employmentId), employmentIdAndStaffAdditionalInfoMap.get(employmentId), planningPeriod.getEndDate()));
+                        }
+                    }catch (Exception e){
+
+                    }
+                }
+            }catch (Exception e){
+
             }
         }
         if(isCollectionNotEmpty(ruleTemplates)){wtaBaseRuleTemplateRepository.saveEntities(ruleTemplates);}
@@ -600,7 +607,6 @@ public class WorkTimeAgreementBalancesCalculationService {
 
     public  List<WTABaseRuleTemplate> getRuleTemplates(Map<BigInteger, ActivityWrapper> activityWrapperMap, List<WTABaseRuleTemplate> ruleTemplates,List<ShiftWithActivityDTO> shiftWithActivityDTOS,StaffAdditionalInfoDTO staffAdditionalInfoDTO ,LocalDate planningPeriodEndDate){
         Activity activity = null;
-        CutOffIntervalUnit cutOffIntervalUnit = null;
         DateTimeInterval dateTimeInterval=null;
         for (WTABaseRuleTemplate ruleTemplate : ruleTemplates) {
             switch (ruleTemplate.getWtaTemplateType()) {
@@ -608,21 +614,24 @@ public class WorkTimeAgreementBalancesCalculationService {
                     SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) ruleTemplate;
                     CareDaysDTO seniorDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), staffAdditionalInfoDTO.getStaffAge());
                     activity=activityWrapperMap.get(seniorDaysPerYearWTATemplate.getActivityIds().get(0)).getActivity();
-                    cutOffIntervalUnit = activity.getRulesActivityTab().getCutOffIntervalUnit();
                     dateTimeInterval = getIntervalByActivity(activityWrapperMap, getDate(), seniorDaysPerYearWTATemplate.getActivityIds(), planningPeriodEndDate);
                     if(dateTimeInterval.getEndDate().equals(getLocalDate()) && CutOffIntervalUnit.CutOffBalances.TRANSFER.equals(activity.getRulesActivityTab().getCutOffBalances())) {
                         shiftWithActivityDTOS = filterShiftsByDateTimeIntervalAndActivityId(shiftWithActivityDTOS, dateTimeInterval, activity.getId());
-
+                        int totalCount = seniorDays.getLeavesAllowed()+seniorDaysPerYearWTATemplate.getTransferLeaveCount()-seniorDaysPerYearWTATemplate.getBorrowLeaveCount();
+                        int count=totalCount-shiftWithActivityDTOS.size();
+                        seniorDaysPerYearWTATemplate.setTransferLeaveCount(seniorDays.getLeavesAllowed()<count ? seniorDays.getLeavesAllowed():count);
                     }
                     break;
                 case CHILD_CARE_DAYS_CHECK:
                     ChildCareDaysCheckWTATemplate childCareDaysCheckWTATemplate = (ChildCareDaysCheckWTATemplate) ruleTemplate;
                     CareDaysDTO careDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays(), staffAdditionalInfoDTO.getStaffAge());
                     activity=activityWrapperMap.get(childCareDaysCheckWTATemplate.getActivityIds().get(0)).getActivity();
-                    cutOffIntervalUnit = activity.getRulesActivityTab().getCutOffIntervalUnit();
                     dateTimeInterval = getIntervalByActivity(activityWrapperMap, getDate(), childCareDaysCheckWTATemplate.getActivityIds(), planningPeriodEndDate);
                     if(dateTimeInterval.getEndDate().equals(getLocalDate()) && CutOffIntervalUnit.CutOffBalances.TRANSFER.equals(activity.getRulesActivityTab().getCutOffBalances())) {
                         shiftWithActivityDTOS = filterShiftsByDateTimeIntervalAndActivityId(shiftWithActivityDTOS, dateTimeInterval, activity.getId());
+                        int totalCount = careDays.getLeavesAllowed()+childCareDaysCheckWTATemplate.getTransferLeaveCount()-childCareDaysCheckWTATemplate.getBorrowLeaveCount();
+                        int count=totalCount-shiftWithActivityDTOS.size();
+                        childCareDaysCheckWTATemplate.setTransferLeaveCount(careDays.getLeavesAllowed()<count ? careDays.getLeavesAllowed():count);
                     }
                     break;
                 case WTA_FOR_CARE_DAYS:
@@ -632,7 +641,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                     activity = activityWrapperMap.get(careDayCount.getActivityId()).getActivity();
                     if(activityLeaveCount.getEndDate().equals(getLocalDate()) && CutOffIntervalUnit.CutOffBalances.TRANSFER.equals(activity.getRulesActivityTab().getCutOffBalances())) {
                         shiftWithActivityDTOS = filterShiftsByDateTimeIntervalAndActivityId(shiftWithActivityDTOS, dateTimeInterval, activity.getId());
-
+                        int totalCount =activityLeaveCount.getCount()+activityLeaveCount.getTransferLeaveCount()-activityLeaveCount.getBorrowLeaveCount();
+                        int count=totalCount-shiftWithActivityDTOS.size();
+                        activityLeaveCount.setTransferLeaveCount(activityLeaveCount.getCount()<count ? activityLeaveCount.getCount():count);
 
                     }
                     break;
