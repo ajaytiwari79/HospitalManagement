@@ -211,7 +211,6 @@ public class ExpertiseService {
         Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId())));
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine currentExpertiseLine = expertise.getExpertiseLines().stream().filter(k -> k.getId().equals(expertiseLineId)).findFirst().orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(PLEASE_PROVIDE_THE_VALID_LINE_ID)));
-        expertiseGraphRepository.removeSeniorityLevel(expertiseLineId);
         expertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
         if (expertise.isPublished() && isExpertiseLineChanged(currentExpertiseLine, expertiseDTO.getOrganizationServiceIds(), expertiseDTO) && currentExpertiseLine.getStartDate().isBefore(expertiseDTO.getStartDate())) {
             if (expertiseDTO.getStartDate().isBefore(getLocalDate()) && (currentExpertiseLine.getEndDate() == null || currentExpertiseLine.getEndDate().isAfter(getLocalDate()))) {
@@ -230,7 +229,7 @@ public class ExpertiseService {
             addSeniorityLevelsInExpertise(expertiseLine, expertiseDTO, expertise);
             employmentService.triggerEmploymentLine(expertiseId, expertiseLine);
         } else {
-
+            expertiseGraphRepository.removeSeniorityLevel(expertiseLineId);
             addSeniorityLevelsInExpertise(currentExpertiseLine, expertiseDTO, expertise);
             updateExistingLine(expertiseDTO, expertise, currentExpertiseLine);
         }
@@ -582,10 +581,6 @@ public class ExpertiseService {
         }
         expertiseGraphRepository.saveAll(expertises);
         return true;
-    }
-
-    public ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, LocalDate startDate) {
-        return expertiseGraphRepository.getCurrentlyActiveExpertiseLineByDate(expertiseId, startDate.toString());
     }
 
     public ExpertiseQueryResult copyExpertise(Long expertiseId, ExpertiseDTO expertiseDTO) {
