@@ -14,10 +14,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 public class GeneralSettingDTO {
     private Long id;
-    @NotNull
     private short idleTimeInMinutes;
-    @NotNull
-    @Valid
     private short awayTimeInMinutes;
 
     @AssertTrue(message = "error.away.time.can.not.be.smaller.than.idle.time")
