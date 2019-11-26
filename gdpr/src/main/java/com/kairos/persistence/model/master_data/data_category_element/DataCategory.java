@@ -18,7 +18,7 @@ import java.util.List;
 public class DataCategory extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "error.message.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$")
     private String name;
 
     // empty array to get rid of null pointer
@@ -28,13 +28,13 @@ public class DataCategory extends BaseEntity {
     private Long countryId;
     private Long organizationId;
 
-    public DataCategory(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, List<DataElement> dataElements, Long organizationId) {
+    public DataCategory(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$") String name, List<DataElement> dataElements, Long organizationId) {
         this.name = name;
         this.dataElements = dataElements;
         this.organizationId = organizationId;
     }
 
-    public DataCategory(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
+    public DataCategory(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$") String name) {
         this.name = name;
     }
 }
