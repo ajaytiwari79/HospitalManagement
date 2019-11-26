@@ -515,7 +515,7 @@ public class KPIBuilderCalculationService implements CounterService {
         private List<Long> staffIds;
         private List<DateTimeInterval> dateTimeIntervals;
         private List<StaffKpiFilterDTO> staffKpiFilterDTOS;
-        private Long organizationId;
+        private Long unitId;
         private ApplicableKPI applicableKPI;
         private KPI kpi;
         private Map<DateTimeInterval, List<ShiftWithActivityDTO>> intervalShiftsMap;
@@ -539,14 +539,14 @@ public class KPIBuilderCalculationService implements CounterService {
         private CalculationType currentCalculationType;
         private DateTimeInterval planningPeriodInterval;
 
-        public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI,KPI kpi) {
+        public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
-            this.organizationId = organizationId;
+            this.unitId = unitId;
             this.applicableKPI = applicableKPI;
             this.kpi = kpi;
             yAxisConfigs = copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_BASED_ON), YAxisConfig.class);
             xAxisConfigs = copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class);
-            loadKpiCalculationRelatedInfo(filterBasedCriteria, organizationId, applicableKPI);
+            loadKpiCalculationRelatedInfo(filterBasedCriteria, unitId, applicableKPI);
             updateIntervalShiftsMap(applicableKPI);
             staffIdAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v -> v));
             updateStaffAndShiftMap();
@@ -555,7 +555,7 @@ public class KPIBuilderCalculationService implements CounterService {
             endDate = dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate();
             getDailyTimeBankEntryByDate();
             updateActivityAndTimeTypeAndPlannedTimeMap();
-            planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(organizationId);
+            planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
             calculationType = (CalculationType) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_TYPE), CalculationType.class).get(0);
         }
 
