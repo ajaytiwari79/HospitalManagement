@@ -49,6 +49,7 @@ public abstract class RelationshipConstants {
 
     // Group
     public static final  String HAS_TEAMS = "HAS_TEAMS";
+    public static final  String HAS_GROUPS = "HAS_GROUPS";
 
     // Team
     public static final  String TEAM_HAS_SKILLS = "TEAM_HAS_SKILLS";
