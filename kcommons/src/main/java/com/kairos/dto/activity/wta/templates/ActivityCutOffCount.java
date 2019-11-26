@@ -15,4 +15,9 @@ public class ActivityCutOffCount {
     private int count;
     private int transferLeaveCount;
     private int borrowLeaveCount;
+
+    public ActivityCutOffCount(LocalDate startDate, LocalDate endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
 }

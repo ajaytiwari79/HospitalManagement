@@ -6,6 +6,7 @@ import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.AgeRange;
+import com.kairos.dto.activity.wta.templates.ActivityCutOffCount;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.WTATemplateType;
@@ -41,6 +42,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private int transferLeaveCount;
     private int borrowLeaveCount;
     private float recommendedValue;
+    private List<ActivityCutOffCount> activityCutOffCounts=new ArrayList<>();
 
     public SeniorDaysPerYearWTATemplate() {
         this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;

@@ -7,6 +7,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.dto.activity.wta.templates.ActivityCutOffCount;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.wta.WTATemplateType;
@@ -40,6 +41,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     private CutOffIntervalUnit cutOffIntervalUnit;
     private int transferLeaveCount;
     private int borrowLeaveCount;
+    private List<ActivityCutOffCount> activityCutOffCounts=new ArrayList<>();
 
 
     public ChildCareDaysCheckWTATemplate() {

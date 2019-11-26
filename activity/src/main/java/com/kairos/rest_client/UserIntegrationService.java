@@ -451,6 +451,12 @@ public class UserIntegrationService {
         });
     }
 
+    public List<StaffAdditionalInfoDTO> getStaffAndEmploymentDetails(Long unitId, List<NameValuePair> requestParam) {
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/staff/staffs_employments_details", requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffAdditionalInfoDTO>>>() {
+        });
+    }
+
+
     public ReasonCodeWrapper getUnitInfoAndReasonCodes(Long unitId, List<NameValuePair> requestParam) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT_WITHOUT_PARENT_ORG, HttpMethod.GET, UNIT_LOCATION_AND_REASON_CODE, requestParam, new ParameterizedTypeReference<RestTemplateResponseEnvelope<ReasonCodeWrapper>>() {
         });
