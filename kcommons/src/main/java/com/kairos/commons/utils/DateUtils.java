@@ -1,6 +1,7 @@
 package com.kairos.commons.utils;
 
 import com.kairos.enums.DurationType;
+import com.kairos.enums.wta.IntervalUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -249,6 +250,12 @@ public  class DateUtils {
         return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
+
+
+    public static int getWeekNoByLocalDate(LocalDate localDate){
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        return localDate.get(weekFields.weekOfWeekBasedYear());
+    }
     public static LocalDate asLocalDate(DateTime dateTime){
         return asLocalDate(dateTime.toDate());
     }
@@ -937,4 +944,6 @@ public  class DateUtils {
 
     public static LocalDateTime getLocaDateTimebyString(String localdate){
         return LocalDateTime.parse(localdate,DateTimeFormatter.ofPattern(ISO_FORMAT));}
+
+
 }

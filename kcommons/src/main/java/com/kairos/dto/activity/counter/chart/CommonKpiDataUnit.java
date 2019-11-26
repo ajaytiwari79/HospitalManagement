@@ -9,9 +9,15 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CommonKpiDataUnit {
     protected String label;
+    protected String date;
     protected Number refId;
     public CommonKpiDataUnit(String label) {
         this.label = label;
+    }
+
+    public CommonKpiDataUnit(String date,String label) {
+        this.label = label;
+        this.date = date;
     }
 
     public CommonKpiDataUnit(String label, Number refId) {

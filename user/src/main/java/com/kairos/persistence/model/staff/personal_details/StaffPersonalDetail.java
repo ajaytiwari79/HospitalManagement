@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.staff.personal_details;
 
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.enums.Gender;
@@ -69,6 +70,7 @@ public class StaffPersonalDetail {
     private String userName;
     private boolean userNameUpdated;
     private List<StaffTeamDTO> teamDetails;
+    private List<TagDTO> tags;
     @Valid
     private List<StaffChildDetailDTO> staffChildDetails;
 

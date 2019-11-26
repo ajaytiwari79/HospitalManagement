@@ -14,6 +14,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.typeconversion.EnumString;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PENALTY_SCORE;
@@ -44,6 +45,8 @@ public class Tag extends UserBaseEntity {
     private Long orgTypeId;
 
     private List<Long> orgSubTypeIds;
+    private LocalDate startDate=LocalDate.now();
+    private LocalDate endDate;
 
     public Tag(@NotBlank(message = "error.Tag.name.notEmptyOrNotNull") String name, MasterDataTypeEnum masterDataType, boolean countryTag) {
         this.name = name;

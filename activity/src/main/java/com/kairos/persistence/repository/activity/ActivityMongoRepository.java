@@ -86,4 +86,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{'balanceSettingsActivityTab.timeType':?0,unitId:{$in:?1 }}, deleted:false}")
     List<Activity> findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum timeTypeEnum, Set<Long> unitIds);
+
+    @Query(value = "{'generalActivityTab.tags':?0}")
+    List<Activity> findActivitiesByTagId(BigInteger tagId);
 }

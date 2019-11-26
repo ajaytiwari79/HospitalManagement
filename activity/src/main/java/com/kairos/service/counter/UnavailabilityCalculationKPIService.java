@@ -29,17 +29,12 @@ public class UnavailabilityCalculationKPIService {
     @Inject
     private TimeTypeService timeTypeService;
     @Inject private KPIBuilderCalculationService kpiBuilderCalculationService;
-    List<BigInteger> timeTypeIds = new ArrayList<>();
 
 
     public double getUnavailabilityCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        if(ObjectUtils.isCollectionEmpty(timeTypeIds)) {
-            timeTypeIds = timeTypeService.getTimeTypeIdsByTimeTypeEnum(TimeTypeEnum.UNAVAILABLE_TIME.toString());
-        }
-        kpiCalculationRelatedInfo.getFilterBasedCriteria().put(TIME_TYPE, timeTypeIds);
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
         KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
-        KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria).invoke();
+        KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
         return getTotalOfUnavailabilityShift(kpiCalculationRelatedInfo, filterShiftActivity,shiftWithActivityDTOS);
     }
 

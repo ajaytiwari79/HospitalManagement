@@ -2,10 +2,10 @@ package com.kairos.service;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
-import com.kairos.utils.user_context.UserContext;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;

@@ -5,6 +5,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
@@ -443,7 +444,6 @@ public class CompanyCreationService {
         prepareAddress(contactAddress, organizationBasicDTO.getContactAddress());
         unit.setContactAddress(contactAddress);
         accessGroupService.linkParentOrganizationAccessGroup(unit, parentUnit.getId());
-        setDefaultTagFromCountry(country.getId(), unit);
         unitGraphRepository.save(unit);
         organizationBasicDTO.setId(unit.getId());
         organizationBasicDTO.setKairosCompanyId(kairosCompanyId);
@@ -459,18 +459,6 @@ public class CompanyCreationService {
         //Assign Parent Organization's level to unit
         return organizationBasicDTO;
 
-    }
-
-    private void setDefaultTagFromCountry(Long countryId, Unit unit){
-        List<Long> orgSubTypeIds = unit.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
-        List<TagQueryResult> tagQueryResults = tagService.getCountryTagsByMasterDataTypeAndOrgSubTypeIds(countryId,MasterDataTypeEnum.STAFF, orgSubTypeIds);
-        List<Tag> tags = new ArrayList<>();
-        if(isCollectionNotEmpty(tagQueryResults)){
-            for (TagQueryResult tagQueryResult : tagQueryResults) {
-                tags.add(new Tag(tagQueryResult.getName(),MasterDataTypeEnum.getByValue(tagQueryResult.getMasterDataType()),false,new PenaltyScore(PenaltyScoreLevel.SOFT,0)));
-            }
-        }
-        unit.setTags(tags);
     }
 
     private boolean doesUnitManagerInfoAvailable(OrganizationBasicDTO organizationBasicDTO) {
@@ -603,6 +591,7 @@ public class CompanyCreationService {
         List<OrganizationContactAddress> organizationContactAddresses = unitGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
         organization.setBoardingCompleted(true);
+        organization.setTags(tagService.getCountryTagByOrgSubTypes(countryId, organization.getOrganizationSubTypes().stream().map(orgSubtype->orgSubtype.getId()).collect(Collectors.toList())));
         organizationBaseRepository.save(organization);
         try {
             List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);

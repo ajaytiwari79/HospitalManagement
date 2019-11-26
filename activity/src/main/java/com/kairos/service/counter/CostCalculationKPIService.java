@@ -41,11 +41,11 @@ public class CostCalculationKPIService {
       Map<Long,EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOMap = staffKpiFilterDTO.getEmployment().stream().collect(Collectors.toMap(EmploymentWithCtaDetailsDTO::getId, v->v));
       Map<Long, List<Day>> daytypesMap = staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, DayTypeDTO::getValidDays));
       Map<Long, DayTypeDTO> dayTypeDTOMap = staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v->v));
-      double totalCost=0l;
-      double totalCtaBonus=0l;
+      BigDecimal totalCost=new BigDecimal(0);
+      int totalCtaBonus=0;
       List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
       KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
-      KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria).invoke();
+      KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,true).invoke();
       List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
       for (ShiftActivityDTO shiftActivityDTO : shiftActivityDTOS) {
           EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO=employmentWithCtaDetailsDTOMap.get(shiftActivityDTO.getEmploymentId());
@@ -55,14 +55,14 @@ public class CostCalculationKPIService {
                   RuletemplateUtils.updateDayTypeDetailInCTARuletemplate(daytypesMap, ruleTemplate);
                   boolean valid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, new StaffEmploymentDetails(new EmploymentType(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getEmploymentTypeId())), shiftActivityDTO.getPhaseId(), shiftActivityDTO.getActivityId(), shiftActivityDTO.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivityDTO.getStartDate(), shiftActivityDTO.getPlannedTimes());
                   if (valid) {
-                      totalCtaBonus += (double) timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()));
+                      totalCtaBonus += timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivityDTO, new StaffEmploymentDetails(employmentWithCtaDetailsDTO.getStaffId(), employmentWithCtaDetailsDTO.getCtaRuleTemplates(), BigDecimal.valueOf(employmentWithCtaDetailsDTO.getHourlyCost()), employmentWithCtaDetailsDTO.getEmploymentLines()));
                   }
               }
           }
-          totalCost=totalCtaBonus*(timeBankCalculationService.getHourlyCostByDate(employmentWithCtaDetailsDTO.getEmploymentLines(),shiftActivityDTO.getStartLocalDate()).doubleValue()/60);
+          totalCost=timeBankCalculationService.getCostByByMinutes(employmentWithCtaDetailsDTO.getEmploymentLines(),totalCtaBonus,shiftActivityDTO.getStartLocalDate());
       }
 
-   return getValueWithDecimalFormat(totalCost);
+   return getValueWithDecimalFormat(totalCost.doubleValue());
   }
 
 }

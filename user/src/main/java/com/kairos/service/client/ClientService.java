@@ -68,7 +68,7 @@ import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FormatUtil;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.wrapper.ClientPersonalCalenderPrerequisiteDTO;
 import com.kairos.wrapper.ContactPersonTabDataDTO;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
