@@ -22,8 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 
 public class KPIUtils {
@@ -146,7 +145,7 @@ public class KPIUtils {
     }
 
     public static void sortKpiDataByDateTimeInterval(List<CommonKpiDataUnit> kpiDataUnits) {
-        if (isCollectionNotEmpty(kpiDataUnits)) {
+        if (isCollectionNotEmpty(kpiDataUnits) && isNotNull(kpiDataUnits.get(0).getDate())) {
             String label = kpiDataUnits.get(0).getDate();
             if (label.matches("\\d{2}-\\D{3}-\\d{2}")) {
                 kpiDataUnits.sort(Comparator.comparing(o -> LocalDate.parse(o.getDate(), DateTimeFormatter.ofPattern(DD_MMM_YY))));
@@ -161,7 +160,7 @@ public class KPIUtils {
                 Double.valueOf(0.0).equals(clusteredBarChartKpiDataUnit.getValue()));
     }
 
-    public static boolean verifyKPIResponseData(Map<Object, Double> objectListMap) {
+    public static <T, E> boolean verifyKPIResponseData(Map<T, E> objectListMap) {
         return objectListMap.values().stream().anyMatch(value -> !Double.valueOf(0.0).equals(value));
     }
 

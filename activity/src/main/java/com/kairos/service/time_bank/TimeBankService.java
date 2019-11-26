@@ -272,7 +272,7 @@ public class TimeBankService{
                 //totaltimebank is timebank without daily timebank entries
                 List<DailyTimeBankEntry> dailyTimeBanksBeforeStartDate = timeBankRepository.findAllByEmploymentIdAndStartDate(employmentId, new DateTime(startDate).toDate());
                 DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-                totalTimeBankBeforeStartDate = (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, interval, employmentWithCtaDetailsDTO, false, dailyTimeBanksBeforeStartDate, false)[0];
+                totalTimeBankBeforeStartDate = (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval, interval, employmentWithCtaDetailsDTO, new HashSet<>(), dailyTimeBanksBeforeStartDate, false)[0];
             }
             totalTimeBankBeforeStartDate += employmentWithCtaDetailsDTO.getAccumulatedTimebankMinutes();
             intervals = timeBankCalculationService.getAllIntervalsBetweenDates(startDate, endDate, query);

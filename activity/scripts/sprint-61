@@ -1,3 +1,7 @@
 //set
 db.getCollection('activities').updateMany({},{"$set":{"rulesActivityTab.reasonCodeRequiredState":"OPTIONAL"}})
 db.time_Type.updateMany({},{"$set":{"rulesActivityTab.reasonCodeRequiredState":"OPTIONAL"}})
+
+db.getCollectionNames().forEach(function(c) {
+   db[c].updateMany({"createdBy._id" : {$exists:false}},{$set:{"createdBy":null}});
+});
