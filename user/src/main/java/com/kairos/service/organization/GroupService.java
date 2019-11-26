@@ -48,12 +48,11 @@ public class GroupService {
     private OrganizationService organizationService;
 
     public GroupDTO createGroup(Long unitId, GroupDTO groupDTO) {
-        Unit unit = unitGraphRepository.getUnitWithGroupsByUnitId(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
         if (groupGraphRepository.existsByName(unitId,-1L, groupDTO.getName())){
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }
         Group group = new Group(groupDTO.getName(),groupDTO.getDescription());
-        groupGraphRepository.save(group);
         unit.getGroups().add(group);
         unitGraphRepository.save(unit);
         groupDTO.setId(group.getId());
@@ -91,9 +90,10 @@ public class GroupService {
     }
 
     public List<GroupDTO> getAllGroupsOfUnit(Long unitId) {
-        Unit unit = unitGraphRepository.getUnitWithGroupsByUnitId(unitId);
+        Unit unit = unitGraphRepository.findOne(unitId);
+        List<Group> groups=groupGraphRepository.findAllById(unit.getGroups().stream().map(k->k.getId()).collect(Collectors.toList()));
         List<GroupDTO> groupDTOS = new ArrayList<>();
-        for(Group group : unit.getGroups()){
+        for(Group group : groups){
             groupDTOS.add(getGroupDTOFromGroup(group));
         }
         return groupDTOS;
