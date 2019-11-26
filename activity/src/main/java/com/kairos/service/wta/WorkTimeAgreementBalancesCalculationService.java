@@ -641,17 +641,14 @@ public class WorkTimeAgreementBalancesCalculationService {
     }
 
     private void updateLeaveCountCareDaysWTA(Map<BigInteger, ActivityWrapper> activityWrapperMap, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Date date, LocalDate currentDate, WTAForCareDays wtaForCareDays) {
-        Activity activity;
-        DateTimeInterval dateTimeInterval;
-        int pendingLeave;
-        activity = activityWrapperMap.get(wtaForCareDays.getCareDayCounts().get(0).getActivityId()).getActivity();
+        Activity activity = activityWrapperMap.get(wtaForCareDays.getCareDayCounts().get(0).getActivityId()).getActivity();
         ActivityCareDayCount careDayCount = wtaForCareDays.careDaysCountMap().get(activity.getId());
         ActivityCutOffCount activityLeaveCount = careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).containsAndEqualsEndDate(date)).findFirst().orElse(null);
         if (isNotNull(activityLeaveCount)) {
-            dateTimeInterval = new DateTimeInterval(activityLeaveCount.getStartDate(), activityLeaveCount.getEndDate());
+            DateTimeInterval  dateTimeInterval = new DateTimeInterval(activityLeaveCount.getStartDate(), activityLeaveCount.getEndDate());
             if (activityLeaveCount.getEndDate().equals(currentDate) && CutOffIntervalUnit.CutOffBalances.TRANSFER.equals(activity.getRulesActivityTab().getCutOffBalances())) {
                 shiftWithActivityDTOS = filterShiftsByDateTimeIntervalAndActivityId(shiftWithActivityDTOS, dateTimeInterval, activity.getId());
-                pendingLeave = getPendingLeave(shiftWithActivityDTOS, activity, dateTimeInterval, activityLeaveCount.getCount(), activityLeaveCount.getTransferLeaveCount(), activityLeaveCount.getBorrowLeaveCount());
+                int  pendingLeave = getPendingLeave(shiftWithActivityDTOS, activity, dateTimeInterval, activityLeaveCount.getCount(), activityLeaveCount.getTransferLeaveCount(), activityLeaveCount.getBorrowLeaveCount());
                 activityLeaveCount = careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).containsAndEqualsEndDate(getDate())).findFirst().orElse(null);
                 if (isNotNull(activityLeaveCount)) {
                     activityLeaveCount.setTransferLeaveCount(pendingLeave);
