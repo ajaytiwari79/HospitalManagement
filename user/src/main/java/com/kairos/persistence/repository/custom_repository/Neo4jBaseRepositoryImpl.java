@@ -78,7 +78,7 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 		}
 		session.save(entity);
 		if(validClass) {
-			AuditLogging.doAudit(oldEntity, entity);
+			//AuditLogging.doAudit(oldEntity, entity);
 		}
 		return entity;
 	}
