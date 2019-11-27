@@ -2,12 +2,15 @@ package com.kairos.persistence.repository.user.skill;
 
 import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.auth.StaffSkillLevelRelationship;
+import com.kairos.persistence.model.user.expertise.response.SkillLevelQueryResult;
+import com.kairos.persistence.model.user.expertise.response.SkillQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANISATION_HAS_SKILL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF_HAS_SKILLS;
@@ -27,6 +30,15 @@ public interface UserSkillLevelRelationshipGraphRepository extends Neo4jBaseRepo
 
     @Query("MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill) DETACH DELETE r")
     void removeExistingByStaffIdAndSkillId(Long staffId,Long skillId);
+
+    @Query("MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill:Skill) WHERE id(skill) IN {1} AND id(staff)={0} \n " +
+            "WITH skill,{}" +
+            "return id(skill) as id")
+    List<SkillQueryResult> findAllByStaffIdAndSkillIds(Long staffId, List<Long> skillId);
+
+    @Query("MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill:Skill) WHERE id(skill) = {1} AND id(staff)={0} \n " +
+            "return DISTINCT r.skillLevel as skillLevel,r.startDate as startDate,r.endDate AS endDate")
+    Set<SkillLevelQueryResult> getSkillLevel(Long staffId, Long skillId);
 
 
 }

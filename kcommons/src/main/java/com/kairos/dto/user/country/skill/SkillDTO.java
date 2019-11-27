@@ -33,16 +33,18 @@ public class SkillDTO {
         this.description = description;
     }
 
-    @AssertTrue(message = "Please provide valid dates")
-    public boolean isValid() {
-        SkillLevelDTO advanceSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.ADVANCE)).findAny().get();
-        SkillLevelDTO basicSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.BASIC)).findAny().get();
-        SkillLevelDTO expertSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.EXPERT)).findAny().get();
-        if(advanceSkill.getStartDate().isAfter(basicSkill.getEndDate()) && advanceSkill.getEndDate().isBefore(expertSkill.getStartDate())){
-            return true;
-        }
-        return false;
-    }
+
+
+//    @AssertTrue(message = "Please provide valid dates")
+//    public boolean isValid() {
+//        SkillLevelDTO advanceSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.ADVANCE)).findAny().orElse(null);
+//        SkillLevelDTO basicSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.BASIC)).findAny().orElse(null);
+//        SkillLevelDTO expertSkill=skillLevels.stream().filter(k->k.getSkillLevel().equals(SkillLevel.EXPERT)).findAny().orElse(null);
+//        if(advanceSkill!=null && basicSkill !=null && advanceSkill.getStartDate().isAfter(basicSkill.getEndDate()) && advanceSkill.getEndDate().isBefore(expertSkill.getStartDate())){
+//            return true;
+//        }
+//        return false;
+//    }
 
 
 

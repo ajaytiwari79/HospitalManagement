@@ -291,6 +291,20 @@ public class StaffController {
     }
 
 
+    // Skills
+    @ApiOperation(value = "assign Skills to staff")
+    @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.POST)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> assignSkillsToStaff(@PathVariable long unitId, @RequestBody StaffSkillDTO staffSkillDTO, @PathVariable long staffId) {
+
+        Object response = skillService.assignSkillToStaff(staffId, staffSkillDTO.getRemovedSkillId(), staffSkillDTO.isSelected(), unitId);
+        if (response == null) {
+            return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, response);
+        }
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
+    }
+
+
     @ApiOperation(value = "Get skills of staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.GET)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
