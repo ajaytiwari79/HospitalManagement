@@ -1,0 +1,2 @@
+MATCH(s:Staff)-[r:STAFF_HAS_SKILLS]-(sk:Skill)
+DETACH delete r

@@ -289,6 +289,7 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, response);
     }
+
     // Skills
     @ApiOperation(value = "assign Skills to staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.POST)
@@ -301,6 +302,7 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
+
 
     @ApiOperation(value = "Get skills of staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.GET)
