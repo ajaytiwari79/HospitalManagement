@@ -449,4 +449,5 @@ public class UserMessagesConstants {
     public static final String PLEASE_ENTER_VALID_SENIORITY_LEVELS = "invalid.seniority_level";
     public static final String MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT = "message.group.already.exists.in.unit";
     public static final String MESSAGE_GROUP_NOT_FOUND = "message.group.not.Found";
+    public static final String MESSAGE_PAYGROUP_USED = "message.paygroup.used";
 }
