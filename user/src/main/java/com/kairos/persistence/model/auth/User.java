@@ -5,6 +5,7 @@ import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
 import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.user.ChatStatus;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -110,6 +111,7 @@ public class User extends UserBaseEntity {
     private String googleCalenderAccessToken;
     @Properties
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
+    private ChatStatus chatStatus;
 
     public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;

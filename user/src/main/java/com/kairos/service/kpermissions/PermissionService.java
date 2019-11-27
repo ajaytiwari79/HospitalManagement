@@ -313,10 +313,10 @@ public class PermissionService {
             List<ModelDTO> modelDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
             Map<String,ModelDTO> modelMap = modelDTOS.stream().collect(Collectors.toMap(k->k.getModelName(),v->v));
             List<Long> objectIds = objects.stream().filter(model->isNotNull(model.getId())).map(model->model.getId()).collect(Collectors.toList());
-            ((Neo4jSession)permissionModelRepository.getSession()).context().detachNodeEntity()
+            /*((Neo4jSession)permissionModelRepository.getSession()).context().detachNodeEntity()
             List<E> dataBaseObjects = sessionFactory.openSession().loadAll(Staff.class,objectIds,2).stream().map(staff -> (E)staff).collect(Collectors.toList());
             Map<Long,E> mapOfDataBaseObject = dataBaseObjects.stream().collect(Collectors.toMap(k->k.getId(),v->v));
-            updateObjectsPropertiesBeforeSave(mapOfDataBaseObject,modelMap,objects);
+            updateObjectsPropertiesBeforeSave(mapOfDataBaseObject,modelMap,objects);*/
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }

@@ -3,7 +3,9 @@ package com.kairos.controller.wta;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
+import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.wta.WTAOrganizationService;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -37,7 +39,11 @@ public class WTAController {
     @Inject
     private WorkTimeAgreementService workTimeAgreementService;
     @Inject
+    private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    @Inject
     private WTAOrganizationService wtaOrganizationService;
+    @Inject
+    private ActivitySchedulerJobService activitySchedulerJobService;
 
     @ApiOperation(value = "Create a New WTA")
     @PostMapping(value =   COUNTRY_URL + "/wta")
@@ -276,6 +282,18 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementService.getProtectedDaysOffCount(unitId,null,staffId,activityId));
     }
 
+    @ApiOperation(value = "Update Phases in Ruletemplates")
+    @GetMapping(value =  COUNTRY_URL+ "/test_count")
+    public ResponseEntity<Map<String, Object>> testJob(@PathVariable long countryId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementBalancesCalculationService.updateWTALeaveCountByJob(countryId));
+    }
+
+    @ApiOperation(value = "Update Phases in Ruletemplates")
+    @GetMapping(value =  COUNTRY_URL+ "/register_job_for_wta_leave_count")
+    public ResponseEntity<Map<String, Object>> regidterJobForWTALeaveCount(@PathVariable long countryId){
+        activitySchedulerJobService.registerJobForWTALeaveCount(countryId);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
+    }
 
 
 }

@@ -3,7 +3,7 @@ package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectUtils;
-import com.kairos.dto.activity.counter.enums.DisplayUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.TimeTypeEnum;
@@ -33,7 +33,8 @@ public class UnavailabilityCalculationKPIService {
 
     public double getUnavailabilityCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-        KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS, kpiCalculationRelatedInfo.getFilterBasedCriteria(),false).invoke();
+        KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
+        KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
         return getTotalOfUnavailabilityShift(kpiCalculationRelatedInfo, filterShiftActivity,shiftWithActivityDTOS);
     }
 
@@ -56,7 +57,7 @@ public class UnavailabilityCalculationKPIService {
     }
 
     private double getTotalByCalculationUnitOfUnavailibilityShift(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity, List<ShiftActivityDTO> shiftActivityDTOS, double total) {
-        DisplayUnit calculationUnit = ((List<DisplayUnit>)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), DisplayUnit.class)).get(0);
+        XAxisConfig calculationUnit = (XAxisConfig) ((List)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
         switch (calculationUnit) {
             case COUNT:
                 total = shiftActivityDTOS.size();

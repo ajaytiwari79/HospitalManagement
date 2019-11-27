@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 @Getter
 @Setter
@@ -18,4 +21,7 @@ public class FieldDTO {
     private Set<OrganizationCategory> organizationCategories;
     private Set<FieldLevelPermission> permissions;
 
+    public Set<FieldLevelPermission> getPermissions() {
+        return isCollectionNotEmpty(permissions) ? permissions : new HashSet<>();
+    }
 }

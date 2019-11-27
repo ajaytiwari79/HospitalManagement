@@ -15,6 +15,7 @@ import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.user.ChatStatus;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -207,8 +208,8 @@ public class UserService {
         map.put("email", currentUser.getEmail());
         map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
+        updateChatStatus(ChatStatus.ONLINE);
         return map;
-
     }
 
     public User findByAccessToken(String token) {
@@ -252,6 +253,7 @@ public class UserService {
             }
             tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
             SecurityContextHolder.clearContext();
+            updateChatStatus(ChatStatus.OFFLINE);
             logoutSuccessfull = true;
         } else {
             exceptionService.internalServerError("message.authentication.null");
@@ -613,5 +615,12 @@ public class UserService {
 
     public Map<String,String> getUnitWiseLastSelectedAccessRole(){
         return userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+    }
+
+    public boolean updateChatStatus(ChatStatus chatStatus){
+        User user = userGraphRepository.findByIdAndDeletedFalse(UserContext.getUserDetails().getId());
+        user.setChatStatus(chatStatus);
+        userGraphRepository.save(user);
+        return true;
     }
 }

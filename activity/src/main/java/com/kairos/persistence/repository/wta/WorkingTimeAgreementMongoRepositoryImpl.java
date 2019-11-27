@@ -330,6 +330,19 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         return result.getMappedResults();
     }
 
+    @Override
+    public List<WTAQueryResultDTO> getAllWTAByDate(Date date) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).exists(true).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date), Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
+                project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION, PARENT_ID, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES, EMPLOYMENT_ID)
+        );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
+
+    }
+
     private String getProjectionWithFilter(WTATemplateType templateType){
        return  "{  \n" +
                 "      \"$project\":{  \n" +

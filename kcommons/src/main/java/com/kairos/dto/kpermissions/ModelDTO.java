@@ -7,8 +7,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 
 @Getter
 @Setter
@@ -24,5 +27,7 @@ public class ModelDTO {
     private Set<OrganizationCategory> organizationCategories;
     private Set<FieldLevelPermission> permissions;
 
-
+    public Set<FieldLevelPermission> getPermissions() {
+        return isCollectionNotEmpty(permissions) ? permissions : new HashSet<>();
+    }
 }

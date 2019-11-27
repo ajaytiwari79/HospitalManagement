@@ -614,6 +614,13 @@ public class ActivityService {
         return new ActivityTabsWrapper(activity.getNotesActivityTab());
     }
 
+
+    public List<CutOffInterval> getCutOffInterValOfActivity(BigInteger activityId) {
+        Activity activity = activityMongoRepository.findOne(activityId);
+        return ActivityUtil.getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(),activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue());
+    }
+
+
     public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO) {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab();
         validateReminderSettings(communicationActivityDTO);
@@ -1000,28 +1007,28 @@ public class ActivityService {
     public void updateBackgroundColorInShifts(String newTimeTypeColor, String existingTimeTypeColor,BigInteger timeTypeId) {
         if(!existingTimeTypeColor.equals(newTimeTypeColor)){
             new Thread(() -> {
-                updateColorInActivity(newTimeTypeColor, timeTypeId);
-                updateColorInShift(newTimeTypeColor, timeTypeId);
+                Set<BigInteger> activityIds = updateColorInActivity(newTimeTypeColor, timeTypeId);
+                updateColorInShift(newTimeTypeColor, timeTypeId,activityIds);
             }).start();
 
         }
     }
 
-    private void updateColorInActivity(String newTimeTypeColor,BigInteger timeTypeId) {
+    private Set<BigInteger> updateColorInActivity(String newTimeTypeColor,BigInteger timeTypeId) {
         List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         if (isCollectionNotEmpty(activities)) {
             activities.forEach(activity -> activity.getGeneralActivityTab().setBackgroundColor(newTimeTypeColor));
             activityMongoRepository.saveEntities(activities);
         }
+        return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 
-    private void updateColorInShift(String newTimeTypeColor,BigInteger timeTypeId) {
-        Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeTypeId).stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
-        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
+    private void updateColorInShift(String newTimeTypeColor,BigInteger timeTypeId,Set<BigInteger> activityIds) {
+        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activityIds,null,null,null);
         shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
-            updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, shiftActivity);
+            updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, shiftActivity);
             if(isNotNull(shift.getDraftShift())){
-                shift.getDraftShift().getActivities().forEach(draftShiftActivity-> updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, draftShiftActivity));
+                shift.getDraftShift().getActivities().forEach(draftShiftActivity-> updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, draftShiftActivity));
             }
         }));
         if(isCollectionNotEmpty(shifts)){

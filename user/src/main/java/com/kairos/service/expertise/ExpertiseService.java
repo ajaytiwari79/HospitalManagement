@@ -584,6 +584,18 @@ public class ExpertiseService {
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
     }
 
+    public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseId) {
+        Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
+        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseId);
+        for (Expertise expertise : expertises) {
+            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
+            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
+            seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
+        }
+        return seniorAndChildCareDaysDTOMap;
+    }
+
+
     private Organization getUnion(Long unionId, String unionName, Country country) {
         Organization union;
         if (Optional.ofNullable(unionId).isPresent()) {
