@@ -78,6 +78,7 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 		}
 		session.save(entity);
 		if(validClass) {
+			//Todo pradeep auditlogging is off due to Infinite recursion issue
 			//AuditLogging.doAudit(oldEntity, entity);
 		}
 		return entity;
