@@ -1,6 +1,7 @@
 package com.kairos.commons.utils;
 
 import com.kairos.enums.DurationType;
+import com.kairos.enums.wta.IntervalUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -249,6 +250,12 @@ public  class DateUtils {
         return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
+
+
+    public static int getWeekNoByLocalDate(LocalDate localDate){
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        return localDate.get(weekFields.weekOfWeekBasedYear());
+    }
     public static LocalDate asLocalDate(DateTime dateTime){
         return asLocalDate(dateTime.toDate());
     }
@@ -671,6 +678,14 @@ public  class DateUtils {
         return new Double(hour+"."+Math.abs(minutes));
     }
 
+    public static int getHourByMinutes(double totalMinutes){
+        return (int) totalMinutes/(60);
+    }
+
+    public static int getHourMinutesByMinutes(double totalMinutes){
+        return (int)totalMinutes % 60;
+    }
+
     public static boolean startDateIsEqualsOrBeforeEndDate(LocalDate startdate,LocalDate endDate){
         return startdate.isBefore(endDate) || startdate.equals(endDate);
     }
@@ -884,7 +899,7 @@ public  class DateUtils {
     }
 
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate().minusDays(1),KPI_DATE_FORMAT);
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate(),KPI_DATE_FORMAT);
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
         return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+"";
@@ -929,4 +944,6 @@ public  class DateUtils {
 
     public static LocalDateTime getLocaDateTimebyString(String localdate){
         return LocalDateTime.parse(localdate,DateTimeFormatter.ofPattern(ISO_FORMAT));}
+
+
 }

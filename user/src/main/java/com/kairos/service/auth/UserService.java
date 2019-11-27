@@ -14,6 +14,7 @@ import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.enums.user.ChatStatus;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -24,6 +25,7 @@ import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -31,6 +33,7 @@ import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepos
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
+import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.CountryService;
@@ -40,7 +43,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,9 +65,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
+import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
-
+import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 
 
 /**
@@ -80,15 +84,11 @@ public class UserService {
     @Inject
     private UserGraphRepository userGraphRepository;
     @Inject
-    private OrganizationBaseRepository organizationBaseRepository;
-    @Inject
     private UserDetailService userDetailsService;
     @Inject
     private StaffGraphRepository staffGraphRepository;
     @Inject
     private SmsService smsService;
-    @Inject
-    private UnitGraphRepository unitGraphRepository;
     @Inject
     private AccessPageRepository accessPageRepository;
     @Inject
@@ -106,14 +106,16 @@ public class UserService {
     @Inject
     private EnvConfig config;
     @Inject
-    private OrganizationService organizationService;
-    @Inject
     private RedisService redisService;
     @Inject
     private CountryService countryService;
     private TokenExtractor tokenExtractor = new BearerTokenExtractor();
     @Inject
     private TokenStore tokenStore;
+    @Inject
+    private UnitPermissionGraphRepository unitPermissionGraphRepository;
+    @Inject
+    private OrganizationService organizationService;
 
     /**
      * Calls UserGraphRepository,
@@ -206,8 +208,8 @@ public class UserService {
         map.put("email", currentUser.getEmail());
         map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
+        updateChatStatus(ChatStatus.ONLINE);
         return map;
-
     }
 
     public User findByAccessToken(String token) {
@@ -251,6 +253,7 @@ public class UserService {
             }
             tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
             SecurityContextHolder.clearContext();
+            updateChatStatus(ChatStatus.OFFLINE);
             logoutSuccessfull = true;
         } else {
             exceptionService.internalServerError("message.authentication.null");
@@ -476,19 +479,26 @@ public class UserService {
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
-         permissionData.setRole((userAccessRoleDTO.getManagement()) ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
+         permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
         return permissionData;
     }
 
 
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if (currentUser.getLastSelectedOrganizationId() != organizationId) {
+        if (!currentUser.getLastSelectedOrganizationId().equals(organizationId)) {
             Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
             currentUser.setCountryId(countryId);
-            userGraphRepository.save(currentUser);
         }
+        if(!currentUser.getUnitWiseAccessRole().containsKey(organizationId.toString())){
+            Staff staff=staffGraphRepository.getStaffByUserId(currentUser.getId(),organizationService.fetchParentOrganization(organizationId).getId());
+            Long staffId=staff==null?staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),organizationService.fetchParentOrganization(organizationId).getId()):staff.getId();
+            boolean onlyStaff=unitPermissionGraphRepository.isOnlyStaff(organizationId,staffId,-1L);
+            currentUser.getUnitWiseAccessRole().put(organizationId.toString(),staff==null||!onlyStaff?MANAGEMENT.name():AccessGroupRole.STAFF.name());
+        }
+
+        userGraphRepository.save(currentUser);
     }
 
 
@@ -592,5 +602,23 @@ public class UserService {
         currentUser.setGoogleCalenderAccessToken(googleCalenderTokenDTO.getGoogleCalenderAccessToken());
         userGraphRepository.save(currentUser);
         return googleCalenderTokenDTO;
+    }
+
+    public boolean updateAccessRoleOfUser(Long unitId, String accessGroupRole){
+        User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        currentUser.getUnitWiseAccessRole().put(String.valueOf(unitId),accessGroupRole);
+        userGraphRepository.save(currentUser);
+        return true;
+    }
+
+    public Map<String,String> getUnitWiseLastSelectedAccessRole(){
+        return userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+    }
+
+    public boolean updateChatStatus(ChatStatus chatStatus){
+        User user = userGraphRepository.findByIdAndDeletedFalse(UserContext.getUserDetails().getId());
+        user.setChatStatus(chatStatus);
+        userGraphRepository.save(user);
+        return true;
     }
 }

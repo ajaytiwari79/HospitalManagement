@@ -1,6 +1,7 @@
 package com.kairos.service.activity;
 
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
+import com.kairos.dto.activity.shift.PlannedTime;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.repository.activity.PlannedTimeTypeRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,5 +96,9 @@ public class PlannedTimeTypeService extends MongoBaseService {
 
     public List<PresenceTypeDTO> getAllPresenceTypesByCountry(Long countryId) {
        return plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+    }
+
+    public Collection<PlannedTimeType> getAllPlannedTimeByIds(Collection<BigInteger> plannedTimeIds){
+        return plannedTimeTypeRepository.findAllById(plannedTimeIds);
     }
 }

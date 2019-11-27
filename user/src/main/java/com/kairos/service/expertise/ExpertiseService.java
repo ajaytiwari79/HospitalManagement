@@ -54,7 +54,7 @@ import com.kairos.service.country.CountryService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationServiceService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -583,6 +583,18 @@ public class ExpertiseService {
         List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
     }
+
+    public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseId) {
+        Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
+        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseId);
+        for (Expertise expertise : expertises) {
+            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
+            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
+            seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
+        }
+        return seniorAndChildCareDaysDTOMap;
+    }
+
 
     private Organization getUnion(Long unionId, String unionName, Country country) {
         Organization union;

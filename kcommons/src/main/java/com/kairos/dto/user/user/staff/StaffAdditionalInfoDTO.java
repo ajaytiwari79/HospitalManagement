@@ -1,13 +1,16 @@
 package com.kairos.dto.user.user.staff;
 
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
+import com.kairos.dto.user_context.UserContext;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,7 +40,6 @@ public class StaffAdditionalInfoDTO {
     private Map<Long, List<LocalDate>> publicHoliday;
     //These are the all day type of country
     private List<DayTypeDTO> dayTypes;
-    private UserAccessRoleDTO user;
     //This is unit TimeZone
     private ZoneId unitTimeZone;
     private int staffAge;
@@ -48,8 +50,12 @@ public class StaffAdditionalInfoDTO {
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private List<ReasonCodeDTO> reasonCodes=new ArrayList<>();
     private UserAccessRoleDTO userAccessRoleDTO;
+    private List<StaffChildDetailDTO> staffChildDetails;
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
+    private List<TagDTO> tags;
+    private boolean nightWorker;
+
 
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
         this.employment = employment;
@@ -78,5 +84,4 @@ public class StaffAdditionalInfoDTO {
             }
         return roles;
     }
-
 }

@@ -19,7 +19,7 @@ import static javax.management.timer.Timer.ONE_MINUTE;
  * @date - 14/5/18
  */
 
-public class DateTimeInterval implements Comparable<DateTimeInterval>{
+public final class DateTimeInterval implements Comparable<DateTimeInterval>{
 
     private Long start;
     private Long end;
@@ -41,8 +41,16 @@ public class DateTimeInterval implements Comparable<DateTimeInterval>{
         checkInterval();
     }
 
+    /**
+     *
+     * @param start
+     * @param end
+     * @Description: This method will take start date and end date to calculate the interval
+     * if end date is null then the end date will be the 2000 years after today
+     */
     public DateTimeInterval(LocalDate start, LocalDate end) {
         this.start = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+         end= end==null?LocalDate.now().plusYears(2000):end;
         this.end = end.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
         checkInterval();
     }

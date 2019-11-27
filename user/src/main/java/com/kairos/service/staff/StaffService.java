@@ -13,6 +13,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
@@ -25,6 +26,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -34,6 +36,7 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffChildDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.staff.position.Position;
@@ -74,7 +77,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.system_setting.SystemLanguageService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.FileUtil;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -272,23 +275,60 @@ public class StaffService {
         if (StaffStatusEnum.INACTIVE.equals(staffPersonalDetail.getCurrentStatus())) {
             redisService.invalidateAllTokenOfUser(staffToUpdate.getUser().getUserName());
         }
-        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
-        List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
-        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
-            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTCHANGED);
-        }
-        List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
-        Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
-        List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseIds(staffId, expertises);
-        Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap = staffExperienceInExpertiseDTOList.stream().collect(Collectors.toMap(StaffExperienceInExpertiseDTO::getExpertiseId, Function.identity()));
-        staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId, expertises);
-        assignExpertiseToStaff(staffPersonalDetail, staffToUpdate, expertiseMap, staffExperienceInExpertiseDTOMap);
+        List<Expertise> oldExpertise = assignExpertise(staffId, staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
         Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
         staffToUpdate.setLanguage(language);
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
+        setStaffChildDetails(staffToUpdate, staffPersonalDetail);
 
+        updateUserDetails(staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
+
+        //saving addresses of staff
+        staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
+        assignTags(staffId, staffPersonalDetail, staffToUpdate);
+        Staff staff = staffGraphRepository.save(staffToUpdate);
+        staffPersonalDetail.setUserName(staff.getUser().getUserName());
+        staffPersonalDetail.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staff.getStaffChildDetails(),StaffChildDetailDTO.class));
+        if (oldExpertise != null) {
+            List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
+            staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
+        }
+        List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
+        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE);
+        // Set if user is female and pregnant
+        User user = updateUserDetails(staffId, staffPersonalDetail);
+        staffPersonalDetail.setPregnant(user.isPregnant());
+        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
+        staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
+        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
+        return staffPersonalDetail;
+    }
+
+    private User updateUserDetails(long staffId, StaffPersonalDetail staffPersonalDetail) {
+        User user = userGraphRepository.getUserByStaffId(staffId);
+        if (!user.getCprNumber().equals(staffPersonalDetail.getCprNumber())) {
+            user.setCprNumber(staffPersonalDetail.getCprNumber());
+            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffPersonalDetail.getCprNumber()));
+        }
+        user.setGender(staffPersonalDetail.getGender());
+        user.setPregnant(Gender.FEMALE.equals(user.getGender()) && staffPersonalDetail.isPregnant());
+        user.setUserName(staffPersonalDetail.getUserName());
+        userGraphRepository.save(user);
+        return user;
+    }
+
+    private void assignTags(long staffId, StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate) {
+        staffToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getTags(), Tag.class));
+        if(isCollectionNotEmpty(staffPersonalDetail.getTags())) {
+            staffGraphRepository.unlinkTagsFromStaff(staffId, staffPersonalDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
+        }else{
+            staffGraphRepository.unlinkAllTagsFromStaff(staffId);
+        }
+    }
+
+    private void updateUserDetails(StaffPersonalDetail staffPersonalDetail, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
         if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
             if (!staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffPersonalDetail.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
                 User user = userGraphRepository.findUserByUserName("(?i)" + staffPersonalDetail.getUserName());
@@ -301,32 +341,26 @@ public class StaffService {
                 }
             }
         }
+    }
 
-        //saving addresses of staff
-        staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
-        Staff staff = staffGraphRepository.save(staffToUpdate);
-        staffPersonalDetail.setUserName(staff.getUser().getUserName());
-        if (oldExpertise != null) {
-            List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
-            staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
+    public List<Expertise> assignExpertise(long staffId, StaffPersonalDetail staffPersonalDetail, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
+        List<Expertise> oldExpertise = staffExpertiseRelationShipGraphRepository.getAllExpertiseByStaffId(staffToUpdate.getId());
+        List<Long> expertises = staffPersonalDetail.getExpertiseWithExperience().stream().map(StaffExperienceInExpertiseDTO::getExpertiseId).collect(Collectors.toList());
+        if (!CollectionUtils.isEqualCollection(expertises, oldExpertise.stream().map(expertise -> expertise.getId()).collect(Collectors.toList())) && !userAccessRoleDTO.getManagement()) {
+            exceptionService.actionNotPermittedException(MESSAGE_EMPLOYMENT_EXPERTISE_NOTCHANGED);
         }
-        List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
-        staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE);
-        // Set if user is female and pregnant
-        User user = userGraphRepository.getUserByStaffId(staffId);
-        if (!user.getCprNumber().equals(staffPersonalDetail.getCprNumber())) {
-            user.setCprNumber(staffPersonalDetail.getCprNumber());
-            user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffPersonalDetail.getCprNumber()));
-        }
-        user.setGender(staffPersonalDetail.getGender());
-        user.setPregnant(Gender.FEMALE.equals(user.getGender()) && staffPersonalDetail.isPregnant());
-        user.setUserName(staffPersonalDetail.getUserName());
-        userGraphRepository.save(user);
-        staffPersonalDetail.setPregnant(user.isPregnant());
-        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
-        staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
-        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
-        return staffPersonalDetail;
+        List<Expertise> expertiseList = expertiseGraphRepository.findAllById(expertises);
+        Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
+        List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseIds(staffId, expertises);
+        Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap = staffExperienceInExpertiseDTOList.stream().collect(Collectors.toMap(StaffExperienceInExpertiseDTO::getExpertiseId, Function.identity()));
+        staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId, expertises);
+        assignExpertiseToStaff(staffPersonalDetail, staffToUpdate, expertiseMap, staffExperienceInExpertiseDTOMap);
+        return oldExpertise;
+    }
+
+    private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
+        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
+        staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
@@ -1037,4 +1071,7 @@ public class StaffService {
     }
 
 
+    public void unlinkTagFromStaff(Long tagId) {
+        staffGraphRepository.unlinkTagFromStaff(tagId);
+    }
 }

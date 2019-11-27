@@ -21,7 +21,6 @@ import java.util.Set;
 public class AbsenceStaffingLevelDto {
 
     BigInteger id;
-    @NotNull
     private BigInteger phaseId;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date currentDate;

@@ -2,7 +2,9 @@ package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
+import com.kairos.enums.user.ChatStatus;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -17,6 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Properties;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.Transient;
 
@@ -25,8 +28,12 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOTNULL;
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_SIZE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -61,6 +68,7 @@ public class User extends UserBaseEntity {
     private List<String> roles;
     private ContactDetail contactDetail;
     private ContactAddress homeAddress;
+    private LocalDate joiningDate;
 
 
     @Relationship(type = ADMINS_COUNTRY)
@@ -99,12 +107,16 @@ public class User extends UserBaseEntity {
     private String googleCalenderTokenId;
     //define for personal google calender
     private String googleCalenderAccessToken;
+    @Properties
+    private Map<String, String> unitWiseAccessRole=new HashMap<>();
+    private ChatStatus chatStatus;
 
     public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
+        this.setJoiningDate(getCurrentLocalDate());
     }
 
     public User(String cprNumber, String firstName, String lastName, String email, String userName) {
@@ -114,6 +126,7 @@ public class User extends UserBaseEntity {
         this.cprNumber = cprNumber;
         this.userName = userName;
         this.setDateOfBirth(getDateOfBirthFromCPR(cprNumber));
+        this.setJoiningDate(getCurrentLocalDate());
     }
 
     public User(String cprNumber, String firstName, String lastName, String email, String userName, boolean isUserNameUpdated) {
@@ -123,6 +136,7 @@ public class User extends UserBaseEntity {
         this.cprNumber = cprNumber;
         this.userName = userName;
         this.userNameUpdated = isUserNameUpdated;
+        this.setJoiningDate(getCurrentLocalDate());
     }
 
     public User(String userName, String firstName, String lastName, String email, ContactDetail contactDetail, String password) {
@@ -132,6 +146,7 @@ public class User extends UserBaseEntity {
         this.email = email;
         this.contactDetail = contactDetail;
         this.password = password;
+        this.setJoiningDate(getCurrentLocalDate());
     }
 
     public String getUserName() {

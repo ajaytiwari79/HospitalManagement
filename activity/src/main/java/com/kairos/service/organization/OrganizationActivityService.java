@@ -18,6 +18,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
@@ -263,8 +264,11 @@ public class OrganizationActivityService extends MongoBaseService {
         logger.info("activityId " + activityId);
         generalTab.setTags(null);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
-        if (!activity.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        if (isCollectionNotEmpty(activity.getTags())) {
+            List<TagDTO> tags = new ArrayList<>();
+            tags.addAll(tagMongoRepository.getTagsById(activity.getTags()));
+            tags.addAll(organizationDTO.getTagDTOS().stream().filter(tagDTO -> activity.getTags().contains(new BigInteger(tagDTO.getId().toString()))).collect(Collectors.toList()));
+            generalActivityTabWithTagDTO.setTags(tags);
         }
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(organizationDTO.getCountryId());
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, organizationDTO.getCountryId());
@@ -299,8 +303,8 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setCountryId(null);
         //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
         TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
-        if (isNotNull(activityPriority)) {
+        if (isNotNull(timeType.getActivityPriorityId())) {
+            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
             ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
             if (isNotNull(unitActivityPriority)) {
                 activityCopied.setActivityPriorityId(unitActivityPriority.getId());
@@ -347,14 +351,16 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setDescription(generalTab.getDescription());
         activity.setTags(generalDTO.getTags());
 
-
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
+        OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         generalTab.setTags(null);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         if (!activity.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+            List<TagDTO> tags = new ArrayList<>();
+            tags.addAll(tagMongoRepository.getTagsById(activity.getTags()));
+            tags.addAll(organizationDTO.getTagDTOS().stream().filter(tagDTO -> activity.getTags().contains(new BigInteger(tagDTO.getId().toString()))).collect(Collectors.toList()));
+            generalActivityTabWithTagDTO.setTags(tags);
             generalTab.setTags(activity.getTags());
         }
         activityService.updateBalanceSettingTab(generalDTO, activity);

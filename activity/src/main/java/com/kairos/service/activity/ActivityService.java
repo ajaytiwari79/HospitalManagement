@@ -33,6 +33,7 @@ import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.dto.user.organization.SelfRosteringMetaData;
 import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
@@ -41,6 +42,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
@@ -68,7 +70,6 @@ import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.unit_settings.ActivityConfigurationService;
 import com.kairos.utils.external_plateform_shift.GetAllActivitiesResponse;
 import com.kairos.utils.external_plateform_shift.TimeCareActivity;
-import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
 import com.kairos.wrapper.activity.ActivityTagDTO;
 import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
@@ -78,10 +79,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -616,6 +614,13 @@ public class ActivityService {
         return new ActivityTabsWrapper(activity.getNotesActivityTab());
     }
 
+
+    public List<CutOffInterval> getCutOffInterValOfActivity(BigInteger activityId) {
+        Activity activity = activityMongoRepository.findOne(activityId);
+        return ActivityUtil.getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(),activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue());
+    }
+
+
     public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO) {
         CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab();
         validateReminderSettings(communicationActivityDTO);
@@ -1001,33 +1006,29 @@ public class ActivityService {
 
     public void updateBackgroundColorInShifts(String newTimeTypeColor, String existingTimeTypeColor,BigInteger timeTypeId) {
         if(!existingTimeTypeColor.equals(newTimeTypeColor)){
-            new Thread(new Runnable() {
-                public void run() {
-                    updateColorInActivity(newTimeTypeColor, timeTypeId);
-                    updateColorInShift(newTimeTypeColor, timeTypeId);
-                }
+            new Thread(() -> {
+                Set<BigInteger> activityIds = updateColorInActivity(newTimeTypeColor, timeTypeId);
+                updateColorInShift(newTimeTypeColor, timeTypeId,activityIds);
             }).start();
 
         }
     }
 
-    private void updateColorInActivity(String newTimeTypeColor,BigInteger timeTypeId) {
+    private Set<BigInteger> updateColorInActivity(String newTimeTypeColor,BigInteger timeTypeId) {
         List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         if (isCollectionNotEmpty(activities)) {
             activities.forEach(activity -> activity.getGeneralActivityTab().setBackgroundColor(newTimeTypeColor));
             activityMongoRepository.saveEntities(activities);
         }
+        return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 
-    private void updateColorInShift(String newTimeTypeColor,BigInteger timeTypeId) {
-        Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeTypeId).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
-        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
+    private void updateColorInShift(String newTimeTypeColor,BigInteger timeTypeId,Set<BigInteger> activityIds) {
+        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activityIds,null,null,null);
         shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
-            updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, shiftActivity);
+            updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, shiftActivity);
             if(isNotNull(shift.getDraftShift())){
-                shift.getDraftShift().getActivities().forEach(draftShiftActivity->{
-                    updateBackgroundColorInShiftActivity(newTimeTypeColor, activitiyIds, draftShiftActivity);
-                });
+                shift.getDraftShift().getActivities().forEach(draftShiftActivity-> updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, draftShiftActivity));
             }
         }));
         if(isCollectionNotEmpty(shifts)){

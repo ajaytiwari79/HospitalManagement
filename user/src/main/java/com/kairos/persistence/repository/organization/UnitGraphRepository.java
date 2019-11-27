@@ -460,9 +460,8 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH (org)-[:" + HAS_SETTING + "]-(orgSetting:OrganizationSetting) WHERE id(org)={0} RETURN orgSetting")
     OrganizationSetting getOrganisationSettingByOrgId(Long unitId);
 
-    @Query("MATCH (org:Unit)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
-            "MATCH(org)-[:" + SUB_TYPE_OF + "]->(organizationType:OrganizationType) \n" +
-            "RETURN id(org) as unitId, COLLECT(id(organizationType)) as orgTypeIds")
+    @Query("MATCH (org:OrganizationBaseEntity)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +
+            "RETURN id(org) as unitId, COLLECT(id(orgType)) as orgTypeIds")
     List<OrgTypeQueryResult> getOrganizationIdsBySubOrgTypeId(List<Long> organizationSubTypeId);
 
     @Query("MATCH (child:Unit) \n" +
@@ -561,7 +560,8 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Long getHubIdByOrganizationId(Long organizationId);
 
 
-    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]-(unit:Unit) where id(staff)={0} RETURN id(unit) as id,unit.name as name")
+    @Query("match (staff:Staff)-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]-(up:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]-(accessGroup:AccessGroup{deleted:false,enabled:true})  WHERE (accessGroup.endDate IS NULL OR date(accessGroup.endDate) >= date())" +
+            "MATCH (up)-[:"+APPLICABLE_IN_UNIT+"]-(unit:Unit) where id(staff)={0} RETURN distinct id(unit) as id,unit.name as name")
     List<OrganizationWrapper> getAllOrganizaionByStaffid(Long staffId);
 
     @Query("MATCH (org:Organization{isEnable:true,union:false})-[:" + HAS_SUB_ORGANIZATION + "*]->(sub:Organization)  WHERE id(org)={0}  \n" +
@@ -573,5 +573,10 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY sub.name")
     List<OrganizationBasicResponse> getAllOrganizationOfOrganization(Long orgId);
 
+    @Query("MATCH (unit:Unit) WHERE id(unit)={0} " +
+            "OPTIONAL MATCH (unit)-[rel:" + HAS_GROUPS + "]->(group:Group{deleted:false})" +
+            "OPTIONAL MATCH (group)-[relFilter:HAS_FILTERS]->(filter:FilterSelection)" +
+            "RETURN unit,COLLECT(rel),COLLECT(group),collect(relFilter),collect(filter)")
+    Unit getUnitWithGroupsByUnitId(Long unitId);
 }
 

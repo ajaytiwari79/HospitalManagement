@@ -8,7 +8,7 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.service.auth.UserService;
 import com.kairos.service.country.CountryService;
 import com.kairos.utils.response.ResponseHandler;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import com.twilio.sdk.TwilioRestException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -4,9 +4,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
-import com.kairos.dto.user.country.skill.SkillLevelDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.MasterDataTypeEnum;
@@ -52,8 +50,7 @@ import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.*;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_COUNTRY_ID_NOTFOUND;
-import static com.kairos.constants.UserMessagesConstants.MESSAGE_SKILL_NAME_DUPLICATE;
+import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
  * Created by oodles on 15/9/16.
@@ -149,6 +146,9 @@ public class SkillService {
         return null;
     }
 
+    public SkillCategory safeDeleteSkill(Long categoryId, Long skillId) {
+        return skillGraphRepository.safeDelete(categoryId, skillId);
+    }
 
     public List<Skill> getSkillsByCategoryId(Long id) {
         return skillGraphRepository.skillsByCategoryId(id);
@@ -190,7 +190,6 @@ public class SkillService {
      * @param id         {id of team or organization based on type}
      * @param skillId
      * @param isSelected {true or false if true skill will be added if not exist otherwise updated, if false skill will be removed}
-     * @param type       {organization,team}
      * @return updated skills irrespective of team or organization
      * @author prabjot
      * to add new skill based onn type of node {organization,team}
@@ -280,6 +279,35 @@ public class SkillService {
         return map;
     }
 
+    /**
+     * @param
+     * @param staffId
+     * @param removedSkillIds
+     * @param isSelected
+     * @param unitId
+     * @return
+     */
+    public List assignSkillToStaff(long staffId, List<Long> removedSkillIds, boolean isSelected, long unitId) {
+
+        Staff staff = staffGraphRepository.findOne(staffId);
+        if (staff == null) {
+            return null;
+        }
+        List<Map<String, Object>> response;
+        if (isSelected) {
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE, true);
+            response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
+        } else {
+            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
+            response = Collections.emptyList();
+        }
+        /*if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId) != 0) {
+            logger.info("Staff  is TaskGiver: Now Syncing Skills in Visitour");
+            updateSkillsOfStaffInVisitour(staff, unitId);
+        }*/
+        return response;
+    }
+
 
     public void updateStaffSkillLevel(Long staffId, SkillDTO skillDTO) {
         Skill skill=skillGraphRepository.findById(skillDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("skill not found")));
@@ -290,6 +318,29 @@ public class SkillService {
         userSkillLevelRelationshipGraphRepository.saveAll(staffSkillLevelRelationships);
     }
 
+
+    public void updateStaffSkillLevel(long staffId, long skillId, SkillLevel skillLevel, long startDate, long endDate, boolean status, long unitId) {
+        Staff staff = staffGraphRepository.findOne(staffId);
+        userSkillLevelRelationshipGraphRepository.updateStaffSkill(staffId, skillId, skillLevel, startDate, endDate, status);
+    }
+
+
+    public boolean assignSkillToStaff(long id, long staffId, long skillId, boolean isSelected) {
+
+        Staff staff = staffGraphRepository.findOne(staffId);
+        if (staff == null) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_ID_NOTFOUND);
+
+        }
+
+        long lastModificationDate = DateUtils.getCurrentDate().getTime();
+        if (isSelected) {
+            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, SkillLevel.ADVANCE, true);
+        } else {
+            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, SkillLevel.ADVANCE, false);
+        }
+        return true;
+    }
 
     public Map<String, Object> getStaffSkills(long id) {
 

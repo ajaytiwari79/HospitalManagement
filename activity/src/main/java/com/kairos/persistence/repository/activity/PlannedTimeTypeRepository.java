@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 /*
@@ -21,5 +22,8 @@ public interface PlannedTimeTypeRepository extends MongoRepository<PlannedTimeTy
 
     @Query("{'countryId':?0, 'name':{$regex:?1,$options:'i'}, 'deleted':?2}")
     List<PlannedTimeType> findByNameAndDeletedAndCountryIdExcludingCurrent(Long countryId, String plannedTimeTypeName, boolean deleted);
+
+    @Query("{'_id':{$in:?0},'deleted':false}")
+    List<PlannedTimeType> findAllById(Collection<BigInteger> ids);
 
 }

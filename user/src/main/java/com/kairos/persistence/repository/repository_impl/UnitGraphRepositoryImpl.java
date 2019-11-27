@@ -6,6 +6,7 @@ import com.kairos.enums.Employment;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
 import com.kairos.persistence.repository.organization.CustomUnitGraphRepository;
+import com.kairos.service.organization.GroupService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.session.Session;
@@ -29,7 +30,8 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
     private Session session;
 
     public String appendWhereOrAndPreFixOnQueryString(int countOfSubString) {
-        return (countOfSubString == 0 ? " WHERE" : ((countOfSubString > 0) ? " AND" : ""));
+       String value = (countOfSubString == 0 ? " WHERE" : " AND" );
+       return countOfSubString<0 ? "" : value;
     }
 
     public String getMatchQueryForNameGenderStatusOfStaffByFilters(Map<FilterType, Set<String>> filters, String searchText) {
@@ -43,10 +45,13 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
             matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) + " user.gender IN {genderList} ";
             countOfSubString += 1;
         }
+        if (Optional.ofNullable(filters.get(FilterType.GROUPS)).isPresent()) {
+            matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) + "  id(staff) IN {GroupStaffLists} ";
+            countOfSubString += 1;
+        }
         if (StringUtils.isNotBlank(searchText)) {
             matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) +
                     " ( LOWER(staff.firstName) CONTAINS LOWER({searchText}) OR LOWER(staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
-            countOfSubString += 1;
         }
         return matchQueryForStaff;
     }
@@ -74,14 +79,21 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         }
 
-        if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
-            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
-                    "WHERE id(expertise) IN {expertiseIds} ";
+        if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent()) {
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + BELONGS_TO_TAGS + "]-(tag:Tag) " +
+                    "WHERE id(tag) IN {tagIds} ";
         } else {
-            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  OPTIONAL MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)  ";
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  OPTIONAL MATCH (staff)-[" + BELONGS_TO_TAGS + "]-(tag:Tag) ";
         }
 
-        matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, " +
+        if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
+                    "WHERE id(expertise) IN {expertiseIds} ";
+        } else {
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  OPTIONAL MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)  ";
+        }
+
+        matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, COLLECT(tag) AS tags, " +
                 "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList " +
                 " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
                 " with engineerType,employments, staff, user, employmentList, expertiseList";
@@ -123,6 +135,14 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
             queryParameters.put("teamIds",
                     convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
         }
+        if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent()) {
+            queryParameters.put("tagIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.GROUPS)).isPresent()) {
+            queryParameters.put("GroupStaffLists",
+                    filters.get(FilterType.GROUPS));
+        }
         if (StringUtils.isNotBlank(searchText)) {
             queryParameters.put("searchText", searchText);
         }
@@ -130,15 +150,7 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
 
         String query = "";
         if (ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
-            query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
-                    " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
-            if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()) {
-                query += " MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
-            }
-            if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
-                query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} " +
-                        " WITH user, staff, employment,organization ";
-            }
+            query = getSelfRosteringQuery(filters, searchText, query);
         } else if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT)).isPresent() && filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITH_EMPLOYMENT.name()) && !filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
@@ -162,12 +174,25 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
 
         query += " RETURN distinct {id:id(staff), employments:employments,expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " +
                 "firstName:user.firstName,lastName:user.lastName,employedSince :staff.employedSince," +
-                "age:duration.between(date(user.dateOfBirth),date()).years," +
+                "age:duration.between(date(user.dateOfBirth),date()).years,experienceInYears:duration.between(date(user.joiningDate),date()).years," +
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId, access_token:staff.access_token," +
                 "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, " +
                 "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType),user_id:staff.user_id } as staff ORDER BY staff.id\n";
 
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
+    }
+
+    private String getSelfRosteringQuery(Map<FilterType, Set<String>> filters, String searchText, String query) {
+        query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
+                " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
+        if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()) {
+            query += " MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
+        }
+        if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
+            query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} " +
+                    " WITH user, staff, employment,organization ";
+        }
+        return query;
     }
 
     public List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,

@@ -396,5 +396,6 @@ public class ActivityMessagesConstants {
     public static final String STATUS_NOT_ALLOWED="status.not.allowed";
     public static final String ACTIVITY_CONFIGURATION_DEFAULT_SETTINGS_ALREADY_EXISTS = "activity.configuration.default.settings.already.exists";
     public static final String CALCULATION_TYPE_NOT_VALID="calculation.type.not.valid";
+    public static final String STAFF_NOT_ALLOWED_ON_TAG="staff.not.allowed";
 
 }

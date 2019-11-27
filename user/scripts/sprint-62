@@ -1,0 +1,30 @@
+
+MATCH (staff)-[skillRel:STAFF_HAS_SKILLS]->(skill)
+set skillRel.startDate="1997-06-10",skillRel.endDate=null
+
+MATCH(e:Expertise) where e.published=false DETACH delete e
+
+MATCH(e:Expertise)-[:HAS_EXPERTISE_LINES]-(ecl:ExpertiseLine)
+MATCH(e)-[:FOR_SENIORITY_LEVEL]-(sl:SeniorityLevel)-[:HAS_BASE_PAY_GRADE]-(pg:PayGrade)
+CREATE UNIQUE (ecl)-[:FOR_SENIORITY_LEVEL{payGradeId:id(pg),payGradeLevel:pg.payGradeLevel}]-(sl)
+
+MATCH(e:Expertise)-[:HAS_EXPERTISE_LINES]-(ecl:ExpertiseLine)
+Set ecl.breakPaymentSetting='PAID',ecl.fullTimeWeeklyMinutes=2220,ecl.numberOfWorkingDaysInWeek=5
+
+
+
+Match(ap:AccessPage) where ap.moduleId="tab_201" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Groups",isModule:false,moduleId:"tab_434",active:true});
+
+
+
+Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
+       Match (ap:AccessPage)
+       CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);
+
+//Add Filter Group At STAFF
+MATCH (n:FilterGroup) where id(n)=355 set n.filterTypes=["EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS", "EXPERTISE","TIME_TYPE","TAGS", "GROUPS","ACTIVITY_TIMECALCULATION_TYPE"] return n;
+
+
+//Add Filter Group At SELF ROSTERING
+MATCH (n:FilterGroup) where id(n)=18649 set n.filterTypes=["PLANNED_TIME_TYPE","EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS", "EXPERTISE", "TIME_TYPE", "TAGS", "GROUPS", "ACTIVITY_TIMECALCULATION_TYPE", "ACTIVITY_STATUS", "REAL_TIME_STATUS", "TIME_SLOT","TEAM","ABSENCE_ACTIVITY","VALIDATED_BY","SKILLS","FUNCTIONS"] return n;
+

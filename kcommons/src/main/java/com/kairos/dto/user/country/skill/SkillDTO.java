@@ -1,11 +1,10 @@
 package com.kairos.dto.user.country.skill;
 
-import com.kairos.enums.SkillLevel;
+import com.kairos.dto.user.skill.SkillLevelDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +44,5 @@ public class SkillDTO {
 //        }
 //        return false;
 //    }
-
-
 
 }

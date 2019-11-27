@@ -2,6 +2,7 @@ package com.kairos.controller.unit_settings;
 
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
 import com.kairos.dto.response.ResponseDTO;
+import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
@@ -24,6 +25,8 @@ import static com.kairos.constants.ApiConstants.*;
 public class ProtectedDaysOffController {
     @Inject
     private ProtectedDaysOffService protectedDaysOffService;
+    @Inject
+    private ActivitySchedulerJobService activitySchedulerJobService;
 
     @ApiOperation("get protected days off by unit id ")
     @GetMapping(UNIT_URL +"/protected_days_off")
@@ -47,7 +50,7 @@ public class ProtectedDaysOffController {
     @PostMapping(value = "/register_job_for_protected_days_off")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> registerJobForNightWorker() {
-        protectedDaysOffService.registerJobForProtectedDaysOff();
+        activitySchedulerJobService.registerJobForProtectedDaysOff();
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 }
