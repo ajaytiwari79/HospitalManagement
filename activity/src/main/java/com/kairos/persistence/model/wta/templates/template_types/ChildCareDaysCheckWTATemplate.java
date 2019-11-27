@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getCareDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByActivity;
@@ -58,7 +60,8 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
                 if (isNotNull(dateTimeInterval)) {
                         List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
-                        if (leaveCount+transferLeaveCount-borrowLeaveCount < (shifts.size() + 1)) {
+                    ActivityCutOffCount activityLeaveCount=this.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(),activityCutOffCount.getEndDate()).containsAndEqualsEndDate(asDate(asLocalDate(infoWrapper.getShift().getStartDate())))).findFirst().orElse(new ActivityCutOffCount());
+                        if (leaveCount+activityLeaveCount.getTransferLeaveCount()-activityLeaveCount.getBorrowLeaveCount() < (shifts.size() + 1)) {
                             boolean isLeaveAvailable=workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(),activityIds.get(0),infoWrapper.getShift(), dateTimeInterval,infoWrapper.getLastPlanningPeriodEndDate(),WTATemplateType.WTA_FOR_CARE_DAYS,leaveCount);
                             if(!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
