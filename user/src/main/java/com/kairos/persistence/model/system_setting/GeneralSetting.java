@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 
+/**
+ * Created By G.P.Ranjan on 25/11/19
+ **/
 @NodeEntity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemLanguage extends UserBaseEntity {
-    private String name;
-    private String code;
-    private boolean active;
-    private boolean defaultLanguage;
-
+public class GeneralSetting extends UserBaseEntity {
+    private short idleTimeInMinutes;
+    private short awayTimeInMinutes;
 }
