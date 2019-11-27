@@ -289,7 +289,6 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, response);
     }
-
     // Skills
     @ApiOperation(value = "assign Skills to staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.POST)
@@ -302,6 +301,7 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
+
 
 
     @ApiOperation(value = "Get skills of staff")
@@ -318,13 +318,8 @@ public class StaffController {
     @ApiOperation(value = "Update skill of staff")
     @RequestMapping(value = "/{staffId}/skill/{skillId}", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateStaffSkillLevel(@PathVariable long unitId, @PathVariable long staffId, @PathVariable long skillId,
-                                                                     @RequestBody Map<String, Object> skillInfo) throws ParseException {
-        SkillLevel level = SkillLevel.valueOf((String) skillInfo.get("level"));
-        long startDate = parseDate((String) skillInfo.get("startDate")).getTime();
-        long endDate = parseDate((String) skillInfo.get("endDate")).getTime();
-        boolean status = (boolean) skillInfo.get("status");
-        skillService.updateStaffSkillLevel(staffId, skillId, level, startDate, endDate, status, unitId);
+    public ResponseEntity<Map<String, Object>> updateStaffSkillLevel(@PathVariable long staffId, @RequestBody SkillDTO skillInfo) {
+        skillService.updateStaffSkillLevel(staffId,skillInfo);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, skillInfo);
     }
 

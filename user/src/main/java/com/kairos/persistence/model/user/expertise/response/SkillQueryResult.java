@@ -1,13 +1,10 @@
 package com.kairos.persistence.model.user.expertise.response;
 
-import com.kairos.dto.user.country.skill.SkillLevelDTO;
-import com.kairos.enums.SkillLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Set;
@@ -30,12 +27,6 @@ public class SkillQueryResult {
     private Set<SkillLevelQueryResult> skillLevels;
     private String skillCategory;
 
-
-    public SkillQueryResult(Long id, @NotBlank(message = "error.SkillCategory.name.notEmpty") String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
 
     public SkillQueryResult(Long id, Set<SkillLevelQueryResult> skillLevels,String name,String skillCategory) {
         this.id = id;
