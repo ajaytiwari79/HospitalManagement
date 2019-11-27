@@ -22,7 +22,7 @@ public class DataSubject extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$")
+    @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$")
     private String name;
     @NotBlank(message = "error.message.description.notNull.orEmpty")
     private String description;
@@ -52,13 +52,13 @@ public class DataSubject extends BaseEntity {
 
 
     public DataSubject(@NotBlank(message = "error.message.name.notNull.orEmpty")
-                               @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotEmpty List<DataCategory> dataCategories) {
+                               @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description, @NotEmpty List<DataCategory> dataCategories) {
         this.name = name;
         this.description = description;
         this.dataCategories = dataCategories;
     }
 
-    public DataSubject(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
+    public DataSubject(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$") String name, @NotBlank(message = "error.message.description.notNull.orEmpty") String description) {
         this.name = name;
         this.description=description;
     }

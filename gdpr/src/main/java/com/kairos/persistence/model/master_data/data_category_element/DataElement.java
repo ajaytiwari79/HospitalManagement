@@ -17,7 +17,7 @@ public class DataElement extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$")
+    @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$")
     private String name;
     private Long countryId;
     private Long organizationId;
@@ -32,7 +32,7 @@ public class DataElement extends BaseEntity {
         this.name = name;
     }
 
-    public DataElement(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$") String name) {
+    public DataElement(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$") String name) {
         this.name = name;
     }
 }
