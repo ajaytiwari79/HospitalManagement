@@ -3,6 +3,8 @@ package com.kairos.dto.user.skill;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 /**
  * Created By G.P.Ranjan on 4/11/19
  **/
@@ -11,4 +13,6 @@ import lombok.Setter;
 public class SkillLevelDTO {
     private Long skillId;
     private String skillLevel;
+    private LocalDate startDate;
+    private LocalDate endDate;
 }

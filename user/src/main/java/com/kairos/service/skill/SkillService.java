@@ -279,35 +279,6 @@ public class SkillService {
         return map;
     }
 
-    /**
-     * @param
-     * @param staffId
-     * @param removedSkillIds
-     * @param isSelected
-     * @param unitId
-     * @return
-     */
-    public List assignSkillToStaff(long staffId, List<Long> removedSkillIds, boolean isSelected, long unitId) {
-
-        Staff staff = staffGraphRepository.findOne(staffId);
-        if (staff == null) {
-            return null;
-        }
-        List<Map<String, Object>> response;
-        if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE, true);
-            response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
-        } else {
-            staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
-            response = Collections.emptyList();
-        }
-        /*if (staffGraphRepository.checkIfStaffIsTaskGiver(staffId, unitId) != 0) {
-            logger.info("Staff  is TaskGiver: Now Syncing Skills in Visitour");
-            updateSkillsOfStaffInVisitour(staff, unitId);
-        }*/
-        return response;
-    }
-
 
     public void updateStaffSkillLevel(Long staffId, SkillDTO skillDTO) {
         Skill skill=skillGraphRepository.findById(skillDTO.getId()).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage("skill not found")));
