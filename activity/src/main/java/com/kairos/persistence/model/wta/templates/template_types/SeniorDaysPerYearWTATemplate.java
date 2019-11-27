@@ -43,7 +43,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     private int transferLeaveCount;
     private int borrowLeaveCount;
     private float recommendedValue;
-    private List<ActivityCutOffCount> activityCutOffCounts=new ArrayList<>();
+    private List<ActivityCutOffCount> activityCutOffCounts = new ArrayList<>();
 
     public SeniorDaysPerYearWTATemplate() {
         this.wtaTemplateType = WTATemplateType.SENIOR_DAYS_PER_YEAR;
@@ -52,18 +52,18 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        WorkTimeAgreementBalancesCalculationService workTimeAgreementService= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
+        WorkTimeAgreementBalancesCalculationService workTimeAgreementService = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
         if (!isDisabled()) {
             CareDaysDTO careDays = getCareDays(infoWrapper.getSeniorCareDays(), infoWrapper.getStaffAge());
             if (isNotNull(careDays)) {
                 int leaveCount = careDays.getLeavesAllowed();
-                DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(),infoWrapper.getShift().getStartDate(),activityIds);
-                if(isNotNull(dateTimeInterval)){
+                DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
+                if (isNotNull(dateTimeInterval)) {
                     List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts().stream().filter(shift -> CollectionUtils.containsAny(shift.getActivityIds(), activityIds) && dateTimeInterval.contains(shift.getStartDate())).collect(Collectors.toList());
-                    ActivityCutOffCount activityLeaveCount=this.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(),activityCutOffCount.getEndDate()).containsAndEqualsEndDate(asDate(asLocalDate(infoWrapper.getShift().getStartDate())))).findFirst().orElse(new ActivityCutOffCount());
-                    if (leaveCount+activityLeaveCount.getTransferLeaveCount()-activityLeaveCount.getBorrowLeaveCount() < (shifts.size()+1)) {
-                        boolean isLeaveAvailable=workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(),activityIds.get(0),infoWrapper.getShift(), dateTimeInterval,infoWrapper.getLastPlanningPeriodEndDate(),WTATemplateType.WTA_FOR_CARE_DAYS,leaveCount);
-                        if(!isLeaveAvailable) {
+                    ActivityCutOffCount activityLeaveCount = this.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).containsAndEqualsEndDate(asDate(asLocalDate(infoWrapper.getShift().getStartDate())))).findFirst().orElse(new ActivityCutOffCount());
+                    if (leaveCount + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount() < (shifts.size() + 1)) {
+                        boolean isLeaveAvailable = workTimeAgreementService.isLeaveCountAvailable(infoWrapper.getActivityWrapperMap(), activityIds.get(0), infoWrapper.getShift(), dateTimeInterval, infoWrapper.getLastPlanningPeriodEndDate(), WTATemplateType.WTA_FOR_CARE_DAYS, leaveCount);
+                        if (!isLeaveAvailable) {
                             WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
                                     new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
                                             DurationType.DAYS, String.valueOf(leaveCount));
@@ -71,10 +71,10 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
                         }
                     }
                 }
-            }else if(CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(), activityIds)){
+            } else if (CollectionUtils.containsAny(infoWrapper.getShift().getActivityIds(), activityIds)) {
                 WorkTimeAgreementRuleViolation workTimeAgreementRuleViolation =
-                        new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false,null,
-                                DurationType.DAYS,String.valueOf(0));
+                        new WorkTimeAgreementRuleViolation(this.id, this.name, null, true, false, null,
+                                DurationType.DAYS, String.valueOf(0));
                 infoWrapper.getViolatedRules().getWorkTimeAgreements().add(workTimeAgreementRuleViolation);
             }
         }
@@ -93,9 +93,9 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
         SeniorDaysPerYearWTATemplate seniorDaysPerYearWTATemplate = (SeniorDaysPerYearWTATemplate) wtaBaseRuleTemplate;
         return (this != seniorDaysPerYearWTATemplate) && !(
                 Float.compare(seniorDaysPerYearWTATemplate.recommendedValue, recommendedValue) == 0 &&
-                Objects.equals(ageRange, seniorDaysPerYearWTATemplate.ageRange) &&
-                Objects.equals(activityIds, seniorDaysPerYearWTATemplate.activityIds) &&
-                cutOffIntervalUnit == seniorDaysPerYearWTATemplate.cutOffIntervalUnit && Objects.equals(this.phaseTemplateValues,seniorDaysPerYearWTATemplate.phaseTemplateValues));
+                        Objects.equals(ageRange, seniorDaysPerYearWTATemplate.ageRange) &&
+                        Objects.equals(activityIds, seniorDaysPerYearWTATemplate.activityIds) &&
+                        cutOffIntervalUnit == seniorDaysPerYearWTATemplate.cutOffIntervalUnit && Objects.equals(this.phaseTemplateValues, seniorDaysPerYearWTATemplate.phaseTemplateValues));
     }
 
 

@@ -1,0 +1,23 @@
+package com.kairos.dto.activity.ShortCuts;
+
+import com.kairos.dto.activity.counter.TabKPIDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigInteger;
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class ShortcutsDTO {
+    private BigInteger id;
+    private String name;
+    private Long staffId;
+    private Long unitId;
+    private StaffFilterDTO staffFilter;
+    private TabKPIDTO tabKPIs;
+    private List<ShortcutsDetailsDTO> shortcutsDetails;
+}
