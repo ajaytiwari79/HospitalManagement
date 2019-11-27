@@ -13,6 +13,7 @@ import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResul
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.kpermissions.CommonRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
@@ -21,6 +22,8 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import org.neo4j.ogm.session.Neo4jSession;
+import org.neo4j.ogm.session.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -62,6 +65,7 @@ public class PermissionService {
     private StaffGraphRepository staffGraphRepository;
     @Inject private AccessGroupService accessGroupService;
     @Inject private CommonRepository commonRepository;
+    @Inject private SessionFactory sessionFactory;
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
         Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
@@ -135,7 +139,7 @@ public class PermissionService {
 
         permissionSchemaMap.put(PERMISSIONS_SCHEMA,ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kPermissionModels, ModelDTO.class));
         permissionSchemaMap.put(PERMISSIONS, FieldLevelPermission.values());
-        permissionSchemaMap.put(PERMISSION_DATA, getModelPermission(kPermissionModels,accessGroupIds));
+        permissionSchemaMap.put(PERMISSION_DATA, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(getModelPermission(kPermissionModels,accessGroupIds),ModelDTO.class));
             return permissionSchemaMap;
     }
 
@@ -186,7 +190,7 @@ public class PermissionService {
     private List<ModelPermissionQueryResult> getModelPermissionQueryResults(List<KPermissionModel> kPermissionModels, Map<Long, Set<FieldLevelPermission>> modelPermissionMap, Map<Long, Set<FieldLevelPermission>> fieldLevelPermissionMap,OrganizationCategory organizationCategory, boolean hubMember) {
         List<ModelPermissionQueryResult> modelPermissionQueryResults = new ArrayList<>();
         for (KPermissionModel kPermissionModel : kPermissionModels) {
-            if(isValidOrganizationCategory(organizationCategory,hubMember,kPermissionModel.getOrganizationCategories())) {
+            if(isValidOrganizationCategory(organizationCategory,hubMember,kPermissionModel.getOrganizationCategories()) || true) {
                 Set<FieldLevelPermission> modelPermission = modelPermissionMap.get(kPermissionModel.getId());
                 modelPermissionQueryResults.add(new ModelPermissionQueryResult(kPermissionModel.getId(), kPermissionModel.getModelName(), getFieldLevelPermissionQueryResult(fieldLevelPermissionMap, kPermissionModel.getFieldPermissions(), organizationCategory, hubMember), getModelPermissionQueryResults(kPermissionModel.getSubModelPermissions(), modelPermissionMap, fieldLevelPermissionMap, organizationCategory, hubMember), modelPermission));
             }
@@ -201,7 +205,7 @@ public class PermissionService {
     private List<FieldPermissionQueryResult> getFieldLevelPermissionQueryResult(Map<Long,Set<FieldLevelPermission>> fieldLevelPermissionMap,List<KPermissionField> fields,OrganizationCategory organizationCategory, boolean hubMember){
         List<FieldPermissionQueryResult> fieldPermissionQueryResults = new ArrayList<>();
         for (KPermissionField field : fields) {
-            if(isValidOrganizationCategory(organizationCategory,hubMember,field.getOrganizationCategories())) {
+            if(isValidOrganizationCategory(organizationCategory,hubMember,field.getOrganizationCategories()) || true) {
                 fieldPermissionQueryResults.add(new FieldPermissionQueryResult(field.getId(), field.getFieldName(), fieldLevelPermissionMap.getOrDefault(field.getId(), new HashSet<>())));
             }
         }
@@ -260,7 +264,6 @@ public class PermissionService {
 
     public <E extends Object, T extends UserBaseEntity> E evaluatePermission(@Valid E dtoObject){
         try {
-
             Organization organization = organizationService.fetchParentOrganization(UserContext.getUnitId());
             Long staffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
             StaffAccessGroupQueryResult staffAccessGroupQueryResult =  accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, organization.getId());
@@ -301,15 +304,16 @@ public class PermissionService {
     public <T extends UserBaseEntity,E extends UserBaseEntity> List<T> updateModelBasisOfPermission(List<T> objects){
         try {
             Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
-            Set<String> modelNames = objects.stream().map(model->model.getClass().getName()).collect(Collectors.toSet());
-            List<KPermissionModel> kPermissionModels = permissionModelRepository.getAllPermissionModelByName(modelNames);
-            Long staffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(),unitId );
+            //Organization organization = organizationService.fetchParentOrganization(unitId);
+            Set<String> modelNames = objects.stream().map(model->model.getClass().getSimpleName()).collect(Collectors.toSet());
+            List<KPermissionModel> kPermissionModels = permissionModelRepository.getAllPermissionModelByName(modelNames);//StreamSupport.stream(permissionModelRepository.findAll(2).spliterator(),false).filter(kPermissionModel -> modelNames.contains(kPermissionModel.getModelName().toLowerCase())).collect(Collectors.toList());
+            //Long staffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(),organization.getId());
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
             List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(kPermissionModels,accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()));
             List<ModelDTO> modelDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
             Map<String,ModelDTO> modelMap = modelDTOS.stream().collect(Collectors.toMap(k->k.getModelName(),v->v));
             List<Long> objectIds = objects.stream().filter(model->isNotNull(model.getId())).map(model->model.getId()).collect(Collectors.toList());
-            List<E> dataBaseObjects = (List<E>)StreamSupport.stream(commonRepository.findAllById(objectIds,2).spliterator(),false).collect(Collectors.toList());
+            List<E> dataBaseObjects = sessionFactory.openSession().loadAll(Staff.class,objectIds,2).stream().map(staff -> (E)staff).collect(Collectors.toList());
             Map<Long,E> mapOfDataBaseObject = dataBaseObjects.stream().collect(Collectors.toMap(k->k.getId(),v->v));
             updateObjectsPropertiesBeforeSave(mapOfDataBaseObject,modelMap,objects);
         }catch (Exception e){
@@ -320,7 +324,7 @@ public class PermissionService {
 
     public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(Map<Long,E> mapOfDataBaseObject,Map<String,ModelDTO> modelMap,List<T> objects){
         for (T object : objects) {
-            ObjectMapperUtils.copySpecificPropertiesByMapper(object,mapOfDataBaseObject.get(object.getId()),modelMap.get(object.getClass().getSimpleName().toLowerCase()));
+            ObjectMapperUtils.copySpecificPropertiesByMapper(object,mapOfDataBaseObject.get(object.getId()),modelMap.get(object.getClass().getSimpleName()));
         }
     }
 }

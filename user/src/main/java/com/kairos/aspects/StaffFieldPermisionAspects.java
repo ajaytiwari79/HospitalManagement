@@ -89,16 +89,15 @@ public class StaffFieldPermisionAspects {
     }
 
     private <T extends UserBaseEntity> List<T> checkAndReturnValidModel(JoinPoint joinPoint) {
+        List<T> validModels = new ArrayList<>();
         if(isNotNull(UserContext.getUserDetails())){
             boolean accessGroupValid = !accessPageService.isHubMember(UserContext.getUserDetails().getId());
             boolean argsValid = joinPoint.getArgs().length!=0;
-            List<T> validModels = new ArrayList<>();
             if(accessGroupValid && argsValid){
                 validModels = Arrays.stream(joinPoint.getArgs()).filter(arg -> arg.getClass().isAnnotationPresent(KPermissionModel.class)).map(model->(T)model).collect(Collectors.toList());
             }
-            return validModels;
         }
-        return new ArrayList();
+        return validModels;
     }
 
 

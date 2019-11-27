@@ -139,7 +139,7 @@ public class RequestAbsenceService {
             response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTO);
         }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
-            todo.setDeleted(true);
+            //todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
         }
         return response;

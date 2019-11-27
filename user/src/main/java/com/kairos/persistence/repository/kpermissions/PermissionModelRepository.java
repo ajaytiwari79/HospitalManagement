@@ -39,13 +39,8 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "WITH permission.fieldLevelPermissions AS coll,model UNWIND coll AS permission WITH DISTINCT permission,model RETURN collect(permission) AS permissions,id(model) as id,model.modelName as modelName")
     List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds);
 
-    @Query("MATCH(model:KPermissionModel{deleted:false}) \n" +
-            "OPTIONAL MATCH(model)-[orgRel:HAS_SUB_MODEL*]->(subModel:KPermissionModel) \n" +
-            "OPTIONAL MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField) \n" +
-            "OPTIONAL MATCH(subModel)-[orgUnitRel:HAS_FIELD]->(fieldn:KPermissionField) \n" +
-            "WITH model,collect(subModel) as subModels, collect(field) as fieldPermissions,collect(fieldn) as uis \n" +
-            "where model.modelName in {0}\n" +
-            "Return model,subModels,fieldPermissions,uis")
+    @Query("MATCH(model:KPermissionModel{deleted:false})  OPTIONAL MATCH(model)-[orgRel:HAS_SUB_MODEL*]->(subModel:KPermissionModel)  OPTIONAL MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField)  OPTIONAL MATCH(subModel)-[orgUnitRel:HAS_FIELD]->(fieldn:KPermissionField) where model.modelName in {0} \n" +
+            "Return model,collect(subModel), collect(field),collect(fieldn),COLLECT(orgRel),collect(orgUnitRel),collect(unitRel)")
     List<KPermissionModel> getAllPermissionModelByName(Collection<String> modelName);
 
 }

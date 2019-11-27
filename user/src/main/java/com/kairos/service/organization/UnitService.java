@@ -169,5 +169,4 @@ public class UnitService {
         return organizationBaseRepository.findOne(organisationId) instanceof Unit;
     }
 
-
 }

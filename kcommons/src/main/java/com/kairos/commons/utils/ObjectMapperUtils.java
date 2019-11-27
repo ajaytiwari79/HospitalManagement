@@ -197,11 +197,11 @@ public class ObjectMapperUtils {
                 if (isNull(target)) {
                     target = (E)src.getClass().newInstance();
                 }
-                updateObjectByPermission(modelDTO,src,target);
-                /*BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
+               // updateObjectByPermission(modelDTO,src,target);
+                BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
                 targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
-                updatePropertyByPermission(modelDTO, targetWrapper, srcWrapper);*/
-                return (E) targetWrapper.getWrappedInstance();
+                updatePropertyByPermission(modelDTO, targetWrapper, srcWrapper,"");
+                return (E) srcWrapper.getWrappedInstance();
             } catch (Exception ex) {
                 LOGGER.error(ERROR,ex);
             }
@@ -213,20 +213,30 @@ public class ObjectMapperUtils {
 
     private static <E> void updateObjectByPermission(ModelDTO modelDTO, E src, E target) {
         try {
-            if (isNull(target)) {
-                target = (E) src.getClass().newInstance();
-            }
-            for (FieldDTO field : modelDTO.getFieldPermissions()) {
-                updateFieldValueByPermission(src, target, field);
-                if (isCollectionNotEmpty(modelDTO.getSubModelPermissions())) {
-                    for (ModelDTO subModelPermission : modelDTO.getSubModelPermissions()) {
-                        updateObjectByPermission(subModelPermission, src.getClass().getDeclaredField(subModelPermission.getModelName()), target.getClass().getDeclaredField(subModelPermission.getModelName()));
-
-                    }
+            if(!(src instanceof Collection)){
+                if (isNull(target)) {
+                    target = (E) src.getClass().newInstance();
                 }
+                updatePermission(modelDTO, src, target);
+            }else {
+                /*for (E o : ((Collection) src)) {
+                    updateObjectByPermission()
+                }*/
             }
         } catch (NoSuchFieldException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static <E> void updatePermission(ModelDTO modelDTO, E src, E target) throws NoSuchFieldException, IllegalAccessException {
+        for (FieldDTO field : modelDTO.getFieldPermissions()) {
+            updateFieldValueByPermission(src, target, field);
+            if (isCollectionNotEmpty(modelDTO.getSubModelPermissions())) {
+                for (ModelDTO subModelPermission : modelDTO.getSubModelPermissions()) {
+                    updateObjectByPermission(subModelPermission, src.getClass().getDeclaredField(subModelPermission.getModelName()), target.getClass().getDeclaredField(subModelPermission.getModelName()));
+
+                }
+            }
         }
     }
 
@@ -242,15 +252,15 @@ public class ObjectMapperUtils {
     }
 
 
-    private static void updatePropertyByPermission(ModelDTO modelDTO, BeanWrapper targetWrapper, BeanWrapper srcWrapper) {
+    private static void updatePropertyByPermission(ModelDTO modelDTO, BeanWrapper targetWrapper, BeanWrapper srcWrapper,String subFieldName) {
         for (FieldDTO field : modelDTO.getFieldPermissions()) {
-            if (field.getPermissions().contains(FieldLevelPermission.WRITE) && targetWrapper.isWritableProperty(field.getFieldName()) && srcWrapper.isReadableProperty(field.getFieldName())) {
-                targetWrapper.setPropertyValue(field.getFieldName(), srcWrapper.getPropertyValue(field.getFieldName()));
+            if (!field.getPermissions().contains(FieldLevelPermission.WRITE) && targetWrapper.isReadableProperty(subFieldName+field.getFieldName()) && srcWrapper.isWritableProperty(subFieldName+field.getFieldName())) {
+                srcWrapper.setPropertyValue(subFieldName+field.getFieldName(), targetWrapper.getPropertyValue(subFieldName+field.getFieldName()));
             }
         }
         if(isCollectionNotEmpty(modelDTO.getSubModelPermissions())){
             for (ModelDTO subModelPermission : modelDTO.getSubModelPermissions()) {
-                updatePropertyByPermission(subModelPermission, targetWrapper, srcWrapper);
+                updatePropertyByPermission(subModelPermission, targetWrapper, srcWrapper,subModelPermission.getModelName()+".");
 
             }
         }

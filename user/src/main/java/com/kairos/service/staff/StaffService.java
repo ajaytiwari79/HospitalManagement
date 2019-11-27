@@ -360,7 +360,7 @@ public class StaffService {
 
     private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
         staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
-        staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
+        //staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
@@ -1015,7 +1015,7 @@ public class StaffService {
         }
     }
 
-    private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) throws ParseException {
+    private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail){
         staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
         staffToUpdate.setLastName(staffPersonalDetail.getLastName());
         staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());

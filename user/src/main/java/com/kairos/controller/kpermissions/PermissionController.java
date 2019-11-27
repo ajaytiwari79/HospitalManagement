@@ -45,7 +45,7 @@ public class PermissionController {
     }
 
 
-    @RequestMapping(value = "/create_permission",method = RequestMethod.POST)
+    @PutMapping(value = "/update_permission")
     public ResponseEntity createFieldPermissions(@Valid @RequestBody PermissionDTO permissionDTO,@RequestParam boolean updateOrganisationCategories)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO,updateOrganisationCategories));
 
