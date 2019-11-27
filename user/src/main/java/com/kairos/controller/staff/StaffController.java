@@ -524,6 +524,14 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsEmploymentData(staffIds, employmentIds, unitId, ORGANIZATION));
     }
 
+
+    @RequestMapping(value = "/staffs_employments_details", method = RequestMethod.GET)
+    @ApiOperation("get staff and employment details by unit ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffAndEmploymentData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds, @RequestParam("employmentIds") List<Long> employmentIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsAndEmploymentData(staffIds, employmentIds, unitId));
+    }
+
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)
     @ApiOperation("verify staff has unit employment in unit or not and get current employment ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")

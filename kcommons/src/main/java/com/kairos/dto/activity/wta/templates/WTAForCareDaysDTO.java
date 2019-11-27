@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.wta.templates;
 
+import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.WTATemplateType;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import java.util.List;
 public class WTAForCareDaysDTO extends WTABaseRuleTemplateDTO{
 
     private List<ActivityCareDayCount> careDayCounts = new ArrayList<>();
+    private CutOffIntervalUnit cutOffIntervalUnit;
 
     public WTAForCareDaysDTO() {
         wtaTemplateType = WTATemplateType.WTA_FOR_CARE_DAYS;
