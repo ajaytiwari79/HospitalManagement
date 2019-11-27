@@ -226,8 +226,10 @@ public class AppConstants {
     public static final String AUTHORIZATION = "Authorization";
 
 
-
-
+//Group
+    public static final double DAYS_IN_ONE_YEAR = 365.242199;
+    public static final double DAYS_IN_ONE_MONTH = 30.4368499;
+    public static final long MAX_LONG_VALUE = 9999999999999999L;
 
 
 }

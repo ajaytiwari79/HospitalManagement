@@ -43,7 +43,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     Boolean checkPayGradeLevelAlreadyExists(Long payTableId, Long payGradeLevel);
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[:"+HAS_PAY_GRADE+"]->(payGrade:PayGrade{deleted:false}) WHERE id(payTable)={0}\n" +
-            "MATCH(payGrade)-[rel:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea)\n" +
+            "MATCH(payGrade)-[rel:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea{deleted:false})\n" +
             "OPTIONAL MATCH(payTable)-[r:"+HAS_TEMP_PAY_TABLE+"]-(tempPayTable:PayTable)-[:"+HAS_PAY_GRADE+"]->(oldPayGrade:PayGrade{deleted:false,payGradeLevel:payGrade.payGradeLevel})-[oldRel:"+HAS_PAY_GROUP_AREA+"]-(pga) \n" +
             "RETURN id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,payGrade.published as published,collect({id:id(rel),payGroupAreaId:id(pga),payGroupAreaAmount:rel.payGroupAreaAmount,publishedAmount:oldRel.payGroupAreaAmount}) as payGroupAreas ORDER BY payGradeLevel")
     List<PayGradeResponse> getPayGradesByPayTableId(Long payTableId);

@@ -366,18 +366,18 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeMongoRepository.existsByIdAndCountryIdAndDeletedFalse(id, countryId);
     }
 
-    public Set<BigInteger> getAllTimeTypeWithItsLowerLevel(Long countryId, List<BigInteger> timeTypeIds){
+    public Map<BigInteger,TimeTypeDTO> getAllTimeTypeWithItsLowerLevel(Long countryId, Collection<BigInteger> timeTypeIds){
         List<TimeTypeDTO> timeTypeDTOS =  getAllTimeType(null,countryId);
-        Set<BigInteger> resultTimeTypeDTOS = new HashSet<>();
+        Map<BigInteger,TimeTypeDTO> resultTimeTypeDTOS = new HashMap<>();
         updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTOS.get(0).getChildren(), timeTypeIds,false);
         updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTOS.get(1).getChildren(), timeTypeIds,false);
         return resultTimeTypeDTOS;
     }
 
-    private void updateTimeTypeList(Set<BigInteger> resultTimeTypeDTOS, List<TimeTypeDTO> timeTypeDTOS, List<BigInteger> timeTypeIds, boolean addAllLowerLevelChildren){
+    private void updateTimeTypeList(Map<BigInteger,TimeTypeDTO> resultTimeTypeDTOS, List<TimeTypeDTO> timeTypeDTOS, Collection<BigInteger> timeTypeIds, boolean addAllLowerLevelChildren){
         for(TimeTypeDTO timeTypeDTO : timeTypeDTOS) {
-            if(timeTypeIds.indexOf(timeTypeDTO.getId())>=0){
-                resultTimeTypeDTOS.add(timeTypeDTO.getId());
+            if(timeTypeIds.contains(timeTypeDTO.getId())){
+                resultTimeTypeDTOS.put(timeTypeDTO.getId(),timeTypeDTO);
                 if(isCollectionNotEmpty(timeTypeDTO.getChildren())){
                     updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTO.getChildren(), timeTypeIds,true);
                 }
@@ -385,7 +385,7 @@ public class TimeTypeService extends MongoBaseService {
                 if(isCollectionNotEmpty(timeTypeDTO.getChildren())) {
                     updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, true);
                 }else{
-                    resultTimeTypeDTOS.add(timeTypeDTO.getId());
+                    resultTimeTypeDTOS.put(timeTypeDTO.getId(),timeTypeDTO);
                 }
             }else{
                 updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, false);

@@ -289,6 +289,7 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, response);
     }
+
     // Skills
     @ApiOperation(value = "assign Skills to staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.POST)
@@ -301,6 +302,7 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
+
 
     @ApiOperation(value = "Get skills of staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.GET)
@@ -522,6 +524,14 @@ public class StaffController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds, @RequestParam("employmentIds") List<Long> employmentIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsEmploymentData(staffIds, employmentIds, unitId, ORGANIZATION));
+    }
+
+
+    @RequestMapping(value = "/staffs_employments_details", method = RequestMethod.GET)
+    @ApiOperation("get staff and employment details by unit ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffAndEmploymentData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds, @RequestParam("employmentIds") List<Long> employmentIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsAndEmploymentData(staffIds, employmentIds, unitId));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)

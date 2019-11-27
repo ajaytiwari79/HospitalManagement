@@ -22,8 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 
 public class KPIUtils {
@@ -146,7 +145,7 @@ public class KPIUtils {
     }
 
     public static void sortKpiDataByDateTimeInterval(List<CommonKpiDataUnit> kpiDataUnits) {
-        if (isCollectionNotEmpty(kpiDataUnits)) {
+        if (isCollectionNotEmpty(kpiDataUnits) && isNotNull(kpiDataUnits.get(0).getDate())) {
             String label = kpiDataUnits.get(0).getDate();
             if (label.matches("\\d{2}-\\D{3}-\\d{2}")) {
                 kpiDataUnits.sort(Comparator.comparing(o -> LocalDate.parse(o.getDate(), DateTimeFormatter.ofPattern(DD_MMM_YY))));
@@ -161,7 +160,7 @@ public class KPIUtils {
                 Double.valueOf(0.0).equals(clusteredBarChartKpiDataUnit.getValue()));
     }
 
-    public static boolean verifyKPIResponseData(Map<Object, Double> objectListMap) {
+    public static <T, E> boolean verifyKPIResponseData(Map<T, E> objectListMap) {
         return objectListMap.values().stream().anyMatch(value -> !Double.valueOf(0.0).equals(value));
     }
 
@@ -184,32 +183,29 @@ public class KPIUtils {
 
 
     public static String getKpiDateFormatByIntervalUnit(String receivedDate, DurationType intervalUnit, KPIRepresentation kpiRepresentation) {
-        String localDate[] =  receivedDate.split(" -").length > 1 ? receivedDate.split(" -") : new String[]{receivedDate};
-        LocalDate startDate=getLocalDateStringByDateFormat(localDate[0]);
-        LocalDate endDate=localDate.length > 1 ? getLocalDateStringByDateFormat(localDate[1]):null;
-        String result = "";
-        switch (intervalUnit) {
-            case DAYS:
-                result = localDate.length > 1 && KPIRepresentation.REPRESENT_TOTAL_DATA.equals(kpiRepresentation)  ? getStringByLocalDates(getDayOrMonthStringWithFormat(startDate.getDayOfWeek().toString()), getDayOrMonthStringWithFormat(endDate.getDayOfWeek().toString())) : getDayOrMonthStringWithFormat(startDate.getDayOfWeek().toString());
-                break;
-            case WEEKS:
-                result = localDate.length > 1  && KPIRepresentation.REPRESENT_TOTAL_DATA.equals(kpiRepresentation)? getStringByLocalDates(WEEk + getWeekNoByLocalDate(startDate), WEEk + getWeekNoByLocalDate(endDate.minusDays(1))) : WEEk + getWeekNoByLocalDate(startDate);
-                break;
-            case MONTHS:
-                result = localDate.length > 1 && KPIRepresentation.REPRESENT_TOTAL_DATA.equals(kpiRepresentation)? getStringByLocalDates(getDayOrMonthStringWithFormat(startDate.getMonth().toString()), getDayOrMonthStringWithFormat(endDate.getMonth().toString())) : getDayOrMonthStringWithFormat(startDate.getMonth().toString());
-                break;
-            case YEAR:
-                result = localDate.length > 1 && KPIRepresentation.REPRESENT_TOTAL_DATA.equals(kpiRepresentation)? getStringByLocalDates(String.valueOf(startDate.getYear()), String.valueOf(endDate.getYear())) : String.valueOf(startDate.getYear());
-                break;
-            default:
-                break;
+        String result = receivedDate;
+        if(!KPIRepresentation.REPRESENT_TOTAL_DATA.equals(kpiRepresentation)) {
+            LocalDate startDate = getLocalDateStringByDateFormat(receivedDate);
+            switch (intervalUnit) {
+                case DAYS:
+                    result = getDayOrMonthStringWithFormat(startDate.getDayOfWeek().toString());
+                    break;
+                case WEEKS:
+                    result = WEEk + getWeekNoByLocalDate(startDate);
+                    break;
+                case MONTHS:
+                    result = getDayOrMonthStringWithFormat(startDate.getMonth().toString());
+                    break;
+                case YEAR:
+                    result = String.valueOf(startDate.getYear());
+                    break;
+                default:
+                    break;
+            }
         }
         return result;
     }
 
-    public static String getStringByLocalDates(String startDate, String endDate) {
-        return startDate + " - " + endDate;
-    }
 
     public static String getDayOrMonthStringWithFormat(String dayOrMonth) {
         return StringUtils.capitalize(dayOrMonth.substring(0, 3).toLowerCase());

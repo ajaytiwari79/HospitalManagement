@@ -309,12 +309,12 @@ public class CounterDistController {
 
     @PostMapping(UNIT_URL + KPI_URL + "/kpi_data")
     public ResponseEntity<Map<String, Object>> kpiDataOfUnitByInterval(@PathVariable BigInteger kpiId, @PathVariable Long unitId, @RequestBody FilterCriteriaDTO filterCriteria ,@RequestParam(required = false) Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiDataByInterval(kpiId, unitId, filterCriteria, ConfLevel.UNIT,staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiDataByInterval(kpiId, unitId, filterCriteria, staffId));
     }
 
     @PostMapping(COUNTRY_URL + KPI_URL + "/kpi_data")
     public ResponseEntity<Map<String, Object>> kpiDataOfCountryByInterval(@PathVariable BigInteger kpiId, @PathVariable Long countryId, @RequestBody FilterCriteriaDTO filterCriteria ,@RequestParam(required = false) Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiDataByInterval(kpiId, countryId, filterCriteria, ConfLevel.COUNTRY,staffId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, counterDataService.getKpiDataByInterval(kpiId, countryId, filterCriteria, staffId));
     }
 
     @PostMapping(COUNTRY_URL+"/create_default_category")
