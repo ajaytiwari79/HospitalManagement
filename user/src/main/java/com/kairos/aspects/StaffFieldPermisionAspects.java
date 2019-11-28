@@ -27,6 +27,7 @@ public class StaffFieldPermisionAspects {
     @Inject
     private PermissionService permissionService;
     @Inject private AccessPageService accessPageService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffFieldPermisionAspects.class);
 
 
@@ -80,7 +81,7 @@ public class StaffFieldPermisionAspects {
     }*/
 
     //@Around("execution(public com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail com.kairos.persistence.repository.user.staff.StaffGraphRepository*.*(..))")
-    @Before("execution(* com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository.save(..))")
+    //@Before("execution(* com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository.save(..))")
     public <T extends UserBaseEntity> void validateStaffResponseAsPerPermissdsaadion(JoinPoint joinPoint) {
         List<T> objects = checkAndReturnValidModel(joinPoint);
         if(isCollectionNotEmpty(objects)) {
@@ -91,7 +92,7 @@ public class StaffFieldPermisionAspects {
     private <T extends UserBaseEntity> List<T> checkAndReturnValidModel(JoinPoint joinPoint) {
         List<T> validModels = new ArrayList<>();
         if(isNotNull(UserContext.getUserDetails())){
-            boolean accessGroupValid = !accessPageService.isHubMember(UserContext.getUserDetails().getId());
+            boolean accessGroupValid = !UserContext.getUserDetails().isHubMember();
             boolean argsValid = joinPoint.getArgs().length!=0;
             if(accessGroupValid && argsValid){
                 validModels = Arrays.stream(joinPoint.getArgs()).filter(arg -> arg.getClass().isAnnotationPresent(KPermissionModel.class)).map(model->(T)model).collect(Collectors.toList());

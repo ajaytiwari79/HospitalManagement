@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
@@ -38,6 +39,7 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.organization.UnitService;
 import com.kairos.service.redis.RedisService;
@@ -116,6 +118,7 @@ public class UserService {
     @Inject
     private OrganizationService organizationService;
     @Inject private UnitService unitService;
+    @Inject private PermissionService permissionService;
 
     /**
      * Calls UserGraphRepository,
@@ -480,6 +483,7 @@ public class UserService {
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
          permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
+         permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(),userAccessRoleDTO.getAccessGroupIds()), ModelDTO.class));
         return permissionData;
     }
 
