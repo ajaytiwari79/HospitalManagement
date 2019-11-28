@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 public class TabKPIDTO {
     private Long unitId;
-    private Long tabId;
+    private String tabId;
     private List<BigInteger> kpiIds;
 }

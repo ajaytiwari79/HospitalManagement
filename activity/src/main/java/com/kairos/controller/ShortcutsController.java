@@ -30,7 +30,7 @@ private ShortcutsService shortcutsService;
     }
 
     @ApiOperation("update shortcuts")
-    @GetMapping("/shortcut")
+    @PutMapping("/shortcut")
     public ResponseEntity<Map<String, Object>> updateShortcutById(@RequestBody ShortcutsDTO shortcutsDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shortcutsService.updateShortcut(shortcutsDTO));
     }

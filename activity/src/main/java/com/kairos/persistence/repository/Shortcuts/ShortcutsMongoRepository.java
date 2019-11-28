@@ -21,4 +21,6 @@ public interface ShortcutsMongoRepository extends MongoRepository<Shortcuts, Big
     @Query(value = "{deleted:false,staffId:?0,unitId:?1,name:?2}")
     ShortcutsDTO findShortcutByUnitIdAndStaffIdAndName(Long staffId , Long unitId , String name);
 
+    boolean existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(String name, Long staffId , Long unitId, BigInteger id);
+
 }

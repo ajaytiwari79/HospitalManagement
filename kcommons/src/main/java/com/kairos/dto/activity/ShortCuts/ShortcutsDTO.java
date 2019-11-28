@@ -20,4 +20,8 @@ public class ShortcutsDTO {
     private StaffFilterDTO staffFilter;
     private TabKPIDTO tabKPIs;
     private List<ShortcutsDetailsDTO> shortcutsDetails;
+
+    public void setName(String name) {
+        this.name = name.trim();
+    }
 }

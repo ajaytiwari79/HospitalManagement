@@ -13,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 public class TabKPI extends MongoBaseEntity {
     private Long unitId;
-    private Long tabId;
+    private String tabId;
     private List<BigInteger> kpiIds;
 }
