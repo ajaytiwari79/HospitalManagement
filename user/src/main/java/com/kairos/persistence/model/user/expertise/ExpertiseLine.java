@@ -1,11 +1,8 @@
 package com.kairos.persistence.model.user.expertise;
 
-import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
-import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.services.OrganizationService;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
@@ -13,14 +10,12 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.kairos.commons.utils.ObjectUtils.isEquals;
 import static com.kairos.persistence.model.constants.RelationshipConstants.FOR_SENIORITY_LEVEL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.SUPPORTS_SERVICES;
 
 @NodeEntity
 @Getter
 @Setter
-@NoArgsConstructor
 public class ExpertiseLine extends UserBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
@@ -30,23 +25,20 @@ public class ExpertiseLine extends UserBaseEntity {
 
     @Relationship(type = FOR_SENIORITY_LEVEL)
     private List<SeniorityLevel> seniorityLevel;
-
-    private BreakPaymentSetting breakPaymentSetting;
     private int fullTimeWeeklyMinutes; // This is equals to 37 hours
     private int numberOfWorkingDaysInWeek; // 5 or 7
 
-    /*private ExpertiseLine(){
+    private ExpertiseLine(){
 
-    }*/
+    }
 
 
     private ExpertiseLine(ExpertiseLineBuilder expertiseLineBuilder) {
         this.startDate = expertiseLineBuilder.startDate;
         this.endDate = expertiseLineBuilder.endDate;
-        this.breakPaymentSetting=expertiseLineBuilder.breakPaymentSetting;
         this.fullTimeWeeklyMinutes=expertiseLineBuilder.fullTimeWeeklyMinutes;
         this.numberOfWorkingDaysInWeek=expertiseLineBuilder.numberOfWorkingDaysInWeek;
-        this.seniorityLevel=null;//expertiseLineBuilder.seniorityLevel;
+        this.seniorityLevel=expertiseLineBuilder.seniorityLevel;
         this.organizationServices=expertiseLineBuilder.organizationServices;
     }
 
@@ -54,11 +46,10 @@ public class ExpertiseLine extends UserBaseEntity {
     public static class ExpertiseLineBuilder {
         private LocalDate startDate;
         private LocalDate endDate;
-        private BreakPaymentSetting breakPaymentSetting;
         private int fullTimeWeeklyMinutes; // This is equals to 37 hours
         private Integer numberOfWorkingDaysInWeek; // 5 or 7
         private List<OrganizationService> organizationServices;
-        //private List<SeniorityLevel> seniorityLevel;
+        private List<SeniorityLevel> seniorityLevel;
 
 
         public ExpertiseLineBuilder setStartDate(LocalDate startDate) {
@@ -71,13 +62,8 @@ public class ExpertiseLine extends UserBaseEntity {
             return this;
         }
 
-        public ExpertiseLineBuilder setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
-            this.breakPaymentSetting = breakPaymentSetting;
-            return this;
-        }
-
         public ExpertiseLineBuilder setSeniorityLevel(List<SeniorityLevel> seniorityLevel) {
-            //this.seniorityLevel = seniorityLevel;
+            this.seniorityLevel = seniorityLevel;
             return this;
         }
         public ExpertiseLineBuilder setNumberOfWorkingDaysInWeek(Integer numberOfWorkingDaysInWeek) {

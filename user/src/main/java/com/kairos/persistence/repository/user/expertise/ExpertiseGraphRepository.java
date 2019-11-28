@@ -78,7 +78,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "CASE when seniorDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE when childCareDays IS NULL THEN [] ELSE collect(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays " +
             "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
-            "expertise.endDate as endDate ,expertise.description as description ,expertise.published as published,level as organizationLevel,union,sector, " +
+            "expertise.endDate as endDate ,expertise.description as description ,expertise.breakPaymentSetting as breakPaymentSetting,expertise.published as published,level as organizationLevel,union,sector, " +
             "seniorDays,childCareDays ORDER BY expertise.name")
     List<ExpertiseQueryResult> getAllExpertise(long countryId, boolean[] published);
 
@@ -90,7 +90,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "   freeChoicePercentage:seniorityLevel.freeChoicePercentage,freeChoiceToPension:seniorityLevel.freeChoiceToPension, " +
             "   to:seniorityLevel.to,payGrade:{id:id(payGradeData), payGradeLevel :payGradeData.payGradeLevel}})  END  as seniorityLevels "+
             "RETURN id(exl) as id ,id(expertise) as expertiseId, exl.startDate as startDate , " +
-            "exl.endDate as endDate ,exl.breakPaymentSetting as breakPaymentSetting,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek, " +
+            "exl.endDate as endDate ,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek, " +
             "services as organizationServices,payTables[0] as payTable,seniorityLevels ORDER BY exl.startDate")
     List<ExpertiseLineQueryResult> findAllExpertiseLines(List<Long> expertiseIds);
 
@@ -100,7 +100,7 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("MATCH(expertise:Expertise{deleted:false})  WHERE id(expertise) = {0} " +
             "RETURN expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate , " +
-            "expertise.endDate as endDate ,expertise.description as description ,expertise.published as published ORDER BY expertise.name")
+            "expertise.endDate as endDate ,expertise.description as description ,expertise.published as published,expertise.breakPaymentSetting as breakPaymentSetting ORDER BY expertise.name")
     ExpertiseQueryResult getExpertiseById(Long expertiseId);
 
     @Query("MATCH(expertise:Expertise{deleted:false,history:false})-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level) WHERE id(level)={0} AND expertise.name={1}  AND id(expertise)<> {2}" +

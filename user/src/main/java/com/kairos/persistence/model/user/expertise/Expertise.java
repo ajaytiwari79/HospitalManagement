@@ -2,12 +2,11 @@ package com.kairos.persistence.model.user.expertise;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.commons.utils.DateUtils;
+import com.kairos.enums.shift.BreakPaymentSetting;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.services.OrganizationService;
 import com.kairos.persistence.model.organization.union.Sector;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,13 +66,15 @@ public class Expertise extends UserBaseEntity {
 
     @Relationship(type = SUPPORTED_BY_UNION)
     private Organization union;
+    private BreakPaymentSetting breakPaymentSetting;
 
     public Expertise(String name, Country country) {
         this.name = name;
         this.country = country;
     }
 
-    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country, boolean published, List<ExpertiseLine> expertiseLines) {
+    public Expertise(@NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, Country country,
+                     boolean published, List<ExpertiseLine> expertiseLines,BreakPaymentSetting breakPaymentSetting) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;
@@ -81,6 +82,7 @@ public class Expertise extends UserBaseEntity {
         this.country = country;
         this.published = published;
         this.expertiseLines = expertiseLines;
+        this.breakPaymentSetting=breakPaymentSetting;
     }
 
     public Expertise(Long id, @NotBlank(message = ERROR_EXPERTISE_NAME_NOTNULL) String name, String description, LocalDate startDate, LocalDate endDate, boolean published, List<ExpertiseLine> expertiseLines) {

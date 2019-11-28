@@ -352,9 +352,9 @@ public class PlanningPeriodService extends MongoBaseService {
         }
 
         // period can't be created in past
-        if (DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(planningPeriodDTO.getStartDate())) {
-            exceptionService.actionNotPermittedException(ERROR_PERIOD_PAST_DATE_CREATION);
-        }
+//        if (DateUtils.getLocalDateFromDate(DateUtils.getDate()).isAfter(planningPeriodDTO.getStartDate())) {
+//            exceptionService.actionNotPermittedException(ERROR_PERIOD_PAST_DATE_CREATION);
+//        }
 
 
         List<PlanningPeriod> planningPeriods = new ArrayList<>(planningPeriodDTO.getRecurringNumber());
