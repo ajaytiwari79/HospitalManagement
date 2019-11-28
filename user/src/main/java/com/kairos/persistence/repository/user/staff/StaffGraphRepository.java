@@ -97,11 +97,8 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[:" + ORGANIZATION_HAS_TAG + "]-(unit) WITH  skill,staff, orgSkillRelation,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END AS otags\n" +
             "OPTIONAL MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill{isEnabled:true}) WITH skill,r,orgSkillRelation, ctags,otags\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH skill,skillCategory,r,orgSkillRelation,ctags,otags\n" +
-            "RETURN {children:COLLECT({id:id(skill),name:case WHEN orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end ,isSelected:r.isEnabled, tags:ctags+otags}),id:id(skillCategory),name:skillCategory.name} AS data")
+            "RETURN {children:COLLECT(DISTINCT {id:id(skill),name:case WHEN orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end ,isSelected:r.isEnabled, tags:ctags+otags}),id:id(skillCategory),name:skillCategory.name} AS data")
     List<Map<String, Object>> getSkills(long staffId, long unitId);
-
-    @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} AND id(skill) IN {1} MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill) set r.isEnabled=false,r.lastModificationDate={2} RETURN r")
-    void deleteSkillFromStaff(long staffId, List<Long> skillId, long lastModificationDate);
 
     @Query("MATCH (o:Unit)-[*..5]->(s:Staff) WHERE id(o)= {0}  WITH s AS staff " +
             "MATCH (t:Team)-[r:" + TEAM_HAS_MEMBER + "]-(staff) WHERE r.role = 'PLANNER' RETURN staff")
@@ -178,12 +175,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "ON CREATE SET r.creationDate={2},r.lastModificationDate={3},r.startDate={3},r.endDate=0,r.skillLevel={4},r.isEnabled={5}\n" +
             "ON MATCH SET r.lastModificationDate={3},r.startDate={3},r.endDate=0,r.skillLevel={4},r.isEnabled={5} RETURN true")
     void addSkillInStaff(long staffId, List<Long> skillId, long creationDate, long lastModificationDate, SkillLevel skillLevel, boolean isEnabled);
-
-    @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} and id(skill) IN {1}\n" +
-            "MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory) WITH skill, staff, skillCategory, r\n" +
-            "MATCH (organization:Unit)-[orgHasSkill:" + ORGANISATION_HAS_SKILL + "]->(skill:Skill) WHERE id(organization)={2} WITH skill, staff, skillCategory,orgHasSkill, r \n" +
-            "RETURN {id:id(r),skillId:id(skill),name:orgHasSkill.customName,skillCategory:skillCategory.name,startDate:r.startDate,endDate:r.endDate,visitourId:skill.visitourId,lastSyncInVisitour:r.lastModificationDate,status:r.isEnabled,level:r.skillLevel} AS data")
-    List<Map<String, Object>> getStaffSkillInfo(long staffId, List<Long> skillId, long unitId);
 
     @Query("MATCH (staff:Staff) WHERE id(staff)={0} WITH staff\n" +
             "MATCH (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) WHERE id(expertise) IN {1} WITH staff,skill\n" +
@@ -443,6 +434,21 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (organization:Organization{deleted:false,isEnable:true,isKairosHub:true})-[:HAS_POSITIONS]->(position:Position)-[:BELONGS_TO]-(staff:Staff)-[:BELONGS_TO]->(user:User) WHERE id(organization)={0} AND id(user)={1} RETURN staff")
     Staff getStaffOfHubByHubIdAndUserId(Long hubId,Long userId);
+
+    @Query("MATCH (staff:Staff),(skill:Skill) WHERE id (staff)={0} AND id(skill) IN {1} WITH staff,skill\n" +
+            "Merge (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)\n" +
+            "ON CREATE SET r.lastModificationDate={3},r.startDate={2},r.skillLevel={4},r.isEnabled={5}\n" +
+            "ON MATCH SET r.lastModificationDate={3},r.startDate={2},r.skillLevel={4},r.isEnabled={5} RETURN true")
+    void addSkillInStaff(long staffId, List<Long> skillId, String creationDate, long lastModificationDate, SkillLevel skillLevel, boolean isEnabled);
+
+    @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} AND id(skill) IN {1} MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill) set r.isEnabled=false,r.lastModificationDate={2} RETURN r")
+    void deleteSkillFromStaff(long staffId, List<Long> skillId, long lastModificationDate);
+
+    @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff)={0} and id(skill) IN {1}\n" +
+            "MATCH (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory) WITH skill, staff, skillCategory, r\n" +
+            "MATCH (organization:Unit)-[orgHasSkill:" + ORGANISATION_HAS_SKILL + "]->(skill:Skill) WHERE id(organization)={2} WITH skill, staff, skillCategory,orgHasSkill, r \n" +
+            "RETURN {id:id(r),skillId:id(skill),name:orgHasSkill.customName,skillCategory:skillCategory.name,startDate:r.startDate,endDate:r.endDate,visitourId:skill.visitourId,lastSyncInVisitour:r.lastModificationDate,status:r.isEnabled,skillLevel:r.skillLevel} AS data")
+    List<Map<String, Object>> getStaffSkillInfo(long staffId, List<Long> skillId, long unitId);
 
     @Query("MATCH (staff:Staff)-[rel:BELONGS_TO_TAGS]->(tag:Tag) WHERE id(tag)={0}  \n" +
             "detach delete rel")
