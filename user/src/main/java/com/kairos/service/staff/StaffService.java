@@ -290,7 +290,7 @@ public class StaffService {
         assignTags(staffId, staffPersonalDetail, staffToUpdate);
         Staff staff = staffGraphRepository.save(staffToUpdate);
         staffPersonalDetail.setUserName(staff.getUser().getUserName());
-        staffPersonalDetail.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staff.getStaffChildDetails(),StaffChildDetailDTO.class));
+        staffPersonalDetail.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staff.getStaffChildDetails(),StaffChildDetailDTO.class));
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
@@ -300,7 +300,7 @@ public class StaffService {
         // Set if user is female and pregnant
         User user = updateUserDetails(staffId, staffPersonalDetail);
         staffPersonalDetail.setPregnant(user.isPregnant());
-        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
+        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
         teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
         return staffPersonalDetail;
@@ -320,7 +320,7 @@ public class StaffService {
     }
 
     private void assignTags(long staffId, StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate) {
-        staffToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getTags(), Tag.class));
+        staffToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffPersonalDetail.getTags(), Tag.class));
         if(isCollectionNotEmpty(staffPersonalDetail.getTags())) {
             staffGraphRepository.unlinkTagsFromStaff(staffId, staffPersonalDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
         }else{
@@ -359,8 +359,8 @@ public class StaffService {
     }
 
     private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
-        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
-        staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
+        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
+        //staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
@@ -928,7 +928,7 @@ public class StaffService {
             EmploymentQueryResult employment = employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().orElse(null);
             if (isNotNull(employment)) {
                 List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-                employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyPropertiesOfListByMapper(protectedDaysOffSettings,ProtectedDaysOffSetting.class));
+                employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(protectedDaysOffSettings,ProtectedDaysOffSetting.class));
                 employmentDetails = new StaffEmploymentDetails(employment.getId(), ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class), employment.getEndDate(), employment.getStartDate(), employment.getUnitId(), employment.getEmploymentSubType());
             }
         }
@@ -1015,7 +1015,7 @@ public class StaffService {
         }
     }
 
-    private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) throws ParseException {
+    private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail){
         staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
         staffToUpdate.setLastName(staffPersonalDetail.getLastName());
         staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
@@ -1067,7 +1067,7 @@ public class StaffService {
 
     public List<com.kairos.dto.user.staff.StaffDTO> getAllStaffPersonalDetailsByUnit(Long unitId){
         List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetailDTOS,com.kairos.dto.user.staff.StaffDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffPersonalDetailDTOS,com.kairos.dto.user.staff.StaffDTO.class);
     }
 
 

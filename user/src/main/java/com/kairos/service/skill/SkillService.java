@@ -1,6 +1,5 @@
 package com.kairos.service.skill;
 
-import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -331,7 +330,7 @@ public class SkillService {
 
         Map<String, Object> map = new HashMap<>();
         map.put("skills", skillsResponse);
-        map.put("staffList", ObjectMapperUtils.copyPropertiesOfListByMapper(staffList, Map.class));
+        map.put("staffList", ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffList, Map.class));
         return map;
     }
 

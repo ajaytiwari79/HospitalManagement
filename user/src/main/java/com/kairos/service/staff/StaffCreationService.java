@@ -149,7 +149,7 @@ public class StaffCreationService {
         ContactDetail contactDetail = objectMapper.convertValue(payload, ContactDetail.class);
         staff.setContactDetail(contactDetail);
         staff.setCurrentStatus(payload.getCurrentStatus());
-        staff.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(payload.getTags(), Tag.class));
+        staff.setTags(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(payload.getTags(), Tag.class));
         if (Optional.ofNullable(staffQueryResult).isPresent()) {
             contactAddress.setId(staffQueryResult.getContactAddressId());
             contactDetail.setId(staffQueryResult.getContactDetailId());

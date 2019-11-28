@@ -60,7 +60,7 @@ public class OrganizationAccessorPartyService {
             }
            accessorPartyRepository.saveAll(accessorParties);
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessorParties, AccessorPartyDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessorParties, AccessorPartyDTO.class);
     }
 
     public List<AccessorPartyResponseDTO> getAllAccessorParty(Long unitId) {

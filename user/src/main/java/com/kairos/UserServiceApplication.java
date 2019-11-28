@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.commons.config.mongo.EnableAuditLogging;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
@@ -80,14 +81,7 @@ public class UserServiceApplication implements WebMvcConfigurer {
 	@Bean
 	@Primary
 	public ObjectMapper serializingObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		JavaTimeModule javaTimeModule = new JavaTimeModule();
-		javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer());
-		javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
-		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		objectMapper.registerModule(javaTimeModule);
-		return objectMapper;
+		return ObjectMapperUtils.getObjectMapper();
 	}
 	@Bean
 	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {

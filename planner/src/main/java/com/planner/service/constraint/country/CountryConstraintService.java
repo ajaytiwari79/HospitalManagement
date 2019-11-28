@@ -95,7 +95,7 @@ public class CountryConstraintService {
 
     public List<CountryConstraint> getAllCountryConstraintByCountryId(Long countryId) {
         List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(true, countryId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(constraintList, CountryConstraint.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(constraintList, CountryConstraint.class);
     }
 
     public void updateCountryConstraint(CountryConstraintDTO countryConstraintDTO) {
