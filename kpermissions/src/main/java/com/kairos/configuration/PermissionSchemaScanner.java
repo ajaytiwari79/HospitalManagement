@@ -33,25 +33,24 @@ public class PermissionSchemaScanner {
                                     fieldsData.put(FIELD_NAME, permissionEntityField.getName());
                                     fields.add(fieldsData);
                                 });
-                        List<Map<String, Object>> subModelData = findSubModelData(permissionClass, fields);
+                        List<Map<String, Object>> subModelData = findSubModelData(permissionClass);
                         getRelationShipTypeModelData(permissionClass, fields, reflections);
                         modelMetaData.put(MODEL_NAME, permissionClass.getSimpleName());
                         modelMetaData.put(MODEL_CLASS, permissionClass.toString());
-                        //modelMetaData.put(IS_PERMISSION_SUB_MODEL, true);
                         modelMetaData.put(FIELDS, fields);
                         modelMetaData.put(SUB_MODEL, subModelData);
                         modelData.add(modelMetaData);
                     });
-            LOGGER.info("model==" + modelData);
+            LOGGER.info("model== {}",modelData);
 
         } catch (Exception ex) {
-            LOGGER.error("ERROR in identifying permission models======" + ex.getMessage());
+            LOGGER.error("ERROR in identifying permission models====== {}",ex.getMessage());
         }
         return modelData;
     }
 
     private void getRelationShipTypeModelData(Class permissionClass, Set<Map<String, String>> fields, Reflections reflections) {
-        reflections.getTypesAnnotatedWith(KPermissionRelatedModel.class).forEach(kpermissionRelationModel -> {
+        reflections.getTypesAnnotatedWith(KPermissionRelatedModel.class).forEach(kpermissionRelationModel ->
             Arrays.stream(kpermissionRelationModel.getDeclaredFields())
                     .filter(entityField -> entityField.isAnnotationPresent(KPermissionRelationshipFrom.class))
                     .findAny().ifPresent(field -> {
@@ -64,11 +63,11 @@ public class PermissionSchemaScanner {
                         fields.add(fieldsData);
                     });
                 }
-            });
-        });
+            })
+        );
     }
 
-    private List<Map<String, Object>> findSubModelData(Class permissionClass, Set<Map<String, String>> fields) {
+    private List<Map<String, Object>> findSubModelData(Class permissionClass) {
         List<Map<String, Object>> subModelData = new ArrayList<>();
         Arrays.stream(permissionClass.getDeclaredFields())
                 .filter(entityField -> entityField.isAnnotationPresent(KPermissionSubModel.class))

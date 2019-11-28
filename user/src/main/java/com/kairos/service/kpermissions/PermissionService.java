@@ -260,50 +260,10 @@ public class PermissionService {
 
     private KPermissionFieldQueryResult getkPermissionFieldQueryResult(ModelDTO modelDTO, FieldDTO fieldDTO) {
         KPermissionFieldQueryResult kPermissionFieldQueryResult = permissionFieldRepository.getPermissionFieldByIdAndPermissionModelId(modelDTO.getId(), fieldDTO.getId());
-        if(kPermissionFieldQueryResult == null){
+        if (kPermissionFieldQueryResult == null) {
             exceptionService.dataNotFoundByIdException("message.permission.KPermissionFieldQueryResult");
         }
         return kPermissionFieldQueryResult;
-    }
-
-    public <E extends Object, T extends UserBaseEntity> E evaluatePermission(@Valid E dtoObject){
-        try {
-            /*Organization organization = organizationService.fetchParentOrganization(UserContext.getUnitId());
-            Long staffId = staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId());
-            StaffAccessGroupQueryResult staffAccessGroupQueryResult =  accessGroupRepository.getAccessGroupIdsByStaffIdAndUnitId(staffId, organization.getId());
-            List<Long> accessGroupIds = staffAccessGroupQueryResult.getAccessGroupIds();
-            //List<String> permissionFields = permissionFieldRepository.findPermissionFieldsByAccessGroupAndModelClass(modelClass.toString(), accessGroupIds,permissions);
-            SimpleFilterProvider filterProvider = new SimpleFilterProvider();
-            filterProvider.addFilter("permissionValidatorFilter",
-                    SimpleBeanPropertyFilter.filterOutAllExcept("firstName"));
-            ObjectMapper objectMapper = ObjectMapperUtils.getObjectMapper();
-            objectMapper.setFilterProvider(filterProvider);
-            String jsonData = objectMapper.writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(dtoObject);*/
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-        }
-        return null;
-    }
-
-
-    public <T extends UserBaseEntity,E extends UserBaseEntity> List<T> updateModelBasisOfPermission(List<T> objects){
-        try {
-           /* Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
-            Set<String> modelNames = objects.stream().map(model->model.getClass().getSimpleName()).collect(Collectors.toSet());
-            List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
-            List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()));
-            List<ModelDTO> modelDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
-            Map<String,ModelDTO> modelMap = modelDTOS.stream().collect(Collectors.toMap(k->k.getModelName(),v->v));
-            List<Long> objectIds = objects.stream().filter(model->isNotNull(model.getId())).map(model->model.getId()).collect(Collectors.toList());*/
-            /*((Neo4jSession)permissionModelRepository.getSession()).context().detachNodeEntity()
-            List<E> dataBaseObjects = sessionFactory.openSession().loadAll(Staff.class,objectIds,2).stream().map(staff -> (E)staff).collect(Collectors.toList());
-            Map<Long,E> mapOfDataBaseObject = dataBaseObjects.stream().collect(Collectors.toMap(k->k.getId(),v->v));
-            updateObjectsPropertiesBeforeSave(mapOfDataBaseObject,modelMap,objects);*/
-        }catch (Exception e){
-            LOGGER.error(e.getMessage());
-        }
-        return objects;
     }
 
     public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(Map<Long,E> mapOfDataBaseObject,Map<String,ModelDTO> modelMap,List<T> objects){
