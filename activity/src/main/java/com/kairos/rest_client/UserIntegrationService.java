@@ -29,7 +29,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
-import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.organization.*;
@@ -844,7 +843,7 @@ public class UserIntegrationService {
 
     public Set<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
         Set<Object> data= genericRestClient.publishRequest(functionIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/get_functions_date", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Object>>>() {});
-        return ObjectMapperUtils.copyPropertiesOfSetByMapper(data,LocalDate.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(data,LocalDate.class);
     }
 
     public Set<BigInteger> getSickSettingsOfUnit(Long unitId) {

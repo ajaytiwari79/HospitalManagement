@@ -172,7 +172,7 @@ public class WTAOrganizationService extends MongoBaseService {
             });
             wtaQueryResultDTOS=wtaQueryResultMap.values().stream().collect(Collectors.toList());
         }
-        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+        List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getDefaultCTAOfExpertiseAndDate(unitId, expertiseId, selectedDate);
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
     }

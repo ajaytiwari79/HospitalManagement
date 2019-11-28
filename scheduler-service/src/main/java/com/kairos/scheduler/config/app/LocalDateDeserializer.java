@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
 import java.time.LocalDate;
 
-import static com.kairos.commons.utils.ObjectMapperUtils.FORMATTER;
+import static com.kairos.commons.utils.ObjectMapperUtils.LOCALDATE_FORMATTER;
 
 public class LocalDateDeserializer extends JsonDeserializer<LocalDate> {
 
     @Override
     public LocalDate deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        return LocalDate.parse(p.getValueAsString(), FORMATTER);
+        return LocalDate.parse(p.getValueAsString(), LOCALDATE_FORMATTER);
     }
 }

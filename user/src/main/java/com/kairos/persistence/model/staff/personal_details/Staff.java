@@ -66,6 +66,7 @@ public class Staff extends UserBaseEntity {
     private boolean copyKariosMailToLogin;
     @KPermissionField
     private String sendNotificationBy;
+    @KPermissionField
     private String profilePic;
     @KPermissionField
     private String email;

@@ -123,11 +123,11 @@ public class ClauseService {
      * @return
      */
     private void setMetadataOfMasterClause(MasterClauseDTO masterClauseDTO, MasterClause clause) {
-        clause.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterClauseDTO.getOrganizationTypes()), OrganizationType.class));
-        clause.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubTypes()), OrganizationSubType.class));
-        clause.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterClauseDTO.getOrganizationServices()), ServiceCategory.class));
-        clause.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfListByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubServices()), SubServiceCategory.class));
-        clause.setAccountTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
+        clause.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterClauseDTO.getOrganizationTypes()), OrganizationType.class));
+        clause.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubTypes()), OrganizationSubType.class));
+        clause.setOrganizationServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterClauseDTO.getOrganizationServices()), ServiceCategory.class));
+        clause.setOrganizationSubServices(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(new ArrayList<>(masterClauseDTO.getOrganizationSubServices()), SubServiceCategory.class));
+        clause.setAccountTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(masterClauseDTO.getAccountTypes(), AccountType.class));
 
     }
 
@@ -167,12 +167,12 @@ public class ClauseService {
      */
     public List<ClauseResponseDTO> getAllClauseByCountryId(Long countryId) {
         List<Clause> clauses = clauseRepository.findAllClauseByCountryId(countryId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(clauses, ClauseResponseDTO.class);
     }
 
     public List<ClauseResponseDTO> getAllClauseByUnitId(Long unitId) {
         List<Clause> clauses = clauseRepository.findAllClauseByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(clauses, ClauseResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(clauses, ClauseResponseDTO.class);
     }
 
 

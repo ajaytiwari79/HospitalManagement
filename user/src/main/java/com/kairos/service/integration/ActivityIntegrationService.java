@@ -71,7 +71,7 @@ public class ActivityIntegrationService {
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypesByUnit(Long unitId, Long countryId) {

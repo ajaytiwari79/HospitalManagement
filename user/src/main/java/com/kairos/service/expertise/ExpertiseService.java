@@ -135,7 +135,7 @@ public class ExpertiseService {
                 exceptionService.invalidRequestException(MESSAGE_PUBLISH_EXPERTISE_UNION);
             }
         });
-        validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
+        validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO);
         Expertise expertise = new Expertise(expertiseDTO.getName(), expertiseDTO.getDescription(), expertiseDTO.getStartDate(), expertiseDTO.getEndDate(), country, expertiseDTO.isPublished(), Collections.singletonList(expertiseLine),expertiseDTO.getBreakPaymentSetting());
         setBasicDetails(expertiseDTO, country, expertise);
@@ -209,7 +209,7 @@ public class ExpertiseService {
     public ExpertiseQueryResult updateExpertiseLine(ExpertiseDTO expertiseDTO, Long expertiseId, Long expertiseLineId) {
         expertiseDTO.setExpertiseLineId(expertiseLineId);
         Expertise expertise = expertiseGraphRepository.findById(expertiseId, 2).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseDTO.getId())));
-        validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
+        validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine currentExpertiseLine = expertise.getExpertiseLines().stream().filter(k -> k.getId().equals(expertiseLineId)).findFirst().orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(PLEASE_PROVIDE_THE_VALID_LINE_ID)));
         expertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));
         if (expertise.isPublished() && isExpertiseLineChanged(currentExpertiseLine, expertiseDTO.getOrganizationServiceIds(), expertiseDTO) && currentExpertiseLine.getStartDate().isBefore(expertiseDTO.getStartDate())) {
@@ -300,7 +300,7 @@ public class ExpertiseService {
         unionServiceWrapper.setServices(organizationServiceService.getAllOrganizationService(countryId));
         unionServiceWrapper.setUnions(unitGraphRepository.findAllUnionsByCountryId(countryId));
         unionServiceWrapper.setOrganizationLevels(countryGraphRepository.getLevelsByCountry(countryId));
-        unionServiceWrapper.setSectors(ObjectMapperUtils.copyPropertiesOfListByMapper(sectorGraphRepository.findAllSectorsByCountryAndDeletedFalse(countryId), SectorDTO.class));
+        unionServiceWrapper.setSectors(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(sectorGraphRepository.findAllSectorsByCountryAndDeletedFalse(countryId), SectorDTO.class));
         return unionServiceWrapper;
     }
 
@@ -351,11 +351,6 @@ public class ExpertiseService {
         return expertiseGraphRepository.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId);
     }
 
-
-
-
-
-
     public Boolean addPlannedTimeInExpertise(Long expertiseId, ExpertiseEmploymentTypeDTO expertiseEmploymentTypeDTO) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (isNull(expertise)) {
@@ -396,7 +391,7 @@ public class ExpertiseService {
         List<EmploymentTypeQueryResult> employmentTypes = employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId, false);
         Map<String, Object> countryDetail = new HashMap<>();
         countryDetail.put("countryId", countryId);
-        List<PresenceTypeDTO> presenceTypes = ObjectMapperUtils.copyPropertiesOfListByMapper
+        List<PresenceTypeDTO> presenceTypes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper
                 (genericRestClient.publish(null, countryId, false, IntegrationOperation.GET, "/plannedTimeType", countryDetail), PresenceTypeDTO.class);
 
         countryDetail.put("employmentTypes", employmentTypes);
@@ -425,9 +420,10 @@ public class ExpertiseService {
         return protectedDaysOffSettingDTO;
     }
 
-    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSetting(Long expertiseId) {
-        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(() -> new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getProtectedDaysOffSettings(), ProtectedDaysOffSettingDTO.class);
+
+    public List<ProtectedDaysOffSettingDTO> getProtectedDaysOffSetting(Long expertiseId){
+        Expertise expertise = expertiseGraphRepository.findById(expertiseId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId)));
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getProtectedDaysOffSettings(),ProtectedDaysOffSettingDTO.class);
     }
 
 
@@ -449,8 +445,8 @@ public class ExpertiseService {
 
     public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays(Long expertiseId) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
-        List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
-        List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
+        List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
+        List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
     }
 
@@ -458,8 +454,8 @@ public class ExpertiseService {
         Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
         List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseId);
         for (Expertise expertise : expertises) {
-            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
-            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfListByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
+            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
+            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
             seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
         }
         return seniorAndChildCareDaysDTOMap;
@@ -599,7 +595,7 @@ public class ExpertiseService {
         ExpertiseLine expertiseLine = (expertise.getExpertiseLines().get(expertise.getExpertiseLines().size() - 1));
         expertiseDTO.setUnion(ObjectMapperUtils.copyPropertiesByMapper(expertise.getUnion(), UnionIDNameDTO.class));
         Map<Long, Long> seniorityLevelAndPayGradeIdMap = expertiseLine.getSeniorityLevel().stream().collect(Collectors.toMap(UserBaseEntity::getId, v -> v.getPayGrade().getId()));
-        expertiseDTO.setSeniorityLevels(ObjectMapperUtils.copyPropertiesOfListByMapper(expertiseLine.getSeniorityLevel(), SeniorityLevelDTO.class));
+        expertiseDTO.setSeniorityLevels(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertiseLine.getSeniorityLevel(), SeniorityLevelDTO.class));
         expertiseDTO.getSeniorityLevels().forEach(s -> {
             s.setPayGradeId(seniorityLevelAndPayGradeIdMap.get(s.getId()));
             s.setId(null);

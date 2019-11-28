@@ -183,17 +183,13 @@ public class AccessPageService {
     }
 
     public boolean isHubMember(Long userId){
-        Boolean hubMember = accessPageRepository.isHubMember(userId);
-        if(hubMember instanceof Boolean){
-            return hubMember;
-        }
-        return false;
+        return accessPageRepository.isHubMember(userId);
     }
 
 
     public List<KPIAccessPageDTO> getKPIAccessPageListForCountry(Long countryId){
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForCountry(countryId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessPages, KPIAccessPageDTO.class);
     }
 
     public List<KPIAccessPageDTO> getKPIAccessPageListForUnit(Long unitId){
@@ -203,7 +199,7 @@ public class AccessPageService {
             unitId=parentHub.getId();
         }
         List<KPIAccessPageQueryResult> accessPages = accessPageRepository.getKPITabsListForUnit(unitId,userId);
-        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        List<KPIAccessPageDTO> kpiTabs = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessPages, KPIAccessPageDTO.class);
         for (KPIAccessPageDTO accessPage : kpiTabs) {
             for (KPIAccessPageDTO kpiAccessPageDTO : accessPage.getChild()) {
                 kpiAccessPageDTO.setActive(kpiAccessPageDTO.isRead()||kpiAccessPageDTO.isWrite());
@@ -215,7 +211,7 @@ public class AccessPageService {
 
     public List<KPIAccessPageDTO> getKPIAccessPageList(String moduleId){
         List<AccessPage> accessPages = accessPageRepository.getKPITabsList(moduleId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessPages, KPIAccessPageDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessPages, KPIAccessPageDTO.class);
     }
 
     public AccessPageLanguageDTO assignLanguageToAccessPage(String moduleId, AccessPageLanguageDTO accessPageLanguageDTO){

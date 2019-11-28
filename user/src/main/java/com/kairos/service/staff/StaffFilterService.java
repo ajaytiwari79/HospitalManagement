@@ -334,7 +334,7 @@ public class StaffFilterService {
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(staffFilterDTO.getModuleId());
 
         StaffFavouriteFilter staffFavouriteFilter = new StaffFavouriteFilter(staffFilterDTO.getName(),
-                ObjectMapperUtils.copyPropertiesOfListByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
+                ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffFilterDTO.getFiltersData(), FilterSelection.class), filterGroup);
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         staff.addFavouriteFilters(staffFavouriteFilter);
         staffGraphRepository.save(staff);
@@ -368,7 +368,7 @@ public class StaffFilterService {
         staffGraphRepository.detachStaffFavouriteFilterDetails(staffFavouriteFilter.getId());
         List<FilterSelectionDTO> filters = favouriteFilterDTO.getFiltersData();
         filters.forEach(filterSelection -> filterSelection.setId(null));
-        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyPropertiesOfListByMapper(filters, FilterSelection.class));
+        staffFavouriteFilter.setFiltersData(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(filters, FilterSelection.class));
         staffFavouriteFilter.setName(favouriteFilterDTO.getName());
         staffFavouriteFilterGraphRepository.save(staffFavouriteFilter);
         return favouriteFilterDTO;
@@ -399,7 +399,7 @@ public class StaffFilterService {
         filters.forEach(filterSelection -> {
             if (!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
                     filterSelection.getName())) {
-                mapOfFilters.put(filterSelection.getName(), FilterType.GROUPS.equals(filterSelection.getName())? groupService.getAllStaffByGroupIds(unitId, ObjectMapperUtils.copyPropertiesOfListByMapper(filterSelection.getValue(), Long.class)) : filterSelection.getValue());
+                mapOfFilters.put(filterSelection.getName(), FilterType.GROUPS.equals(filterSelection.getName())? groupService.getAllStaffByGroupIds(unitId, new ArrayList<>(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(filterSelection.getValue(), Long.class))) : filterSelection.getValue());
 
             }
         });

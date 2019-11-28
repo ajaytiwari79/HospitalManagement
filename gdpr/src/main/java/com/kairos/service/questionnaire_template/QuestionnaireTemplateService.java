@@ -258,7 +258,7 @@ public class QuestionnaireTemplateService {
         if (Optional.ofNullable(questionnaireTemplate.getSubAssetType()).isPresent()) {
             questionnaireTemplateResponseDTO.setSubAssetType(new QuestionnaireAssetTypeDTO(questionnaireTemplate.getSubAssetType().getId(), questionnaireTemplate.getSubAssetType().getName(), questionnaireTemplate.getSubAssetType().isSubAssetType()));
         }
-        questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyPropertiesOfListByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
+        questionnaireTemplateResponseDTO.setSections(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(questionnaireTemplate.getSections(), QuestionnaireSectionResponseDTO.class));
 
         return questionnaireTemplateResponseDTO;
     }

@@ -34,7 +34,7 @@ public class IntegrationConfigurationService extends MongoBaseService {
 
     public List<IntegrationSettingsDTO> getAllIntegrationServices(){
 
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(integrationConfigurationRepository.findAllAndIsEnabledTrue(),IntegrationSettingsDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(integrationConfigurationRepository.findAllAndIsEnabledTrue(),IntegrationSettingsDTO.class);
     }
 
     public boolean deleteIntegrationService(BigInteger integrationServiceId){

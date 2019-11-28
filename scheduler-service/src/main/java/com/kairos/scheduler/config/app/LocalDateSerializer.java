@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.time.LocalDate;
 
-import static com.kairos.commons.utils.ObjectMapperUtils.FORMATTER;
+import static com.kairos.commons.utils.ObjectMapperUtils.LOCALDATE_FORMATTER;
 
 public class LocalDateSerializer extends JsonSerializer<LocalDate> {
 
     @Override
     public void serialize(LocalDate value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        gen.writeString(value.format(FORMATTER));
+        gen.writeString(value.format(LOCALDATE_FORMATTER));
     }
 }
