@@ -416,6 +416,7 @@ public class CounterDataService extends MongoBaseService {
         if (!applicableKPIS.get(0).getTitle().equals(counterDTO.getTitle()) && Optional.ofNullable(counterRepository.getKpiByTitleAndUnitId(counterDTO.getTitle(), refId, level)).isPresent()) {
             exceptionService.duplicateDataException(ERROR_KPI_NAME_DUPLICATE);
         }
+        kpi.setMultiDimensional(counterDTO.isMultiDimensional());
         kpi.setCalculationFormula(counterDTO.getCalculationFormula());
         applicableKPIS.get(0).setApplicableFilter(new ApplicableFilter(counterDTO.getSelectedFilters(), true));
         List<ApplicableKPI> updateApplicableKPI = counterRepository.getFilterBaseApplicableKPIByKpiIdsOrUnitId(Arrays.asList(kpiId), Arrays.asList(ConfLevel.UNIT, ConfLevel.STAFF), ConfLevel.COUNTRY.equals(level) ? null : refId);
