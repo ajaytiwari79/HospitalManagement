@@ -1,5 +1,6 @@
 package com.kairos.service.skill;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
