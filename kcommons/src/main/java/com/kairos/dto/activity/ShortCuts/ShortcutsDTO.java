@@ -18,7 +18,7 @@ public class ShortcutsDTO {
     private Long staffId;
     private Long unitId;
     private StaffFilterDTO staffFilter;
-    private TabKPIDTO tabKPIs;
+    private List<TabKPIDTO> tabKPIs;
     private List<ShortcutsDetailsDTO> shortcutsDetails;
 
     public void setName(String name) {
