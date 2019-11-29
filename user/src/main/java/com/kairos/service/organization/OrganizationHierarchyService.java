@@ -53,7 +53,6 @@ public class OrganizationHierarchyService {
 
     public List<QueryResult> generateHierarchy() {
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
-
         OrganizationBaseEntity hierarchy = organizationGraphRepository.generateHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList())).get(0);
         QueryResult orgHierarchy = setUnitPermission(hierarchy, accessPageService.isHubMember(UserContext.getUserDetails().getId()));
         return Collections.singletonList(orgHierarchy);
