@@ -29,10 +29,22 @@ private ShortcutsService shortcutsService;
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shortcutsService.getShortcutById(shortcutId));
     }
 
+    @ApiOperation("get shortcuts")
+    @DeleteMapping("/shortcut/{shortcutId}")
+    public ResponseEntity<Map<String, Object>> deleteShortcutById(@PathVariable BigInteger shortcutId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shortcutsService.deleteShortcutById(shortcutId));
+    }
+
+    @ApiOperation("get shortcuts")
+    @PostMapping("/copy_shortcut/{shortcutId}")
+    public ResponseEntity<Map<String, Object>> createCopyOfShortcut(@PathVariable BigInteger shortcutId, @RequestParam String name) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shortcutsService.createCopyOfShortcut(shortcutId,name));
+    }
+
     @ApiOperation("update shortcuts")
-    @PutMapping("/shortcut")
-    public ResponseEntity<Map<String, Object>> updateShortcutById(@RequestBody ShortcutsDTO shortcutsDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shortcutsService.updateShortcut(shortcutsDTO));
+    @PutMapping("/shortcut/{shortcutId}")
+    public ResponseEntity<Map<String, Object>> updateShortcutById(@PathVariable BigInteger shortcutId,@RequestBody ShortcutsDTO shortcutsDTO , @RequestParam(required = false , value = "name") String name ) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shortcutsService.updateShortcut(shortcutId,name,shortcutsDTO));
     }
 
     @ApiOperation("get all shortcuts")
