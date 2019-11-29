@@ -90,11 +90,11 @@ public class ExpertiseController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.getExpertiseByOrganizationSubType(countryId, organizationSubTypeId));
     }
 
-//    @ApiOperation(value = "Update Age range in Expertise")
-//    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/set_age_range")
-//    public ResponseEntity<Map<String, Object>> updateAgeRangeInExpertise(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("wtaType") String wtaType) {
-//        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO, wtaType));
-//    }
+    @ApiOperation(value = "Update Age range in Expertise")
+    @PutMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/set_age_range")
+    public ResponseEntity<Map<String, Object>> updateAgeRangeInExpertise(@PathVariable Long expertiseId, @RequestBody @Valid List<AgeRangeDTO> ageRangeDTO, @RequestParam("wtaType") String wtaType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateAgeRangeInExpertise(expertiseId, ageRangeDTO, wtaType));
+    }
 
     @ApiOperation(value = "save a functional payment settings for expertise")
     @PostMapping(value =  COUNTRY_URL + "/expertise/{expertiseId}/functional_payment")

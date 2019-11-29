@@ -452,17 +452,37 @@ public class ExpertiseService {
         return new SeniorAndChildCareDaysDTO(seniorDays, childCareDays);
     }
 
-    public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseId) {
-        Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
-        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseId);
-        for (Expertise expertise : expertises) {
-            List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
-            List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getSeniorDays(), CareDaysDTO.class);
-            seniorAndChildCareDaysDTOMap.put(expertise.getId(), new SeniorAndChildCareDaysDTO(seniorDays, childCareDays));
+    public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {
+        Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
+        if (isNull(expertise) || expertise.isDeleted()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
+
         }
-        return seniorAndChildCareDaysDTOMap;
+        validateAgeRange(ageRangeDTO);
+
+        List<CareDays> careDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(ageRangeDTO, CareDays.class);
+        if (wtaType.equalsIgnoreCase(SENIOR_DAYS)) {
+            expertise.setSeniorDays(careDays);
+        } else if (wtaType.equalsIgnoreCase(CHILD_CARE)) {
+            expertise.setChildCareDays(careDays);
+        }
+        expertiseGraphRepository.save(expertise);
+        ageRangeDTO = ObjectMapperUtils.copyPropertiesOfCollectionByMapper((wtaType.equals(CHILD_CARE) ? expertise.getChildCareDays() : expertise.getSeniorDays()), AgeRangeDTO.class);
+        return ageRangeDTO;
     }
 
+    //Validating age range
+    private void validateAgeRange(List<AgeRangeDTO> ageRangeDTO) {
+        Collections.sort(ageRangeDTO);
+        for (int i = 0; i < ageRangeDTO.size(); i++) {
+            if (ageRangeDTO.get(i).getTo() != null && (ageRangeDTO.get(i).getFrom() > ageRangeDTO.get(i).getTo()))
+                exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_RANGEINVALID, ageRangeDTO.get(i).getFrom(), ageRangeDTO.get(i).getTo());
+            if (ageRangeDTO.size() > 1 && i < ageRangeDTO.size() - 1 && ageRangeDTO.get(i).getTo() > ageRangeDTO.get(i + 1).getFrom())
+                exceptionService.actionNotPermittedException(MESSAGE_EXPERTISE_AGE_OVERLAP);
+
+        }
+
+    }
 
     private Organization getUnion(Long unionId, String unionName, Country country) {
         Organization union;
