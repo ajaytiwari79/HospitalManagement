@@ -196,7 +196,9 @@ public class KPIBuilderCalculationService implements CounterService {
                 methodParam = ShiftActivityDTO::getMinutes;
                 break;
             case DELTA_TIMEBANK:
-                return getTotalTimeBank(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+                return getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo,false);
+            case STAFFING_LEVEL_CAPACITY:
+                return getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo,true);
             case UNAVAILABILITY:
                 return unavailabilityCalculationKPIService.getUnavailabilityCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             default:
@@ -206,16 +208,16 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
 
-    private double getTotalTimeBank(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        double totalTimeBank = 0;
+    private double getTotalTimeBankOrContractual(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean calculateContractual) {
+        double totalTimeBankOrContractual = 0;
         for (StaffKpiFilterDTO staffKpiFilterDTO : kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffId)) {
             for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
                 Collection<DailyTimeBankEntry> dailyTimeBankEntries = kpiCalculationRelatedInfo.getDailyTimeBankEntrysByEmploymentIdAndInterval(employmentWithCtaDetailsDTO.getId(), dateTimeInterval);
-                int timeBankOfInterval = (int) timeBankCalculationService.calculateDeltaTimeBankForInterval(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, new HashSet<>(), (List)dailyTimeBankEntries, false)[0];
-                totalTimeBank += timeBankOfInterval;
+                int timeBankOfInterval = (int) timeBankCalculationService.calculateDeltaTimeBankForInterval(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, new HashSet<>(), (List)dailyTimeBankEntries, calculateContractual)[0];
+                totalTimeBankOrContractual += timeBankOfInterval;
             }
         }
-        return getHoursByMinutes(totalTimeBank);
+        return getHoursByMinutes(totalTimeBankOrContractual);
     }
 
     private double getTotalValueByByType(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, Function<ShiftActivityDTO, Integer> methodParam) {
@@ -362,7 +364,6 @@ public class KPIBuilderCalculationService implements CounterService {
     private List<ClusteredBarChartKpiDataUnit> getClusteredBarChartDetails(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (YAxisConfig yAxisConfig : kpiCalculationRelatedInfo.getYAxisConfigs()) {
-            //for (CalculationType calculationType : kpiCalculationRelatedInfo.calculationTypes) {
                 kpiCalculationRelatedInfo.setCurrentCalculationType(null);
                 switch (yAxisConfig){
                     case ACTIVITY:
@@ -378,6 +379,7 @@ public class KPIBuilderCalculationService implements CounterService {
                     case PAYOUT:
                     case UNAVAILABILITY:
                     case TOTAL_PLANNED_HOURS:
+                    case STAFFING_LEVEL_CAPACITY:
                         CalculationType currentCalculationType = copyPropertiesByMapper(yAxisConfig, CalculationType.class);
                         kpiCalculationRelatedInfo.setCurrentCalculationType(currentCalculationType);
                         Double value = getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
@@ -387,7 +389,6 @@ public class KPIBuilderCalculationService implements CounterService {
                         break;
 
                 }
-            //}
         }
         return subClusteredBarValue;
     }
@@ -396,17 +397,16 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (CalculationType calculationType : kpiCalculationRelatedInfo.getCalculationTypes()) {
             kpiCalculationRelatedInfo.setCurrentCalculationType(calculationType);
-            if(!newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK,DURATION_HOURS,TOTAL_MINUTES,COLLECTIVE_TIME_BONUS_TIMEBANK, PAYOUT,COLLECTIVE_TIME_BONUS_PAYOUT,TOTAL_COLLECTIVE_BONUS,TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.currentCalculationType)){
-                return subClusteredBarValue;
-            }
-            if(isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_IDS))){
-                Double value = getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
-                subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
-            }else {
-                for (Map.Entry<BigInteger, Activity> activityEntry : kpiCalculationRelatedInfo.getActivityMap().entrySet()) {
-                    kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setActivityIds(newHashSet(activityEntry.getKey()));
+            if (newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK, DURATION_HOURS, TOTAL_MINUTES, COLLECTIVE_TIME_BONUS_TIMEBANK, PAYOUT, COLLECTIVE_TIME_BONUS_PAYOUT, TOTAL_COLLECTIVE_BONUS, TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.currentCalculationType)) {
+                if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_IDS))) {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activityEntry.getValue().getName(), activityEntry.getValue().getGeneralActivityTab().getBackgroundColor(), value));
+                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
+                } else {
+                    for (Map.Entry<BigInteger, Activity> activityEntry : kpiCalculationRelatedInfo.getActivityMap().entrySet()) {
+                        kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setActivityIds(newHashSet(activityEntry.getKey()));
+                        Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
+                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activityEntry.getValue().getName(), activityEntry.getValue().getGeneralActivityTab().getBackgroundColor(), value));
+                    }
                 }
             }
         }
@@ -417,17 +417,16 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (CalculationType calculationType : kpiCalculationRelatedInfo.getCalculationTypes()) {
             kpiCalculationRelatedInfo.setCurrentCalculationType(calculationType);
-            if(!newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK,DURATION_HOURS,TOTAL_MINUTES,COLLECTIVE_TIME_BONUS_TIMEBANK, PAYOUT,COLLECTIVE_TIME_BONUS_PAYOUT,TOTAL_COLLECTIVE_BONUS,TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.currentCalculationType)){
-                return subClusteredBarValue;
-            }
-            if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TIME_TYPE))) {
-                Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
-            } else {
-                for (Map.Entry<BigInteger, TimeTypeDTO> timeTypeEntry : kpiCalculationRelatedInfo.getTimeTypeMap().entrySet()) {
-                    kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setTimeTypeIds(newHashSet(timeTypeEntry.getKey()));
+            if(newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK,DURATION_HOURS,TOTAL_MINUTES,COLLECTIVE_TIME_BONUS_TIMEBANK, PAYOUT,COLLECTIVE_TIME_BONUS_PAYOUT,TOTAL_COLLECTIVE_BONUS,TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.currentCalculationType)) {
+                if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TIME_TYPE))) {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(timeTypeEntry.getValue().getLabel(), timeTypeEntry.getValue().getBackgroundColor(), value));
+                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
+                } else {
+                    for (Map.Entry<BigInteger, TimeTypeDTO> timeTypeEntry : kpiCalculationRelatedInfo.getTimeTypeMap().entrySet()) {
+                        kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setTimeTypeIds(newHashSet(timeTypeEntry.getKey()));
+                        Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
+                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(timeTypeEntry.getValue().getLabel(), timeTypeEntry.getValue().getBackgroundColor(), value));
+                    }
                 }
             }
         }
@@ -440,17 +439,16 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (CalculationType calculationType : kpiCalculationRelatedInfo.getCalculationTypes()) {
             kpiCalculationRelatedInfo.setCurrentCalculationType(calculationType);
-            if(!newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK,DURATION_HOURS,TOTAL_MINUTES,COLLECTIVE_TIME_BONUS_TIMEBANK, PAYOUT,COLLECTIVE_TIME_BONUS_PAYOUT,TOTAL_COLLECTIVE_BONUS,TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.currentCalculationType)){
-                return subClusteredBarValue;
-            }
-            if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(PLANNED_TIME_TYPE))) {
-                Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
-            } else {
-                for (Map.Entry<BigInteger, PlannedTimeType> plannedtimeTypeEntry : kpiCalculationRelatedInfo.getPlannedTimeMap().entrySet()) {
-                    kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setPlannedTimeIds(newHashSet(plannedtimeTypeEntry.getKey()));
+            if(newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK,DURATION_HOURS,TOTAL_MINUTES,COLLECTIVE_TIME_BONUS_TIMEBANK, PAYOUT,COLLECTIVE_TIME_BONUS_PAYOUT,TOTAL_COLLECTIVE_BONUS,TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.currentCalculationType)) {
+                if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(PLANNED_TIME_TYPE))) {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(plannedtimeTypeEntry.getValue().getName(), value));
+                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
+                } else {
+                    for (Map.Entry<BigInteger, PlannedTimeType> plannedtimeTypeEntry : kpiCalculationRelatedInfo.getPlannedTimeMap().entrySet()) {
+                        kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setPlannedTimeIds(newHashSet(plannedtimeTypeEntry.getKey()));
+                        Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
+                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(plannedtimeTypeEntry.getValue().getName(), value));
+                    }
                 }
             }
         }

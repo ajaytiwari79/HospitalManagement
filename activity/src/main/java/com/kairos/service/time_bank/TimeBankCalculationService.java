@@ -593,7 +593,7 @@ public class TimeBankCalculationService {
         int contractualOrDeltaMinutes = 0;
         if (interval != null) {
             DateTime startDate = interval.getStart();
-            while (startDate.isBefore(interval.getEnd())) {
+            while (!startDate.isAfter(interval.getEnd())) {
                 if(isCollectionEmpty(dayOfWeeks) || dayOfWeeks.contains(asLocalDate(startDate.toDate()).getDayOfWeek())){
                     if (calculateContractual || !dailyTimeBanksDatesMap.containsKey(startDate.toLocalDate())) {
                         boolean vaild = (employmentWithCtaDetailsDTO.getWorkingDaysInWeek() == 7) || (startDate.getDayOfWeek() != DateTimeConstants.SATURDAY && startDate.getDayOfWeek() != DateTimeConstants.SUNDAY);
