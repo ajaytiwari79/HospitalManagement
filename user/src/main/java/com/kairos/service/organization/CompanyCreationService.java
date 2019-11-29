@@ -450,7 +450,7 @@ public class CompanyCreationService {
         if(organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
-        reasonCodeService.createReasonCodeForUnit(unit, parentUnit.getId());
+        reasonCodeService.createReasonCodeForUnit(unit, country.getId());
         unitGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if(doesUnitManagerInfoAvailable(organizationBasicDTO)) {

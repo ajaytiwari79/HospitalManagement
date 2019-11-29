@@ -142,8 +142,8 @@ public class ReasonCodeService {
         return reasonCodeGraphRepository.save(reasonCode);
     }
 
-    public void createReasonCodeForUnit(Unit unit, long parentId) {
-        List<ReasonCodeResponseDTO> reasonCodeResponseDTO = reasonCodeGraphRepository.findReasonCodeByUnitId(parentId);
+    public void createReasonCodeForUnit(Unit unit, long countryId) {
+        List<ReasonCodeResponseDTO> reasonCodeResponseDTO = reasonCodeGraphRepository.findReasonCodeByCountryId(countryId);
         createDefaultData(reasonCodeResponseDTO, unit);
     }
 
