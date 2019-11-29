@@ -206,8 +206,7 @@ public class StaffRetrievalService {
             Map<Long, List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap = expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
             expertises.forEach(expertiseQueryResult -> {
                 expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId()));
-                ExpertiseLineQueryResult expertiseLine = expertiseQueryResult.getCurrentlyActiveLine();
-                expertiseQueryResult.setSector(expertiseLine.getSector());
+                ExpertiseLineQueryResult expertiseLine=expertiseQueryResult.getCurrentlyActiveLine();
                 expertiseQueryResult.setSeniorityLevels(expertiseLine.getSeniorityLevels());
             });
             return expertises;

@@ -21,6 +21,7 @@ import com.kairos.dto.activity.wta.version.WTATableSettingWrapper;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
+import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -197,7 +198,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
 
     private Map<Long, WTAResponseDTO> assignWTAToNewOrganization(WorkingTimeAgreement wta, WTADTO wtadto, WTABasicDetailsDTO wtaBasicDetailsDTO, boolean creatingFromCountry, Long referenceId) {
         List<WorkingTimeAgreement> workingTimeAgreements = new ArrayList<>(wtaBasicDetailsDTO.getOrganizations().size());
-        List<Long> organizationIds = wtaBasicDetailsDTO.getOrganizations().stream().map(o -> o.getId()).collect(Collectors.toList());
+        List<Long> organizationIds = wtaBasicDetailsDTO.getOrganizations().stream().map(OrganizationBasicDTO::getId).collect(Collectors.toList());
         List<WorkingTimeAgreement> workingTimeAgreementList = wtaRepository.findWTAByUnitIdsAndName(organizationIds, wtadto.getName());
         Map<String, WorkingTimeAgreement> workingTimeAgreementMap = workingTimeAgreementList.stream().collect(toMap(k -> k.getName() + "_" + k.getOrganization().getId() + "_" + k.getOrganizationType().getId(), v -> v));
         Map<String, BigInteger> activitiesIdsAndUnitIdsMap = getActivityMapWithUnitId(wtadto.getRuleTemplates(), organizationIds);

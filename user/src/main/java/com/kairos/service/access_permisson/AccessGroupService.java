@@ -104,8 +104,6 @@ public class AccessGroupService {
     @Inject
     private AccountTypeGraphRepository accountTypeGraphRepository;
     @Inject
-    private StaffService staffService;
-    @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;

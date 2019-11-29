@@ -89,20 +89,20 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN x")
     List<Long> getAllUnitsByCountryId(Long countryId);
 
-    @Query("MATCH(exl:ExpertiseLine)  WHERE id(exl)={0} " +
-            "OPTIONAL MATCH(exl)-[rel:"+BELONGS_TO_SECTOR+"]-(sector:Sector)\n" +
-            "with exl,rel  " +
+    @Query("MATCH(ex:Expertise)  WHERE id(ex)={0} " +
+            "OPTIONAL MATCH(ex)-[rel:"+BELONGS_TO_SECTOR+"]-(sector:Sector)\n" +
+            "with ex,rel  " +
             "MATCH(newSector:Sector) where id(newSector) = {1} \n" +
             "DETACH delete rel \n" +
-            "CREATE UNIQUE(exl)-[:"+BELONGS_TO_SECTOR+"]-(newSector) ")
-    void addSector(Long expertiseLineId,Long sectorId);
+            "CREATE UNIQUE(ex)-[:"+BELONGS_TO_SECTOR+"]-(newSector) ")
+    void addSector(Long expertiseId,Long sectorId);
 
-    @Query("MATCH(exl:ExpertiseLine)  WHERE id(exl)={0} " +
-            "OPTIONAL MATCH(exl)-[rel:"+SUPPORTED_BY_UNION+"]-(union:Organization)\n" +
-            "with exl,rel  " +
+    @Query("MATCH(ex:Expertise)  WHERE id(ex)={0} " +
+            "OPTIONAL MATCH(ex)-[rel:"+SUPPORTED_BY_UNION+"]-(union:Organization)\n" +
+            "with ex,rel  " +
             "MATCH(newUnion:Organization) where id(newUnion) = {1} \n" +
             "DETACH delete rel \n" +
-            "CREATE UNIQUE(exl)-[:"+SUPPORTED_BY_UNION+"]-(newUnion) ")
+            "CREATE UNIQUE(ex)-[:"+SUPPORTED_BY_UNION+"]-(newUnion) ")
     void addUnion(Long expertiseLineId,Long unionId);
 
     @Query("MATCH (org:Organization)-[:" + SUB_TYPE_OF + "]->(orgType:OrganizationType) WHERE id(orgType) IN {0} \n" +

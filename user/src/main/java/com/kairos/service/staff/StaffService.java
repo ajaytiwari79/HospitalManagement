@@ -45,6 +45,7 @@ import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
 import com.kairos.persistence.model.user.filter.FavoriteFilterQueryResult;
@@ -377,14 +378,16 @@ public class StaffService {
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
         for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
             Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
+            expertise=expertiseGraphRepository.findById(expertise.getId(),2).orElse(null);
             StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
             Long id = null;
+            ExpertiseLine expertiseLine=expertise.getCurrentlyActiveLine(null);
             if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
                 id = staffExperienceInExpertiseDTO.getId();
             Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
             staffExpertiseRelationShips.add(new StaffExpertiseRelationShip(id, staffToUpdate, expertise, staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths(), expertiseStartDate));
             boolean isSeniorityLevelMatched = false;
-            for (SeniorityLevel seniorityLevel : expertise.getSeniorityLevel()) {
+            for (SeniorityLevel seniorityLevel : expertiseLine.getSeniorityLevel()) {
                 if (staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() >= seniorityLevel.getFrom() * 12 && (seniorityLevel.getTo() == null || staffPersonalDetail.getExpertiseWithExperience().get(i).getRelevantExperienceInMonths() < seniorityLevel.getTo() * 12)) {
                     isSeniorityLevelMatched = true;
                     break;
