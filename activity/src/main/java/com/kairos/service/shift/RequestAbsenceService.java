@@ -113,6 +113,7 @@ public class RequestAbsenceService {
         if(!shiftOptional.isPresent()){
             exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
         }
+        ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
         if(TodoStatus.APPROVE.equals(todo.getStatus())){
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
             if(isNull(shiftOptional.get().getRequestAbsence())){
@@ -124,7 +125,6 @@ public class RequestAbsenceService {
                 todo.setStatus(TodoStatus.REQUESTED);
                 return (T)shiftAndActivtyStatusDTO;
             }
-            ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), shift.getEmploymentId(), new HashSet<>());
             if(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
                 Date startDate = getStartOfDay(shift.getStartDate());
@@ -137,10 +137,12 @@ public class RequestAbsenceService {
                 shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
             }
             response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTO);
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
         }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
             //todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
         }
         return response;
     }

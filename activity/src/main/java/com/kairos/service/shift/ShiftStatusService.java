@@ -223,11 +223,11 @@ public class ShiftStatusService {
                 break;
             case FIX:
                 shiftActivity.getStatus().add(FIX);
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, null);
+                sendMailToStaffWhenStatusChange(shift, shiftActivity.getActivityName(), shiftStatus, null);
                 break;
             case UNFIX:
                 shiftActivity.getStatus().removeAll(Arrays.asList(FIX));
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, null);
+                sendMailToStaffWhenStatusChange(shift, shiftActivity.getActivityName(), shiftStatus, null);
                 break;
             case APPROVE:
                 shiftActivity.getStatus().removeAll(Arrays.asList(PENDING, REQUEST));
@@ -235,7 +235,7 @@ public class ShiftStatusService {
                 break;
             case DISAPPROVE:
                 updateShiftOnDisapprove(shift, shiftActivity);
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, isNotNull(todo) ? todo.getComment() : null);
+                sendMailToStaffWhenStatusChange(shift, shiftActivity.getActivityName(), shiftStatus, isNotNull(todo) ? todo.getComment() : null);
                 break;
             case UNLOCK:
                 shiftActivity.getStatus().removeAll(Arrays.asList(LOCK, REQUEST));
@@ -249,7 +249,7 @@ public class ShiftStatusService {
             case PENDING:
                 shiftActivity.getStatus().removeAll(Arrays.asList(REQUEST));
                 shiftActivity.getStatus().add(PENDING);
-                sendMailToStaffWhenStatusChange(shift, shiftActivity, shiftStatus, null);
+                sendMailToStaffWhenStatusChange(shift, shiftActivity.getActivityName(), shiftStatus, null);
                 break;
             default:
                 break;
@@ -323,11 +323,11 @@ public class ShiftStatusService {
     }
 
 
-    public void sendMailToStaffWhenStatusChange(Shift shift, ShiftActivity activity, ShiftStatus shiftStatus, String disapproveComments) {
+    public void sendMailToStaffWhenStatusChange(Shift shift, String activityName, ShiftStatus shiftStatus, String disapproveComments) {
         StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime shiftDate = DateUtils.asLocalDateTime(shift.getStartDate());
         String bodyPart1 = "The status of the ";
-        String bodyPart2 = activity.getActivityName();
+        String bodyPart2 = activityName;
         String bodyPart3 = " activity which is planned on " + WordUtils.capitalizeFully(getEmailDateTimeWithFormat(shiftDate)) + " has been moved to ";
         String bodyPart4 = shiftStatus.toString();
         String bodyPart5 = " by " + UserContext.getUserDetails().getFullName() + ".\n";
