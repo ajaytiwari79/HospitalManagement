@@ -27,6 +27,7 @@ public class TodoDTO {
     private TodoStatus status;
     private LocalDate shiftDate;
     private Date shiftDateTime;
+    private Date requestedOn;
     private String description;
     private Long staffId;
     private Long employmentId;

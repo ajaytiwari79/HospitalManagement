@@ -15,6 +15,7 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
@@ -43,6 +44,7 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.todo.TodoService;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
@@ -105,6 +107,8 @@ public class KPIBuilderCalculationService implements CounterService {
     @Inject
     private UnavailabilityCalculationKPIService unavailabilityCalculationKPIService;
     @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject
+    private TodoService todoService;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig) {
@@ -538,6 +542,8 @@ public class KPIBuilderCalculationService implements CounterService {
         private CalculationType calculationType;
         private CalculationType currentCalculationType;
         private DateTimeInterval planningPeriodInterval;
+        private Map<BigInteger,List<TodoDTO>> activityIdAndTodoListMap;
+        private List<TodoDTO> todoDTOS;
 
         public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
@@ -617,6 +623,16 @@ public class KPIBuilderCalculationService implements CounterService {
             StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
             shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             currentShiftActivityCriteria = getDefaultShiftActivityCriteria();
+        }
+
+
+        public void getTodoDetails(){
+            todoDTOS=todoService.getAllTodoByEntityIds(shifts.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList()));
+            activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(k->k.getSubEntityId(),Collectors.toList()));
+        }
+
+        public List<TodoDTO> getTodosByInterval(DateTimeInterval dateTimeInterval , List<TodoDTO> todoDTOS){
+            return todoDTOS.stream().filter(todoDTO -> dateTimeInterval.containsAndEqualsEndDate(todoDTO.getRequestedOn())).collect(Collectors.toList());
         }
 
         private ShiftActivityCriteria getDefaultShiftActivityCriteria() {
@@ -710,6 +726,9 @@ public class KPIBuilderCalculationService implements CounterService {
             return filteredStaffKpiFilterDTOS;
         }
     }
+
+
+
 
     @Setter
     @Getter

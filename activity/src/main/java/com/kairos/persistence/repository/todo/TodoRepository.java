@@ -52,6 +52,9 @@ public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger>,Cu
 //    @Query(value = "{unitId:?0,shiftDate:{$gte:?1,$lte:?2}},staffId:{$in:?3},status:{$in:?4}}")
 //    List<TodoDTO> findAllByKpiFilter(Long unit, Date startDate, Date endDate, List<Long> staffIds, Collection<String> statuses);
 
+    @Query(value = "{entityId:{$in:?0},deleted:false,status:{$in:?1}}")
+    List<TodoDTO> findAllByEntityIdsAndTodoStatus(List<BigInteger> entityId, Collection<TodoStatus> statuses);
+
     @Query(value ="{subEntityId:?0,deleted:false,entityId:?1,status:{$in:?2}}")
     Todo findTodoBySubEntityId(BigInteger shiftActivityId,BigInteger shiftId,Collection<TodoStatus> statuses);
 }

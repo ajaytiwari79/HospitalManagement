@@ -261,4 +261,10 @@ public class TodoService {
         todoRepository.saveEntities(todoList);
 
     }
+
+
+    public List<TodoDTO> getAllTodoByEntityIds(List<BigInteger> entityIds){
+        return todoRepository.findAllByEntityIdsAndTodoStatus(entityIds,newArrayList(APPROVE, REQUESTED));
+    }
+
 }
