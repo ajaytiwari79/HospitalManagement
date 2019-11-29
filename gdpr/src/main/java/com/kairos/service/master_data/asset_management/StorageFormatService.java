@@ -58,7 +58,7 @@ public class StorageFormatService{
                 }
                 storageFormatRepository.saveAll(storageFormats);
             }
-           return ObjectMapperUtils.copyPropertiesOfListByMapper(storageFormats,StorageFormatDTO.class);
+           return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(storageFormats,StorageFormatDTO.class);
     }
 
 

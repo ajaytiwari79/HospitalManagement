@@ -37,8 +37,8 @@ public class StaffSkillLevelRelationship extends UserBaseEntity {
     @KPermissionRelationshipTo
     @EndNode
     private Skill skill;
-    private SkillLevel skillLevel = SkillLevel.ADVANCE;
-    private long startDate;
-    private long endDate;
+    private SkillLevel skillLevel = SkillLevel.BASIC;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private boolean isEnabled=true;
 }

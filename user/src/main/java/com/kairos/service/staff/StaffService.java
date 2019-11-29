@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -58,6 +59,7 @@ import com.kairos.persistence.repository.user.access_permission.AccessPageReposi
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
@@ -199,6 +201,8 @@ public class StaffService {
     private StaffCreationService staffCreationService;
     @Inject
     private RedisService redisService;
+    @Inject
+    private TagGraphRepository tagGraphRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
@@ -290,7 +294,7 @@ public class StaffService {
         assignTags(staffId, staffPersonalDetail, staffToUpdate);
         Staff staff = staffGraphRepository.save(staffToUpdate);
         staffPersonalDetail.setUserName(staff.getUser().getUserName());
-        staffPersonalDetail.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staff.getStaffChildDetails(),StaffChildDetailDTO.class));
+        staffPersonalDetail.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staff.getStaffChildDetails(), StaffChildDetailDTO.class));
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
@@ -300,9 +304,9 @@ public class StaffService {
         // Set if user is female and pregnant
         User user = updateUserDetails(staffId, staffPersonalDetail);
         staffPersonalDetail.setPregnant(user.isPregnant());
-        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
+        List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
-        teamService.assignStaffInTeams(staff,staffPersonalDetail.getTeamDetails(),unitId);
+        teamService.assignStaffInTeams(staff, staffPersonalDetail.getTeamDetails(), unitId);
         return staffPersonalDetail;
     }
 
@@ -320,10 +324,16 @@ public class StaffService {
     }
 
     private void assignTags(long staffId, StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate) {
-        staffToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getTags(), Tag.class));
-        if(isCollectionNotEmpty(staffPersonalDetail.getTags())) {
+        Map<Long, TagDTO> tagDTOMap = staffPersonalDetail.getTags().stream().collect(Collectors.toMap(k -> k.getId().longValue(), Function.identity()));
+        List<Tag> tagList = tagGraphRepository.findAllById(staffPersonalDetail.getTags().stream().map(k -> k.getId().longValue()).collect(Collectors.toList()));
+        tagList.forEach(tag -> {
+            tag.setStartDate(tagDTOMap.get(tag.getId()).getStartDate());
+            tag.setEndDate(tagDTOMap.get(tag.getId()).getEndDate());
+        });
+        staffToUpdate.setTags(tagList);
+        if (isCollectionNotEmpty(staffPersonalDetail.getTags())) {
             staffGraphRepository.unlinkTagsFromStaff(staffId, staffPersonalDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
-        }else{
+        } else {
             staffGraphRepository.unlinkAllTagsFromStaff(staffId);
         }
     }
@@ -359,8 +369,8 @@ public class StaffService {
     }
 
     private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
-        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
-        staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
+        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
+        //staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {
@@ -443,7 +453,7 @@ public class StaffService {
         StaffUploadBySheetQueryResult staffUploadBySheetQueryResult = new StaffUploadBySheetQueryResult();
         staffUploadBySheetQueryResult.setStaffErrorList(staffErrorList);
         staffUploadBySheetQueryResult.setStaffList(staffList);
-        Organization organization=organizationService.fetchParentOrganization(unitId);
+        Organization organization = organizationService.fetchParentOrganization(unitId);
         if (organization == null) {
             LOGGER.info("Organization is null");
             return null;
@@ -596,7 +606,7 @@ public class StaffService {
                     staffDTO.setAge(Period.between(CPRUtil.getDateOfBirthFromCPR(user.getCprNumber()), LocalDate.now()).getYears());
                     staffList.add(staffDTO);
                     if (!staffGraphRepository.staffAlreadyInUnit(externalId, organization.getId())) {
-                        positionService.createPosition(organization,staff, accessGroupId, DateUtils.getCurrentDateMillis());
+                        positionService.createPosition(organization, staff, accessGroupId, DateUtils.getCurrentDateMillis());
                     }
                 }
             }
@@ -726,7 +736,7 @@ public class StaffService {
     }
 
     public void setUserAndPosition(OrganizationBaseEntity organizationBaseEntity, User user, Long accessGroupId, boolean parentOrganization, boolean union) {
-        Organization organization=organizationService.fetchParentOrganization(organizationBaseEntity.getId());
+        Organization organization = organizationService.fetchParentOrganization(organizationBaseEntity.getId());
         Position position = positionGraphRepository.findPositionByOrganizationIdAndUserId(organization.getId(), user.getId());
 
         if (isNull(position)) {
@@ -742,12 +752,12 @@ public class StaffService {
             position.setStartDateMillis(DateUtils.getCurrentDayStartMillis());
         }
         // if the organization is not parent organization then adding position in parent organization.
-            organization.getPositions().add(position);
-            organizationGraphRepository.save(organization);
-            user.setCountryId(organization.getCountry().getId());
+        organization.getPositions().add(position);
+        organizationGraphRepository.save(organization);
+        user.setCountryId(organization.getCountry().getId());
 
-        UnitPermission unitPermission =unitPermissionGraphRepository.checkUnitPermissionOfUser(organization.getId(),user.getId(),organizationBaseEntity.getId()).orElse(new UnitPermission());
-        if(organizationBaseEntity instanceof Organization){
+        UnitPermission unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfUser(organization.getId(), user.getId(), organizationBaseEntity.getId()).orElse(new UnitPermission());
+        if (organizationBaseEntity instanceof Organization) {
             unitPermission.setOrganization((Organization) organizationBaseEntity);
         } else {
             unitPermission.setUnit((Unit) organizationBaseEntity);
@@ -760,7 +770,7 @@ public class StaffService {
             }
         }
         position.getUnitPermissions().add(unitPermission);
-        positionGraphRepository.save(position,2);
+        positionGraphRepository.save(position, 2);
     }
 
     public void updateStaffFromExcel(MultipartFile multipartFile) {
@@ -808,9 +818,9 @@ public class StaffService {
     }
 
     public Map<String, Object> getUnitManager(long unitId) {
-        Organization organization=organizationService.fetchParentOrganization(unitId);
+        Organization organization = organizationService.fetchParentOrganization(unitId);
         List<Map<String, Object>> unitManagers;
-         unitManagers = staffGraphRepository.getUnitManagers(organization.getId(), unitId);
+        unitManagers = staffGraphRepository.getUnitManagers(organization.getId(), unitId);
         List<Map<String, Object>> unitManagerList = new ArrayList<>();
         for (Map<String, Object> unitManager : unitManagers) {
             unitManagerList.add((Map<String, Object>) unitManager.get("data"));
@@ -887,7 +897,7 @@ public class StaffService {
 
     public com.kairos.dto.user.staff.StaffDTO getStaffById(long staffId) {
         Staff staff = staffGraphRepository.findOne(staffId, 1);
-        com.kairos.dto.user.staff.StaffDTO staffDTO =  ObjectMapperUtils.copyPropertiesByMapper(staff,com.kairos.dto.user.staff.StaffDTO.class);
+        com.kairos.dto.user.staff.StaffDTO staffDTO = ObjectMapperUtils.copyPropertiesByMapper(staff, com.kairos.dto.user.staff.StaffDTO.class);
         staffDTO.setEmail(staff.getUser().getEmail());
         return staffDTO;
     }
@@ -897,7 +907,7 @@ public class StaffService {
     }
 
     public List<Long> getUnitManagerIds(long unitId) {
-        Organization organization=organizationService.fetchParentOrganization(unitId);
+        Organization organization = organizationService.fetchParentOrganization(unitId);
         return staffGraphRepository.getUnitManagersIds(organization.getId(), unitId);
     }
 
@@ -923,12 +933,12 @@ public class StaffService {
 
     public StaffEmploymentDetails getMainEmploymentOfStaff(long staffId, long unitId) {
         StaffEmploymentDetails employmentDetails = null;
-        List<EmploymentQueryResult> employmentQueryResults =  employmentGraphRepository.getAllEmploymentsForCurrentOrganization(staffId, unitId);
-        if(isCollectionNotEmpty(employmentQueryResults)) {
+        List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsForCurrentOrganization(staffId, unitId);
+        if (isCollectionNotEmpty(employmentQueryResults)) {
             EmploymentQueryResult employment = employmentQueryResults.stream().filter(employmentQueryResult -> EmploymentSubType.MAIN.equals(employmentQueryResult.getEmploymentSubType())).findAny().orElse(null);
             if (isNotNull(employment)) {
                 List<ProtectedDaysOffSetting> protectedDaysOffSettings = expertiseGraphRepository.findProtectedDaysOffSettingByExpertiseId(employment.getExpertise().getId());
-                employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyPropertiesOfListByMapper(protectedDaysOffSettings,ProtectedDaysOffSetting.class));
+                employment.getExpertise().setProtectedDaysOffSettings(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(protectedDaysOffSettings, ProtectedDaysOffSetting.class));
                 employmentDetails = new StaffEmploymentDetails(employment.getId(), ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class), employment.getEndDate(), employment.getStartDate(), employment.getUnitId(), employment.getEmploymentSubType());
             }
         }
@@ -995,7 +1005,7 @@ public class StaffService {
     public boolean registerAllStaffsToChatServer() {
         List<Staff> staffList = staffGraphRepository.findAll();
         staffList.forEach(staff -> {
-                addStaffInChatServer(staff);
+            addStaffInChatServer(staff);
         });
         staffGraphRepository.saveAll(staffList);
         return true;
@@ -1015,7 +1025,7 @@ public class StaffService {
         }
     }
 
-    private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) throws ParseException {
+    private void setStaffDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
         staffToUpdate.setFirstName(staffPersonalDetail.getFirstName());
         staffToUpdate.setLastName(staffPersonalDetail.getLastName());
         staffToUpdate.setFamilyName(staffPersonalDetail.getFamilyName());
@@ -1065,9 +1075,9 @@ public class StaffService {
         return newUserName;
     }
 
-    public List<com.kairos.dto.user.staff.StaffDTO> getAllStaffPersonalDetailsByUnit(Long unitId){
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId,envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetailDTOS,com.kairos.dto.user.staff.StaffDTO.class);
+    public List<com.kairos.dto.user.staff.StaffDTO> getAllStaffPersonalDetailsByUnit(Long unitId) {
+        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllStaffPersonalDetailsByUnit(unitId, envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath());
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffPersonalDetailDTOS, com.kairos.dto.user.staff.StaffDTO.class);
     }
 
 

@@ -124,10 +124,10 @@ public class UnitSolverConfigService {
     }
 
     public DefaultDataDTO getDefaultData(Long unitId) {
-        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
       //  Long countryId=userNeo4jRepo.getCountryIdByUnitId(unitId);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
-                .setOrganizationServicesBuilder(ObjectMapperUtils.copyPropertiesOfListByMapper(userNeo4jRepo.getAllOrganizationServicesByUnitId(unitId),OrganizationServiceDTO.class))
+                .setOrganizationServicesBuilder(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userNeo4jRepo.getAllOrganizationServicesByUnitId(unitId),OrganizationServiceDTO.class))
 
                 //get All Phases
                 .setPhaseDTOSBuilder(getAllPhases(unitId))

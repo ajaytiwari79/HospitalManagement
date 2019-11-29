@@ -23,9 +23,9 @@ public class EmploymentUtility {
         employmentDetails.setId(employment.getId());
         employmentDetails.setStartDate(employment.getStartDate());
 
-        employmentDetails.setAppliedFunctions(ObjectMapperUtils.copyPropertiesOfListByMapper(employment.getAppliedFunctions(),FunctionDTO.class));
+        employmentDetails.setAppliedFunctions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employment.getAppliedFunctions(),FunctionDTO.class));
         employmentDetails.setEndDate(employment.getEndDate());
-        employmentDetails.setEmploymentLines(ObjectMapperUtils.copyPropertiesOfListByMapper(employment.getEmploymentLines(), EmploymentLinesDTO.class));
+        employmentDetails.setEmploymentLines(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employment.getEmploymentLines(), EmploymentLinesDTO.class));
         employmentDetails.setFullTimeWeeklyMinutes(currentEmploymentLine.getFullTimeWeeklyMinutes());
         employmentDetails.setTotalWeeklyMinutes(currentEmploymentLine.getTotalWeeklyMinutes());
         employmentDetails.setTotalWeeklyHours(currentEmploymentLine.getTotalWeeklyHours());

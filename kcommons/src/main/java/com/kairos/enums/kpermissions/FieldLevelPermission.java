@@ -3,9 +3,9 @@ package com.kairos.enums.kpermissions;
 public enum FieldLevelPermission {
     READ("Read"),
     WRITE("Write"),
-    HIDE("Hide"),
-    DELETE("Delete"),
-    MASK("Mask");
+    HIDE("Hide");
+    /*DELETE("Delete"),
+    MASK("Mask");*/
 
     private final String value;
 

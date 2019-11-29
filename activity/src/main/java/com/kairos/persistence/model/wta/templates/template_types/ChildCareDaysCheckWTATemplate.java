@@ -10,7 +10,9 @@ import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
 import com.kairos.dto.activity.wta.templates.ActivityCutOffCount;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.wta.WTATemplateType;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -21,6 +23,7 @@ import org.apache.commons.collections.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -52,8 +55,8 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled()) {
-            WorkTimeAgreementBalancesCalculationService workTimeAgreementService = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
+        if (!isDisabled() && validateRulesChildCareDayCheck(infoWrapper.getActivityWrapperMap())) {
+            WorkTimeAgreementBalancesCalculationService workTimeAgreementService= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
             //CareDaysDTO careDays = getCareDays(infoWrapper.getChildCareDays(), infoWrapper.getStaffAge());
             if (isCollectionNotEmpty(infoWrapper.getChildCareDays())) {
                 long leaveCount = calculateChildCareDaysLeaveCount(infoWrapper.getChildCareDays(), infoWrapper.getStaffChildAges());
@@ -76,7 +79,17 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     }
 
-    public long calculateChildCareDaysLeaveCount(List<CareDaysDTO> careDaysDTOS, List<Integer> staffChildAges) {
+
+    private boolean validateRulesChildCareDayCheck(Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        for(BigInteger activityId : activityWrapperMap.keySet()){
+            if(!TimeTypeEnum.PAID_BREAK.equals(activityWrapperMap.get(activityId).getTimeTypeInfo().getSecondLevelType()) && isNotNull(activityWrapperMap.get(activityId).getActivity().getRulesActivityTab().getCutOffIntervalUnit())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public long calculateChildCareDaysLeaveCount(List<CareDaysDTO> careDaysDTOS, List<Integer> staffChildAges){
         long leaveCount = 0L;
         if (isCollectionNotEmpty(staffChildAges)) {
             for (Integer staffChildAge : staffChildAges) {
@@ -103,7 +116,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         return (this != childCareDaysCheckWTATemplate) && !(
                 Float.compare(childCareDaysCheckWTATemplate.recommendedValue, recommendedValue) == 0 &&
                         Objects.equals(activityIds, childCareDaysCheckWTATemplate.activityIds) &&
-                        cutOffIntervalUnit == childCareDaysCheckWTATemplate.cutOffIntervalUnit && Objects.equals(this.phaseTemplateValues, childCareDaysCheckWTATemplate.phaseTemplateValues));
+                        cutOffIntervalUnit == childCareDaysCheckWTATemplate.cutOffIntervalUnit && Objects.equals(this.phaseTemplateValues,childCareDaysCheckWTATemplate.phaseTemplateValues));
     }
 
 }

@@ -10,8 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_MUNICIPALITY;
-import static com.kairos.persistence.model.constants.RelationshipConstants.IN_LEVEL;
+import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 
 /**
  * Created by prabjot on 21/12/17.
@@ -58,4 +57,7 @@ public interface PayGroupAreaGraphRepository extends Neo4jBaseRepository<PayGrou
 
     @Query("MATCH (payGroupArea:PayGroupArea{deleted:false}) where id(payGroupArea) IN {0} return payGroupArea")
     List<PayGroupArea> findAllByIds(Set<Long> payGroupAreaIds);
+
+    @Query("MATCH(payGrade:PayGrade)-[rel:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea{deleted:false}) WHERE id(pga)={0} RETURN COUNT(payGrade)>0 ")
+    boolean isLinkedWithPayTable(Long payGroupAreaId);
 }

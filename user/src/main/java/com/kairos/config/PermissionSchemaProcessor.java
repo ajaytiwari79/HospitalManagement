@@ -13,7 +13,6 @@ import java.util.Map;
 
 
 public class PermissionSchemaProcessor  implements BeanPostProcessor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PermissionSchemaProcessor.class);
 
     private PermissionService permissionService;
 

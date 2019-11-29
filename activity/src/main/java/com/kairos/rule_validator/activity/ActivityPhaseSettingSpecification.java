@@ -6,6 +6,7 @@ import com.kairos.dto.activity.shift.ShiftActivityIdsDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -19,6 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
 /**
@@ -50,23 +52,25 @@ public class ActivityPhaseSettingSpecification extends AbstractSpecification<Shi
 
     @Override
     public void validateRules(ShiftWithActivityDTO shift) {
-        boolean staff=staffAdditionalInfoDTO.getRoles().contains(AccessGroupRole.STAFF);
-        boolean management=staffAdditionalInfoDTO.getRoles().contains(AccessGroupRole.MANAGEMENT);
         ShiftActivityIdsDTO shiftActivityIdsDTO = getActivitiesToProcess(oldShift.getActivities(), shift.getActivities());
         Map<BigInteger,PhaseTemplateValue> activityPerPhaseMap=constructMapOfActivityAndPhaseTemplateValue(phase,activities);
         activityPerPhaseMap.forEach((k,v)->{
             if(shiftActivityIdsDTO.getActivitiesToAdd().contains(k)){
-                if(( staff && !v.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) || (management && !v.isEligibleForManagement() )){
+                if(( UserContext.getUserDetails().isStaff() && !v.getEligibleEmploymentTypes().contains(staffAdditionalInfoDTO.getEmployment().getEmploymentType().getId())) || (UserContext.getUserDetails().isManagement() && !v.isEligibleForManagement() )){
                     throwException(ERROR_SHIFT_NOT_AUTHORISED_PHASE);
                 }
             }
             if(shiftActivityIdsDTO.getActivitiesToEdit().contains(k)){
-                if(!org.springframework.util.CollectionUtils.containsAny(v.getAllowedSettings().getCanEdit(),staffAdditionalInfoDTO.getRoles())){
-                    throwException(ERROR_SHIFT_NOT_EDITABLE_PHASE);
+                if(v.getAllowedSettings().getCanEdit().size()<2){
+                    if(v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.STAFF) && !UserContext.getUserDetails().isStaff() ||
+                            v.getAllowedSettings().getCanEdit().contains(AccessGroupRole.MANAGEMENT) && !UserContext.getUserDetails().isManagement()
+                    ){
+                        throwException(ERROR_SHIFT_NOT_EDITABLE_PHASE);
+                    }
                 }
             }
             if(shiftActivityIdsDTO.getActivitiesToDelete().contains(k)){
-                if((management && !v.isManagementCanDelete()) || (staff && !v.isStaffCanDelete())){
+                if((UserContext.getUserDetails().isManagement() && !v.isManagementCanDelete()) || (UserContext.getUserDetails().isStaff() && !v.isStaffCanDelete())){
                     throwException(ERROR_SHIFT_NOT_DELETABLE_PHASE);
                 }
             }

@@ -58,7 +58,7 @@ public class OrganizationHostingTypeService {
             }
             hostingTypeRepository.saveAll(hostingTypes);
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(hostingTypes, HostingTypeDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(hostingTypes, HostingTypeDTO.class);
     }
 
 
