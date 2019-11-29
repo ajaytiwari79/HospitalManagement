@@ -43,7 +43,7 @@ public class ShortcutsService {
     public ShortcutsDTO saveShortcut(ShortcutsDTO shortcutsDTO){
         boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(shortcutsDTO.getName(),shortcutsDTO.getStaffId(),shortcutsDTO.getUnitId(),BigInteger.valueOf(-1));
         if(existByName){
-            exceptionService.dataNotMatchedException("",shortcutsDTO.getId());
+           // exceptionService.dataNotMatchedException("",shortcutsDTO.getId());
         }
         shortcutsDTO.setTabKPIs(getTabKPIs(shortcutsDTO.getTabKPIs().stream().map(tabKPIDTO -> tabKPIDTO.getTabId()).collect(Collectors.toList()), new ArrayList<>(),shortcutsDTO.getStaffId(),shortcutsDTO.getUnitId()));
         Shortcuts shortcuts = shortcutsMongoRepository.save(ObjectMapperUtils.copyPropertiesByMapper(shortcutsDTO,Shortcuts.class));
@@ -53,11 +53,11 @@ public class ShortcutsService {
     public ShortcutsDTO updateShortcut(BigInteger shortcutId , String name , ShortcutsDTO shortcutsDTO){
         Shortcuts shortcut=shortcutsMongoRepository.findById(shortcutId).orElse(null);
         if(ObjectUtils.isNull(shortcut)){
-            exceptionService.dataNotMatchedException("",shortcutsDTO.getId());
+         //   exceptionService.dataNotMatchedException("",shortcutsDTO.getId());
         }
         boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(ObjectUtils.isNotNull(name)?name:shortcut.getName(),shortcut.getStaffId(),shortcut.getUnitId(),shortcut.getId());
         if(existByName){
-            exceptionService.dataNotMatchedException("",shortcutsDTO.getId());
+          //  exceptionService.dataNotMatchedException("",shortcutsDTO.getId());
         }
         if(ObjectUtils.isNotNull(name)){
             shortcut.setName(name);
@@ -81,7 +81,7 @@ public class ShortcutsService {
     public boolean deleteShortcutById(BigInteger shortcutId){
         ShortcutsDTO shortcutsDTO= shortcutsMongoRepository.findShortcutById(shortcutId);
         if(Objects.isNull(shortcutsDTO)){
-            exceptionService.dataNotMatchedException("",shortcutsDTO.getId());
+          //  exceptionService.dataNotMatchedException("",shortcutsDTO.getId());
         }
         shortcutsMongoRepository.deleteById(shortcutId);
         return true;
@@ -91,7 +91,7 @@ public class ShortcutsService {
     public List<ShortcutsDTO> getAllShortcutByStaffIdAndUnitId(Long unitId,Long staffId){
         List<ShortcutsDTO> shortcutsDTOS=shortcutsMongoRepository.findShortcutByUnitIdAndStaffId(staffId,unitId);
         if(ObjectUtils.isCollectionEmpty(shortcutsDTOS)){
-            exceptionService.dataNotMatchedException("",staffId);
+            //exceptionService.dataNotMatchedException("",staffId);
         }
         return shortcutsDTOS;
     }
@@ -103,7 +103,7 @@ public class ShortcutsService {
         }
         boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(name,shortcut.getStaffId(),shortcut.getUnitId(),BigInteger.valueOf(-1));
         if(existByName){
-            exceptionService.dataNotMatchedException("",shortcutId);
+          //  exceptionService.dataNotMatchedException("",shortcutId);
         }
         shortcut.setName(name);
         shortcut.setId(null);

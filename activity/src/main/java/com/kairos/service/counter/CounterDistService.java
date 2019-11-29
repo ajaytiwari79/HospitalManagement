@@ -371,10 +371,7 @@ public class CounterDistService extends MongoBaseService {
             AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO = userIntegrationService.getAccessGroupIdsAndCountryAdmin(refId);
             refId = accessGroupPermissionCounterDTO.getStaffId();
         }
-        DeleteResult result = counterRepository.removeTabKPIConfiguration(tabKPIMappingDTO, refId, level);
-        if (result.getDeletedCount() < 1) {
-            exceptionService.invalidRequestException(ERROR_KPI_INVALIDDATA);
-        }
+        counterRepository.removeTabKPIConfiguration(tabKPIMappingDTO, refId, level);
     }
     //setting accessGroup-KPI configuration
 
