@@ -55,6 +55,7 @@ public class StaffAdditionalInfoDTO {
     private boolean countryAdmin;
     private List<TagDTO> tags;
     private boolean nightWorker;
+    private Map<String, String> unitWiseAccessRole;
 
 
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
