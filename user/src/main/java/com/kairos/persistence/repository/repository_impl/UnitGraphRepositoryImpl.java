@@ -50,8 +50,9 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
             countOfSubString += 1;
         }
         if (StringUtils.isNotBlank(searchText)) {
+            String s="";
             matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) +
-                    " ( LOWER(staff.firstName) CONTAINS LOWER({searchText}) OR LOWER(staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
+                    " (  LOWER(staff.firstName+staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
         }
         return matchQueryForStaff;
     }
@@ -106,7 +107,7 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
 
     public List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
                                          Map<FilterType, Set<String>> filters, String searchText, String imagePath) {
-
+        searchText=searchText.replaceAll(" ","");
         Map<String, Object> queryParameters = new HashMap<>();
 
         queryParameters.put("unitId", unitId);
