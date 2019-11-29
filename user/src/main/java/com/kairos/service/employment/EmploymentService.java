@@ -1070,6 +1070,7 @@ public class EmploymentService {
                 }
                 employmentLine.setEndDate(expertiseDTO.getEndDate());
             });
+            employment.setEndDate(expertiseDTO.getEndDate());
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(employment.getUnit().getId(), expertiseDTO.getEndDate(), employment.getId(), staffAdditionalInfoDTO);
             employmentGraphRepository.saveAll(employments);
         });
