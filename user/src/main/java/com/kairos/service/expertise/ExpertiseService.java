@@ -6,12 +6,14 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseEmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
@@ -67,7 +69,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getEndOfDayFromLocalDate;
 import static com.kairos.commons.utils.DateUtils.getLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
-import static com.kairos.constants.AppConstants.DAY;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 /**
