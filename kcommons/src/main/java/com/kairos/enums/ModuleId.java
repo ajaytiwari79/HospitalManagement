@@ -1,7 +1,7 @@
 package com.kairos.enums;
 
 public enum ModuleId {
-    SELF_ROSTERING_MODULE_ID("module_7");
+    SELF_ROSTERING_MODULE_ID("module_7"), Group_TAB_ID("tab434");
     public String value;
 
     ModuleId(String value){
