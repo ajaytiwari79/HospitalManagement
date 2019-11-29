@@ -249,7 +249,7 @@ public class WTARuleTemplateCalculationService {
                     staffWTACounter.setCount(staffWTACounter.getCount()+1);
                 }
             }
-            shiftViolatedRules.getWorkTimeAgreements().removeIf(workTimeAgreementRuleViolation -> workTimeAgreementRuleViolation.getRuleTemplateId().equals(wtaBaseRuleTemplate.getId()));
+            //shiftViolatedRules.getWorkTimeAgreements().removeIf(workTimeAgreementRuleViolation -> workTimeAgreementRuleViolation.getRuleTemplateId().equals(wtaBaseRuleTemplate.getId()));
             if(isCollectionEmpty(shiftViolatedRules.getWorkTimeAgreements())){
                 shiftViolatedRules.getEscalationReasons().remove(WORK_TIME_AGREEMENT);
             }
