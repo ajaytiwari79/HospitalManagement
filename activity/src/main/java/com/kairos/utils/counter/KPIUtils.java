@@ -183,9 +183,9 @@ public class KPIUtils {
 
 
     public static String getKpiDateFormatByIntervalUnit(String receivedDate, DurationType intervalUnit, KPIRepresentation kpiRepresentation) {
-        String result = receivedDate;
+        String result  =  receivedDate.split(" -").length > 1 ? receivedDate.split(" -")[0] : receivedDate;
         if(!KPIRepresentation.REPRESENT_TOTAL_DATA.equals(kpiRepresentation)) {
-            LocalDate startDate = getLocalDateStringByDateFormat(receivedDate);
+            LocalDate startDate = getLocalDateStringByDateFormat(result);
             switch (intervalUnit) {
                 case DAYS:
                     result = getDayOrMonthStringWithFormat(startDate.getDayOfWeek().toString());
