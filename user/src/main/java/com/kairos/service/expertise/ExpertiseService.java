@@ -140,12 +140,12 @@ public class ExpertiseService {
         Expertise expertise = new Expertise(expertiseDTO.getName(), expertiseDTO.getDescription(), expertiseDTO.getStartDate(), expertiseDTO.getEndDate(), country, expertiseDTO.isPublished(), Collections.singletonList(expertiseLine),expertiseDTO.getBreakPaymentSetting());
         setBasicDetails(expertiseDTO, country, expertise);
         addSeniorityLevelsInExpertise(expertiseLine, expertiseDTO, expertise);
-//        linkProtectedDaysOffSetting(new ArrayList<>(), Arrays.asList(expertise));
-//        TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
-//        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
-//                null, null, null, null, countryId, expertise.getId());
-//        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
-//                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
+        linkProtectedDaysOffSetting(new ArrayList<>(), Arrays.asList(expertise));
+        TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
+        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
+                null, null, null, null, countryId, expertise.getId());
+        genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
+                "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return updatedExpertiseData(expertise);
     }
 
