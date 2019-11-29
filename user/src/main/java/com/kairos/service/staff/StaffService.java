@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.activity.task.StaffAssignedTasksWrapper;
 import com.kairos.dto.activity.task.StaffTaskDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -58,6 +59,7 @@ import com.kairos.persistence.repository.user.access_permission.AccessPageReposi
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.client.ClientGraphRepository;
 import com.kairos.persistence.repository.user.country.EngineerTypeGraphRepository;
+import com.kairos.persistence.repository.user.country.TagGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentGraphRepository;
 import com.kairos.persistence.repository.user.expertise.ExpertiseGraphRepository;
 import com.kairos.persistence.repository.user.language.LanguageGraphRepository;
@@ -199,6 +201,8 @@ public class StaffService {
     private StaffCreationService staffCreationService;
     @Inject
     private RedisService redisService;
+    @Inject
+    TagGraphRepository tagGraphRepository;
     private static final Logger LOGGER = LoggerFactory.getLogger(StaffService.class);
 
     public String uploadPhoto(Long staffId, MultipartFile multipartFile) {
@@ -320,7 +324,13 @@ public class StaffService {
     }
 
     private void assignTags(long staffId, StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate) {
-        staffToUpdate.setTags(ObjectMapperUtils.copyPropertiesOfListByMapper(staffPersonalDetail.getTags(), Tag.class));
+        Map<Long, TagDTO> tagDTOMap = staffPersonalDetail.getTags().stream().collect(Collectors.toMap(k -> k.getId().longValue(), Function.identity()));
+        List<Tag> tagList = tagGraphRepository.findAllById(staffPersonalDetail.getTags().stream().map(k -> k.getId().longValue()).collect(Collectors.toList()));
+        tagList.forEach(tag -> {
+            tag.setStartDate(tagDTOMap.get(tag.getId()).getStartDate());
+            tag.setEndDate(tagDTOMap.get(tag.getId()).getEndDate());
+        });
+        staffToUpdate.setTags(tagList);
         if(isCollectionNotEmpty(staffPersonalDetail.getTags())) {
             staffGraphRepository.unlinkTagsFromStaff(staffId, staffPersonalDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
         }else{
