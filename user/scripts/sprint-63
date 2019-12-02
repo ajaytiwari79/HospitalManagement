@@ -10,3 +10,7 @@ CREATE UNIQUE(e)-[:IN_ORGANIZATION_LEVEL]-(l)
 CREATE UNIQUE(e)-[:BELONGS_TO_SECTOR]-(s)
 CREATE UNIQUE(e)-[:SUPPORTED_BY_UNION]-(u)
 SET e.breakPaymentSetting=exl.breakPaymentSetting;
+
+MATCH(n:KPermissionModel) detach delete n;
+
+MATCH(n:KPermissionField) detach delete n;
