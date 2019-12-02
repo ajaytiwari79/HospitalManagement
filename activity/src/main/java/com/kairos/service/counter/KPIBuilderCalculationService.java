@@ -377,6 +377,9 @@ public class KPIBuilderCalculationService implements CounterService {
                 case PLANNED_TIME:
                     subClusteredBarValue.addAll(getPlannedTimeSubClusteredValue(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
                     break;
+                case PLANNING_QUALITY_LEVEL:
+                    subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
+                    break;
                 case DELTA_TIMEBANK:
                 case UNAVAILABILITY:
                 case TOTAL_PLANNED_HOURS:
@@ -402,6 +405,28 @@ public class KPIBuilderCalculationService implements CounterService {
         }
         return subClusteredBarValue;
     }
+
+
+
+
+    private List<ClusteredBarChartKpiDataUnit> geTodoSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig){
+        List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
+        List<BigInteger> activityIds=shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList());
+        Activity activity=null;
+        List<TodoDTO> todoDTOS=new ArrayList<>();
+        for (BigInteger activityId : activityIds) {
+            if(kpiCalculationRelatedInfo.getActivityMap().containsKey(activityId)){
+                activity=kpiCalculationRelatedInfo.getActivityMap().get(activityId);
+                todoDTOS=kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId);
+                subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getGeneralActivityTab().getBackgroundColor(), 0));
+            }
+        }
+
+        return subClusteredBarValue;
+    }
+
+
 
     private List<ClusteredBarChartKpiDataUnit> getTimeTypeSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig){
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
