@@ -371,9 +371,14 @@ public class TimeBankService{
      * @return
      */
     public boolean updateTimeBankOnEmploymentModification(BigInteger ctaId, Long employmentId, Date startDate, Date endDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        Map<LocalDate, CTAResponseDTO> ctaResponseDTOMap = new HashMap<>();
         List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate);
+        updateDailyTimebankForShifts(ctaId, employmentId, staffAdditionalInfoDTO, shifts);
+        return true;
+    }
+
+    public void updateDailyTimebankForShifts(BigInteger ctaId, Long employmentId, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<Shift> shifts) {
         List<DailyTimeBankEntry> dailyTimeBanks = new ArrayList<>(shifts.size());
+        Map<LocalDate, CTAResponseDTO> ctaResponseDTOMap = new HashMap<>();
         for (Shift shift : shifts) {
             LocalDate shiftDate = DateUtils.asLocalDate(shift.getStartDate());
             CTAResponseDTO ctaResponseDTO;
@@ -393,7 +398,6 @@ public class TimeBankService{
         if(!dailyTimeBanks.isEmpty()) {
             timeBankRepository.saveEntities(dailyTimeBanks);
         }
-        return true;
     }
 
     private List<ShiftWithActivityDTO> getShiftsByInterval(List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval dateTimeInterval) {

@@ -211,7 +211,7 @@ public class UserService {
         map.put("email", currentUser.getEmail());
         map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
-        updateChatStatus(ChatStatus.ONLINE);
+        //updateChatStatus(ChatStatus.ONLINE);
         return map;
     }
 

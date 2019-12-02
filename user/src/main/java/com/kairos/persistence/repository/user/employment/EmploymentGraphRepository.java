@@ -340,4 +340,17 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN id(employment) as id,id(staff) as staffId,id(unit) as unitId,expertise ,employment.endDate as endDate,employment.employmentSubType as employmentSubType,employment.published as published,employment.startDate as startDate ,\n" +
             "employmentLines,collect(protectedDaysOffSetting) as protectedDaysOffSettings")
     List<EmploymentQueryResult> getMainEmploymentOfStaffs(EmploymentSubType employmentSubType);
+
+    @Query("MATCH(exp:Expertise)-[:"+HAS_EXPERTISE_IN+"]-(e:Employment)-[r:"+HAS_EMPLOYMENT_LINES+"]-(el:EmploymentLine) WHERE id(exp)={0}" +
+            "MATCH(e)-[unitRel:"+IN_UNIT+"]-(unit:Unit) " +
+            "MATCH(e)-[staffRel:"+BELONGS_TO_STAFF+"]-(s:Staff) RETURN e,r,el,unitRel,unit,staffRel,s")
+    List<Employment> findAllEmploymentByExpertiseId(Long expertiseId);
+
+    @Query("MATCH(l:Level)<-[:"+IN_ORGANIZATION_LEVEL+"]-(exp:Expertise{deleted:false,published:true})-[r:"+HAS_EXPERTISE_IN+"]-(emp:Employment{deleted:false,published:true})-[empRel:"+HAS_EMPLOYMENT_LINES+"]->(empLine:EmploymentLine)-[slRel:"+HAS_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) " +
+            "WHERE id(l)={0} AND  \n" +
+            "(({2} IS NULL AND (emp.endDateMillis IS NULL OR DATE(emp.endDateMillis) > DATE({1})))\n" +
+            "OR " +
+            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < DATE(emp.endDateMillis) OR DATE({2}) > DATE(emp.startDateMillis)))) " +
+            "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine)")
+    List<Employment> getAllEmploymentByLevel(Long levelId,String startDate,String endDate);
 }

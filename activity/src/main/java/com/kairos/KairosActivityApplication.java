@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.config.LocalDateDeserializer;
-import com.kairos.config.LocalDateSerializer;
 import com.kairos.dto.user_context.UserContextInterceptor;
 import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
@@ -37,6 +37,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectMapperUtils.LOCALDATE_FORMATTER;
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 @SpringBootApplication
@@ -78,7 +79,14 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 	@Bean("objectMapperJackson")
 	@Primary
 	public ObjectMapper serializingObjectMapper() {
-		return ObjectMapperUtils.getObjectMapper();
+		ObjectMapper mapper = new ObjectMapper();
+		JavaTimeModule javaTimeModule = new JavaTimeModule();
+		javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(LOCALDATE_FORMATTER));
+		javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(LOCALDATE_FORMATTER));
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.registerModule(javaTimeModule);
+		return mapper;
 	}
 	@Bean
 	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {

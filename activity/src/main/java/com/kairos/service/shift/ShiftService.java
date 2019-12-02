@@ -648,7 +648,7 @@ public class ShiftService extends MongoBaseService {
             if (!valid) {
                 validateStaffingLevel(shift, staffAdditionalInfoDTO, activityWrapperMap, phase, oldStateShift);
             }
-            shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, shift, activityWrapperMap, true, false, shiftActionType);
+            shiftWithViolatedInfoDTO = shiftValidatorService.validateShiftWithActivity(phase, wtaQueryResultDTO, shiftWithActivityDTO, staffAdditionalInfoDTO, oldStateShift, activityWrapperMap, true, false, shiftActionType);
         }
         if (shiftWithViolatedInfoDTO == null) {
             shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO(new ViolatedRulesDTO());
@@ -1037,8 +1037,9 @@ public class ShiftService extends MongoBaseService {
         }
     }
 
-    public void deleteShiftsAfterEmploymentEndDate(Long staffId, Long unitId, LocalDate employmentEndDate) {
-        shiftMongoRepository.deleteShiftsAfterDate(staffId, employmentEndDate.atStartOfDay());
+    public void deleteShiftsAfterEmploymentEndDate(Long employmentId, LocalDate employmentEndDate,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        List<Shift> shiftList=shiftMongoRepository.findAllShiftsByEmploymentIdAfterDate(employmentId,asDate(employmentEndDate));
+        timeBankService.updateDailyTimebankForShifts(null,employmentId,staffAdditionalInfoDTO,shiftList);
     }
 
     //TODO need to optimize this method

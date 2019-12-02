@@ -48,4 +48,8 @@ public interface SeniorityLevelGraphRepository extends Neo4jBaseRepository<Senio
             "match(seniorityLevel)-[rel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) detach delete rel")
     void unlinkAllPayGradesFromExpertise(Long expertiseId);
 
+    @Query("MATCH(expertiseLine:ExpertiseLine)-["+FOR_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel{deleted:false})-[rel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) WHERE id(expertiseLine)={0} " +
+            "RETURN seniorityLevel,rel,payGrade")
+    List<SeniorityLevel> findAllByLineId(Long expertiseLineId);
+
 }

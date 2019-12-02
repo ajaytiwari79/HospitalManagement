@@ -206,8 +206,7 @@ public class StaffRetrievalService {
             Map<Long, List<ExpertiseLineQueryResult>> expertiseLineQueryResultMap = expertiseLineQueryResults.stream().collect(Collectors.groupingBy(ExpertiseLineQueryResult::getExpertiseId));
             expertises.forEach(expertiseQueryResult -> {
                 expertiseQueryResult.setExpertiseLines(expertiseLineQueryResultMap.get(expertiseQueryResult.getId()));
-                ExpertiseLineQueryResult expertiseLine = expertiseQueryResult.getCurrentlyActiveLine();
-                expertiseQueryResult.setSector(expertiseLine.getSector());
+                ExpertiseLineQueryResult expertiseLine=expertiseQueryResult.getCurrentlyActiveLine();
                 expertiseQueryResult.setSeniorityLevels(expertiseLine.getSeniorityLevels());
             });
             return expertises;
@@ -575,6 +574,8 @@ public class StaffRetrievalService {
      */
     public StaffAdditionalInfoDTO getStaffEmploymentDataByEmploymentIdAndStaffId(LocalDate startDate, long staffId, Long employmentId, long organizationId, Set<Long> reasonCodeIds) {
         StaffAdditionalInfoQueryResult staffAdditionalInfoQueryResult = staffGraphRepository.getStaffInfoByUnitIdAndStaffId(organizationId, staffId, employmentId, startDate.toString());
+        User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        staffAdditionalInfoQueryResult.setUnitWiseAccessRole(user.getUnitWiseAccessRole());
         if (isNull(staffAdditionalInfoQueryResult)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNIT_EMPLOYMENT_NOTFOUND);
         }

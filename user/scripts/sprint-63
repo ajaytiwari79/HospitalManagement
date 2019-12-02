@@ -1,2 +1,12 @@
 MATCH(s:Staff)-[r:STAFF_HAS_SKILLS]-(sk:Skill)
 DETACH delete r
+
+MATCH(e:Expertise)-[rel:HAS_EXPERTISE_LINES]-(exl:ExpertiseLine)
+MATCH(exl)-[levelRel:IN_ORGANIZATION_LEVEL]-(l:Level)
+MATCH(exl)-[sectorRel:BELONGS_TO_SECTOR]-(s:Sector)
+MATCH(exl)-[unionRel:SUPPORTED_BY_UNION]-(u:Organization)
+DETACH DELETE levelRel,sectorRel,unionRel
+CREATE UNIQUE(e)-[:IN_ORGANIZATION_LEVEL]-(l)
+CREATE UNIQUE(e)-[:BELONGS_TO_SECTOR]-(s)
+CREATE UNIQUE(e)-[:SUPPORTED_BY_UNION]-(u)
+SET e.breakPaymentSetting=exl.breakPaymentSetting;
