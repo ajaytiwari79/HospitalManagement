@@ -80,10 +80,10 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
         }
 
         if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent()) {
-            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[" + BELONGS_TO_TAGS + "]-(tag:Tag) " +
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  MATCH (staff)-[:" + BELONGS_TO_TAGS + "]-(tag:Tag) " +
                     "WHERE id(tag) IN {tagIds} ";
         } else {
-            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  OPTIONAL MATCH (staff)-[" + BELONGS_TO_TAGS + "]-(tag:Tag) ";
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList  OPTIONAL MATCH (staff)-[:" + BELONGS_TO_TAGS + "]-(tag:Tag) ";
         }
 
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
@@ -93,10 +93,10 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
             matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  OPTIONAL MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)  ";
         }
 
-        matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, COLLECT(tag) AS tags, " +
+        matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, CASE WHEN tag IS NULL THEN [] ELSE collect(distinct {id:id(tag),name:tag.name,color:tag.color}) END AS tags, " +
                 "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList " +
-                " with staff, employments,user, employmentList,expertiseList  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
-                " with engineerType,employments, staff, user, employmentList, expertiseList";
+                " with staff, employments,user, employmentList,expertiseList,tags  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
+                " with engineerType,employments, staff, user, employmentList, expertiseList,tags";
         return matchRelationshipQueryForStaff;
     }
 
@@ -170,9 +170,9 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
 
         query += getMatchQueryForRelationshipOfStaffByFilters(filters);
 
-        query += " WITH engineerType, staff,employments, user,expertiseList,employmentList Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) ";
+        query += " WITH engineerType, staff,employments, user,expertiseList,employmentList,tags Optional MATCH (staff)-[:" + HAS_CONTACT_ADDRESS + "]-(contactAddress:ContactAddress) ";
 
-        query += " RETURN distinct {id:id(staff), employments:employments,expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " +
+        query += " RETURN distinct {id:id(staff),tags:tags, employments:employments,expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " +
                 "firstName:user.firstName,lastName:user.lastName,employedSince :staff.employedSince," +
                 "age:duration.between(date(user.dateOfBirth),date()).years,experienceInYears:duration.between(date(user.joiningDate),date()).years," +
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId, access_token:staff.access_token," +
