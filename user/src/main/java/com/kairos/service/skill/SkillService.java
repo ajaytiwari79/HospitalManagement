@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -335,8 +336,8 @@ public class SkillService {
         return map;
     }
 
-    public List<StaffDTO> getStaffSkillAndLevelByStaffIds( List<Long> staffIds) {
-        List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds);
+    public List<StaffDTO> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedDate) {
+        List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds,selectedDate.toString());
         List<StaffDTO> staffDTOS = new ArrayList<>();
         if(isCollectionNotEmpty(staffQueryResults)) {
             staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffDTO(staffQueryResult.getStaff().getId(), staffQueryResult.getSkillInfo())));
