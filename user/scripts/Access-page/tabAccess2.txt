@@ -327,7 +327,13 @@ Match(ap:AccessPage) where ap.moduleId="tab_422" merge (ap)-[:SUB_PAGE]-(accessP
 Match(ap:AccessPage) where ap.moduleId="tab_423" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Solver Configuration Settings",isModule:false,moduleId:"tab_424",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_253" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Non working time",isModule:false,moduleId:"tab_429",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_310" merge (ap)-[:SUB_PAGE]-(accessPage:AccessPage{name:"Non working time",isModule:false,moduleId:"tab_431",active:true});
-
+Match(ap:AccessPage) where ap.moduleId="tab_367" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Force Planned",isModule:false,moduleId:"tab_432",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_174" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Force Planned",isModule:false,moduleId:"tab_433",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_201" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Groups",isModule:false,moduleId:"tab_434",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Tab Permission",isModule:false,moduleId:"tab_435",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Tab Permission",isModule:false,moduleId:"tab_436",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_437",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_438",active:true});
 
 
 Match(ap:AccessPage) where ap.moduleId="tab_310" set ap.name="Activity Configuration" return ap;
