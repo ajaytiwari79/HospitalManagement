@@ -213,7 +213,7 @@ public class KPIBuilderCalculationService implements CounterService {
         for (StaffKpiFilterDTO staffKpiFilterDTO : kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffId)) {
             for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
                 Collection<DailyTimeBankEntry> dailyTimeBankEntries = kpiCalculationRelatedInfo.getDailyTimeBankEntrysByEmploymentIdAndInterval(employmentWithCtaDetailsDTO.getId(), dateTimeInterval);
-                int timeBankOfInterval = (int) timeBankCalculationService.calculateDeltaTimeBankForInterval(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), new Interval(DateUtils.getLongFromLocalDate(dateTimeInterval.getStartLocalDate()), DateUtils.getLongFromLocalDate(dateTimeInterval.getEndLocalDate())), employmentWithCtaDetailsDTO, new HashSet<>(), (List)dailyTimeBankEntries, calculateContractual)[0];
+                int timeBankOfInterval = (int) timeBankCalculationService.calculateDeltaTimeBankForInterval(kpiCalculationRelatedInfo.getPlanningPeriodInterval(), new Interval(dateTimeInterval.getStartDate().getTime(),dateTimeInterval.getEndDate().getTime()), employmentWithCtaDetailsDTO, new HashSet<>(), (List)dailyTimeBankEntries, calculateContractual)[0];
                 totalTimeBankOrContractual += timeBankOfInterval;
             }
         }
@@ -276,7 +276,7 @@ public class KPIBuilderCalculationService implements CounterService {
             if (REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())) {
                 kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue()));
             } else {
-                kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue()));
+                kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(getKpiDateFormatByIntervalUnit(entry.getKey().toString(),applicableKPI.getFrequencyType(),applicableKPI.getKpiRepresentation()),entry.getKey().toString(), entry.getValue()));
             }
         }
         return kpiDataUnits;
