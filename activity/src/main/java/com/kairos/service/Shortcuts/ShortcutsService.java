@@ -66,7 +66,6 @@ public class ShortcutsService {
             shortcut.setName(name);
         }else {
             shortcut=ObjectMapperUtils.copyPropertiesByMapper(shortcutsDTO,Shortcuts.class);
-            shortcut.setTabKPIs(getTabKPIs(shortcutsDTO.getTabKPIs().stream().map(tabKPIDTO -> tabKPIDTO.getTabId()).collect(Collectors.toList()), new ArrayList<>(),shortcutsDTO.getStaffId(),shortcutsDTO.getUnitId()));
         }
         shortcutsMongoRepository.save(shortcut);
         return shortcutsDTO;
