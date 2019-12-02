@@ -483,7 +483,7 @@ public class UserService {
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
          permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
-         permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(),userAccessRoleDTO.getAccessGroupIds()), ModelDTO.class));
+         permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(),userAccessRoleDTO.getAccessGroupIds(),UserContext.getUserDetails().isHubMember()), ModelDTO.class));
         return permissionData;
     }
 

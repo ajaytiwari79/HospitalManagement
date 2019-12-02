@@ -2,6 +2,7 @@ package com.kairos.persistence.model.staff.personal_details;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.annotations.KPermissionField;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.utils.CPRUtil;
@@ -22,8 +23,11 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 public class StaffChildDetail extends UserBaseEntity {
+    @KPermissionField
     private String name;
+    @KPermissionField
     private String cprNumber;
+    @KPermissionField
     private boolean childCustodyRights;
 
 }
