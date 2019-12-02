@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
@@ -798,12 +799,12 @@ public class AccessGroupService {
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), userId);
         UserAccessRoleDTO userAccessRoleDTO = null;
         if (staffAtHub != null) {
-            userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
+            userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staffAtHub.getId(),false, true);
         } else {
             Long hubIdByOrganizationId = unitGraphRepository.getHubIdByOrganizationId(parent.getId());
             staffAtHub = staffGraphRepository.getStaffOfHubByHubIdAndUserId(parent.isKairosHub() ? parent.getId() : hubIdByOrganizationId, userId);
             if (staffAtHub != null) {
-                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,staffAtHub.getId(), false, true);
             } else if (isNull(userAccessRoleDTO)) {
                 AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
                 if (isNull(accessGroupQueryResult)) {

@@ -91,11 +91,7 @@ public class ShortcutService {
 
 
     public List<ShortcutDTO> getAllShortcutByStaffIdAndUnitId(Long unitId, Long staffId){
-        List<ShortcutDTO> shortcutDTOS =shortcutsMongoRepository.findShortcutByUnitIdAndStaffId(staffId,unitId);
-        if(ObjectUtils.isCollectionEmpty(shortcutDTOS)){
-            exceptionService.dataNotMatchedException(SHORTCUT_NOT_FOUND);
-        }
-        return shortcutDTOS;
+        return shortcutsMongoRepository.findShortcutByUnitIdAndStaffId(staffId,unitId);
     }
 
     public ShortcutDTO createCopyOfShortcut(BigInteger shortcutId, String name){
