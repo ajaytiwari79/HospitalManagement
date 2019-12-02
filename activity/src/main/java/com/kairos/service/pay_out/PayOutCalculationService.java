@@ -80,7 +80,7 @@ public class PayOutCalculationService {
                         ctaScheduledOrCompensationMinutes = shiftActivity.getScheduledMinutes();
                         shiftActivityDTO.setScheduledMinutesOfPayout(shiftActivity.getScheduledMinutes() + shiftActivityDTO.getScheduledMinutesOfPayout());
                     } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
-                        ctaScheduledOrCompensationMinutes = Math.round(timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(interval, ruleTemplate, shiftActivity,staffEmploymentDetails));
+                        ctaScheduledOrCompensationMinutes = (int)Math.round(timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getAndUpdateCtaBonusMinutes(interval, ruleTemplate, shiftActivity,staffEmploymentDetails));
                         ctaBonusMinutes += ctaScheduledOrCompensationMinutes;
                         Optional<PayOutPerShiftCTADistributionDTO> payOutPerShiftCTADistributionDTOOptional = shiftActivity.getPayoutPerShiftCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
                         if (payOutPerShiftCTADistributionDTOOptional.isPresent()) {

@@ -57,7 +57,7 @@ public class DaysOffAfterASeriesWTATemplateTest {
         ruleTemplateSpecificInfo = new RuleTemplateSpecificInfo(shiftWithActivityDTOS,true,expertiseNightWorkerSetting,new BigInteger("15"),new ShiftWithActivityDTO(asDate(LocalDate.now(), LocalTime.of(7,0)),asDate(LocalDate.now().plusDays(1), LocalTime.of(2,0)),newArrayList(new ShiftActivityDTO(asDate(LocalDate.now(), LocalTime.of(7,0)),asDate(LocalDate.now().plusDays(1), LocalTime.of(2,0))))),new UserAccessRoleDTO(true,false),new ViolatedRulesDTO());
     }
 
-    @Test
+    //@Test
     public void validateRules() {
         daysOffAfterASeriesWTATemplate.validateRules(ruleTemplateSpecificInfo);
     }
