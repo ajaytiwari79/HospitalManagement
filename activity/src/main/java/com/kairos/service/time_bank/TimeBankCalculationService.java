@@ -622,14 +622,9 @@ public class TimeBankCalculationService {
     public Interval getIntervalValidIntervalForTimebank(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, Interval interval, DateTimeInterval planningPeriodInterval) {
         Interval updatedInterval = null;
         DateTime employmentStartTime = toJodaDateTime(employmentWithCtaDetailsDTO.getStartDate());
-        if (interval.contains(employmentStartTime) || interval.getStart().isAfter(employmentStartTime)) {
-            DateTime employmentEndTime = toJodaDateTime(isNull(employmentWithCtaDetailsDTO.getEndDate()) ? planningPeriodInterval.getEndLocalDate() : employmentWithCtaDetailsDTO.getEndDate().isBefore(planningPeriodInterval.getEndLocalDate()) ? employmentWithCtaDetailsDTO.getEndDate() : planningPeriodInterval.getEndLocalDate());
-            Interval employmentInterval = new Interval(employmentStartTime, employmentEndTime);
-            if (interval.overlaps(employmentInterval)) {
-                updatedInterval = interval.overlap(employmentInterval);
-            }
-        }
-        return updatedInterval;
+        DateTime employmentEndTime = toJodaDateTime(isNull(employmentWithCtaDetailsDTO.getEndDate()) ? planningPeriodInterval.getEndLocalDate() : employmentWithCtaDetailsDTO.getEndDate().isBefore(planningPeriodInterval.getEndLocalDate()) ? employmentWithCtaDetailsDTO.getEndDate() : planningPeriodInterval.getEndLocalDate());
+        Interval employmentInterval = new Interval(employmentStartTime, employmentEndTime);
+        return interval.overlap(employmentInterval);
     }
 
 
