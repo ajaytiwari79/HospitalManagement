@@ -42,6 +42,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
+import static com.kairos.enums.shift.TodoStatus.PENDING;
 import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
@@ -142,6 +143,8 @@ public class RequestAbsenceService {
             shiftOptional.get().setRequestAbsence(null);
             //todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
+        }else if(PENDING.equals(todo.getStatus())){
             shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
         }
         return response;
