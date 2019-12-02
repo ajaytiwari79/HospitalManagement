@@ -1,0 +1,7 @@
+
+//Script to link municipality with pay group area
+
+MATCH(m:Municipality) where m.name starts with 'Ballerup'
+MATCH(pga:PayGroupArea) where pga.name starts with 'Area 0`'
+CREATE UNIQUE (pga)-[r:HAS_MUNICIPALITY]->(m)
+SET r.startDateMillis=1536756095237

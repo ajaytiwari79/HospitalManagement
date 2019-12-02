@@ -50,8 +50,9 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
             countOfSubString += 1;
         }
         if (StringUtils.isNotBlank(searchText)) {
+            String s="";
             matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) +
-                    " ( LOWER(staff.firstName) CONTAINS LOWER({searchText}) OR LOWER(staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
+                    " (  LOWER(staff.firstName+staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
         }
         return matchQueryForStaff;
     }
@@ -106,7 +107,7 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
 
     public List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
                                          Map<FilterType, Set<String>> filters, String searchText, String imagePath) {
-
+        searchText=searchText.replaceAll(" ","");
         Map<String, Object> queryParameters = new HashMap<>();
 
         queryParameters.put("unitId", unitId);
@@ -143,6 +144,10 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
             queryParameters.put("GroupStaffLists",
                     filters.get(FilterType.GROUPS));
         }
+        if (Optional.ofNullable(filters.get(FilterType.FUNCTIONS)).isPresent()) {
+            queryParameters.put("functionIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.FUNCTIONS)));
+        }
         if (StringUtils.isNotBlank(searchText)) {
             queryParameters.put("searchText", searchText);
         }
@@ -150,7 +155,9 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
 
         String query = "";
         if (ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
-            query = getSelfRosteringQuery(filters, searchText, query);
+            query = getSelfRosteringQuery(filters, searchText);
+        }else if(ModuleId.Group_TAB_ID.value.equals(moduleId)){
+            query = getGroupQuery(filters, searchText);
         } else if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT)).isPresent() && filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITH_EMPLOYMENT.name()) && !filters.get(FilterType.EMPLOYMENT).contains(Employment.STAFF_WITHOUT_EMPLOYMENT.name()) && !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) {
             query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
                     " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
@@ -182,16 +189,28 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
     }
 
-    private String getSelfRosteringQuery(Map<FilterType, Set<String>> filters, String searchText, String query) {
-        query += " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
+    private String getSelfRosteringQuery(Map<FilterType, Set<String>> filters, String searchText) {
+        String query = "";
+        query = " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
                 " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
         if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()) {
             query += " MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
         }
         if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
-            query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} " +
-                    " WITH user, staff, employment,organization ";
+            query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
         }
+        query +=" WITH user, staff, employment,organization ";
+        return query;
+    }
+
+    private String getGroupQuery(Map<FilterType, Set<String>> filters, String searchText) {
+        String query = "";
+        if(Optional.ofNullable(filters.get(FilterType.FUNCTIONS)).isPresent()) {
+            query +=" MATCH (staff:Staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]->(employmentLine:EmploymentLine)-[:APPLICABLE_FUNCTION]->(function:Function)\n" +
+                    " where id(function) IN {functionIds}";
+        }
+        query += getSelfRosteringQuery(filters, searchText);
+
         return query;
     }
 

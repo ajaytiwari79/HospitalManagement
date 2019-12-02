@@ -72,7 +72,7 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case PROTECTED_DAYS_OFF:
                 logger.info("Job to protected days off ");
-                timeBankCalculationService.updateTimeBankAgainstProtectedDaysOffSetting();
+                timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().updateTimeBankAgainstProtectedDaysOffSetting();
                 break;
             case WTA_LEAVE_COUNT:
                 logger.info("Job to protected days off ");
