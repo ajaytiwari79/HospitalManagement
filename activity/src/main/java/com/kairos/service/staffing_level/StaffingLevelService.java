@@ -699,7 +699,7 @@ public class StaffingLevelService  {
         Map<BigInteger,BigInteger> childAndParentActivityIdMap = activityAndParentActivityMap[0];
         Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
         List<Long> staffIds = shifts.stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
-        List<StaffDTO> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds);
+        List<StaffDTO> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds,asLocalDate(staffingLevel.getCurrentDate()));
         Map<Long, List<Map<String,Object>>> staffSkillsMap = staffDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v.getSkillInfo()));
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
