@@ -1,7 +1,7 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
-import com.kairos.dto.activity.ShortCuts.ShortcutsDTO;
+import com.kairos.dto.activity.ShortCuts.ShortcutDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.counter.configuration.KPIDTO;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
@@ -26,11 +26,10 @@ import com.kairos.persistence.model.counter.*;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.Shortcuts.ShortcutsService;
+import com.kairos.service.Shortcuts.ShortcutService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
-import com.mongodb.client.result.DeleteResult;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +64,7 @@ public class CounterDistService extends MongoBaseService {
     @Inject
     private FibonacciKPIService fibonacciKPIService;
     @Inject
-    private ShortcutsService shortcutsService;
+    private ShortcutService shortcutService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CounterDistService.class);
 
@@ -237,8 +236,8 @@ public class CounterDistService extends MongoBaseService {
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
         if(isNotNull(shortcutId)){
-            ShortcutsDTO shortcutsDTO=shortcutsService.getShortcutById(shortcutId);
-            com.kairos.dto.activity.counter.TabKPIDTO tabKPIDTO=shortcutsDTO.getTabKPIs().stream().filter(tabKPIDto->tabKPIDto.getTabId().equals(moduleId)).findFirst().orElse(null);
+            ShortcutDTO shortcutDTO = shortcutService.getShortcutById(shortcutId);
+            com.kairos.dto.activity.counter.TabKPIDTO tabKPIDTO= shortcutDTO.getTabKPIs().stream().filter(tabKPIDto->tabKPIDto.getTabId().equals(moduleId)).findFirst().orElse(null);
             if(isNotNull(tabKPIDTO)){
                 filters.setKpiIds(tabKPIDTO.getKpiIds());
             }

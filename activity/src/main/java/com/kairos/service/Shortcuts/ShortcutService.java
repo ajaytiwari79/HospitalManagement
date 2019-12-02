@@ -2,10 +2,10 @@ package com.kairos.service.Shortcuts;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
-import com.kairos.dto.activity.ShortCuts.ShortcutsDTO;
+import com.kairos.dto.activity.ShortCuts.ShortcutDTO;
 import com.kairos.dto.activity.counter.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
-import com.kairos.persistence.model.shortcuts.Shortcuts;
+import com.kairos.persistence.model.shortcuts.Shortcut;
 import com.kairos.persistence.repository.Shortcuts.ShortcutsMongoRepository;
 import com.kairos.service.counter.CounterDistService;
 import com.kairos.service.exception.ExceptionService;
@@ -23,7 +23,7 @@ import static com.kairos.constants.ActivityMessagesConstants.SHORTCUT_ALREADY_EX
 import static com.kairos.constants.ActivityMessagesConstants.SHORTCUT_NOT_FOUND;
 
 @Service
-public class ShortcutsService {
+public class ShortcutService {
 
     @Inject
     private ShortcutsMongoRepository  shortcutsMongoRepository;
@@ -43,18 +43,18 @@ public class ShortcutsService {
         return tabKPIDTOS;
     }
 
-    public ShortcutsDTO saveShortcut(ShortcutsDTO shortcutsDTO){
-        boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(shortcutsDTO.getName(),shortcutsDTO.getStaffId(),shortcutsDTO.getUnitId(),BigInteger.valueOf(-1));
+    public ShortcutDTO saveShortcut(ShortcutDTO shortcutDTO){
+        boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(shortcutDTO.getName(), shortcutDTO.getStaffId(), shortcutDTO.getUnitId(),BigInteger.valueOf(-1));
         if(existByName){
-            exceptionService.dataNotMatchedException(SHORTCUT_ALREADY_EXISTS_NAME,shortcutsDTO.getName());
+            exceptionService.dataNotMatchedException(SHORTCUT_ALREADY_EXISTS_NAME, shortcutDTO.getName());
         }
-        shortcutsDTO.setTabKPIs(getTabKPIs(shortcutsDTO.getTabKPIs().stream().map(tabKPIDTO -> tabKPIDTO.getTabId()).collect(Collectors.toList()), new ArrayList<>(),shortcutsDTO.getStaffId(),shortcutsDTO.getUnitId()));
-        Shortcuts shortcuts = shortcutsMongoRepository.save(ObjectMapperUtils.copyPropertiesByMapper(shortcutsDTO,Shortcuts.class));
-        return ObjectMapperUtils.copyPropertiesByMapper(shortcuts,ShortcutsDTO.class);
+        shortcutDTO.setTabKPIs(getTabKPIs(shortcutDTO.getTabKPIs().stream().map(tabKPIDTO -> tabKPIDTO.getTabId()).collect(Collectors.toList()), new ArrayList<>(), shortcutDTO.getStaffId(), shortcutDTO.getUnitId()));
+        Shortcut shortcut = shortcutsMongoRepository.save(ObjectMapperUtils.copyPropertiesByMapper(shortcutDTO, Shortcut.class));
+        return ObjectMapperUtils.copyPropertiesByMapper(shortcut, ShortcutDTO.class);
     }
 
-    public ShortcutsDTO updateShortcut(BigInteger shortcutId , String name , ShortcutsDTO shortcutsDTO){
-        Shortcuts shortcut=shortcutsMongoRepository.findById(shortcutId).orElse(null);
+    public ShortcutDTO updateShortcut(BigInteger shortcutId , String name , ShortcutDTO shortcutDTO){
+        Shortcut shortcut=shortcutsMongoRepository.findById(shortcutId).orElse(null);
         if(ObjectUtils.isNull(shortcut)){
            exceptionService.dataNotMatchedException(SHORTCUT_NOT_FOUND);
         }
@@ -65,24 +65,24 @@ public class ShortcutsService {
         if(ObjectUtils.isNotNull(name)){
             shortcut.setName(name);
         }else {
-            shortcut=ObjectMapperUtils.copyPropertiesByMapper(shortcutsDTO,Shortcuts.class);
+            shortcut=ObjectMapperUtils.copyPropertiesByMapper(shortcutDTO, Shortcut.class);
         }
         shortcutsMongoRepository.save(shortcut);
-        return shortcutsDTO;
+        return shortcutDTO;
     }
 
-    public ShortcutsDTO getShortcutById(BigInteger shortcutId){
-        ShortcutsDTO shortcutsDTO= shortcutsMongoRepository.findShortcutById(shortcutId);
-        if(Objects.isNull(shortcutsDTO)){
+    public ShortcutDTO getShortcutById(BigInteger shortcutId){
+        ShortcutDTO shortcutDTO = shortcutsMongoRepository.findShortcutById(shortcutId);
+        if(Objects.isNull(shortcutDTO)){
             exceptionService.dataNotMatchedException(SHORTCUT_NOT_FOUND);
         }
-        return shortcutsDTO;
+        return shortcutDTO;
     }
 
 
     public boolean deleteShortcutById(BigInteger shortcutId){
-        ShortcutsDTO shortcutsDTO= shortcutsMongoRepository.findShortcutById(shortcutId);
-        if(Objects.isNull(shortcutsDTO)){
+        ShortcutDTO shortcutDTO = shortcutsMongoRepository.findShortcutById(shortcutId);
+        if(Objects.isNull(shortcutDTO)){
            exceptionService.dataNotMatchedException(SHORTCUT_NOT_FOUND);
         }
         shortcutsMongoRepository.deleteById(shortcutId);
@@ -90,16 +90,16 @@ public class ShortcutsService {
     }
 
 
-    public List<ShortcutsDTO> getAllShortcutByStaffIdAndUnitId(Long unitId,Long staffId){
-        List<ShortcutsDTO> shortcutsDTOS=shortcutsMongoRepository.findShortcutByUnitIdAndStaffId(staffId,unitId);
-        if(ObjectUtils.isCollectionEmpty(shortcutsDTOS)){
+    public List<ShortcutDTO> getAllShortcutByStaffIdAndUnitId(Long unitId, Long staffId){
+        List<ShortcutDTO> shortcutDTOS =shortcutsMongoRepository.findShortcutByUnitIdAndStaffId(staffId,unitId);
+        if(ObjectUtils.isCollectionEmpty(shortcutDTOS)){
             exceptionService.dataNotMatchedException(SHORTCUT_NOT_FOUND);
         }
-        return shortcutsDTOS;
+        return shortcutDTOS;
     }
 
-    public ShortcutsDTO createCopyOfShortcut(BigInteger shortcutId,String name){
-        Shortcuts shortcut=shortcutsMongoRepository.findById(shortcutId).orElse(null);
+    public ShortcutDTO createCopyOfShortcut(BigInteger shortcutId, String name){
+        Shortcut shortcut=shortcutsMongoRepository.findById(shortcutId).orElse(null);
         if(ObjectUtils.isNull(shortcut)){
             exceptionService.dataNotMatchedException(SHORTCUT_NOT_FOUND);
         }
@@ -110,7 +110,7 @@ public class ShortcutsService {
         shortcut.setName(name);
         shortcut.setId(null);
         shortcutsMongoRepository.save(shortcut);
-        return ObjectMapperUtils.copyPropertiesByMapper(shortcut,ShortcutsDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(shortcut, ShortcutDTO.class);
     }
 
 }
