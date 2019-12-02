@@ -45,6 +45,8 @@ public class FunctionalPaymentService {
     private FunctionGraphRepository functionGraphRepository;
     private SeniorityLevelFunctionRelationshipGraphRepository seniorityLevelFunctionRelationshipGraphRepository;
     private FunctionalPaymentMatrixRepository functionalPaymentMatrixRepository;
+    private ExpertiseLineGraphRepository expertiseLineGraphRepository;
+
 
 
     public FunctionalPaymentService(ExpertiseGraphRepository expertiseGraphRepository, ExceptionService exceptionService, FunctionalPaymentGraphRepository functionalPaymentGraphRepository
@@ -60,12 +62,12 @@ public class FunctionalPaymentService {
         this.functionalPaymentMatrixRepository = functionalPaymentMatrixRepository;
     }
 
-    public FunctionalPaymentDTO saveFunctionalPayment(Long expertiseId, FunctionalPaymentDTO functionalPaymentDTO) {
-        Optional<Expertise> expertise = expertiseGraphRepository.findById(expertiseId);
-        if (!expertise.isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseId);
+    public FunctionalPaymentDTO saveFunctionalPayment(Long expertiseLineId, FunctionalPaymentDTO functionalPaymentDTO) {
+        Optional<ExpertiseLine> expertiseLine = expertiseLineGraphRepository.findById(expertiseLineId);
+        if (!expertiseLine.isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, EXPERTISE, expertiseLineId);
         }
-        FunctionalPayment functionalPayment = validateAndGetDomainObject(functionalPaymentDTO, expertise.get());
+        FunctionalPayment functionalPayment = validateAndGetDomainObject(functionalPaymentDTO, expertiseLine.get());
         functionalPaymentGraphRepository.save(functionalPayment);
         functionalPaymentDTO.setId(functionalPayment.getId());
         return functionalPaymentDTO;
@@ -75,14 +77,14 @@ public class FunctionalPaymentService {
         return functionalPaymentGraphRepository.getFunctionalPaymentOfExpertise(expertiseId);
     }
 
-    private FunctionalPayment validateAndGetDomainObject(FunctionalPaymentDTO functionalPaymentDTO, Expertise expertise) {
-        FunctionalPayment functionalPaymentFromDb = functionalPaymentGraphRepository.getLastFunctionalPaymentOfExpertise(expertise.getId());
-        Specification<FunctionalPaymentDTO> isGreaterThanStartDateAndToday = new IsGreaterThanStartDate(expertise, exceptionService)
+    private FunctionalPayment validateAndGetDomainObject(FunctionalPaymentDTO functionalPaymentDTO, ExpertiseLine expertiseLine) {
+        FunctionalPayment functionalPaymentFromDb = functionalPaymentGraphRepository.getLastFunctionalPaymentOfExpertise(expertiseLine.getId());
+        Specification<FunctionalPaymentDTO> isGreaterThanStartDateAndToday = new IsGreaterThanStartDate(expertiseLine, exceptionService)
                 .and(new IsGreaterThanToday(exceptionService))
                 .and(new IsFunctionalPaymentAvailable(functionalPaymentFromDb, exceptionService));
 
         isGreaterThanStartDateAndToday.isSatisfied(functionalPaymentDTO);
-        return new FunctionalPayment(expertise, functionalPaymentDTO.getStartDate(), functionalPaymentDTO.getEndDate(), functionalPaymentDTO.getPaymentUnit());
+        return new FunctionalPayment(expertiseLine, functionalPaymentDTO.getStartDate(), functionalPaymentDTO.getEndDate(), functionalPaymentDTO.getPaymentUnit());
     }
 
     public FunctionalPaymentDTO updateFunctionalPayment(Long expertiseId, FunctionalPaymentDTO functionalPaymentDTO) {
@@ -107,7 +109,7 @@ public class FunctionalPaymentService {
         if (!functionalPayment.isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "functionalpayment", functionalSeniorityLevelDTO.getFunctionalPaymentId());
         }
-        List<FunctionalPaymentMatrix> list = new ArrayList<FunctionalPaymentMatrix>(1);
+        List<FunctionalPaymentMatrix> list = new ArrayList<>(1);
         List<Function> functions = getFunctions(functionalPaymentMatrixDTOS);
         List<SeniorityLevel> seniorityLevels = getSeniorityLevel(functionalPaymentMatrixDTOS);
 
@@ -201,7 +203,7 @@ public class FunctionalPaymentService {
 
         if (functionalPayment.get().isPublished()) {
             // functional payment is published so we need to create a  new copy and update in same
-            FunctionalPayment functionalPaymentCopy = new FunctionalPayment(functionalPayment.get().getExpertise(), functionalPayment.get().getStartDate(),
+            FunctionalPayment functionalPaymentCopy = new FunctionalPayment(functionalPayment.get().getExpertiseLine(), functionalPayment.get().getStartDate(),
                     functionalPayment.get().getEndDate(), functionalPayment.get().getPaymentUnit());
 
             functionalPaymentMatrixDTOS.forEach(functionalPaymentMatrixDTO -> {
@@ -265,7 +267,7 @@ public class FunctionalPaymentService {
         functionalPayment.get().setPublished(true);
         functionalPayment.get().setStartDate(functionalPaymentDTO.getStartDate()); // changing
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
-        FunctionalPayment lastFunctionPayment = functionalPaymentGraphRepository.findByExpertiseId(functionalPayment.get().getExpertise().getId());
+        FunctionalPayment lastFunctionPayment = functionalPaymentGraphRepository.findByExpertiseLineId(functionalPayment.get().getExpertiseLine().getId());
         boolean onGoingUpdated = false;
         if (lastFunctionPayment != null && functionalPaymentDTO.getStartDate().isAfter(lastFunctionPayment.getStartDate()) && lastFunctionPayment.getEndDate() == null) {
             lastFunctionPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1));
@@ -338,7 +340,7 @@ public class FunctionalPaymentService {
 
                     //Creating new and updating values
 
-                    FunctionalPayment functionalPayment = new FunctionalPayment(functionalPaymentQueryResult.getExpertise(), startDate,
+                    FunctionalPayment functionalPayment = new FunctionalPayment(functionalPaymentQueryResult.getExpertiseLine(), startDate,
                             functionalPaymentQueryResult.getEndDate(), functionalPaymentQueryResult.getPaymentUnit());
                     functionalPayment.setParentFunctionalPayment(existing);
                     functionalPayment.setPublished(functionalPaymentQueryResult.isPublished());
