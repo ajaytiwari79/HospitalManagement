@@ -542,8 +542,8 @@ public class ActivityService {
             rulesActivityDTO.setCutOffIntervals(cutOffIntervals);
         }
         if(activity.getRulesActivityTab().isEligibleForStaffingLevel() != rulesActivityTab.isEligibleForStaffingLevel() && !rulesActivityTab.isEligibleForStaffingLevel()){
-//            removedActivityFromStaffingLevelOfChildActivity(activity.getChildActivityIds());
-//            staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
+            removedActivityFromStaffingLevelOfChildActivity(activity.getChildActivityIds());
+            staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
         }
         activity.setRulesActivityTab(rulesActivityTab);
         if (!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
