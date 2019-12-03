@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.time_bank;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,8 +12,8 @@ import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 /**
  * @author pradeep
@@ -46,5 +47,16 @@ public class TimeBankRepositoryImpl implements CustomTimeBankRepository{
         }
         Query query = new Query(criteria);
         return mongoTemplate.find(query,DailyTimeBankEntry.class);
+    }
+
+    public long getTimeBankOffMinutes(Long employmentId){
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(EMPLOYMENT_ID).is(employmentId).and("deleted").is(false)),
+                group(EMPLOYMENT_ID).sum("timeBankOffMinutes").as("timeBankOffMinutes"),
+                project("timeBankOffMinutes").andExclude("_id")
+
+        );
+        AggregationResults<DailyTimeBankEntry> results = mongoTemplate.aggregate(aggregation,DailyTimeBankEntry.class,DailyTimeBankEntry.class);
+        return isCollectionEmpty(results.getMappedResults()) ? 0 : results.getMappedResults().get(0).getTimeBankOffMinutes();
     }
 }
