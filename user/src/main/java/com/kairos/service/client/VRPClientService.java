@@ -126,10 +126,9 @@ public class VRPClientService {
 
     public VRPClientDTO getClient(Long clientId){
         VRPClient vrpClient = vrpClientGraphRepository.findOne(clientId,1);
-        VRPClientDTO vrpClientDTO = ObjectMapperUtils.copyPropertiesByMapper(vrpClient, VRPClientDTO.class);
+        return ObjectMapperUtils.copyPropertiesByMapper(vrpClient, VRPClientDTO.class);
         //TODO please don't remove this
         //  vrpClientDTO.setPreferedTimeWindowId(vrpClient.getPreferedTimeWindow().getId());
-        return vrpClientDTO;
     }
 
     public boolean deleteClient(Long clientId){

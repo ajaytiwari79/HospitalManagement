@@ -147,8 +147,7 @@ public class OrganizationType extends UserBaseEntity {
     }
 
     public OrganizationType basicDetails(){
-        OrganizationType organizationType = new OrganizationType(this.id, this.name, this.description);
-        return organizationType;
+        return new OrganizationType(this.id, this.name, this.description);
     }
     @Override
     public String toString() {

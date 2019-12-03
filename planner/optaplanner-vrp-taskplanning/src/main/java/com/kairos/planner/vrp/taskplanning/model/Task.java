@@ -252,8 +252,7 @@ public class Task extends TaskOrShift{
     }
 
     public int getDrivingTime(){
-        int mins=(int)Math.ceil(getDrivingTimeSeconds()/60d);
-        return mins;
+        return (int)Math.ceil(getDrivingTimeSeconds()/60d);
     }
 
     @Override

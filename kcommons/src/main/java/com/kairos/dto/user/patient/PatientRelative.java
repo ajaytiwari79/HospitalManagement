@@ -1,8 +1,12 @@
 package com.kairos.dto.user.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class PatientRelative {
     private String id;
 
@@ -20,83 +24,6 @@ public class PatientRelative {
 
     private String version;
 
-    public String getId ()
-    {
-        return id;
-    }
-
-    public void setId (String id)
-    {
-        this.id = id;
-    }
-
-    public String getPatientId ()
-    {
-        return patientId;
-    }
-
-    public void setPatientId (String patientId)
-    {
-        this.patientId = patientId;
-    }
-
-    public RelatedPatient getRelatedPatient ()
-    {
-        return relatedPatient;
-    }
-
-    public void setRelatedPatient (RelatedPatient relatedPatient)
-    {
-        this.relatedPatient = relatedPatient;
-    }
-
-    public String getImportance ()
-    {
-        return importance;
-    }
-
-    public void setImportance (String importance)
-    {
-        this.importance = importance;
-    }
-
-    public String getDisplayName ()
-    {
-        return displayName;
-    }
-
-    public void setDisplayName (String displayName)
-    {
-        this.displayName = displayName;
-    }
-
-    public String getType ()
-    {
-        return type;
-    }
-
-    public void setType (String type)
-    {
-        this.type = type;
-    }
-
-    public String getVersion ()
-    {
-        return version;
-    }
-
-    public void setVersion (String version)
-    {
-        this.version = version;
-    }
-
-    public RelativeContactDetails getContact() {
-        return contact;
-    }
-
-    public void setContact(RelativeContactDetails contact) {
-        this.contact = contact;
-    }
 
     @Override
     public String toString()

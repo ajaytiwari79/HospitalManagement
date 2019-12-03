@@ -2,6 +2,7 @@ package com.kairos.service.staff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -10,6 +11,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.*;
 import com.kairos.enums.shift.ShiftStatus;
@@ -17,13 +19,13 @@ import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.group.GroupDTO;
+import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
 import com.kairos.persistence.model.user.filter.*;
-import com.kairos.persistence.model.user.skill.Skill;
-import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
-import com.kairos.persistence.repository.organization.TeamGraphRepository;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.organization.*;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.country.EmploymentTypeGraphRepository;
@@ -34,11 +36,13 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.user_filter.FilterGroupGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.FunctionService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.organization.GroupService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.skill.SkillService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.wrapper.staff.StaffEmploymentTypeWrapper;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
@@ -106,6 +110,14 @@ public class StaffFilterService {
     private FunctionService functionService;
     @Inject
     private SkillService skillService;
+    @Inject
+    private TagService tagService;
+    @Inject
+    private GroupService groupService;
+    @Inject
+    private OrganizationBaseRepository organizationBaseRepository;
+    @Inject
+    private OrganizationServiceRepository organizationServiceRepository;
 
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
 
@@ -157,7 +169,13 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(StaffStatusEnum.getListOfStaffStatusForFilters(), objectMapper);
             }
             case EXPERTISE: {
-                return expertiseGraphRepository.getExpertiseByCountryIdForFilters(unitId, countryId);
+                List<Long> allUnitIds = organizationBaseRepository.fetchAllUnitIds(unitId);
+                OrganizationServicesAndLevelQueryResult servicesAndLevel = organizationServiceRepository.getOrganizationServiceIdsByOrganizationId(allUnitIds);
+                if(ObjectUtils.isNotNull(servicesAndLevel)) {
+                    return expertiseGraphRepository.getExpertiseByCountryIdForFilters(countryId, servicesAndLevel.getServicesId());
+                }
+                break;
+
             }
             case EMPLOYMENT: {
                 return dtoToQueryesultConverter(Employment.getListOfEmploymentForFilters(), objectMapper);
@@ -184,6 +202,10 @@ public class StaffFilterService {
                 return getTAStatus();
             case TEAM:
                 return teamGraphRepository.getTeamsByUnitIdForFilters(unitId);
+            case TAGS:
+                return getTags(unitId);
+            case GROUPS:
+                return getGroups(unitId);
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
@@ -191,6 +213,15 @@ public class StaffFilterService {
         return null;
     }
 
+    private List<FilterSelectionQueryResult> getTags(Long orgId) {
+        List<TagDTO> tags = tagService.getTagsByOrganizationIdAndMasterDataType(orgId, MasterDataTypeEnum.STAFF);
+        return tags.stream().map(tag  -> new FilterSelectionQueryResult(tag.getId().toString(),tag.getName())).collect(Collectors.toList());
+    }
+
+    private List<FilterSelectionQueryResult> getGroups(Long unitId) {
+        List<GroupDTO> groups = groupService.getAllGroupsOfUnit(unitId);
+        return groups.stream().map(group  -> new FilterSelectionQueryResult(group.getId().toString(),group.getName())).collect(Collectors.toList());
+    }
 
     private List<FilterSelectionQueryResult> getTAStatus(){
         return Arrays.stream(AccessGroupRole.values()).map(accessGroupRole -> new FilterSelectionQueryResult(accessGroupRole.name(),accessGroupRole.toString())).collect(Collectors.toList());
@@ -362,14 +393,14 @@ public class StaffFilterService {
         return employmentTypeGraphRepository.getEmploymentTypeByCountryIdForFilters(countryId);
     }
 
-    private Map<FilterType, Set<String>> getMapOfFiltersToBeAppliedWithValue(String moduleId, List<FilterSelectionDTO> filters) {
+    public Map<FilterType, Set<String>> getMapOfFiltersToBeAppliedWithValue(Long unitId, String moduleId, List<FilterSelectionDTO> filters) {
         Map<FilterType, Set<String>> mapOfFilters = new HashMap<>();
         // Fetch filter group to which access page is linked
         FilterGroup filterGroup = filterGroupGraphRepository.getFilterGroupByModuleId(moduleId);
         filters.forEach(filterSelection -> {
             if (!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
                     filterSelection.getName())) {
-                mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
+                mapOfFilters.put(filterSelection.getName(), FilterType.GROUPS.equals(filterSelection.getName())? groupService.getAllStaffByGroupIds(unitId, ObjectMapperUtils.copyPropertiesOfListByMapper(filterSelection.getValue(), Long.class)) : filterSelection.getValue());
 
             }
         });
@@ -389,7 +420,7 @@ public class StaffFilterService {
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
         List<Long> allOrgIds=unit?Arrays.asList(organization.getId()):organizationGraphRepository.findAllOrganizationIdsInHierarchy(organization.getId());
        staffEmploymentTypeWrapper.setStaffList(unitGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
-                getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
+                getMapOfFiltersToBeAppliedWithValue(unitId, staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
         List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId);

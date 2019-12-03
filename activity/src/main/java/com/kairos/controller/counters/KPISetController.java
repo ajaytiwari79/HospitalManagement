@@ -73,8 +73,8 @@ public class KPISetController {
 
 
     @GetMapping(UNIT_URL+"/kpi_set_calculation")
-    public ResponseEntity<Map<String, Object>> createKPISetCalculation(@PathVariable Long unitId, @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getKPISetCalculationData(unitId,startDate));
+    public ResponseEntity<Map<String, Object>> createKPISetCalculation(@PathVariable Long unitId, @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate , @RequestParam(required = false)  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiSetService.getKPISetCalculationData(unitId,startDate,endDate));
     }
 
 

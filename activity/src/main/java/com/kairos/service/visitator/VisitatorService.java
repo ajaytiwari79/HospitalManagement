@@ -60,6 +60,11 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class VisitatorService{
 
     private static final Logger logger = LoggerFactory.getLogger(VisitatorService.class);
+    public static final String CHILDREN = "children";
+    public static final String START_DATE = "startDate";
+    public static final String END_DATE = "endDate";
+    public static final String MM_DD_YYYY = "MM-dd-yyyy";
+    public static final String WEEKDAY_VISITS = "weekdayVisits";
 
     @Inject
     private TaskTypeService taskTypeService;
@@ -215,9 +220,9 @@ public class VisitatorService{
         for (Map<String, Object> service : orgSelectedServices) {
             mainServiceMap = createCustomServiceMap(service.get("id"), "service", (String) service.get("customName"), null);
 
-            if(service.get("children")!=null){
+            if(service.get(CHILDREN)!=null){
                 List<Map<String, Object>> subServicesList = new ArrayList<>();
-                List<Map<String, Object>> subServices = (List<Map<String, Object>>) service.get("children");
+                List<Map<String, Object>> subServices = (List<Map<String, Object>>) service.get(CHILDREN);
 
                 //Iterate all Sub-Services
                 for (Map<String, Object> subService : subServices){
@@ -225,10 +230,10 @@ public class VisitatorService{
                     subServiceMap = createCustomServiceMap(subService.get("id"), "subService", (String) subService.get("customName"), null);
 
                     //Iterate TaskTypes associated with Sub-Service
-                    subServiceMap.put("children",createCustomTaskTypeList(unitId,  new Long((int)subService.get("id"))  ));
+                    subServiceMap.put(CHILDREN,createCustomTaskTypeList(unitId,  new Long((int)subService.get("id"))  ));
                     subServicesList.add(subServiceMap);
                 }
-                mainServiceMap.put("children",subServicesList);
+                mainServiceMap.put(CHILDREN,subServicesList);
             }
             mainServiceList.add(mainServiceMap);
         }
@@ -431,9 +436,9 @@ public class VisitatorService{
 
     public List<Map<String, Object>> fetchTaskDemand(long unitId, long citizenId, Map<String, String> requestParams) {
 
-        Date startDate = (requestParams.get("startDate") != null) ? new DateTime(requestParams.get("startDate")).toDate() : null;
+        Date startDate = (requestParams.get(START_DATE) != null) ? new DateTime(requestParams.get(START_DATE)).toDate() : null;
 
-        Date endDate = (requestParams.get("endDate") != null) ? new DateTime(requestParams.get("endDate")).toDate() : null;
+        Date endDate = (requestParams.get(END_DATE) != null) ? new DateTime(requestParams.get(END_DATE)).toDate() : null;
 
         List<TaskDemand> taskDemandList = Collections.EMPTY_LIST;
         if (startDate == null && endDate == null) {
@@ -441,7 +446,7 @@ public class VisitatorService{
             exceptionService.taskDemandException(MESSAGE_TASKDEMAND_STARTDATE_ENDDATE);
         } else if (startDate != null && endDate != null) {
             taskDemandList = taskDemandMongoRepository.findAllBetweenDates(unitId, citizenId, startDate, endDate);
-        } else if (startDate != null && endDate == null) {
+        } else if (startDate != null) {
             taskDemandList = taskDemandMongoRepository.findAllAfterDate(unitId, citizenId, startDate);
         } else {
             taskDemandList = taskDemandMongoRepository.findAllBeforeDate(unitId, citizenId, endDate);
@@ -470,10 +475,10 @@ public class VisitatorService{
         taskDemandMap.put("taskTypeDescription", taskType.getDescription());
         taskDemandMap.put("taskTypeName", taskType.getTitle());
 
-        taskDemandMap.put("startDate", taskDemand.getStartDate());
-        taskDemandMap.put("startDateFormatted", DateFormatUtils.format(taskDemand.getStartDate(), "MM-dd-yyyy"));
-        taskDemandMap.put("endDate", taskDemand.getEndDate());
-        taskDemandMap.put("endDateFormatted", taskDemand.getEndDate()!=null ?  DateFormatUtils.format(taskDemand.getEndDate(), "MM-dd-yyyy") : "");
+        taskDemandMap.put(START_DATE, taskDemand.getStartDate());
+        taskDemandMap.put("startDateFormatted", DateFormatUtils.format(taskDemand.getStartDate(), MM_DD_YYYY));
+        taskDemandMap.put(END_DATE, taskDemand.getEndDate());
+        taskDemandMap.put("endDateFormatted", taskDemand.getEndDate()!=null ?  DateFormatUtils.format(taskDemand.getEndDate(), MM_DD_YYYY) : "");
 
         taskDemandMap.put("priority", taskDemand.getPriority());
         taskDemandMap.put("needRehabilitation", taskDemand.isNeedRehabilitation());
@@ -496,13 +501,13 @@ public class VisitatorService{
                 taskDemandMap.putAll(organizaionInfo);
                 taskDemandMap.put("weekdayFrequency", taskDemand.getWeekdayFrequency());
                 taskDemandMap.put("weekdayFrequencyValue", taskDemand.getWeekdayFrequency().value);
-                taskDemandMap.put("weekdayVisits", taskDemand.getWeekdayVisits());
+                taskDemandMap.put(WEEKDAY_VISITS, taskDemand.getWeekdayVisits());
             } else {
                 taskDemandMap.put("weekdaySupplier", "");
                 taskDemandMap.put("weekdaySupplierId", "");
                 taskDemandMap.put("weekdayFrequency", "");
                 taskDemandMap.put("weekdayFrequencyValue", "");
-                taskDemandMap.put("weekdayVisits", Collections.EMPTY_LIST);
+                taskDemandMap.put(WEEKDAY_VISITS, Collections.EMPTY_LIST);
             }
 
             if (taskDemand.getWeekendSupplierId() > 0 && taskDemand.getWeekendFrequency() != null && taskDemand.getWeekendVisits() != null) {
@@ -532,7 +537,7 @@ public class VisitatorService{
             List<TaskDemandVisit> taskDemandVisits = taskDemand.getWeekdayVisits();
             taskDemandVisits.forEach(taskDemandVisit -> taskDemandVisit.setVisitCount(toIntExact(taskDemand.getDailyFrequency())));
             //taskDemandVisits.get(0).setVisitCount(toIntExact(taskDemand.getDailyFrequency()));
-            taskDemandMap.put("weekdayVisits", taskDemandVisits);
+            taskDemandMap.put(WEEKDAY_VISITS, taskDemandVisits);
 
             taskDemandMap.put("dailyFrequency", taskDemand.getDailyFrequency());
             taskDemandMap.put("endAfterOccurrence", taskDemand.getEndAfterOccurrence());
@@ -562,7 +567,7 @@ public class VisitatorService{
             }
             taskDemandVisits.forEach(taskDemandVisit -> taskDemandVisit.setVisitCount(weekDayVisitCount));
             //taskDemandVisits.get(0).setVisitCount(weekDayVisitCount);
-            taskDemandMap.put("weekdayVisits", taskDemandVisits);
+            taskDemandMap.put(WEEKDAY_VISITS, taskDemandVisits);
 
             taskDemandMap.put("endAfterOccurrence", taskDemand.getEndAfterOccurrence());
 
@@ -575,7 +580,7 @@ public class VisitatorService{
         }
 
         taskDemandMap.put("nextVisit", (taskDemand.getNextVisit() != null) ? taskDemand.getNextVisit() : "");
-        taskDemandMap.put("nextVisitFormatted", (taskDemand.getNextVisit() != null) ? DateFormatUtils.format(taskDemand.getNextVisit(), "MM-dd-yyyy") : "");
+        taskDemandMap.put("nextVisitFormatted", (taskDemand.getNextVisit() != null) ? DateFormatUtils.format(taskDemand.getNextVisit(), MM_DD_YYYY) : "");
         taskDemandMap.put("daysToReview", (taskDemand.getNextVisit() != null) ? DAYS.between(LocalDate.now(), taskDemand.getNextVisit().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) : 0);
         taskDemandMap.put("recurrencePattern", taskDemand.getRecurrencePattern());
         //taskDemandMap.put("citizenHouseholds", clientService.getPeopleInHousehold(taskDemand.getCitizenId()));

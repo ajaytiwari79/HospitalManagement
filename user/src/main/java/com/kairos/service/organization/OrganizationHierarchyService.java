@@ -5,9 +5,7 @@ import com.kairos.dto.gdpr.filter.FilterAndFavouriteFilterDTO;
 import com.kairos.dto.gdpr.filter.FilterAttributes;
 import com.kairos.dto.gdpr.filter.FilterResponseDTO;
 import com.kairos.dto.user.organization.CompanyType;
-import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.dto.user.organization.hierarchy.OrganizationHierarchyFilterDTO;
-import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.gdpr.FilterType;
 import com.kairos.persistence.model.access_permission.StaffAccessGroupQueryResult;
 import com.kairos.persistence.model.common.QueryResult;
@@ -20,7 +18,7 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

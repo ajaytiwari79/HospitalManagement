@@ -17,12 +17,14 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
@@ -32,8 +34,6 @@ import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.organization.AbsenceTypes;
-import com.kairos.persistence.model.organization.OrganizationContactAddress;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
@@ -42,8 +42,8 @@ import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
-import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
-import com.kairos.persistence.model.user.expertise.Response.OrderDefaultDataWrapper;
+import com.kairos.persistence.model.user.expertise.response.OrderAndActivityDTO;
+import com.kairos.persistence.model.user.expertise.response.OrderDefaultDataWrapper;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.open_shift.RuleTemplateDefaultData;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -66,6 +66,7 @@ import com.kairos.service.client.ClientService;
 import com.kairos.service.country.CitizenStatusService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.country.EmploymentTypeService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.region.RegionService;
@@ -73,7 +74,7 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -99,6 +100,9 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Transactional
 @Service
 public class OrganizationService {
+    public static final String ESTIMOTE_APP_ID = "estimoteAppId";
+    public static final String ESTIMOTE_APP_TOKEN = "estimoteAppToken";
+    public static final String CLIENT_SINCE = "clientSince";
     @Inject
     private AccessGroupService accessGroupService;
     @Inject
@@ -179,6 +183,8 @@ public class OrganizationService {
     private SchedulerServiceRestClient schedulerServiceRestClient;
     @Inject
     private OrganizationMetadataRepository organizationMetadataRepository;
+    @Inject
+    private TagService tagService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationService.class);
 
@@ -187,6 +193,7 @@ public class OrganizationService {
         OrganizationDTO organizationDTO = ObjectMapperUtils.copyPropertiesByMapper(unit, OrganizationDTO.class);
         organizationDTO.setCountryId(countryGraphRepository.getCountryIdByUnitId(id));
         organizationDTO.setParentOrganization(unit instanceof Organization);
+        organizationDTO.setTagDTOS(tagService.getTagsByOrganizationIdAndMasterDataType(id, MasterDataTypeEnum.STAFF));
         return organizationDTO;
     }
 
@@ -244,7 +251,7 @@ public class OrganizationService {
         List<Municipality> municipalities = (zipCode == null) ? Collections.emptyList() : municipalityGraphRepository.getMunicipalitiesByZipCode(zipCode.getId());
         Map<String, Object> generalTabQueryResult = unitGraphRepository.getGeneralTabInfo(id);
         HashMap<String, Object> generalTabInfo = new HashMap<>(generalTabQueryResult);
-        generalTabInfo.put("clientSince", (generalTabInfo.get("clientSince") == null ? null : getDate((long) generalTabInfo.get("clientSince"))));
+        generalTabInfo.put(CLIENT_SINCE, (generalTabInfo.get(CLIENT_SINCE) == null ? null : getDate((long) generalTabInfo.get(CLIENT_SINCE))));
         cloneMap.put("municipalities", municipalities);
         response.put("generalTabInfo", generalTabInfo);
         response.put("otherData", cloneMap);
@@ -388,9 +395,9 @@ public class OrganizationService {
 
     public Map setEstimoteCredentials(long organization, Map<String, String> payload) {
         Unit unitObj = unitGraphRepository.findOne(organization);
-        if (unitObj != null && payload.containsKey("estimoteAppId") && payload.containsKey("estimoteAppToken") && payload.get("estimoteAppId") != null && payload.get("estimoteAppToken") != null) {
-            unitObj.setEstimoteAppId(payload.get("estimoteAppId"));
-            unitObj.setEstimoteAppToken(payload.get("estimoteAppToken"));
+        if (unitObj != null && payload.containsKey(ESTIMOTE_APP_ID) && payload.containsKey(ESTIMOTE_APP_TOKEN) && payload.get(ESTIMOTE_APP_ID) != null && payload.get(ESTIMOTE_APP_TOKEN) != null) {
+            unitObj.setEstimoteAppId(payload.get(ESTIMOTE_APP_ID));
+            unitObj.setEstimoteAppToken(payload.get(ESTIMOTE_APP_TOKEN));
             return payload;
         }
         return null;
@@ -400,8 +407,8 @@ public class OrganizationService {
         Map returnData = new HashMap();
         Unit unitObj = unitGraphRepository.findOne(organization);
         if (unitObj != null) {
-            returnData.put("estimoteAppId", unitObj.getEstimoteAppId());
-            returnData.put("estimoteAppToken", unitObj.getEstimoteAppToken());
+            returnData.put(ESTIMOTE_APP_ID, unitObj.getEstimoteAppId());
+            returnData.put(ESTIMOTE_APP_TOKEN, unitObj.getEstimoteAppToken());
         }
         return returnData;
     }
@@ -660,7 +667,8 @@ public class OrganizationService {
             wtaBasicDetailsDTO.setOrganizationType(organizationTypeDTO);
         }
         List<Unit> units;
-        units = CollectionUtils.isNotEmpty(unitIds) ? unitGraphRepository.findOrganizationsByIdsIn(unitIds) : organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+        units = CollectionUtils.isNotEmpty(unitIds) ? unitGraphRepository.findOrganizationsByIdsIn(unitIds) : organizationTypeGraphRepository.getOrganizationsByOrganizationTypeId(organizationSubTypeId);
+        units = units.stream().filter(unit -> unit.isWorkcentre()).collect(Collectors.toList());
         if (Optional.ofNullable(organizationSubTypeId).isPresent()) {
             OrganizationType organizationSubType = organizationTypeGraphRepository.findOne(organizationSubTypeId, 0);
             if (Optional.ofNullable(organizationSubType).isPresent()) {
@@ -813,8 +821,9 @@ public class OrganizationService {
         if (CollectionUtils.isNotEmpty(unitIds)) {
             units = unitGraphRepository.findOrganizationsByIdsIn(unitIds);
         } else {
-            units = organizationTypeGraphRepository.getOrganizationsByOrganizationType(organizationSubTypeId);
+            units = organizationTypeGraphRepository.getOrganizationsByOrganizationTypeId(organizationSubTypeId);
         }
+        units = units.stream().filter(unit -> unit.isWorkcentre()).collect(Collectors.toList());
         if (Optional.ofNullable(organizationSubType).isPresent()) {
             OrganizationTypeDTO organizationSubTypeDTO = new OrganizationTypeDTO();
             BeanUtils.copyProperties(organizationSubType, organizationSubTypeDTO);

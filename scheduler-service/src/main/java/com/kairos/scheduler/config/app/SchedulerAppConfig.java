@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.kairos.dto.user_context.UserContextInterceptor;
 import com.kairos.scheduler.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
 import com.kairos.scheduler.utils.user_context.SchedulerUserContextInterceptor;
-import com.kairos.scheduler.utils.user_context.UserContextInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -127,33 +127,30 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
     @Primary
     @Bean(name="restTemplate")
     public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+        return restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
     @Profile({"local", "test"})
     @Primary
     @Bean(name="restTemplate")
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+        return restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
     @Profile({"local", "test"})
     @Bean(name="schedulerServiceRestTemplate")
     public RestTemplate getRestTemplateWithoutUserContextLocal(RestTemplateBuilder restTemplateBuilder,  @Value("${scheduler.authorization}") String authorization) {
 
-        RestTemplate template =restTemplateBuilder
+        return restTemplateBuilder
                 .interceptors(new SchedulerUserContextInterceptor(authorization))
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
    /* @Profile({"development","qa","production"})
@@ -172,20 +169,18 @@ public class SchedulerAppConfig implements WebMvcConfigurer {
     @Primary
     @Bean(name="restTemplateWithoutAuth")
     public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+        return restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
     @Profile({"local", "test"})
     @Primary
     @Bean(name="restTemplateWithoutAuth")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+        return restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
 }

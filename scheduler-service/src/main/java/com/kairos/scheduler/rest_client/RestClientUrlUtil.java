@@ -1,6 +1,6 @@
 package com.kairos.scheduler.rest_client;
 
-import com.kairos.scheduler.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 
 import java.util.Optional;
 
@@ -13,15 +13,12 @@ public class RestClientUrlUtil {
 
     public final static String getBaseUrl(boolean hasUnitInUrl, Long id,String userServiceUrl) {
         if(!Optional.ofNullable(id).isPresent()) {
-            String baseUrl = userServiceUrl;
-            return baseUrl;
+            return userServiceUrl;
         }else {
             if (hasUnitInUrl) {
-                String baseUrl = new StringBuilder(userServiceUrl).append("unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
-                return baseUrl;
+                return new StringBuilder(userServiceUrl).append("unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             } else {
-                String baseUrl = new StringBuilder(userServiceUrl).append("country/").append(id).toString();
-                return baseUrl;
+                return new StringBuilder(userServiceUrl).append("country/").append(id).toString();
             }
         }
 

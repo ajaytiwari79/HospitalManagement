@@ -7,7 +7,7 @@ import com.kairos.dto.user.organization.OrganizationBasicDTO;
 import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.organization.OrganizationType;
-import com.kairos.persistence.model.user.expertise.Response.ExpertiseSkillDTO;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseSkillDTO;
 import com.kairos.persistence.model.user.resources.Vehicle;
 import com.kairos.persistence.model.user.skill.Skill;
 import com.kairos.persistence.model.user.skill.SkillCategory;
@@ -294,11 +294,20 @@ public class CountryController {
     }
 
     @ApiOperation(value = "Update expertise")
-    @RequestMapping(value = COUNTRY_URL + "/expertise", method = RequestMethod.PUT)
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId, @RequestBody @Validated ExpertiseDTO expertise) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(countryId, expertise));
+    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable long countryId, @RequestBody  ExpertiseDTO expertise,@PathVariable Long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertise(countryId, expertise,expertiseId));
     }
+
+    @ApiOperation(value = "Update expertise Line")
+    @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/expertise_line/{expertiseLineId}", method = RequestMethod.PUT)
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateExpertise(@PathVariable Long countryId, @RequestBody  ExpertiseDTO expertise,@PathVariable Long expertiseId,@PathVariable Long expertiseLineId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.updateExpertiseLine(countryId, expertise,expertiseId,expertiseLineId));
+    }
+
+
 
     @ApiOperation(value = "Delete expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}", method = RequestMethod.DELETE)
@@ -310,8 +319,8 @@ public class CountryController {
     @ApiOperation(value = "Publish expertise")
     @RequestMapping(value = COUNTRY_URL + "/expertise/{expertiseId}/publish", method = RequestMethod.PUT)
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> publishExpertise(@PathVariable long expertiseId, @RequestParam Long publishedDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.publishExpertise(expertiseId, publishedDate));
+    public ResponseEntity<Map<String, Object>> publishExpertise(@PathVariable long expertiseId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, expertiseService.publishExpertise(expertiseId));
     }
 
     @ApiOperation(value = "Delete expertise")
@@ -340,7 +349,7 @@ public class CountryController {
     @ApiOperation("linking of skill with an organization type")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> addExpertiseInOrgType(@PathVariable long orgTypeId, @RequestBody OrgTypeSkillDTO orgTypeSkillDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.addExpertiseInOrgType(orgTypeId, orgTypeSkillDTO.getSkillId(), orgTypeSkillDTO.isSelected()));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationTypeService.addSkillInOrgType(orgTypeId, orgTypeSkillDTO.getSkillId(), orgTypeSkillDTO.isSelected()));
     }
 
     @RequestMapping(value = COUNTRY_URL + "/organization_type/{orgTypeId}/skill_category", method = RequestMethod.GET)

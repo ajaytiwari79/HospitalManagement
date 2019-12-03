@@ -17,6 +17,7 @@ public class PayOutPerShiftCTADistribution {
     private String ctaName;
     private int minutes;
     private BigInteger ctaRuleTemplateId;
+    private transient float cost;
 
 
     @Override

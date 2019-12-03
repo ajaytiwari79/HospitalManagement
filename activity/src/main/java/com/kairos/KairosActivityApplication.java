@@ -7,9 +7,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.config.LocalDateDeserializer;
 import com.kairos.config.LocalDateSerializer;
+import com.kairos.dto.user_context.UserContextInterceptor;
 import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
-import com.kairos.utils.user_context.UserContextInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -116,40 +116,34 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 	@Primary
 	@Bean
 	public RestTemplate getCustomRestTemplate(RestTemplateBuilder restTemplateBuilder) {
-		RestTemplate template =restTemplateBuilder
-				.interceptors(new UserContextInterceptor())
-				.messageConverters(mappingJackson2HttpMessageConverter())
-				.build();
-		return template;
+		return restTemplateBuilder.interceptors(new UserContextInterceptor()).messageConverters(mappingJackson2HttpMessageConverter()).build();
 	}
 
 	@Profile({"development","qa","production"})
 	@LoadBalanced
 	@Bean(name ="restTemplateWithoutAuth")
 	public RestTemplate getCustomRestTemplateWithoutAuthorization(RestTemplateBuilder restTemplateBuilder) {
-		RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
 				.messageConverters(mappingJackson2HttpMessageConverter())
 				.build();
-		return template;
 	}
 
     @Profile({"local", "test"})
     @Primary
     @Bean
     public RestTemplate getCustomRestTemplateLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
                 .interceptors(new UserContextInterceptor())
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
 
 	@Profile({"local", "test"})
     @Bean(name ="restTemplateWithoutAuth")
     public RestTemplate getCustomRestTemplateWithoutAuthorizationLocal(RestTemplateBuilder restTemplateBuilder) {
-        RestTemplate template =restTemplateBuilder
+		return restTemplateBuilder
                 .messageConverters(mappingJackson2HttpMessageConverter())
                 .build();
-        return template;
     }
+
 }

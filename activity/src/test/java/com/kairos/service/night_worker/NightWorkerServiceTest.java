@@ -1,9 +1,9 @@
 package com.kairos.service.night_worker;
 
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.repository.night_worker.ExpertiseNightWorkerSettingRepository;
@@ -23,7 +23,6 @@ import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.when;
 
@@ -54,7 +53,7 @@ public class NightWorkerServiceTest {
         employmentAndExpertiseIdMap.put(145l,156l);
         employmentIdAndStaffIdMap = new HashMap<>();
         employmentIdAndStaffIdMap.put(145l,160l);
-        expertiseNightWorkerSettings = newArrayList(new ExpertiseNightWorkerSetting(new TimeSlot(23,7),120,DurationType.WEEKS,1,2760,CalculationUnit.HOURS,180l,156l));
+        expertiseNightWorkerSettings = newArrayList(new ExpertiseNightWorkerSetting(new TimeSlot(23,7),120,DurationType.WEEKS,1,2760, XAxisConfig.HOURS,180l,156l));
         shiftDTOS = new ArrayList();
         shiftDTOS.add(new ShiftDTO(asDate(LocalDate.now().minusDays(4), LocalTime.of(15,0)),asDate(LocalDate.now().minusDays(3), LocalTime.of(3,0)),newArrayList(new ShiftActivityDTO(asDate(LocalDate.now().minusDays(4), LocalTime.of(15,0)),asDate(LocalDate.now().minusDays(3), LocalTime.of(3,0))))));
         shiftDTOS.add(new ShiftDTO(asDate(LocalDate.now().minusDays(3), LocalTime.of(18,0)),asDate(LocalDate.now().minusDays(3), LocalTime.of(23,0)),newArrayList(new ShiftActivityDTO(asDate(LocalDate.now().minusDays(3), LocalTime.of(18,0)),asDate(LocalDate.now().minusDays(3), LocalTime.of(23,0))))));
@@ -69,15 +68,15 @@ public class NightWorkerServiceTest {
     @Test
     public void updateNightWorkers(){
         when(expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(anyCollection())).thenReturn(expertiseNightWorkerSettings);
-        when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
-        Map[] nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
+        //when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
+        Map[] nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
         Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorkerMap[0];
-         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),true);
-        expertiseNightWorkerSettings.get(0).setMinShiftsUnitToCheckNightWorker(CalculationUnit.PERCENTAGE);
+         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
+        expertiseNightWorkerSettings.get(0).setMinShiftsUnitToCheckNightWorker(XAxisConfig.PERCENTAGE);
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(50);
-        nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
+        nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
         staffIdAndNightWorkerMap = nightWorkerMap[0];
-        Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),true);
+        Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
     }
 
     //Negative test case
@@ -85,13 +84,13 @@ public class NightWorkerServiceTest {
     public void updateNightWorkersWithNegativeDetails(){
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(3000);
         when(expertiseNightWorkerSettingRepository.findAllByExpertiseIdsOfUnit(anyCollection())).thenReturn(expertiseNightWorkerSettings);
-        when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
-        Map[] nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
+        //when(shiftMongoRepository.findAllShiftBetweenDuration(any(Long.class), any(Date.class), any(Date.class))).thenReturn(shiftDTOS);
+        Map[] nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
         Map<Long,Boolean> staffIdAndNightWorkerMap = nightWorkerMap[0];
         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
-        expertiseNightWorkerSettings.get(0).setMinShiftsUnitToCheckNightWorker(CalculationUnit.PERCENTAGE);
+        expertiseNightWorkerSettings.get(0).setMinShiftsUnitToCheckNightWorker(XAxisConfig.PERCENTAGE);
         expertiseNightWorkerSettings.get(0).setMinShiftsValueToCheckNightWorker(70);
-        nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap);
+        nightWorkerMap = nightWorkerService.getNightWorkerDetails(employmentAndExpertiseIdMap,employmentIdAndStaffIdMap,new HashMap<>(0));
         staffIdAndNightWorkerMap = nightWorkerMap[0];
         Assert.assertEquals(staffIdAndNightWorkerMap.get(160l).booleanValue(),false);
     }

@@ -12,7 +12,6 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
-import com.kairos.persistence.model.country.default_data.KairosStatus;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
 import com.kairos.persistence.model.organization.union.Location;
 import com.kairos.persistence.model.organization.union.Sector;
@@ -36,8 +35,6 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class Organization extends OrganizationBaseEntity {
 
     private boolean isKairosHub;
-    @Relationship(type = KAIROS_STATUS)
-    private KairosStatus kairosStatus;
     //fixme need to remove
     private boolean isParentOrganization;
 

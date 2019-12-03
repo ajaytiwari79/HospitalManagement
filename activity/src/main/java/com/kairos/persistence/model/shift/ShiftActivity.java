@@ -13,6 +13,7 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isEquals;
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
@@ -108,7 +109,7 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     }
 
     public boolean isShiftActivityChanged(ShiftActivity shiftActivity){
-        if(!(this.startDate.equals(shiftActivity.startDate) && this.endDate.equals(shiftActivity.endDate))){
+        if(!isEquals(startDate,shiftActivity.getStartDate())){
             return true;
         }
         DateTimeInterval thisInterVal=new DateTimeInterval(startDate,endDate);

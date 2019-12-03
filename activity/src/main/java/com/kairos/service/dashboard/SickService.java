@@ -5,6 +5,7 @@ import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
 import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.user.staff.staff.StaffResultDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.attendence_setting.SickSettings;
@@ -17,7 +18,6 @@ import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
-import com.kairos.utils.user_context.UserContext;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_EMPTY_STAFF_OR_UNIT_SETTING;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_NOTFOUND;
 

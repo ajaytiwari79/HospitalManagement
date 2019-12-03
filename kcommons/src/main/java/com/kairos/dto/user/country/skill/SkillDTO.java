@@ -1,11 +1,21 @@
 package com.kairos.dto.user.country.skill;
 
+import com.kairos.enums.SkillLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by prerna on 14/11/17.
  */
+@Getter
+@Setter
+@NoArgsConstructor
 public class SkillDTO {
 
     private Long id;
@@ -15,52 +25,10 @@ public class SkillDTO {
     private String shortName;
     private List<Long> tags;
 
-    public SkillDTO() {
-    }
 
     public SkillDTO(Long id, @NotBlank(message = "error.SkillCategory.name.notEmpty") String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<Long> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Long> tags) {
-        this.tags = tags;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
     }
 }

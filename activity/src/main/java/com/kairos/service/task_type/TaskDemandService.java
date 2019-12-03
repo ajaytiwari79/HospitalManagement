@@ -49,13 +49,12 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 public class TaskDemandService extends MongoBaseService {
 
 
+    public static final String TASK_TYPE_IDS = "taskTypeIds";
+    public static final String CLIENT_ID = "clientId";
     @Inject
     private TaskTypeMongoRepository taskTypeMongoRepository;
     @Inject
     private TaskDemandMongoRepository taskDemandMongoRepository;
-
-//    @Inject
-//    com.kairos.user.service.services.organization.OrganizationService organizationService;
 
     @Inject
     private TaskService taskService;
@@ -319,7 +318,7 @@ public class TaskDemandService extends MongoBaseService {
                     List<String> taskTypeIds = new ArrayList<>();
                     TaskTypeAggregateResult taskTypeAggregateResult = taskTypeAggregateResultList.get(0);
                     taskTypeIds.addAll(taskTypeAggregateResult.getTaskTypeIds());
-                    clientUpdatedMap.put("taskTypeIds", taskTypeIds);
+                    clientUpdatedMap.put(TASK_TYPE_IDS, taskTypeIds);
                 }
 
                 clientUpdatedMap.put("services", getClientServicesIds(clientId, organizationId));
@@ -350,7 +349,7 @@ public class TaskDemandService extends MongoBaseService {
     private List<Map> countExceptions( Long citizenId){
         LocalDateTime starDate=LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0));
         LocalDateTime endDate=LocalDateTime.of(LocalDate.now(),LocalTime.MAX);
-        Criteria criteria = Criteria.where("clientId").is(citizenId).and("isDeleted").is(false).and("fromTime").gte(Date.from(starDate.atZone(ZoneId.systemDefault()).toInstant())).and("toTime").lte(Date.from(endDate.atZone(ZoneId.systemDefault()).toInstant()));
+        Criteria criteria = Criteria.where(CLIENT_ID).is(citizenId).and("isDeleted").is(false).and("fromTime").gte(Date.from(starDate.atZone(ZoneId.systemDefault()).toInstant())).and("toTime").lte(Date.from(endDate.atZone(ZoneId.systemDefault()).toInstant()));
         Document dbObject = new Document("$group", new Document("_id", "$value").append("count", new Document("$sum", 1)));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(
@@ -416,10 +415,10 @@ public class TaskDemandService extends MongoBaseService {
                 TaskTypeAggregateResult taskTypeAggregateResult = taskTypeAggregateResults.get(0);
                 List<String> taskTypeIds = new ArrayList<>();
                 taskTypeIds.addAll(taskTypeAggregateResult.getTaskTypeIds());
-                newClientMap.put("taskTypeIds", taskTypeIds);
+                newClientMap.put(TASK_TYPE_IDS, taskTypeIds);
 
             }else{
-                newClientMap.put("taskTypeIds", Collections.emptyList());
+                newClientMap.put(TASK_TYPE_IDS, Collections.emptyList());
             }
             newClientMap.put("noOfExceptions", countExceptions( clientId));
             newClientMap.put("services", getClientServicesIds(clientId, organizationId));
@@ -445,8 +444,8 @@ public class TaskDemandService extends MongoBaseService {
         String grantName = (String) grantObject.get("grantName");
         Integer grantId = Integer.valueOf(grantObject.get("grantId").toString());
         Long clientId = null;
-        Optional clientOptional = Optional.ofNullable(grantObject.get("clientId"));
-        if(clientOptional.isPresent()) clientId = Long.valueOf(grantObject.get("clientId").toString());
+        Optional clientOptional = Optional.ofNullable(grantObject.get(CLIENT_ID));
+        if(clientOptional.isPresent()) clientId = Long.valueOf(grantObject.get(CLIENT_ID).toString());
         Long organizationId = null;
         Optional organizationOptional = Optional.ofNullable(grantObject.get("organizationId"));
         if(organizationOptional.isPresent()) organizationId = Long.valueOf(grantObject.get("organizationId").toString());

@@ -61,6 +61,10 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.newA
 public class AggregatorService extends MongoBaseService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AggregatorService.class);
+    public static final String TASK_IDS = "taskIds";
+    public static final String FLS_DEFAULT_URL = "flsDefaultUrl";
+    public static final String TASKS = "tasks";
+    public static final String MINUTES = "minutes";
 
     @Inject
     private UserIntegrationService userIntegrationService;
@@ -120,15 +124,15 @@ public class AggregatorService extends MongoBaseService {
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(0, 7, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
             LOGGER.debug("taskIds map for one week: " + map);
-            List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get("taskIds");
+            List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get(TASK_IDS);
             Long  citizenId = Long.valueOf(map.get("_id").toString());
 
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  userIntegrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
-            if(!flsCredentials.get("flsDefaultUrl").equals("")) {
+            if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
             }
 
@@ -196,14 +200,14 @@ public class AggregatorService extends MongoBaseService {
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(7, 14, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
             LOGGER.debug("taskIds map for two week: " + map);
-            List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get("taskIds");
+            List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get(TASK_IDS);
             Long  citizenId = Long.valueOf(map.get("_id").toString());
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  userIntegrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
-            if(!flsCredentials.get("flsDefaultUrl").equals("")) {
+            if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
             }
 
@@ -252,14 +256,14 @@ public class AggregatorService extends MongoBaseService {
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(14, 21, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
             LOGGER.debug("taskIds map for three weeks: " + map);
-            List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get("taskIds");
+            List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get(TASK_IDS);
             Long  citizenId = Long.valueOf(map.get("_id").toString());
 
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  userIntegrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
-            if(!flsCredentials.get("flsDefaultUrl").equals("")) {
+            if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                 clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
             }
 
@@ -300,13 +304,13 @@ public class AggregatorService extends MongoBaseService {
         List<Map> taskIdsGroupByCitizen = getTasksGroupByCitizen(21, 28, organizationId);
         for (Map map : taskIdsGroupByCitizen) {
             LOGGER.debug("taskIds map for four week: " + map);
-            List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get("taskIds");
+            List<Map<String, Object>> taskIds = (List<Map<String, Object>>) map.get(TASK_IDS);
             Long  citizenId = Long.valueOf(map.get("_id").toString());
             ClientAggregator clientAggregator = clientAggregatorMongoRepository.findByUnitIdAndCitizenId(organizationId, citizenId);
             if (clientAggregator == null) clientAggregator = new ClientAggregator();
-            Map<String, String> flsCredentials =  userIntegrationService.getFLS_Credentials(organizationId);
+            Map<String, String> flsCredentials =  userIntegrationService.getFLSCredentials(organizationId);
             ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO();
-            if(!flsCredentials.get("flsDefaultUrl").equals("")) {
+            if(!flsCredentials.get(FLS_DEFAULT_URL).equals("")) {
                  clientAggregatorDTO = saveClientAggregator( taskIds, flsCredentials);
             }
             clientAggregator = saveAggregatorFourWeek(clientAggregator, clientAggregatorDTO);
@@ -385,9 +389,8 @@ public class AggregatorService extends MongoBaseService {
 
         }
 
-        ClientAggregatorDTO clientAggregatorDTO = new ClientAggregatorDTO(longDrivingCount, longDrivingTasks, mostDrivenCount, mostDrivenTasks, escalationCount, escalationTasks, waitingCount, plannedStatusCount, waitingTasks, plannedStatusTasks, totalPlannedProblemsTasks);
+        return new ClientAggregatorDTO(longDrivingCount, longDrivingTasks, mostDrivenCount, mostDrivenTasks, escalationCount, escalationTasks, waitingCount, plannedStatusCount, waitingTasks, plannedStatusTasks, totalPlannedProblemsTasks);
 
-        return clientAggregatorDTO;
 
     }
 
@@ -580,8 +583,8 @@ public class AggregatorService extends MongoBaseService {
             Map<String, Object> citizenWeeklyDemandData = calculateWeeklyDemands(clientOrganizationIds.getCitizenId(), clientOrganizationIds.getOrganizationId());
             Map<String, Object> citizenMonthlyDemandData = calculateMonthlyDemands(clientOrganizationIds.getCitizenId(), clientOrganizationIds.getOrganizationId());
             Map<String, Object> citizenDailyDemandData = calculateDailyDemands(clientOrganizationIds.getCitizenId(), clientOrganizationIds.getOrganizationId());
-            Long visitatedMinutes = (Long) citizenWeeklyDemandData.get("minutes") + (Long) citizenMonthlyDemandData.get("minutes") + (Long) citizenDailyDemandData.get("minutes");
-            Float visitatedTasks = (Float) citizenWeeklyDemandData.get("tasks") + (Float) citizenMonthlyDemandData.get("tasks")  + (Float) citizenDailyDemandData.get("tasks");
+            Long visitatedMinutes = (Long) citizenWeeklyDemandData.get(MINUTES) + (Long) citizenMonthlyDemandData.get(MINUTES) + (Long) citizenDailyDemandData.get(MINUTES);
+            Float visitatedTasks = (Float) citizenWeeklyDemandData.get(TASKS) + (Float) citizenMonthlyDemandData.get(TASKS)  + (Float) citizenDailyDemandData.get(TASKS);
             Duration weekDuration = Duration.ofMinutes(visitatedMinutes);
             Duration monthDuration = Duration.ofMinutes(visitatedMinutes*4);
             clientAggregator.setVisitatedHoursPerWeek(weekDuration.toHours());
@@ -660,8 +663,8 @@ public class AggregatorService extends MongoBaseService {
             }
         }
 
-        citizenDemandData.put("minutes", weekDayMinutes+weekEndMinutes);
-        citizenDemandData.put("tasks", weekEndTasks+weekDayTasks);
+        citizenDemandData.put(MINUTES, weekDayMinutes+weekEndMinutes);
+        citizenDemandData.put(TASKS, weekEndTasks+weekDayTasks);
         return citizenDemandData;
     }
 
@@ -702,8 +705,8 @@ public class AggregatorService extends MongoBaseService {
             }
 
         }
-        citizenDemandData.put("minutes", monthDayMinutes);
-        citizenDemandData.put("tasks", monthDayTasks);
+        citizenDemandData.put(MINUTES, monthDayMinutes);
+        citizenDemandData.put(TASKS, monthDayTasks);
         return citizenDemandData;
     }
 
@@ -761,8 +764,8 @@ public class AggregatorService extends MongoBaseService {
 
         }
 
-        citizenDemandData.put("minutes", minutes);
-        citizenDemandData.put("tasks", tasks);
+        citizenDemandData.put(MINUTES, minutes);
+        citizenDemandData.put(TASKS, tasks);
         return citizenDemandData;
     }
 

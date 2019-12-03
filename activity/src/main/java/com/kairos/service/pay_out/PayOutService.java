@@ -5,7 +5,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
@@ -14,6 +13,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.payout.PayOutTrasactionStatus;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
 import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.persistence.model.shift.Shift;
@@ -26,8 +26,6 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +48,6 @@ import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_EMPLOYMENT_
 @Service
 public class PayOutService extends MongoBaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(PayOutService.class);
 
     @Inject
     private PayOutRepository payOutRepository;
@@ -74,7 +71,7 @@ public class PayOutService extends MongoBaseService {
      */
     public void savePayOuts(StaffEmploymentDetails employmentDetails, List<Shift> shifts, List<Activity> activities, Map<BigInteger, ActivityWrapper> activityWrapperMap, List<DayTypeDTO> dayTypeDTOS) {
         if (isNull(activityWrapperMap)) {
-            activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getId(), v -> new ActivityWrapper(v, "")));
+            activityWrapperMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, v -> new ActivityWrapper(v, "")));
         }
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(employmentDetails,dayTypeDTOS);
         for (Shift shift : shifts) {
@@ -97,7 +94,7 @@ public class PayOutService extends MongoBaseService {
             payOutPerShift.setPayoutBeforeThisDate(lastPayOutPerShift.getPayoutBeforeThisDate() + lastPayOutPerShift.getTotalPayOutMinutes());
         }
         payOutRepository.updatePayOut(payOutPerShift.getEmploymentId(), (int) payOutPerShift.getTotalPayOutMinutes());
-        save(payOutPerShift);
+        payOutRepository.save(payOutPerShift);
         return true;
     }
 
@@ -126,7 +123,7 @@ public class PayOutService extends MongoBaseService {
     public void updatePayOut(StaffAdditionalInfoDTO staffAdditionalInfoDTO, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
         updateActivityWrapper(shift,activityWrapperMap);
         ZonedDateTime startDate = DateUtils.asZoneDateTime(shift.getStartDate()).truncatedTo(ChronoUnit.DAYS);
-        ZonedDateTime endDate = DateUtils.asZoneDateTime(shift.getEndDate()).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime endDate = startDate.plusDays(1);
         DateTimeInterval interval = new DateTimeInterval(startDate, endDate);
         ShiftWithActivityDTO shiftWithActivityDTO = buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shift,activityWrapperMap);
         updatePayoutByShift(staffAdditionalInfoDTO, shiftWithActivityDTO, activityWrapperMap, interval);
@@ -144,11 +141,12 @@ public class PayOutService extends MongoBaseService {
             ShiftActivity shiftActivity = shift.getActivities().get(index);
             ShiftActivityDTO shiftActivityDTO = shiftWithActivityDTO.getActivities().get(index);
             shiftActivity.setPayoutCtaBonusMinutes(shiftActivityDTO.getPayoutCtaBonusMinutes());
-            shiftActivity.setPlannedMinutesOfPayout(shiftActivityDTO.getPlannedMinutesOfPayout());
+            shiftActivity.setPlannedMinutesOfPayout(shiftActivityDTO.getScheduledMinutesOfPayout() + shiftActivityDTO.getPayoutCtaBonusMinutes());
             shiftActivity.setScheduledMinutesOfPayout(shiftActivityDTO.getScheduledMinutesOfPayout());
             shiftActivity.setPayoutPerShiftCTADistributions(ObjectMapperUtils.copyPropertiesOfListByMapper(shiftActivityDTO.getPayoutPerShiftCTADistributions(), PayOutPerShiftCTADistribution.class));
+            shift.setPlannedMinutesOfPayout(shift.getPlannedMinutesOfPayout()+shiftActivity.getPlannedMinutesOfPayout());
         }
-        shift.setPlannedMinutesOfPayout(shiftWithActivityDTO.getPlannedMinutesOfPayout());
+        shift.setPayoutCtaBonusMinutes(shift.getActivities().stream().mapToInt(shiftActivity -> shiftActivity.getPayoutCtaBonusMinutes()).sum());
     }
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
@@ -210,6 +208,12 @@ public class PayOutService extends MongoBaseService {
         if (isNotNull(payOutPerShift)) {
             payOutPerShift.setDeleted(true);
             payOutRepository.save(payOutPerShift);
+        }
+    }
+
+    public void savePayout(List<PayOutPerShift> payOutPerShifts){
+        if(isCollectionNotEmpty(payOutPerShifts)) {
+            payOutRepository.saveEntities(payOutPerShifts);
         }
     }
 

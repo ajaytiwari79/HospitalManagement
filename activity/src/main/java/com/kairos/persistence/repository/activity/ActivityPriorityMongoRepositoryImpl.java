@@ -17,14 +17,17 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 
 public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriorityMongoRepository{
 
+    public static final String ORGANIZATION_ID = "organizationId";
+    public static final String DELETED = "deleted";
+    public static final String SEQUENCE = "sequence";
     @Inject private MongoTemplate mongoTemplate;
 
     @Override
     public List<ActivityPriority> findLastSeqenceByOrganizationIds(List<Long> organizationIds){
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("organizationId").in(organizationIds).and("deleted").is(false)),
-                group("organizationId").last("sequence").as("sequence"),
-                project("sequence").and("_id").as("organizationId")
+                match(Criteria.where(ORGANIZATION_ID).in(organizationIds).and(DELETED).is(false)),
+                group(ORGANIZATION_ID).last(SEQUENCE).as(SEQUENCE),
+                project(SEQUENCE).and("_id").as(ORGANIZATION_ID)
 
         );
         return mongoTemplate.aggregate(aggregation,ActivityPriority.class,ActivityPriority.class).getMappedResults();
@@ -33,7 +36,7 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
 
     @Override
     public boolean existsByNameAndCountryIdAndNotEqualToId(String name,String colorCode, BigInteger id,Long countryId){
-        Criteria criteria = Criteria.where("countryId").is(countryId).and("deleted").is(false).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
+        Criteria criteria = Criteria.where("countryId").is(countryId).and(DELETED).is(false).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
         if(isNotNull(id)){
             criteria.and("_id").ne(id);
         }
@@ -42,7 +45,7 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
 
     @Override
     public boolean existsByNameAndOrganizationIdAndNotEqualToId(String name,String colorCode, BigInteger id,Long organizationId){
-        Criteria criteria = Criteria.where("organizationId").is(organizationId).and("deleted").is(false).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
+        Criteria criteria = Criteria.where(ORGANIZATION_ID).is(organizationId).and(DELETED).is(false).and("name").regex(Pattern.compile("^" + name + "$", Pattern.CASE_INSENSITIVE));
         if(isNotNull(id)){
             criteria.and("_id").ne(id);
         }
@@ -52,14 +55,14 @@ public class ActivityPriorityMongoRepositoryImpl implements CustomActivityPriori
     @Override
     public void updateSequenceOfActivityPriorityOnCountry(int oldSequence,int newSequence,Long countryId){
         Update update = new Update();
-        update.set("sequence",newSequence);
-        mongoTemplate.updateFirst(new Query(Criteria.where("sequence").is(oldSequence).and("countryId").is(countryId)),update,ActivityPriority.class);
+        update.set(SEQUENCE,newSequence);
+        mongoTemplate.updateFirst(new Query(Criteria.where(SEQUENCE).is(oldSequence).and("countryId").is(countryId)),update,ActivityPriority.class);
     }
 
     @Override
     public void updateSequenceOfActivityPriorityOnOrganization(int oldSequence,int newSequence,Long unitId){
         Update update = new Update();
-        update.set("sequence",newSequence);
-        mongoTemplate.updateFirst(new Query(Criteria.where("sequence").is(oldSequence).and("organizationId").is(unitId)),update,ActivityPriority.class);
+        update.set(SEQUENCE,newSequence);
+        mongoTemplate.updateFirst(new Query(Criteria.where(SEQUENCE).is(oldSequence).and(ORGANIZATION_ID).is(unitId)),update,ActivityPriority.class);
     }
 }

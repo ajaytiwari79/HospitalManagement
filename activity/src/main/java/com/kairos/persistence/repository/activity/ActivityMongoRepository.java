@@ -48,7 +48,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{_id:{$in:?0}, deleted:false}")
     List<Activity> findAllActivitiesByIds(Collection<BigInteger> activityIds);
 
-    @Query(value = "{childActivityIds:?0, deleted:false}",fields ="{'_id':1}")
+    @Query(value = "{childActivityIds:?0, deleted:false}")
     Activity findByChildActivityId(BigInteger childActivityId);
 
     @Query(value = "{childActivityIds:{$in:?0}, deleted:false}",fields ="{'_id':1,'childActivityIds':1}")
@@ -83,4 +83,10 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{'balanceSettingsActivityTab.timeType':?0}, deleted:false}")
     List<Activity>  findAllBySecondLevelTimeType(TimeTypeEnum timeTypeEnum);
 
+
+    @Query(value = "{'balanceSettingsActivityTab.timeType':?0,unitId:{$in:?1 }}, deleted:false}")
+    List<Activity> findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum timeTypeEnum, Set<Long> unitIds);
+
+    @Query(value = "{'generalActivityTab.tags':?0}")
+    List<Activity> findActivitiesByTagId(BigInteger tagId);
 }

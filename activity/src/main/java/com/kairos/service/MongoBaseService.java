@@ -2,10 +2,10 @@ package com.kairos.service;
 
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.common.UserInfo;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
-import com.kairos.utils.user_context.UserContext;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BulkWriteOperation;
 import com.mongodb.DB;
@@ -27,6 +27,7 @@ import java.util.Set;
 @Service
 public class MongoBaseService {
 
+    public static final String ENTITY_MUST_NOT_BE_NULL = "Entity must not be null!";
     @Inject
     protected MongoSequenceRepository mongoSequenceRepository;
 
@@ -41,7 +42,7 @@ public class MongoBaseService {
     @Deprecated
     public <T extends MongoBaseEntity> T save(@Valid T entity){
 
-        Assert.notNull(entity, "Entity must not be null!");
+        Assert.notNull(entity, ENTITY_MUST_NOT_BE_NULL);
         /**
         *  Get class name for sequence class
         * */
@@ -71,7 +72,7 @@ public class MongoBaseService {
 
     @Deprecated
     public <T extends MongoBaseEntity> List<T> save(@Valid List<T> entities){
-        Assert.notNull(entities, "Entity must not be null!");
+        Assert.notNull(entities, ENTITY_MUST_NOT_BE_NULL);
         Assert.notEmpty(entities, "Entity must not be Empty!");
 
         String collectionName = mongoTemplate.getCollectionName(entities.get(0).getClass());
@@ -167,7 +168,7 @@ public class MongoBaseService {
 
     @Deprecated
     public <T extends MongoBaseEntity> Set<T> save(@Valid Set<T> entities){
-        Assert.notNull(entities, "Entity must not be null!");
+        Assert.notNull(entities, ENTITY_MUST_NOT_BE_NULL);
         Assert.notEmpty(entities, "Entity must not be Empty!");
 
         String collectionName = mongoTemplate.getCollectionName(entities.iterator().next().getClass());

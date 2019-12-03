@@ -11,7 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.kairos.constants.ApiConstant.*;
+import static com.kairos.constants.ApiConstant.GET_ALL_UNITS_BY_COUNTRY;
+import static com.kairos.constants.ApiConstant.GET_ORGANIZATION_IDS_BY_ORGANIZATION_SUB_TYPE_IDS_AND_SUB_SERVICE_IDS;
 
 /**
  * Created By G.P.Ranjan on 10/9/19
@@ -28,7 +29,7 @@ public class GDPRToUserIntegrationService {
         Map<String,List<Long>> requestBody = new HashMap<>();
         requestBody.put("organizationSubTypeIds",organizationSubTypeIds);
         requestBody.put("organizationSubServicesIds",organizationSubServicesIds);
-        return gdprGenericRestClient.publishRequest(requestBody, countryId, false, IntegrationOperation.CREATE, GET_ORGANIZATION_IDS_BY_ORGANIZATION_SUB_TYPE_IdS_AND_SUB_SERVICE_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
+        return gdprGenericRestClient.publishRequest(requestBody, countryId, false, IntegrationOperation.CREATE, GET_ORGANIZATION_IDS_BY_ORGANIZATION_SUB_TYPE_IDS_AND_SUB_SERVICE_IDS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<Long>>>() {});
     }
 
     public List<Long> getAllUnitIdsByCountryId(Long countryId) {

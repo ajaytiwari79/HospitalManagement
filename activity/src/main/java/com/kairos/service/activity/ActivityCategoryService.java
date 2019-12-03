@@ -23,6 +23,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 @Service
 public class ActivityCategoryService{
 
+    public static final String NO_ACTIVITY_CATEGORY_FOUND = "No ActivityCategory found";
     @Inject
     ActivityCategoryRepository activityCategoryRepository;
     @Inject
@@ -40,7 +41,7 @@ public class ActivityCategoryService{
             exceptionService.duplicateDataException(MESSAGE_CATEGORY_ALREADYEXISTS);
         }
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
-        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
+        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException(NO_ACTIVITY_CATEGORY_FOUND));
         if(activityCategory.getName().equals("NONE")){
             exceptionService.invalidOperationException(MESSAGE_CATEGORY_UPDATE);
         }
@@ -64,7 +65,7 @@ public class ActivityCategoryService{
             exceptionService.duplicateDataException(MESSAGE_CATEGORY_ALREADYEXISTS,name);
         }
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
-        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
+        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException(NO_ACTIVITY_CATEGORY_FOUND));
         if(activityCategory.getName().equals("NONE")){
             exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_UPDATE);
         }else {
@@ -85,7 +86,7 @@ public class ActivityCategoryService{
 
    public boolean deleteActivityCategory(Long countryId,BigInteger activityCategoryId){
        Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
-       ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
+       ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException(NO_ACTIVITY_CATEGORY_FOUND));
        if(activityCategory.getName().equals("NONE")){
            exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_DELETE);
        }
@@ -104,7 +105,7 @@ public class ActivityCategoryService{
 
     public boolean deleteActivityCategoryByUnit(Long unitId,BigInteger activityCategoryId){
         Optional<ActivityCategory> activityCategoryOptional= activityCategoryRepository.findById(activityCategoryId);
-        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException("No ActivityCategory found"));
+        ActivityCategory  activityCategory= activityCategoryOptional.orElseThrow(()->new DataNotFoundByIdException(NO_ACTIVITY_CATEGORY_FOUND));
         if(activityCategory.getName().equals("NONE")){
             exceptionService.actionNotPermittedException(MESSAGE_CATEGORY_DELETE);
         }

@@ -17,7 +17,7 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
-import com.kairos.persistence.model.user.expertise.Response.OrderAndActivityDTO;
+import com.kairos.persistence.model.user.expertise.response.OrderAndActivityDTO;
 import com.kairos.rest_client.RestClientForSchedulerMessages;
 import com.kairos.rest_client.priority_group.GenericRestClient;
 import org.apache.http.NameValuePair;
@@ -198,6 +198,10 @@ public class ActivityIntegrationService {
     public boolean isStaffNightWorker(Long unitId, Long staffId) {
         return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/staff/{staffId}/night_worker_general", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<NightWorkerGeneralResponseDTO>>() {
         },staffId).isNightWorker();
+    }
+
+    public Boolean unlinkTagFromActivity(Long unitId, Long tagId) {
+        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/tag/{tagId}/unlink", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){}, tagId);
     }
 }
 

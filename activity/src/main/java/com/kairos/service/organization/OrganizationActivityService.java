@@ -18,6 +18,7 @@ import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.enums.ActivityStateEnum;
@@ -263,15 +264,18 @@ public class OrganizationActivityService extends MongoBaseService {
         logger.info("activityId " + activityId);
         generalTab.setTags(null);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
-        if (!activity.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+        if (isCollectionNotEmpty(activity.getTags())) {
+            List<TagDTO> tags = new ArrayList<>();
+            tags.addAll(tagMongoRepository.getTagsById(activity.getTags()));
+            tags.addAll(organizationDTO.getTagDTOS().stream().filter(tagDTO -> activity.getTags().contains(new BigInteger(tagDTO.getId().toString()))).collect(Collectors.toList()));
+            generalActivityTabWithTagDTO.setTags(tags);
         }
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeService.getAllPresenceTypeByCountry(organizationDTO.getCountryId());
         PresenceTypeWithTimeTypeDTO presenceType = new PresenceTypeWithTimeTypeDTO(presenceTypeDTOS, organizationDTO.getCountryId());
         BalanceSettingsActivityTab balanceSettingsActivityTab = activity.getBalanceSettingsActivityTab();
         generalActivityTabWithTagDTO.setAddTimeTo(balanceSettingsActivityTab.getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(balanceSettingsActivityTab.getTimeTypeId());
-        generalActivityTabWithTagDTO.setOnCallTimePresent(balanceSettingsActivityTab.getOnCallTimePresent());
+        generalActivityTabWithTagDTO.setOnCallTimePresent(balanceSettingsActivityTab.isOnCallTimePresent());
         generalActivityTabWithTagDTO.setNegativeDayBalancePresent(balanceSettingsActivityTab.getNegativeDayBalancePresent());
         generalActivityTabWithTagDTO.setTimeType(balanceSettingsActivityTab.getTimeType());
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
@@ -298,16 +302,14 @@ public class OrganizationActivityService extends MongoBaseService {
         activityCopied.setUnitId(unitId);
         activityCopied.setCountryId(null);
         //TODO Refactor below query or might need to add parent id in activity priority domain while copying from country to organization
-        if (isNotNull(activity.getActivityPriorityId())) {
-            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(activity.getActivityPriorityId());
-            if (activityPriority != null) {
-                ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
-                if (unitActivityPriority != null) {
-                    activityCopied.setActivityPriorityId(unitActivityPriority.getId());
-                }
+        TimeType timeType = timeTypeMongoRepository.findOneById(activity.getBalanceSettingsActivityTab().getTimeTypeId());
+        if (isNotNull(timeType.getActivityPriorityId())) {
+            ActivityPriority activityPriority = activityPriorityService.getActivityPriorityById(timeType.getActivityPriorityId());
+            ActivityPriority unitActivityPriority = activityPriorityService.getActivityPriorityNameAndOrganizationId(activityPriority.getName(), unitId);
+            if (isNotNull(unitActivityPriority)) {
+                activityCopied.setActivityPriorityId(unitActivityPriority.getId());
             }
         }
-
         // activityCopied.setCompositeActivities(null);
         return activityCopied;
     }
@@ -349,14 +351,16 @@ public class OrganizationActivityService extends MongoBaseService {
         activity.setDescription(generalTab.getDescription());
         activity.setTags(generalDTO.getTags());
 
-
         // generalTab.setTags(tagMongoRepository.getTagsById(generalDTO.getTags()));
-        Long countryId = userIntegrationService.getCountryIdOfOrganization(unitId);
+        OrganizationDTO organizationDTO = userIntegrationService.getOrganizationWithCountryId(unitId);
         generalTab.setTags(null);
-        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(countryId);
+        List<ActivityCategory> activityCategories = activityCategoryRepository.findByCountryId(organizationDTO.getCountryId());
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
         if (!activity.getTags().isEmpty()) {
-            generalActivityTabWithTagDTO.setTags(tagMongoRepository.getTagsById(activity.getTags()));
+            List<TagDTO> tags = new ArrayList<>();
+            tags.addAll(tagMongoRepository.getTagsById(activity.getTags()));
+            tags.addAll(organizationDTO.getTagDTOS().stream().filter(tagDTO -> activity.getTags().contains(new BigInteger(tagDTO.getId().toString()))).collect(Collectors.toList()));
+            generalActivityTabWithTagDTO.setTags(tags);
             generalTab.setTags(activity.getTags());
         }
         activityService.updateBalanceSettingTab(generalDTO, activity);
@@ -364,7 +368,7 @@ public class OrganizationActivityService extends MongoBaseService {
         activityMongoRepository.save(activity);
         generalActivityTabWithTagDTO.setAddTimeTo(activity.getBalanceSettingsActivityTab().getAddTimeTo());
         generalActivityTabWithTagDTO.setTimeTypeId(activity.getBalanceSettingsActivityTab().getTimeTypeId());
-        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().getOnCallTimePresent());
+        generalActivityTabWithTagDTO.setOnCallTimePresent(activity.getBalanceSettingsActivityTab().isOnCallTimePresent());
         generalActivityTabWithTagDTO.setNegativeDayBalancePresent(activity.getBalanceSettingsActivityTab().getNegativeDayBalancePresent());
         generalActivityTabWithTagDTO.setTimeType(activity.getBalanceSettingsActivityTab().getTimeType());
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
@@ -465,13 +469,12 @@ public class OrganizationActivityService extends MongoBaseService {
         UnitSettingDTO minOpenShiftHours = unitSettingRepository.getMinOpenShiftHours(unitId);
         List<CounterDTO> counters = counterRepository.getAllCounterBySupportedModule(ModuleType.OPEN_SHIFT);
 
-        ActivityWithTimeTypeDTO activityWithTimeTypeDTO = new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
+        return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals,
                 minOpenShiftHours.getOpenShiftPhaseSetting().getMinOpenShiftHours(), counters);
-        return activityWithTimeTypeDTO;
     }
 
     public boolean createDefaultDataForOrganization(Long unitId, OrgTypeAndSubTypeDTO orgTypeAndSubTypeDTO) {
-        logger.info("I am going to create default data or organization " + unitId);
+        logger.info("I am going to create default data or organization {}" , unitId);
         //unitDataService.addParentOrganizationAndCountryIdForUnit(unitId, parentOrganizationId, countryId);
 
         List<Phase> phases = phaseService.createDefaultPhase(unitId, orgTypeAndSubTypeDTO.getCountryId());
@@ -531,43 +534,9 @@ public class OrganizationActivityService extends MongoBaseService {
             save(activityCopiedList);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
-            updateCompositeActivitiesIds(activityCopiedList);
         }
     }
 
-    /**
-     * This method is used to update all composite activities Ids
-     * which is initially set as country level composite activities,
-     * after update all composite activities will be updated
-     * as per Organizational level composite activities Ids.
-     * CalledBy {#createDefaultDataForOrganization}
-     *
-     * @param activities{after copied into database}
-     * @author mohit
-     * @date 5-10-2018
-     */
-    private void updateCompositeActivitiesIds(List<Activity> activities) {
-       /* Map<BigInteger, BigInteger> activityIdMap = activities.stream().collect(Collectors.toMap(k -> k.getParentId(), v -> v.getId()));
-        for (Activity activity : activities) {
-            Iterator<CompositeActivity> compositeActivityIterator = activity.getCompositeActivities().iterator();
-            while (compositeActivityIterator.hasNext()) {
-                CompositeActivity compositeActivity = compositeActivityIterator.next();
-                if (activityIdMap.containsKey(compositeActivity.getActivityId())) {
-                    compositeActivity.setActivityId(activityIdMap.get(compositeActivity.getActivityId()));
-                } else {
-                    compositeActivityIterator.remove();
-                }
-            }
-            List<BigInteger> copyChildActivtiies = new CopyOnWriteArrayList<>(activity.getChildActivityIds());
-            for (BigInteger childActivityId : copyChildActivtiies) {
-                if (activityIdMap.containsKey(childActivityId)) {
-                    activity.getChildActivityIds().add(activityIdMap.get(childActivityId));
-                }
-                activity.getChildActivityIds().remove(childActivityId);
-            }
-        }
-        save(activities);*/
-    }
 
 
     /**

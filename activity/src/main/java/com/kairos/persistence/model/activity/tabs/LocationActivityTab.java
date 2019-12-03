@@ -2,42 +2,23 @@ package com.kairos.persistence.model.activity.tabs;
 
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 import com.kairos.enums.LocationEnum;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Set;
 
 /**
  * Created by vipul on 13/4/18.
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class LocationActivityTab{
     private Set<ActivityGlideTimeDetails> glideTimeForCheckIn;
     private Set<ActivityGlideTimeDetails> glideTimeForCheckOut;
-
-
-
-    public LocationActivityTab() {
-        //Default Constructor
-    }
-
-    public Set<ActivityGlideTimeDetails> getGlideTimeForCheckIn() {
-        return glideTimeForCheckIn;
-    }
-
-    public void setGlideTimeForCheckIn(Set<ActivityGlideTimeDetails> glideTimeForCheckIn) {
-        this.glideTimeForCheckIn = glideTimeForCheckIn;
-    }
-
-    public Set<ActivityGlideTimeDetails> getGlideTimeForCheckOut() {
-        return glideTimeForCheckOut;
-    }
-
-    public void setGlideTimeForCheckOut(Set<ActivityGlideTimeDetails> glideTimeForCheckOut) {
-        this.glideTimeForCheckOut = glideTimeForCheckOut;
-    }
-
-    public LocationActivityTab(Set<ActivityGlideTimeDetails> glideTimeForCheckIn, Set<ActivityGlideTimeDetails> glideTimeForCheckOut) {
-        this.glideTimeForCheckIn = glideTimeForCheckIn;
-        this.glideTimeForCheckOut = glideTimeForCheckOut;
-    }
 
     public ActivityGlideTimeDetails getCheckInGlideTime(LocationEnum locationEnum){
         ActivityGlideTimeDetails activityGlideTimeDetails = null;

@@ -9,7 +9,7 @@ import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.ChartType;
-import com.kairos.dto.activity.counter.enums.DisplayUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
@@ -41,7 +41,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.utils.counter.KPIUtils.*;
 
@@ -157,10 +156,10 @@ public class AbsencePlanningKPIService implements CounterService {
                     break;
             }
         }
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toValue(), AppConstants.REQUESTED_COLOR_CODE, Double.valueOf(requested)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toValue(), AppConstants.PENDING_COLOR_CODE, Double.valueOf(pending)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toValue(), AppConstants.APPROVE_COLOR_CODE, Double.valueOf(approve)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toValue(), AppConstants.DISAPPROVE_COLOR_CODE, Double.valueOf(disapprove)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toString(), AppConstants.REQUESTED_COLOR_CODE, Double.valueOf(requested)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toString(), AppConstants.PENDING_COLOR_CODE, Double.valueOf(pending)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toString(), AppConstants.APPROVE_COLOR_CODE, Double.valueOf(approve)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toString(), AppConstants.DISAPPROVE_COLOR_CODE, Double.valueOf(disapprove)));
         return clusteredBarChartKpiDataUnits;
     }
 
@@ -186,13 +185,13 @@ public class AbsencePlanningKPIService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getAbsencePlanningKpiData(organizationId, filterBasedCriteria, null);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.COUNT, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.COUNT, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getAbsencePlanningKpiData(organizationId, filterBasedCriteria, applicableKPI);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), KPIRepresentation.INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : KPIRepresentation.COLUMN_TIMESLOT.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : ChartType.STACKED_CHART, DisplayUnit.COUNT, RepresentationUnit.NUMBER, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), KPIRepresentation.INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : KPIRepresentation.COLUMN_TIMESLOT.equals(applicableKPI.getKpiRepresentation()) ? ChartType.BAR : ChartType.STACKED_CHART, XAxisConfig.COUNT, RepresentationUnit.NUMBER, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
@@ -201,7 +200,7 @@ public class AbsencePlanningKPIService implements CounterService {
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, ApplicableKPI applicableKPI) {
-        return null;
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, KPI kpi,ApplicableKPI applicableKPI) {
+        return new TreeSet<>();
     }
 }

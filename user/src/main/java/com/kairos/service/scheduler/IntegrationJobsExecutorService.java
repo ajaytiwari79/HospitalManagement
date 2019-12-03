@@ -88,18 +88,10 @@ public class IntegrationJobsExecutorService {
                         String loggingString = StringEscapeUtils.escapeHtml4(transstatus.getLogging_string());
                         loggingString = loggingString.substring(loggingString.indexOf("[CDATA[")+7,loggingString.indexOf("]]&gt"));
                         byte[] bytes = Base64.decodeBase64(loggingString);
-                        GZIPInputStream zi = null;
                         String unzipped;
-                        try {
-                            zi = new GZIPInputStream(new ByteArrayInputStream(bytes));
+                        try(GZIPInputStream zi = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
                             unzipped = IOUtils.toString(zi);
-                        } finally {
-                            IOUtils.closeQuietly(zi);
                         }
-
-
-
-
                         KairosSchedulerLogsDTO logs = new KairosSchedulerLogsDTO(Result.SUCCESS,unzipped,job.getId(),job.getUnitId(),DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),job.getJobSubType());
                         if(transstatus.getResult().getNr_errors() > 0) {
                             logs.setResult(Result.ERROR);

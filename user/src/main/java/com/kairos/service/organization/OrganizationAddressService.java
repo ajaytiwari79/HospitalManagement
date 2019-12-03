@@ -28,7 +28,7 @@ import com.kairos.service.country.CurrencyService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.utils.FormatUtil;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -47,6 +47,7 @@ import static com.kairos.constants.UserMessagesConstants.*;
 @Service
 public class OrganizationAddressService {
 
+    public static final String ZIP_CODE_ID = "zipCodeId";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Inject
@@ -86,15 +87,15 @@ public class OrganizationAddressService {
         OrganizationContactAddress contactAddressData = unitGraphRepository.getContactAddressOfOrg(id);
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> map = objectMapper.convertValue(contactAddressData.getContactAddress(), Map.class);
-        map.put("zipCodeId", contactAddressData.getZipCode().getId());
+        map.put(ZIP_CODE_ID, contactAddressData.getZipCode().getId());
         map.put("municipalityId", (contactAddressData.getMunicipality() == null) ? null : contactAddressData.getMunicipality().getId());
         response.put("contactAddress", map);
         response.put("zipCodes", FormatUtil.formatNeoResponse(zipCodeGraphRepository.getAllZipCodeByCountryId(countryId)));
         response.put("municipalities", FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(contactAddressData.getZipCode().getId())));
         Map<String, Object> billingAddress = unitGraphRepository.getBillingAddress(id);
         response.put("billingAddress", billingAddress);
-        response.put("billingMunicipalities", (billingAddress.get("zipCodeId") == null) ? Collections.emptyList() :
-                FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) billingAddress.get("zipCodeId"))));
+        response.put("billingMunicipalities", (billingAddress.get(ZIP_CODE_ID) == null) ? Collections.emptyList() :
+                FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) billingAddress.get(ZIP_CODE_ID))));
         response.put("paymentTypes", paymentTypeService.getPaymentTypes(countryId));
         response.put("currencies", currencyService.getCurrencies(countryId));
 
@@ -301,7 +302,7 @@ public class OrganizationAddressService {
         response.put("floorNumber", billingAddress.getFloorNumber());
         response.put("streetUrl", billingAddress.getStreetUrl());
         response.put("billingPerson", billingAddress.getContactPersonForBillingAddress());
-        response.put("zipCodeId", zipCode.getId());
+        response.put(ZIP_CODE_ID, zipCode.getId());
         response.put("latitude", billingAddress.getLatitude());
         response.put("longitude", billingAddress.getLongitude());
         response.put("municipalities", FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(zipCode.getId())));

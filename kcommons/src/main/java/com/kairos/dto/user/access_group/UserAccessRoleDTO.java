@@ -1,15 +1,22 @@
 package com.kairos.dto.user.access_group;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserAccessRoleDTO {
     private Long userId;
     private Long unitId;
     private Boolean staff;
     private Boolean management;
     private Long staffId;
-
-    public UserAccessRoleDTO(){
-        // default constructor
-    }
+    private Set<Long> accessGroupIds = new HashSet<>();
 
     public UserAccessRoleDTO(Boolean staff,Boolean management) {
         this.staff = staff;
@@ -23,50 +30,18 @@ public class UserAccessRoleDTO {
         this.management = management;
     }
 
+    public UserAccessRoleDTO(Long userId, Long unitId, Boolean staff, Boolean management, Set<Long> accessGroupIds){
+        this.userId = userId;
+        this.unitId = unitId;
+        this.staff = staff;
+        this.management = management;
+        this.accessGroupIds = accessGroupIds;
+    }
+
     public UserAccessRoleDTO(Long unitId, Boolean staff, Boolean management, Long staffId) {
         this.unitId = unitId;
         this.staff = staff;
         this.management = management;
-        this.staffId = staffId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Boolean getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Boolean staff) {
-        this.staff = staff;
-    }
-
-    public Boolean getManagement() {
-        return management;
-    }
-
-    public void setManagement(Boolean management) {
-        this.management = management;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
 

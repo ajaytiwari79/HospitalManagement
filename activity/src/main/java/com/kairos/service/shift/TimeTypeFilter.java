@@ -5,10 +5,12 @@ import com.kairos.enums.FilterType;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.TIME_TYPE;
 
 /**
@@ -17,10 +19,10 @@ import static com.kairos.enums.FilterType.TIME_TYPE;
  **/
 
 public class TimeTypeFilter implements ShiftFilter{
-    private List<BigInteger> selectedTimeTypes;
+    private Set<BigInteger> selectedTimeTypes;
     private Map<FilterType, Set<String>> filterCriteriaMap;
 
-    public TimeTypeFilter(Map<FilterType, Set<String>> filterCriteriaMap, List<BigInteger> selectedTimeTypes) {
+    public TimeTypeFilter(Map<FilterType, Set<String>> filterCriteriaMap, Set<BigInteger> selectedTimeTypes) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.selectedTimeTypes = selectedTimeTypes;
     }

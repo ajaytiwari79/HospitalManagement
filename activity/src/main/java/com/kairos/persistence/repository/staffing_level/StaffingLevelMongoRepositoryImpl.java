@@ -1,9 +1,6 @@
 package com.kairos.persistence.repository.staffing_level;
 
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.service.staffing_level.StaffingLevelService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,7 +14,7 @@ import java.util.List;
 
 @Component
 public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepository{
-    private Logger logger= LoggerFactory.getLogger(StaffingLevelService.class);
+    public static final String CURRENT_DATE = "currentDate";
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -26,14 +23,14 @@ public class StaffingLevelMongoRepositoryImpl implements StaffingLevelCustomRepo
     }
 
     public List<StaffingLevel> getStaffingLevelsByUnitIdAndDate(Long unitId, Date startDate, Date endDate){
-        Query query = new Query(Criteria.where("unitId").is(unitId).and("currentDate").gte(startDate).lte(endDate).and("deleted").is(false));
-        query.with(new Sort(Sort.Direction.ASC, "currentDate"));
+        Query query = new Query(Criteria.where("unitId").is(unitId).and(CURRENT_DATE).gte(startDate).lte(endDate).and("deleted").is(false));
+        query.with(new Sort(Sort.Direction.ASC, CURRENT_DATE));
         return mongoTemplate.find(query,StaffingLevel.class);
     }
 
    public StaffingLevel findByUnitIdAndCurrentDateAndDeletedFalseCustom(Long unitId, Date currentDate) {
 
-        Query query = new Query(Criteria.where("unitId").is(unitId).and("currentDate").is(currentDate).and("deleted").is(false));
+        Query query = new Query(Criteria.where("unitId").is(unitId).and(CURRENT_DATE).is(currentDate).and("deleted").is(false));
         query.limit(1);
 
         return mongoTemplate.findOne(query,StaffingLevel.class);

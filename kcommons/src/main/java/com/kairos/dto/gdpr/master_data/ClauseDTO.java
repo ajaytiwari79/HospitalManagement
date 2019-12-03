@@ -2,6 +2,7 @@ package com.kairos.dto.gdpr.master_data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.Valid;
@@ -13,13 +14,14 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClauseDTO {
 
     protected Long id;
 
     @NotBlank(message = "error.message.title.notNull.orEmpty")
-    @Pattern(message = "error.message.number.and.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "error.message.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$")
     protected String title;
 
     @Valid
@@ -31,8 +33,5 @@ public class ClauseDTO {
     @NotEmpty(message = "error.message.templateType.notNull")
     private List<Long> templateTypes;
 
-    public ClauseDTO() {
-        //Not in use
-    }
 
   }

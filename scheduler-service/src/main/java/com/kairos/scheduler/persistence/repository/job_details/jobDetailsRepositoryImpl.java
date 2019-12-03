@@ -17,14 +17,15 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 @Repository
 public class jobDetailsRepositoryImpl implements CustomJobDetailsRepository {
 
+    public static final String SCHEDULER_PANEL = "schedulerPanel";
     @Inject
     private MongoTemplate mongoTemplate;
 
     public List<JobDetailsDTO> findAllSchedulerPanelsByUnitIdAndOffset(Long unitId, int offset) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where("unitId").is(unitId).and("deleted").is(false)),
-                lookup("schedulerPanel","schedulerPanelId","_id","schedulerPanel"),
-                        project("schedulerPanelId","unitId","started","stopped","result","log","processName").and("schedulerPanel").arrayElementAt(0).as("schedulerPanel").and("schedulerPanel.jobSubType").arrayElementAt(0).as("jobSubType"),
+                lookup(SCHEDULER_PANEL,"schedulerPanelId","_id", SCHEDULER_PANEL),
+                        project("schedulerPanelId","unitId","started","stopped","result","log","processName").and(SCHEDULER_PANEL).arrayElementAt(0).as(SCHEDULER_PANEL).and("schedulerPanel.jobSubType").arrayElementAt(0).as("jobSubType"),
                 sort(Sort.Direction.DESC,"started"),
                 skip(offset*50L),
                 limit(50)

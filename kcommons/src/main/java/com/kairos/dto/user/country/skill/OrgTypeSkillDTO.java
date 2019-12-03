@@ -12,7 +12,6 @@ import lombok.Setter;
 public class OrgTypeSkillDTO {
 
     private Long skillId;
-
     @JsonProperty("isSelected")
     private boolean isSelected;
 }

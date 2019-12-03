@@ -41,8 +41,7 @@ public class OpenShiftIntervalService extends MongoBaseService {
     public List<OpenShiftIntervalDTO> getAllIntervalsByCountryId(Long countryId) {
         List<OpenShiftInterval> openShiftIntervals = openShiftIntervalRepository.findAllByCountryIdAndDeletedFalse(countryId);
         Collections.sort(openShiftIntervals);
-        List<OpenShiftIntervalDTO> openShiftIntervalDTOs = ObjectMapperUtils.copyPropertiesOfListByMapper(openShiftIntervals, OpenShiftIntervalDTO.class);
-        return openShiftIntervalDTOs;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(openShiftIntervals, OpenShiftIntervalDTO.class);
     }
 
     public OpenShiftIntervalDTO updateInterval(Long countryId, BigInteger openShiftIntervalId, OpenShiftIntervalDTO openShiftIntervalDTO) {

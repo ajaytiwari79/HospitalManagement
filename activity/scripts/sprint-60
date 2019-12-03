@@ -1,0 +1,2 @@
+//kpi set changes
+db.getCollection('kPISet').updateMany({},{"$set":{"kpiSetType" : "VERTICAL"}})

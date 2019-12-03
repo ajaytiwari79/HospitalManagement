@@ -11,6 +11,7 @@ import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.default_data.EngineerType;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.staff.StaffFavouriteFilter;
 import com.kairos.persistence.model.user.language.Language;
 import lombok.Getter;
@@ -34,7 +35,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Staff extends UserBaseEntity implements Cloneable {
+public class Staff extends UserBaseEntity {
     @KPermissionSubModel
     @Relationship(type = HAS_CONTACT_DETAIL)
     private ContactDetail contactDetail;
@@ -54,6 +55,9 @@ public class Staff extends UserBaseEntity implements Cloneable {
 
     @Relationship(type = HAS_FAVOURITE_FILTERS)
     private List<StaffFavouriteFilter> staffFavouriteFilterList;
+
+    @Relationship(type = HAS_CHILDREN)
+    private List<StaffChildDetail> staffChildDetails;
 
     private String generalNote;
     private String reqFromPerson;
@@ -112,6 +116,9 @@ public class Staff extends UserBaseEntity implements Cloneable {
     private String access_token; // specially required for chat server only
     private String user_id; //specially required for chat server only
 
+    @Relationship(type = BELONGS_TO_TAGS)
+    private List<Tag> tags;
+
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
         this.email = email;
         this.userName = userName;
@@ -142,9 +149,4 @@ public class Staff extends UserBaseEntity implements Cloneable {
         staffFavouriteFilterList.add(staffFavouriteFilter);
         this.staffFavouriteFilterList = staffFavouriteFilterList;
     }
-
-    public Staff clone()throws CloneNotSupportedException{
-        return (Staff)super.clone();
-    }
-
 }

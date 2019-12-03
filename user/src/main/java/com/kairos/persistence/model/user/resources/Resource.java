@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.feature.Feature;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
@@ -18,6 +21,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.RESOU
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Resource extends UserBaseEntity {
 
 
@@ -46,90 +52,6 @@ public class Resource extends UserBaseEntity {
         this.fuelType = fuelType;
     }
 
-    public Resource() {
-    }
-
-
-    public void setRegistrationNumber(String registrationNumber) {
-        this.registrationNumber = registrationNumber;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public void setModelDescription(String modelDescription) {
-        this.modelDescription = modelDescription;
-    }
-
-    public void setCostPerKM(float costPerKM) {
-        this.costPerKM = costPerKM;
-    }
-
-    public void setFuelType(FuelType fuelType) {
-        this.fuelType = fuelType;
-    }
-
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getRegistrationNumber() {
-        return registrationNumber;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public String getModelDescription() {
-        return modelDescription;
-    }
-
-    public float getCostPerKM() {
-        return costPerKM;
-    }
-
-    public FuelType getFuelType() {
-        return fuelType;
-    }
-
-    public Vehicle getVehicleType() {
-        return vehicleType;
-    }
-
-    public void setVehicleType(Vehicle vehicleType) {
-        this.vehicleType = vehicleType;
-    }
-
-    public Long getDecommissionDate() {
-        return decommissionDate;
-    }
-
-    public void setDecommissionDate(Long decommissionDate) {
-        this.decommissionDate = decommissionDate;
-    }
-
-    public List<Feature> getFeatures() {
-        return features;
-    }
-
-    public void setFeatures(List<Feature> features) {
-        this.features = features;
-    }
-
-    public List<Equipment> getEquipments() {
-        return equipments;
-    }
-
-    public void setEquipments(List<Equipment> equipments) {
-        this.equipments = equipments;
-    }
 }
 
 

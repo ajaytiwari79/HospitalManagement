@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
 import com.kairos.dto.activity.night_worker.QuestionAnswerDTO;
 import com.kairos.dto.activity.night_worker.QuestionnaireAnswerResponseDTO;
@@ -13,7 +14,6 @@ import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
-import com.kairos.enums.CalculationUnit;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -365,7 +365,7 @@ public class NightWorkerService {
             if (nightInterval.overlaps(shiftDTO.getInterval())) {
                 int overlapMinutes = (int) nightInterval.overlap(shiftDTO.getInterval()).getMinutes();
                 if (overlapMinutes >= expertiseNightWorkerSetting.getMinMinutesToCheckNightShift()) {
-                    if (expertiseNightWorkerSetting.getMinShiftsUnitToCheckNightWorker().equals(CalculationUnit.HOURS)) {
+                    if (expertiseNightWorkerSetting.getMinShiftsUnitToCheckNightWorker().equals(XAxisConfig.HOURS)) {
                         minutesOrCount += (int) shiftDTO.getInterval().getMinutes();
                     } else {
                         minutesOrCount++;
@@ -377,10 +377,10 @@ public class NightWorkerService {
     }
 
     private boolean isNightWorker(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, int minutesOrCount, int shiftCount) {
-        return isNightHoursValid(expertiseNightWorkerSetting, minutesOrCount, CalculationUnit.HOURS) || isNightHoursValid(expertiseNightWorkerSetting, (minutesOrCount * 100) / shiftCount, CalculationUnit.PERCENTAGE);
+        return isNightHoursValid(expertiseNightWorkerSetting, minutesOrCount, XAxisConfig.HOURS) || isNightHoursValid(expertiseNightWorkerSetting, (minutesOrCount * 100) / shiftCount, XAxisConfig.PERCENTAGE);
     }
 
-    private boolean isNightHoursValid(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, int minutesOrCount, CalculationUnit calculationUnit) {
+    private boolean isNightHoursValid(ExpertiseNightWorkerSetting expertiseNightWorkerSetting, int minutesOrCount, XAxisConfig calculationUnit) {
         return expertiseNightWorkerSetting.getMinShiftsUnitToCheckNightWorker().equals(calculationUnit) && minutesOrCount >= expertiseNightWorkerSetting.getMinShiftsValueToCheckNightWorker();
     }
 
@@ -414,7 +414,6 @@ public class NightWorkerService {
 
     public void registerJobForNightWorker() {
         SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 1), JobType.SYSTEM, JobSubType.NIGHT_WORKER, ZoneId.systemDefault().toString());
-        // create job for auto clock out and create realtime/draft shiftstate
         List<SchedulerPanelDTO> schedulerPanelDTOS = schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
         });
     }
@@ -427,7 +426,7 @@ public class NightWorkerService {
             staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toList());
         }
         List<NightWorker> nightWorker = nightWorkerMongoRepository.findByStaffIds(staffIds);
-        Map<Long, Boolean> staffIdAndNightWorkerMap = nightWorker.stream().collect(Collectors.toMap(NightWorker::getStaffId, NightWorker::isNightWorker));
+        Map<Long, Boolean> staffIdAndNightWorkerMap = nightWorker.stream().filter(distinctByKey(NightWorker::getStaffId)).collect(Collectors.toMap(NightWorker::getStaffId, NightWorker::isNightWorker));
         for (Long staffId : staffIds) {
             if (!staffIdAndNightWorkerMap.containsKey(staffId)) {
                 staffIdAndNightWorkerMap.put(staffId, false);

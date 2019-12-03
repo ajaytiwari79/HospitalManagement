@@ -14,7 +14,7 @@ import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRe
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +73,7 @@ public class ResourceService {
      * @return resource
      */
     public Resource getResourceById(Long resourceId) {
-        Resource resource = resourceGraphRepository.findOne(resourceId);
-        return resource;
+        return resourceGraphRepository.findOne(resourceId);
     }
 
 
@@ -136,15 +135,13 @@ public class ResourceService {
     public List<ResourceWrapper> getOrganizationResourcesWithUnAvailability(Long unitId, String date) {
         Instant instant = Instant.parse(date);
         LocalDateTime startDate = LocalDateTime.ofInstant(instant, ZoneId.of(ZoneOffset.UTC.getId()));
-        List<ResourceWrapper> resources = resourceGraphRepository.getResourcesWithUnAvailability(unitId, startDate.getMonth().getValue(), startDate.getYear());
-        return resources;
+        return resourceGraphRepository.getResourcesWithUnAvailability(unitId, startDate.getMonth().getValue(), startDate.getYear());
     }
 
     public ResourceTypeWrapper getUnitResourcesTypes(Long unitId) {
         Long countryId = UserContext.getUserDetails().getCountryId();
         List<Vehicle> vehicleTypes = countryService.getVehicleList(countryId);
-        ResourceTypeWrapper resourceWrapper = new ResourceTypeWrapper(vehicleTypes, Arrays.asList(FuelType.values()));
-        return resourceWrapper;
+        return new ResourceTypeWrapper(vehicleTypes, Arrays.asList(FuelType.values()));
     }
 
 

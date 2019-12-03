@@ -16,8 +16,7 @@ import java.util.function.Predicate;
 public class ObjectUtils {
 
 
-    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
-    {
+    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor){
         Map<Object, Boolean> map = new ConcurrentHashMap<>();
         return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
@@ -69,9 +68,16 @@ public class ObjectUtils {
         return list;
     }
 
-    public static String getHoursByMinutes(int minutes){
+    public static String getHoursStringByMinutes(int minutes){
         int hoursValue = minutes / 60; //since both are ints, you get an int
         int minutesValue = minutes % 60;
         return hoursValue+"."+minutesValue;
+    }
+
+    public static boolean isEquals(Object o1, Object o2) {
+        if (o1 != null && o2 != null) {
+            return o1.equals(o2);
+        }
+        return o1 == null && o2 == null;
     }
 }

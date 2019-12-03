@@ -1,20 +1,17 @@
 package com.kairos.dto.activity.task;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigInteger;
 import java.util.List;
 
 /**
  * Created by prabjot on 13/7/17.
  */
+@Getter
+@Setter
 public class BulDeleteTaskDTO {
 
-    List<BigInteger> taskIds;
-
-    public List<BigInteger> getTaskIds() {
-        return taskIds;
-    }
-
-    public void setTaskIds(List<BigInteger> taskIds) {
-        this.taskIds = taskIds;
-    }
+   private List<BigInteger> taskIds;
 }

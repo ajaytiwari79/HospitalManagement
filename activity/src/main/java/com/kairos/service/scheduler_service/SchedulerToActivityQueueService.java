@@ -9,6 +9,7 @@ import com.kairos.service.dashboard.SickService;
 import com.kairos.service.payroll_setting.UnitPayrollSettingService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.shift.ShiftReminderService;
+import com.kairos.service.time_bank.TimeBankCalculationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,8 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
     private UnitPayrollSettingService unitPayrollSettingService;
     @Inject
     private ActivityService activityService;
+    @Inject
+    private TimeBankCalculationService timeBankCalculationService;
     @Override
     public void execute(KairosSchedulerExecutorDTO job) {
         logger.info("Job type----------------->"+job.getJobSubType());
@@ -62,6 +65,10 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
             case ADD_PLANNING_PERIOD:
                 logger.info("Job to add planning period ");
                 planningPeriodService.addPlanningPeriodViaJob();
+                break;
+            case PROTECTED_DAYS_OFF:
+                logger.info("Job to protected days off ");
+                timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().updateTimeBankAgainstProtectedDaysOffSetting();
                 break;
             case UNASSIGN_EXPERTISE_FROM_ACTIVITY:
                 logger.info("Job to Unassign expertise from activity ");

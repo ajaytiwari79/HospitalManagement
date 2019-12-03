@@ -1,6 +1,6 @@
 package com.kairos.persistence.model.auth;
 
-import com.kairos.dto.CurrentUserDetails;
+import com.kairos.dto.user_context.CurrentUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -72,6 +72,7 @@ public class UserPrincipal implements UserDetails, Authentication {
         details.setAge(this.user.getAge());
         details.setLastSelectedOrganizationId(this.getUser().getLastSelectedOrganizationId());
         details.setCountryId(this.getUser().getCountryId());
+        details.setUnitWiseAccessRole(this.getUser().getUnitWiseAccessRole());
         return details;
     }
 

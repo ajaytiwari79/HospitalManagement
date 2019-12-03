@@ -10,6 +10,7 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.scheduler.JobSubType;
@@ -20,6 +21,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.common.QueryResult;
 import com.kairos.persistence.model.country.default_data.EngineerType;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;
+import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
@@ -67,8 +69,9 @@ import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 
@@ -171,7 +174,7 @@ public class PositionService {
         map.put("timeCareExternalId", staff.getExternalId());
         LocalDate dateOfBirth = (user.getDateOfBirth());
         map.put("dateOfBirth", dateOfBirth);
-
+        map.put("tags", staff.getTags());
         return map;
     }
 
@@ -247,6 +250,12 @@ public class PositionService {
         List<NameValuePair> param = Arrays.asList(new BasicNameValuePair("created", created + ""));
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
         }, accessGroupId);
+
+        if(unitPermissionGraphRepository.isOnlyStaff(unitId,staffId,accessGroupId)){
+            User user=userGraphRepository.findOne(UserContext.getUserDetails().getId(),0);
+            user.getUnitWiseAccessRole().put(String.valueOf(unitId),STAFF);
+            userGraphRepository.save(user);
+        }
 
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);

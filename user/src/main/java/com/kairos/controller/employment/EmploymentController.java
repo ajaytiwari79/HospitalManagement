@@ -166,7 +166,7 @@ public class EmploymentController {
     @ApiOperation(value = "get employment's CTA")
     @GetMapping(value = "/cta_by_employment/{employmentId}")
     public ResponseEntity<Map<String, Object>> getEmploymentCTA(@PathVariable Long employmentId, @PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getEmploymentDetails(employmentId, unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentDetails(employmentId));
     }
 
 
@@ -208,6 +208,12 @@ public class EmploymentController {
     @GetMapping("/initial_time_bank_log/{employmentId}")
     public ResponseEntity<Map<String, Object>> getInitialTimeBalanceByEmployment(@PathVariable Long employmentId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, initialTimeBankLogService.getInitialTimeBalanceByEmployment(employmentId));
+    }
+
+    @ApiOperation("Get All Employment by unit id")
+    @GetMapping("/get_all_employment_by_unit_id")
+    public ResponseEntity<Map<String, Object>> getAllEmploymentByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.findEmploymentByUnitId(unitId));
     }
 
 

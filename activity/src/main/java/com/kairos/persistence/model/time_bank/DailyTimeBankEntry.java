@@ -33,13 +33,12 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private int ctaBonusMinutesOfTimeBank;
     private LocalDate date;
     //It Includes CTAcompensation of Function and Bonus Ruletemplate which accountType is equal to TIMEBANK_ACCOUNT
-    private List<TimeBankCTADistribution> timeBankCTADistributionList;
+    private List<TimeBankCTADistribution> timeBankCTADistributionList=new ArrayList<>();
     private int deltaAccumulatedTimebankMinutes;
     private boolean publishedSomeActivities;
     //It is the sum of scheduledMinutesOfTimeBank + ctaBonusMinutesOfTimeBank
     private int plannedMinutesOfTimebank;
     private Map<LocalDate,Integer> publishedBalances;
-    private long protectedDaysOffHours;
     private DailyTimeBankEntry draftDailyTimeBankEntry;
 
 
@@ -57,14 +56,6 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
         this.publishedBalances = new HashMap<>();
         this.contractualMinutes = contractualMinutes;
         this.deltaTimeBankMinutes = deltaTimeBankMinutes;
-    }
-
-    public List<TimeBankCTADistribution> getTimeBankCTADistributionList() {
-        return isNullOrElse(timeBankCTADistributionList,new ArrayList<>());
-    }
-
-    public void setTimeBankCTADistributionList(List<TimeBankCTADistribution> timeBankCTADistributionList) {
-        this.timeBankCTADistributionList = timeBankCTADistributionList;
     }
 
 

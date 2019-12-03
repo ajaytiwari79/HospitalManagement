@@ -46,7 +46,7 @@ import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -797,10 +798,12 @@ public class AccessGroupService {
                 if (isNull(accessGroupQueryResult)) {
                     exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
                 }
+                accessGroupQueryResult=ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult,AccessGroupStaffQueryResult.class);
                 String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
                 boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
                 boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
-                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management);
+                Set<Long> accessGroupIds = accessGroupQueryResult.getDayTypesByAccessGroup().stream().map(dayTypesByAccessGroup -> dayTypesByAccessGroup.getAccessGroup().getId()).collect(Collectors.toSet());
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management, accessGroupIds);
                 userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
 
             }
@@ -880,5 +883,20 @@ public class AccessGroupService {
 
     private List<AccessGroupQueryResult> getOrganizationAccessGroups(Long parentOrganizationId) {
         return accessGroupRepository.getAccessGroupsForUnit(parentOrganizationId);
+    }
+
+    public StaffAccessGroupQueryResult getAccessGroupWithDayTypesByStaffIdAndUnitId(Long unitId){
+        Organization parent = organizationService.fetchParentOrganization(unitId);
+        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), UserContext.getUserDetails().getId());
+        StaffAccessGroupQueryResult accessGroupStaffQueryResult=new StaffAccessGroupQueryResult();
+        if(staffAtHub!=null){
+            accessGroupStaffQueryResult.setCountryAdmin(true);
+            return accessGroupStaffQueryResult;
+        }
+        Long staffId = staffRetrievalService.getStaffIdOfLoggedInUser(unitId);
+        List<AccessGroup> accessGroups=accessGroupRepository.getAccessGroupWithDayTypesByStaffIdAndUnitId(staffId,unitId);
+
+        accessGroupStaffQueryResult.setAccessGroups(accessGroups);
+        return  accessGroupStaffQueryResult;
     }
 }

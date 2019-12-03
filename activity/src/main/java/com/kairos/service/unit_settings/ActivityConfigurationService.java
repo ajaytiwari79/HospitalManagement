@@ -13,7 +13,7 @@ import com.kairos.dto.activity.unit_settings.activity_configuration.*;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.TimeTypeResponseDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.TimeTypeEnum;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
@@ -66,24 +66,23 @@ public class ActivityConfigurationService extends MongoBaseService {
     @Inject private PhaseService phaseService;
 
     public void createDefaultSettings(Long unitId, Long countryId, List<Phase> phases,List<Long> employmentTypeIds) {
-        if(activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)){
-            exceptionService.actionNotPermittedException(MESSAGE_ALREADY_EXISTS);
+        if(!activityConfigurationRepository.existsByUnitIdAndDeletedFalse(unitId)) {
+            List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
+            if (isCollectionEmpty(phases)) {
+                phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
+            }
+            List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+            PresenceTypeDTO normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny().orElse(null);
+            PresenceTypeDTO extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny().orElse(null);
+            BigInteger normalPlannedTypeId = isNull(normalPlannedType) ? null : normalPlannedType.getId();
+            BigInteger extraTimePlannedTypeId = isNotNull(extraTimePlannedType) ? normalPlannedType.getId() : normalPlannedTypeId;
+            for (Phase phase : phases) {
+                createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId, employmentTypeIds, ConfLevel.UNIT);
+                createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, unitId, ConfLevel.UNIT);
+                createDefaultNonWorkingSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, unitId, ConfLevel.UNIT);
+            }
+            activityConfigurationRepository.saveEntities(activityConfigurations);
         }
-        List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
-        if (isCollectionEmpty(phases)) {
-            phases = phaseMongoRepository.findByOrganizationIdAndDeletedFalse(unitId);
-        }
-        List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
-        PresenceTypeDTO normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny().orElse(null);
-        PresenceTypeDTO extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny().orElse(null);
-        BigInteger normalPlannedTypeId = isNull(normalPlannedType) ? null : normalPlannedType.getId();
-        BigInteger extraTimePlannedTypeId = isNotNull(extraTimePlannedType) ? normalPlannedType.getId() : normalPlannedTypeId;
-        for (Phase phase : phases) {
-            createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, unitId,employmentTypeIds,ConfLevel.UNIT);
-            createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, unitId, ConfLevel.UNIT);
-            createDefaultNonWorkingSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, unitId, ConfLevel.UNIT);
-        }
-        activityConfigurationRepository.saveEntities(activityConfigurations);
     }
 
     private void createDefaultPresentSettings(BigInteger phaseId, BigInteger applicablePlannedTimeId, List<ActivityConfiguration> activityConfigurations, Long referenceId,List<Long> employmentTypeIds,ConfLevel confLevel) {
@@ -163,23 +162,25 @@ public class ActivityConfigurationService extends MongoBaseService {
 
 
     public void createDefaultSettingsForCountry(Long countryId, List<Phase> phases) {
-        List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
-        if (phases == null || phases.isEmpty()) {
-            phases = phaseMongoRepository.getPlanningPhasesByCountry(countryId);
+        if(!activityConfigurationRepository.existsByCountryIdAndDeletedFalse(countryId)) {
+            List<ActivityConfiguration> activityConfigurations = new ArrayList<>();
+            if (phases == null || phases.isEmpty()) {
+                phases = ObjectMapperUtils.copyPropertiesOfListByMapper(phaseMongoRepository.getPhasesByCountryId(countryId, Sort.Direction.ASC), Phase.class);
+            }
+            List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
+            Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
+            Optional<PresenceTypeDTO> extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny();
+            BigInteger normalPlannedTypeId = normalPlannedType.map(PresenceTypeDTO::getId).orElse(null);
+            BigInteger extraTimePlannedTypeId = extraTimePlannedType.isPresent() ? normalPlannedType.get().getId() : normalPlannedTypeId;
+            List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByCountry(countryId);
+            List<Long> employmentTypeIds = employmentTypeDTOS.stream().map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toList());
+            for (Phase phase : phases) {
+                createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, countryId, employmentTypeIds, ConfLevel.COUNTRY);
+                createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.COUNTRY);
+                createDefaultNonWorkingSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.COUNTRY);
+            }
+            activityConfigurationRepository.saveEntities(activityConfigurations);
         }
-        List<PresenceTypeDTO> plannedTimeTypes = plannedTimeTypeRepository.getAllPresenceTypeByCountryId(countryId, false);
-        Optional<PresenceTypeDTO> normalPlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(NORMAL_TIME)).findAny();
-        Optional<PresenceTypeDTO> extraTimePlannedType = plannedTimeTypes.stream().filter(presenceTypeDTO -> presenceTypeDTO.getName().equalsIgnoreCase(EXTRA_TIME)).findAny();
-        BigInteger normalPlannedTypeId = normalPlannedType.map(PresenceTypeDTO::getId).orElse(null);
-        BigInteger extraTimePlannedTypeId = extraTimePlannedType.isPresent() ? normalPlannedType.get().getId() : normalPlannedTypeId;
-        List<EmploymentTypeDTO> employmentTypeDTOS = userIntegrationService.getEmploymentTypeByCountry(countryId);
-        List<Long> employmentTypeIds = employmentTypeDTOS.stream().map(employmentTypeDTO -> employmentTypeDTO.getId()).collect(Collectors.toList());
-        for (Phase phase : phases) {
-            createDefaultPresentSettings(phase.getId(), normalPlannedTypeId, activityConfigurations, countryId,employmentTypeIds,ConfLevel.UNIT);
-            createDefaultAbsenceSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.UNIT);
-            createDefaultNonWorkingSettings(phase.getId(), DRAFT_PHASE_NAME.equals(phase.getName()) ? extraTimePlannedTypeId : normalPlannedTypeId, activityConfigurations, countryId, ConfLevel.UNIT);
-        }
-        activityConfigurationRepository.saveEntities(activityConfigurations);
     }
 
     public PresencePlannedTime updatePresenceActivityConfigurationForCountry(Long countryId, PresencePlannedTime presencePlannedTime) {
@@ -238,7 +239,7 @@ public class ActivityConfigurationService extends MongoBaseService {
     }
 
     public List<BigInteger> addPlannedTimeInShift(Long unitId, BigInteger phaseId, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        Boolean managementPerson = Optional.ofNullable(staffAdditionalInfoDTO.getUserAccessRoleDTO()).isPresent() && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement();
+        boolean managementPerson = UserContext.getUserDetails().isManagement();
         List<BigInteger> plannedTimes;
         switch (activity.getBalanceSettingsActivityTab().getTimeType()){
             case ABSENCE :

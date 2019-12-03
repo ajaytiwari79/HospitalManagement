@@ -95,6 +95,8 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("Match (n:Unit{isEnable:true,union:false,boardingCompleted:true,isKairosHub:false,gdprUnit:false})-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType)={0} return DISTINCT n")
     List<Unit> getOrganizationsByOrganizationType(long orgTypeId);
 
+    @Query("Match (n:Unit{isEnable:true})-[:"+SUB_TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType)={0} return DISTINCT n")
+    List<Unit> getOrganizationsByOrganizationTypeId(long orgTypeId);
 
     @Query("Match (organization{isEnable:true}) where id(organization)={0} with organization\n" +
             "Match (organization)-[:"+TYPE_OF+"]->(organizationType:OrganizationType{isEnable:true}) with organizationType,organization\n" +
@@ -140,7 +142,7 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
     @Query("MATCH (organizationSubType:OrganizationType)<-[:" +HAS_SUB_TYPE + "]-(organizationType:OrganizationType) where id(organizationSubType)={0} return organizationType")
     OrganizationType findOrganizationTypeBySubTypeId(Long organizationSubTypeId);
 
-    @Query("Match (unit:Unit{isEnable:true,union:false,boardingCompleted:true,isKairosHub:false,gdprUnit:false}) \n" +
+    @Query("Match (unit:Unit{isEnable:true,boardingCompleted:true,gdprUnit:false}) \n" +
             "-[:" +SUB_TYPE_OF + "]->(organizationType:OrganizationType{isEnable:true}) where id(organizationType) in {0} \n" +
             "MATCH(unit)-[:" +PROVIDE_SERVICE + "]-(orgSubService:OrganizationService) where id(orgSubService) in {1} \n" +
             "RETURN distinct id(unit)")

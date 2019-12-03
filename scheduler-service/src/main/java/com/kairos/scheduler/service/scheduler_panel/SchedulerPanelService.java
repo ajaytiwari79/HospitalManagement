@@ -322,8 +322,7 @@ public class SchedulerPanelService extends MongoBaseService {
     public List<SchedulerPanelDTO> getSchedulerPanelByUnitId(long unitId) {
         //List<Map<String, Object>> controlPanels = schedulerPanelRepository.findByUnitId(unitId);
         List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllByUnitIdAndDeletedFalse(unitId);
-        List<SchedulerPanelDTO> schedulerPanelDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels, SchedulerPanelDTO.class);
-        return schedulerPanelDTOS;
+        return ObjectMapperUtils.copyPropertiesOfListByMapper(schedulerPanels, SchedulerPanelDTO.class);
 
     }
 
@@ -333,8 +332,7 @@ public class SchedulerPanelService extends MongoBaseService {
      * @lastmodifiedby
      */
     public List<SchedulerPanel> getAllControlPanels() {
-        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findByActive(true);
-        return schedulerPanels;
+        return schedulerPanelRepository.findByActive(true);
     }
 
     /**
@@ -392,8 +390,7 @@ public class SchedulerPanelService extends MongoBaseService {
 
     private String cronExpressionEveryMonthBuilder(LocalDateTime localDateTime) {
         String cronExpressionRunOnce = "0 {0} {1} {2} * ?";
-        String cronExpression = MessageFormat.format(cronExpressionRunOnce, String.valueOf(localDateTime.get(ChronoField.MINUTE_OF_HOUR)), String.valueOf(localDateTime.get(ChronoField.HOUR_OF_DAY)), String.valueOf(localDateTime.getDayOfMonth()));
-        return cronExpression;
+        return MessageFormat.format(cronExpressionRunOnce, String.valueOf(localDateTime.get(ChronoField.MINUTE_OF_HOUR)), String.valueOf(localDateTime.get(ChronoField.HOUR_OF_DAY)), String.valueOf(localDateTime.getDayOfMonth()));
     }
 
 

@@ -177,8 +177,7 @@ public class ClientExtendedService{
     }
 
     private User validateCPRNumber(String cprNumber) {
-        User user = userGraphRepository.findUserByCprNumber(cprNumber.trim());
-        return user;
+        return userGraphRepository.findUserByCprNumber(cprNumber.trim());
     }
 
     private Boolean hasAlreadyNextToKin(Long clientId, Long nextToKinId) {

@@ -15,7 +15,9 @@ import com.kairos.persistence.model.address.ZipCodeSectorQueryResult;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.reason_code.ReasonCodeResponseDTO;
-import com.kairos.persistence.model.organization.*;
+import com.kairos.persistence.model.organization.Organization;
+import com.kairos.persistence.model.organization.OrganizationBaseEntity;
+import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.union.*;
 import com.kairos.persistence.model.staff.StaffExperienceInExpertiseDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -496,7 +498,7 @@ public class UnionService {
     public void updateMunicipalities(List<MunicipalityDTO> municipalities, Map<Long, MunicipalityQueryResult> municipalityMap) {
         for (MunicipalityDTO municipalityDTO : municipalities) {
             MunicipalityQueryResult currentMunicipality = municipalityMap.get(municipalityDTO.getId());
-            RegionDTO regionDTO = new RegionDTO(currentMunicipality.getRegion().getId(), currentMunicipality.getRegion().getName());
+            RegionDTO regionDTO = new RegionDTO( currentMunicipality.getRegion().getName(),currentMunicipality.getRegion().getId());
             ProvinceDTO province = new ProvinceDTO(currentMunicipality.getProvince().getId(), currentMunicipality.getProvince().getName(), regionDTO);
             municipalityDTO.setProvince(province);
         }

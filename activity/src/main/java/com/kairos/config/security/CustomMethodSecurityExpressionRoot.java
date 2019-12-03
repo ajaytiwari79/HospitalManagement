@@ -1,7 +1,7 @@
 package com.kairos.config.security;
 
-import com.kairos.dto.CurrentUserDetails;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.CurrentUserDetails;
+import com.kairos.dto.user_context.UserContext;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
