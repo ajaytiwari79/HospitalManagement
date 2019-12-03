@@ -8,13 +8,19 @@ import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 17/8/17.
@@ -22,6 +28,9 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(collection = "activities")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Activity extends MongoBaseEntity implements Serializable {
 
     private String name;
@@ -65,11 +74,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
     //time care id
     private String externalId;
 
-    public Activity() {
-    // default constructor
-    }
-
-
     public Activity(String name, String description, List<BigInteger> tags) {
         this.name = name;
         this.description = description;
@@ -83,270 +87,11 @@ public class Activity extends MongoBaseEntity implements Serializable {
     }
 
 
-    public List<BigInteger> getTags() {
-        return tags;
-    }
 
-    public void setTags(List<BigInteger> tags) {
-        this.tags = tags;
-    }
-
-    public IndividualPointsActivityTab getIndividualPointsActivityTab() {
-        return individualPointsActivityTab;
-    }
-
-    public void setIndividualPointsActivityTab(IndividualPointsActivityTab individualPointsActivityTab) {
-        this.individualPointsActivityTab = individualPointsActivityTab;
-    }
-
-    public RulesActivityTab getRulesActivityTab() {
-        return rulesActivityTab;
-    }
-
-    public void setRulesActivityTab(RulesActivityTab rulesActivityTab) {
-        this.rulesActivityTab = rulesActivityTab;
-    }
-
-    public GeneralActivityTab getGeneralActivityTab() {
-        return generalActivityTab;
-    }
-
-    public void setGeneralActivityTab(GeneralActivityTab generalActivityTab) {
-        this.generalActivityTab = generalActivityTab;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BalanceSettingsActivityTab getBalanceSettingsActivityTab() {
-        return balanceSettingsActivityTab;
-    }
-
-    public void setBalanceSettingsActivityTab(BalanceSettingsActivityTab balanceSettingsActivityTab) {
-        this.balanceSettingsActivityTab = balanceSettingsActivityTab;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-    public TimeCalculationActivityTab getTimeCalculationActivityTab() {
-        return timeCalculationActivityTab;
-    }
-
-    public void setTimeCalculationActivityTab(TimeCalculationActivityTab timeCalculationActivityTab) {
-        this.timeCalculationActivityTab = timeCalculationActivityTab;
-    }
-
-    public NotesActivityTab getNotesActivityTab() {
-        return notesActivityTab;
-    }
-
-    public void setNotesActivityTab(NotesActivityTab notesActivityTab) {
-        this.notesActivityTab = notesActivityTab;
-    }
-
-    public CommunicationActivityTab getCommunicationActivityTab() {
-        return communicationActivityTab;
-    }
-
-    public void setCommunicationActivityTab(CommunicationActivityTab communicationActivityTab) {
-        this.communicationActivityTab = communicationActivityTab;
-    }
-
-    public BonusActivityTab getBonusActivityTab() {
-        return bonusActivityTab;
-    }
-
-    public void setBonusActivityTab(BonusActivityTab bonusActivityTab) {
-        this.bonusActivityTab = bonusActivityTab;
-    }
-
-    public SkillActivityTab getSkillActivityTab() {
-        return skillActivityTab;
-    }
-
-    public void setSkillActivityTab(SkillActivityTab skillActivityTab) {
-        this.skillActivityTab = skillActivityTab;
-    }
-
-    public List<Long> getExpertises() {
-        return expertises;
-    }
-
-    public void setExpertises(List<Long> expertises) {
-        this.expertises = expertises;
-    }
-
-    public List<Long> getOrganizationTypes() {
-        return organizationTypes;
-    }
-
-    public void setOrganizationTypes(List<Long> organizationTypes) {
-        this.organizationTypes = organizationTypes;
-    }
-
-    public List<Long> getOrganizationSubTypes() {
-        return organizationSubTypes;
-    }
-
-    public void setOrganizationSubTypes(List<Long> organizationSubTypes) {
-        this.organizationSubTypes = organizationSubTypes;
-    }
-
-    public List<Long> getRegions() {
-        return regions;
-    }
-
-    public void setRegions(List<Long> regions) {
-        this.regions = regions;
-    }
-
-    public List<Long> getLevels() {
-        return levels;
-    }
-
-    public void setLevels(List<Long> levels) {
-        this.levels = levels;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public List<Long> getEmploymentTypes() {
-        return employmentTypes;
-    }
-
-    public void setEmploymentTypes(List<Long> employmentTypes) {
-        this.employmentTypes = employmentTypes;
-    }
-
-    public Activity(List<BigInteger> tags) {
-        this.tags = tags;
-    }
-
-    public OptaPlannerSettingActivityTab getOptaPlannerSettingActivityTab() {
-        return optaPlannerSettingActivityTab;
-    }
-
-    public void setOptaPlannerSettingActivityTab(OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
-        this.optaPlannerSettingActivityTab = optaPlannerSettingActivityTab;
-    }
-
-    public CTAAndWTASettingsActivityTab getCtaAndWtaSettingsActivityTab() {
-        return ctaAndWtaSettingsActivityTab;
-    }
-
-    public void setCtaAndWtaSettingsActivityTab(CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab) {
-        this.ctaAndWtaSettingsActivityTab = ctaAndWtaSettingsActivityTab;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public boolean isParentActivity() {
-        return isParentActivity;
-    }
-
-    public void setParentActivity(boolean parentActivityType) {
-        isParentActivity = parentActivityType;
-    }
-
-    public BigInteger getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(BigInteger parentId) {
-        this.parentId = parentId;
-    }
-
-    public ActivityStateEnum getState() {
-        return state;
-    }
-
-    public void setState(ActivityStateEnum state) {
-        this.state = state;
-    }
-
-    public LocationActivityTab getLocationActivityTab() {
-        return locationActivityTab;
-    }
-
-    public void setLocationActivityTab(LocationActivityTab locationActivityTab) {
-        this.locationActivityTab = locationActivityTab;
-    }
 
     public static Activity copyProperties(Activity source, Activity target, String _id, String organizationType, String organizationSubType) {
         BeanUtils.copyProperties(source, target, _id, organizationSubType, organizationType);
         return target;
-    }
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
-    }
-
-    public PhaseSettingsActivityTab getPhaseSettingsActivityTab() {
-        return phaseSettingsActivityTab;
-    }
-
-    public void setPhaseSettingsActivityTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
-        this.phaseSettingsActivityTab = phaseSettingsActivityTab;
-    }
-
-    public BigInteger getCountryParentId() {
-        return countryParentId;
-    }
-
-    public void setCountryParentId(BigInteger countryParentId) {
-        this.countryParentId = countryParentId;
-    }
-
-
-    public BigInteger getActivityPriorityId() {
-        return activityPriorityId;
-    }
-
-    public void setActivityPriorityId(BigInteger activityPriorityId) {
-        this.activityPriorityId = activityPriorityId;
-    }
-
-    public Set<BigInteger> getChildActivityIds() {
-        return childActivityIds =Optional.ofNullable(childActivityIds).orElse(new HashSet<>());
-    }
-
-    public void setChildActivityIds(Set<BigInteger> childActivityIds) {
-        this.childActivityIds = childActivityIds;
     }
 
     @Override

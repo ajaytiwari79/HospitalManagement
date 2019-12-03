@@ -226,7 +226,7 @@ public class CostTimeAgreementService {
 
 
     public CTAResponseDTO getEmploymentCTA(Long unitId, Long employmentId) {
-        EmploymentDTO employment = userIntegrationService.getEmploymentDTO(unitId,employmentId);
+        EmploymentDTO employment = userIntegrationService.getEmploymentDTO(unitId, employmentId);
         if (!Optional.ofNullable(employment).isPresent()) {
             exceptionService.dataNotFoundByIdException("message.InvalidEmploymentId", employmentId);
         }
@@ -378,6 +378,8 @@ public class CostTimeAgreementService {
                 case WEEKLY_SALARY:
                     ctaRuleTemplate.getCalculateValueAgainst().setScale(ctaRuleTemplate.getCalculateValueAgainst().getScale());
                     break;
+                default:
+                    break;
             }
         }
         ctaRuleTemplate.getCalculateValueAgainst().setCalculateValue(ctaRuleTemplateDTO.getCalculateValueAgainst().getCalculateValue());
@@ -473,16 +475,16 @@ public class CostTimeAgreementService {
         this.buildCTARuleTemplate(udpdateCtaRuleTemplate, ctaRuleTemplateDTO, true, countryDTO);
         udpdateCtaRuleTemplate.setId(ctaRuleTemplate.getId());
         udpdateCtaRuleTemplate.setCountryId(countryId);
-        if(!udpdateCtaRuleTemplate.getRuleTemplateCategoryId().equals(ctaRuleTemplate.getRuleTemplateCategoryId())){
+        if (!udpdateCtaRuleTemplate.getRuleTemplateCategoryId().equals(ctaRuleTemplate.getRuleTemplateCategoryId())) {
             updateAllCtaRuleTemplateCategoryIdByCtaRuleTemplateName(udpdateCtaRuleTemplate.getName(), udpdateCtaRuleTemplate.getRuleTemplateCategoryId());
         }
         ctaRuleTemplateRepository.save(udpdateCtaRuleTemplate);
         return ctaRuleTemplateDTO;
     }
 
-    private void updateAllCtaRuleTemplateCategoryIdByCtaRuleTemplateName(String CtaRuleTemplateName, BigInteger ctaRuleTemplateCategoryId){
+    private void updateAllCtaRuleTemplateCategoryIdByCtaRuleTemplateName(String CtaRuleTemplateName, BigInteger ctaRuleTemplateCategoryId) {
         List<CTARuleTemplate> ctaRuleTemplates = ctaRuleTemplateRepository.findAllByNameAndDeletedFalse(CtaRuleTemplateName);
-        if(isCollectionNotEmpty(ctaRuleTemplates)){
+        if (isCollectionNotEmpty(ctaRuleTemplates)) {
             ctaRuleTemplates.forEach(ctaRuleTemplate -> ctaRuleTemplate.setRuleTemplateCategoryId(ctaRuleTemplateCategoryId));
             ctaRuleTemplateRepository.saveAll(ctaRuleTemplates);
         }

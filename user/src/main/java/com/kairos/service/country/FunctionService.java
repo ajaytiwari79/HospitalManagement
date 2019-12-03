@@ -5,7 +5,7 @@ import com.kairos.dto.activity.shift.FunctionDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
-import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationship;
 import com.kairos.persistence.model.user.employment.EmploymentFunctionRelationshipQueryResult;
@@ -15,7 +15,7 @@ import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.functions.FunctionGraphRepository;
 import com.kairos.persistence.repository.user.employment.EmploymentFunctionRelationshipRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,16 +65,15 @@ public class FunctionService {
         if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
             levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
         }
-        List<Unit> unions = new ArrayList<>();
+        List<Organization> unions = new ArrayList<>();
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
-        Function function = new Function(functionDTO.getName(), functionDTO.getDescription(), functionDTO.getStartDate(), functionDTO.getEndDate(), unions, levels, country, functionDTO.getIcon());
+        Function function = new Function(functionDTO.getName(), functionDTO.getDescription(), functionDTO.getStartDate(), functionDTO.getEndDate(), unions, levels, country, functionDTO.getIcon(),functionDTO.getCode());
         functionGraphRepository.save(function);
-        com.kairos.persistence.model.country.functions.FunctionDTO functionResponseDTO = new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
-                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon());
+        return new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
+                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon(),function.getCode());
 
-        return functionResponseDTO;
     }
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsByCountry(long countryId) {
@@ -84,7 +83,6 @@ public class FunctionService {
 
     public List<com.kairos.persistence.model.country.functions.FunctionDTO> getFunctionsIdAndNameByCountry(long countryId) {
         return functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
-
     }
 
     public com.kairos.persistence.model.country.functions.FunctionDTO updateFunction(Long countryId, FunctionDTO functionDTO) {
@@ -94,7 +92,7 @@ public class FunctionService {
 
         }
         Function function = functionGraphRepository.findOne(functionDTO.getId());
-        if (!Optional.ofNullable(function).isPresent() || function.isDeleted() == true) {
+        if (!Optional.ofNullable(function).isPresent() || function.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTION_ID_NOTFOUND, functionDTO.getId());
 
         }
@@ -107,7 +105,7 @@ public class FunctionService {
         if (!functionDTO.getOrganizationLevelIds().isEmpty()) {
             levels = countryGraphRepository.getLevelsByIdsIn(countryId, functionDTO.getOrganizationLevelIds());
         }
-        List<Unit> unions = new ArrayList<>();
+        List<Organization> unions = new ArrayList<>();
         if (!functionDTO.getUnionIds().isEmpty()) {
             unions = unitGraphRepository.findUnionsByIdsIn(functionDTO.getUnionIds());
         }
@@ -119,11 +117,11 @@ public class FunctionService {
         function.setUnions(unions);
         function.setOrganizationLevels(levels);
         function.setIcon(functionDTO.getIcon());
+        function.setCode(functionDTO.getCode());
         functionGraphRepository.save(function);
-        com.kairos.persistence.model.country.functions.FunctionDTO functionResponseDTO = new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
-                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon());
 
-        return functionResponseDTO;
+        return new com.kairos.persistence.model.country.functions.FunctionDTO(function.getId(), function.getName(), function.getDescription(),
+                function.getStartDate(), function.getEndDate(), function.getUnions(), function.getOrganizationLevels(), function.getIcon(),function.getCode());
     }
 
     public boolean deleteFunction(long functionId) {
@@ -208,6 +206,7 @@ public class FunctionService {
                 for (LocalDate localDate : appliedFunctionDTO.getAppliedDates()) {
                     FunctionDTO functionDTO = new FunctionDTO(appliedFunctionDTO.getId(), appliedFunctionDTO.getName(), appliedFunctionDTO.getIcon());
                     functionDTO.setEmploymentId(employmentQueryResult.getId());
+                    functionDTO.setCode(appliedFunctionDTO.getCode());
                     List<FunctionDTO> functionDTOS = dateWiseFunctionMap.getOrDefault(localDate, new ArrayList<>());
                     functionDTOS.add(functionDTO);
                     dateWiseFunctionMap.put(localDate, functionDTOS);
@@ -218,7 +217,6 @@ public class FunctionService {
     }
 
     public List<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
-        List<LocalDate> allDateByFunctionIds= functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds);
-        return allDateByFunctionIds;
+        return functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds);
     }
 }

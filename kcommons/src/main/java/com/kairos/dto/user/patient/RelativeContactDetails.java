@@ -1,8 +1,12 @@
 package com.kairos.dto.user.patient;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class RelativeContactDetails {
     private String maritalStatus;
 
@@ -14,43 +18,4 @@ public class RelativeContactDetails {
 
     private String lastName;
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getMaritalStatus() {
-        return maritalStatus;
-    }
-
-    public void setMaritalStatus(String maritalStatus) {
-        this.maritalStatus = maritalStatus;
-    }
-
-    public String getSecondaryPhoneNumber() {
-        return secondaryPhoneNumber;
-    }
-
-    public void setSecondaryPhoneNumber(String secondaryPhoneNumber) {
-        this.secondaryPhoneNumber = secondaryPhoneNumber;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
 }

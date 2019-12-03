@@ -3,11 +3,12 @@ package com.kairos.dto.activity.wta.basic_details;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.kairos.commons.annotation.ValidateIgnoreCounter;
 import com.kairos.dto.activity.wta.rule_template_category.RuleTemplateCategoryDTO;
 import com.kairos.dto.activity.wta.templates.*;
 import com.kairos.enums.wta.WTATemplateType;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -44,6 +45,9 @@ import java.util.List;
         @JsonSubTypes.Type(value = BreakWTATemplateDTO.class,name="WTA_FOR_BREAKS_IN_SHIFT"),
         @JsonSubTypes.Type(value = ProtectedDaysOffWTATemplateDTO.class,name ="PROTECTED_DAYS_OFF" )
 })
+@Getter
+@Setter
+@NoArgsConstructor
 public class WTABaseRuleTemplateDTO{
     protected BigInteger id;
     protected String name;
@@ -57,109 +61,10 @@ public class WTABaseRuleTemplateDTO{
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
     protected List<PhaseTemplateValue> phaseTemplateValues;
-    public WTATemplateType getWtaTemplateType() {
-        return wtaTemplateType;
-    }
 
-    public void setWtaTemplateType(WTATemplateType wtaTemplateType) {
-        this.wtaTemplateType = wtaTemplateType;
-    }
-
-    public RuleTemplateCategoryDTO getRuleTemplateCategory() {
-        return ruleTemplateCategory;
-    }
-
-    public void setRuleTemplateCategory(RuleTemplateCategoryDTO ruleTemplateCategory) {
-        this.ruleTemplateCategory = ruleTemplateCategory;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public Long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
-    }
-
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public BigInteger getRuleTemplateCategoryId() {
-        return ruleTemplateCategoryId;
-    }
-
-    public void setRuleTemplateCategoryId(BigInteger ruleTemplateCategoryId) {
-        this.ruleTemplateCategoryId = ruleTemplateCategoryId;
-    }
-
-    public WTABaseRuleTemplateDTO(){}
 
     public WTABaseRuleTemplateDTO(String name, String description) {
         this.name = name;
         this.description = description;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public List<PhaseTemplateValue> getPhaseTemplateValues() {
-        return phaseTemplateValues;
-    }
-
-    public void setPhaseTemplateValues(List<PhaseTemplateValue> phaseTemplateValues) {
-        this.phaseTemplateValues = phaseTemplateValues;
-    }
-    public String getLastUpdatedBy() {
-        return lastUpdatedBy;
-    }
-
-    public void setLastUpdatedBy(String lastUpdatedBy) {
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
-
-    public Integer getStaffCanIgnoreCounter() {
-        return staffCanIgnoreCounter;
-    }
-
-    public void setStaffCanIgnoreCounter(Integer staffCanIgnoreCounter) {
-        this.staffCanIgnoreCounter = staffCanIgnoreCounter;
-    }
-
-    public Integer getManagementCanIgnoreCounter() {
-        return managementCanIgnoreCounter;
-    }
-
-    public void setManagementCanIgnoreCounter(Integer managementCanIgnoreCounter) {
-        this.managementCanIgnoreCounter = managementCanIgnoreCounter;
     }
 }

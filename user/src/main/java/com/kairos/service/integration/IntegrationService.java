@@ -72,9 +72,7 @@ public class IntegrationService {
     }
 
     public TimeCare fetchTimeCareIntegrationData(Long unitId){
-        TimeCare timeCare = timeCareGraphRepository.findByOrganizationId(unitId);
-
-        return timeCare;
+        return timeCareGraphRepository.findByOrganizationId(unitId);
     }
 
     public Twillio saveTwillioIntegrationData (Long unitId, Twillio twillio){
@@ -88,9 +86,7 @@ public class IntegrationService {
     }
 
     public Twillio fetchTwillioIntegrationData(Long unitId){
-        Twillio twillio = twillioGraphRepository.findByOrganizationId(unitId);
-
-        return twillio;
+        return twillioGraphRepository.findByOrganizationId(unitId);
     }
 
     public Visitour saveVisitourIntegrationData(Long unitId, Visitour visitour){
@@ -115,9 +111,8 @@ public class IntegrationService {
     }
 
     public Visitour fetchVisitourIntegrationData(Long unitId){
-        Visitour visitour = visitourGraphRepository.findByOrganizationId(unitId);
+        return visitourGraphRepository.findByOrganizationId(unitId);
 
-        return visitour;
     }
 
     public Map<String, String> getFLS_Credentials(long organizationId){

@@ -49,8 +49,9 @@ public class StaffingLevelService {
         for(LocalDate localDate:map.keySet()){
             for(StaffingLevelInterval staffingLevelInterval:map.get(localDate))
             {
-                if(staffingLevelInterval.getStaffingLevelActivities().size()>0)
-                map1.put(localDate,staffingLevelInterval.getStaffingLevelActivities());
+                if(staffingLevelInterval.getStaffingLevelActivities().size()>0) {
+                    map1.put(localDate, staffingLevelInterval.getStaffingLevelActivities());
+                }
             }
 
         }

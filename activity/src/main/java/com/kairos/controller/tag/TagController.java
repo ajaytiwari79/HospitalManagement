@@ -51,8 +51,9 @@ public class TagController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getCountryTag(@PathVariable long countryId,
                                                              @RequestParam(value = "filterText",required = false) String filterText,
-                                                             @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfCountryTags(countryId, filterText, masterDataType));
+                                                             @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType,
+                                                             @RequestParam(value = "includeStaffTags",required = false) boolean includeStaffTags) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfCountryTags(countryId, filterText, masterDataType, includeStaffTags));
     }
 
     @ApiOperation(value = "Delete Country Tag")
@@ -81,8 +82,9 @@ public class TagController {
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getOrganizationTag(@PathVariable long unitId,
                                                                   @RequestParam(value = "filterText",required = false) String filterText,
-                                                                  @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType));
+                                                                  @RequestParam(value = "masterDataType",required = false) MasterDataTypeEnum masterDataType,
+                                                                  @RequestParam(value = "includeStaffTags",required = false) boolean includeStaffTags) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.getListOfOrganizationTags(unitId, filterText, masterDataType, includeStaffTags));
     }
 
     @ApiOperation(value = "Delete Organization Tag")
@@ -98,4 +100,11 @@ public class TagController {
     public ResponseEntity<Map<String, Object>> updateCountryTag(@Validated @RequestBody ShowCountryTagSetting showCountryTagSetting, @PathVariable long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.updateShowCountryTagSettingOfOrganization(unitId, showCountryTagSetting.isShowCountryTags()));
     }*/
+
+    @ApiOperation(value = "Remove Tag from activity")
+    @GetMapping(value = UNIT_URL + "/tag/{tagId}/unlink")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> unlinkTagFromActivity(@PathVariable long unitId, @PathVariable BigInteger tagId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,tagService.unlinkTagFromActivity(tagId));
+    }
 }

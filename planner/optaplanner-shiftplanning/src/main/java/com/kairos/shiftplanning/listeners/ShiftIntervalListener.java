@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class ShiftIntervalListener implements VariableListener<ActivityLineInterval>{
+    public static final String START_TIME = "startTime";
+    public static final String END_TIME = "endTime";
     private static Logger log= LoggerFactory.getLogger(ShiftIntervalListener.class);
 
     @Override
@@ -40,16 +42,16 @@ public class ShiftIntervalListener implements VariableListener<ActivityLineInter
             List<ActivityLineInterval> activityLineIntervals=shift.getActivityLineIntervals();
             DateTime[] startAndEnd= getEarliestStartAndLatestEnd(activityLineIntervals);
             //activityLineIntervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
-            scoreDirector.beforeVariableChanged(shift,"startTime");
+            scoreDirector.beforeVariableChanged(shift, START_TIME);
             //shift.setStartTime(activityLineIntervals.get(0).getStart().toLocalTime());
             shift.setStartTime(startAndEnd[0]==null?null:startAndEnd[0].toLocalTime());
-            scoreDirector.afterVariableChanged(shift,"startTime");
+            scoreDirector.afterVariableChanged(shift, START_TIME);
 
 
-            scoreDirector.beforeVariableChanged(shift,"endTime");
+            scoreDirector.beforeVariableChanged(shift, END_TIME);
             //shift.setEndTime(activityLineIntervals.get(activityLineIntervals.size()-1).getEnd().toLocalTime());
             shift.setEndTime(startAndEnd[1]==null?null:startAndEnd[1].toLocalTime());
-            scoreDirector.afterVariableChanged(shift,"endTime");
+            scoreDirector.afterVariableChanged(shift, END_TIME);
            // log.info("making shifts mins"+shift.getMinutes());
         }
     }
@@ -83,15 +85,15 @@ public class ShiftIntervalListener implements VariableListener<ActivityLineInter
         if(shift!=null){
             if(shift.getStartTime()==null ||
                     shift.getStartTime().isAfter(activityLineInterval.getStart().toLocalTime())){
-                scoreDirector.beforeVariableChanged(shift,"startTime");
+                scoreDirector.beforeVariableChanged(shift, START_TIME);
                 shift.setStartTime(activityLineInterval.getStart().toLocalTime());
-                scoreDirector.afterVariableChanged(shift,"startTime");
+                scoreDirector.afterVariableChanged(shift, START_TIME);
             }
             if(shift.getEndTime()==null ||
                     shift.getEndTime().isBefore(activityLineInterval.getEnd().toLocalTime())){
-                scoreDirector.beforeVariableChanged(shift,"endTime");
+                scoreDirector.beforeVariableChanged(shift, END_TIME);
                 shift.setEndTime(activityLineInterval.getEnd().toLocalTime());
-                scoreDirector.afterVariableChanged(shift,"endTime");
+                scoreDirector.afterVariableChanged(shift, END_TIME);
             }
             log.info("making shifts mins"+shift.getMinutes());
         }

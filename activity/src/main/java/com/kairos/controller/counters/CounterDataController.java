@@ -44,7 +44,7 @@ public class CounterDataController {
         BaseChart baseChart;
         ArrayList<KPI> kpiList = new ArrayList<>();
         //TODO: TO COMPLETE
-        kpiList.addAll(counterDataService.getCountersData(unitId, solverConfigId));
+        kpiList.addAll(new ArrayList<>());
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, kpiList);
     }

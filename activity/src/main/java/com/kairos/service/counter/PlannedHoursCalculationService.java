@@ -8,7 +8,7 @@ import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
-import com.kairos.dto.activity.counter.enums.DisplayUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
@@ -16,7 +16,6 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
@@ -37,9 +36,9 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
 import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
-import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
-import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
+import static com.kairos.utils.counter.KPIUtils.*;
 
 @Service
 public class PlannedHoursCalculationService implements CounterService {
@@ -74,10 +73,10 @@ public class PlannedHoursCalculationService implements CounterService {
         double multiplicationFactor = 1;
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
-        List<Long> staffIds = (List<Long>)filterCriteria[0];
-        List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
-        List<Long> unitIds = (List<Long>)filterCriteria[2];
-        List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
+        List<Long> staffIds = (List<Long>) filterCriteria[0];
+        List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
+        List<Long> unitIds = (List<Long>) filterCriteria[2];
+        List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
         Set<BigInteger> timeTypeIds = new HashSet<>();
         List<String> shiftActivityStatus = (filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) != null) ? filterBasedCriteria.get(FilterType.ACTIVITY_STATUS) : new ArrayList<>();
         if (filterBasedCriteria.containsKey(FilterType.TIME_TYPE) && isCollectionNotEmpty(filterBasedCriteria.get(FilterType.TIME_TYPE))) {
@@ -88,9 +87,9 @@ public class PlannedHoursCalculationService implements CounterService {
                 timeTypeIds.addAll(KPIUtils.getBigIntegerValue(filterBasedCriteria.get(FilterType.TIME_TYPE)));
             }
         }
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
-        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
+        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];
         List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), shiftActivityStatus, timeTypeIds, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         Map<Object, Double> staffPlannedHours = calculatePlannedHours(staffIds, applicableKPI, dateTimeIntervals, shifts);
@@ -100,31 +99,25 @@ public class PlannedHoursCalculationService implements CounterService {
     }
 
 
-
-
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getPlannedHoursKpiData(organizationId, filterBasedCriteria, null);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getPlannedHoursKpiData(organizationId, filterBasedCriteria, applicableKPI);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 
     private void getKpiDataUnits(double multiplicationFactor, Map<Object, Double> staffRestingHours, List<CommonKpiDataUnit> kpiDataUnits, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         for (Map.Entry<Object, Double> entry : staffRestingHours.entrySet()) {
-            switch (applicableKPI.getKpiRepresentation()) {
-                case REPRESENT_PER_STAFF:
-                    Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
-                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue() * multiplicationFactor))));
-                    break;
-                default:
-                    kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), Arrays.asList(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue() * multiplicationFactor))));
-                    break;
-
+            if (REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())){
+                Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
+                kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue() * multiplicationFactor))));
+            }else{
+                kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(getKpiDateFormatByIntervalUnit(entry.getKey().toString(),applicableKPI.getFrequencyType(),applicableKPI.getKpiRepresentation()),entry.getKey().toString(), Arrays.asList(new ClusteredBarChartKpiDataUnit(entry.getKey().toString(), entry.getValue() * multiplicationFactor))));
             }
         }
     }
@@ -186,37 +179,30 @@ public class PlannedHoursCalculationService implements CounterService {
         return staffplannedHours;
     }
 
-    public   Map<Object, Double>  getStaffWithPlannedHour(Map<FilterType, List> filterBasedCriteria, Long organizationId,ApplicableKPI applicableKPI) {
+    public Map<Object, Double> getStaffWithPlannedHour(Map<FilterType, List> filterBasedCriteria, Long organizationId, ApplicableKPI applicableKPI) {
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
-      //  List<Long> staffIds = (List<Long>)filterCriteria[0];
         List<Long> staffIds = new ArrayList<>();
-        List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
-        staffIds=(List<Long>)kpiData[2];
-        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
+        List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
+        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, newArrayList(), newArrayList(organizationId), organizationId);
+        staffIds = (List<Long>) kpiData[2];
+        List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters(staffIds, newArrayList(organizationId), newArrayList(), newHashSet(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-        Map<Object, Double> plannedHoursMap = getStaffPlannedHoursByRepresentPerStaff(staffIds, shifts);
-       // Map<Long, Integer> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
-        return  plannedHoursMap;
+        return getStaffPlannedHoursByRepresentPerStaff(staffIds, shifts);
     }
-
-
-
 
 
     @Override
-    public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,ApplicableKPI applicableKPI) {
-        Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria,organizationId,applicableKPI);
-        Map<Long, Integer> staffAndPlannedHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
-        return getFibonacciCalculation(staffAndPlannedHoursMap,sortingOrder);
+    public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, KPI kpi,ApplicableKPI applicableKPI) {
+        Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria, organizationId, applicableKPI);
+        Map<Long, Integer> staffAndPlannedHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k -> (Long) k.getKey(), v -> v.getValue().intValue()));
+        return getFibonacciCalculation(staffAndPlannedHoursMap, sortingOrder);
     }
 
 
-
-    public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI){
+    public KPIResponseDTO getCalculatedDataOfKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
-        Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria,organizationId,applicableKPI);
-        Map<Long, Double> staffAndPlanningHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().doubleValue()));
+        Map<Object, Double> plannedHoursMap = getStaffWithPlannedHour(filterBasedCriteria, organizationId, applicableKPI);
+        Map<Long, Double> staffAndPlanningHoursMap = plannedHoursMap.entrySet().stream().collect(Collectors.toMap(k -> (Long) k.getKey(), v -> v.getValue().doubleValue()));
         kpiSetResponseDTO.setKpiId(kpi.getId());
         kpiSetResponseDTO.setKpiName(kpi.getTitle());
         kpiSetResponseDTO.setStaffKPIValue(staffAndPlanningHoursMap);

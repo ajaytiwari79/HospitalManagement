@@ -125,9 +125,8 @@ public class PriorityGroupRulesDataGetterService {
         }
         filterShiftStartDate = DateUtils.getDateFromLocalDate(filterShiftStartLocalDate);
         filterShiftEndDate = DateUtils.getDateFromLocalDate(maxDate.plusDays(1));
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationByEmploymentIds(commonEmploymentIds, filterShiftStartDate, filterShiftEndDate);
+        return shiftMongoRepository.findShiftBetweenDurationByEmploymentIds(commonEmploymentIds, filterShiftStartDate, filterShiftEndDate);
 
-        return shifts;
     }
 //flagged to be changed after accumulatedtimebank has been
     public void calculateTimeBankAndPlannedHours(Long unitId, Map<Long, List<DailyTimeBankEntry>> employmentDailyTimeBankEntryMap, Map<BigInteger, List<StaffEmploymentQueryResult>> openShiftStaffMap, Map<BigInteger,OpenShift> openShiftMap) {
@@ -161,11 +160,11 @@ public class PriorityGroupRulesDataGetterService {
                         dailyTimeBankEntry.getDate().isEqual(startDatePlanned)&&dailyTimeBankEntry.getDate().isBefore(endDatePlanned)||
                dailyTimeBankEntry.getDate().isEqual(endDatePlanned)).mapToInt(d->d.getScheduledMinutesOfTimeBank() + d.getCtaBonusMinutesOfTimeBank()).sum();
                 DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-                timeBank = -1* timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),
-                        employmentWithCtaDetailsDTO,false,dailyTimeBankEntries,false);
+                timeBank = -1* (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(DateUtils.getDateFromLocalDate(DateUtils.getDateFromEpoch(staffEmploymentQueryResult.getStartDate())).getTime(),endDate),
+                        employmentWithCtaDetailsDTO,new HashSet<>(),dailyTimeBankEntries,false)[0];
                 planningPeriodInterval =  planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-                deltaTimeBank =  -1 * timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(startDateDeltaWeek,endDateDeltaWeek),
-                        employmentWithCtaDetailsDTO,false,dailyTimeBankEntries, false);
+                deltaTimeBank =  -1 * (int)timeBankCalculationService.calculateDeltaTimeBankForInterval(planningPeriodInterval,new Interval(startDateDeltaWeek,endDateDeltaWeek),
+                        employmentWithCtaDetailsDTO,new HashSet<>(),dailyTimeBankEntries, false)[0];
                 staffEmploymentQueryResult.setAccumulatedTimeBank(timeBank);
                 staffEmploymentQueryResult.setDeltaWeeklytimeBank(deltaTimeBank);
                 staffEmploymentQueryResult.setPlannedHoursWeek(plannedHoursWeekly);

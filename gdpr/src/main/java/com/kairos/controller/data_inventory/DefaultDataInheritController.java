@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.util.List;
 
 import static com.kairos.constants.ApiConstant.API_ORGANIZATION_URL;
 import static com.kairos.constants.ApiConstant.UNIT_URL;
@@ -38,5 +39,11 @@ class DefaultDataInheritController {
 
     }
 
+    @ApiOperation(value = "create asset for organization on the basis of sub Type, Sub service")
+    @PostMapping( UNIT_URL + "/create_default_asset/org_sub_service/{orgSubService}")
+    public ResponseEntity<ResponseDTO<Boolean>> createDefaultAsset(@RequestParam Long countryId, @PathVariable Long unitId, @PathVariable Long orgSubService, @Valid @RequestBody List<Long> orgSubTypeIds){
+        return ResponseHandler.generateResponseDTO(HttpStatus.OK, true, defaultDataInheritService.copyMasterAssetToUnitAsset(countryId, unitId,orgSubTypeIds,orgSubService));
+
+    }
 
 }

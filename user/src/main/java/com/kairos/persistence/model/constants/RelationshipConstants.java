@@ -49,6 +49,7 @@ public abstract class RelationshipConstants {
 
     // Group
     public static final  String HAS_TEAMS = "HAS_TEAMS";
+    public static final  String HAS_GROUPS = "HAS_GROUPS";
 
     // Team
     public static final  String TEAM_HAS_SKILLS = "TEAM_HAS_SKILLS";
@@ -99,6 +100,8 @@ public abstract class RelationshipConstants {
 
     public static final String BELONGS_TO = "BELONGS_TO";
     public static final String IS_A = "IS_A";
+    public static final String BELONGS_TO_TAGS = "BELONGS_TO_TAGS";
+    public static final String HAS_PENALTY_SCORE =  "HAS_PENALTY_SCORE";
 
     public static final String HAS_ORGANIZATION_SERVICES = "HAS_ORGANIZATION_SERVICES";
     public static final String CIVILIAN_STATUS = "CIVILIAN_STATUS";
@@ -123,6 +126,8 @@ public abstract class RelationshipConstants {
     public static final  String HAS_SUB_TYPE = "HAS_SUB_TYPE";
     public static final  String HAS_CONTACT_ADDRESS = "HAS_CONTACT_ADDRESS";
     public static final  String DAY_TYPE = "DAY_TYPE";
+    public static final  String HAS_CHILDREN = "HAS_CHILDREN";
+
 
     //TimeCare
     public static final  String CONTACT_DETAIL = "CONTACT_DETAIL";
@@ -203,6 +208,7 @@ public abstract class RelationshipConstants {
     public static final  String EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT = "EXPERTISE_HAS_PLANNED_TIME_FOR_EMPLOYMENT";
     public static final  String HAS_PREFERED_TIME_WINDOW = "HAS_PREFERED_TIME_WINDOW";
     public static final  String BELONGS_TO_SECTOR = "BELONGS_TO_SECTOR";
+    public static final String HAS_EXPERTISE_LINES="HAS_EXPERTISE_LINES";
 
 // System Langugae
 
@@ -210,7 +216,7 @@ public abstract class RelationshipConstants {
     public static final  String SELECTED_LANGUAGE = "SELECTED_LANGUAGE";
     public static final  String IN_COUNTRY = "IN_COUNTRY";
     public static final  String HAS_ACCOUNT_TYPE = "HAS_ACCOUNT_TYPE";
-    public static final  String HAS_ACCESS_Of_MODULE = "HAS_ACCESS_Of_MODULE";
+    public static final  String HAS_ACCESS_OF_MODULE = "HAS_ACCESS_OF_MODULE";
     public static final  String HAS_UNIT_TYPE = "HAS_UNIT_TYPE";
 
     public static final  String HAS_EMPLOYMENT_LINES = "HAS_EMPLOYMENT_LINES";

@@ -152,6 +152,7 @@ public class AppConstants {
     public static final String DAYS = "DAYS";
     public static final String YEARS = "YEARS";
     public static final int MINIMUM_WTA_RULE_TEMPLATE_COUNTER = 0;
+    public static final int MINIMUM_VALUE = 0;
 
 
     // Default Unit Age Settings
@@ -193,8 +194,8 @@ public class AppConstants {
     public static final float STOP_BRICK_BLOCKING_POINT=0.5f;
 
     //Time Type Default Colors - Green for Working and Pink for Non-Working
-    public static final String WORKING_TYPE_COLOR = "#c5f7c7";
-    public static final String NON_WORKING_TYPE_COLOR = "#f7c5e7";
+    public static final String WORKING_TYPE_COLOR = "#7ddc7d";
+    public static final String NON_WORKING_TYPE_COLOR = "#f7c8ec";
     public static final String IS_BROKEN = " is broken";
     public static final long ONE_HOUR_MINUTES=60;
     public static final long SHIFT_LEAST_GRANULARITY =15;
@@ -208,7 +209,7 @@ public class AppConstants {
     public static final String STAFF_LIST = "Staff Name";
 
     public static final String DATE = "Dates";
-    public static final String LABEL = "label";
+    public static final String LABEL = "date";
     public static final String VALUE_FIELD = "value";
     //for ContractualAndPlannedHoursCalculationService
     public static final String BAR_YAXIS = "barValue";
@@ -242,5 +243,8 @@ public class AppConstants {
     public static final String DISAPPROVE_COLOR_CODE="#f7665e";
     public static final String PENDING_COLOR_CODE="#f5f591";
 
+
+    public static final String LEVEL = "level";
+    public static final String SKILL_ID = "skillId";
 
 }

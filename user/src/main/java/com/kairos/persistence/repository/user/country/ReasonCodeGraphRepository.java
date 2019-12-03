@@ -35,6 +35,10 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
             "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
     List<ReasonCodeResponseDTO> findReasonCodesByUnitIdAndReasonCodeType(long unitId, ReasonCodeType reasonCodeType);
 
+    @Query("MATCH (unit:Unit)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) WHERE id(unit) IN {0} AND reasonCode.reasonCodeType={1} " +
+            "RETURN id(reasonCode) as id, reasonCode.name as name," +
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
+    List<ReasonCodeResponseDTO> findReasonCodesByUnitIdsAndReasonCodeType(List<Long> unitId, ReasonCodeType reasonCodeType);
 
     @Query("MATCH (organization:Unit)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(organization)={0} return id(reasonCode) as id, reasonCode.name as name," +
             "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
@@ -52,6 +56,11 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
 
     @Query("MATCH(reasonCode:ReasonCode{deleted:false}) where reasonCode.timeTypeId=toString({0}) RETURN CASE WHEN COUNT(reasonCode)>0 THEN TRUE ELSE FALSE END AS result")
     boolean existsByTimeTypeIdAndDeletedFalse(BigInteger timeTypeId);
+
+    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} " +
+            "Return id(reasonCode) as id, reasonCode.name as name," +
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
+    List<ReasonCodeResponseDTO> findReasonCodeByCountryId(Long countryId);
 
 
 }

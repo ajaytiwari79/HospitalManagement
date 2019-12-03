@@ -1,6 +1,8 @@
 package com.kairos.dto.activity.task_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 
@@ -9,6 +11,8 @@ import java.math.BigInteger;
  * @date - 11/6/18
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class TaskTypeSettingDTO {
 
     private BigInteger id;
@@ -25,72 +29,5 @@ public class TaskTypeSettingDTO {
         this.taskTypeName = taskTypeName;
         this.clientId = clientId;
         this.duration = duration;
-    }
-
-    public TaskTypeSettingDTO() {
-    }
-
-    public TaskTypeDTO getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(TaskTypeDTO taskType) {
-        this.taskType = taskType;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
-    }
-
-    public String getTaskTypeName() {
-        return taskTypeName;
-    }
-
-    public void setTaskTypeName(String taskTypeName) {
-        this.taskTypeName = taskTypeName;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public BigInteger getTaskTypeId() {
-        return taskTypeId;
-    }
-
-    public void setTaskTypeId(BigInteger taskTypeId) {
-        this.taskTypeId = taskTypeId;
-    }
-
-    public int getEfficiency() {
-        return efficiency;
-    }
-
-    public void setEfficiency(int efficiency) {
-        this.efficiency = efficiency;
     }
 }

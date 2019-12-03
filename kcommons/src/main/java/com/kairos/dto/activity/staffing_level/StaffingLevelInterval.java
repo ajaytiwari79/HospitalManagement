@@ -1,5 +1,8 @@
 package com.kairos.dto.activity.staffing_level;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -7,7 +10,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+@Getter
+@Setter
+@NoArgsConstructor
 public class StaffingLevelInterval {
+    public static final String CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY = "Can't add null staffLevelActivity";
     private int sequence;
     private int minNoOfStaff;
     private int maxNoOfStaff;
@@ -16,9 +23,7 @@ public class StaffingLevelInterval {
     private Set<StaffingLevelActivity> staffingLevelActivities=new LinkedHashSet<>();
     private Set<StaffingLevelSkill> staffingLevelSkills=new HashSet<>();
 
-    public StaffingLevelInterval() {
-        // default constructor
-    }
+
 
     public StaffingLevelInterval(int minNoOfStaff, int maxNoOfStaff, Duration staffingLevelDuration) {
         this.minNoOfStaff = minNoOfStaff;
@@ -41,91 +46,20 @@ public class StaffingLevelInterval {
         this.staffingLevelDuration = staffingLevelDuration;
     }
 
-    public int getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
-    }
-
-    public int getMinNoOfStaff() {
-        return minNoOfStaff;
-    }
-
-    public void setMinNoOfStaff(Integer minNoOfStaff) {
-        this.minNoOfStaff = minNoOfStaff;
-    }
-
-    public int getMaxNoOfStaff() {
-        return maxNoOfStaff;
-    }
-
-    public void setMaxNoOfStaff(Integer maxNoOfStaff) {
-        this.maxNoOfStaff = maxNoOfStaff;
-    }
-
-    public int getAvailableNoOfStaff() {
-        return availableNoOfStaff;
-    }
-
-    public void setAvailableNoOfStaff(int availableNoOfStaff) {
-        this.availableNoOfStaff = availableNoOfStaff;
-    }
-
-    public Duration getStaffingLevelDuration() {
-        return staffingLevelDuration;
-    }
-
-    public void setStaffingLevelDuration(Duration staffingLevelDuration) {
-        this.staffingLevelDuration = staffingLevelDuration;
-    }
-
-    public Set<StaffingLevelActivity> getStaffingLevelActivities() {
-        return staffingLevelActivities;
-    }
-
-    public void setStaffingLevelActivities(Set<StaffingLevelActivity> staffingLevelActivities) {
-        this.staffingLevelActivities = staffingLevelActivities;
-    }
-
-    public Set<StaffingLevelSkill> getStaffingLevelSkills() {
-        return staffingLevelSkills;
-    }
-
-    public void setStaffingLevelSkills(Set<StaffingLevelSkill> staffingLevelSkills) {
-        this.staffingLevelSkills = staffingLevelSkills;
-    }
-
-    public void addStaffLevelActivity(StaffingLevelActivity staffLevelActivity) {
-        if (staffLevelActivity == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
-
-        this.getStaffingLevelActivities().add(staffLevelActivity);
-
-    }
-
     public void addStaffLevelActivity(Set<StaffingLevelActivity> staffLevelActivitys) {
         if (staffLevelActivitys == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
+            throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);
 
         this.getStaffingLevelActivities().addAll(staffLevelActivitys);
 
     }
 
 
-    public void addStaffLevelSkill(StaffingLevelSkill staffLevelSkill) {
-
-        if (staffLevelSkill == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
-        this.getStaffingLevelSkills().add(staffLevelSkill);
-
-    }
 
     public void addStaffLevelSkill(Set<StaffingLevelSkill> staffLevelSkills) {
 
         if (staffLevelSkills == null)
-            throw new NullPointerException("Can't add null staffLevelActivity");
+            throw new NullPointerException(CAN_T_ADD_NULL_STAFF_LEVEL_ACTIVITY);
         this.getStaffingLevelSkills().addAll(staffLevelSkills);
 
     }

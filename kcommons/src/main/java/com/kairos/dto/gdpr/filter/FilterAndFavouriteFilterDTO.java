@@ -1,28 +1,16 @@
 package com.kairos.dto.gdpr.filter;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
-//@Getter @Setter
+@Getter
+@Setter
 public class FilterAndFavouriteFilterDTO {
 
 
     private List<FilterResponseDTO> allFilters;
 
     private List<FilterResponseDTO> favouriteFilters;//Might require copied from gdpr
-
-    public List<FilterResponseDTO> getAllFilters() {
-        return allFilters;
-    }
-
-    public void setAllFilters(List<FilterResponseDTO> allFilters) {
-        this.allFilters = allFilters;
-    }
-
-    public List<FilterResponseDTO> getFavouriteFilters() {
-        return favouriteFilters;
-    }
-
-    public void setFavouriteFilters(List<FilterResponseDTO> favouriteFilters) {
-        this.favouriteFilters = favouriteFilters;
-    }
 }

@@ -2,12 +2,12 @@ package com.kairos.persistence.model.organization;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import com.kairos.persistence.model.organization.group.Group;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.user.resources.Resource;
 import lombok.Getter;
@@ -55,6 +55,9 @@ public class Unit extends OrganizationBaseEntity {
 
     @Relationship(type = HAS_PAYMENT_SETTINGS)
     private PaymentSettings paymentSettings;
+
+    @Relationship(type = HAS_GROUPS)
+    private List<Group> groups = new ArrayList<>();
 
     private boolean workcentre;
     private boolean gdprUnit;

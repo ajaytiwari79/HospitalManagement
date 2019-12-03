@@ -1,69 +1,27 @@
 package com.kairos.persistence.model.time_bank;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class TimeBankCTADistribution {
 
     private String ctaName;
     private int minutes;
     private BigInteger ctaRuleTemplateId;
     private LocalDate ctaDate;
+    private transient float cost;
 
     public TimeBankCTADistribution(String ctaName, int minutes, BigInteger ctaRuleTemplateId) {
         this.ctaName = ctaName;
         this.minutes = minutes;
         this.ctaRuleTemplateId = ctaRuleTemplateId;
-    }
-
-
-    public TimeBankCTADistribution(String ctaName, int minutes, BigInteger ctaRuleTemplateId,LocalDate ctaDate) {
-        this.ctaName = ctaName;
-        this.minutes = minutes;
-        this.ctaRuleTemplateId = ctaRuleTemplateId;
-        this.ctaDate = ctaDate;
-    }
-
-
-
-
-    public TimeBankCTADistribution() {
-    }
-
-
-    public String getCtaName() {
-        return ctaName;
-    }
-
-    public void setCtaName(String ctaName) {
-        this.ctaName = ctaName;
-    }
-
-    public Integer getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
-    }
-
-    public BigInteger getCtaRuleTemplateId() {
-        return ctaRuleTemplateId;
-    }
-
-    public void setCtaRuleTemplateId(BigInteger ctaRuleTemplateId) {
-        this.ctaRuleTemplateId = ctaRuleTemplateId;
-    }
-
-
-    public LocalDate getCtaDate() {
-        return ctaDate;
-    }
-
-    public void setCtaDate(LocalDate ctaDate) {
-        this.ctaDate = ctaDate;
     }
 
     @Override

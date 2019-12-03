@@ -1,5 +1,6 @@
 package com.kairos.scheduler.utils.user_context;
 
+import com.kairos.dto.user_context.UserContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;

@@ -28,7 +28,7 @@ public class StaffingLevelUtil {
                     staffingLevelTimeSlotDTO.getMaxNoOfStaff(), staffingLevelTimeSlotDTO.getStaffingLevelDuration()
             );
             staffingLevelTimeSlot.addStaffLevelActivity(staffingLevelTimeSlotDTO.getStaffingLevelActivities());
-            staffingLevelTimeSlot.addStaffLevelSkill(staffingLevelTimeSlotDTO.getStaffingLevelSkills());
+            staffingLevelTimeSlot.setStaffingLevelSkills(staffingLevelTimeSlotDTO.getStaffingLevelSkills());
             staffingLevelTimeSlotsList.add(staffingLevelTimeSlot);
         }
 
@@ -63,6 +63,7 @@ public class StaffingLevelUtil {
             staffingLevelInterval.setMinNoOfStaff(staffingLevelTimeSlotDTO.getMinNoOfStaff());
             staffingLevelInterval.setMaxNoOfStaff(staffingLevelTimeSlotDTO.getMaxNoOfStaff());
             staffingLevelInterval.setSequence(staffingLevelTimeSlotDTO.getSequence());
+            staffingLevelInterval.setStaffingLevelSkills(staffingLevelTimeSlotDTO.getStaffingLevelSkills());
             Map<BigInteger, StaffingLevelActivity> staffingLevelActivityMap = staffingLevelInterval.getStaffingLevelActivities().stream().collect(Collectors.toMap(StaffingLevelActivity::getActivityId, v -> v));
             Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
             Map<BigInteger, StaffingLevelStaffMinMax> activityIdStaffMinMaxMap = new HashMap<>();

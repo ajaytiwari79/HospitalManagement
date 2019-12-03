@@ -1,12 +1,18 @@
 package com.kairos.persistence.model.staff_settings;
 
 import com.kairos.persistence.model.common.MongoBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class StaffActivitySetting extends MongoBaseEntity {
     private Long staffId;
     private BigInteger activityId;
@@ -21,14 +27,11 @@ public class StaffActivitySetting extends MongoBaseEntity {
     private LocalTime latestStartTime;
     private LocalTime maximumEndTime;
     private List<Long> dayTypeIds;
-
-    public StaffActivitySetting() {
-        //Default Constructor
-    }
+    private LocalTime defaultStartTime;
 
     public StaffActivitySetting(Long staffId, BigInteger activityId, Long employmentId, Long unitId,
                                 Short shortestTime, Short longestTime, Integer minLength, Integer maxThisActivityPerShift,
-                                boolean eligibleForMove, LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, List<Long> dayTypeIds) {
+                                boolean eligibleForMove, LocalTime earliestStartTime, LocalTime latestStartTime, LocalTime maximumEndTime, List<Long> dayTypeIds, LocalTime defaultStartTime) {
         this.staffId = staffId;
         this.activityId = activityId;
         this.employmentId = employmentId;
@@ -42,111 +45,9 @@ public class StaffActivitySetting extends MongoBaseEntity {
         this.latestStartTime=latestStartTime;
         this.maximumEndTime=maximumEndTime;
         this.dayTypeIds=dayTypeIds;
+        this.defaultStartTime = defaultStartTime;
     }
 
-    public Long getStaffId() {
-        return staffId;
-    }
-
-    public void setStaffId(Long staffId) {
-        this.staffId = staffId;
-    }
-
-    public BigInteger getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(BigInteger activityId) {
-        this.activityId = activityId;
-    }
-
-    public Long getEmploymentId() {
-        return employmentId;
-    }
-
-    public void setEmploymentId(Long employmentId) {
-        this.employmentId = employmentId;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public Short getShortestTime() {
-        return shortestTime;
-    }
-
-    public void setShortestTime(Short shortestTime) {
-        this.shortestTime = shortestTime;
-    }
-
-    public Short getLongestTime() {
-        return longestTime;
-    }
-
-    public void setLongestTime(Short longestTime) {
-        this.longestTime = longestTime;
-    }
-
-    public Integer getMinLength() {
-        return minLength;
-    }
-
-    public void setMinLength(Integer minLength) {
-        this.minLength = minLength;
-    }
-
-    public Integer getMaxThisActivityPerShift() {
-        return maxThisActivityPerShift;
-    }
-
-    public void setMaxThisActivityPerShift(Integer maxThisActivityPerShift) {
-        this.maxThisActivityPerShift = maxThisActivityPerShift;
-    }
-
-    public boolean isEligibleForMove() {
-        return eligibleForMove;
-    }
-
-    public void setEligibleForMove(boolean eligibleForMove) {
-        this.eligibleForMove = eligibleForMove;
-    }
-
-    public LocalTime getEarliestStartTime() {
-        return earliestStartTime;
-    }
-
-    public void setEarliestStartTime(LocalTime earliestStartTime) {
-        this.earliestStartTime = earliestStartTime;
-    }
-
-    public LocalTime getLatestStartTime() {
-        return latestStartTime;
-    }
-
-    public void setLatestStartTime(LocalTime latestStartTime) {
-        this.latestStartTime = latestStartTime;
-    }
-
-    public LocalTime getMaximumEndTime() {
-        return maximumEndTime;
-    }
-
-    public void setMaximumEndTime(LocalTime maximumEndTime) {
-        this.maximumEndTime = maximumEndTime;
-    }
-
-    public List<Long> getDayTypeIds() {
-        return dayTypeIds;
-    }
-
-    public void setDayTypeIds(List<Long> dayTypeIds) {
-        this.dayTypeIds = dayTypeIds;
-    }
 
     @Override
     public boolean equals(Object o) {

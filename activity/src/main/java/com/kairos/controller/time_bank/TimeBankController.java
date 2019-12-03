@@ -2,19 +2,18 @@ package com.kairos.controller.time_bank;
 
 
 import com.kairos.constants.ApiConstants;
-import com.kairos.controller.task.TaskController;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Map;
@@ -23,13 +22,14 @@ import java.util.Map;
 @RequestMapping(ApiConstants.TIMEBANK_URL)
 public class TimeBankController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskController.class);
 
     @Autowired
     private TimeBankService timeBankService;
+    @Inject
+    private TimeBankCalculationService timeBankCalculationService;
 
-    @GetMapping(value = "/employment/{employmentId}/")
-    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@PathVariable Long employmentId, @RequestParam(value = "query") String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    @GetMapping(value = "/employment")
+    public ResponseEntity<Map<String, Object>> getTimeBankForAdvanceView(@PathVariable Long unitId,@RequestParam(required = false) Long employmentId, @RequestParam(value = "query",required = false) String query, @RequestParam(value = "startDate") @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getAdvanceViewTimeBank
                 (unitId,employmentId,query,startDate,endDate));
     }
@@ -41,7 +41,7 @@ public class TimeBankController {
     }
 
     @GetMapping(value = "visual_view/employment/{employmentId}")
-    public ResponseEntity<Map<String, Object>> getTimeBankForVisualView(@PathVariable Long unitId,@PathVariable Long employmentId,@RequestParam(value = "query",required = false) String query,@RequestParam(value = "value",required = false) Integer value,@RequestParam(value = "startDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+    public ResponseEntity<Map<String, Object>> getTimeBankForVisualView(@PathVariable Long unitId,@PathVariable Long employmentId,@RequestParam(value = "query") String query,@RequestParam(value = "value",required = false) Integer value,@RequestParam(value = "startDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, timeBankService.getTimeBankForVisualView
                 (unitId,employmentId,query,value,startDate,endDate));
     }
@@ -94,7 +94,12 @@ public class TimeBankController {
         return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankService.getCTARultemplateByEmploymentId(employmentId));
     }
 
-
+    //remove after test qa
+    @ApiOperation("update time bank of protected days off")
+    @GetMapping("/test_timebank")
+    public ResponseEntity<Map<String,Object>> testApiForProtecrtedDaysOFf(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().updateTimeBankAgainstProtectedDaysOffSetting());
+    }
 
 
 }

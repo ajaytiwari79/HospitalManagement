@@ -3,13 +3,15 @@ package com.kairos.persistence.model.access_permission;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_PAGE;
@@ -21,6 +23,9 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.SUB_P
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
 public class AccessPage extends UserBaseEntity {
 
     @NotNull(message = ERROR_NAME_NOTNULL)
@@ -34,7 +39,7 @@ public class AccessPage extends UserBaseEntity {
 
 
     @Relationship(type = SUB_PAGE)
-    private List<AccessPage> subPages;
+    private List<AccessPage> subPages=new ArrayList<>();
 
     private int sequence;
 
@@ -51,70 +56,5 @@ public class AccessPage extends UserBaseEntity {
         this.name = name;
         this.isModule = isModule;
         this.moduleId = moduleId;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-    public AccessPage(){}
-
-    public void setSubPages(List<AccessPage> subPages) {
-        this.subPages = subPages;
-    }
-
-    public List<AccessPage> getSubPages() {
-        return Optional.ofNullable(subPages).orElse(new ArrayList<>());
-    }
-
-    public void setModule(boolean module) {
-        isModule = module;
-    }
-
-    public boolean isModule() {
-        return isModule;
-    }
-
-    public String getModuleId() {
-        return moduleId;
-    }
-
-    public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public boolean isKpiEnabled() {
-        return kpiEnabled;
-    }
-
-    public void setKpiEnabled(boolean kpiEnabled) {
-        this.kpiEnabled = kpiEnabled;
-    }
-
-    public Boolean isEditable() {
-        return editable;
-    }
-
-    public void setEditable(Boolean editable) {
-        this.editable = editable;
-    }
-
-    public int getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
     }
 }

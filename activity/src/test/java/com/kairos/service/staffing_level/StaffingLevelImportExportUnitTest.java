@@ -36,8 +36,6 @@ public class StaffingLevelImportExportUnitTest {
     @Mock
     private ActivityMongoRepository activityTypeMongoRepository;
     @Mock
-    StaffingLevelActivityRankService staffingLevelActivityRankService;
-    @Mock
     PlannerSyncService plannerSyncService;
 
 

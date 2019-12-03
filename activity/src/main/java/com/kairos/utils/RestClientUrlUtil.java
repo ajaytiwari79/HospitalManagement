@@ -1,8 +1,8 @@
 package com.kairos.utils;
 
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.rest_client.RestClientUrlType;
 import com.kairos.rest_client.GenericRestClient;
-import com.kairos.utils.user_context.UserContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
@@ -17,6 +17,8 @@ import java.util.Optional;
 @Component
 public class RestClientUrlUtil {
 
+    public static final String ORGANIZATION = "organization/";
+    public static final String UNIT = "/unit/";
     private static  String userServiceUrl;
     private static  String plannerServiceUrl;
     private static String schedulerServiceUrl;
@@ -42,10 +44,10 @@ public class RestClientUrlUtil {
     public final static String getBaseUrl(boolean hasUnitInUrl, Long id) {
         boolean idExists=Optional.ofNullable(id).isPresent();
         if (hasUnitInUrl && idExists) {
-            String baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            String baseUrl = new StringBuilder(userServiceUrl + ORGANIZATION).append(UserContext.getOrgId()).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             return baseUrl;
         } else {
-            String baseUrl = new StringBuilder(userServiceUrl + "organization/").append(UserContext.getOrgId()).toString();
+            String baseUrl = new StringBuilder(userServiceUrl + ORGANIZATION).append(UserContext.getOrgId()).toString();
             return baseUrl;
         }
     }
@@ -68,7 +70,7 @@ public class RestClientUrlUtil {
         String baseUrl = null;
 
         switch (restClientUrlType){
-            case UNIT:baseUrl = new StringBuilder(userServiceUrl ).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            case UNIT:baseUrl = new StringBuilder(userServiceUrl ).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
             case COUNTRY:baseUrl = new StringBuilder(userServiceUrl ).append("/country/").append(id).toString();
                 break;
@@ -78,7 +80,7 @@ public class RestClientUrlUtil {
                 baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
                 break;
             case UNIT_WITHOUT_PARENT_ORG:
-                baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                baseUrl = new StringBuilder(userServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
 
         }
@@ -88,17 +90,17 @@ public class RestClientUrlUtil {
     public static String getUserServiceBaseUrl(RestClientUrlType restClientUrlType,Long id,Long parentId){
         String baseUrl = null;
         switch (restClientUrlType){
-            case UNIT:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            case UNIT:baseUrl = new StringBuilder(userServiceUrl + ORGANIZATION).append(parentId).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
-            case COUNTRY:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId).append("/country/").append(id).toString();
+            case COUNTRY:baseUrl = new StringBuilder(userServiceUrl + ORGANIZATION).append(parentId).append("/country/").append(id).toString();
                 break;
-            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl + "organization/").append(parentId).toString();
+            case ORGANIZATION:baseUrl = new StringBuilder(userServiceUrl + ORGANIZATION).append(parentId).toString();
                 break;
             case COUNTRY_WITHOUT_PARENT_ORG:
                 baseUrl = new StringBuilder(userServiceUrl).append("/country/").append(id).toString();
                 break;
             case UNIT_WITHOUT_PARENT_ORG:
-                baseUrl = new StringBuilder(userServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+                baseUrl = new StringBuilder(userServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
                 break;
 
         }
@@ -111,10 +113,10 @@ public class RestClientUrlUtil {
     @Deprecated
     public static final String getBaseUrl(boolean hasUnitInUrl){
         if(hasUnitInUrl){
-            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).append("/unit/").append(UserContext.getUnitId()).toString();
+            String baseUrl=new StringBuilder(userServiceUrl+ ORGANIZATION).append(UserContext.getOrgId()).append(UNIT).append(UserContext.getUnitId()).toString();
             return baseUrl;
         }else{
-            String baseUrl=new StringBuilder(userServiceUrl+"organization/").append(UserContext.getOrgId()).toString();
+            String baseUrl=new StringBuilder(userServiceUrl+ ORGANIZATION).append(UserContext.getOrgId()).toString();
             return baseUrl;
         }
 
@@ -122,7 +124,7 @@ public class RestClientUrlUtil {
     //TODO FIX
     @Deprecated
     public static final String getBaseUrl(Long organizationId, Long unitId, Long countryId){
-        StringBuilder baseUrl=new StringBuilder(userServiceUrl+"organization/"+organizationId);
+        StringBuilder baseUrl=new StringBuilder(userServiceUrl+ ORGANIZATION +organizationId);
         if(Optional.ofNullable(unitId).isPresent()){
             return baseUrl.append("/unitId/").append(unitId).toString();
         }else{
@@ -131,8 +133,8 @@ public class RestClientUrlUtil {
     }
     //TODO FIX
     public static final String getBaseUrl(Long id,boolean hasUnitInUrl, Long parentOrganizationId){
-        StringBuilder sb = new StringBuilder(userServiceUrl+"organization/").append(parentOrganizationId);
-            String baseUrl= hasUnitInUrl? sb.append("/unit/").append(id).toString() : sb.append("/country/").append(id).toString();
+        StringBuilder sb = new StringBuilder(userServiceUrl+ ORGANIZATION).append(parentOrganizationId);
+            String baseUrl= hasUnitInUrl? sb.append(UNIT).append(id).toString() : sb.append("/country/").append(id).toString();
             return baseUrl;
     }
 
@@ -157,7 +159,7 @@ public class RestClientUrlUtil {
     public final static String getSchedulerBaseUrl(boolean hasUnitInUrl, Long id) {
         if (hasUnitInUrl) {
 
-            String baseUrl = new StringBuilder(schedulerServiceUrl).append("/unit/").append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
+            String baseUrl = new StringBuilder(schedulerServiceUrl).append(UNIT).append((Optional.ofNullable(id).isPresent() ? id : UserContext.getUnitId())).toString();
             return baseUrl;
         } else {
             String baseUrl = schedulerServiceUrl;

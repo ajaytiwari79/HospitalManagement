@@ -1,10 +1,13 @@
 package com.kairos.dto.scheduler;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-
+@Getter
+@Setter
 public class IntegrationSettingsDTO {
 
 
@@ -17,61 +20,6 @@ public class IntegrationSettingsDTO {
     @NotEmpty(message = "unique key can not be null") @NotNull(message = "unique key can not be null")
     private String uniqueKey;
     private boolean isEnabled = true;
-
-    public BigInteger getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(BigInteger countryId) {
-        this.countryId = countryId;
-    }
-
     private BigInteger countryId;
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-    }
-
-    public String getUniqueKey() {
-        return uniqueKey;
-    }
-
-    public void setUniqueKey(String uniqueKey) {
-        this.uniqueKey = uniqueKey;
-    }
-
-    public BigInteger getId() {
-        return id;
-    }
-
-    public void setId(BigInteger id) {
-        this.id = id;
-    }
-
-
-
-
 
 }

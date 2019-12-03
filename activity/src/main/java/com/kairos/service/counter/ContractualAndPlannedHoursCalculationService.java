@@ -8,7 +8,7 @@ import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.BarLineChartKPIRepresentationData;
 import com.kairos.dto.activity.counter.data.CommonRepresentationData;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
-import com.kairos.dto.activity.counter.enums.DisplayUnit;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
@@ -16,7 +16,6 @@ import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
-import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
@@ -41,6 +40,7 @@ import static com.kairos.commons.utils.DateUtils.getDateTimeintervalString;
 import static com.kairos.commons.utils.DateUtils.getStartDateTimeintervalString;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.sortKpiDataByDateTimeInterval;
 import static com.kairos.utils.counter.KPIUtils.verifyKPIResponseData;
@@ -79,7 +79,7 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
         List<Shift> shifts = shiftMongoRepository.findShiftsByKpiFilters((List<Long>) kpiData[2], isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), new HashSet<>(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
         Map<Object, Double> staffPlannedHours = plannedHoursCalculationService.calculatePlannedHours(staffIds, applicableKPI, dateTimeIntervals, shifts);
-        Map<Object, Double> staffContractualAndPlannedHours = calculateDataByKpiRepresentation(dateTimeIntervals, applicableKPI,unitIds ,staffKpiFilterDTOS);
+        Map<Object, Double> staffContractualAndPlannedHours = calculateDataByKpiRepresentation(dateTimeIntervals, applicableKPI ,staffKpiFilterDTOS);
         kpiDataUnits = getKpiDataUnits(staffPlannedHours,staffContractualAndPlannedHours,applicableKPI,staffKpiFilterDTOS);
         sortKpiDataByDateTimeInterval(kpiDataUnits);
         return kpiDataUnits;
@@ -143,29 +143,29 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getContractualAndPlannedHoursKpiDate(organizationId, filterBasedCriteria,null);
-        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.CONTRACTUAL_HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
+        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(AppConstants.CONTRACTUAL_HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
     }
 
     @Override
     public CommonRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi,ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getContractualAndPlannedHoursKpiDate(organizationId, filterBasedCriteria ,applicableKPI);
-        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), DisplayUnit.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(KPIRepresentation.REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.CONTRACTUAL_HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
+        return new BarLineChartKPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.HOURS, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF :AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.CONTRACTUAL_HOURS, AppConstants.BAR_YAXIS), new KPIAxisData(AppConstants.PLANNED_HOURS, AppConstants.LINE_FIELD));
     }
 
     @Override
-    public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,ApplicableKPI applicableKPI) {
+    public TreeSet<FibonacciKPICalculation>  getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder,List<StaffKpiFilterDTO> staffKpiFilterDTOS,KPI kpi,ApplicableKPI applicableKPI) {
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = (List<Long>)filterCriteria[0];
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
         Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
-        Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(dateTimeIntervals, applicableKPI, newArrayList(organizationId),staffKpiFilterDTOS);
+        Map<Object, Double> restingHoursMap = calculateDataByKpiRepresentation(dateTimeIntervals, applicableKPI,staffKpiFilterDTOS);
         Map<Long, Integer> staffAndRestingHoursMap = restingHoursMap.entrySet().stream().collect(Collectors.toMap(k->(Long)k.getKey(),v->v.getValue().intValue()));
         return getFibonacciCalculation(staffAndRestingHoursMap,sortingOrder);
     }
 
 
-    private Map<Object, Double> calculateDataByKpiRepresentation(List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<Long> unitIds,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
+    private Map<Object, Double> calculateDataByKpiRepresentation(List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
         Map<Object, Double> staffContratualHours ;
         switch (applicableKPI.getKpiRepresentation()) {
             case REPRESENT_PER_STAFF:
@@ -184,15 +184,11 @@ public class ContractualAndPlannedHoursCalculationService implements CounterServ
 
     private List<CommonKpiDataUnit> getKpiDataUnits(Map<Object, Double> staffPlannedHours,Map<Object, Double> staffContractualAndPlannedHours, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<CommonKpiDataUnit> kpiDataUnits;
-            switch (applicableKPI.getKpiRepresentation()) {
-                case REPRESENT_PER_STAFF:
+               if(REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation())){
                     Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
-                    kpiDataUnits = staffContractualAndPlannedHours.entrySet().stream().map(entry -> new BarLineChartKPiDateUnit(staffIdAndNameMap.get(entry.getKey()), (Long)entry.getKey(), entry.getValue(), staffPlannedHours.get(entry.getKey()))).collect(Collectors.toList());
-                    break;
-                default:
-                    kpiDataUnits = staffContractualAndPlannedHours.entrySet().stream().map(entry -> new BarLineChartKPiDateUnit(entry.getKey().toString(),  entry.getValue(), staffPlannedHours.get(entry.getKey()))).collect(Collectors.toList());
-                    break;
-
+                    kpiDataUnits = staffContractualAndPlannedHours.entrySet().stream().map(entry -> new BarLineChartKPiDateUnit(staffIdAndNameMap.get(entry.getKey()), (Long) entry.getKey(), entry.getValue(), staffPlannedHours.get(entry.getKey()))).collect(Collectors.toList());
+            }else{
+            kpiDataUnits = staffContractualAndPlannedHours.entrySet().stream().map(entry -> new BarLineChartKPiDateUnit(entry.getKey().toString(), entry.getValue(), staffPlannedHours.get(entry.getKey()))).collect(Collectors.toList());
         }
         return kpiDataUnits;
     }

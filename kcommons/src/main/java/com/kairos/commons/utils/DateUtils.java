@@ -1,6 +1,7 @@
 package com.kairos.commons.utils;
 
 import com.kairos.enums.DurationType;
+import com.kairos.enums.wta.IntervalUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -29,7 +30,9 @@ public  class DateUtils {
     public static final String MONGODB_QUERY_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String ONLY_DATE = "yyyy-MM-dd";
     public static final String COMMON_DATE_FORMAT = "dd-MM-yyyy";
+    public static final String KPI_DATE_FORMAT = "dd-MMM-yy";
     public static final String COMMON_TIME_FORMAT="HH:mm";
+    public static final String THE_DATE_MUST_NOT_BE_NULL = "The date must not be null";
 
     public static Date getEndOfDay(Date date) {
         LocalDateTime localDateTime = dateToLocalDateTime(date);
@@ -56,8 +59,7 @@ public  class DateUtils {
 
     public static LocalDate getLocalDateFromDate(Date date) {
 
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        return localDate;
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     public static Date convertLocalDateToDate(LocalDate dateToConvert) {
@@ -102,24 +104,22 @@ public  class DateUtils {
 
     public static LocalDateTime getMondayFromWeek(int week, int year) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime ldt = LocalDateTime.now()
+        return LocalDateTime.now()
                 .withYear(year)
                 .with(weekFields.weekOfYear(), week)
                 .with(weekFields.dayOfWeek(), 2);
-        return ldt;
     }
 
     public static LocalDateTime getSundayFromWeek(int week, int year) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        LocalDateTime ldt = LocalDateTime.now()
+        return LocalDateTime.now()
                 .withYear(year)
                 .with(weekFields.weekOfYear(), week + 1)
                 .with(weekFields.dayOfWeek(), 1);
-        return ldt;
     }
 
     public static Date getDeductionInTimeDuration(Date startDate, Date endDate, int dayShiftPercentage, int nightShiftPercentage) {
-        int percentage = 4;
+        int percentage;
         DateTime startTime = new DateTime(startDate).toDateTime(DateTimeZone.UTC);
         int startHour = startTime.getHourOfDay();
         DateTime endTime = new DateTime(endDate).toDateTime(DateTimeZone.UTC);
@@ -221,10 +221,9 @@ public  class DateUtils {
 
 
     public static Date getDateFromLocalDate(LocalDate localDate) {
-        Date date = localDate != null
+        return localDate != null
                 ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
                 : Date.from(LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC));
-        return date;
     }
 
     public static Date asDate(LocalDateTime localDateTime) {
@@ -251,6 +250,12 @@ public  class DateUtils {
         return LocalDate.parse(receivedDate, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
+
+
+    public static int getWeekNoByLocalDate(LocalDate localDate){
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        return localDate.get(weekFields.weekOfWeekBasedYear());
+    }
     public static LocalDate asLocalDate(DateTime dateTime){
         return asLocalDate(dateTime.toDate());
     }
@@ -263,8 +268,7 @@ public  class DateUtils {
     public static Date asDate(LocalTime localTime) {
         Instant instant = localTime.atDate(LocalDate.now()).
                 atZone(ZoneId.systemDefault()).toInstant();
-        Date time = Date.from(instant);
-        return time;
+        return Date.from(instant);
     }
 
     public static LocalDateTime asLocalDateTime(Date date) {
@@ -285,7 +289,7 @@ public  class DateUtils {
 
     private static Date add(final Date date, final int calendarField, final int amount) {
         if (date == null) {
-            throw new IllegalArgumentException("The date must not be null");
+            throw new IllegalArgumentException(THE_DATE_MUST_NOT_BE_NULL);
         }
         final Calendar c = Calendar.getInstance();
         c.setTime(date);
@@ -295,7 +299,7 @@ public  class DateUtils {
 
     public static boolean isSameDay(final Date date1, final Date date2) {
         if (date1 == null || date2 == null) {
-            throw new IllegalArgumentException("The date must not be null");
+            throw new IllegalArgumentException(THE_DATE_MUST_NOT_BE_NULL);
         }
         final Calendar cal1 = Calendar.getInstance();
         cal1.setTime(date1);
@@ -306,7 +310,7 @@ public  class DateUtils {
 
     public static boolean isSameDay(final Calendar cal1, final Calendar cal2) {
         if (cal1 == null || cal2 == null) {
-            throw new IllegalArgumentException("The date must not be null");
+            throw new IllegalArgumentException(THE_DATE_MUST_NOT_BE_NULL);
         }
         return (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
                 cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
@@ -493,10 +497,8 @@ public  class DateUtils {
 
     public static Date getISOEndOfWeekDate(LocalDate date) {
 
-        Date endOfWeek = Date.from(ZonedDateTime.ofInstant(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+        return Date.from(ZonedDateTime.ofInstant(date.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
                 ZoneId.systemDefault()).with(DayOfWeek.SUNDAY).toInstant());
-
-        return endOfWeek;
     }
 
     public static Long getISOStartOfWeek(LocalDate date) {
@@ -676,6 +678,14 @@ public  class DateUtils {
         return new Double(hour+"."+Math.abs(minutes));
     }
 
+    public static int getHourByMinutes(double totalMinutes){
+        return (int) totalMinutes/(60);
+    }
+
+    public static int getHourMinutesByMinutes(double totalMinutes){
+        return (int)totalMinutes % 60;
+    }
+
     public static boolean startDateIsEqualsOrBeforeEndDate(LocalDate startdate,LocalDate endDate){
         return startdate.isBefore(endDate) || startdate.equals(endDate);
     }
@@ -731,6 +741,7 @@ public  class DateUtils {
         return date;
     }
 
+
     public static Long getCurrentDateMillis() {
         DateTime date = new DateTime().withTime(0, 0, 0, 0);
         return date.getMillis();
@@ -774,19 +785,16 @@ public  class DateUtils {
         return dateTime.toDate();
     }
 
-    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
+    public static LocalDate getNextLocaDateByDurationType(LocalDate date, DurationType durationType) {
         switch (durationType) {
-            case DAYS:
-                date = date.plusDays(value);
-                break;
             case MONTHS:
-                date = date.plusMonths(value);
+                date = date.with(TemporalAdjusters.lastDayOfMonth());
                 break;
             case WEEKS:
-                date = date.plusWeeks(value);
+                date = date.with(TemporalAdjusters.next(DayOfWeek.SUNDAY));
                 break;
             case YEAR:
-                date = date.plusYears(value);
+                date = date.with(TemporalAdjusters.lastDayOfYear());
                 break;
             default:
                 break;
@@ -796,17 +804,14 @@ public  class DateUtils {
 
     public static LocalDate getPriviousLocaDateByDurationType(LocalDate date, DurationType durationType,int value) {
         switch (durationType) {
-            case DAYS:
-                date = date.minusDays(value);
-                break;
             case MONTHS:
-                date = date.minusMonths(value);
+                date = date.with(TemporalAdjusters.firstDayOfMonth());
                 break;
             case WEEKS:
-                date = date.minusWeeks(value);
+                date = date.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
                 break;
             case YEAR:
-                date = date.minusYears(value);
+                date = date.with(TemporalAdjusters.firstDayOfYear());
                 break;
             default:
                 break;
@@ -823,7 +828,7 @@ public  class DateUtils {
                 date = date.with(TemporalAdjusters.lastDayOfMonth());
                 break;
             case WEEKS:
-                date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+                date = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
                 break;
             case YEAR:
                 date = date.with(TemporalAdjusters.lastDayOfYear());
@@ -853,11 +858,55 @@ public  class DateUtils {
         return date;
     }
 
+    public static LocalDate getLastDateByFrequencyType(DurationType durationType,LocalDate localDate){
+        switch (durationType) {
+            case DAYS:
+                localDate = localDate.minusDays(1);
+                break;
+            case MONTHS:
+                localDate = localDate.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+                break;
+            case WEEKS:
+                localDate = localDate.with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+                break;
+            case YEAR:
+                localDate = localDate.minusYears(1).with(TemporalAdjusters.lastDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return localDate;
+    }
+
+    public static LocalDate getNextDateByFrequencyType(DurationType durationType,LocalDate localDate){
+        switch (durationType) {
+            case DAYS:
+                localDate = localDate.plusDays(1);
+                break;
+            case MONTHS:
+                localDate = localDate.plusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
+                break;
+            case WEEKS:
+                localDate = localDate.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+                break;
+            case YEAR:
+                localDate = localDate.plusYears(1).with(TemporalAdjusters.firstDayOfYear());
+                break;
+            default:
+                break;
+        }
+        return localDate;
+    }
+
     public static String getDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate().minusDays(1),"dd-MM-yyyy");
+        return  getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+" - "+ getLocalDateStringByPattern(dateTimeInterval.getEndLocalDate(),KPI_DATE_FORMAT);
     }
     public static String getStartDateTimeintervalString(DateTimeInterval dateTimeInterval){
-        return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,COMMON_DATE_FORMAT)+"";
+        return getLocalDateStringByPattern(dateTimeInterval.getStartLocalDate() ,KPI_DATE_FORMAT)+"";
+    }
+
+    public static String getLocalTimeByFormat(LocalDateTime localDateTime){
+        return localDateTime.format(DateTimeFormatter.ofPattern(ISO_FORMAT));
     }
 
     public static long getMinutesBetweenDate(Date toDate,Date fromDate){
@@ -869,10 +918,8 @@ public  class DateUtils {
 
     public static String getEmailDateTimeWithFormat(LocalDateTime dateTime){
         LocalTime time=getLocalTimeFromLocalDateTime(dateTime);
-        String localtime=time.format(DateTimeFormatter.ofPattern("HH:mm"));
-        String date = dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
-        return date;
-
+        String localtime=time.format(DateTimeFormatter.ofPattern(COMMON_TIME_FORMAT));
+        return dateTime.getDayOfWeek().toString() +", "+ dateTime.getDayOfMonth()+" "+dateTime.getMonth()+" "+dateTime.getYear()+" "+localtime;
     }
 
     public static ZonedDateTime roundDateByMinutes(ZonedDateTime zonedDateTime,int minutes){
@@ -894,4 +941,9 @@ public  class DateUtils {
         }
         return dayOfWeeks;
     }
+
+    public static LocalDateTime getLocaDateTimebyString(String localdate){
+        return LocalDateTime.parse(localdate,DateTimeFormatter.ofPattern(ISO_FORMAT));}
+
+
 }

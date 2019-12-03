@@ -11,7 +11,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.agreement.cta.cta_response.CTARuleTemplateDefaultDataWrapper;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.Currency;
@@ -57,7 +56,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ApiConstants.API_ALL_PHASES_URL;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;

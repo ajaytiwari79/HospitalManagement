@@ -34,6 +34,7 @@ public class Todo extends MongoBaseEntity {
     private String activityName;
     private Date approvedOn;
     private String remark;
+    private String comment;
 
     public Todo(TodoType type, TodoSubtype subtype, BigInteger entityId, BigInteger subEntityId, String activityName, TodoStatus status, LocalDate shiftDate, String description, Long staffId, Long employmentId, Long unitId,String remark) {
         this.type = type;

@@ -1,6 +1,6 @@
 package com.kairos.config.javers;
 
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.javers.spring.auditable.AuthorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

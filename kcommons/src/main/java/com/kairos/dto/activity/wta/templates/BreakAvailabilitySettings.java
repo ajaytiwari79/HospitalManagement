@@ -5,21 +5,19 @@ package com.kairos.dto.activity.wta.templates;/*
 
 import com.kairos.enums.wta.PartOfDay;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class BreakAvailabilitySettings {
     private PartOfDay timeSlot;
     private short startAfterMinutes;
     private short endBeforeMinutes;
     private short shiftPercentage;
-
-    public BreakAvailabilitySettings() {
-        //Default Constructor
-    }
 
     public BreakAvailabilitySettings(PartOfDay timeSlot, short startAfterMinutes, short endBeforeMinutes) {
         this.timeSlot = timeSlot;

@@ -1,38 +1,22 @@
 package com.kairos.persistence.model.staff;
 
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by prabjot on 5/10/17.
  */
 @QueryResult
+@Getter
+@Setter
 public class StaffQueryResult {
     private Staff staff;
     private Long contactAddressId;
     private Long contactDetailId;
-
-    public Staff getStaff() {
-        return staff;
-    }
-
-    public void setStaff(Staff staff) {
-        this.staff = staff;
-    }
-
-    public Long getContactAddressId() {
-        return contactAddressId;
-    }
-
-    public void setContactAddressId(Long contactAddressId) {
-        this.contactAddressId = contactAddressId;
-    }
-
-    public Long getContactDetailId() {
-        return contactDetailId;
-    }
-
-    public void setContactDetailId(Long contactDetailId) {
-        this.contactDetailId = contactDetailId;
-    }
+    private List<Map<String,Object>> skillInfo;
 }

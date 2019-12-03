@@ -42,4 +42,12 @@ public class ProtectedDaysOffController {
     public ResponseEntity<Map<String,Object>> createAutoProtectedDaysOffOfAllUnits(@PathVariable Long countryId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, protectedDaysOffService.createAutoProtectedDaysOffOfAllUnits(countryId));
     }
+
+    @ApiOperation(value = "Register job for protected days off")
+    @PostMapping(value = "/register_job_for_protected_days_off")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> registerJobForNightWorker() {
+        protectedDaysOffService.registerJobForProtectedDaysOff();
+        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
+    }
 }

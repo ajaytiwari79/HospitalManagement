@@ -19,8 +19,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class UserRestClient {
@@ -82,20 +80,4 @@ public class UserRestClient {
         return null;
     }
 
-
-
-
-    private static <T> String getURI(T t, String uri, Map<String, Object> queryParams){
-        URIBuilder builder = new URIBuilder();
-
-        if(Optional.ofNullable(queryParams).isPresent()){
-            queryParams.forEach((key, value) -> builder.addParameter(key, value.toString()));
-        }
-        try {
-            uri= uri+builder.build().toString();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return uri;
-    }
 }

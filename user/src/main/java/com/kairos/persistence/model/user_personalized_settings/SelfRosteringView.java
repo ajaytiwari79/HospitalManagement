@@ -3,6 +3,10 @@ package com.kairos.persistence.model.user_personalized_settings;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.AbsenceViewSettings;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
@@ -10,24 +14,12 @@ import org.neo4j.ogm.annotation.NodeEntity;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NodeEntity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SelfRosteringView extends UserBaseEntity {
 
     private AbsenceViewSettings absenceViewSettings;
-
-    public AbsenceViewSettings getAbsenceViewSettings() {
-        return absenceViewSettings;
-    }
-
-    public void setAbsenceViewSettings(AbsenceViewSettings absenceViewSettings) {
-        this.absenceViewSettings = absenceViewSettings;
-    }
-    public SelfRosteringView() {
-
-    }
-
-    public SelfRosteringView(AbsenceViewSettings absenceViewSettings) {
-
-        this.absenceViewSettings = absenceViewSettings;
-    }
 
 }

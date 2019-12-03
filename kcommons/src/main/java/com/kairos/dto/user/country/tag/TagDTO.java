@@ -3,6 +3,11 @@ package com.kairos.dto.user.country.tag;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.MasterDataTypeEnum;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
 
 /**
  * Created by prerna on 10/11/17.
@@ -10,6 +15,9 @@ import com.kairos.enums.MasterDataTypeEnum;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
+@NoArgsConstructor
 public class TagDTO {
 
     private Long id;
@@ -23,53 +31,11 @@ public class TagDTO {
 
     private long organizationId;
 
-    public long getCountryId() {
-        return countryId;
-    }
+    private Long orgTypeId;
 
-    public void setCountryId(long countryId) {
-        this.countryId = countryId;
-    }
+    private List<Long> orgSubTypeIds;
 
-    public long getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(long organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    public boolean isCountryTag() {
-        return countryTag;
-    }
-
-    public void setCountryTag(boolean countryTag) {
-        this.countryTag = countryTag;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public MasterDataTypeEnum getMasterDataType() {
-        return masterDataType;
-    }
-
-    public void setMasterDataType(MasterDataTypeEnum masterDataType) {
-        this.masterDataType = masterDataType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    private PenaltyScoreDTO penaltyScore;
 
     public TagDTO(String name, MasterDataTypeEnum masterDataType){
         this.name = name;
@@ -81,6 +47,4 @@ public class TagDTO {
         this.name = name;
         this.masterDataType = masterDataType;
     }
-
-    public TagDTO(){}
 }

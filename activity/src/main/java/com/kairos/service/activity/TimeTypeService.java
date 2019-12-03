@@ -10,6 +10,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.enums.OrganizationHierarchy;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.TimeTypes;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
@@ -17,6 +18,7 @@ import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
 import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
@@ -24,20 +26,25 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.wrapper.activity.ActivityTabsWrapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.TimeTypeEnum.*;
 import static com.kairos.service.activity.ActivityUtil.getCutoffInterval;
 
 @Service
 public class TimeTypeService extends MongoBaseService {
+    public static final String PRESENCE = "Presence";
+    public static final String ABSENCE = "Absence";
     @Inject
     private TimeTypeMongoRepository timeTypeMongoRepository;
     @Inject
@@ -50,6 +57,7 @@ public class TimeTypeService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject private ShiftMongoRepository shiftMongoRepository;
     @Inject private ActivityService activityService;
+    @Inject private ExecutorService executorService;
 
     public List<TimeTypeDTO> createTimeType(List<TimeTypeDTO> timeTypeDTOs, Long countryId) {
         List<String> timeTypeLabels = timeTypeDTOs.stream().map(timeTypeDTO -> timeTypeDTO.getLabel()).collect(Collectors.toList());
@@ -67,9 +75,7 @@ public class TimeTypeService extends MongoBaseService {
             if (timeTypeDTO.getTimeTypes() != null && timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                 timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(), timeTypeDTO.getBackgroundColor(), upperTimeType.getSecondLevelType(), countryId, timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy());
                 timeType.setCountryId(countryId);
-                //if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                 timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
-                //}
                 timeType = save(timeType);
                 if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
                     upperTimeType.getChildTimeTypeIds().add(timeType.getId());
@@ -103,14 +109,13 @@ public class TimeTypeService extends MongoBaseService {
             //User Cannot Update NAME for TimeTypes of Second Level
             exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_RENAME_NOTALLOWED, timeType.getLabel());
         }
+        activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), timeType.getBackgroundColor(),timeType.getId());
         timeType.setLabel(timeTypeDTO.getLabel());
         timeType.setDescription(timeTypeDTO.getDescription());
-        if(!timeType.getBackgroundColor().equals(timeTypeDTO.getBackgroundColor())){
-            updateColorInShift(timeTypeDTO, timeType);
-            updateColorInActivity(timeTypeDTO, timeType);
-        }
         timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+        timeType.setActivityPriorityId(timeTypeDTO.getActivityPriorityId());
         timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+        timeType.setPriorityFor(timeTypeDTO.getPriorityFor());
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
         timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
@@ -136,37 +141,15 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTO;
     }
 
-    private void updateColorInActivity(TimeTypeDTO timeTypeDTO, TimeType timeType) {
-        List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeType.getId());
-        if (isCollectionNotEmpty(activities)) {
-            activities.forEach(activity -> activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor()));
-            activityMongoRepository.saveEntities(activities);
-        }
-    }
 
-    private void updateColorInShift(TimeTypeDTO timeTypeDTO, TimeType timeType) {
-        Set<BigInteger> activitiyIds = activityMongoRepository.findAllByTimeTypeId(timeType.getId()).stream().map(activity -> activity.getId()).collect(Collectors.toSet());
-        List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activitiyIds,null,null,null);
-        shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
-            if(activitiyIds.contains(shiftActivity.getActivityId())){
-                shiftActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-            }
-            shiftActivity.getChildActivities().forEach(childActivity -> {
-                if(activitiyIds.contains(childActivity.getActivityId())){
-                    childActivity.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-                }
-            });
-        }));
-        if(isCollectionNotEmpty(shifts)){
-            shiftMongoRepository.saveEntities(shifts);
-        }
-    }
 
     private void setPropertiesInChildren(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> timeTypes, Map<BigInteger, List<TimeType>> leafTimeTypesMap, List<TimeType> childTimeTypeList) {
         boolean partOfTeamUpdated = false;
         boolean allowedChildActivityUpdated = false;
         boolean allowedConflictsUpdate = false;
+        boolean priorityForUpdate = false;
         for (TimeType childTimeType : childTimeTypeList) {
+            activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), childTimeType.getBackgroundColor(),childTimeType.getId());
             if (childTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && childTimeType.getChildTimeTypeIds().isEmpty()) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
                 partOfTeamUpdated = true;
@@ -179,18 +162,22 @@ public class TimeTypeService extends MongoBaseService {
                 childTimeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
                 allowedConflictsUpdate = true;
             }
-
+            if (isNotNull(childTimeType.getPriorityFor()) && isNotNull(timeTypeDTO.getPriorityFor()) && !childTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && childTimeType.getChildTimeTypeIds().isEmpty()) {
+                childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
+                priorityForUpdate = true;
+            }
             childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
             if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
-                setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, childTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, childTimeType);
+                setPropertiesInLeafTimeTypes(timeTypeDTO, timeType, leafTimeTypeList, partOfTeamUpdated, allowedChildActivityUpdated, allowedConflictsUpdate, priorityForUpdate, childTimeType);
                 timeTypes.addAll(leafTimeTypeList);
             }
         }
     }
 
-    private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, TimeType childTimeType) {
+    private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, boolean priorityForUpdate, TimeType childTimeType) {
         for (TimeType leafTimeType : childTimeTypeList) {
+            activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), leafTimeType.getBackgroundColor(),leafTimeType.getId());
             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             if (leafTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
@@ -200,6 +187,9 @@ public class TimeTypeService extends MongoBaseService {
             }
             if (leafTimeType.isAllowedConflicts() != timeTypeDTO.isAllowedConflicts() && !allowedConflictsUpdate && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
+            }
+            if (leafTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && !priorityForUpdate && timeType.getUpperLevelTimeTypeId() != null) {
+                childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
             }
         }
     }
@@ -218,7 +208,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeTypeDTO> parentOfWorkingTimeType = new ArrayList<>();
         List<TimeTypeDTO> parentOfNonWorkingTimeType = new ArrayList<>();
         for (TimeType timeType : topLevelTimeTypes) {
-            TimeTypeDTO timeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts(),timeType.isBreakNotHeldValid());
+            TimeTypeDTO timeTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class);
             timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
             if ( timeType.getId().equals(timeTypeId)) {
                 timeTypeDTO.setSelected(true);
@@ -243,14 +233,14 @@ public class TimeTypeService extends MongoBaseService {
         Map<BigInteger, List<TimeType>> timeTypeMap = timeTypes.stream().filter(t -> t.getUpperLevelTimeTypeId() != null).collect(Collectors.groupingBy(TimeType::getUpperLevelTimeTypeId, Collectors.toList()));
         Map<String, List<TimeType>> presenceAbsenceTimeTypeMap = new HashMap<>();
         timeTypes.forEach(t -> {
-            if (t.getLabel().equals("Presence")) {
+            if (t.getLabel().equals(PRESENCE)) {
                 List<TimeType> presenceTimeTypes = getChildOfTimeType(t, timeTypeMap);
                 presenceTimeTypes.add(t);
-                presenceAbsenceTimeTypeMap.put("Presence", presenceTimeTypes);
-            } else if (t.getLabel().equals("Absence")) {
+                presenceAbsenceTimeTypeMap.put(PRESENCE, presenceTimeTypes);
+            } else if (t.getLabel().equals(ABSENCE)) {
                 List<TimeType> absenceTimeTypes = getChildOfTimeType(t, timeTypeMap);
                 absenceTimeTypes.add(t);
-                presenceAbsenceTimeTypeMap.put("Absence", absenceTimeTypes);
+                presenceAbsenceTimeTypeMap.put(ABSENCE, absenceTimeTypes);
             }
         });
         return presenceAbsenceTimeTypeMap;
@@ -287,7 +277,7 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeTypeDTO> lowerLevelTimeTypeDTOS = new ArrayList<>();
         timeTypes.forEach(timeType -> {
             if (timeType.getUpperLevelTimeTypeId().equals(upperlevelTimeTypeId)) {
-                TimeTypeDTO levelTwoTimeTypeDTO = new TimeTypeDTO(timeType.getId(), timeType.getTimeTypes().toValue(), timeType.getLabel(), timeType.getDescription(), timeType.getBackgroundColor(), timeType.getActivityCanBeCopiedForOrganizationHierarchy(), timeType.isPartOfTeam(), timeType.isAllowChildActivities(),timeType.isAllowedConflicts(),timeType.isBreakNotHeldValid());
+                TimeTypeDTO levelTwoTimeTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class);
                 if (timeTypeId != null && timeType.getId().equals(timeTypeId)) {
                     levelTwoTimeTypeDTO.setSelected(true);
                 }
@@ -326,8 +316,8 @@ public class TimeTypeService extends MongoBaseService {
     public Boolean createDefaultTimeTypes(Long countryId) {
         List<TimeType> allTimeTypes = new ArrayList<>();
         List<TimeType> workingTimeTypes = new ArrayList<>();
-        TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Presence", "", AppConstants.WORKING_TYPE_COLOR, PRESENCE, countryId, Collections.EMPTY_SET);
-        TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Absence", "", AppConstants.WORKING_TYPE_COLOR, ABSENCE, countryId, Collections.EMPTY_SET);
+        TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, PRESENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.PRESENCE, countryId, Collections.EMPTY_SET);
+        TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, ABSENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.ABSENCE, countryId, Collections.EMPTY_SET);
         TimeType breakTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR, PAID_BREAK, countryId, Collections.EMPTY_SET);
         workingTimeTypes.add(presenceTimeType);
         workingTimeTypes.add(absenceTimeType);
@@ -376,18 +366,18 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeMongoRepository.existsByIdAndCountryIdAndDeletedFalse(id, countryId);
     }
 
-    public List<BigInteger> getAllTimeTypeWithItsLowerLevel(Long countryId, List<BigInteger> timeTypeIds){
+    public Map<BigInteger,TimeTypeDTO> getAllTimeTypeWithItsLowerLevel(Long countryId, Collection<BigInteger> timeTypeIds){
         List<TimeTypeDTO> timeTypeDTOS =  getAllTimeType(null,countryId);
-        List<BigInteger> resultTimeTypeDTOS = new ArrayList<>();
+        Map<BigInteger,TimeTypeDTO> resultTimeTypeDTOS = new HashMap<>();
         updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTOS.get(0).getChildren(), timeTypeIds,false);
         updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTOS.get(1).getChildren(), timeTypeIds,false);
         return resultTimeTypeDTOS;
     }
 
-    private void updateTimeTypeList(List<BigInteger> resultTimeTypeDTOS, List<TimeTypeDTO> timeTypeDTOS, List<BigInteger> timeTypeIds, boolean addAllLowerLevelChildren){
+    private void updateTimeTypeList(Map<BigInteger,TimeTypeDTO> resultTimeTypeDTOS, List<TimeTypeDTO> timeTypeDTOS, Collection<BigInteger> timeTypeIds, boolean addAllLowerLevelChildren){
         for(TimeTypeDTO timeTypeDTO : timeTypeDTOS) {
-            if(timeTypeIds.indexOf(timeTypeDTO.getId())>=0){
-                resultTimeTypeDTOS.add(timeTypeDTO.getId());
+            if(timeTypeIds.contains(timeTypeDTO.getId())){
+                resultTimeTypeDTOS.put(timeTypeDTO.getId(),timeTypeDTO);
                 if(isCollectionNotEmpty(timeTypeDTO.getChildren())){
                     updateTimeTypeList(resultTimeTypeDTOS,timeTypeDTO.getChildren(), timeTypeIds,true);
                 }
@@ -395,7 +385,7 @@ public class TimeTypeService extends MongoBaseService {
                 if(isCollectionNotEmpty(timeTypeDTO.getChildren())) {
                     updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, true);
                 }else{
-                    resultTimeTypeDTOS.add(timeTypeDTO.getId());
+                    resultTimeTypeDTOS.put(timeTypeDTO.getId(),timeTypeDTO);
                 }
             }else{
                 updateTimeTypeList(resultTimeTypeDTOS, timeTypeDTO.getChildren(), timeTypeIds, false);
@@ -430,7 +420,7 @@ public class TimeTypeService extends MongoBaseService {
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,BigInteger timeTypeId) {
-        activityService.validateActivityTimeRules(rulesActivityDTO.getEarliestStartTime(), rulesActivityDTO.getLatestStartTime(), rulesActivityDTO.getMaximumEndTime(), rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
+        activityService.validateActivityTimeRules(rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         TimeType timeType = timeTypeMongoRepository.findOne(timeTypeId);
         if (!Optional.ofNullable(timeType).isPresent()) {
@@ -533,6 +523,10 @@ public class TimeTypeService extends MongoBaseService {
         organizationMappingDTO.setEmploymentTypes(timeType.getEmploymentTypes());
         return organizationMappingDTO;
 
+    }
+
+    public List<BigInteger> getTimeTypeIdsByTimeTypeEnum(String timeTypeEnum){
+        return timeTypeMongoRepository.findAllByDeletedFalseAndTimeType(timeTypeEnum);
     }
 
 }

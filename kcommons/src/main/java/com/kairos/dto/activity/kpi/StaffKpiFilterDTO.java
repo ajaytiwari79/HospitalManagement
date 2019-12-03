@@ -1,6 +1,7 @@
 package com.kairos.dto.activity.kpi;
 
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class StaffKpiFilterDTO {
     private Long unitId;
     private String unitName;
     private List<EmploymentWithCtaDetailsDTO> employment;
+    private List<DayTypeDTO> dayTypeDTOS;
 
 
     public List<EmploymentWithCtaDetailsDTO> getEmployment() {
@@ -72,5 +74,13 @@ public class StaffKpiFilterDTO {
 
     public void setUnitIds(List<Long> unitIds) {
         this.unitIds = unitIds;
+    }
+
+    public List<DayTypeDTO> getDayTypeDTOS() {
+        return dayTypeDTOS;
+    }
+
+    public void setDayTypeDTOS(List<DayTypeDTO> dayTypeDTOS) {
+        this.dayTypeDTOS = dayTypeDTOS;
     }
 }

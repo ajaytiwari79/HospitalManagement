@@ -10,6 +10,8 @@ import com.kairos.service.kpermissions.PermissionService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
@@ -23,6 +25,7 @@ public class StaffAspects {
 
     @Inject
     private PermissionService permissionService;
+    private static final Logger LOGGER= LoggerFactory.getLogger(StaffAspects.class);
 
 
     @Around("execution(public com.kairos.persistence.model.staff.personal_details.Staff com.kairos.service.staff.*.*(..))")
@@ -32,7 +35,7 @@ public class StaffAspects {
             List<KPermissionModelFieldDTO> kPermissionModelFieldDTOS = permissionService.fetchPermissionFields(staff.getClass(), Arrays.asList(FieldLevelPermission.WRITE, FieldLevelPermission.READ));
             return ObjectMapperUtils.copyObjectSpecificPropertiesByMapper(staff, staff.getClass().newInstance(), kPermissionModelFieldDTOS, UserBaseEntity.class);
         }catch (Throwable ex){
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage());
         }
         return null;
     }
@@ -50,7 +53,7 @@ public class StaffAspects {
             }
             return newStaffList;
         }catch (Throwable ex){
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage());
         }
         return null;
     }
@@ -69,7 +72,7 @@ public class StaffAspects {
             }
             return staffPersonalDetailDTOList;
         }catch (Throwable ex){
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage());
         }
         return null;
     }

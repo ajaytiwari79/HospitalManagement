@@ -110,12 +110,9 @@ public class BeanFactoryUtil {
      * @return DefaultListableBeanFactory
      */
     public static DefaultListableBeanFactory getDefaultListableBeanFactory() {
-        final DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) ((ConfigurableApplicationContext)
+        return (DefaultListableBeanFactory) ((ConfigurableApplicationContext)
                 ApplicationContextProviderNonManageBean.getApplicationContext()
-
         ).getBeanFactory();
-
-        return beanFactory;
     }
 
     public static AbstractBeanDefinition getBeanDefinition(final Class<?> beanClass) {

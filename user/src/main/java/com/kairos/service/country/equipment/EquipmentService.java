@@ -7,7 +7,6 @@ import com.kairos.persistence.model.country.equipment.Equipment;
 import com.kairos.persistence.model.country.equipment.EquipmentCategory;
 import com.kairos.persistence.model.country.equipment.EquipmentQueryResult;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.resources.Resource;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;

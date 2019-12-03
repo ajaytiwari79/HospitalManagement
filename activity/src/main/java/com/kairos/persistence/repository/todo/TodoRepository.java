@@ -9,10 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,6 +39,12 @@ public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger>,Cu
 
     @Query(value = "{entityId:?0,deleted:false,type:?1}")
     Todo findByEntityIdAndType(BigInteger entityId, TodoType todoType);
+
+
+    @Query(value = "{entityId:?0,deleted:false,type:?1,status:{$in:?2}}")
+    Todo findByEntityIdAndTypeAndStatus(BigInteger entityId, TodoType todoType,Collection<TodoStatus> statuses);
+
+
 
     @Query(value = "{staffId:?0,deleted:false}")
     List<TodoDTO> findAllTodoByStaffId(Long staffId);

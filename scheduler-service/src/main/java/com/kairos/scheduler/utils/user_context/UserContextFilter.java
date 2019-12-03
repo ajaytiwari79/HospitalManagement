@@ -1,5 +1,6 @@
 package com.kairos.scheduler.utils.user_context;
 
+import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,21 +17,19 @@ public class UserContextFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        logger.info("Entering Scheduler Service ");
         UserContext.setCorrelationId(  httpServletRequest.getHeader(UserContext.CORRELATION_ID) );
         UserContext.setUserId( httpServletRequest.getHeader(UserContext.USER_ID) );
         UserContext.setAuthToken( httpServletRequest.getHeader(UserContext.AUTH_TOKEN) );
-        logger.debug("Exiting the UserContextFilter");
         filterChain.doFilter(httpServletRequest, servletResponse);
     }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        //This is Override method
+        //Not in use
     }
 
     @Override
     public void destroy() {
-        //This is Override method
+        //Not in use
     }
 }

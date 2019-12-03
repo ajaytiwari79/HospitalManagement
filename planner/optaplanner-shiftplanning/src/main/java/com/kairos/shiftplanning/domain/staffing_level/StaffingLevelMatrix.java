@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 @XStreamAlias("StaffingLevelMatrix")
 public class StaffingLevelMatrix {
+
+    public static final String SL_MATRIX_DEDUCTION_TOOK = "SL matrix deduction took:";
+
     public StaffingLevelMatrix() {
     }
 
@@ -34,7 +37,7 @@ public class StaffingLevelMatrix {
 
         int[] minMax=ShiftPlanningUtility.getTotalMissingMinAndMaxStaffingLevels(reducedStaffingLevelMatrix,activitiesRank);
         if(log.isDebugEnabled())
-            log.debug("SL matrix deduction took:"+(System.currentTimeMillis()-start)/1000.0);
+            log.debug(SL_MATRIX_DEDUCTION_TOOK +(System.currentTimeMillis()-start)/1000.0);
 
         return minMax;
     }
@@ -44,7 +47,7 @@ public class StaffingLevelMatrix {
 
         int[] minMax=ShiftPlanningUtility.getTotalMissingMinAndMaxStaffingLevels(reducedStaffingLevelMatrix,activitiesRank);
         if(log.isDebugEnabled())
-            log.debug("SL matrix deduction took:"+(System.currentTimeMillis()-start)/1000.0);
+            log.debug(SL_MATRIX_DEDUCTION_TOOK +(System.currentTimeMillis()-start)/1000.0);
 
         return minMax;
     }
@@ -56,7 +59,7 @@ public class StaffingLevelMatrix {
 
         int[] minMax=ShiftPlanningUtility.getTotalMissingMinAndMaxStaffingLevels(reducedStaffingLevelMatrix,activitiesRank);
         if(log.isDebugEnabled())
-            log.debug("SL matrix deduction took:"+(System.currentTimeMillis()-start)/1000.0);
+            log.debug(SL_MATRIX_DEDUCTION_TOOK +(System.currentTimeMillis()-start)/1000.0);
 
         return minMax;
     }

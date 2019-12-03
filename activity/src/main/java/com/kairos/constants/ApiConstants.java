@@ -37,6 +37,7 @@ public final class ApiConstants {
     //RestClientURL
     public static final String CTA_BASIC_INFO = "/cta_basic_info";
     public static final String GET_EMPLOYMENT = "/employment/{employmentId}";
+    public static final String GET_ALL_EMPLOYMENT_BY_UNIT_ID = "/get_all_employment_by_unit_id";
     public static final String GET_REASONCODE = "/reason_codes";
     public static final String REMOVE_FUNCTIONS_BY_EMPLOYMENT_ID = "/employment/{employmentId}/remove_functions";
     public static final String RESTORE_FUNCTIONS_BY_EMPLOYMENT_ID = "/employment/{employmentId}/restore_functions";
@@ -113,6 +114,7 @@ public final class ApiConstants {
     public static final String GET_UNIT_IDS_BY_CLIENT_IDS = "/client/client_ids_by_unitIds";
     public static final String API_EXPERTISE_URL = "/expertise/{expertiseId}";
     public static final String API_EXPERTISE_BREAK_URL = "/expertise/{expertiseId}/break";
+    public static final String GET_STAFF_BY_UNITID = "/staff/get_staff_by_unitId";
 
     public static final String GET_ORGANIZATION_WITH_COUNTRY_ID = "/getOrganizationWithCountryId";
     public static final String COMMON_DATA = "/common_data";
@@ -137,6 +139,7 @@ public final class ApiConstants {
     public static final String DAY_TYPE = "/dayType";
     public static final String SHOW_COUNTRY_TAGS = "/show_country_tags";
     public static final String TEAM_ORGANIZATION_ID = "/team/organizationId";
+    public static final String TEAMS = "/teams";
     public static final String COUNTRY_GLIDE_TIME_SETTINGS = "/country/{countryId}/glide_time";
     public static final String RESTORE_FUNCTION_ON_PHASE_RESTORATION = "/updateFunctionOnPhaseRestoration";
     public static final String GET_FUNCTIONS_OF_EMPLOYMENT = STAFF_WITH_STAFF_ID + "/employment/{employmentId}/functions";

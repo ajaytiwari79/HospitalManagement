@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  * CreatedBy vipulpandey on 23/10/18
  **/
 public class TimeTypeMongoRepositoryImpl implements CustomTimeTypeMongoRepository {
+    public static final String UPPER_LEVEL_TIME_TYPE_ID = "upperLevelTimeTypeId";
     @Inject
     private MongoTemplate mongoTemplate;
 
@@ -25,7 +26,7 @@ public class TimeTypeMongoRepositoryImpl implements CustomTimeTypeMongoRepositor
     public Set<BigInteger> findAllTimeTypeIdsByTimeTypeIds(List<BigInteger> timeTypeIds) {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("id").in(timeTypeIds)),
-                Aggregation.graphLookup("time_Type").startWith("id").connectFrom("_id").connectTo("upperLevelTimeTypeId").as("children"),
+                Aggregation.graphLookup("time_Type").startWith("id").connectFrom("_id").connectTo(UPPER_LEVEL_TIME_TYPE_ID).as("children"),
                 Aggregation.project("children._id"),
                 Aggregation.unwind("_id"))
             ;
@@ -47,9 +48,19 @@ public class TimeTypeMongoRepositoryImpl implements CustomTimeTypeMongoRepositor
     public List<TimeTypeDTO> findTimeTypeWithItsParent() {
         Aggregation aggregation=Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("deleted").is(false)),
-                Aggregation.graphLookup("time_Type").startWith("upperLevelTimeTypeId").connectFrom("upperLevelTimeTypeId").connectTo("_id").as("parent"));
+                Aggregation.graphLookup("time_Type").startWith(UPPER_LEVEL_TIME_TYPE_ID).connectFrom(UPPER_LEVEL_TIME_TYPE_ID).connectTo("_id").as("parent"));
         AggregationResults<TimeTypeDTO> results = mongoTemplate.aggregate(aggregation,TimeType.class,TimeTypeDTO.class);
         return results.getMappedResults();
+    }
+
+    @Override
+    public List<BigInteger> findAllByDeletedFalseAndTimeType(String timeTypeEnum) {
+        Aggregation aggregation=Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("secondLevelType").is(timeTypeEnum)),
+                Aggregation.project("id"),
+                Aggregation.unwind("id"));
+        AggregationResults<Map> results = mongoTemplate.aggregate(aggregation,TimeType.class,Map.class);
+        return results.getMappedResults().stream().map(s-> new BigInteger(s.get("_id").toString())).collect(Collectors.toList());
     }
 
 }

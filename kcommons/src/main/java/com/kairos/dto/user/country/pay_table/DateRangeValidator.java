@@ -25,8 +25,7 @@ public class DateRangeValidator implements ConstraintValidator<DateRange, PayGro
         if (Optional.ofNullable(payGroupAreaDTO.getEndDateMillis()).isPresent()) {
             DateTime endDateAsUtc = new DateTime(payGroupAreaDTO.getEndDateMillis()).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             DateTime startDateAsUtc = new DateTime(payGroupAreaDTO.getStartDateMillis()).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
-            boolean dateValue = (endDateAsUtc.isBefore(startDateAsUtc)) ? false : true;
-            return dateValue;
+            return (endDateAsUtc.isBefore(startDateAsUtc)) ? false : true;
         }
         return true;
     }
