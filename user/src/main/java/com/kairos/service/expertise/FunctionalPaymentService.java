@@ -1,6 +1,7 @@
 package com.kairos.service.expertise;
 
 import com.google.common.base.Functions;
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.experties.FunctionalPaymentMatrixDTO;
 import com.kairos.dto.user.country.experties.FunctionalSeniorityLevelDTO;
@@ -51,7 +52,7 @@ public class FunctionalPaymentService {
 
     public FunctionalPaymentService(ExpertiseGraphRepository expertiseGraphRepository, ExceptionService exceptionService, FunctionalPaymentGraphRepository functionalPaymentGraphRepository
             , PayGroupAreaGraphRepository payGroupAreaGraphRepository, SeniorityLevelGraphRepository seniorityLevelGraphRepository, FunctionGraphRepository functionGraphRepository
-            , SeniorityLevelFunctionRelationshipGraphRepository seniorityLevelFunctionRelationshipGraphRepository, FunctionalPaymentMatrixRepository functionalPaymentMatrixRepository) {
+            , SeniorityLevelFunctionRelationshipGraphRepository seniorityLevelFunctionRelationshipGraphRepository, FunctionalPaymentMatrixRepository functionalPaymentMatrixRepository,ExpertiseLineGraphRepository expertiseLineGraphRepository) {
         this.expertiseGraphRepository = expertiseGraphRepository;
         this.exceptionService = exceptionService;
         this.functionalPaymentGraphRepository = functionalPaymentGraphRepository;
@@ -60,6 +61,7 @@ public class FunctionalPaymentService {
         this.functionGraphRepository = functionGraphRepository;
         this.seniorityLevelFunctionRelationshipGraphRepository = seniorityLevelFunctionRelationshipGraphRepository;
         this.functionalPaymentMatrixRepository = functionalPaymentMatrixRepository;
+        this.expertiseLineGraphRepository=expertiseLineGraphRepository;
     }
 
     public FunctionalPaymentDTO saveFunctionalPayment(Long expertiseLineId, FunctionalPaymentDTO functionalPaymentDTO) {
@@ -251,29 +253,27 @@ public class FunctionalPaymentService {
     }
 
     public FunctionalPaymentDTO publishFunctionalPayment(Long functionalPaymentId, FunctionalPaymentDTO functionalPaymentDTO) {
-        Optional<FunctionalPayment> functionalPayment = functionalPaymentGraphRepository.findById(functionalPaymentId);
-        if (!functionalPayment.isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, "functionalpayment", functionalPaymentDTO.getId());
-        }
-        if (functionalPayment.get().getFunctionalPaymentMatrices().isEmpty()) {
+        FunctionalPayment functionalPayment = functionalPaymentGraphRepository.findById(functionalPaymentId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, "functionalpayment", functionalPaymentDTO.getId())));
+        if (functionalPayment.getFunctionalPaymentMatrices().isEmpty()) {
             exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONAL_PAYMENT_EMPTY_MATRIX);
         }
-        if (functionalPayment.get().isPublished()) {
+        if (functionalPayment.isPublished()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED);
         }
-        if (functionalPayment.get().getStartDate().isAfter(functionalPaymentDTO.getStartDate())) {
+        if (functionalPayment.getStartDate().isAfter(functionalPaymentDTO.getStartDate()) ||
+                (functionalPayment.getEndDate()!=null && functionalPayment.getEndDate().isBefore(functionalPaymentDTO.getStartDate()))) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE);
         }
-        functionalPayment.get().setPublished(true);
-        functionalPayment.get().setStartDate(functionalPaymentDTO.getStartDate()); // changing
+        functionalPayment.setPublished(true);
+        functionalPayment.setStartDate(functionalPaymentDTO.getStartDate()); // changing
         FunctionalPaymentDTO parentFunctionalPayment = functionalPaymentGraphRepository.getParentFunctionalPayment(functionalPaymentId);
-        FunctionalPayment lastFunctionPayment = functionalPaymentGraphRepository.findByExpertiseLineId(functionalPayment.get().getExpertiseLine().getId());
+        FunctionalPayment lastFunctionPayment = functionalPaymentGraphRepository.findByExpertiseLineId(functionalPayment.getExpertiseLine().getId());
         boolean onGoingUpdated = false;
         if (lastFunctionPayment != null && functionalPaymentDTO.getStartDate().isAfter(lastFunctionPayment.getStartDate()) && lastFunctionPayment.getEndDate() == null) {
             lastFunctionPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1));
             functionalPaymentGraphRepository.save(lastFunctionPayment);
             functionalPaymentGraphRepository.detachFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId());
-            functionalPayment.get().setEndDate(null);
+            functionalPayment.setEndDate(null);
             onGoingUpdated = true;
         }
         if (!onGoingUpdated && Optional.ofNullable(parentFunctionalPayment).isPresent()) {
@@ -283,11 +283,11 @@ public class FunctionalPaymentService {
             functionalPaymentGraphRepository.setEndDateToFunctionalPayment(functionalPaymentId, parentFunctionalPayment.getId(),
                     functionalPaymentDTO.getStartDate().minusDays(1L).toString());
             parentFunctionalPayment.setEndDate(functionalPaymentDTO.getStartDate().minusDays(1L));
-            if (lastFunctionPayment == null && functionalPayment.get().getEndDate() != null && functionalPayment.get().getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
-                functionalPayment.get().setEndDate(null);
+            if (lastFunctionPayment == null && functionalPayment.getEndDate() != null && functionalPayment.getEndDate().isBefore(functionalPaymentDTO.getStartDate())) {
+                functionalPayment.setEndDate(null);
             }
         }
-        functionalPaymentGraphRepository.save(functionalPayment.get());
+        functionalPaymentGraphRepository.save(functionalPayment);
         return parentFunctionalPayment;
 
     }

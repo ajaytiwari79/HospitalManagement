@@ -11,6 +11,14 @@ CREATE UNIQUE(e)-[:BELONGS_TO_SECTOR]-(s)
 CREATE UNIQUE(e)-[:SUPPORTED_BY_UNION]-(u)
 SET e.breakPaymentSetting=exl.breakPaymentSetting;
 
+
+MATCH(e:Expertise)<-[r:APPLICABLE_FOR_EXPERTISE]-(fp:FunctionalPayment)
+MATCH(e)-[:HAS_EXPERTISE_LINES]-(exl:ExpertiseLine) with e,collect(exl) as exl,r,fp
+WITH e,exl[0] as exl,r,fp
+DETACH DELETE r
+CREATE UNIQUE(exl)<-[:APPLICABLE_FOR_EXPERTISE]-(fp)
+
+
 MATCH(n:KPermissionModel) detach delete n;
 
 MATCH(n:KPermissionField) detach delete n;

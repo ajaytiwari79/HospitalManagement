@@ -91,4 +91,11 @@ public class StaffActivitySettingController {
     public ResponseEntity<Map<String, Object>> updateBulkStaffActivitySettings(@PathVariable Long unitId,@PathVariable Long staffId, @RequestBody @Valid List<StaffActivitySettingDTO> staffActivitySettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.updateBulkStaffActivitySettings(unitId,staffId,staffActivitySettingDTO));
     }
+
+    @ApiOperation("Get Staff Personalized activity settings")
+    @GetMapping(value = "staff/{staffId}/activity/{activityId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffActivitySettingsByActivityId( @PathVariable Long unitId,@PathVariable BigInteger activityId,@PathVariable Long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffActivitySettingsByActivityId(unitId,activityId,staffId));
+    }
 }
