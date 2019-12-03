@@ -347,10 +347,11 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     List<Employment> findAllEmploymentByExpertiseId(Long expertiseId);
 
     @Query("MATCH(l:Level)<-[:"+IN_ORGANIZATION_LEVEL+"]-(exp:Expertise{deleted:false,published:true})-[r:"+HAS_EXPERTISE_IN+"]-(emp:Employment{deleted:false,published:true})-[empRel:"+HAS_EMPLOYMENT_LINES+"]->(empLine:EmploymentLine)-[slRel:"+HAS_SENIORITY_LEVEL+"]-(sl:SeniorityLevel) " +
+            "MATCH(emp)<-[staffRel:"+BELONGS_TO_STAFF+"]-(staff:Staff)" +
             "WHERE id(l)={0} AND  \n" +
             "(({2} IS NULL AND (emp.endDateMillis IS NULL OR DATE(emp.endDateMillis) > DATE({1})))\n" +
             "OR " +
             "(DATE({2}) IS NOT NULL AND  (DATE({1}) < DATE(emp.endDateMillis) OR DATE({2}) > DATE(emp.startDateMillis)))) " +
-            "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine)")
+            "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine),staffRel,staff")
     List<Employment> getAllEmploymentByLevel(Long levelId,String startDate,String endDate);
 }
