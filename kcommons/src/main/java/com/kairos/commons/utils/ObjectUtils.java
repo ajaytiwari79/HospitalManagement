@@ -84,10 +84,4 @@ public class ObjectUtils {
         return o1 == null && o2 == null;
     }
 
-    public static boolean isEquals(Object o1, Object o2) {
-        if (o1 != null && o2 != null) {
-            return o1.equals(o2);
-        }
-        return o1 == null && o2 == null;
-    }
 }
