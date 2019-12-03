@@ -23,4 +23,6 @@ public class TagQueryResult {
     private Long orgTypeId;
     private List<Long> orgSubTypeIds;
     private String color;
+    private String shortName;
+    private String ultraShortName;
 }
