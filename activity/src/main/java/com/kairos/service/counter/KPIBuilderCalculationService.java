@@ -1,12 +1,14 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.activity.activity_tabs.ApprovalCriteria;
+import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
 import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
+import com.kairos.dto.activity.counter.enums.ChartType;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
@@ -291,14 +293,14 @@ public class KPIBuilderCalculationService implements CounterService {
     public KPIRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, kpi,null);
         XAxisConfig XAxisConfig = (XAxisConfig) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class).get(0);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(XAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(),ChartType.STACKED_CHART, XAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(XAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 
     @Override
     public KPIRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, kpi,applicableKPI);
         XAxisConfig XAxisConfig = (XAxisConfig) copyPropertiesOfListByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class).get(0);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(XAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), ChartType.STACKED_CHART, XAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(XAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 
 
@@ -368,8 +370,7 @@ public class KPIBuilderCalculationService implements CounterService {
     private List<ClusteredBarChartKpiDataUnit> getClusteredBarChartDetails(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (YAxisConfig yAxisConfig : kpiCalculationRelatedInfo.getYAxisConfigs()) {
-
-                kpiCalculationRelatedInfo.setCurrentCalculationType(null);
+                 kpiCalculationRelatedInfo.setCurrentCalculationType(null);
                 switch (yAxisConfig){
                     case ACTIVITY:
                         subClusteredBarValue.addAll(getActivitySubClusteredValue(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
@@ -425,22 +426,44 @@ public class KPIBuilderCalculationService implements CounterService {
 
 
     private List<ClusteredBarChartKpiDataUnit> geTodoSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig){
-        List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-        List<BigInteger> activityIds=shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList());
-        Activity activity=null;
-        List<TodoDTO> todoDTOS=new ArrayList<>();
+        ShiftActivityCriteria shiftActivityCriteria = getShiftActivityCriteria(kpiCalculationRelatedInfo);
+        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
+        List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
+        List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
+        Set<BigInteger> activityIds=shiftActivityDTOS.stream().map(shiftActivityDTO  -> shiftActivityDTO.getActivityId()).collect(Collectors.toSet());
         for (BigInteger activityId : activityIds) {
             if(kpiCalculationRelatedInfo.getActivityMap().containsKey(activityId)){
-                activity=kpiCalculationRelatedInfo.getActivityMap().get(activityId);
-                todoDTOS=kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId);
-                subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getGeneralActivityTab().getBackgroundColor(), 0));
+                Activity activity=kpiCalculationRelatedInfo.getActivityMap().get(activityId);
+                List<TodoDTO> todoDTOS=kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId);
+                subClusteredBarValue.addAll(getPQlOfTodo(activity,todoDTOS));
             }
         }
 
         return subClusteredBarValue;
     }
 
+    private List<ClusteredBarChartKpiDataUnit> getPQlOfTodo(Activity activity,List<TodoDTO> todoDTOS){
+        List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits=new ArrayList<>();
+        PQLSettings pqlSettings=activity.getRulesActivityTab().getPqlSettings();
+        if(isNotNull(pqlSettings)){
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAppreciable(),"#4caf502e");
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAcceptable(),"#ffeb3b33");
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getCritical(),"#ff3b3b33");
+        }
+        return clusteredBarChartKpiDataUnits;
+    }
+
+    private void getDataByPQLSetting(Activity activity, List<TodoDTO> todoDTOS, List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits, ApprovalCriteria approvalCriteria,String color) {
+        Float approvalPercentage=approvalCriteria.getApprovalPercentage();
+        Short approvalTime=approvalCriteria.getApprovalTime();
+        if(isNotNull(approvalPercentage) && isNotNull(approvalTime)) {
+            long size = todoDTOS.stream().filter(todoDTO -> new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime)).containsAndEqualsEndDate(asDate(todoDTO.getApprovedOn()))).count();
+            if (approvalPercentage < size * 100 / todoDTOS.size()) {
+                clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(activity.getName()+Math.random(), color, todoDTOS.size()));
+            }
+        }
+    }
 
 
     private List<ClusteredBarChartKpiDataUnit> getTimeTypeSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig){
@@ -619,6 +642,7 @@ public class KPIBuilderCalculationService implements CounterService {
             employmentIds = staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getEmployment().stream().map(EmploymentWithCtaDetailsDTO::getId)).collect(Collectors.toSet());
             startDate = dateTimeIntervals.get(0).getStartDate();
             endDate = dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate();
+            getTodoDetails();
             getDailyTimeBankEntryByDate();
             updateActivityAndTimeTypeAndPlannedTimeMap();
             planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
@@ -642,6 +666,7 @@ public class KPIBuilderCalculationService implements CounterService {
             for (YAxisConfig yAxisConfig : yAxisConfigs) {
                 switch (yAxisConfig) {
                     case ACTIVITY:
+                    case PLANNING_QUALITY_LEVEL:
                         List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(filterBasedCriteria.containsKey(ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(filterBasedCriteria.get(ACTIVITY_IDS)) : new HashSet<>());
                         activityMap = activities.stream().collect(Collectors.toMap(Activity::getId, v -> v));
                         break;
