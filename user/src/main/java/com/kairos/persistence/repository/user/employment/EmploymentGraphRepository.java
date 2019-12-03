@@ -218,7 +218,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query(" MATCH (employment:Employment{deleted:false}) where id(employment) IN  {0} \n" +
             "MATCH(employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine) \n" +
             "MATCH(employmentLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:"+HAS_BASE_PAY_GRADE+"]-(payGrade:PayGrade) \n" +
-            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise{published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE (DATE(employmentLine.startDate)>=exl.startDate AND (employmentLine.endDate IS NULL OR (exl.endDate IS NULL  OR DATE(employmentLine.endDate)<=DATE(exl.endDate) )))   \n" +
+            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise{published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) \n" +
             "OPTIONAL MATCH(employment)-[:"+IN_UNIT+"]-(org:Unit)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+HAS_MUNICIPALITY+"]-(pga:PayGroupArea)<-[pgaRel:"+HAS_PAY_GROUP_AREA+"]-(payGrade) \n" +
             "WITH  employment,employmentLine,payGrade,exl,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as hourlyCost \n" +
             "OPTIONAL MATCH (employmentLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) \n" +
@@ -274,7 +274,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "WHERE id(organization)={0}  AND id(employment)={1} \n" +
             "MATCH(employmentLine:EmploymentLine)-[:"+ HAS_EMPLOYMENT_LINES +" ]-(employment)   \n" +
             "MATCH(employmentLine)-[: "+HAS_SENIORITY_LEVEL +"]->(seniorityLevel:SeniorityLevel)-[: HAS_BASE_PAY_GRADE ]-(payGrade:PayGrade)   \n" +
-            "MATCH(employment)-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE (DATE(employmentLine.startDate)>=exl.startDate AND (employmentLine.endDate IS NULL OR (exl.endDate IS NULL  OR DATE(employmentLine.endDate)<=DATE(exl.endDate) )))   \n" +
+            "MATCH(employment)-[:"+ HAS_EXPERTISE_IN +"]->(expertise:Expertise{published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine)   \n" +
             "OPTIONAL MATCH(organization)-[: "+CONTACT_ADDRESS +"]->(contactAddress:ContactAddress)-[:"+ MUNICIPALITY +"]->(municipality:Municipality)-[:"+ HAS_MUNICIPALITY+"]-(pga:PayGroupArea)<-[pgaRel:"+ HAS_PAY_GROUP_AREA+" ]-(payGrade)   \n" +
             "WITH  employmentLine,payGrade,expertise,seniorityLevel,exl,  \n" +
             "CASE WHEN pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END AS basePayGradeAmount   \n" +
