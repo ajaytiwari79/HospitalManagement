@@ -15,8 +15,11 @@ SET e.breakPaymentSetting=exl.breakPaymentSetting;
 MATCH(e:Expertise)<-[r:APPLICABLE_FOR_EXPERTISE]-(fp:FunctionalPayment)
 MATCH(e)-[:HAS_EXPERTISE_LINES]-(exl:ExpertiseLine) with e,collect(exl) as exl,r,fp
 WITH e,exl[0] as exl,r,fp
-DETACH DELETE r
 CREATE UNIQUE(exl)<-[:APPLICABLE_FOR_EXPERTISE]-(fp)
+DETACH DELETE r
+
+MATCH(e:ExpertiseLine) where not exists(e.deleted)
+Set e.deleted=false
 
 
 MATCH(n:KPermissionModel) detach delete n;
@@ -25,7 +28,7 @@ MATCH(n:KPermissionField) detach delete n;
 
 Match(ap:AccessPage) where ap.moduleId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Tab Permission",isModule:false,moduleId:"tab_435",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Tab Permission",isModule:false,moduleId:"tab_436",active:true});
-Match(ap:AccessPage) where ap.moduleId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_437",active:true});
+Match(ap:AccessPage) where ap.modul/functional_paymenteId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_437",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_438",active:true});
 
 Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
