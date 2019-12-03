@@ -261,7 +261,7 @@ public class TimeBankCalculationService {
         return contractualMinutes;
     }
 
-    public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails) {
+    public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails,boolean calculateTimeBankOff) {
         if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
             exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, activity.getName());
         }
@@ -298,7 +298,7 @@ public class TimeBankCalculationService {
             default:
                 break;
         }
-        if (TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType())) {
+        if (TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType()) || calculateTimeBankOff) {
             shiftActivity.setDurationMinutes(duration);
             shiftActivity.setScheduledMinutes(scheduledMinutes);
         }
