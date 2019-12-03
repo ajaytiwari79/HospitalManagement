@@ -399,6 +399,6 @@ public class ActivityMessagesConstants {
     public static final String STAFF_NOT_ALLOWED_ON_TAG="staff.not.allowed";
     public static final String SHORTCUT_NOT_FOUND="message.shortcut.not.found";
     public static final String SHORTCUT_ALREADY_EXISTS_NAME="message.shortcut.already.exists.name";
-
+    public static final String ERROR_BLOCK_SETTING_NOT_FOUND = "error.block.setting.not.found";
 
 }

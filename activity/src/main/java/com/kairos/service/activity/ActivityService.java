@@ -42,6 +42,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
@@ -1144,5 +1145,11 @@ public class ActivityService {
         filterActivityDto.sort(Comparator.comparing(ActivityDTO :: getActivitySequence));
         filterActivityDto.addAll(activityDTOS);
         return filterActivityDto;
+    }
+
+    public Set<BigInteger> getFullDayOrWeekAndApprovalRequiredActivityIds(Long unitId, Date date) {
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, date, null);
+        List<Activity> activities = activityMongoRepository.findAllByMethodForCalculatingTimeAndApprovalRequiredPhaseId(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
+        return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 }
