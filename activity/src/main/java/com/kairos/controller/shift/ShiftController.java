@@ -82,6 +82,7 @@ public class ShiftController {
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType) {
+          shiftDTO.setUnitId(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, false, false, shiftActionType));
     }
 

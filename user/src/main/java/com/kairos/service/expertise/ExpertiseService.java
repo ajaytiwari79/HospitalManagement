@@ -152,6 +152,7 @@ public class ExpertiseService {
     }
 
     private void setBasicDetails(ExpertiseDTO expertiseDTO, Country country, Expertise expertise) {
+        expertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
         countryGraphRepository.addLevel(expertise.getId(),expertiseDTO.getOrganizationLevelId());
         if(expertiseDTO.getSector()!=null){
             organizationGraphRepository.addSector(expertise.getId(),expertiseDTO.getSector().getId());
@@ -177,7 +178,6 @@ public class ExpertiseService {
         currentExpertise.setEndDate(expertiseDTO.getEndDate());
         if (!currentExpertise.isPublished()) {
             currentExpertise.getExpertiseLines().get(0).setEndDate(currentExpertise.getEndDate());
-            currentExpertise.setBreakPaymentSetting(expertiseDTO.getBreakPaymentSetting());
             setBasicDetails(expertiseDTO, country, currentExpertise);
         } else {
             currentExpertise.getExpertiseLines().sort(Comparator.comparing(ExpertiseLine::getStartDate));

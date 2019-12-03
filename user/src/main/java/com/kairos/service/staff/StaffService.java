@@ -332,7 +332,9 @@ public class StaffService {
             tag.setEndDate(tagDTOMap.get(tag.getId()).getEndDate());
         });
         staffToUpdate.setTags(tagList);
+
         if (isCollectionNotEmpty(staffPersonalDetail.getTags())) {
+
             staffGraphRepository.unlinkTagsFromStaff(staffId, staffPersonalDetail.getTags().stream().map(tagDTO -> tagDTO.getId().longValue()).collect(Collectors.toList()));
         } else {
             staffGraphRepository.unlinkAllTagsFromStaff(staffId);
