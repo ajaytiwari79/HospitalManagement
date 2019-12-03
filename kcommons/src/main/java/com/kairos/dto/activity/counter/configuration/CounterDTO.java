@@ -44,4 +44,5 @@ public class CounterDTO {
     @Positive(message = FREQUENCY_VALUE_IS_NOT_POSITIVE)
     private int value;
     private IntervalUnit interval;
+    private boolean multiDimensional;
 }
