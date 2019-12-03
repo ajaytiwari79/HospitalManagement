@@ -86,7 +86,7 @@ public class CountryHolidayCalenderController {
     ResponseEntity<Map<String, Object>> updateCountryCalender(@RequestBody CountryHolidayCalenderDTO countryHolidayCalender) throws Exception{
         return ResponseHandler.generateResponse(HttpStatus.OK,true,countryHolidayCalenderService.updateCountryCalender(countryHolidayCalender));
     }
-    @RequestMapping(value = COUNTRY_URL+"holiday/{holidayId}",method = RequestMethod.DELETE)
+    @RequestMapping(value = COUNTRY_URL+"/holiday/{holidayId}",method = RequestMethod.DELETE)
     @ApiOperation("Delete a  CountryHolidayCalenderController holiday by id")
     ResponseEntity<Map<String, Object>> deleteCountryCalender(@PathVariable Long holidayId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, countryHolidayCalenderService.safeDeleteCountryCalender(holidayId));

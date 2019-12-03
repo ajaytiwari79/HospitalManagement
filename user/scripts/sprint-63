@@ -1,3 +1,4 @@
+
 MATCH(s:Staff)-[r:STAFF_HAS_SKILLS]-(sk:Skill)
 DETACH delete r
 
@@ -23,3 +24,12 @@ Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(access
 Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
        Match (ap:AccessPage)
        CREATE UNIQUE (ag)-[r:HAS_ACCESS_OF_TABS{isEnabled:true,read:true,write:true}]-(ap);
+
+
+//Script to link municipality with pay group area
+
+MATCH(m:Municipality) where m.name starts with 'Ballerup'
+MATCH(pga:PayGroupArea) where pga.name starts with 'Area 0`'
+CREATE UNIQUE (pga)-[r:HAS_MUNICIPALITY]->(m)
+SET r.startDateMillis=1536756095237
+

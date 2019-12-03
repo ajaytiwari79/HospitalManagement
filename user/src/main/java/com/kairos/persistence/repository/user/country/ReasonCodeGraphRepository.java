@@ -57,6 +57,11 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
     @Query("MATCH(reasonCode:ReasonCode{deleted:false}) where reasonCode.timeTypeId=toString({0}) RETURN CASE WHEN COUNT(reasonCode)>0 THEN TRUE ELSE FALSE END AS result")
     boolean existsByTimeTypeIdAndDeletedFalse(BigInteger timeTypeId);
 
+    @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} " +
+            "Return id(reasonCode) as id, reasonCode.name as name," +
+            "reasonCode.code as code, reasonCode.description as description,reasonCode.reasonCodeType as reasonCodeType,reasonCode.timeTypeId as timeTypeId ORDER BY reasonCode.creationDate  DESC")
+    List<ReasonCodeResponseDTO> findReasonCodeByCountryId(Long countryId);
+
 
 }
 
