@@ -15,6 +15,7 @@ import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -139,8 +140,7 @@ public class TimeBankService{
         List<Shift> shiftsList = shiftMongoRepository.findAllOverlappedShiftsAndEmploymentId(employmentIds, startDateTime, endDateTime);
         Map<Long, List<Shift>> shiftMapByEmploymentId = shiftsList.stream().collect(Collectors.groupingBy(Shift::getEmploymentId));
         List<BigInteger> activityIdsList = shiftsList.stream().flatMap(s -> s.getActivities().stream().map(ShiftActivity::getActivityId)).distinct().collect(Collectors.toList());
-        List<ActivityWrapper> activities = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIdsList);
-        Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = shiftService.getActivityWrapperMap(shiftsList,null);
         for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
             List<Shift> shiftList = shiftMapByEmploymentId.getOrDefault(staffAdditionalInfoDTO.getEmployment().getId(), new ArrayList<>());
             for (Shift shift : shiftList) {
@@ -712,6 +712,12 @@ public class TimeBankService{
 
     public List<DailyTimeBankEntry> findAllByEmploymentIdsAndBetweenDate(Collection<Long> employmentIds, LocalDate startDate, LocalDate endDate){
         return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,asDate(startDate),asDate(endDate));
+    }
+
+    public void updateTimeBanOnApproveTimebankOFF(ShiftActivity shiftActivity,Long employmentId,Map<BigInteger, Activity> activityIdAndActivityMap,Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap){
+        StaffEmploymentDetails staffEmploymentDetails = staffAdditionalInfoMap.get(employmentId).getEmployment();
+        timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity,activityIdAndActivityMap.get(shiftActivity.getActivityId()),staffEmploymentDetails,true);
+
     }
 
 

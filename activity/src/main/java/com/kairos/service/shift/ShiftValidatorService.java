@@ -240,7 +240,7 @@ public class ShiftValidatorService {
         int durationMinutes = 0;
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             ShiftActivity shiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivityDTO, ShiftActivity.class);
-            timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), staffAdditionalInfoDTO.getEmployment());
+            timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), staffAdditionalInfoDTO.getEmployment(),false);
             shiftActivityDTO.setScheduledMinutes(shiftActivity.getScheduledMinutes());
             shiftActivityDTO.setDurationMinutes(shiftActivity.getDurationMinutes());
             scheduledMinutes += shiftActivity.getScheduledMinutes();

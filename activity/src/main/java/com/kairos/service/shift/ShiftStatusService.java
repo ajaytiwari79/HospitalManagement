@@ -34,6 +34,8 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import org.apache.commons.lang.WordUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -93,9 +95,14 @@ public class ShiftStatusService {
         List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc((List<BigInteger>) objects[0]);
         List<ShiftActivityResponseDTO> shiftActivityResponseDTOS = new ArrayList<>(shifts.size());
         List<ShiftDTO> shiftDTOS = new ArrayList<>(shifts.size());
-        Map[] activityDetails = getActivityDetailsMap(shifts);
-        Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap = activityDetails[0];
-        Map<BigInteger, Activity> activityIdAndActivityMap = activityDetails[1];
+        Object[] activityDetails = getActivityDetailsMap(shifts);
+        Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap = (Map<BigInteger, PhaseSettingsActivityTab>)activityDetails[0];
+        Map<BigInteger, Activity> activityIdAndActivityMap = (Map<BigInteger, Activity>)activityDetails[1];
+        List<NameValuePair> requestParam = new ArrayList<>();
+        requestParam.add(new BasicNameValuePair("staffIds", activityDetails[2].toString()));
+        requestParam.add(new BasicNameValuePair("employmentIds", activityDetails[3].toString()));
+        List<StaffAdditionalInfoDTO> staffAdditionalInfoDTOS = userIntegrationService.getStaffAditionalDTOS(shifts.get(0).getUnitId(), requestParam);
+        Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getEmployment().getId())).collect(Collectors.toMap(s -> s.getEmployment().getId(), v -> v));
         if (isCollectionNotEmpty(shifts) && objects[1] != null) {
             Set<LocalDateTime> dates = shifts.stream().map(s -> DateUtils.asLocalDateTime(s.getActivities().get(0).getStartDate())).collect(Collectors.toSet());
             Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
@@ -122,16 +129,20 @@ public class ShiftStatusService {
         return new ShiftAndActivtyStatusDTO(shiftDTOS, shiftActivityResponseDTOS);
     }
 
-    private Map[] getActivityDetailsMap(List<Shift> shifts){
+    private Object[] getActivityDetailsMap(List<Shift> shifts){
         Set<BigInteger> activityIds = new HashSet<>();
+        Set<Long> staffIds = new HashSet<>();
+        Set<Long> employmentIds = new HashSet<>();
         for (Shift shift : shifts) {
             activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
             activityIds.addAll(shift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toList()));
+            staffIds.add(shift.getStaffId());
+            employmentIds.add(shift.getEmploymentId());
         }
         List<Activity> activities = activityMongoRepository.findAllPhaseSettingsByActivityIds(activityIds);
         Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap = activities.stream().collect(Collectors.toMap(Activity::getId, Activity::getPhaseSettingsActivityTab));
         Map<BigInteger, Activity> activityIdAndActivityMap = activities.stream().collect(Collectors.toMap(Activity::getId, Function.identity()));
-        return new Map[]{activityPhaseSettingMap,activityIdAndActivityMap};
+        return new Object[]{activityPhaseSettingMap,activityIdAndActivityMap,staffIds,employmentIds};
     }
 
     private void updateStatusOfShiftActivity(ShiftPublishDTO shiftPublishDTO, Set<BigInteger> shiftActivitiyIds, List<ShiftActivityResponseDTO> shiftActivityResponseDTOS, Map<BigInteger, PhaseSettingsActivityTab> activityPhaseSettingMap, Map<BigInteger, Activity> activityIdAndActivityMap, Map<Date, Phase> phaseListByDate, StaffAccessGroupDTO staffAccessGroupDTO, Shift shift, ShiftActivity shiftActivity) {
@@ -155,7 +166,7 @@ public class ShiftStatusService {
             shift.setDraftShift(null);
         }
         if (validAccessGroup && validateShiftActivityStatus && !draftShift) {
-            removeOppositeStatus(shift, shiftActivity, shiftPublishDTO.getStatus());
+            removeOppositeStatus(shift, shiftActivity, shiftPublishDTO.getStatus(),activityIdAndActivityMap);
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(), shiftActivity.getId(), localeService.getMessage(MESSAGE_SHIFT_STATUS_ADDED), true, shiftActivity.getStatus()));
         } else if (validAccessGroup && !validateShiftActivityStatus) {
             shiftActivityResponseDTO.getActivities().add(new ShiftActivityDTO(shiftActivity.getActivityName(),shiftActivity.getStartDate(), shiftActivity.getEndDate(), shiftActivity.getId(), localeService.getMessage(ACTIVITY_STATUS_INVALID), false));
@@ -206,7 +217,7 @@ public class ShiftStatusService {
         return shiftStatuses;
     }
 
-    private void removeOppositeStatus(Shift shift, ShiftActivity shiftActivity, ShiftStatus shiftStatus) {
+    private void removeOppositeStatus(Shift shift, ShiftActivity shiftActivity, ShiftStatus shiftStatus,Map<BigInteger, Activity> activityIdAndActivityMap) {
         Todo todo = null;
         if(newHashSet(APPROVE,DISAPPROVE).contains(shiftStatus)){
             TodoStatus todoStatus = shiftStatus.equals(APPROVE) ? TodoStatus.APPROVE: TodoStatus.DISAPPROVE;

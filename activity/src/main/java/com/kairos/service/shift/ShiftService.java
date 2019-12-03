@@ -327,7 +327,7 @@ public class ShiftService extends MongoBaseService {
             Map<Long, DayTypeDTO> dayTypeDTOMap = staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, v -> v));
             Set<DayOfWeek> activityDayTypes = getValidDays(dayTypeDTOMap, activityWrapper.getActivity().getTimeCalculationActivityTab().getDayTypes());
             if (activityDayTypes.contains(DateUtils.asLocalDate(shiftActivity.getStartDate()).getDayOfWeek())) {
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapper.getActivity(), staffAdditionalInfoDTO.getEmployment());
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activityWrapper.getActivity(), staffAdditionalInfoDTO.getEmployment(),false);
                 scheduledMinutes = shiftActivity.getScheduledMinutes();
                 durationMinutes = shiftActivity.getDurationMinutes();
             }
@@ -542,8 +542,10 @@ public class ShiftService extends MongoBaseService {
     public Map<BigInteger, ActivityWrapper> getActivityWrapperMap(List<Shift> shifts, ShiftDTO shiftDTO) {
         Set<BigInteger> activityIds = new HashSet<>();
         for (Shift shift : shifts) {
-            activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
-            activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+            getActivityIdsByShift(activityIds, shift);
+            if(isNotNull(shift.getDraftShift())){
+                getActivityIdsByShift(activityIds, shift.getDraftShift());
+            }
         }
         if (isNotNull(shiftDTO)) {
             activityIds.addAll(shiftDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
@@ -551,6 +553,14 @@ public class ShiftService extends MongoBaseService {
         }
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         return activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+    }
+
+    private void getActivityIdsByShift(Set<BigInteger> activityIds, Shift shift) {
+        activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        activityIds.addAll(shift.getActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        if(isCollectionNotEmpty(shift.getBreakActivities())){
+            activityIds.addAll(shift.getBreakActivities().stream().map(ShiftActivity::getActivityId).collect(Collectors.toList()));
+        }
     }
 
     public ShiftWithViolatedInfoDTO updateShift(ShiftDTO shiftDTO, boolean byTAndAView, boolean validatedByPlanner, ShiftActionType shiftAction) {

@@ -150,28 +150,28 @@ public class TimeBankCalculationServiceTest {
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 shiftActivity.setTimeType(TimeTypes.WORKING_TYPE.toString());
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 480);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 480);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(ENTERED_MANUALLY);
                 shiftActivity.setDurationMinutes(180);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 180);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 180);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(FIXED_TIME);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 150);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 150);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(CommonConstants.FULL_DAY_CALCULATION);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 2220);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 2220);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(WEEKLY_HOURS);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 1920);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 1920);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(WEEKLY_HOURS);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 1920);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 1920);
             }
