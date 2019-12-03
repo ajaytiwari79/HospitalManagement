@@ -38,6 +38,11 @@ public class StaffFilterDTO {
         this.filtersData = isNullOrElse(filtersData,new ArrayList<>());
     }
 
+    public List<FilterSelectionDTO> getFiltersData() {
+        this.filtersData = isNullOrElse(filtersData,new ArrayList<>());
+        return filtersData;
+    }
+
     public boolean isValidFilterForShift(){
         boolean isValidFilterForShift = false;
         Set<FilterType> filterTypeSet = newHashSet(TIME_TYPE,ACTIVITY_TIMECALCULATION_TYPE,ACTIVITY_STATUS,TIME_SLOT,ABSENCE_ACTIVITY,VALIDATED_BY,PLANNED_TIME_TYPE,REAL_TIME_STATUS,TIME_TYPE,FUNCTIONS);

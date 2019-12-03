@@ -47,6 +47,7 @@ public class Tag extends UserBaseEntity {
     private List<Long> orgSubTypeIds;
     private LocalDate startDate=LocalDate.now();
     private LocalDate endDate;
+    private String color;
 
     public Tag(@NotBlank(message = "error.Tag.name.notEmptyOrNotNull") String name, MasterDataTypeEnum masterDataType, boolean countryTag) {
         this.name = name;
@@ -54,19 +55,21 @@ public class Tag extends UserBaseEntity {
         this.countryTag = countryTag;
     }
 
-    public Tag(String name, MasterDataTypeEnum masterDataType, boolean countryTag, Long orgTypeId, List<Long> orgSubTypeIds) {
+    public Tag(String name, MasterDataTypeEnum masterDataType, boolean countryTag, Long orgTypeId, List<Long> orgSubTypeIds, String color) {
         this.name = name;
         this.masterDataType = masterDataType;
         this.countryTag = countryTag;
         this.orgTypeId = orgTypeId;
         this.orgSubTypeIds = orgSubTypeIds;
+        this.color = color;
     }
 
-    public Tag(String name, MasterDataTypeEnum masterDataType, boolean countryTag, PenaltyScore penaltyScore) {
+    public Tag(String name, MasterDataTypeEnum masterDataType, boolean countryTag, PenaltyScore penaltyScore, String color) {
         this.name = name;
         this.masterDataType = masterDataType;
         this.countryTag = countryTag;
         this.penaltyScore = penaltyScore;
+        this.color = color;
     }
 
     public Tag(TagDTO tagDTO, boolean countryTag){
