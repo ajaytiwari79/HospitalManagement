@@ -67,7 +67,7 @@ public class SkillController {
 
     @PostMapping("/country/{countryId}/get_Skill_and_level_by_staff_ids")
     @ApiOperation("Get Staff's SkillId And Level")
-    public ResponseEntity<Map<String, Object>> getStaffSkillAndLevelByStaffIds(@RequestBody List<Long> StaffIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffSkillAndLevelByStaffIds(StaffIds));
+    public ResponseEntity<Map<String, Object>> getStaffSkillAndLevelByStaffIds(@RequestBody List<Long> StaffIds, @RequestParam("selectedDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate selectedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffSkillAndLevelByStaffIds(StaffIds,selectedDate));
     }
 }

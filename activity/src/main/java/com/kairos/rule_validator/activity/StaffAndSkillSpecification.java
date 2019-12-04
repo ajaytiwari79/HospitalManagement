@@ -79,8 +79,8 @@ public class StaffAndSkillSpecification extends AbstractSpecification<ShiftWithA
             for (SkillLevelDTO skillLevelDTO : skillLevelDTOS) {
                 if (activitySkill.getSkillId().equals(skillLevelDTO.getSkillId()) &&
                         (SkillLevel.BASIC.toString().equals(activitySkill.getLevel()) ||
-                                (SkillLevel.ADVANCE.toString().equals(activitySkill.getLevel()) && !SkillLevel.BASIC.toString().equals(skillLevelDTO.getSkillLevel())) ||
-                                activitySkill.getLevel().equals(skillLevelDTO.getSkillLevel()))) {
+                                (SkillLevel.ADVANCE.toString().equals(activitySkill.getLevel()) && !SkillLevel.BASIC.toString().equals(skillLevelDTO.getSkillLevel().toString())) ||
+                                activitySkill.getLevel().equals(skillLevelDTO.getSkillLevel().toString()))) {
                     return true;
                 }
             }

@@ -141,7 +141,7 @@ public class DataCategoryService {
      */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByCountryId(Long countryId) {
         List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByCountryId(countryId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategories, DataCategoryResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 
 
@@ -151,7 +151,7 @@ public class DataCategoryService {
      */
     public List<DataCategoryResponseDTO> getAllDataCategoryWithDataElementByUnitId(Long unitId) {
         List<DataCategory> dataCategories = dataCategoryRepository.getAllDataCategoriesByUnitId(unitId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(dataCategories, DataCategoryResponseDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataCategories, DataCategoryResponseDTO.class);
     }
 
 

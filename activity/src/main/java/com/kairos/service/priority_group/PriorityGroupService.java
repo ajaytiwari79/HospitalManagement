@@ -59,7 +59,7 @@ public class PriorityGroupService extends MongoBaseService {
         if(isPriorityGroupsAlreadyExists){
             exceptionService.actionNotPermittedException(PRIORITYGROUP_ALREADY_EXISTS,countryId);
         }
-        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTO, PriorityGroup.class);
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(priorityGroupDTO, PriorityGroup.class);
         save(priorityGroups);
         return true;
     }
@@ -181,14 +181,14 @@ public class PriorityGroupService extends MongoBaseService {
             priorityGroupDTO.setId(null);
 
         });
-        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTOs, PriorityGroup.class);
+        List<PriorityGroup> priorityGroups=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(priorityGroupDTOs, PriorityGroup.class);
         save(priorityGroups);
 
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroups,PriorityGroupDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(priorityGroups,PriorityGroupDTO.class);
         //return  priorityGroupDTOs;
     }
     public List<PriorityGroupDTO> updatePriorityGroupsForOrder(List<PriorityGroupDTO> priorityGroupDTOs) {
-        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyPropertiesOfListByMapper(priorityGroupDTOs,PriorityGroup.class);
+        List<PriorityGroup> priorityGroups= ObjectMapperUtils.copyPropertiesOfCollectionByMapper(priorityGroupDTOs,PriorityGroup.class);
         save(priorityGroups);
         return priorityGroupDTOs;
     }

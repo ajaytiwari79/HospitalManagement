@@ -7,6 +7,7 @@ import com.kairos.dto.activity.shift.ViolatedRulesDTO;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
@@ -26,6 +27,7 @@ import java.util.TimeZone;
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.constants.AppConstants.WEEKS;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DaysOffAfterASeriesWTATemplateTest {
@@ -59,6 +61,7 @@ public class DaysOffAfterASeriesWTATemplateTest {
 
     //@Test
     public void validateRules() {
+        when(UserContext.getUserDetails().isManagement()).thenReturn(true);
         daysOffAfterASeriesWTATemplate.validateRules(ruleTemplateSpecificInfo);
     }
 }

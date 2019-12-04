@@ -71,7 +71,7 @@ public class ActivityIntegrationService {
     }
 
     public List<ActivityDTO> getActivitiesWithCategories(long unitId) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(genericRestClient.publish(null, unitId, true, IntegrationOperation.GET, "/activities_categories", null), ActivityDTO.class);
     }
 
     public ActivityWithTimeTypeDTO getAllActivitiesAndTimeTypesByUnit(Long unitId, Long countryId) {
@@ -108,10 +108,10 @@ public class ActivityIntegrationService {
         restClientForSchedulerMessages.publish(null, unitId, true, IntegrationOperation.UPDATE, "/staff/" + staffId + "/shifts_and_openshifts", queryParams);
     }
 
-    public void deleteShiftsAfterEmploymentEndDate(Long unitId, LocalDate endDate, Long staffId) {
+    public void deleteShiftsAfterEmploymentEndDate(Long unitId, LocalDate endDate, Long employmentId,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         Map<String, Object> queryParams = new HashMap<>();
         queryParams.put("endDate", endDate);
-        genericRestClient.publish(null, unitId, true, IntegrationOperation.DELETE, "/delete_shifts/staff/" + staffId, queryParams);
+        genericRestClient.publish(staffAdditionalInfoDTO, unitId, true, IntegrationOperation.UPDATE, "/delete_shifts/employment/" + employmentId, queryParams);
     }
 
 

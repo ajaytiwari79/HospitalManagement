@@ -71,6 +71,7 @@ public class GroupService {
         if(isNotNull(groupDTO.getName())){
             group.setName(groupDTO.getName());
             group.setDescription(groupDTO.getDescription());
+            group.setRoomId(groupDTO.getRoomId());
         } else {
             groupGraphRepository.deleteAllFiltersByGroupId(groupId);
             List<FilterSelection> filterSelections = new ArrayList<>();
@@ -101,7 +102,7 @@ public class GroupService {
     }
 
     private GroupDTO getGroupDTOFromGroup(Group group) {
-        GroupDTO groupDTO = new GroupDTO(group.getId(), group.getName(), group.getDescription(), group.getExcludedStaffs());
+        GroupDTO groupDTO = new GroupDTO(group.getId(), group.getName(), group.getDescription(), group.getExcludedStaffs(), group.getRoomId());
         List<FilterSelectionDTO> filterSelectionDTOS = new ArrayList<>();
         for(FilterSelection filterSelection : group.getFiltersData()){
             filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), newHashSet(ObjectMapperUtils.jsonStringToObject(filterSelection.getValue().get(0),Object.class))));

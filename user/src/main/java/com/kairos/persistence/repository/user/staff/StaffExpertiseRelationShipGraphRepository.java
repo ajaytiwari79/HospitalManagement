@@ -38,16 +38,16 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
             "RETURN id(rel) as id, id(expertise) as expertiseId, expertise.name as name,rel.expertiseStartDate as expertiseStartDate,rel.relevantExperienceInMonths as relevantExperienceInMonths")
     List<StaffExperienceInExpertiseDTO> getExpertiseWithExperienceByStaffIdAndExpertiseIds(Long staffId, List<Long> expertiseId);
 
-   @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) where id(staff) = {0} AND (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE())) " +
-            "MATCH (expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
-            "MATCH(exl)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) " +
+
+    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise)-["+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) where id(staff) = {0} AND (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE())) " +
+            "MATCH(expertise)-[:"+BELONGS_TO_SECTOR+"]-(sector:Sector) " +
+            "MATCH (exl)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
             "WITH sector,expertise, staff,rel,seniorityLevel ORDER By seniorityLevel.from " +
             "WITH expertise ,staff,rel,collect({id:id(seniorityLevel),from:seniorityLevel.from,to:seniorityLevel.to}) as seniorityLevels,sector " +
             "OPTIONAL MATCH(expertise)<-[expRel:"+HAS_EXPERTISE_IN+"]-(employment:Employment)<-["+BELONGS_TO_STAFF+"]-(staff) " +
             "WITH expertise ,seniorityLevels,sector,CASE WHEN count(expRel)>0 THEN true ELSE false END as employmentExists,rel ORDER BY rel.expertiseStartDate " +
             "RETURN id(sector) as id,sector.name as name, COLLECT({id:id(rel), expertiseId:id(expertise), name:expertise.name ,expertiseStartDate:rel.expertiseStartDate ,relevantExperienceInMonths:rel.relevantExperienceInMonths ,employmentExists:employmentExists,seniorityLevels:seniorityLevels}) as expertiseWithExperience ")
     List<SectorAndStaffExpertiseQueryResult> getSectorWiseExpertiseWithExperience(Long staffId);
-
 
 
 

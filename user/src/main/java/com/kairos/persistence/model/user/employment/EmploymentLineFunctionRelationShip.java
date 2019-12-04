@@ -2,6 +2,10 @@ package com.kairos.persistence.model.user.employment;
 
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.functions.Function;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.RelationshipEntity;
@@ -16,6 +20,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.APPLI
  * Created by vipul on 6/4/18.
  */
 @RelationshipEntity(type = APPLICABLE_FUNCTION)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class EmploymentLineFunctionRelationShip extends UserBaseEntity {
 
 
@@ -26,36 +34,4 @@ public class EmploymentLineFunctionRelationShip extends UserBaseEntity {
     @Property
     private BigDecimal amount;
 
-    public EmploymentLineFunctionRelationShip() {
-
-    }
-
-    public EmploymentLineFunctionRelationShip(EmploymentLine employmentLine, Function function, BigDecimal amount) {
-        this.employmentLine = employmentLine;
-        this.function = function;
-        this.amount=amount;
-    }
-    public EmploymentLine getEmploymentLine() {
-        return employmentLine;
-    }
-
-    public void setEmploymentLine(EmploymentLine employmentLine) {
-        this.employmentLine = employmentLine;
-    }
-
-    public Function getFunction() {
-        return function;
-    }
-
-    public void setFunction(Function function) {
-        this.function = function;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
 }

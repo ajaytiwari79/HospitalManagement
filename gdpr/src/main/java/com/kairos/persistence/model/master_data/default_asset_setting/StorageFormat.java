@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class StorageFormat extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.name.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "error.message.name.special.character.notAllowed",regexp = "^[a-zA-Z0-9\\s]+$")
     private String name;
     private Long countryId;
     private SuggestedDataStatus suggestedDataStatus;
@@ -34,7 +34,7 @@ public class StorageFormat extends BaseEntity {
         this.countryId = countryId;
     }
 
-    public StorageFormat(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
+    public StorageFormat(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$") String name) {
         this.name = name;
     }
 }

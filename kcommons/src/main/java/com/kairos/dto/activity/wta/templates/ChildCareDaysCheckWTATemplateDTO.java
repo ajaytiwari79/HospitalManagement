@@ -20,7 +20,6 @@ public class ChildCareDaysCheckWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     private List<AgeRange> ageRange;
     private List<BigInteger> activityIds = new ArrayList<>();
-    private boolean borrowLeave;
     private CutOffIntervalUnit cutOffIntervalUnit;
     protected float recommendedValue;
 

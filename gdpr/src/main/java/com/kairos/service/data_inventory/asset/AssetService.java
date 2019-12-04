@@ -306,10 +306,10 @@ public class AssetService {
             assetResponseDTO.setSuggested(asset.isSuggested());
             assetResponseDTO.setAssetOwner(asset.getAssetOwner());
             assetResponseDTO.setAssetAssessor(asset.getAssetAssessor());
-            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOfListByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
-            assetResponseDTO.setOrgSecurityMeasures(ObjectMapperUtils.copyPropertiesOfListByMapper(asset.getOrgSecurityMeasures(), OrganizationalSecurityMeasureResponseDTO.class));
-            assetResponseDTO.setTechnicalSecurityMeasures(ObjectMapperUtils.copyPropertiesOfListByMapper(asset.getTechnicalSecurityMeasures(), TechnicalSecurityMeasureResponseDTO.class));
-            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOfListByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
+            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
+            assetResponseDTO.setOrgSecurityMeasures(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(asset.getOrgSecurityMeasures(), OrganizationalSecurityMeasureResponseDTO.class));
+            assetResponseDTO.setTechnicalSecurityMeasures(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(asset.getTechnicalSecurityMeasures(), TechnicalSecurityMeasureResponseDTO.class));
+            assetResponseDTO.setStorageFormats(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(asset.getStorageFormats(), StorageFormatResponseDTO.class));
             assetResponseDTO.setHostingProvider(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingProvider(), HostingProviderResponseDTO.class));
             assetResponseDTO.setHostingType(ObjectMapperUtils.copyPropertiesByMapper(asset.getHostingType(), HostingTypeResponseDTO.class));
             assetResponseDTO.setDataDisposal(ObjectMapperUtils.copyPropertiesByMapper(asset.getDataDisposal(), DataDisposalResponseDTO.class));

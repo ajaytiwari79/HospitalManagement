@@ -33,7 +33,7 @@ public class PlannedHoursCalculationServiceTest {
     public void getStaffPlannedHoursByRepresentPerStaff(){
         staffIds=new ArrayList<>();
         staffIds.add(920L);
-        shifts = ObjectMapperUtils.JsonStringToList(getShift(),Shift.class);
+        shifts = ObjectMapperUtils.jsonStringToList(getShift(),Shift.class);
         Map<Object, Double> shiDoubleMap=plannedHoursCalculationService.getStaffPlannedHoursByRepresentPerStaff(staffIds,shifts);
         assertTrue(shiDoubleMap.get(staffIds.get(0)).equals(6.0));
     }
@@ -42,7 +42,7 @@ public class PlannedHoursCalculationServiceTest {
     public void getStaffPlannedHoursByRepresentPerStaffNegitive(){
         staffIds=new ArrayList<>();
         staffIds.add(120L);
-        shifts = ObjectMapperUtils.JsonStringToList(getShift(),Shift.class);
+        shifts = ObjectMapperUtils.jsonStringToList(getShift(),Shift.class);
         Map<Object, Double> shiDoubleMap=plannedHoursCalculationService.getStaffPlannedHoursByRepresentPerStaff(staffIds,shifts);
         assertTrue(shiDoubleMap.get(staffIds.get(0)).equals(0.0));
     }
