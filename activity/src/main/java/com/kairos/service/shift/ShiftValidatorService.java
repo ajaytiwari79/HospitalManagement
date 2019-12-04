@@ -158,6 +158,9 @@ public class ShiftValidatorService {
     @Inject
     private TimeBankCalculationService timeBankCalculationService;
 
+    @Inject
+    private BlockSettingService blockSettingService;
+
     @Autowired
     public void setExceptionService(ExceptionService exceptionService) {
         this.exceptionService = exceptionService;
@@ -219,6 +222,8 @@ public class ShiftValidatorService {
         } else {
             Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
             activitySpecification = activitySpecification.and(staffEmploymentSpecification);
+            Specification<ShiftWithActivityDTO> blockSettingSpecification = new BlockSettingSpecification(blockSettingService.getBlockSettingDetail(shift.getUnitId(), asLocalDate(shift.getStartDate())));
+            activitySpecification = activitySpecification.and(blockSettingSpecification);
         }
         if (!byTandAPhase) {
             Specification<ShiftWithActivityDTO> shiftTimeLessThan = new ShiftStartTimeLessThan();
