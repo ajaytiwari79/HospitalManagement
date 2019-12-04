@@ -72,7 +72,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -222,8 +221,7 @@ public class ShiftValidatorService {
         } else {
             Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
             activitySpecification = activitySpecification.and(staffEmploymentSpecification);
-            List<BlockSettingDTO> blockSettingDTOS = blockSettingService.getBlockSettingDetails(shift.getUnitId(), asLocalDate(shift.getStartDate()), asLocalDate(shift.getStartDate()));
-            Specification<ShiftWithActivityDTO> blockSettingSpecification = new BlockSettingSpecification(isCollectionNotEmpty(blockSettingDTOS) ? blockSettingDTOS.get(0) : null);
+            Specification<ShiftWithActivityDTO> blockSettingSpecification = new BlockSettingSpecification(blockSettingService.getBlockSetting(shift.getUnitId(), asLocalDate(shift.getStartDate())));
             activitySpecification = activitySpecification.and(blockSettingSpecification);
         }
         if (!byTandAPhase) {

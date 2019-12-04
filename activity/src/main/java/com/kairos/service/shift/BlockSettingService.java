@@ -35,14 +35,14 @@ public class BlockSettingService {
     @Inject
     private ExceptionService exceptionService;
 
-    public BlockSettingDTO saveBlockSettingDetails(Long unitId, BlockSettingDTO blockSettingDTO) {
+    public BlockSettingDTO saveBlockSetting(Long unitId, BlockSettingDTO blockSettingDTO) {
         Map<Long, Set<BigInteger>> blockDetails = blockSettingDTO.getBlockDetails();
         if(isMapEmpty(blockDetails) || blockDetails.size() == 1 && blockDetails.containsKey(null)){
             Set<BigInteger> activitySet;
             if(isMapNotEmpty(blockDetails)){
                 activitySet = blockDetails.get(null);
             }else{
-                activitySet = activityService.getFullDayOrWeekAndApprovalRequiredActivityIds(unitId, asDate(blockSettingDTO.getDate()));
+                activitySet = activityService.getAbsenceActivityIds(unitId, asDate(blockSettingDTO.getDate()));
             }
             Set<Long> staffIds = userIntegrationService.getStaffByUnitId(unitId).stream().map(staffDTO -> staffDTO.getId()).collect(Collectors.toSet());
             blockDetails = new HashMap<>();
@@ -62,11 +62,15 @@ public class BlockSettingService {
         return blockSettingDTO;
     }
 
-    public List<BlockSettingDTO> getBlockSettingDetails(Long unitId, LocalDate startDate, LocalDate endDate) {
+    public List<BlockSettingDTO> getBlockSettings(Long unitId, LocalDate startDate, LocalDate endDate) {
         return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(blockSettingMongoRepository.findAllBlockSettingByUnitIdAndDateRange(unitId, startDate, endDate), BlockSettingDTO.class);
     }
 
-    public boolean deleteBlockSettingDetail(Long unitId, LocalDate date) {
+    public BlockSettingDTO getBlockSetting(Long unitId, LocalDate date) {
+        return ObjectMapperUtils.copyPropertiesByMapper(blockSettingMongoRepository.findBlockSettingByUnitIdAndDate(unitId, date), BlockSettingDTO.class);
+    }
+
+    public boolean deleteBlockSetting(Long unitId, LocalDate date) {
         BlockSetting blockSetting = blockSettingMongoRepository.findBlockSettingByUnitIdAndDate(unitId, date);
         if(isNull(blockSetting)){
             exceptionService.dataNotFoundException(ERROR_BLOCK_SETTING_NOT_FOUND);

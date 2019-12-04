@@ -27,24 +27,24 @@ public class BlockSettingController {
     @Inject
     private BlockSettingService blockSettingService;
 
-    @ApiOperation("create or update block setting details")
+    @ApiOperation("create or update block setting")
     @PutMapping(value = "/block_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveBlockSettingDetails(@PathVariable Long unitId, @RequestBody BlockSettingDTO blockSettingDTO) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.saveBlockSettingDetails(unitId, blockSettingDTO));
+    public ResponseEntity<Map<String, Object>> saveBlockSetting(@PathVariable Long unitId, @RequestBody BlockSettingDTO blockSettingDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.saveBlockSetting(unitId, blockSettingDTO));
     }
 
-    @ApiOperation("get block setting details")
+    @ApiOperation("get block settings")
     @GetMapping(value = "/block_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getBlockSettingDetails(@PathVariable Long unitId, @RequestParam(value = "startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.getBlockSettingDetails(unitId, startDate, isNull(endDate) ? startDate : endDate));
+    public ResponseEntity<Map<String, Object>> getBlockSettings(@PathVariable Long unitId, @RequestParam(value = "startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.getBlockSettings(unitId, startDate, isNull(endDate) ? startDate : endDate));
     }
 
-    @ApiOperation("delete block setting detail")
+    @ApiOperation("delete block setting")
     @DeleteMapping(value = "/block_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteBlockSettingDetail(@PathVariable Long unitId, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.deleteBlockSettingDetail(unitId, date));
+    public ResponseEntity<Map<String, Object>> deleteBlockSetting(@PathVariable Long unitId, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.deleteBlockSetting(unitId, date));
     }
 }
