@@ -1,5 +1,6 @@
 package com.kairos.service.shift;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
@@ -8,13 +9,16 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.break_settings.BreakSettings;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.phase.PhaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,7 +33,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
+import static com.kairos.constants.AppConstants.*;
 
 /**
  * @author pradeep
@@ -46,6 +50,10 @@ public class ShiftBreakService {
     private ExceptionService exceptionService;
     @Inject private ShiftService shiftService;
     @Inject private MongoSequenceRepository mongoSequenceRepository;
+    @Inject
+    private ShiftMongoRepository shiftMongoRepository;
+    @Inject
+    private PhaseService phaseService;
 
 
     public Map<BigInteger, ActivityWrapper> getBreakActivities(BreakSettings breakSetting, Long unitId) {
@@ -175,6 +183,16 @@ public class ShiftBreakService {
             breakAvailabilitySettings = breakWTATemplate.getBreakAvailability().stream().filter(currentAvailability -> (currentAvailability.getTimeSlot().toString().equalsIgnoreCase(currentTimeSlot.getName()))).findFirst().get();
         }
         return breakAvailabilitySettings;
+    }
+
+    public boolean interruptBreak(BigInteger shiftId){
+        Shift shift=shiftMongoRepository.findById(shiftId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_SHIFT_ID, shiftId)));
+        Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
+        if(REALTIME.equals(phase.getName()) && TIME_AND_ATTENDANCE.equals(phase.getName())){
+            shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakInterrupt(true));
+        }
+        shiftMongoRepository.save(shift);
+        return true;
     }
 
 

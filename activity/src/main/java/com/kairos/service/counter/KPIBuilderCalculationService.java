@@ -386,6 +386,8 @@ public class KPIBuilderCalculationService implements CounterService {
                         Double value = getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,value));
                         break;
+                    case BREAK_INTERRUPT:
+
                     default:
                         break;
 
@@ -743,6 +745,10 @@ public class KPIBuilderCalculationService implements CounterService {
                 filteredStaffKpiFilterDTOS = filteredStaffKpiFilterDTOS.stream().filter(staffKpiFilterDTO -> staffKpiFilterDTO.getId().equals(staffId)).collect(Collectors.toList());
             }
             return filteredStaffKpiFilterDTOS;
+        }
+
+        private long getNumberOfBreakInterrupt(KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+            kpiCalculationRelatedInfo.getShifts().stream().filter()
         }
     }
 

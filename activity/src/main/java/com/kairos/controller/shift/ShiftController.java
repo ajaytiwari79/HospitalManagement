@@ -56,6 +56,8 @@ public class ShiftController {
     @Inject
     private ShiftStatusService shiftStatusService;
     @Inject private RequestAbsenceService requestAbsenceService;
+    @Inject
+    private ShiftBreakService shiftBreakService;
 
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
@@ -237,5 +239,12 @@ public class ShiftController {
     @GetMapping("employment/{employmentId}/shift_count")
     public ResponseEntity<Map<String, Object>> getPublishShiftCount(@PathVariable Long employmentId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getPublishShiftCount(employmentId));
+    }
+
+    @ApiOperation("update a Shift of a staff")
+    @PatchMapping(value = "/shift/break_interrupt{shiftId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> breakInterrupt(@PathVariable BigInteger shiftId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId));
     }
 }
