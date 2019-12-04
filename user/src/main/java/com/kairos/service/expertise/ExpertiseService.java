@@ -177,6 +177,7 @@ public class ExpertiseService {
         currentExpertise.setStartDate(expertiseDTO.getStartDate());
         currentExpertise.setEndDate(expertiseDTO.getEndDate());
         if (!currentExpertise.isPublished()) {
+            currentExpertise.getExpertiseLines().get(0).setStartDate(currentExpertise.getStartDate());
             currentExpertise.getExpertiseLines().get(0).setEndDate(currentExpertise.getEndDate());
             setBasicDetails(expertiseDTO, country, currentExpertise);
         } else {
