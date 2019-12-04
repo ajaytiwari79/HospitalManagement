@@ -10,7 +10,6 @@ import com.kairos.dto.activity.activity.activity_tabs.communication_tab.Activity
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.FrequencySettings;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
@@ -1148,7 +1147,7 @@ public class ActivityService {
 
     public Set<BigInteger> getFullDayOrWeekAndApprovalRequiredActivityIds(Long unitId, Date date) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, date, null);
-        List<Activity> activities = activityMongoRepository.findAllByMethodForCalculatingTimeAndApprovalRequiredPhaseId(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
+        List<Activity> activities = activityMongoRepository.findAllActivitiesByMethodForCalculatingTimeAndApprovalRequiredAndPhaseId(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
         return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 }

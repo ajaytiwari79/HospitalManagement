@@ -92,5 +92,5 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     List<Activity> findActivitiesByTagId(BigInteger tagId);
 
     @Query(value = "{unitId:?0, 'timeCalculationActivityTab.methodForCalculatingTime':{$in:?1 }, 'rulesActivityTab.approvalAllowedPhaseIds':?2, deleted:false}")
-    List<Activity> findAllByMethodForCalculatingTimeAndApprovalRequiredPhaseId(Long unitId, Set<String> methodForCalculatingTimes, BigInteger id);
+    List<Activity> findAllActivitiesByMethodForCalculatingTimeAndApprovalRequiredAndPhaseId(Long unitId, Set<String> methodForCalculatingTimes, BigInteger id);
 }
