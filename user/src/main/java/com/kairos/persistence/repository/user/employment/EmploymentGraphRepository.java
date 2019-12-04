@@ -344,7 +344,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(exp:Expertise)-[:"+HAS_EXPERTISE_IN+"]-(e:Employment)-[r:"+HAS_EMPLOYMENT_LINES+"]-(el:EmploymentLine) WHERE id(exp)={0}" +
             "MATCH(e)-[unitRel:"+IN_UNIT+"]-(unit:Unit) " +
             "MATCH(e)-[staffRel:"+BELONGS_TO_STAFF+"]-(s:Staff) " +
-            "MATCH(e)-[prRel:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]-(pr:ProtectedDaysOffSetting)" +
+            "MATCH(e)-[prRel:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(pr:ProtectedDaysOffSetting)" +
             "RETURN e,r,el,unitRel,unit,staffRel,s,COLLECT(prRel),COLLECT(pr)")
     List<Employment> findAllEmploymentByExpertiseId(Long expertiseId);
 
@@ -353,7 +353,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "WHERE id(l)={0} AND  \n" +
             "(({2} IS NULL AND (emp.endDateMillis IS NULL OR DATE(emp.endDateMillis) > DATE({1})))\n" +
             "OR " +
-            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < DATE(emp.endDateMillis) OR DATE({2}) > DATE(emp.startDateMillis)))) " +
+            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < DATE(emp.endDateMillis) AND DATE({2}) > DATE(emp.startDateMillis)))) " +
             "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine),staffRel,staff")
     List<Employment> getAllEmploymentByLevel(Long levelId,String startDate,String endDate);
 }
