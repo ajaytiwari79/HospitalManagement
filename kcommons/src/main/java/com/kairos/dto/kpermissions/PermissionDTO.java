@@ -20,5 +20,5 @@ public class PermissionDTO {
 
     @Valid
     @NotEmpty(message = "message.model.permissions.null")
-    private List<ModelPermissionDTO> modelPermissions;
+    private List<ModelDTO> modelPermissions;
 }

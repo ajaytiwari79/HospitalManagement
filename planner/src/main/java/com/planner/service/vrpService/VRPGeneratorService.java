@@ -34,7 +34,7 @@ public class VRPGeneratorService {
 
     public VrpTaskPlanningSolution writeToJson(){
         VrpTaskPlanningSolution solution = new VrpTaskPlanningSolution();
-        List<Employee> employees = ObjectMapperUtils.copyPropertiesOfListByMapper(employeeService.getEmployees(),Employee.class);
+        List<Employee> employees = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employeeService.getEmployees(),Employee.class);
 
         List<Matrix> matrix=tomTomService.getMatrix();
         LocationsDistanceMatrix locationsDistanceMatrix= new LocationsDistanceMatrix();
@@ -122,7 +122,7 @@ public class VRPGeneratorService {
     private Object[] getEmployeesAndShifts(List<ShiftDTO> shiftDTOS){
         List<Shift> shifts = new ArrayList<>();
         List<EmployeeDTO> employeeDTOSet = new ArrayList<>(shiftDTOS.stream().map(shiftDTO -> shiftDTO.getEmployee()).collect(Collectors.toSet()));
-        List<Employee> employees = ObjectMapperUtils.copyPropertiesOfListByMapper(employeeDTOSet,Employee.class);
+        List<Employee> employees = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employeeDTOSet,Employee.class);
         Map<String,Employee> employeeMap = employees.stream().collect(Collectors.toMap(k->k.getId(), v->v));
         shiftDTOS.forEach(s->{
             //for (int i=4;i<=8;i++) {

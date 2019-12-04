@@ -95,8 +95,9 @@ public class EmploymentCTAWTAService {
 
     public CtaWtaQueryResult getCtaAndWtaWithExpertiseDetailByExpertiseId(Long unitId, Long expertiseId, Long staffId,LocalDate selectedDate,Long employmentId){
         CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = activityIntegrationService.getCTAWTAByExpertiseAndDate(expertiseId,unitId,selectedDate,employmentId);
-        Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId);
-        SeniorityLevel appliedSeniorityLevel = employmentService.getSeniorityLevelByStaffAndExpertise(staffId, currentExpertise.get());
+        Optional<Expertise> currentExpertise = expertiseGraphRepository.findById(expertiseId,2);
+        ExpertiseLine expertiseLine=currentExpertise.get().getCurrentlyActiveLine(selectedDate);
+        SeniorityLevel appliedSeniorityLevel = employmentService.getSeniorityLevelByStaffAndExpertise(staffId, expertiseLine,currentExpertise.get().getId());
         SeniorityLevelQueryResult seniorityLevel = null;
         if (appliedSeniorityLevel != null) {
             seniorityLevel = seniorityLevelGraphRepository.getSeniorityLevelById(appliedSeniorityLevel.getId());
@@ -104,11 +105,10 @@ public class EmploymentCTAWTAService {
             seniorityLevel.setFunctions(functionDTOs);
         }
         ExpertiseDTO expertiseDTO=ObjectMapperUtils.copyPropertiesByMapper(currentExpertise,ExpertiseDTO.class);
-        ExpertiseLine expertiseLine=expertiseService.getCurrentlyActiveExpertiseLineByDate(expertiseId,selectedDate);
         expertiseDTO.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
         expertiseDTO.setNumberOfWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
 
-        return new CtaWtaQueryResult(ctawtaAndAccumulatedTimebankWrapper.getCta(),ctawtaAndAccumulatedTimebankWrapper.getWta(),expertiseDTO,seniorityLevel,expertiseLine.getUnion());
+        return new CtaWtaQueryResult(ctawtaAndAccumulatedTimebankWrapper.getCta(),ctawtaAndAccumulatedTimebankWrapper.getWta(),expertiseDTO,seniorityLevel,currentExpertise.get().getUnion());
     }
 
     //TODO this must be moved to activity

@@ -11,6 +11,7 @@ import com.kairos.persistence.model.country.pay_table.PayGroupAreaDTO;
 import com.kairos.persistence.model.country.pay_table.PayTableResponseWrapper;
 import com.kairos.persistence.model.organization.Level;
 import com.kairos.persistence.model.pay_table.*;
+import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupArea;
 import com.kairos.persistence.model.user.pay_group_area.PayGroupAreaQueryResult;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
@@ -19,6 +20,7 @@ import com.kairos.persistence.repository.user.pay_group_area.PayGroupAreaGraphRe
 import com.kairos.persistence.repository.user.pay_table.PayGradeGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableGraphRepository;
 import com.kairos.persistence.repository.user.pay_table.PayTableRelationShipGraphRepository;
+import com.kairos.service.employment.EmploymentService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.FunctionalPaymentService;
 import org.apache.commons.collections.CollectionUtils;
@@ -47,6 +49,8 @@ public class PayTableService {
 
     @Inject
     private PayTableGraphRepository payTableGraphRepository;
+    @Inject
+    private EmploymentService employmentService;
     @Inject
     private PayGradeGraphRepository payGradeGraphRepository;
     @Inject
@@ -475,19 +479,9 @@ public class PayTableService {
 
     public List<PayTable> publishPayTable(Long payTableId, LocalDate publishedDate) {
         PayTable payTable = payTableGraphRepository.findOne(payTableId);
-        if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_PAYTABLE_ID_NOTFOUND);
-        }
-        if (payTable.isPublished()) {
-            exceptionService.actionNotPermittedException(MESSAGE_PAYTABLE_PUBLISHED);
-
-        }
-        if (CollectionUtils.isEmpty(payTable.getPayGrades())) {
-            exceptionService.actionNotPermittedException(MESSAGE_PAYGRADE_ABSENT);
-        }
+        validateDetails(payTable);
         List<PayTable> response = new ArrayList<>();
         PayTable parentPayTable = payTableGraphRepository.getPermanentPayTableByPayTableId(payTableId);
-        LOGGER.debug(payTable.getStartDateMillis() + "----" + publishedDate);
         if (Optional.ofNullable(parentPayTable).isPresent()) {
             LocalDate endDate;
             if (DateUtils.getLocalDate().equals(publishedDate) || parentPayTable.getStartDateMillis().equals(publishedDate)) {
@@ -511,11 +505,27 @@ public class PayTableService {
         payTable.setStartDateMillis(publishedDate);
         payTable.getPayGrades().forEach(currentPayGrade -> currentPayGrade.setPublished(true));
         payTableGraphRepository.save(payTable);
-        if (payTable.getPercentageValue() != null && parentPayTable != null) {
-            functionalPaymentService.updateAmountInFunctionalTable(parentPayTable.getId(), payTable.getStartDateMillis(), payTable.getEndDateMillis(), payTable.getPercentageValue());
+        if (parentPayTable != null) {
+            employmentService.createEmploymentLineOnPayTableChanges(payTable);
+            if (payTable.getPercentageValue() != null) {
+                functionalPaymentService.updateAmountInFunctionalTable(parentPayTable.getId(), payTable.getStartDateMillis(), payTable.getEndDateMillis(), payTable.getPercentageValue());
+            }
         }
         response.add(payTable);
         return response;
+    }
+
+    private void validateDetails(PayTable payTable) {
+        if (!Optional.ofNullable(payTable).isPresent() || payTable.isDeleted()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_PAYTABLE_ID_NOTFOUND);
+        }
+        if (payTable.isPublished()) {
+            exceptionService.actionNotPermittedException(MESSAGE_PAYTABLE_PUBLISHED);
+
+        }
+        if (CollectionUtils.isEmpty(payTable.getPayGrades())) {
+            exceptionService.actionNotPermittedException(MESSAGE_PAYGRADE_ABSENT);
+        }
     }
 
     public List<PayTableResponse> getPayTablesByOrganizationLevel(Long organizationLevelId) {
@@ -531,13 +541,13 @@ public class PayTableService {
         Map<String, PayGradePayGroupAreaRelationShip> publishedPayGroupAreaRelationShipMap = null;
         if (!payTable.isPublished() && payTable.getPayTable() != null) {
             parentPayTable = payTable.getPayTable();
-            List<PayGradePayGroupAreaRelationShip> publishedPayGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfListByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(parentPayTable.getId()), PayGradePayGroupAreaRelationShip.class);
+            List<PayGradePayGroupAreaRelationShip> publishedPayGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(parentPayTable.getId()), PayGradePayGroupAreaRelationShip.class);
             publishedPayGroupAreaRelationShipMap = publishedPayGradePayGroupAreaRelationShips.stream().collect(Collectors.toMap(k -> k.getPayGrade().getPayGradeLevel().toString() + k.getPayGroupArea().getId(), v -> v));
         }
 
         List<PayGradeResponse> payGradeResponses = null;
         payTable.setPercentageValue(payTableDTO.getPercentageValue());
-        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfListByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
+        List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(payTableRelationShipGraphRepository.findAllByPayTableId(payTableId), PayGradePayGroupAreaRelationShip.class);
         if (CollectionUtils.isNotEmpty(payGradePayGroupAreaRelationShips)) {
             for (PayGradePayGroupAreaRelationShip current : payGradePayGroupAreaRelationShips) {
                 if (current.getPayGroupAreaAmount() != null) {

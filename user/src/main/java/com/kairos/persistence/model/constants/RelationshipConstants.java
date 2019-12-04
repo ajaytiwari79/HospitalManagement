@@ -6,6 +6,8 @@ package com.kairos.persistence.model.constants;
 
 public abstract class RelationshipConstants {
 
+
+
     /**
      * Default constructor
      */
@@ -18,6 +20,7 @@ public abstract class RelationshipConstants {
     public static final  String COUNTRY_HAS_EQUIPMENT = "COUNTRY_HAS_EQUIPMENT";
     public static final  String EQUIPMENT_HAS_CATEGORY = "EQUIPMENT_HAS_CATEGORY";
     public static final  String HAS_TAG = "HAS_TAG";
+    public static final  String BELONGS_TO_EXPERTISE="BELONGS_TO_EXPERTISE";
 
     // Organization
     public static final  String HAS_SETTING = "HAS_SETTING";
@@ -198,6 +201,7 @@ public abstract class RelationshipConstants {
     public static final  String HAS_PAYMENT_SETTINGS = "HAS_PAYMENT_SETTINGS";
     public static final  String HAS_PERSONALIZED_SETTINGS = "HAS_PERSONALIZED_SETTINGS";
     public static final  String HAS_SENIOR_DAYS = "HAS_SENIOR_DAYS";
+    public static final  String HAS_CARE_DAYS = "HAS_CARE_DAYS";
     public static final  String HAS_CHILD_CARE_DAYS = "HAS_CHILD_CARE_DAYS";
     public static final String APPLICABLE_FOR_EXPERTISE = "APPLICABLE_FOR_EXPERTISE";
     public static final String SENIORITY_LEVEL_FUNCTIONS = "SENIORITY_LEVEL_FUNCTIONS";

@@ -74,7 +74,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION_TYPE, ORGANIZATION_SUB_TYPE, COUNTRY_ID, ORGANIZATION, PARENT_ID, COUNTRY_PARENT_WTA, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES)
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
-        return result.getMappedResults().size() > 0 ? result.getMappedResults().get(0) : null;
+        return !result.getMappedResults().isEmpty() ? result.getMappedResults().get(0) : null;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
                 project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION_TYPE, ORGANIZATION_SUB_TYPE, COUNTRY_ID, ORGANIZATION, PARENT_ID, COUNTRY_PARENT_WTA, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES)
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
-        return result.getMappedResults().size() > 0 ? result.getMappedResults().get(0) : null;
+        return !result.getMappedResults().isEmpty() ? result.getMappedResults().get(0) : null;
     }
 
     @Override
@@ -207,23 +207,6 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         return result.getMappedResults();
     }
 
-    /**
-     * @Auhor vipul
-     * @Date 6 July
-     * @NOTE PLEASE DON'T REMOVE BELOW COMMENTED CODE.
-     **/
-    // TODO --> PLEASE DON'T REMOVE BELOW COMMENTED CODE.
-    /*db.workingTimeAgreement.aggregate([ {"$match":{"_id":{"$in":["41"]}}},
-    {"$graphLookup": {from:"workingTimeAgreement",startWith:"$parentWTA","connectFromField":"parentId","connectToField":"_id",as:"pvpv"}},
-    {"$project":{"pvpv":1}},
-    {"$unwind":"$pvpv"},{"$unwind":"$pvpv.ruleTemplateIds"},
-    {"$lookup":{from:"wtaBaseRuleTemplate",localField:"pvpv.ruleTemplateIds","foreignField":"_id",as:"dataOFRT"}},
-    {"$unwind":"$dataOFRT"},
-     ,{"$group":{"_id":{parentId:"$_id",wta:"$pvpv","rules":"$dataOFRT"}}},
-     {"$group":{"_id":{"parentId":"$_id.parentId","wta":{"id":"$_id.wta._id","name":"$_id.wta.name","startDate":"$_id.wta.startDate",'endDate':'$_id.wta.endDate'}},
-            ruleTemp:{$push:"$_id.rules"}}},
-     {"$group":{"_id":"$_id.parentId", data:{$push:{wta:"$_id.wta",ruleTemp:"$ruleTemp"}}}}]).pretty();
-     */
     @Override
     public List<WTAQueryResultDTO> getWTAWithVersionIds(List<Long> employmentIds) {
         Aggregation aggregation = Aggregation.newAggregation(
@@ -345,6 +328,19 @@ public class WorkingTimeAgreementMongoRepositoryImpl implements CustomWorkingTim
         );
         AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public List<WTAQueryResultDTO> getAllWTAByDate(Date date) {
+        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).exists(true).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date), Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(criteria),
+                lookup(WTA_BASE_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
+                project("name", DESCRIPTION, DISABLED, EXPERTISE, ORGANIZATION, PARENT_ID, ORGANIZATION_PARENT_ID, "tags", START_DATE, END_DATE, EXPIRY_DATE, RULE_TEMPLATES, EMPLOYMENT_ID)
+        );
+        AggregationResults<WTAQueryResultDTO> result = mongoTemplate.aggregate(aggregation, WorkingTimeAgreement.class, WTAQueryResultDTO.class);
+        return result.getMappedResults();
+
     }
 
     private String getProjectionWithFilter(WTATemplateType templateType){

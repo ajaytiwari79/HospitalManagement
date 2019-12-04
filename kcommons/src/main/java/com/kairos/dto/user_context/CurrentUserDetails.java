@@ -2,6 +2,7 @@ package com.kairos.dto.user_context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.OrganizationCategory;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,6 +30,7 @@ public class CurrentUserDetails {
     private boolean hubMember;
     private Long languageId;
     private Long lastSelectedOrganizationId;
+    private OrganizationCategory lastSelectedOrganizationCategory;
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
 
 

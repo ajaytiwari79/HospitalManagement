@@ -7,6 +7,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
@@ -14,6 +15,8 @@ import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.user.ChatStatus;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.access_permission.AccessPageDTO;
 import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
@@ -26,8 +29,6 @@ import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
-import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
-import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.system_setting.SystemLanguageGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
@@ -38,7 +39,9 @@ import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.kpermissions.PermissionService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.UnitService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
@@ -64,7 +67,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
-import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
@@ -115,6 +117,8 @@ public class UserService {
     private UnitPermissionGraphRepository unitPermissionGraphRepository;
     @Inject
     private OrganizationService organizationService;
+    @Inject private UnitService unitService;
+    @Inject private PermissionService permissionService;
 
     /**
      * Calls UserGraphRepository,
@@ -207,8 +211,8 @@ public class UserService {
         map.put("email", currentUser.getEmail());
         map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
+        //updateChatStatus(ChatStatus.ONLINE);
         return map;
-
     }
 
     public User findByAccessToken(String token) {
@@ -252,6 +256,7 @@ public class UserService {
             }
             tokenStore.removeAccessToken(tokenStore.getAccessToken(oAuth2Authentication));
             SecurityContextHolder.clearContext();
+            updateChatStatus(ChatStatus.OFFLINE);
             logoutSuccessfull = true;
         } else {
             exceptionService.internalServerError("message.authentication.null");
@@ -472,12 +477,13 @@ public class UserService {
             List<Long> accessibleModules = modules.stream().map(AccessPageDTO::getId).collect(Collectors.toList());
             for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
-                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfListByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
+                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
             }
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
          permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
+         permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(),userAccessRoleDTO.getAccessGroupIds(),UserContext.getUserDetails().isHubMember()), ModelDTO.class));
         return permissionData;
     }
 
@@ -485,8 +491,10 @@ public class UserService {
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (!currentUser.getLastSelectedOrganizationId().equals(organizationId)) {
+            OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);
             Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
+            currentUser.setLastSelectedOrganizationCategory(organizationCategory);
             currentUser.setCountryId(countryId);
         }
         if(!currentUser.getUnitWiseAccessRole().containsKey(organizationId.toString())){
@@ -611,5 +619,12 @@ public class UserService {
 
     public Map<String,String> getUnitWiseLastSelectedAccessRole(){
         return userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+    }
+
+    public boolean updateChatStatus(ChatStatus chatStatus){
+        User user = userGraphRepository.findByIdAndDeletedFalse(UserContext.getUserDetails().getId());
+        user.setChatStatus(chatStatus);
+        userGraphRepository.save(user);
+        return true;
     }
 }

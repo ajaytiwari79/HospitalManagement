@@ -39,6 +39,6 @@ public class CountryAccessGroupDTO {
 
     @AssertTrue(message = "Access group can't be blank")
     public boolean isValid() {
-        return (this.name.trim().isEmpty()) ? false : true;
+        return !this.name.trim().isEmpty();
     }
 }

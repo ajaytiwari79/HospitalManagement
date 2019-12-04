@@ -173,6 +173,7 @@ public class TimeBankCalculationService {
         dailyTimeBankEntry.setPublishedSomeActivities(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() > MINIMUM_VALUE);
         dailyTimeBankEntry.setTimeBankCTADistributionList(isCollectionNotEmpty(timeBankCTADistributionList) ?timeBankCTADistributionList :new ArrayList<>());
         dailyTimeBankEntry.setDraftDailyTimeBankEntry(null);
+        dailyTimeBankEntry.setTimeBankOffMinutes(0);
     }
 
     private List<TimeBankCTADistribution> getProtectedDaysOffTimeBankCTADistributions(DailyTimeBankEntry dailyTimeBankEntry) {
@@ -260,7 +261,7 @@ public class TimeBankCalculationService {
         return contractualMinutes;
     }
 
-    public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails) {
+    public void calculateScheduledAndDurationInMinutes(ShiftActivity shiftActivity, Activity activity, StaffEmploymentDetails staffEmploymentDetails,boolean calculateTimeBankOff) {
         if (shiftActivity.getStartDate().after(shiftActivity.getEndDate())) {
             exceptionService.invalidRequestException(ACTIVITY_END_DATE_LESS_THAN_START_DATE, activity.getName());
         }
@@ -297,7 +298,7 @@ public class TimeBankCalculationService {
             default:
                 break;
         }
-        if (TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType())) {
+        if (TimeTypes.WORKING_TYPE.toString().equals(shiftActivity.getTimeType()) || calculateTimeBankOff) {
             shiftActivity.setDurationMinutes(duration);
             shiftActivity.setScheduledMinutes(scheduledMinutes);
         }
@@ -415,6 +416,7 @@ public class TimeBankCalculationService {
         long approvePayOut = calculatedTimebankValues[8];
         long totalPlannedMinutes = calculatedTimebankValues[9];
         long plannedMinutesOfTimebank = calculatedTimebankValues[10];
+        long timeBankOffMinutes = calculatedTimebankValues[11];
         timeBankDTO.setApprovePayOut(approvePayOut);
         timeBankDTO.setPaidoutChange(paidPayOut);
         timeBankDTO.setRequestPayOut(requestPayOut);
@@ -427,6 +429,7 @@ public class TimeBankCalculationService {
         timeBankDTO.setTotalScheduledMin(totalScheduledMin);
         timeBankDTO.setTotalTimeBankDiff(totalTimeBankDiff);
         timeBankDTO.setTotalPlannedMinutes(totalPlannedMinutes);
+        timeBankDTO.setTimeBankOffMinutes(timeBankOffMinutes);
     }
 
     private List<CTADistributionDTO> getCTADistributionsOfTimebank(Map<String, Integer> ctaDistributionMap, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
@@ -481,6 +484,7 @@ public class TimeBankCalculationService {
         long paidPayOut = 0l;
         long totalPlannedMinutes = 0l;
         long plannedMinutesOfTimebank = 0l;
+        long timeBankOffMinutes = 0l;
         for (TimeBankIntervalDTO timeBankIntervalDTO : timeBankIntervalDTOS) {
             totalContractedMin += timeBankIntervalDTO.getTotalContractedMin();
             totalScheduledMin += timeBankIntervalDTO.getTotalScheduledMin();
@@ -491,12 +495,13 @@ public class TimeBankCalculationService {
             approvePayOut += timeBankIntervalDTO.getApprovePayOut();
             totalPlannedMinutes += timeBankIntervalDTO.getTotalPlannedMinutes();
             plannedMinutesOfTimebank += timeBankIntervalDTO.getTimeBankDistribution().getPlannedMinutesOfTimebank();
+            timeBankOffMinutes += timeBankIntervalDTO.getTimeBankOffMinutes();
         }
         if (!timeBankIntervalDTOS.isEmpty()) {
             totalTimeBankBeforeCtaMin = timeBankIntervalDTOS.get(timeBankIntervalDTOS.size() - 1).getTotalTimeBankBeforeCtaMin();
             totalTimeBankAfterCtaMin = totalTimeBankBeforeCtaMin + totalTimeBankDiff;
         }
-        return new long[]{totalContractedMin, totalScheduledMin, totalTimeBankAfterCtaMin, totalTimeBankBeforeCtaMin, totalTimeBankDiff, totalTimeBank, requestPayOut, paidPayOut, approvePayOut, totalPlannedMinutes, plannedMinutesOfTimebank};
+        return new long[]{totalContractedMin, totalScheduledMin, totalTimeBankAfterCtaMin, totalTimeBankBeforeCtaMin, totalTimeBankDiff, totalTimeBank, requestPayOut, paidPayOut, approvePayOut, totalPlannedMinutes, plannedMinutesOfTimebank,timeBankOffMinutes};
 
     }
 
@@ -622,14 +627,9 @@ public class TimeBankCalculationService {
     public Interval getIntervalValidIntervalForTimebank(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO, Interval interval, DateTimeInterval planningPeriodInterval) {
         Interval updatedInterval = null;
         DateTime employmentStartTime = toJodaDateTime(employmentWithCtaDetailsDTO.getStartDate());
-        if (interval.contains(employmentStartTime) || interval.getStart().isAfter(employmentStartTime)) {
-            DateTime employmentEndTime = toJodaDateTime(isNull(employmentWithCtaDetailsDTO.getEndDate()) ? planningPeriodInterval.getEndLocalDate() : employmentWithCtaDetailsDTO.getEndDate().isBefore(planningPeriodInterval.getEndLocalDate()) ? employmentWithCtaDetailsDTO.getEndDate() : planningPeriodInterval.getEndLocalDate());
-            Interval employmentInterval = new Interval(employmentStartTime, employmentEndTime);
-            if (interval.overlaps(employmentInterval)) {
-                updatedInterval = interval.overlap(employmentInterval);
-            }
-        }
-        return updatedInterval;
+        DateTime employmentEndTime = toJodaDateTime(isNull(employmentWithCtaDetailsDTO.getEndDate()) ? planningPeriodInterval.getEndLocalDate() : employmentWithCtaDetailsDTO.getEndDate().isBefore(planningPeriodInterval.getEndLocalDate()) ? employmentWithCtaDetailsDTO.getEndDate() : planningPeriodInterval.getEndLocalDate());
+        Interval employmentInterval = new Interval(employmentStartTime, employmentEndTime);
+        return interval.overlap(employmentInterval);
     }
 
 
@@ -694,6 +694,7 @@ public class TimeBankCalculationService {
         long plannedMinutesOfTimebank = (long)calculatedTimebankValues[1];
         long scheduledMinutesOfTimebank = (long)calculatedTimebankValues[2];
         BigDecimal plannedTimebankCost = (BigDecimal) calculatedTimebankValues[3];
+        long timeBankOffMinutes = (Long) calculatedTimebankValues[4];
         Object[] calculatedPayoutValues = getSumOfPayoutValues(payOutPerShifts,employmentWithCtaDetailsDTOMap);
         long plannedMinutesOfPayout = (long)calculatedPayoutValues[0];
         long scheduledMinutesOfPayout = (long)calculatedPayoutValues[1];
@@ -711,6 +712,7 @@ public class TimeBankCalculationService {
         Map<String, Double> ctaCostDistributionMap = timeBankDistributions.stream().collect(Collectors.groupingBy(TimeBankCTADistribution::getCtaName, Collectors.summingDouble(TimeBankCTADistribution::getCost)));
         timeBankIntervalDTO.setTimeBankDistribution(getDistributionOfTimeBank(ctaDistributionMap, ctaRuleTemplateDTOS, plannedMinutesOfTimebank,ctaCostDistributionMap));
         timeBankIntervalDTO.setWorkingTimeType(isNotNull(timeTypeDTOS) ? getWorkingTimeType(interval, shifts, timeTypeDTOS) : null);
+        timeBankIntervalDTO.setTimeBankOffMinutes(timeBankOffMinutes);
         return totalTimeBankBefore;
     }
 
@@ -1046,6 +1048,7 @@ public class TimeBankCalculationService {
         long plannedMinutesOfTimebank = 0l;
         long scheduledMinutes = 0l;
         BigDecimal plannedTimebankCost = new BigDecimal(0);
+        long timeBankOffMinutes = 0l;
         for (DailyTimeBankEntry dailyTimeBankEntry : dailyTimeBankEntries) {
             calculatedTimeBank += dailyTimeBankEntry.getDeltaTimeBankMinutes();
             plannedMinutesOfTimebank += dailyTimeBankEntry.getPlannedMinutesOfTimebank();
@@ -1054,8 +1057,9 @@ public class TimeBankCalculationService {
             for (TimeBankCTADistribution timeBankCTADistribution : dailyTimeBankEntry.getTimeBankCTADistributionList()) {
                 timeBankCTADistribution.setCost(getCostByByMinutes(employmentWithCtaDetailsDTOMap.get(dailyTimeBankEntry.getEmploymentId()),timeBankCTADistribution.getMinutes(),dailyTimeBankEntry.getDate()).floatValue());
             }
+            timeBankOffMinutes += dailyTimeBankEntry.getTimeBankOffMinutes();
         }
-        return new Object[]{calculatedTimeBank, plannedMinutesOfTimebank, scheduledMinutes,plannedTimebankCost};
+        return new Object[]{calculatedTimeBank, plannedMinutesOfTimebank, scheduledMinutes,plannedTimebankCost,timeBankOffMinutes};
 
     }
 
@@ -1131,7 +1135,7 @@ public class TimeBankCalculationService {
             int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeInterval, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
             if (dateDailyTimeBankEntryMap.containsKey(employmentStartDate) && dateDailyTimeBankEntryMap.get(employmentStartDate).isPublishedSomeActivities()) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
+                deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() - dailyTimeBankEntry.getTimeBankOffMinutes();
                 actualTimebank += deltaTimeBankMinutes;
                 LOGGER.debug("delta timebank {}", dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
                 LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));

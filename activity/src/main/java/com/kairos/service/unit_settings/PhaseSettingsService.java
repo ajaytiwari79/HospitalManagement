@@ -27,7 +27,7 @@ public class PhaseSettingsService extends MongoBaseService {
         phaseSettingsDTOS.forEach(phaseSettingsDTO -> {
             phaseSettingsDTO.setUnitId(unitId);
         });
-        List<PhaseSettings> phaseSettings = ObjectMapperUtils.copyPropertiesOfListByMapper(phaseSettingsDTOS,PhaseSettings.class);
+        List<PhaseSettings> phaseSettings = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(phaseSettingsDTOS,PhaseSettings.class);
         save(phaseSettings);
         return phaseSettingsDTOS;
     }
@@ -36,7 +36,7 @@ public class PhaseSettingsService extends MongoBaseService {
 
     public boolean createDefaultPhaseSettings(Long unitId, List<Phase> phases){
         if (!Optional.ofNullable(phases).isPresent()){
-            phases=ObjectMapperUtils.copyPropertiesOfListByMapper(phaseService.getPhasesByUnit(unitId),Phase.class);
+            phases=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(phaseService.getPhasesByUnit(unitId),Phase.class);
         }
         List<PhaseSettings> phaseSettings=new ArrayList<>();
         phases.forEach(phase -> {

@@ -44,6 +44,7 @@ public class TimeBankIntervalDTO {
     private float totalContractedCost;
     private float totalPlannedCost;
     private float totalTimeBankDiffCost;
+    private long timeBankOffMinutes;
 
     public TimeBankIntervalDTO(String title) {
         this.title = title;

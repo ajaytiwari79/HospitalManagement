@@ -199,7 +199,7 @@ public class FunctionService {
     }
 
     public Map<LocalDate, List<FunctionDTO>> findAppliedFunctionsAtEmployment(Long unitId, String startDate, String endDate) {
-        List<EmploymentQueryResult> employmentQueryResults = ObjectMapperUtils.copyPropertiesOfListByMapper(functionGraphRepository.findAppliedFunctionsAtEmpployment(unitId, startDate, endDate), EmploymentQueryResult.class);
+        List<EmploymentQueryResult> employmentQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(functionGraphRepository.findAppliedFunctionsAtEmpployment(unitId, startDate, endDate), EmploymentQueryResult.class);
         Map<LocalDate, List<FunctionDTO>> dateWiseFunctionMap = new HashMap<>();
         for (EmploymentQueryResult employmentQueryResult : employmentQueryResults) {
             for (com.kairos.persistence.model.country.functions.FunctionDTO appliedFunctionDTO : employmentQueryResult.getAppliedFunctions()) {

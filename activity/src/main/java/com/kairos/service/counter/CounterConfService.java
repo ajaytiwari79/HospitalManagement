@@ -135,7 +135,7 @@ public class CounterConfService extends MongoBaseService {
         List<BigInteger> deletableCategoryIds = deletableCategories.stream().map(KPICategoryDTO::getId).collect(Collectors.toList());
         linkKpiToUncategorized(deletableCategoryIds, level, refId);
         counterRepository.removeAll("id", deletableCategoryIds, KPICategory.class, level);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiCategories, KPICategoryDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kpiCategories, KPICategoryDTO.class);
     }
 
     public void linkKpiToUncategorized(List<BigInteger> deletableCategoryIds, ConfLevel level, Long refId) {
