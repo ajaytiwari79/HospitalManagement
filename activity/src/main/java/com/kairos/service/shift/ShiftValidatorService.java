@@ -222,7 +222,8 @@ public class ShiftValidatorService {
         } else {
             Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
             activitySpecification = activitySpecification.and(staffEmploymentSpecification);
-            Specification<ShiftWithActivityDTO> blockSettingSpecification = new BlockSettingSpecification(blockSettingService.getBlockSettingDetail(shift.getUnitId(), asLocalDate(shift.getStartDate())));
+            List<BlockSettingDTO> blockSettingDTOS = blockSettingService.getBlockSettingDetails(shift.getUnitId(), asLocalDate(shift.getStartDate()), asLocalDate(shift.getStartDate()));
+            Specification<ShiftWithActivityDTO> blockSettingSpecification = new BlockSettingSpecification(isCollectionNotEmpty(blockSettingDTOS) ? blockSettingDTOS.get(0) : null);
             activitySpecification = activitySpecification.and(blockSettingSpecification);
         }
         if (!byTandAPhase) {

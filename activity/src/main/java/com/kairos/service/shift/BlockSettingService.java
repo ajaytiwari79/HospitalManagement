@@ -62,8 +62,8 @@ public class BlockSettingService {
         return blockSettingDTO;
     }
 
-    public BlockSettingDTO getBlockSettingDetail(Long unitId, LocalDate date) {
-        return ObjectMapperUtils.copyPropertiesByMapper(blockSettingMongoRepository.findBlockSettingByUnitIdAndDate(unitId, date), BlockSettingDTO.class);
+    public List<BlockSettingDTO> getBlockSettingDetails(Long unitId, LocalDate startDate, LocalDate endDate) {
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(blockSettingMongoRepository.findAllBlockSettingByUnitIdAndDateRange(unitId, startDate, endDate), BlockSettingDTO.class);
     }
 
     public boolean deleteBlockSettingDetail(Long unitId, LocalDate date) {

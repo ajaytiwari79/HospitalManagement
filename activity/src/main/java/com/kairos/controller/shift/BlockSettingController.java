@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 
 /**
@@ -33,14 +34,14 @@ public class BlockSettingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.saveBlockSettingDetails(unitId, blockSettingDTO));
     }
 
-    @ApiOperation("get block setting detail")
+    @ApiOperation("get block setting details")
     @GetMapping(value = "/block_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getBlockSettingDetail(@PathVariable Long unitId, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.getBlockSettingDetail(unitId, date));
+    public ResponseEntity<Map<String, Object>> getBlockSettingDetails(@PathVariable Long unitId, @RequestParam(value = "startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, @RequestParam(value = "endDate",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, blockSettingService.getBlockSettingDetails(unitId, startDate, isNull(endDate) ? startDate : endDate));
     }
 
-    @ApiOperation("get block setting detail")
+    @ApiOperation("delete block setting detail")
     @DeleteMapping(value = "/block_setting")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> deleteBlockSettingDetail(@PathVariable Long unitId, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {

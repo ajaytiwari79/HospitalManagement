@@ -1147,7 +1147,7 @@ public class ActivityService {
 
     public Set<BigInteger> getFullDayOrWeekAndApprovalRequiredActivityIds(Long unitId, Date date) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, date, null);
-        List<Activity> activities = activityMongoRepository.findAllActivitiesByMethodForCalculatingTimeAndApprovalRequiredAndPhaseId(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
+        List<Activity> activities = activityMongoRepository.findAllAbsenceActivities(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
         return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 }
