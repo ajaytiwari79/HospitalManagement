@@ -77,5 +77,12 @@ public class ObjectUtils {
         return hoursValue + "." + minutesValue;
     }
 
+    public static boolean isEquals(Object o1, Object o2) {
+        if (o1 != null && o2 != null) {
+            return o1.equals(o2);
+        }
+        return o1 == null && o2 == null;
+    }
+
 
 }
