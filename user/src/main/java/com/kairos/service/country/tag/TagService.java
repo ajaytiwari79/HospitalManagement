@@ -117,7 +117,7 @@ public class TagService {
     public List<Tag> getCountryTagByOrgSubTypes(Long countryId, List<Long> orgSubTypeId){
         Country country = countryGraphRepository.findOne(countryId);
         List<Tag> tags = new ArrayList<>();
-        for(Tag tag : country.getTags().stream().filter(tag -> MasterDataTypeEnum.STAFF.equals(tag.getMasterDataType()) && CollectionUtils.containsAny(null,orgSubTypeId)).collect(Collectors.toList())){
+        for(Tag tag : country.getTags().stream().filter(tag -> MasterDataTypeEnum.STAFF.equals(tag.getMasterDataType()) && CollectionUtils.containsAny(tag.getOrgSubTypeIds(),orgSubTypeId)).collect(Collectors.toList())){
             tags.add(new Tag(tag.getName(),tag.getMasterDataType(),false,new PenaltyScore(PenaltyScoreLevel.SOFT,0),tag.getColor(),tag.getShortName(),tag.getUltraShortName()));
         }
         return  tags;
