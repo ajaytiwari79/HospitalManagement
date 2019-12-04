@@ -669,7 +669,7 @@ public class EmploymentService {
                     LocalDate startDateForLine = getStartDate(employmentDTO, expertiseLine, payTable);
                     LocalDate endDateForLine = getEndDate(expertiseLine, payTable);
                     addEmploymentLines(employmentDTO, employmentLines, expertiseLine, startDateForLine,endDateForLine);
-                    employmentDTO.setStartDate(endDateForLine.plusDays(1));
+                    employmentDTO.setStartDate(endDateForLine!=null?endDateForLine.plusDays(1):employmentDTO.getStartDate());
                 });
             }
             });
