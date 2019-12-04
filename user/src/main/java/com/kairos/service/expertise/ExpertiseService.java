@@ -140,8 +140,8 @@ public class ExpertiseService {
         validateSeniorityLevels(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertiseDTO.getSeniorityLevels(), SeniorityLevel.class));
         ExpertiseLine expertiseLine = createExpertiseLine(expertiseDTO);
         Expertise expertise = new Expertise(expertiseDTO.getName(), expertiseDTO.getDescription(), expertiseDTO.getStartDate(), expertiseDTO.getEndDate(), country, expertiseDTO.isPublished(), Collections.singletonList(expertiseLine),expertiseDTO.getBreakPaymentSetting());
+        expertiseGraphRepository.save(expertise);
         setBasicDetails(expertiseDTO, country, expertise);
-        addSeniorityLevelsInExpertise(expertiseLine, expertiseDTO, expertise);
         linkProtectedDaysOffSetting(new ArrayList<>(), Arrays.asList(expertise));
         TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
         ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
@@ -177,6 +177,7 @@ public class ExpertiseService {
         currentExpertise.setStartDate(expertiseDTO.getStartDate());
         currentExpertise.setEndDate(expertiseDTO.getEndDate());
         if (!currentExpertise.isPublished()) {
+            currentExpertise.getExpertiseLines().get(0).setStartDate(currentExpertise.getStartDate());
             currentExpertise.getExpertiseLines().get(0).setEndDate(currentExpertise.getEndDate());
             setBasicDetails(expertiseDTO, country, currentExpertise);
         } else {
