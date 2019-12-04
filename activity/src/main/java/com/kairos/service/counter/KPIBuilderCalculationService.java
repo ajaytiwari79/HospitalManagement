@@ -1,7 +1,6 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
 import com.kairos.dto.activity.counter.chart.CommonKpiDataUnit;
@@ -26,12 +25,15 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.persistence.model.wta.WTAQueryResultDTO;
+import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
@@ -43,6 +45,8 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
+import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
@@ -70,6 +74,8 @@ import static com.kairos.dto.activity.counter.enums.XAxisConfig.*;
 import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
+import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
+import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
 import static com.kairos.utils.counter.KPIUtils.*;
 import static java.util.Map.Entry.comparingByKey;
@@ -105,6 +111,8 @@ public class KPIBuilderCalculationService implements CounterService {
     @Inject
     private UnavailabilityCalculationKPIService unavailabilityCalculationKPIService;
     @Inject private ActivityMongoRepository activityMongoRepository;
+    @Inject private WorkTimeAgreementService workTimeAgreementService;
+    @Inject private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig) {
@@ -165,9 +173,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
-        CalculationType calculationType = (CalculationType) ((List)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE), CalculationType.class)).get(0);
         Function<ShiftActivityDTO, Integer> methodParam = ShiftActivityDTO::getScheduledMinutes;
-
         switch (kpiCalculationRelatedInfo.getCalculationType()) {
             case PLANNED_HOURS_TIMEBANK:
                 methodParam = ShiftActivityDTO::getPlannedMinutesOfTimebank;
@@ -202,6 +208,11 @@ public class KPIBuilderCalculationService implements CounterService {
                 return getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo,true);
             case UNAVAILABILITY:
                 return unavailabilityCalculationKPIService.getUnavailabilityCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+            case PROTECTED_DAYS_OFF:
+            case CARE_DAYS:
+            case SENIORDAYS:
+            case TOTAL_ABSENCE_DAYS:
+            case CHILD_CARE_DAYS:
             default:
                 break;
         }
@@ -573,6 +584,10 @@ public class KPIBuilderCalculationService implements CounterService {
         private List<CalculationType> calculationTypes;
         private CalculationType currentCalculationType;
         private DateTimeInterval planningPeriodInterval;
+        List<WTAQueryResultDTO> wtaQueryResultDTOS;
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
+        Map<Long, List<WTAQueryResultDTO>> employmentIdAndWtaMap;
+        Set<BigInteger> wtaActivityIds;
 
         public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
@@ -581,6 +596,7 @@ public class KPIBuilderCalculationService implements CounterService {
             this.kpi = kpi;
             yAxisConfigs = ((List)copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_BASED_ON), YAxisConfig.class));
             xAxisConfigs = ((List)copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class));
+            calculationTypes = ((List)copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_TYPE), CalculationType.class));
             loadKpiCalculationRelatedInfo(filterBasedCriteria, unitId, applicableKPI);
             updateIntervalShiftsMap(applicableKPI);
             staffIdAndStaffKpiFilterMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, v -> v));
@@ -589,15 +605,21 @@ public class KPIBuilderCalculationService implements CounterService {
             startDate = dateTimeIntervals.get(0).getStartDate();
             endDate = dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate();
             getDailyTimeBankEntryByDate();
+            getWtaRuleDetails();
             updateActivityAndTimeTypeAndPlannedTimeMap();
             planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-            calculationTypes = ((List)copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_TYPE), CalculationType.class));
         }
 
         public CalculationType getCalculationType(){
             return isNotNull(currentCalculationType) ? currentCalculationType : calculationTypes.get(0);
         }
 
+        public void  getWtaRuleDetails(){
+            wtaQueryResultDTOS= workTimeAgreementService.getWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds),dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> getWtaTemplateTypes().contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
+            employmentIdAndWtaMap = wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(), Collectors.toList()));
+            wtaActivityIds =workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
+        }
         private void updateStaffAndShiftMap() {
             staffIdAndShiftsMap = shifts.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
             staffKpiFilterDTOS.forEach(staffKpiFilterDTO -> {
@@ -605,6 +627,26 @@ public class KPIBuilderCalculationService implements CounterService {
                     staffIdAndShiftsMap.put(staffKpiFilterDTO.getId(),new ArrayList<>());
                 }
             });
+        }
+
+        public Set<WTATemplateType> getWtaTemplateTypes(){
+            Set<WTATemplateType> wtaTemplateTypes=new HashSet<>();
+            for (YAxisConfig yAxisConfig : yAxisConfigs) {
+                switch (yAxisConfig){
+                    case CHILD_CARE_DAYS:
+                        wtaTemplateTypes.add(CHILD_CARE_DAYS_CHECK);
+                    case SENIORDAYS:
+                        wtaTemplateTypes.add(SENIOR_DAYS_PER_YEAR);
+                    case PROTECTED_DAYS_OFF:
+                        wtaTemplateTypes.add(PROTECTED_DAYS_OFF);
+                    case CARE_DAYS:
+                        wtaTemplateTypes.add(WTA_FOR_CARE_DAYS);
+                    case TOTAL_ABSENCE_DAYS:
+                        wtaTemplateTypes.addAll(newHashSet(CHILD_CARE_DAYS_CHECK,SENIOR_DAYS_PER_YEAR,PROTECTED_DAYS_OFF,WTA_FOR_CARE_DAYS));
+                    default:break;
+                }
+            }
+        return wtaTemplateTypes;
         }
 
         private void updateActivityAndTimeTypeAndPlannedTimeMap() {

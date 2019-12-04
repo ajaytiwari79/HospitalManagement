@@ -598,12 +598,12 @@ public class WorkTimeAgreementBalancesCalculationService {
                 for (StaffAdditionalInfoDTO staffAdditionalInfoDTO : staffAdditionalInfoDTOS) {
                     employmentIdAndStaffAdditionalInfoMap.putIfAbsent(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO);
                 }
-                for (Long employmentId : employmentIdAndShiftsMap.keySet()) {
+                for (Long employmentId : employmentIds) {
                     try {
                         if (employmentIdAndWtaMap.containsKey(employmentId)) {
                             List<WTAQueryResultDTO> wtaQueryResuls = employmentIdAndWtaMap.get(employmentId);
                             for (WTAQueryResultDTO wtaQueryResul : wtaQueryResuls) {
-                                ruleTemplates.addAll(getRuleTemplates(activityWrapperMap, wtaQueryResul.getRuleTemplates(), employmentIdAndShiftsMap.get(employmentId), employmentIdAndStaffAdditionalInfoMap.get(employmentId), planningPeriod.getEndDate()));
+                                ruleTemplates.addAll(getRuleTemplates(activityWrapperMap, wtaQueryResul.getRuleTemplates(), employmentIdAndShiftsMap.getOrDefault(employmentId,new ArrayList<>()), employmentIdAndStaffAdditionalInfoMap.get(employmentId), planningPeriod.getEndDate()));
                             }
                         }
                     } catch (Exception e) {
