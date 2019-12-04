@@ -1,6 +1,7 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.annotations.KPermissionField;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
@@ -49,13 +50,21 @@ import static com.kairos.utils.CPRUtil.getDateOfBirthFromCPR;
 @Setter
 @NoArgsConstructor
 public class User extends UserBaseEntity {
+    @KPermissionField
     protected String cprNumber;
+    @KPermissionField
     private String userName;
+    @KPermissionField
     protected String nickName;
+    @KPermissionField
     protected String firstName;
+    @KPermissionField
     protected String lastName;
+    @KPermissionField
     protected Gender gender;
+    @KPermissionField
     private boolean pregnant;
+    @KPermissionField
     private String email;
     private ConfLevel confLevel;
     private Long lastSelectedOrganizationId;

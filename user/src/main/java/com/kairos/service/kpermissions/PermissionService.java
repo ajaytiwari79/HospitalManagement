@@ -136,7 +136,7 @@ public class PermissionService {
         List<KPermissionModel> kPermissionModels = getkPermissionModels();
         permissionSchemaMap.put(PERMISSIONS_SCHEMA,ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kPermissionModels, ModelDTO.class));
         permissionSchemaMap.put(PERMISSIONS, FieldLevelPermission.values());
-        permissionSchemaMap.put(PERMISSION_DATA, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(getModelPermission(newArrayList(),accessGroupIds),ModelDTO.class));
+        permissionSchemaMap.put(PERMISSION_DATA, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(getModelPermission(newArrayList(),accessGroupIds,false),ModelDTO.class));
             return permissionSchemaMap;
     }
 
@@ -150,21 +150,21 @@ public class PermissionService {
         return kPermissionModels;
     }
 
-    private Map[] getMapOfPermission(Collection<Long> accessGroupIds) {
+    private Map[] getMapOfPermission(Collection<Long> accessGroupIds,boolean hubMember) {
         List<ModelPermissionQueryResult> modelPermissionQueryResults = permissionModelRepository.getAllModelPermission(accessGroupIds);
         List<FieldPermissionQueryResult> fieldLevelPermissions = permissionModelRepository.getAllFieldPermission(accessGroupIds);
         Map<Long,Set<FieldLevelPermission>> fieldLevelPermissionMap = new HashMap<>();
         Map<Long,Set<FieldLevelPermission>> modelPermissionMap = new HashMap<>();
         if(isCollectionNotEmpty(modelPermissionQueryResults)){
-            modelPermissionMap = modelPermissionQueryResults.stream().collect(Collectors.toMap(ModelPermissionQueryResult::getId,v->getFieldPermissionByPriority(v.getPermissions())));
+            modelPermissionMap = modelPermissionQueryResults.stream().collect(Collectors.toMap(ModelPermissionQueryResult::getId,v->getFieldPermissionByPriority(v.getPermissions(),hubMember)));
         }
         if(isCollectionNotEmpty(fieldLevelPermissions)){
-            fieldLevelPermissionMap = fieldLevelPermissions.stream().collect(Collectors.toMap(FieldPermissionQueryResult::getId,v->getFieldPermissionByPriority(v.getPermissions())));
+            fieldLevelPermissionMap = fieldLevelPermissions.stream().collect(Collectors.toMap(FieldPermissionQueryResult::getId,v->getFieldPermissionByPriority(v.getPermissions(),hubMember)));
         }
         return new Map[]{modelPermissionMap,fieldLevelPermissionMap};
     }
 
-    private Set<FieldLevelPermission> getFieldPermissionByPriority(Set<FieldLevelPermission> fieldLevelPermissions){
+    private Set<FieldLevelPermission> getFieldPermissionByPriority(Set<FieldLevelPermission> fieldLevelPermissions,boolean hubMember){
         /*if(fieldLevelPermissions.size()>1){
             if(fieldLevelPermissions.contains(FieldLevelPermission.WRITE)){
                 fieldLevelPermissions.removeIf(fieldLevelPermission->!FieldLevelPermission.WRITE.equals(fieldLevelPermission));
@@ -172,15 +172,14 @@ public class PermissionService {
                 fieldLevelPermissions.remove(FieldLevelPermission.HIDE);
             }
         }*/
-        return UserContext.getUserDetails().isHubMember() ? newHashSet(FieldLevelPermission.WRITE,FieldLevelPermission.READ) : fieldLevelPermissions;
+        return hubMember ? newHashSet(FieldLevelPermission.WRITE,FieldLevelPermission.READ) : fieldLevelPermissions;
     }
 
-    public List<ModelPermissionQueryResult> getModelPermission(List<String> modelNames,Collection<Long> accessGroupIds){
-        Map[] permissionMap = getMapOfPermission(accessGroupIds);
+    public List<ModelPermissionQueryResult> getModelPermission(List<String> modelNames,Collection<Long> accessGroupIds,boolean hubMember){
+        Map[] permissionMap = getMapOfPermission(accessGroupIds,hubMember);
         Map<Long,Set<FieldLevelPermission>> modelPermissionMap = permissionMap[0];
         Map<Long,Set<FieldLevelPermission>> fieldLevelPermissionMap = permissionMap[1];
         OrganizationCategory organizationCategory = UserContext.getUserDetails().getLastSelectedOrganizationCategory();
-        boolean hubMember = UserContext.getUserDetails().isHubMember();
         List<KPermissionModel> kPermissionModels;
         if(isCollectionNotEmpty(modelNames)){
             kPermissionModels = permissionModelRepository.getAllPermissionModelByName(modelNames);
@@ -193,10 +192,10 @@ public class PermissionService {
     private List<ModelPermissionQueryResult> getModelPermissionQueryResults(List<KPermissionModel> kPermissionModels, Map<Long, Set<FieldLevelPermission>> modelPermissionMap, Map<Long, Set<FieldLevelPermission>> fieldLevelPermissionMap,OrganizationCategory organizationCategory, boolean hubMember) {
         List<ModelPermissionQueryResult> modelPermissionQueryResults = new ArrayList<>();
         for (KPermissionModel kPermissionModel : kPermissionModels) {
-            if(isValidOrganizationCategory(organizationCategory,hubMember,kPermissionModel.getOrganizationCategories()) || true) {
-                Set<FieldLevelPermission> modelPermission = hubMember ? newHashSet(FieldLevelPermission.WRITE,FieldLevelPermission.READ) : modelPermissionMap.get(kPermissionModel.getId());
+           // if(isValidOrganizationCategory(organizationCategory,hubMember,kPermissionModel.getOrganizationCategories()) || true) {
+                Set<FieldLevelPermission> modelPermission = hubMember ? newHashSet(FieldLevelPermission.WRITE,FieldLevelPermission.READ) : modelPermissionMap.getOrDefault(kPermissionModel.getId(),new HashSet<>());
                 modelPermissionQueryResults.add(new ModelPermissionQueryResult(kPermissionModel.getId(), kPermissionModel.getModelName(), getFieldLevelPermissionQueryResult(fieldLevelPermissionMap, kPermissionModel.getFieldPermissions(), organizationCategory, hubMember), getModelPermissionQueryResults(kPermissionModel.getSubModelPermissions(), modelPermissionMap, fieldLevelPermissionMap, organizationCategory, hubMember), modelPermission));
-            }
+            //}
         }
         return modelPermissionQueryResults;
     }
@@ -208,10 +207,10 @@ public class PermissionService {
     private List<FieldPermissionQueryResult> getFieldLevelPermissionQueryResult(Map<Long,Set<FieldLevelPermission>> fieldLevelPermissionMap,List<KPermissionField> fields,OrganizationCategory organizationCategory, boolean hubMember){
         List<FieldPermissionQueryResult> fieldPermissionQueryResults = new ArrayList<>();
         for (KPermissionField field : fields) {
-            if(isValidOrganizationCategory(organizationCategory,hubMember,field.getOrganizationCategories()) || true) {
+            //if(isValidOrganizationCategory(organizationCategory,hubMember,field.getOrganizationCategories()) || true) {
                 Set<FieldLevelPermission> fieldLevelPermissions = hubMember ? newHashSet(FieldLevelPermission.WRITE,FieldLevelPermission.READ) : fieldLevelPermissionMap.getOrDefault(field.getId(), new HashSet<>());
                 fieldPermissionQueryResults.add(new FieldPermissionQueryResult(field.getId(), field.getFieldName(), fieldLevelPermissions));
-            }
+            //}
         }
         return fieldPermissionQueryResults;
     }

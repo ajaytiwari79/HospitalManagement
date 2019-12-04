@@ -37,8 +37,8 @@ public class ShortcutService {
          List<TabKPIDTO> tabKPIDTOS=new ArrayList<>();
         List<TabKPIMappingDTO> tabKPIMappingDTOS = counterDistService.getTabKPIByTabIdsAndKpiIds(tabIds, kpiIds, staffId);
         Map<String,List<TabKPIMappingDTO>> tabIdAndTabKPIDtoMap=tabKPIMappingDTOS.stream().collect(Collectors.groupingBy(k -> k.getTabId(),Collectors.toList()));
-        for (String tabId : tabIdAndTabKPIDtoMap.keySet()) {
-            tabKPIDTOS.add(new TabKPIDTO(unitId,tabId,tabIdAndTabKPIDtoMap.get(tabId).stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList())));
+        for (String tabId : tabIds) {
+            tabKPIDTOS.add(new TabKPIDTO(unitId,tabId,tabIdAndTabKPIDtoMap.containsKey(tabId) ? tabIdAndTabKPIDtoMap.get(tabId).stream().map(tabKPIMappingDTO -> tabKPIMappingDTO.getKpiId()).collect(Collectors.toList()): new ArrayList<>()));
         }
         return tabKPIDTOS;
     }
@@ -46,7 +46,7 @@ public class ShortcutService {
     public ShortcutDTO saveShortcut(ShortcutDTO shortcutDTO){
         boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(shortcutDTO.getName(), shortcutDTO.getStaffId(), shortcutDTO.getUnitId(),BigInteger.valueOf(-1));
         if(existByName){
-            exceptionService.dataNotMatchedException(SHORTCUT_ALREADY_EXISTS_NAME, shortcutDTO.getName());
+            exceptionService.duplicateDataException(SHORTCUT_ALREADY_EXISTS_NAME, shortcutDTO.getName());
         }
         shortcutDTO.setTabKPIs(getTabKPIs(shortcutDTO.getTabKPIs().stream().map(tabKPIDTO -> tabKPIDTO.getTabId()).collect(Collectors.toList()), new ArrayList<>(), shortcutDTO.getStaffId(), shortcutDTO.getUnitId()));
         Shortcut shortcut = shortcutsMongoRepository.save(ObjectMapperUtils.copyPropertiesByMapper(shortcutDTO, Shortcut.class));
@@ -60,7 +60,7 @@ public class ShortcutService {
         }
         boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(ObjectUtils.isNotNull(name)?name:shortcut.getName(),shortcut.getStaffId(),shortcut.getUnitId(),shortcut.getId());
         if(existByName){
-          exceptionService.dataNotMatchedException(SHORTCUT_ALREADY_EXISTS_NAME,name);
+          exceptionService.duplicateDataException(SHORTCUT_ALREADY_EXISTS_NAME,name);
         }
         if(ObjectUtils.isNotNull(name)){
             shortcut.setName(name);
@@ -91,11 +91,7 @@ public class ShortcutService {
 
 
     public List<ShortcutDTO> getAllShortcutByStaffIdAndUnitId(Long unitId, Long staffId){
-        List<ShortcutDTO> shortcutDTOS =shortcutsMongoRepository.findShortcutByUnitIdAndStaffId(staffId,unitId);
-        if(ObjectUtils.isCollectionEmpty(shortcutDTOS)){
-            exceptionService.dataNotMatchedException(SHORTCUT_NOT_FOUND);
-        }
-        return shortcutDTOS;
+        return shortcutsMongoRepository.findShortcutByUnitIdAndStaffId(staffId,unitId);
     }
 
     public ShortcutDTO createCopyOfShortcut(BigInteger shortcutId, String name){
@@ -105,7 +101,7 @@ public class ShortcutService {
         }
         boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(name,shortcut.getStaffId(),shortcut.getUnitId(),BigInteger.valueOf(-1));
         if(existByName){
-            exceptionService.dataNotMatchedException(SHORTCUT_ALREADY_EXISTS_NAME,name);
+            exceptionService.duplicateDataException(SHORTCUT_ALREADY_EXISTS_NAME,name);
         }
         shortcut.setName(name);
         shortcut.setId(null);
