@@ -668,8 +668,8 @@ public class EmploymentService {
                 payTables.forEach(payTable -> {
                     LocalDate startDateForLine = getStartDate(employmentDTO, expertiseLine, payTable);
                     LocalDate endDateForLine = getEndDate(expertiseLine, payTable);
-                    addEmploymentLines(employmentDTO, employmentLines, expertiseLine, startDateForLine,endDateForLine)
-                    ;
+                    addEmploymentLines(employmentDTO, employmentLines, expertiseLine, startDateForLine,endDateForLine);
+                    employmentDTO.setStartDate(endDateForLine.plusDays(1));
                 });
             }
             });

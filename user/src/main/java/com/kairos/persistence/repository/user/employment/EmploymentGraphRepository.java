@@ -344,7 +344,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     @Query("MATCH(exp:Expertise)-[:"+HAS_EXPERTISE_IN+"]-(e:Employment)-[r:"+HAS_EMPLOYMENT_LINES+"]-(el:EmploymentLine) WHERE id(exp)={0}" +
             "MATCH(e)-[unitRel:"+IN_UNIT+"]-(unit:Unit) " +
             "MATCH(e)-[staffRel:"+BELONGS_TO_STAFF+"]-(s:Staff) " +
-            "MATCH(e)-[prRel:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]-(pr:ProtectedDaysOffSetting)" +
+            "OPTIONAL MATCH(e)-[prRel:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]-(pr:ProtectedDaysOffSetting)" +
             "RETURN e,r,el,unitRel,unit,staffRel,s,COLLECT(prRel),COLLECT(pr)")
     List<Employment> findAllEmploymentByExpertiseId(Long expertiseId);
 
