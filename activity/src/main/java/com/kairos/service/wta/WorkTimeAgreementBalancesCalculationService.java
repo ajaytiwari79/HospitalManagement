@@ -183,10 +183,14 @@ public class WorkTimeAgreementBalancesCalculationService {
         Set<BigInteger> timeTypeIds = activityWrappers.stream().map(activityWrapper -> activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toSet());
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
         Map<BigInteger, TimeType> timeTypeMap = timeTypes.stream().collect(Collectors.toMap(TimeType::getId, v -> v));
-        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances = new ArrayList<>();
-        WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO;
+        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances = getWorkTimeAgreementRuleTemplateBalancesDtos(unitId, startDate, endDate, staffAdditionalInfoDTO, wtaBaseRuleTemplates, activityWrapperMap, planningPeriod, shiftWithActivityDTOS, timeTypeMap);
         WorkTimeAgreementBalance workTimeAgreementBalance = new WorkTimeAgreementBalance(workTimeAgreementRuleTemplateBalances);
+        return workTimeAgreementBalance;
+    }
 
+    public List<WorkTimeAgreementRuleTemplateBalancesDTO> getWorkTimeAgreementRuleTemplateBalancesDtos(Long unitId, LocalDate startDate, LocalDate endDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<WTABaseRuleTemplate> wtaBaseRuleTemplates, Map<BigInteger, ActivityWrapper> activityWrapperMap, PlanningPeriod planningPeriod, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, TimeType> timeTypeMap) {
+        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances=new ArrayList<>();
+        WorkTimeAgreementRuleTemplateBalancesDTO workTimeAgreementRuleTemplateBalancesDTO;
         for (WTABaseRuleTemplate ruleTemplate : wtaBaseRuleTemplates) {
             switch (ruleTemplate.getWtaTemplateType()) {
                 case VETO_AND_STOP_BRICKS:
@@ -217,7 +221,7 @@ public class WorkTimeAgreementBalancesCalculationService {
                 workTimeAgreementRuleTemplateBalances.add(workTimeAgreementRuleTemplateBalancesDTO);
             }
         }
-        return workTimeAgreementBalance;
+        return workTimeAgreementRuleTemplateBalances;
     }
 
     public boolean isLeaveCountAvailable(Map<BigInteger, ActivityWrapper> activityWrapperMap, BigInteger activityId, ShiftWithActivityDTO shift, DateTimeInterval dateTimeInterval, LocalDate lastPlanningPeriodEndDat, WTATemplateType wtaTemplateType, long leaveCount) {

@@ -27,6 +27,7 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
@@ -588,6 +589,8 @@ public class KPIBuilderCalculationService implements CounterService {
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
         Map<Long, List<WTAQueryResultDTO>> employmentIdAndWtaMap;
         Set<BigInteger> wtaActivityIds;
+        List<ActivityWrapper> activityWrappers;
+        Map<BigInteger, ActivityWrapper> activityWrapperMap;
 
         public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
@@ -619,6 +622,8 @@ public class KPIBuilderCalculationService implements CounterService {
             wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> getWtaTemplateTypes().contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
             employmentIdAndWtaMap = wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(), Collectors.toList()));
             wtaActivityIds =workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
+            activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(wtaActivityIds));
+            activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         }
         private void updateStaffAndShiftMap() {
             staffIdAndShiftsMap = shifts.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));
