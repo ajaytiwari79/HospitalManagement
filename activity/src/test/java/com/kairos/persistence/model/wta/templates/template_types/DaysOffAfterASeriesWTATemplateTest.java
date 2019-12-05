@@ -43,7 +43,7 @@ public class DaysOffAfterASeriesWTATemplateTest {
         DateTimeZone.setDefault(DateTimeZone.forTimeZone(TimeZone.getDefault()));
     }
 
-    @Before
+    //@Before
     public void init(){
         daysOffAfterASeriesWTATemplate = new DaysOffAfterASeriesWTATemplate("Night shifts in sequence", false, "Night shifts in sequence", 1, WEEKS, 3);
         daysOffAfterASeriesWTATemplate.setPhaseTemplateValues(newArrayList(new PhaseTemplateValue(new BigInteger("15"), "DRAFT", (short) 2, (short) 5, true, false, false,4)));

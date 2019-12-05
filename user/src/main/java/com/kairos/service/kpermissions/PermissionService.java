@@ -26,9 +26,13 @@ import org.neo4j.ogm.session.Neo4jSession;
 import org.neo4j.ogm.session.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,7 +68,10 @@ public class PermissionService {
     private StaffGraphRepository staffGraphRepository;
     @Inject private AccessGroupService accessGroupService;
     @Inject private CommonRepository commonRepository;
-    @Inject private SessionFactory sessionFactory;
+
+    @Autowired
+    @Qualifier("PermissionSessionFactory")
+    private SessionFactory sessionFactory;
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
         Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
@@ -263,6 +270,25 @@ public class PermissionService {
             exceptionService.dataNotFoundByIdException("message.permission.KPermissionFieldQueryResult");
         }
         return kPermissionFieldQueryResult;
+    }
+
+    public <T extends UserBaseEntity,E extends UserBaseEntity> List<T> updateModelBasisOfPermission(List<T> objects){
+        try {
+            Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
+            Set<String> modelNames = objects.stream().map(model->model.getClass().getSimpleName()).collect(Collectors.toSet());
+            List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
+            boolean hubMember = UserContext.getUserDetails().isHubMember();
+            List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
+            List<ModelDTO> modelDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
+            Map<String,ModelDTO> modelMap = modelDTOS.stream().collect(Collectors.toMap(k->k.getModelName(),v->v));
+            List<Long> objectIds = objects.stream().filter(model->isNotNull(model.getId())).map(model->model.getId()).collect(Collectors.toList());
+            List<E> dataBaseObjects = sessionFactory.openSession().loadAll(Staff.class,objectIds,2).stream().map(staff -> (E)staff).collect(Collectors.toList());
+            Map<Long,E> mapOfDataBaseObject = dataBaseObjects.stream().collect(Collectors.toMap(k->k.getId(),v->v));
+            updateObjectsPropertiesBeforeSave(mapOfDataBaseObject,modelMap,objects);
+        }catch (Exception e){
+            LOGGER.error(e.getMessage());
+        }
+        return objects;
     }
 
     public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(Map<Long,E> mapOfDataBaseObject,Map<String,ModelDTO> modelMap,List<T> objects){
