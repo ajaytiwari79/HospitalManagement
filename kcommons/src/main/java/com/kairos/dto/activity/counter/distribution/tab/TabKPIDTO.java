@@ -23,6 +23,14 @@ public class TabKPIDTO {
     private int priority;
 
 
+    public TabKPIDTO(String tabId, KPIDTO kpi,CounterSize size ) {
+        this.tabId = tabId;
+        this.kpi = kpi;
+        this.size=size;
+    }
+
+    public TabKPIDTO() {
+    }
 
     public String getTabId() {
         return tabId;

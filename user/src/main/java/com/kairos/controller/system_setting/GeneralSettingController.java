@@ -34,10 +34,10 @@ public class GeneralSettingController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingService.updateGeneralSetting(generalSettingDTO));
     }
 
-    @GetMapping(value = "/general_setting/{generalSettingId}")
+    @GetMapping(value = "/general_setting/")
     @ApiOperation("To fetch System Language")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getGeneralSetting(@PathVariable Long generalSettingId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingService.getGeneralSetting(generalSettingId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingService.getGeneralSetting());
     }
 }

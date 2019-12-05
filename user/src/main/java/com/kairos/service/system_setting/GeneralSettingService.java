@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created By G.P.Ranjan on 25/11/19
@@ -28,7 +30,11 @@ public class GeneralSettingService {
         return generalSettingDTO;
     }
 
-    public GeneralSettingDTO getGeneralSetting(Long generalSettingId) {
-        return ObjectMapperUtils.copyPropertiesByMapper(generalSettingGraphRepository.findOne(generalSettingId), GeneralSettingDTO.class);
+    public List<GeneralSettingDTO> getGeneralSetting() {
+        List<GeneralSettingDTO> generalSettingDTOS = new ArrayList<>();
+        for(GeneralSetting generalSetting : generalSettingGraphRepository.findAll()){
+            generalSettingDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(generalSetting, GeneralSettingDTO.class));
+        }
+        return generalSettingDTOS;
     }
 }
