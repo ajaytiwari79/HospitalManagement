@@ -206,7 +206,4 @@ public class StaffActivitySettingService extends MongoBaseService {
        return responseMap;
    }
 
-    public StaffActivitySettingDTO getStaffActivitySettingsByActivityId(Long unitId,BigInteger activityId,Long staffId){
-        return staffActivitySettingRepository.findByActivityIdAndStaffIdAndUnitIdAndDeletedFalse(activityId,staffId,unitId);
-    }
 }
