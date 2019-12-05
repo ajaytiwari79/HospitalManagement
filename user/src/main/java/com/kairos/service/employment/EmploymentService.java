@@ -681,8 +681,8 @@ public class EmploymentService {
         return employmentLines;
     }
 
-    private LocalDate getStartDate(EmploymentDTO employmentDTO,ExpertiseLine expertiseLine,PayTable payTable) {
-         LocalDate startDate=expertiseLine.getStartDate().isBefore(employmentDTO.getStartDate())?employmentDTO.getStartDate():payTable.getStartDateMillis().isAfter(expertiseLine.getStartDate())?payTable.getStartDateMillis():expertiseLine.getStartDate();
+    private LocalDate getStartDate(LocalDate startDateForLine,ExpertiseLine expertiseLine,PayTable payTable) {
+         LocalDate startDate=expertiseLine.getStartDate().isBefore(startDateForLine)?startDateForLine:payTable.getStartDateMillis().isAfter(expertiseLine.getStartDate())?payTable.getStartDateMillis():expertiseLine.getStartDate();
         return startDate;
     }
 
