@@ -399,7 +399,7 @@ public class StaffFilterService {
         filters.forEach(filterSelection -> {
             if (!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
                     filterSelection.getName())) {
-                mapOfFilters.put(filterSelection.getName(), FilterType.GROUPS.equals(filterSelection.getName())? groupService.getAllStaffByGroupIds(unitId, new ArrayList<>(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(filterSelection.getValue(), Long.class))) : filterSelection.getValue());
+                mapOfFilters.put(filterSelection.getName(), FilterType.GROUPS.equals(filterSelection.getName())? groupService.getAllStaffIdsByGroupIds(unitId, new ArrayList<>(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(filterSelection.getValue(), Long.class))) : filterSelection.getValue());
 
             }
         });

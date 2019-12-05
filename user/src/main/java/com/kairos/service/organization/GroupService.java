@@ -86,7 +86,7 @@ public class GroupService {
         return groupDTO;
     }
 
-    public GroupDTO getGroupDetails(Long groupId) {
+    public GroupDTO getGroupDetail(Long groupId) {
         Group group = groupGraphRepository.findOne(groupId);
         return getGroupDTOFromGroup(group);
     }
@@ -181,13 +181,13 @@ public class GroupService {
         }
     }
 
-    public Set<Long> getAllStaffByGroupIds(Long unitId, List<Long> groupIds){
+    public Set<Long> getAllStaffIdsByGroupIds(Long unitId, List<Long> groupIds){
         Set<Long> staffIds = new HashSet<>();
         Set<Long> excludedStaffs = new HashSet<>();
         List<Group> groups = groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(groupIds);
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for(Group group : groups){
-            groupDTOS.add(getGroupDetails(group.getId()));
+            groupDTOS.add(getGroupDTOFromGroup(group));
         }
         for (GroupDTO groupDTO : groupDTOS) {
             List<Map> staffs = getMapsOfStaff(unitId, groupDTO.getFiltersData());
