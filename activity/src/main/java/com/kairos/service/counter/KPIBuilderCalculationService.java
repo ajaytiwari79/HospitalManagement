@@ -210,7 +210,10 @@ public class KPIBuilderCalculationService implements CounterService {
             case UNAVAILABILITY:
                 return unavailabilityCalculationKPIService.getUnavailabilityCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case PROTECTED_DAYS_OFF:
+
             case CARE_DAYS:
+                StaffKpiFilterDTO staffKpiFilterDTO =kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
+                kpiCalculationRelatedInfo.employmentIdAndWtaMap.get(staffKpiFilterDTO.getEmployment())
             case SENIORDAYS:
             case TOTAL_ABSENCE_DAYS:
             case CHILD_CARE_DAYS:
