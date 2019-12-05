@@ -29,7 +29,7 @@ MATCH(n:KPermissionField) detach delete n;
 
 Match(ap:AccessPage) where ap.moduleId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Tab Permission",isModule:false,moduleId:"tab_435",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Tab Permission",isModule:false,moduleId:"tab_436",active:true});
-Match(ap:AccessPage) where ap.modul/functional_paymenteId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_437",active:true});
+Match(ap:AccessPage) where ap.moduleId="tab_45" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_437",active:true});
 Match(ap:AccessPage) where ap.moduleId="tab_184" merge (ap)-[:SUB_PAGE]->(accessPage:AccessPage{name:"Field Permission",isModule:false,moduleId:"tab_438",active:true});
 
 Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
