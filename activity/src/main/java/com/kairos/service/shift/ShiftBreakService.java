@@ -68,7 +68,11 @@ public class ShiftBreakService {
     }
 
 
-    public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated,Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO  staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot) {
+    public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated,Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO  staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot,Shift dbShift) {
+        Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
+        if(TIME_AND_ATTENDANCE.equals(phase.getName())){
+            return getBreakActivity(shift, dbShift,activityWrapperMap);
+        }
         BreakSettings breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
         List<ShiftActivity> breakActivities = new ArrayList<>();
         if(isNotNull(breakSettings)) {
@@ -108,11 +112,20 @@ public class ShiftBreakService {
                     if (breakActivity.getId() == null) {
                         breakActivity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName()));
                     }
+                    updateBreakHeldInShift(breakActivity,shift,dbShift, activityWrapperMap);
                     breakActivities.add(breakActivity);
                 }
             }
         }
         return breakActivities;
+    }
+
+    public List<ShiftActivity> getBreakActivity(Shift shift, Shift dbShift,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        ShiftActivity breakActivity=dbShift.getBreakActivities().get(0);
+        breakActivity.setStartDate(shift.getStartDate());
+        breakActivity.setEndDate(shift.getEndDate());
+        updateBreakHeldInShift(breakActivity,shift,dbShift, activityWrapperMap);
+        return Arrays.asList(breakActivity);
     }
 
     private ShiftActivity validateBreakOnUpdateShift(Shift shift, DateTimeInterval eligibleBreakInterval, Date placeBreakAfterThisDate,BreakSettings breakSettings) {
@@ -193,6 +206,16 @@ public class ShiftBreakService {
         }
         shiftMongoRepository.save(shift);
         return true;
+    }
+
+    private void updateBreakHeldInShift(ShiftActivity breakActivity,Shift shift,Shift dbShift,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        if (isCollectionNotEmpty(dbShift.getBreakActivities())) {
+            if (!dbShift.getBreakActivities().get(0).getStartDate().equals(breakActivity.getStartDate()) ||
+                    !dbShift.getBreakActivities().get(0).getEndDate().equals(breakActivity.getEndDate())) {
+                ShiftActivity shiftActivity = shift.getActivities().stream().filter(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()).contains(breakActivity.getStartDate())).findFirst().get();
+                breakActivity.setBreakNotHeld(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed());
+            }
+        }
     }
 
 
