@@ -5,7 +5,7 @@ package com.kairos.persistence.model.user.expertise.response;
  */
 
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
-import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
@@ -21,7 +21,7 @@ public class FunctionalPaymentQueryResult {
    private LocalDate startDate;
    private LocalDate endDate;
    private List<FunctionalPaymentMatrixQueryResult> functionalPaymentMatrices;
-   private Expertise expertise;
+   private ExpertiseLine expertiseLine;
    private PaidOutFrequencyEnum paymentUnit;
    private boolean published;
 }
