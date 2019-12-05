@@ -93,7 +93,7 @@ public class StaffActivitySettingController {
     }
 
     @ApiOperation("Get Staff Personalized activity settings")
-    @GetMapping(value = "staff/{staffId}/activity/{activityId}")
+    @GetMapping(value = "/staff_activity_setting/staff/{staffId}/activity/{activityId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffActivitySettingsByActivityId( @PathVariable Long unitId,@PathVariable BigInteger activityId,@PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffActivitySettingService.getStaffActivitySettingsByActivityId(unitId,activityId,staffId));

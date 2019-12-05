@@ -656,28 +656,29 @@ public class EmploymentService {
         return employment;
     }
 
-    private List<EmploymentLine> getEmploymentLines(EmploymentDTO employmentDTO,Employment employment) {
+    private List<EmploymentLine> getEmploymentLines(EmploymentDTO employmentDTO, Employment employment) {
         List<EmploymentLine> employmentLines = new ArrayList<>();
         Expertise expertise = expertiseGraphRepository.findOne(employmentDTO.getExpertiseId(), 2);
-        expertise.getExpertiseLines().forEach(expertiseLine -> {
-            DateTimeInterval expertiseLineInterval=new DateTimeInterval(expertiseLine.getStartDate(),expertiseLine.getEndDate());
-            DateTimeInterval employmentInterval=new DateTimeInterval(employmentDTO.getStartDate(),employmentDTO.getEndDate());
-            if(expertiseLineInterval.overlaps(employmentInterval)) {
+        LocalDate startDateForLine=employmentDTO.getStartDate();
+        LocalDate endDateForLine;
+        for (ExpertiseLine expertiseLine : expertise.getExpertiseLines()) {
+            DateTimeInterval expertiseLineInterval = new DateTimeInterval(expertiseLine.getStartDate(), expertiseLine.getEndDate());
+            DateTimeInterval employmentInterval = new DateTimeInterval(employmentDTO.getStartDate(), employmentDTO.getEndDate());
+            if (expertiseLineInterval.overlaps(employmentInterval)) {
                 List<PayTable> payTables = payTableGraphRepository.findAllActivePayTable(expertise.getOrganizationLevel().getId(), expertiseLine.getStartDate().toString(), expertiseLine.getEndDate() == null ? null : expertiseLine.getEndDate().toString());
                 payTables.sort(Comparator.comparing(PayTable::getStartDateMillis));
-                payTables.forEach(payTable -> {
-                    LocalDate startDateForLine = getStartDate(employmentDTO, expertiseLine, payTable);
-                    LocalDate endDateForLine = getEndDate(expertiseLine, payTable);
-                    addEmploymentLines(employmentDTO, employmentLines, expertiseLine, startDateForLine,endDateForLine)
-                    ;
-                });
+                for (PayTable payTable : payTables) {
+                    startDateForLine = getStartDate(startDateForLine, expertiseLine, payTable);
+                    endDateForLine = getEndDate(expertiseLine, payTable);
+                    addEmploymentLines(employmentDTO, employmentLines, expertiseLine, startDateForLine, endDateForLine);
+                    if(endDateForLine!=null){
+                        startDateForLine=endDateForLine.plusDays(1);
+                    }
+                }
             }
-            });
-
-
+        }
         employment.setExpertise(expertise);
         return employmentLines;
-
     }
 
     private LocalDate getStartDate(EmploymentDTO employmentDTO,ExpertiseLine expertiseLine,PayTable payTable) {
@@ -1072,8 +1073,8 @@ public class EmploymentService {
             });
             employment.setEndDate(expertiseDTO.getEndDate());
             activityIntegrationService.deleteShiftsAfterEmploymentEndDate(employment.getUnit().getId(), expertiseDTO.getEndDate(), employment.getId(), staffAdditionalInfoDTO);
-            employmentGraphRepository.saveAll(employments);
         });
+        employmentGraphRepository.saveAll(employments);
 
     }
 
