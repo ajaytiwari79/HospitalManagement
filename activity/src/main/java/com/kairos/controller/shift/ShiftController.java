@@ -5,6 +5,7 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.BreakAction;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ViewType;
@@ -241,10 +242,10 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getPublishShiftCount(employmentId));
     }
 
-    @ApiOperation("update a Shift of a staff")
-    @PatchMapping(value = "/shift/break_interrupt{shiftId}")
+    @ApiOperation("update a break interrupt")
+    @PutMapping(value = "/shift/break_interrupt/{shiftId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> breakInterrupt(@PathVariable BigInteger shiftId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId));
+    public ResponseEntity<Map<String, Object>> breakInterrupt(@PathVariable BigInteger shiftId, @RequestParam("breakAction") BreakAction breakAction) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId,breakAction));
     }
 }

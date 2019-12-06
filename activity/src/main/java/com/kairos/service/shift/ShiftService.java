@@ -620,7 +620,12 @@ public class ShiftService extends MongoBaseService {
             shift.setDraftShift(oldStateOfShift.getDraftShift());
             shift.setPlanningPeriodId(oldStateOfShift.getPlanningPeriodId());
             if(!TIME_AND_ATTENDANCE.equals(phase.getName()) || isCollectionNotEmpty(shift.getBreakActivities())){
-                List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,shift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),oldStateOfShift);
+                List<ShiftActivity> breakActivities=new ArrayList<>();
+                List<Shift> shiftList=getListOfShift(shift,activityWrapperMap);
+                for (Shift currentShift:shiftList) {
+                    List<ShiftActivity> breakActivityList = shiftBreakService.updateBreakInShift(false,currentShift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),oldStateOfShift);
+                    breakActivities.addAll(breakActivityList);
+                }
                 shift.setBreakActivities(breakActivities);
             }
             activityConfigurationService.addPlannedTimeInShift(shift, activityWrapperMap, staffAdditionalInfoDTO);
@@ -1237,5 +1242,25 @@ public class ShiftService extends MongoBaseService {
     public Long getPublishShiftCount(Long employmentId) {
         List<Shift> shifts = shiftMongoRepository.findAllPublishShiftByEmploymentId(employmentId);
         return (long) shifts.size();
+    }
+
+    private List<Shift> getListOfShift(Shift shift,Map<BigInteger, ActivityWrapper> activityWrapperMap){
+        List<Shift> shiftList=new ArrayList<>();
+        Shift shift1=ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class);
+        shift1.setActivities(new ArrayList<>());
+        for (ShiftActivity shiftActivity:shift.getActivities()) {
+            if("GAP".equals(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getLabel())){
+                ShiftActivity breakActivity=shift.getBreakActivities().stream().filter(k->k.getStartDate().before(shiftActivity.getStartDate())).findFirst().orElse(null);
+                if(breakActivity!=null){
+                    shift1.setBreakActivities(Arrays.asList(breakActivity));
+                }
+                shiftList.add(shift1);
+                shift1=ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class);
+                shift1.setActivities(new ArrayList<>());
+                continue;
+            }
+            shift1.getActivities().add(shiftActivity);
+        }
+       return shiftList;
     }
 }

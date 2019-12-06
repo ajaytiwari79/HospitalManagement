@@ -6,6 +6,7 @@ import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.BreakAction;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.break_settings.BreakSettings;
@@ -121,9 +122,7 @@ public class ShiftBreakService {
     }
 
     public List<ShiftActivity> getBreakActivity(Shift shift, Shift dbShift,Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        ShiftActivity breakActivity=dbShift.getBreakActivities().get(0);
-        breakActivity.setStartDate(shift.getStartDate());
-        breakActivity.setEndDate(shift.getEndDate());
+        ShiftActivity breakActivity=shift.getBreakActivities().get(0);
         updateBreakHeldInShift(breakActivity,shift,dbShift, activityWrapperMap);
         return Arrays.asList(breakActivity);
     }
@@ -198,11 +197,24 @@ public class ShiftBreakService {
         return breakAvailabilitySettings;
     }
 
-    public boolean interruptBreak(BigInteger shiftId){
+    public boolean interruptBreak(BigInteger shiftId, BreakAction breakAction){
         Shift shift=shiftMongoRepository.findById(shiftId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_SHIFT_ID, shiftId)));
         Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(),shift.getStartDate(),shift.getEndDate());
-        if(REALTIME.equals(phase.getName()) && TIME_AND_ATTENDANCE.equals(phase.getName())){
-            shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakInterrupt(true));
+        if(TIME_AND_ATTENDANCE.equals(phase.getName())){
+            switch (breakAction){
+                case INTERRUPT:
+                    shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakInterrupt(true));
+                    break;
+                case NOT_HELD:
+                    shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakNotHeld(true));
+                    break;
+                case UNINTERRUPT:
+                    shift.getBreakActivities().forEach(shiftActivity -> shiftActivity.setBreakInterrupt(false));
+                    break;
+                default:
+                    break;
+            }
+
         }
         shiftMongoRepository.save(shift);
         return true;
