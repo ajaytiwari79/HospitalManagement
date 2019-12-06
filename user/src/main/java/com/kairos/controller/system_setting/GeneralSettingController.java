@@ -27,17 +27,17 @@ public class GeneralSettingController {
     @Inject
     private GeneralSettingService generalSettingService;
 
-    @PutMapping("/general_setting/")
+    @PutMapping("/general_setting")
     @ApiOperation("To update System Language")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateGeneralSetting(@Valid @RequestBody GeneralSettingDTO generalSettingDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingService.updateGeneralSetting(generalSettingDTO));
     }
 
-    @GetMapping(value = "/general_setting/")
+    @GetMapping(value = "/general_setting")
     @ApiOperation("To fetch System Language")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> getGeneralSetting(@PathVariable Long generalSettingId) {
+    public ResponseEntity<Map<String, Object>> getGeneralSetting() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, generalSettingService.getGeneralSetting());
     }
 }
