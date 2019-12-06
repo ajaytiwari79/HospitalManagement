@@ -41,6 +41,7 @@ public class DailyTimeBankEntry extends MongoBaseEntity{
     private Map<LocalDate,Integer> publishedBalances;
     private DailyTimeBankEntry draftDailyTimeBankEntry;
     private int timeBankOffMinutes;
+    private long protectedDaysOffMinutes;
 
 
     public DailyTimeBankEntry(Long employmentId, Long staffId, LocalDate date) {

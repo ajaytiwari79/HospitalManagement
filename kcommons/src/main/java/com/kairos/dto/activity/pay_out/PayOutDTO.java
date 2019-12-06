@@ -23,6 +23,7 @@ public class PayOutDTO {
     private long totalPayOutAfterCtaMin;
     private long totalPayOutBeforeCtaMin;
     private long payOutChange;
+    private long protectedDaysOffMinutes;
 
     //Distributed min on the basis of Interval;
     private List<PayOutIntervalDTO> timeIntervals = new ArrayList<>();
@@ -97,5 +98,13 @@ public class PayOutDTO {
 
     public void setPayOutDistribution(PayOutCTADistributionDTO payOutDistribution) {
         this.payOutDistribution = payOutDistribution;
+    }
+
+    public long getProtectedDaysOffMinutes() {
+        return protectedDaysOffMinutes;
+    }
+
+    public void setProtectedDaysOffMinutes(long protectedDaysOffMinutes) {
+        this.protectedDaysOffMinutes = protectedDaysOffMinutes;
     }
 }
