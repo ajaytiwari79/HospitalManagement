@@ -220,4 +220,5 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> updateChatStatus(@RequestBody ChatStatus chatStatus)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateChatStatus(chatStatus));
     }
+
 }
