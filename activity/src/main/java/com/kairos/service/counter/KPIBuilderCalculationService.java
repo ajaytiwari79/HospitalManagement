@@ -32,10 +32,12 @@ import com.kairos.persistence.model.activity.PlannedTimeType;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
+import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -114,6 +116,8 @@ public class KPIBuilderCalculationService implements CounterService {
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private WorkTimeAgreementService workTimeAgreementService;
     @Inject private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
+    @Inject
+    private PlanningPeriodMongoRepository planningPeriodMongoRepository;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig) {
@@ -213,7 +217,10 @@ public class KPIBuilderCalculationService implements CounterService {
 
             case CARE_DAYS:
                 StaffKpiFilterDTO staffKpiFilterDTO =kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
-                kpiCalculationRelatedInfo.employmentIdAndWtaMap.get(staffKpiFilterDTO.getEmployment())
+                List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
+                List<WTAQueryResultDTO> wtaQueryResultDTOS=kpiCalculationRelatedInfo.employmentIdAndWtaMap.get(staffKpiFilterDTO.getEmployment());
+                List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).collect(Collectors.toList());
+                workTimeAgreementBalancesCalculationService.getWorkTimeAgreementRuleTemplateBalancesDtos(kpiCalculationRelatedInfo.unitId,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate(),null,wtaBaseRuleTemplates,kpiCalculationRelatedInfo.activityWrapperMap,kpiCalculationRelatedInfo.planningPeriod,shiftWithActivityDTOS,new HashMap<>());
             case SENIORDAYS:
             case TOTAL_ABSENCE_DAYS:
             case CHILD_CARE_DAYS:
@@ -594,6 +601,8 @@ public class KPIBuilderCalculationService implements CounterService {
         Set<BigInteger> wtaActivityIds;
         List<ActivityWrapper> activityWrappers;
         Map<BigInteger, ActivityWrapper> activityWrapperMap;
+        PlanningPeriod planningPeriod;
+
 
         public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
@@ -627,6 +636,7 @@ public class KPIBuilderCalculationService implements CounterService {
             wtaActivityIds =workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
             activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(wtaActivityIds));
             activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+            planningPeriod= planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
         }
         private void updateStaffAndShiftMap() {
             staffIdAndShiftsMap = shifts.parallelStream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getStaffId, Collectors.toList()));

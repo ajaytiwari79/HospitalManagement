@@ -2,6 +2,7 @@ package com.kairos.dto.activity.kpi;
 
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 
 import java.util.List;
 
@@ -12,6 +13,8 @@ public class StaffKpiFilterDTO {
     private List<Long> unitIds;
     private Long unitId;
     private String unitName;
+    private String cprNumber;
+    private int staffAge;
     private List<EmploymentWithCtaDetailsDTO> employment;
     private List<DayTypeDTO> dayTypeDTOS;
 
