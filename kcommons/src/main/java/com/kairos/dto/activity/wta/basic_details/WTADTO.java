@@ -3,6 +3,7 @@ package com.kairos.dto.activity.wta.basic_details;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.annotation.ValidateIgnoreCounter;
+import com.kairos.commons.planning_setting.PlanningSetting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,7 +41,19 @@ public class WTADTO {
     private List<BigInteger> tags;
     private LocalDate employmentEndDate;
     private List<Long> unitIds;
+    private PlanningSetting planningSetting;
 
+    public WTADTO(String name, String description, long expertiseId, LocalDate startDate, LocalDate endDate, @NotNull(message = "error.RuleTemplate.description.notnull") List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType,PlanningSetting planningSetting) {
+        this.name = name;
+        this.description = description;
+        this.expertiseId = expertiseId;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.ruleTemplates = ruleTemplates;
+        this.organizationType = organizationType;
+        this.organizationSubType = organizationSubType;
+        this.planningSetting = planningSetting;
+    }
 
     public WTADTO(String name, String description, long expertiseId, LocalDate startDate, LocalDate endDate, @NotNull(message = "error.RuleTemplate.description.notnull") List<WTABaseRuleTemplateDTO> ruleTemplates, Long organizationType, Long organizationSubType) {
         this.name = name;

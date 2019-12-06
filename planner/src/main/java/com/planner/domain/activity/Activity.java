@@ -1,5 +1,6 @@
 package com.planner.domain.activity;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.planner.domain.common.MongoBaseEntity;
 
 import java.math.BigInteger;
@@ -16,8 +17,9 @@ public class Activity extends MongoBaseEntity {
     private long maxLength;
     private long maxAllocations;
     private Long unitId;
+    private PlanningSetting planningSetting;
 
-    public Activity(String name, List<Long> expertises, String description, List<Long> activitySkills, List<Long> employementTypes, long minLength, long maxLength, long maxAllocations, BigInteger kairosId, Long unitId) {
+    public Activity(String name, List<Long> expertises, String description, List<Long> activitySkills, List<Long> employementTypes, long minLength, long maxLength, long maxAllocations, BigInteger kairosId, Long unitId,PlanningSetting planningSetting) {
         this.name = name;
         this.expertises = expertises;
         this.description = description;
@@ -28,6 +30,7 @@ public class Activity extends MongoBaseEntity {
         this.maxAllocations = maxAllocations;
         this.unitId = unitId;
         this.kairosId=kairosId;
+        this.planningSetting =planningSetting;
     }
 
     public Activity() {
@@ -113,5 +116,13 @@ public class Activity extends MongoBaseEntity {
 
     public void setKairosId(BigInteger kairosId) {
         this.kairosId = kairosId;
+    }
+
+    public PlanningSetting getPlanningSetting() {
+        return planningSetting;
+    }
+
+    public void setPlanningSetting(PlanningSetting planningSetting) {
+        this.planningSetting = planningSetting;
     }
 }
