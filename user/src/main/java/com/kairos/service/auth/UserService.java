@@ -211,7 +211,6 @@ public class UserService {
         map.put("email", currentUser.getEmail());
         map.put("userNameUpdated",currentUser.isUserNameUpdated());
         map.put("otp", otp);
-        //updateChatStatus(ChatStatus.ONLINE);
         return map;
     }
 
@@ -484,7 +483,8 @@ public class UserService {
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
          permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
          permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(),userAccessRoleDTO.getAccessGroupIds(),UserContext.getUserDetails().isHubMember()), ModelDTO.class));
-        return permissionData;
+         updateChatStatus(ChatStatus.ONLINE);
+         return permissionData;
     }
 
 

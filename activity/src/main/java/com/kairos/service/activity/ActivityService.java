@@ -10,7 +10,6 @@ import com.kairos.dto.activity.activity.activity_tabs.communication_tab.Activity
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.FrequencySettings;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
-import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.activity.counter.enums.ModuleType;
 import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftIntervalDTO;
@@ -42,6 +41,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.unit_settings.ActivityConfiguration;
@@ -1143,5 +1143,11 @@ public class ActivityService {
         filterActivityDto.sort(Comparator.comparing(ActivityDTO :: getActivitySequence));
         filterActivityDto.addAll(activityDTOS);
         return filterActivityDto;
+    }
+
+    public Set<BigInteger> getAbsenceActivityIds(Long unitId, Date date) {
+        Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, date, null);
+        List<Activity> activities = activityMongoRepository.findAllAbsenceActivities(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
+        return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
     }
 }
