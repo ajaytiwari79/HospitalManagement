@@ -81,13 +81,13 @@ public class StaffFieldPermisionAspects {
     }*/
 
     //@Around("execution(public com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail com.kairos.persistence.repository.user.staff.StaffGraphRepository*.*(..))")
-    //@Before("execution(* com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository.save(..))")
-    /*public <T extends UserBaseEntity> void validateStaffResponseAsPerPermissdsaadion(JoinPoint joinPoint) {
+    @Before("execution(* com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository.save(..))")
+    public <T extends UserBaseEntity> void validateStaffResponseAsPerPermissdsaadion(JoinPoint joinPoint) {
         List<T> objects = checkAndReturnValidModel(joinPoint);
         if(isCollectionNotEmpty(objects)) {
             permissionService.updateModelBasisOfPermission(objects);
         }
-    }*/
+    }
 
     private <T extends UserBaseEntity> List<T> checkAndReturnValidModel(JoinPoint joinPoint) {
         List<T> validModels = new ArrayList<>();

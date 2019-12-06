@@ -8,10 +8,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.data.neo4j.annotation.EnableNeo4jAuditing;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 
 import javax.inject.Inject;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.Neo4jConstant.*;
 
 
@@ -20,37 +22,39 @@ import static com.kairos.constants.Neo4jConstant.*;
  * 1. getSession()
  * 2. getConfiguration()
  */
-/*@Configuration
+@Configuration
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
-@ComponentScan("com.kairos.persistence")*/
+//@ComponentScan("com.kairos.persistence")
 //@EnableTransactionManagement
-//@EnableNeo4jAuditing
+@EnableNeo4jAuditing
 public class Neo4jConfiguration {
 
-   /* private final Logger logger = LoggerFactory.getLogger(Neo4jConfiguration.class);
+    private final Logger logger = LoggerFactory.getLogger(Neo4jConfiguration.class);
 
 
     @Inject
     private Environment environment;
+    private static final String test = isNotNull(environment) ? "getSessionFactory" : "sess";
+    private static final String test2 = test;
 
-    @Bean(name = "PermissionSessionFactory")
-    public SessionFactory permissionSessionFactory() {
+    @Bean(name = test2)
+    public SessionFactory getSessionFactory() {
         return new SessionFactory(configuration(), "com.kairos.persistence.model");
     }
 
-    *//*@Bean(name = "PermissionNeo4jTransactionManager")
+    /*@Bean(name = "PermissionNeo4jTransactionManager")
     public Neo4jTransactionManager transactionManager(){
         return new Neo4jTransactionManager(permissionSessionFactory());
-    }*//*
+    }*/
 
     @Bean(name = "PermissionConfiguration")
     public org.neo4j.ogm.config.Configuration configuration() {
         return new org.neo4j.ogm.config.Configuration.Builder()
-                .connectionPoolSize(Integer.parseInt(this.environment.getProperty(CONNECTION_POOL_SIZE)))
-                .uri(this.environment.getProperty(NEO4J_URI))
-               .credentials(this.environment.getProperty(NEO4J_USER_NAME), this.environment.getProperty(NEO4J_PASSCODE))
+                .connectionPoolSize(150)
+                .uri("bolt://neo4j:oodles@localhost:7687")
+               .credentials("neo4j", "oodles")
                 .verifyConnection(true)
                 .build();
-    }*/
+    }
 
 }
