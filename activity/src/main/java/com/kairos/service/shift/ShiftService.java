@@ -873,7 +873,6 @@ public class ShiftService extends MongoBaseService {
 
         ViolatedRulesDTO violatedRulesDTO = shiftValidatorService.validateRuleOnShiftDelete(activityWrapperMap,shift,staffAdditionalInfoDTO);
 
-
         return violatedRulesDTO;
     }
 
