@@ -1,4 +1,4 @@
-package com.kairos.configuration;
+package com.kairos.config.permission_config;
 
 import org.neo4j.ogm.session.SessionFactory;
 import org.slf4j.Logger;
@@ -10,11 +10,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.neo4j.annotation.EnableNeo4jAuditing;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
-
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.constants.Neo4jConstant.*;
 
 
 /**
@@ -24,25 +22,23 @@ import static com.kairos.constants.Neo4jConstant.*;
  */
 @Configuration
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
-//@ComponentScan("com.kairos.persistence")
+@ComponentScan("com.kairos.persistence")
 //@EnableTransactionManagement
 @EnableNeo4jAuditing
-public class Neo4jConfiguration {
+public class FieldPermissionDataConfiguration {
 
-    private final Logger logger = LoggerFactory.getLogger(Neo4jConfiguration.class);
+    private final Logger logger = LoggerFactory.getLogger(FieldPermissionDataConfiguration.class);
 
 
     @Inject
     private Environment environment;
-    private static final String test = isNotNull(environment) ? "getSessionFactory" : "sess";
-    private static final String test2 = test;
 
-    @Bean(name = test2)
+    @Bean//(name = "getSessionFactory")
     public SessionFactory getSessionFactory() {
         return new SessionFactory(configuration(), "com.kairos.persistence.model");
     }
 
-    /*@Bean(name = "PermissionNeo4jTransactionManager")
+   /* @Bean//(name = "PermissionNeo4jTransactionManager")
     public Neo4jTransactionManager transactionManager(){
         return new Neo4jTransactionManager(permissionSessionFactory());
     }*/

@@ -24,10 +24,12 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
 import org.neo4j.ogm.session.Neo4jSession;
 import org.neo4j.ogm.session.SessionFactory;
+import org.neo4j.ogm.transaction.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -72,6 +74,9 @@ public class PermissionService {
     @Autowired
     @Qualifier("PermissionSessionFactory")
     private SessionFactory sessionFactory;
+
+    @Inject
+    private ApplicationContext applicationContext;
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
         Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
@@ -273,7 +278,8 @@ public class PermissionService {
     }
 
     public <T extends UserBaseEntity,E extends UserBaseEntity> List<T> updateModelBasisOfPermission(List<T> objects){
-        try {
+        Neo4jSession neo4jSession = (Neo4jSession) sessionFactory.openSession();
+        try (Transaction transaction = neo4jSession.getTransaction()){
             Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
             Set<String> modelNames = objects.stream().map(model->model.getClass().getSimpleName()).collect(Collectors.toSet());
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
@@ -285,6 +291,7 @@ public class PermissionService {
             List<E> dataBaseObjects = sessionFactory.openSession().loadAll(Staff.class,objectIds,2).stream().map(staff -> (E)staff).collect(Collectors.toList());
             Map<Long,E> mapOfDataBaseObject = dataBaseObjects.stream().collect(Collectors.toMap(k->k.getId(),v->v));
             updateObjectsPropertiesBeforeSave(mapOfDataBaseObject,modelMap,objects);
+            transaction.close();
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }
