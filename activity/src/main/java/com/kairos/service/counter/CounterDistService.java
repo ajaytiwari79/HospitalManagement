@@ -235,15 +235,10 @@ public class CounterDistService extends MongoBaseService {
     private List<TabKPIDTO> getTabKPIsData(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters, Long staffId, BigInteger shortcutId, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, Long countryId, List<BigInteger> kpiIds, Map<BigInteger, String> kpiIdAndTitleMap) {
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
-        if(isNotNull(shortcutId)){
-            ShortcutDTO shortcutDTO = shortcutService.getShortcutById(shortcutId);
-            com.kairos.dto.activity.counter.TabKPIDTO tabKPIDTO= shortcutDTO.getTabKPIs().stream().filter(tabKPIDto->tabKPIDto.getTabId().equals(moduleId)).findFirst().orElse(null);
-            if(isNotNull(tabKPIDTO)){
-                filters.setKpiIds(tabKPIDTO.getKpiIds());
-            }
-        }else {
-            filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
+        if(isCollectionNotEmpty(getTabKPIDToByShortcutId(shortcutId,moduleId))){
+            tabKPIDTOS=getTabKPIDToByShortcutId(shortcutId,moduleId);
         }
+        filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
         filters.setUnitId(unitId);
         filters.setCountryId(countryId);
         filters.setCountryAdmin(accessGroupPermissionCounterDTO.isCountryAdmin());
