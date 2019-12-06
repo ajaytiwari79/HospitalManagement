@@ -3,6 +3,7 @@ package com.kairos.controller.staff;
 import com.google.common.primitives.Chars;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
+import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
@@ -111,7 +112,7 @@ public class StaffController {
     @RequestMapping(value = "/{staffId}/personal_info", method = RequestMethod.PUT)
     @ApiOperation("update staff personal information")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @Validated @RequestBody StaffPersonalDetail staffPersonalDetail) throws ParseException {
+    public ResponseEntity<Map<String, Object>> savePersonalDetail(@PathVariable long unitId, @PathVariable long staffId, @RequestBody @Valid StaffPersonalDetail staffPersonalDetail) throws ParseException {
         StaffPersonalDetail response = staffService.savePersonalDetail(staffId, staffPersonalDetail, unitId);
         if (response == null) {
             return ResponseHandler.generateResponse(HttpStatus.OK, true, Collections.EMPTY_MAP);
@@ -288,7 +289,6 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.BAD_REQUEST, false, response);
     }
-
     // Skills
     @ApiOperation(value = "assign Skills to staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.POST)
@@ -301,6 +301,8 @@ public class StaffController {
         }
         return ResponseHandler.generateResponse(HttpStatus.OK, true, response);
     }
+
+
 
     @ApiOperation(value = "Get skills of staff")
     @RequestMapping(value = "/{staffId}/skill", method = RequestMethod.GET)
@@ -316,13 +318,8 @@ public class StaffController {
     @ApiOperation(value = "Update skill of staff")
     @RequestMapping(value = "/{staffId}/skill/{skillId}", method = RequestMethod.PUT)
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> updateStaffSkillLevel(@PathVariable long unitId, @PathVariable long staffId, @PathVariable long skillId,
-                                                                     @RequestBody Map<String, Object> skillInfo) throws ParseException {
-        SkillLevel level = SkillLevel.valueOf((String) skillInfo.get("level"));
-        long startDate = parseDate((String) skillInfo.get("startDate")).getTime();
-        long endDate = parseDate((String) skillInfo.get("endDate")).getTime();
-        boolean status = (boolean) skillInfo.get("status");
-        skillService.updateStaffSkillLevel(staffId, skillId, level, startDate, endDate, status, unitId);
+    public ResponseEntity<Map<String, Object>> updateStaffSkillLevel(@PathVariable long staffId, @RequestBody SkillDTO skillInfo) {
+        skillService.updateStaffSkillLevel(staffId,skillInfo);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, skillInfo);
     }
 
@@ -522,6 +519,14 @@ public class StaffController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffEmploymentsData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds, @RequestParam("employmentIds") List<Long> employmentIds) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsEmploymentData(staffIds, employmentIds, unitId, ORGANIZATION));
+    }
+
+
+    @RequestMapping(value = "/staffs_employments_details", method = RequestMethod.GET)
+    @ApiOperation("get staff and employment details by unit ")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffAndEmploymentData(@PathVariable long unitId, @RequestParam("staffIds") List<Long> staffIds, @RequestParam("employmentIds") List<Long> employmentIds) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getStaffsAndEmploymentData(staffIds, employmentIds, unitId));
     }
 
     @RequestMapping(value = "/{staffId}/verifyUnitEmployment", method = RequestMethod.GET)

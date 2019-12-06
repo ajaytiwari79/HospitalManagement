@@ -538,6 +538,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         String project = "{  \n" +
                 "      '$project':{  \n" +
                 "         '_id' : 1,\n" +
+                "         'breakActivities' : 1,\n" +
                 "    'name' : 1,\n" +
                 "    'durationMinutes' : 1,\n" +
                 "        'scheduledMinutes':1,\n" +
@@ -564,6 +565,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.scheduledMinutesOfPayout':1,\n" +
                 "        'activities.plannedMinutesOfPayout':1,\n" +
                 "        'activities.plannedMinutesOfTimebank':1,\n" +
+                "        'activities.absenceReasonCodeId' : 1,\n" +
                 "        'activities.payoutCtaBonusMinutes':1,\n" +
                 "        'activities.plannedTimes':1,\n" +
                 "        'activities.startDate' : 1,\n" +
@@ -582,7 +584,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private String groupByShiftAndActivity() {
         return "{'$group':{'_id':'$_id', 'durationMinutes':{'$first':'$durationMinutes'},\n" +
-                "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'createdBy':{'$first':'$createdBy'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'phaseId':{'$first':'$phaseId'},'activities':{'$addToSet':'$activities'}}}";
+                "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'createdBy':{'$first':'$createdBy'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'phaseId':{'$first':'$phaseId'},'breakActivities':{'$first':'$breakActivities'},'activities':{'$addToSet':'$activities'}}}";
     }
 
 
@@ -651,26 +653,33 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         }
         Map<BigInteger, ActivityDTO> activityDTOMap = getActivityDTOMap(activityIds);
         shiftWithActivityDTOS.forEach(shift -> {
-            updateActivityInShiftActivities(activityDTOMap, shift);
+            updateActivityInShiftActivities(activityDTOMap, shift.getActivities(),shift.getEmploymentId(),shift.getPhaseId());
+            updateActivityInShiftActivities(activityDTOMap, shift.getBreakActivities(),shift.getEmploymentId(),shift.getPhaseId());
             if(isNotNull(shift.getDraftShift())){
-                updateActivityInShiftActivities(activityDTOMap, shift.getDraftShift());
+                updateActivityInShiftActivities(activityDTOMap, shift.getDraftShift().getActivities(),shift.getEmploymentId(),shift.getPhaseId());
+                updateActivityInShiftActivities(activityDTOMap, shift.getDraftShift().getBreakActivities(),shift.getEmploymentId(),shift.getPhaseId());
             }
         });
     }
 
-    private <T extends ShiftDTO> void updateActivityInShiftActivities(Map<BigInteger, ActivityDTO> activityDTOMap, T shift) {
-        shift.getActivities().forEach(shiftActivityDTO -> {
-            shiftActivityDTO.setEmploymentId(shift.getEmploymentId());
-            shiftActivityDTO.setPhaseId(shift.getPhaseId());
-            shiftActivityDTO.setActivity(activityDTOMap.get(shiftActivityDTO.getActivityId()));
-            shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> childActivityDTO.setActivity(activityDTOMap.get(childActivityDTO.getActivityId())));
-        });
+    private <T extends ShiftActivityDTO> void updateActivityInShiftActivities(Map<BigInteger, ActivityDTO> activityDTOMap, List<T> shiftActivities,Long employmentId,BigInteger phaseId) {
+        if(isCollectionNotEmpty(shiftActivities)) {
+            shiftActivities.forEach(shiftActivityDTO -> {
+                shiftActivityDTO.setEmploymentId(employmentId);
+                shiftActivityDTO.setPhaseId(phaseId);
+                shiftActivityDTO.setActivity(activityDTOMap.get(shiftActivityDTO.getActivityId()));
+                shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> childActivityDTO.setActivity(activityDTOMap.get(childActivityDTO.getActivityId())));
+            });
+        }
     }
 
     private <T extends ShiftDTO> Set<BigInteger> getActivityIdsByShift( T shift) {
         Set<BigInteger> activityIds = new HashSet<>();
         activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         activityIds.addAll(shift.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+        if(isCollectionNotEmpty(shift.getBreakActivities())) {
+            activityIds.addAll(shift.getBreakActivities().stream().map(shiftActivityDTO -> shiftActivityDTO.getActivityId()).collect(Collectors.toList()));
+        }
         return activityIds;
     }
 

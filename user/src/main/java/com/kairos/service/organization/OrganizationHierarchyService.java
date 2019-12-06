@@ -18,7 +18,7 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.tree_structure.TreeStructureService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +53,6 @@ public class OrganizationHierarchyService {
 
     public List<QueryResult> generateHierarchy() {
         List<OrganizationWrapper> organizationWrappers = userGraphRepository.getOrganizations(UserContext.getUserDetails().getId());
-
         OrganizationBaseEntity hierarchy = organizationGraphRepository.generateHierarchy(organizationWrappers.stream().map(organizationWrapper -> organizationWrapper.getId()).collect(toList())).get(0);
         QueryResult orgHierarchy = setUnitPermission(hierarchy, accessPageService.isHubMember(UserContext.getUserDetails().getId()));
         return Collections.singletonList(orgHierarchy);
@@ -154,7 +153,7 @@ public class OrganizationHierarchyService {
                     break;
                 default:
             }
-            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyPropertiesOfListByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
+            List<FilterAttributes> filterAttributes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper((List<Map>) filterTypeDataMap.get(filterType), FilterAttributes.class);
             filterResponseDTO.setFilterData(filterAttributes);
             filterResponseDTOList.add(filterResponseDTO);
         }

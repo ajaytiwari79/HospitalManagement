@@ -42,6 +42,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
+import static com.kairos.enums.shift.TodoStatus.PENDING;
 import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
@@ -74,7 +75,7 @@ public class RequestAbsenceService {
         Shift shift = shiftOptional.get();
         shift.setRequestAbsence(requestAbsence);
         shiftMongoRepository.save(shift);
-        todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE,null,true);
+        todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE,true);
         return shiftDetailsService.shiftDetailsById(shift.getUnitId(), newArrayList(shift.getId()), false);
     }
 
@@ -113,6 +114,7 @@ public class RequestAbsenceService {
         if(!shiftOptional.isPresent()){
             exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
         }
+        ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
         if(TodoStatus.APPROVE.equals(todo.getStatus())){
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
             if(isNull(shiftOptional.get().getRequestAbsence())){
@@ -124,7 +126,6 @@ public class RequestAbsenceService {
                 todo.setStatus(TodoStatus.REQUESTED);
                 return (T)shiftAndActivtyStatusDTO;
             }
-            ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), shift.getEmploymentId(), new HashSet<>());
             if(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
                 Date startDate = getStartOfDay(shift.getStartDate());
@@ -137,10 +138,14 @@ public class RequestAbsenceService {
                 shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
             }
             response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTO);
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
         }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
-            todo.setDeleted(true);
+            //todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
+        }else if(PENDING.equals(todo.getStatus())){
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
         }
         return response;
     }
@@ -210,9 +215,13 @@ public class RequestAbsenceService {
                 updatedShiftActivity.setId(null);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
                 updatedShiftActivity.setEndDate(timeInterval.getEndDate());
-                shiftActivities.add(updatedShiftActivity);
+                if(!updatedShiftActivity.getStartDate().equals(updatedShiftActivity.getEndDate())) {
+                    shiftActivities.add(updatedShiftActivity);
+                }
             }
-            shiftActivities.add(absenceActivity);
+            if(shiftActivities.stream().noneMatch(activity->activity.getActivityId().equals(absenceActivity.getActivityId()))) {
+                shiftActivities.add(absenceActivity);
+            }
         }else {
             shiftActivities.add(shiftActivity);
         }

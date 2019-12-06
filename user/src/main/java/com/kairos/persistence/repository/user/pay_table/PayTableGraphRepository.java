@@ -43,7 +43,7 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
     Boolean checkPayGradeLevelAlreadyExists(Long payTableId, Long payGradeLevel);
 
     @Query("MATCH (payTable:PayTable{deleted:false})-[:"+HAS_PAY_GRADE+"]->(payGrade:PayGrade{deleted:false}) WHERE id(payTable)={0}\n" +
-            "MATCH(payGrade)-[rel:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea)\n" +
+            "MATCH(payGrade)-[rel:"+HAS_PAY_GROUP_AREA+"]-(pga:PayGroupArea{deleted:false})\n" +
             "OPTIONAL MATCH(payTable)-[r:"+HAS_TEMP_PAY_TABLE+"]-(tempPayTable:PayTable)-[:"+HAS_PAY_GRADE+"]->(oldPayGrade:PayGrade{deleted:false,payGradeLevel:payGrade.payGradeLevel})-[oldRel:"+HAS_PAY_GROUP_AREA+"]-(pga) \n" +
             "RETURN id(payTable) as payTableId,id(payGrade) as payGradeId,payGrade.payGradeLevel as payGradeLevel,payGrade.published as published,collect({id:id(rel),payGroupAreaId:id(pga),payGroupAreaAmount:rel.payGroupAreaAmount,publishedAmount:oldRel.payGroupAreaAmount}) as payGroupAreas ORDER BY payGradeLevel")
     List<PayGradeResponse> getPayGradesByPayTableId(Long payTableId);
@@ -76,4 +76,11 @@ public interface PayTableGraphRepository extends Neo4jBaseRepository<PayTable, L
             "MATCH(level)-[:"+IN_ORGANIZATION_LEVEL+"]-(payTables:PayTable{deleted:false}) WHERE DATE(payTables.startDateMillis)<=DATE({1}) AND (payTables.endDateMillis IS NULL OR DATE(payTables.endDateMillis)>=DATE({1})) AND id(payTables)<>{0}\n" +
             "RETURN CASE WHEN COUNT(payTables)>0 then true else false end as result")
     boolean existsByDate(Long id,String publishedDate);
+
+    @Query("MATCH(level:Level)<-[:"+IN_ORGANIZATION_LEVEL+"]-(payTable:PayTable{published:true}) WHERE id(level)={0} AND  \n" +
+            "(({2} IS NULL AND (payTable.endDateMillis IS NULL OR DATE(payTable.endDateMillis) > DATE({1})))\n" +
+            "OR \n" +
+            "(DATE({2}) IS NOT NULL AND  (DATE({1}) < DATE(payTable.endDateMillis) AND DATE({2}) > DATE(payTable.startDateMillis))))\n" +
+            "RETURN payTable")
+    List<PayTable> findAllActivePayTable(Long levelId,String startDate,String endDate);
 }

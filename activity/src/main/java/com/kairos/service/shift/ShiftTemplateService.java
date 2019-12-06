@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.shift.IndividualShiftTemplate;
@@ -12,7 +13,6 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.IndividualShiftTemplateRepository;
 import com.kairos.persistence.repository.shift.ShiftTemplateRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,7 +84,7 @@ public class ShiftTemplateService{
 
     public List<ShiftTemplateDTO> getAllShiftTemplates(Long unitId) {
         List<ShiftTemplate> shiftTemplates = shiftTemplateRepository.findAllByUnitIdAndCreatedByAndDeletedFalse(unitId, UserContext.getUserDetails().getId());
-        List<ShiftTemplateDTO> shiftTemplateDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(shiftTemplates, ShiftTemplateDTO.class);
+        List<ShiftTemplateDTO> shiftTemplateDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftTemplates, ShiftTemplateDTO.class);
         Set<BigInteger> individualShiftTemplateIds = shiftTemplates.stream().flatMap(e -> e.getIndividualShiftTemplateIds().stream()).collect(Collectors.toSet());
         List<IndividualShiftTemplateDTO> individualShiftTemplateDTOS = individualShiftTemplateRepository.getAllIndividualShiftTemplateByIdsIn(individualShiftTemplateIds);
         Set<BigInteger> activityIds = individualShiftTemplateDTOS.stream().flatMap(s -> s.getActivities().stream().map(a -> a.getActivityId())).collect(Collectors.toSet());

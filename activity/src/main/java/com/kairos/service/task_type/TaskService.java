@@ -16,6 +16,7 @@ import com.kairos.dto.user.organization.OrganizationDTO;
 import com.kairos.dto.user.patient.PatientResourceList;
 import com.kairos.dto.user.staff.*;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.task_type.TaskTypeEnum;
 import com.kairos.messaging.ReceivedTask;
 import com.kairos.persistence.model.activity.Activity;
@@ -51,7 +52,6 @@ import com.kairos.utils.JsonUtils;
 import com.kairos.utils.TaskUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResponse;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.utils.user_context.UserContext;
 import com.kairos.wrapper.EscalatedTasksWrapper;
 import com.kairos.wrapper.TaskWrapper;
 import com.kairos.wrapper.task.StaffAssignedTasksWrapper;
@@ -963,7 +963,7 @@ public class TaskService extends MongoBaseService {
                 newTasks.add(task);
             }
         }
-        List<Task> tasks = ObjectMapperUtils.copyPropertiesOfListByMapper(newTasks,Task.class);//getVrpTasksByRows(rows,unitId);
+        List<Task> tasks = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(newTasks,Task.class);//getVrpTasksByRows(rows,unitId);
         save(tasks);
         return true;
     }

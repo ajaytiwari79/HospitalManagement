@@ -147,6 +147,7 @@ public class ShiftStateService {
                 newshiftState.setId(null);
                 newshiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
                 newshiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+                newshiftState.getBreakActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                 timeAndAttendanceShiftState.setValidated(getLocalDate());
                 timeAndAttendanceShiftStates.add(newshiftState);
             }
@@ -171,6 +172,7 @@ public class ShiftStateService {
                     shiftState.setEndDate(shiftState.getActivities().get(shiftState.getActivities().size() - 1).getEndDate());
                     shiftState.setShiftId(shift.getId());
                     shiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
+                    shiftState.getBreakActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                     shiftState.setShiftStatePhaseId(phaseId);
                     shiftState.setDraftShift(null);
                     shiftStates.add(shiftState);

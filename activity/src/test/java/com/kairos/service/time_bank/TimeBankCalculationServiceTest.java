@@ -76,12 +76,12 @@ public class TimeBankCalculationServiceTest {
         staffEmploymentDetails = ObjectMapperUtils.jsonStringToObject(getFileDataAsString(EMPLOYMENT_DETAILS),StaffEmploymentDetails.class);
         staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmploymentDetails,dayTypeDTOS);
         interval = new DateTimeInterval(1555718400000l,1555804800000l);
-        shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(SHIFT_FOR_TIMEBANK_CALCULATION),ShiftWithActivityDTO.class);;
+        shiftWithActivityDTOS = ObjectMapperUtils.jsonStringToList(getFileDataAsString(SHIFT_FOR_TIMEBANK_CALCULATION),ShiftWithActivityDTO.class);;
         dailyTimeBankEntryMap = new HashMap<>();
         planningPeriodInterval = new DateTimeInterval(1555286400000l, 1555804800000l);
-        dayTypeDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(DAYTYPE), DayTypeDTO.class);
+        dayTypeDTOS = ObjectMapperUtils.jsonStringToList(getFileDataAsString(DAYTYPE), DayTypeDTO.class);
         activity = ObjectMapperUtils.jsonStringToObject(getFileDataAsString(ACTIVITY_FOR_TIMEBANK_CALCULATION), Activity.class);
-        shifts = ObjectMapperUtils.JsonStringToList(getFileDataAsString(JsonConstaints.SHIFT), Shift.class);
+        shifts = ObjectMapperUtils.jsonStringToList(getFileDataAsString(JsonConstaints.SHIFT), Shift.class);
         todayDailyTimeBankEntry = new DailyTimeBankEntry(115l,154l,LocalDate.now());
     }
 
@@ -120,7 +120,7 @@ public class TimeBankCalculationServiceTest {
         todayDailyTimeBankEntry.setPublishedBalances(new HashMap<>());
         when(timeBankRepository.findByEmploymentAndDate(any(Long.class), any(LocalDate.class))).thenReturn(todayDailyTimeBankEntry);
         when(timeBankRepository.save(todayDailyTimeBankEntry)).thenReturn(todayDailyTimeBankEntry);
-        shiftWithActivityDTOS = ObjectMapperUtils.JsonStringToList(getFileDataAsString(NIGHT_SHIFT_FOR_TIMEBANK_CALCULATION), ShiftWithActivityDTO.class);
+        shiftWithActivityDTOS = ObjectMapperUtils.jsonStringToList(getFileDataAsString(NIGHT_SHIFT_FOR_TIMEBANK_CALCULATION), ShiftWithActivityDTO.class);
         DailyTimeBankEntry dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, null, planningPeriodInterval, dayTypeDTOS, validatedByPlanner);
         LOGGER.info("daily timebank : {}", dailyTimeBankEntry);
         Map<BigInteger, Integer> ctaDistributionCalculation = new HashMap<>(8);
@@ -150,28 +150,28 @@ public class TimeBankCalculationServiceTest {
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 shiftActivity.setTimeType(TimeTypes.WORKING_TYPE.toString());
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 480);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 480);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(ENTERED_MANUALLY);
                 shiftActivity.setDurationMinutes(180);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 180);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 180);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(FIXED_TIME);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 150);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 150);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(CommonConstants.FULL_DAY_CALCULATION);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 2220);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 2220);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(WEEKLY_HOURS);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 1920);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 1920);
                 activity.getTimeCalculationActivityTab().setMethodForCalculatingTime(WEEKLY_HOURS);
-                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails);
+                timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity, activity, staffEmploymentDetails,false);
                 Assert.assertEquals(shiftActivity.getScheduledMinutes(), 1920);
                 Assert.assertEquals(shiftActivity.getDurationMinutes(), 1920);
             }

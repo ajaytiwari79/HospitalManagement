@@ -2,7 +2,9 @@ package com.kairos.persistence.model.user.filter;
 
 import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.common.UserBaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 
@@ -14,8 +16,9 @@ import java.util.List;
 @NodeEntity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class FilterSelection extends UserBaseEntity {
-
     private FilterType name;
     private List<String> value;
 }

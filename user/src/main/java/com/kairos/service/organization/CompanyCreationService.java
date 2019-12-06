@@ -5,10 +5,13 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.MasterDataTypeEnum;
+import com.kairos.enums.PenaltyScoreLevel;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -20,6 +23,9 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
+import com.kairos.persistence.model.country.tag.PenaltyScore;
+import com.kairos.persistence.model.country.tag.Tag;
+import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
@@ -51,6 +57,7 @@ import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepositor
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.country.ReasonCodeService;
+import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.staff.StaffCreationService;
@@ -149,6 +156,8 @@ public class CompanyCreationService {
     private StaffCreationService staffCreationService;
     @Inject
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
+    @Inject
+    private TagService tagService;
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -441,7 +450,7 @@ public class CompanyCreationService {
         if(organizationBasicDTO.getContactAddress() != null) {
             organizationBasicDTO.getContactAddress().setId(unit.getContactAddress().getId());
         }
-        reasonCodeService.createReasonCodeForUnit(unit, parentUnit.getId());
+        reasonCodeService.createReasonCodeForUnit(unit, country.getId());
         unitGraphRepository.createChildOrganization(parentOrganizationId, unit.getId());
         setCompanyData(unit, organizationBasicDTO);
         if(doesUnitManagerInfoAvailable(organizationBasicDTO)) {
@@ -582,6 +591,7 @@ public class CompanyCreationService {
         List<OrganizationContactAddress> organizationContactAddresses = unitGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
         organization.setBoardingCompleted(true);
+        organization.setTags(tagService.getCountryTagByOrgSubTypes(countryId, organization.getOrganizationSubTypes().stream().map(orgSubtype->orgSubtype.getId()).collect(Collectors.toList())));
         organizationBaseRepository.save(organization);
         try {
             List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);

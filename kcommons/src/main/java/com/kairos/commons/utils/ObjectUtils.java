@@ -16,43 +16,44 @@ import java.util.function.Predicate;
 public class ObjectUtils {
 
 
-    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
-    {
+    public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor){
         Map<Object, Boolean> map = new ConcurrentHashMap<>();
         return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    public static boolean isCollectionEmpty(@Nullable Collection<?> collection){
+    public static boolean isCollectionEmpty(@Nullable Collection<?> collection) {
         return (collection == null || collection.isEmpty());
     }
 
-    public static boolean isCollectionNotEmpty(@Nullable Collection<?> collection){
+    public static boolean isCollectionNotEmpty(@Nullable Collection<?> collection) {
         return !(collection == null || collection.isEmpty());
     }
 
-    public static <K,V> boolean isMapNotEmpty(@Nullable Map<K,V> map){
+    public static <K, V> boolean isMapNotEmpty(@Nullable Map<K, V> map) {
         return !(map == null || map.isEmpty());
     }
 
-    public static <K,V> boolean isMapEmpty(@Nullable Map<K,V> map){
+    public static <K, V> boolean isMapEmpty(@Nullable Map<K, V> map) {
         return (map == null || map.isEmpty());
     }
+
     public static boolean isEmpty(@Nullable Map<?, ?> map) {
         return (map == null || map.isEmpty());
     }
+
     public static boolean isNotEmpty(@Nullable Map<?, ?> map) {
         return !isEmpty(map);
     }
 
-    public static <T> boolean isNull(T object){
+    public static <T> boolean isNull(T object) {
         return !Optional.ofNullable(object).isPresent();
     }
 
-    public static <T> T isNullOrElse(T object,T elseObject){
+    public static <T> T isNullOrElse(T object, T elseObject) {
         return Optional.ofNullable(object).orElse(elseObject);
     }
 
-    public static <T> boolean isNotNull(T object){
+    public static <T> boolean isNotNull(T object) {
         return Optional.ofNullable(object).isPresent();
     }
 
@@ -69,9 +70,19 @@ public class ObjectUtils {
         return list;
     }
 
+
     public static String getHoursStringByMinutes(int minutes){
         int hoursValue = minutes / 60; //since both are ints, you get an int
         int minutesValue = minutes % 60;
-        return hoursValue+"."+minutesValue;
+        return hoursValue + "." + minutesValue;
     }
+
+    public static boolean isEquals(Object o1, Object o2) {
+        if (o1 != null && o2 != null) {
+            return o1.equals(o2);
+        }
+        return o1 == null && o2 == null;
+    }
+
+
 }

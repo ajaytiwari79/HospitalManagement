@@ -28,7 +28,7 @@ import com.kairos.service.country.CurrencyService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.payment_type.PaymentTypeService;
 import com.kairos.utils.FormatUtil;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -341,7 +341,7 @@ public class OrganizationAddressService {
     public ReasonCodeWrapper getAddressAndReasonCodeOfOrganization(Set<Long> absenceReasonCodeIds, Long unitId) {
         Map<String, Object> contactAddressData = unitGraphRepository.getContactAddressOfParentOrganization(unitId);
         List<ReasonCode> reasonCodes = reasonCodeGraphRepository.findByIds(absenceReasonCodeIds);
-        List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodes, ReasonCodeDTO.class);
+        List<ReasonCodeDTO> reasonCodeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodes, ReasonCodeDTO.class);
         return new ReasonCodeWrapper(reasonCodeDTOS, contactAddressData);
     }
 

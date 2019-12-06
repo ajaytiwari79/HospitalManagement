@@ -83,7 +83,7 @@ public class PayGroupAreaService {
 
             payGroupArea = new PayGroupArea(payGroupAreaDTO.getName(), payGroupAreaDTO.getDescription(), level);
             payGroupAreaGraphRepository.save(payGroupArea);
-            LOGGER.info("pay group area Id {}",payGroupArea.getId());
+            LOGGER.info("pay group area Id {}", payGroupArea.getId());
         }
 
         List<PayGroupAreaMunicipalityRelationship> municipalityRelationships = new ArrayList<>();
@@ -94,7 +94,7 @@ public class PayGroupAreaService {
         });
 
         payGroupAreaRelationshipRepository.saveAll(municipalityRelationships);
-        return municipalityRelationships.stream().map(a->new PayGroupAreaQueryResult(payGroupArea, a, a.getMunicipality())).collect(Collectors.toList());
+        return municipalityRelationships.stream().map(a -> new PayGroupAreaQueryResult(payGroupArea, a, a.getMunicipality())).collect(Collectors.toList());
     }
 
     public PayGroupAreaQueryResult updatePayGroupArea(Long payGroupAreaId, PayGroupAreaDTO payGroupAreaDTO) {
@@ -195,8 +195,14 @@ public class PayGroupAreaService {
         if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted()) {
             LOGGER.info("pay group area not found for deletion  ");
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_ID_NOTFOUND, payGroupAreaId);
-
         }
+        if (payGroupAreaGraphRepository.isLinkedWithPayTable(payGroupAreaId)) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_USED);
+        }
+        if(payGroupAreaGraphRepository.isLinkedWithPayTable(payGroupAreaId)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_USED);
+        }
+
         payGroupArea.setDeleted(true);
         payGroupAreaGraphRepository.save(payGroupArea);
         return true;
@@ -228,7 +234,10 @@ public class PayGroupAreaService {
         if (!Optional.ofNullable(payGroupArea).isPresent() || payGroupArea.isDeleted()) {
             LOGGER.info("pay group area not found for deletion  ");
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_ID_NOTFOUND, payGroupAreaId);
+        }
 
+        if (payGroupAreaGraphRepository.isLinkedWithPayTable(payGroupAreaId)) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_USED);
         }
 
         int linkedMunicipalityCount = payGroupAreaGraphRepository.removePayGroupAreaFromMunicipality(payGroupAreaId, municipalityId, relationshipId);

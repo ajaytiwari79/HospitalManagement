@@ -2,22 +2,26 @@ package com.kairos.service.tag;
 
 import com.kairos.controller.staffing_level.StaffingLevelController;
 import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.tag.Tag;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.tag.TagMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
@@ -37,6 +41,10 @@ public class TagService extends MongoBaseService {
     TagMongoRepository tagMongoRepository;
     @Autowired
     ExceptionService exceptionService;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
+
+
 
     public Tag addCountryTag(Long countryId, TagDTO tagDTO) {
         if ( !userIntegrationService.isCountryExists(countryId)) {
@@ -66,7 +74,7 @@ public class TagService extends MongoBaseService {
         return tag;
     }
 
-    public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType){
+    public HashMap<String,Object> getListOfCountryTags(Long countryId, String filterText, MasterDataTypeEnum masterDataType,boolean includeStaffTags){
         if ( !userIntegrationService.isCountryExists(countryId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID,countryId);
         }
@@ -78,12 +86,16 @@ public class TagService extends MongoBaseService {
         }*/
 
         HashMap<String,Object> tagsData = new HashMap<>();
+        List<Tag> tags;
         if(masterDataType == null){
-            tagsData.put("tags", tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false));
+            tags = tagMongoRepository.findAllTagByCountryIdAndNameAndDeletedAndCountryTagTrue(countryId, filterText, false);
         } else {
-            tagsData.put("tags", tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false));
+            tags = tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false);
         }
-
+        if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
+            tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(countryId, filterText, true));
+        }
+        tagsData.put("tags",tags);
         return tagsData;
     }
 
@@ -127,8 +139,7 @@ public class TagService extends MongoBaseService {
         return tag;
     }
 
-    public HashMap<String,Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType){
-
+    public HashMap<String,Object> getListOfOrganizationTags(Long organizationId, String filterText, MasterDataTypeEnum masterDataType, boolean includeStaffTags){
 
         if(filterText == null){
             filterText = "";
@@ -148,6 +159,9 @@ public class TagService extends MongoBaseService {
             } else {
                 tags.addAll( tagMongoRepository.findAllTagByCountryIdAndNameAndMasterDataTypeAndDeletedAndCountryTagTrue(countryId, filterText, masterDataType.toString(), false));
             }
+        }
+        if(includeStaffTags && MasterDataTypeEnum.ACTIVITY.equals(masterDataType)){
+            tags.addAll(userIntegrationService.getAllStaffTagsByCountryIdOrOrganizationId(organizationId, filterText, false));
         }
         tagsData.put("tags",tags);
         return tagsData;
@@ -178,5 +192,15 @@ public class TagService extends MongoBaseService {
 
     public static Tag buildTag(TagDTO tagDTO, boolean countryTag, long countryOrOrgId){
         return new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), countryTag, countryOrOrgId);
+    }
+
+    public boolean unlinkTagFromActivity(BigInteger tagId){
+        List<Activity> activities = activityMongoRepository.findActivitiesByTagId(tagId);
+        for (Activity activity : activities) {
+            activity.getGeneralActivityTab().setTags(activity.getGeneralActivityTab().getTags().stream().filter(t->!t.equals(tagId)).collect(Collectors.toList()));
+            activity.setTags(activity.getTags().stream().filter(t->!t.equals(tagId)).collect(Collectors.toList()));
+        }
+        activityMongoRepository.saveAll(activities);
+        return true;
     }
 }

@@ -14,7 +14,7 @@ import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRe
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.UserContext;
+import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

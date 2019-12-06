@@ -1,7 +1,9 @@
 package com.kairos.controller.user;
 
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.enums.user.ChatStatus;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
@@ -21,6 +23,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.UNIT_URL;
@@ -42,7 +45,7 @@ public class UserController {
     @Inject
     private StaffService staffService;
 
-   @Inject
+    @Inject
     private UserSickService userSickService;
     @Inject
     private AccessGroupService accessGroupService;
@@ -198,5 +201,23 @@ public class UserController {
     @GetMapping(value = "/staffs/main_employments")
     public ResponseEntity<Map<String, Object>> getStaffsMainEmployments()  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getMainEmploymentOfStaffs());
+    }
+
+    @PutMapping(UNIT_URL+"/update_access_role")
+    @ApiOperation("update access_role")
+    public ResponseEntity<Map<String, Object>> updateAccessRole(@PathVariable Long unitId, @RequestBody String accessGroupRole) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateAccessRoleOfUser(unitId,accessGroupRole));
+    }
+
+    @GetMapping("/get_unit_wise_access_role")
+    @ApiOperation("get access_role")
+    public ResponseEntity<Map<String, Object>> getUnitWiseLastSelectedAccessRole() {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getUnitWiseLastSelectedAccessRole());
+    }
+
+    @ApiOperation("Update User Chat Status ")
+    @PutMapping("/user/chat_status")
+    public ResponseEntity<Map<String, Object>> updateChatStatus(@RequestBody ChatStatus chatStatus)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateChatStatus(chatStatus));
     }
 }

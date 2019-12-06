@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * Created by prerna on 10/11/17.
  */
@@ -29,6 +31,16 @@ public class TagDTO {
 
     private long organizationId;
 
+    private Long orgTypeId;
+
+    private List<Long> orgSubTypeIds;
+
+    private PenaltyScoreDTO penaltyScore;
+
+    private String color;
+
+    private String shortName;
+    private String ultraShortName;
 
     public TagDTO(String name, MasterDataTypeEnum masterDataType){
         this.name = name;

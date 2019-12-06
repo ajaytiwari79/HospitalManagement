@@ -134,7 +134,7 @@ public class StaffActivitySettingService extends MongoBaseService {
             staffActivitySetting.setUnitId(unitId);
             staffActivitySetting.setStaffId(staffId);
         });
-        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyPropertiesOfListByMapper(staffActivitySettings,StaffActivitySetting.class);
+        List<StaffActivitySetting> staffActivitySettingsList=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffActivitySettings,StaffActivitySetting.class);
         save(staffActivitySettingsList);
         return staffActivitySettings;
    }
@@ -201,4 +201,8 @@ public class StaffActivitySettingService extends MongoBaseService {
        responseMap.put(ERROR,error);
        return responseMap;
    }
+
+    public StaffActivitySettingDTO getStaffActivitySettingsByActivityId(Long unitId,BigInteger activityId,Long staffId){
+        return staffActivitySettingRepository.findByActivityIdAndStaffIdAndUnitIdAndDeletedFalse(activityId,staffId,unitId);
+    }
 }

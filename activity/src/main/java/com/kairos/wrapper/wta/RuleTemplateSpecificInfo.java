@@ -46,11 +46,10 @@ public class RuleTemplateSpecificInfo {
     private boolean nightWorker;
     private ExpertiseNightWorkerSetting expertiseNightWorkerSetting;
     PhaseDefaultName phaseEnum;
+    private List<Integer> staffChildAges;
 
 
-
-
-    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, UserAccessRoleDTO user, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum) {
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum, List<Integer> staffChildAges) {
         this.shifts = shifts;
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
@@ -58,7 +57,27 @@ public class RuleTemplateSpecificInfo {
         this.planningPeriod = planningPeriod;
         this.counterMap = counterMap;
         this.dayTypeMap = dayTypeMap;
-        this.user = user;
+        this.totalTimeBank = totalTimeBank;
+        this.violatedRules = new ViolatedRulesDTO();
+        this.activityWrapperMap = activityWrapperMap;
+        this.staffAge = staffAge;
+        this.childCareDays = childCareDays;
+        this.seniorCareDays = seniorCareDays;
+        this.lastPlanningPeriodEndDate = lastPlanningPeriodEndDate;
+        this.expertiseNightWorkerSetting = expertiseNightWorkerSetting;
+        this.nightWorker = nightWorker;
+        this.phaseEnum=phaseEnum;
+        this.staffChildAges=staffChildAges;
+    }
+
+    public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum) {
+        this.shifts = shifts;
+        this.shift = shift;
+        this.timeSlotWrapperMap = timeSlotWrapperMap;
+        this.phaseId = phaseId;
+        this.planningPeriod = planningPeriod;
+        this.counterMap = counterMap;
+        this.dayTypeMap = dayTypeMap;
         this.totalTimeBank = totalTimeBank;
         this.violatedRules = new ViolatedRulesDTO();
         this.activityWrapperMap = activityWrapperMap;

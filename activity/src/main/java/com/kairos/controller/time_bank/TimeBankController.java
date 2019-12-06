@@ -98,7 +98,7 @@ public class TimeBankController {
     @ApiOperation("update time bank of protected days off")
     @GetMapping("/test_timebank")
     public ResponseEntity<Map<String,Object>> testApiForProtecrtedDaysOFf(@PathVariable Long unitId){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankCalculationService.updateTimeBankAgainstProtectedDaysOffSetting());
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().updateTimeBankAgainstProtectedDaysOffSetting());
     }
 
 

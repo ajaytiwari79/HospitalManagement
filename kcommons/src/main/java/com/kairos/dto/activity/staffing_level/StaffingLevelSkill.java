@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.staffing_level;
 
+import com.kairos.enums.SkillLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,10 @@ import java.util.List;
 public class StaffingLevelSkill {
     private Long skillId;
     private List<SkillLevelSetting> skillLevelSettings = new ArrayList<>(3);
+
+    public SkillLevelSetting getSkillLevelSettingBySkillLevel(SkillLevel skillLevel){
+        return this.skillLevelSettings.stream().filter(skillLevelSetting -> skillLevelSetting.getSkillLevel().equals(skillLevel)).findFirst().get();
+    }
 
     @Override
     public String toString() {

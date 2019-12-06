@@ -32,7 +32,7 @@ public class UserSickService {
         List<StaffInformationQueryResult> staffUnitWrappers = staffGraphRepository.getAllStaffsAndUnitDetailsByUserId(UserId);
         List<StaffResultDTO> staffResults = new ArrayList<>();
         if (Optional.ofNullable(staffUnitWrappers).isPresent()) {
-            staffResults = ObjectMapperUtils.copyPropertiesOfListByMapper(staffUnitWrappers, StaffResultDTO.class);
+            staffResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffUnitWrappers, StaffResultDTO.class);
             // if the size id one then also calculating allowed time type for sick
             if (staffUnitWrappers.size() == 1 && YES.equals(sickSettingsRequired)) {
                 Set<BigInteger> allowedTimeTypes = sickConfigurationService.getSickSettingsOfUnit(staffUnitWrappers.get(0).getUnitId());

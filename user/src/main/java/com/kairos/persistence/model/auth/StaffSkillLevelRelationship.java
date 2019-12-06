@@ -7,12 +7,15 @@ import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.skill.Skill;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
+
+import java.time.LocalDate;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF_HAS_SKILLS;
 
@@ -25,6 +28,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.STAFF
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class StaffSkillLevelRelationship extends UserBaseEntity {
     @KPermissionRelationshipFrom
     @StartNode
@@ -33,14 +37,8 @@ public class StaffSkillLevelRelationship extends UserBaseEntity {
     @KPermissionRelationshipTo
     @EndNode
     private Skill skill;
-    private SkillLevel skillLevel = SkillLevel.ADVANCE;
-    private long startDate;
-    private long endDate;
+    private SkillLevel skillLevel = SkillLevel.BASIC;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private boolean isEnabled=true;
-
-    public StaffSkillLevelRelationship(Staff staff, Skill skill, SkillLevel skillLevel) {
-        this.staff = staff;
-        this.skill = skill;
-        this.skillLevel = skillLevel;
-    }
 }

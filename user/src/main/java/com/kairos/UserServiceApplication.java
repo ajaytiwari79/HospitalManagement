@@ -4,12 +4,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.kairos.commons.config.mongo.EnableAuditLogging;
-import com.kairos.config.LocalDateDeserializer;
-import com.kairos.config.LocalDateSerializer;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
 import com.kairos.utils.user_context.SchedulerUserContextInterceptor;
-import com.kairos.utils.user_context.UserContextInterceptor;
+import com.kairos.dto.user_context.UserContextInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectMapperUtils.LOCALDATE_FORMATTER;
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 /**
@@ -80,14 +82,14 @@ public class UserServiceApplication implements WebMvcConfigurer {
 	@Bean
 	@Primary
 	public ObjectMapper serializingObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper mapper = new ObjectMapper();
 		JavaTimeModule javaTimeModule = new JavaTimeModule();
-		javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer());
-		javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer());
-		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		objectMapper.registerModule(javaTimeModule);
-		return objectMapper;
+		javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(LOCALDATE_FORMATTER));
+		javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(LOCALDATE_FORMATTER));
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,false);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.registerModule(javaTimeModule);
+		return mapper;
 	}
 	@Bean
 	public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
@@ -163,8 +165,6 @@ public class UserServiceApplication implements WebMvcConfigurer {
 				.messageConverters(mappingJackson2HttpMessageConverter())
 				.build();
 	}
-
-
 
 }
 

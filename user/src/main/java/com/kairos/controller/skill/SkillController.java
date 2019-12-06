@@ -5,11 +5,13 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,7 +67,7 @@ public class SkillController {
 
     @PostMapping("/country/{countryId}/get_Skill_and_level_by_staff_ids")
     @ApiOperation("Get Staff's SkillId And Level")
-    public ResponseEntity<Map<String, Object>> getStaffSkillAndLevelByStaffIds(@RequestBody List<Long> StaffIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffSkillAndLevelByStaffIds(StaffIds));
+    public ResponseEntity<Map<String, Object>> getStaffSkillAndLevelByStaffIds(@RequestBody List<Long> StaffIds, @RequestParam("selectedDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate selectedDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffSkillAndLevelByStaffIds(StaffIds,selectedDate));
     }
 }

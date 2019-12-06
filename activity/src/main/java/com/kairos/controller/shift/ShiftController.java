@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ViewType;
@@ -81,6 +82,7 @@ public class ShiftController {
     @PutMapping(value = "/shift")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> updateShift(@PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO, @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType) {
+          shiftDTO.setUnitId(unitId);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShift(shiftDTO, false, false, shiftActionType));
     }
 
@@ -123,10 +125,10 @@ public class ShiftController {
     }
 
     @ApiOperation("delete all shifts of staff after employment end")
-    @DeleteMapping(value = "/delete_shifts/staff/{staffId}")
+    @PutMapping(value = "/delete_shifts/employment/{employmentId}")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> deleteShiftsAfterEmploymentEndDate(@PathVariable Long unitId, @PathVariable Long staffId, @RequestParam("endDate") String endDate) {
-        shiftService.deleteShiftsAfterEmploymentEndDate(staffId, unitId, DateUtils.asLocalDate(endDate));
+    public ResponseEntity<Map<String, Object>> deleteShiftsAfterEmploymentEndDate(@PathVariable Long employmentId, @RequestParam("endDate") String endDate, @RequestBody StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        shiftService.deleteShiftsAfterEmploymentEndDate(employmentId, DateUtils.asLocalDate(endDate),staffAdditionalInfoDTO);
         return ResponseHandler.generateResponse(HttpStatus.OK, true, true);
     }
 

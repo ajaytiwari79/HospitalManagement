@@ -1,7 +1,11 @@
 package com.kairos.dto.activity.shift;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
  * @author pradeep
@@ -27,7 +31,7 @@ public class ActivityRuleViolation {
 
 
     public List<String> getErrorMessages() {
-        return errorMessages;
+        return isNull(errorMessages) ? new ArrayList<>() : errorMessages;
     }
 
     public void setErrorMessages(List<String> errorMessages) {

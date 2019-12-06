@@ -188,7 +188,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(deleted)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
                 lookup("tag", "tags", "_id", "tags"),
-                project("name", DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB, "tags", ACTIVITY_PRIORITY_ID).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID)
+                project("name", DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB, "tags", ACTIVITY_PRIORITY_ID).and(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).as(BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID).and("timeCalculationActivityTab").as("timeCalculationActivityTab")
                         .and(TIME_CALCULATION_ACTIVITY_TAB_METHOD_FOR_CALCULATING_TIME).as("methodForCalculatingTime")
                         .and("timeType.activityCanBeCopiedForOrganizationHierarchy").arrayElementAt(0).as("activityCanBeCopiedForOrganizationHierarchy")
                         .and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
@@ -735,11 +735,13 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                     match(criteria),
                     lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
                     lookup(ACTIVITIES, "_id", CHILD_ACTIVITY_IDS, "parentActivity"),
+                    lookup("activityPriority", "activityPriorityId", "_id",
+                        "activityPriority"),
                     project("id","name", GENERAL_ACTIVITY_TAB, TIME_CALCULATION_ACTIVITY_TAB, EXPERTISES, EMPLOYMENT_TYPES, RULES_ACTIVITY_TAB, SKILL_ACTIVITY_TAB,
                             PHASE_SETTINGS_ACTIVITY_TAB,
                             BALANCE_SETTINGS_ACTIVITY_TAB,
                             UNIT_ID,
-                            CHILD_ACTIVITY_IDS).and("parentActivity._id").as("parentActivityId").and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES)
+                            CHILD_ACTIVITY_IDS).and("parentActivity._id").as("parentActivityId").and(TIME_TYPE_ALLOW_CHILD_ACTIVITIES).arrayElementAt(0).as(ALLOW_CHILD_ACTIVITIES).and("activityPriority.name").arrayElementAt(0).as("activityPriorityName")
                     );
     }
 
@@ -815,7 +817,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id", TIME_TYPE1),
-                project("name", DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
+                project("name", DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB).and("timeCalculationActivityTab").as("timeCalculationActivityTab")
                         .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1),
                 match(Criteria.where("timeType.partOfTeam").is(false))
         );

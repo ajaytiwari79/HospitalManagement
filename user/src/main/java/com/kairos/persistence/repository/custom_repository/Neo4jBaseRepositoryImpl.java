@@ -60,6 +60,11 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 		return new ArrayList<>(session.loadAll(clazz, (Collection<ID>) ids, 1));
 	}
 
+	@Override
+	public List<T> findAllById(List<ID> ids, int depth) {
+		return new ArrayList<>(session.loadAll(clazz, (Collection<ID>) ids, depth));
+	}
+
 	@Transactional
 	@Override
 	public <S extends T> S save(S entity) {
@@ -78,7 +83,8 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 		}
 		session.save(entity);
 		if(validClass) {
-			AuditLogging.doAudit(oldEntity, entity);
+			//Todo pradeep auditlogging is off due to Infinite recursion issue
+			//AuditLogging.doAudit(oldEntity, entity);
 		}
 		return entity;
 	}
