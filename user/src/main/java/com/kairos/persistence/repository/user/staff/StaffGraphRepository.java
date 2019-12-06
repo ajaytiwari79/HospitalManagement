@@ -423,10 +423,10 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN staff")
     Staff getStaffByOrganizationHub(Long currentUnitId, Long userId);
 
-    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff) " +
+    @Query("MATCH (organization:Organization{deleted:false,isEnable:true})-[:" + HAS_POSITIONS + "]->(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) " +
             "WHERE id(organization)={0} " +
-            "WITH staff OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[: " + IN_UNIT + "]-(unit:Unit) WHERE id(unit)={1} " +
-            "RETURN distinct id(staff) AS id ,staff.lastName AS lastName  , staff.firstName AS firstName ,{2} + staff.profilePic AS profilePic, staff.email AS email , staff.userName AS userName ,staff.access_token AS access_token ,staff.user_id AS user_id")
+            "WITH staff,user OPTIONAL MATCH (staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[: " + IN_UNIT + "]-(unit:Unit) WHERE id(unit)={1} " +
+            "RETURN distinct id(staff) AS id ,staff.lastName AS lastName  , staff.firstName AS firstName ,{2} + staff.profilePic AS profilePic, staff.email AS email , staff.userName AS userName ,staff.access_token AS access_token ,staff.user_id AS user_id, user.chatStatus AS chatStatus")
     List<Map> findAllStaffBasicDetailsByOrgIdAndUnitId(Long parentOrgId, Long unitId, String imagePath);
 
     @Query(" MATCH (staff:Staff)-[r:" + BELONGS_TO + "]->(user:User) WHERE id(staff)={0} RETURN staff,r,user")
