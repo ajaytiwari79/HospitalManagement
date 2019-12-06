@@ -205,11 +205,19 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
 
     private String getGroupQuery(Map<FilterType, Set<String>> filters, String searchText) {
         String query = "";
+        query = " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
+                " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
         if(Optional.ofNullable(filters.get(FilterType.FUNCTIONS)).isPresent()) {
-            query +=" MATCH (staff:Staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false,published:true})-[:HAS_EMPLOYMENT_LINES]->(employmentLine:EmploymentLine)-[:APPLICABLE_FUNCTION]->(function:Function)\n" +
+            query +=" MATCH (staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false})-[:HAS_EMPLOYMENT_LINES]->(employmentLine:EmploymentLine)-[:APPLICABLE_FUNCTION]->(function:Function)\n" +
                     " where id(function) IN {functionIds}";
         }
-        query += getSelfRosteringQuery(filters, searchText);
+        if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()) {
+            query += " MATCH (staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
+        }
+        if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
+            query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
+        }
+        query +=" WITH user, staff, employment,organization ";;
 
         return query;
     }

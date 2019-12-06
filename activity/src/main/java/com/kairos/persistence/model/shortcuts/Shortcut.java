@@ -18,6 +18,7 @@ public class Shortcut extends MongoBaseEntity {
     private Long staffId;
     private Long unitId;
     private String name;
+    private String selectedRole;
     private StaffFilterDTO staffFilter;
     private List<TabKPIDTO> tabKPIs;
     private TodoFilter todoFilter;

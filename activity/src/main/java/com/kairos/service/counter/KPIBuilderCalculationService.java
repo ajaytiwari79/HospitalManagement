@@ -165,9 +165,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
         }
-        CalculationType calculationType = (CalculationType) ((List)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE), CalculationType.class)).get(0);
         Function<ShiftActivityDTO, Integer> methodParam = ShiftActivityDTO::getScheduledMinutes;
-
         switch (kpiCalculationRelatedInfo.getCalculationType()) {
             case PLANNED_HOURS_TIMEBANK:
                 methodParam = ShiftActivityDTO::getPlannedMinutesOfTimebank;
@@ -401,7 +399,7 @@ public class KPIBuilderCalculationService implements CounterService {
             if (newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK, DURATION_HOURS, TOTAL_MINUTES, COLLECTIVE_TIME_BONUS_TIMEBANK, PAYOUT, COLLECTIVE_TIME_BONUS_PAYOUT, TOTAL_COLLECTIVE_BONUS, TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.currentCalculationType)) {
                 if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_IDS))) {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
+                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(calculationType.value, value));
                 } else {
                     for (Map.Entry<BigInteger, Activity> activityEntry : kpiCalculationRelatedInfo.getActivityMap().entrySet()) {
                         kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setActivityIds(newHashSet(activityEntry.getKey()));
