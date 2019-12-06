@@ -99,7 +99,7 @@ public class ShortcutService {
         if(ObjectUtils.isNull(shortcut)){
             exceptionService.dataNotMatchedException(SHORTCUT_NOT_FOUND);
         }
-        boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(name,shortcut.getStaffId(),shortcut.getUnitId(),shortcut.getId());
+        boolean existByName = shortcutsMongoRepository.existsByNameIgnoreCaseAndDeletedFalseAndStaffIdAndUnitIdAndIdNot(name,shortcut.getStaffId(),shortcut.getUnitId(),BigInteger.valueOf(-1));
         if(existByName){
             exceptionService.duplicateDataException(SHORTCUT_ALREADY_EXISTS_NAME,name);
         }
