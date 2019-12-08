@@ -370,10 +370,13 @@ public class CounterDistService extends MongoBaseService {
         Map<BigInteger, TabKPIMappingDTO> tabKPIMappingDTOMap = new HashMap<>();
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> tabKPIMappingDTOMap.put(tabKPIMappingDTO.getId(), tabKPIMappingDTO));
         tabKPIConfs.stream().forEach(tabKPIConf -> {
-            TabKPIMappingDTO tabKPIMappingDTO = tabKPIMappingDTOMap.get(tabKPIConf.getId());
-            tabKPIConf.setPosition(tabKPIMappingDTO.getPosition());
+            if(tabKPIMappingDTOMap.containsKey(tabKPIConf.getId())) {
+                tabKPIConf.setPosition(tabKPIMappingDTOMap.get(tabKPIConf.getId()).getPosition());
+            }
         });
-        save(tabKPIConfs);
+        if(isCollectionNotEmpty(tabKPIConfs)) {
+            save(tabKPIConfs);
+        }
     }
 
     public void removeTabKPIEntries(TabKPIMappingDTO tabKPIMappingDTO, Long refId, ConfLevel level) {
