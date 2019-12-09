@@ -19,6 +19,7 @@ import com.kairos.dto.activity.counter.distribution.tab.TabKPIDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIEntryConfDTO;
 import com.kairos.dto.activity.counter.distribution.tab.TabKPIMappingDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
+import com.kairos.dto.activity.counter.enums.CounterSize;
 import com.kairos.dto.activity.counter.enums.KPIValidity;
 import com.kairos.dto.activity.counter.enums.LocationType;
 import com.kairos.dto.user.access_page.KPIAccessPageDTO;
@@ -229,21 +230,16 @@ public class CounterDistService extends MongoBaseService {
             applicableKPIS = counterRepository.getApplicableKPI(new ArrayList(kpiIds), ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
         }
         Map<BigInteger, String> kpiIdAndTitleMap = applicableKPIS.stream().collect(Collectors.toMap(ApplicableKPI::getActiveKpiId, ApplicableKPI::getTitle));
-        return getTabKPIsData(moduleId, unitId, level, filters, staffId, shortcutId, accessGroupPermissionCounterDTO, countryId, kpiIds, kpiIdAndTitleMap);
+        return getTabKPIsData(moduleId, unitId, level, filters, staffId,shortcutId, accessGroupPermissionCounterDTO, countryId, kpiIds, kpiIdAndTitleMap);
     }
 
     private List<TabKPIDTO> getTabKPIsData(String moduleId, Long unitId, ConfLevel level, FilterCriteriaDTO filters, Long staffId, BigInteger shortcutId, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, Long countryId, List<BigInteger> kpiIds, Map<BigInteger, String> kpiIdAndTitleMap) {
         List<TabKPIDTO> tabKPIDTOS = counterRepository.getTabKPIForStaffByTabAndStaffIdPriority(moduleId, kpiIds, accessGroupPermissionCounterDTO.getStaffId(), countryId, unitId, level);
         tabKPIDTOS = filterTabKpiDate(tabKPIDTOS);
-        if(isNotNull(shortcutId)){
-            ShortcutDTO shortcutDTO = shortcutService.getShortcutById(shortcutId);
-            com.kairos.dto.activity.counter.TabKPIDTO tabKPIDTO= shortcutDTO.getTabKPIs().stream().filter(tabKPIDto->tabKPIDto.getTabId().equals(moduleId)).findFirst().orElse(null);
-            if(isNotNull(tabKPIDTO)){
-                filters.setKpiIds(tabKPIDTO.getKpiIds());
-            }
-        }else {
-            filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
+        if(isCollectionNotEmpty(getTabKPIDToByShortcutId(filters.getKpiIds(),shortcutId,moduleId))){
+            tabKPIDTOS=getTabKPIDToByShortcutId(filters.getKpiIds(),shortcutId,moduleId);
         }
+        filters.setKpiIds(tabKPIDTOS.stream().map(tabKPIDTO -> tabKPIDTO.getKpi().getId()).collect(toList()));
         filters.setUnitId(unitId);
         filters.setCountryId(countryId);
         filters.setCountryAdmin(accessGroupPermissionCounterDTO.isCountryAdmin());
@@ -256,6 +252,21 @@ public class CounterDistService extends MongoBaseService {
                 tabKPIDTO.getKpi().setTitle(kpiIdAndTitleMap.get(tabKPIDTO.getKpi().getId()));
             }
         });
+        return tabKPIDTOS;
+    }
+
+
+    private List<TabKPIDTO> getTabKPIDToByShortcutId(List<BigInteger> kpiIds,BigInteger shortcutId,String moduleId){
+        List<TabKPIDTO> tabKPIDTOS=new ArrayList<>();
+        if(isNotNull(shortcutId)){
+            ShortcutDTO shortcutDTO = shortcutService.getShortcutById(shortcutId);
+            com.kairos.dto.activity.counter.TabKPIDTO tabKPIDTO= shortcutDTO.getTabKPIs().stream().filter(tabKPIDto->tabKPIDto.getTabId().equals(moduleId)).findFirst().orElse(null);
+            if(isNotNull(tabKPIDTO) && isCollectionNotEmpty(kpiIds)){
+                for (BigInteger kpiId : kpiIds) {
+                    tabKPIDTOS.add(new TabKPIDTO(tabKPIDTO.getTabId(),new KPIDTO(kpiId, CounterSize.SIZE_8X2), CounterSize.SIZE_8X2));
+                }
+            }
+        }
         return tabKPIDTOS;
     }
 
@@ -359,10 +370,13 @@ public class CounterDistService extends MongoBaseService {
         Map<BigInteger, TabKPIMappingDTO> tabKPIMappingDTOMap = new HashMap<>();
         tabKPIMappingDTOS.stream().forEach(tabKPIMappingDTO -> tabKPIMappingDTOMap.put(tabKPIMappingDTO.getId(), tabKPIMappingDTO));
         tabKPIConfs.stream().forEach(tabKPIConf -> {
-            TabKPIMappingDTO tabKPIMappingDTO = tabKPIMappingDTOMap.get(tabKPIConf.getId());
-            tabKPIConf.setPosition(tabKPIMappingDTO.getPosition());
+            if(tabKPIMappingDTOMap.containsKey(tabKPIConf.getId())) {
+                tabKPIConf.setPosition(tabKPIMappingDTOMap.get(tabKPIConf.getId()).getPosition());
+            }
         });
-        save(tabKPIConfs);
+        if(isCollectionNotEmpty(tabKPIConfs)) {
+            save(tabKPIConfs);
+        }
     }
 
     public void removeTabKPIEntries(TabKPIMappingDTO tabKPIMappingDTO, Long refId, ConfLevel level) {
