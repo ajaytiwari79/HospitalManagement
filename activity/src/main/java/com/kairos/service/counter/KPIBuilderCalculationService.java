@@ -349,14 +349,10 @@ public class KPIBuilderCalculationService implements CounterService {
     private <T, E> Map<T, E> getStaffTotalByRepresentTotalData(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         Double totalHours = 0d;
         Map<T, E> staffTotalHours = new HashMap<>();
-        for (DateTimeInterval dateTimeInterval : kpiCalculationRelatedInfo.getDateTimeIntervals()) {
-            for (Long staffId : kpiCalculationRelatedInfo.getStaffIds()) {
-                if(!kpiCalculationRelatedInfo.getKpi().isMultiDimensional()){
-                    totalHours += getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getYAxisConfigs().get(0));
-                }
-            }
-        }
         DateTimeInterval totalDataInterval = new DateTimeInterval(kpiCalculationRelatedInfo.getDateTimeIntervals().get(0).getStartDate(), kpiCalculationRelatedInfo.getDateTimeIntervals().get(kpiCalculationRelatedInfo.getDateTimeIntervals().size() - 1).getEndDate());
+        if (!kpiCalculationRelatedInfo.getKpi().isMultiDimensional()) {
+            totalHours += getTotalByCalculationBased(null, totalDataInterval, kpiCalculationRelatedInfo, kpiCalculationRelatedInfo.getYAxisConfigs().get(0));
+        }
         T key = (T)getDateTimeintervalString(totalDataInterval);
         staffTotalHours.put(key, kpiCalculationRelatedInfo.getKpi().isMultiDimensional() ? (E)getClusteredBarChartDetails(null,totalDataInterval,kpiCalculationRelatedInfo) : (E)totalHours);
         return staffTotalHours;
@@ -475,15 +471,15 @@ public class KPIBuilderCalculationService implements CounterService {
         Map<T, E> staffTotalHours = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : kpiCalculationRelatedInfo.getDateTimeIntervals()) {
             Double totalHours = 0d;
-            for (Long staffId : kpiCalculationRelatedInfo.getStaffIds()) {
-                if(!kpiCalculationRelatedInfo.getKpi().isMultiDimensional()) {
-                    totalHours += getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getYAxisConfigs().get(0));
-                }
+            if(!kpiCalculationRelatedInfo.getKpi().isMultiDimensional()) {
+                totalHours += getTotalByCalculationBased(null, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getYAxisConfigs().get(0));
             }
             List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = getClusteredBarChartDetails(null,dateTimeInterval,kpiCalculationRelatedInfo);
             String key = getKeyByStaffRepresentation(kpiCalculationRelatedInfo, dateTimeInterval);
             staffTotalHours.put((T)key,kpiCalculationRelatedInfo.getKpi().isMultiDimensional() ? (E)subClusteredBarValue : (E)totalHours);
         }
+
+
         return staffTotalHours;
     }
 
