@@ -158,6 +158,8 @@ public class ShiftValidatorService {
 
     @Inject
     private WorkTimeAgreementService workTimeAgreementService;
+
+    @Inject
     private BlockSettingService blockSettingService;
 
     @Autowired
