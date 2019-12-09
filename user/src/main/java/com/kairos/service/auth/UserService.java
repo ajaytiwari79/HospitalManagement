@@ -461,11 +461,10 @@ public class UserService {
                     break;
                 }
             }
-            Organization parentOrganization = organizationService.fetchParentOrganization(organizationId);
             if (checkDayType) {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, parentOrganization.getId());
+                unitWisePermissions = accessPageRepository.fetchStaffPermissionsWithDayTypes(currentUserId, dayTypeIds, organizationId);
             } else {
-                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, parentOrganization.getId());
+                unitWisePermissions = accessPageRepository.fetchStaffPermissions(currentUserId, organizationId);
             }
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
