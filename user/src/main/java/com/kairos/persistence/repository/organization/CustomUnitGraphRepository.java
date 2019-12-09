@@ -15,8 +15,7 @@ public interface CustomUnitGraphRepository {
     List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,
                                              Long organizationId, String imagePath, String skip,String moduleId);
 
-    List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
-                                  Map<FilterType, Set<String>> filters, String searchText, String imagePath);
+
 
     List<Map<String, Object>> getOrganizationHierarchyByFilters(long parentOrganizationId, OrganizationHierarchyFilterDTO organizationHierarchyFilterDTO);
 }
