@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.neo4j.annotation.EnableNeo4jAuditing;
+import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
@@ -21,11 +22,13 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
  * 1. getSession()
  * 2. getConfiguration()
  */
+/*
 @Configuration
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 @ComponentScan("com.kairos.persistence")
-//@EnableTransactionManagement
+@EnableTransactionManagement
 @EnableNeo4jAuditing
+*/
 public class FieldPermissionDataConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger(FieldPermissionDataConfiguration.class);
@@ -39,9 +42,9 @@ public class FieldPermissionDataConfiguration {
         return new SessionFactory(configuration(), "com.kairos.persistence.model");
     }
 
-    /*@Bean(name = "PermissionNeo4jTransactionManager")
+   /* @Bean(name = "PermissionNeo4jTransactionManager")
     public Neo4jTransactionManager transactionManager(){
-        return new Neo4jTransactionManager(permissionSessionFactory());
+        return new Neo4jTransactionManager(getSessionFactory());
     }*/
 
     @Bean(name = "PermissionConfiguration")

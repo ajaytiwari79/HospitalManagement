@@ -22,9 +22,28 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.organization.OrganizationService;
+import org.apache.commons.lang3.StringUtils;
+import org.neo4j.ogm.context.EntityRowModelMapper;
+import org.neo4j.ogm.context.GraphEntityMapper;
+import org.neo4j.ogm.context.MappingContext;
+import org.neo4j.ogm.context.ResponseMapper;
+import org.neo4j.ogm.cypher.query.*;
+import org.neo4j.ogm.metadata.ClassInfo;
+import org.neo4j.ogm.metadata.FieldInfo;
+import org.neo4j.ogm.metadata.reflect.ReflectionEntityInstantiator;
+import org.neo4j.ogm.model.GraphModel;
+import org.neo4j.ogm.model.RowModel;
+import org.neo4j.ogm.request.GraphModelRequest;
+import org.neo4j.ogm.request.RowModelRequest;
+import org.neo4j.ogm.response.Response;
+import org.neo4j.ogm.session.LoadStrategy;
 import org.neo4j.ogm.session.Neo4jSession;
 import org.neo4j.ogm.session.SessionFactory;
+import org.neo4j.ogm.session.request.strategy.LoadClauseBuilder;
+import org.neo4j.ogm.session.request.strategy.QueryStatements;
+import org.neo4j.ogm.session.request.strategy.impl.*;
 import org.neo4j.ogm.transaction.Transaction;
+import org.neo4j.ogm.utils.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +55,10 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.Valid;
+import java.io.Serializable;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -45,6 +67,8 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATANOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_PERMISSION_FIELD;
+import static org.neo4j.ogm.session.LoadStrategy.PATH_LOAD_STRATEGY;
+import static org.neo4j.ogm.session.LoadStrategy.SCHEMA_LOAD_STRATEGY;
 
 @Service
 public class PermissionService {
@@ -72,11 +96,13 @@ public class PermissionService {
     @Inject private CommonRepository commonRepository;
 
     @Autowired
-    @Qualifier("PermissionSessionFactory")
+    //@Qualifier("PermissionSessionFactory")
     private SessionFactory sessionFactory;
 
     @Inject
     private ApplicationContext applicationContext;
+
+    private static final Pattern WRITE_CYPHER_KEYWORDS = Pattern.compile("\\b(CREATE|MERGE|SET|DELETE|REMOVE|DROP)\\b");
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
         Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
@@ -278,8 +304,7 @@ public class PermissionService {
     }
 
     public <T extends UserBaseEntity,E extends UserBaseEntity> List<T> updateModelBasisOfPermission(List<T> objects){
-        Neo4jSession neo4jSession = (Neo4jSession) sessionFactory.openSession();
-        try (Transaction transaction = neo4jSession.getTransaction()){
+        try {
             Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
             Set<String> modelNames = objects.stream().map(model->model.getClass().getSimpleName()).collect(Collectors.toSet());
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
@@ -287,20 +312,181 @@ public class PermissionService {
             List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
             List<ModelDTO> modelDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
             Map<String,ModelDTO> modelMap = modelDTOS.stream().collect(Collectors.toMap(k->k.getModelName(),v->v));
-            List<Long> objectIds = objects.stream().filter(model->isNotNull(model.getId())).map(model->model.getId()).collect(Collectors.toList());
-            List<E> dataBaseObjects = sessionFactory.openSession().loadAll(Staff.class,objectIds,2).stream().map(staff -> (E)staff).collect(Collectors.toList());
+            Collection<Long> objectIds = objects.stream().filter(model->isNotNull(model.getId())).map(model->model.getId()).collect(Collectors.toList());
+            List<E> dataBaseObjects = loadAll(Staff.class,objectIds,new SortOrder(),null,2).stream().map(staff -> (E)staff).collect(Collectors.toList());
             Map<Long,E> mapOfDataBaseObject = dataBaseObjects.stream().collect(Collectors.toMap(k->k.getId(),v->v));
             updateObjectsPropertiesBeforeSave(mapOfDataBaseObject,modelMap,objects);
-            transaction.close();
+           // neo4jSession.transactionManager().clear();
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }
         return objects;
     }
 
-    public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(Map<Long,E> mapOfDataBaseObject,Map<String,ModelDTO> modelMap,List<T> objects){
+    public <T, ID extends Serializable> Collection<T> loadAll(Class<T> type, Collection<ID> ids, SortOrder sortOrder,
+                                                              Pagination pagination, int depth) {
+
+        String entityLabel = sessionFactory.metaData().entityType(type.getName());
+        if (entityLabel == null) {
+            LOGGER.warn("Unable to find database label for entity " + type.getName()
+                    + " : no results will be returned. Make sure the class is registered, "
+                    + "and not abstract without @NodeEntity annotation");
+        }
+        QueryStatements<ID> queryStatements = queryStatementsFor(type, depth);
+
+        PagingAndSortingQuery qry = queryStatements.findAllByType(entityLabel, ids, depth)
+                .setSortOrder(sortOrder)
+                .setPagination(pagination);
+
+        GraphModelRequest request = new DefaultGraphModelRequest(qry.getStatement(), qry.getParameters());
+            try (Response<GraphModel> response = sessionFactory.getDriver().request().execute(request)) {
+                Iterable<T> mapped = new GraphEntityMapper(sessionFactory.metaData(), new MappingContext(sessionFactory.metaData()), new ReflectionEntityInstantiator(sessionFactory.metaData())).map(type, response);
+
+                if (sortOrder.sortClauses().isEmpty()) {
+                    return sortResultsByIds(type, ids, mapped);
+                }
+                Set<T> results = new LinkedHashSet<>();
+                for (T entity : mapped) {
+                    if (includeMappedEntity(ids, entity)) {
+                        results.add(entity);
+                    }
+                }
+                return results;
+            }
+    }
+
+    private <T, ID extends Serializable> boolean includeMappedEntity(Collection<ID> ids, T mapped) {
+
+        final ClassInfo classInfo = sessionFactory.metaData().classInfo(mapped);
+        final FieldInfo primaryIndexField = classInfo.primaryIndexField();
+
+        if (primaryIndexField != null) {
+            final Object primaryIndexValue = primaryIndexField.read(mapped);
+            if (ids.contains(primaryIndexValue)) {
+                return true;
+            }
+        }
+        Object id = EntityUtils.identity(mapped, sessionFactory.metaData());
+        return ids.contains(id);
+    }
+
+    private <T, ID extends Serializable> Set<T> sortResultsByIds(Class<T> type, Collection<ID> ids,
+                                                                 Iterable<T> mapped) {
+        Map<ID, T> items = new HashMap<>();
+        ClassInfo classInfo = sessionFactory.metaData().classInfo(type.getName());
+
+        FieldInfo idField = classInfo.primaryIndexField();
+        if (idField == null) {
+            idField = classInfo.identityField();
+        }
+
+        for (T t : mapped) {
+            Object id = idField.read(t);
+            if (id != null) {
+                items.put((ID) id, t);
+            }
+        }
+
+        Set<T> results = new LinkedHashSet<>();
+        for (ID id : ids) {
+            T item = items.get(id);
+            if (item != null) {
+                results.add(item);
+            }
+        }
+        return results;
+    }
+
+    public <T, ID extends Serializable> QueryStatements<ID> queryStatementsFor(Class<T> type, int depth) {
+        final FieldInfo fieldInfo = sessionFactory.metaData().classInfo(type.getName()).primaryIndexField();
+        String primaryIdName = fieldInfo != null ? fieldInfo.property() : null;
+        if (sessionFactory.metaData().isRelationshipEntity(type.getName())) {
+            return new RelationshipQueryStatements<>(primaryIdName, loadRelationshipClauseBuilder(depth,LoadStrategy.PATH_LOAD_STRATEGY));
+        } else {
+            return new NodeQueryStatements<>(primaryIdName, loadNodeClauseBuilder(depth,LoadStrategy.PATH_LOAD_STRATEGY));
+        }
+    }
+
+    private LoadClauseBuilder loadRelationshipClauseBuilder(int depth,LoadStrategy loadStrategy) {
+        if (depth < 0) {
+            throw new IllegalArgumentException("Can't load unlimited depth for relationships");
+        }
+
+        switch (loadStrategy) {
+            case PATH_LOAD_STRATEGY:
+                return new PathRelationshipLoadClauseBuilder();
+
+            case SCHEMA_LOAD_STRATEGY:
+                return new SchemaRelationshipLoadClauseBuilder(sessionFactory.metaData().getSchema());
+
+            default:
+                throw new IllegalStateException("Unknown loadStrategy " + loadStrategy);
+        }
+    }
+
+    private LoadClauseBuilder loadNodeClauseBuilder(int depth,LoadStrategy loadStrategy) {
+        if (depth < 0) {
+            return new PathNodeLoadClauseBuilder();
+        }
+
+        switch (loadStrategy) {
+            case PATH_LOAD_STRATEGY:
+                return new PathNodeLoadClauseBuilder();
+
+            case SCHEMA_LOAD_STRATEGY:
+                return new SchemaNodeLoadClauseBuilder(sessionFactory.metaData().getSchema());
+
+            default:
+                throw new IllegalStateException("Unknown loadStrategy " + loadStrategy);
+        }
+    }
+
+   public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(Map<Long,E> mapOfDataBaseObject,Map<String,ModelDTO> modelMap,List<T> objects){
         for (T object : objects) {
             ObjectMapperUtils.copySpecificPropertiesByMapper(object,mapOfDataBaseObject.get(object.getId()),modelMap.get(object.getClass().getSimpleName()));
         }
     }
+
+     /*private <T> Iterable<T> executeAndMap(Class<T> type, String cypher, Map<String, ?> parameters,
+                                          ResponseMapper mapper) {
+        if (type != null && sessionFactory.metaData().classInfo(type.getSimpleName()) != null) {
+            GraphModelRequest request = new DefaultGraphModelRequest(cypher, parameters);
+            try (Response<GraphModel> response = sessionFactory.getDriver().request().execute(request)) {
+                return new GraphEntityMapper(sessionFactory.metaData(), new MappingContext(sessionFactory.metaData()), new ReflectionEntityInstantiator(sessionFactory.metaData())).map(type, response);
+            }
+        } else {
+            RowModelRequest request = new DefaultRowModelRequest(cypher, parameters);
+            try (Response<RowModel> response = sessionFactory.getDriver().request().execute(request)) {
+                return mapper.map(type, response);
+            }
+        }
+    }
+
+    public <T> Iterable<T> query(Class<T> type, String cypher, Map<String, ?> parameters) {
+        validateQuery(cypher, parameters, false); //we'll allow modifying statements
+        if (type == null || type.equals(Void.class)) {
+            throw new RuntimeException("Supplied type must not be null or void.");
+        }
+        return executeAndMap(type, cypher, parameters, new EntityRowModelMapper());
+    }
+
+    private void validateQuery(String cypher, Map<String, ?> parameters, boolean readOnly) {
+
+        if (readOnly && !isReadOnly(cypher)) {
+            throw new RuntimeException("Cypher query must not modify the graph if readOnly=true");
+        }
+
+        if (StringUtils.isEmpty(cypher)) {
+            throw new RuntimeException("Supplied cypher statement must not be null or empty.");
+        }
+
+        if (parameters == null) {
+            throw new RuntimeException("Supplied Parameters cannot be null.");
+        }
+    }
+
+    private boolean isReadOnly(String cypher) {
+        Matcher matcher = WRITE_CYPHER_KEYWORDS.matcher(cypher.toUpperCase());
+        return !matcher.find();
+    }*/
 }
