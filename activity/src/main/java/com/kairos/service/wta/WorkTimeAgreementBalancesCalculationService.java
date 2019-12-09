@@ -36,6 +36,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.unit_settings.ProtectedDaysOffService;
+import com.kairos.utils.CPRUtil;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -391,19 +392,19 @@ public class WorkTimeAgreementBalancesCalculationService {
         BigInteger activityId = BigInteger.ZERO;
         boolean borrowLeave = false;
         CutOffIntervalUnit cutOffIntervalUnit = null;
-        if (isCollectionNotEmpty(seniorDaysPerYearWTATemplate.getActivityIds())) {
+        if (isCollectionNotEmpty(seniorDaysPerYearWTATemplate.getActivityIds()) && activityWrapperMap.containsKey(seniorDaysPerYearWTATemplate.getActivityIds().get(0))) {
             Activity activity = activityWrapperMap.get(seniorDaysPerYearWTATemplate.getActivityIds().get(0)).getActivity();
             activityName = activity.getName();
             activityId = activity.getId();
             borrowLeave = activity.getRulesActivityTab().isBorrowLeave();
             cutOffIntervalUnit = activity.getRulesActivityTab().getCutOffIntervalUnit();
-            timetypeColor = timeTypeMap.get(activity.getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor();
+            timetypeColor = timeTypeMap.containsKey(activity.getBalanceSettingsActivityTab().getTimeTypeId()) ? timeTypeMap.get(activity.getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor() : "";
             while (startDate.isBefore(endDate) || startDate.equals(endDate)) {
                 if (!containsInInterval(intervalBalances, startDate)) {
                     DateTimeInterval dateTimeInterval = getIntervalByActivity(activityWrapperMap, asDate(startDate), seniorDaysPerYearWTATemplate.getActivityIds(), planningPeriodEndDate);
                     if (isNotNull(dateTimeInterval)) {
                         int[] scheduledAndApproveActivityCount = getShiftsActivityCountByInterval(dateTimeInterval, shiftWithActivityDTOS, new HashSet<>(seniorDaysPerYearWTATemplate.getActivityIds()));
-                        CareDaysDTO careDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), staffAdditionalInfoDTO.getStaffAge());
+                        CareDaysDTO careDays = getCareDays(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getSeniorDays(), CPRUtil.getAgeByCPRNumberAndStartDate(staffAdditionalInfoDTO.getCprNumber(),startDate));
                         if (isNotNull(careDays)) {
                             ActivityCutOffCount activityLeaveCount = seniorDaysPerYearWTATemplate.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(dateTimeInterval.getStartLocalDate())).findFirst().orElse(new ActivityCutOffCount());
                             intervalBalances.add(new IntervalBalance(careDays.getLeavesAllowed() + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount(), scheduledAndApproveActivityCount[0], (careDays.getLeavesAllowed() + activityLeaveCount.getTransferLeaveCount()) - scheduledAndApproveActivityCount[0], dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
@@ -428,12 +429,12 @@ public class WorkTimeAgreementBalancesCalculationService {
         BigInteger activityId = BigInteger.ZERO;
         boolean borrowLeave = false;
         CutOffIntervalUnit cutOffIntervalUnit = null;
-        if (isCollectionNotEmpty(childCareDaysCheckWTATemplate.getActivityIds())) {
+        if (isCollectionNotEmpty(childCareDaysCheckWTATemplate.getActivityIds()) &&  activityWrapperMap.containsKey(childCareDaysCheckWTATemplate.getActivityIds().get(0))) {
             Activity activity = activityWrapperMap.get(childCareDaysCheckWTATemplate.getActivityIds().get(0)).getActivity();
             activityName = activity.getName();
             activityId = activity.getId();
             borrowLeave = activity.getRulesActivityTab().isBorrowLeave();
-            timetypeColor = timeTypeMap.get(activity.getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor();
+            timetypeColor = timeTypeMap.containsKey(activity.getBalanceSettingsActivityTab().getTimeTypeId()) ? timeTypeMap.get(activity.getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor() : "";
             cutOffIntervalUnit = activity.getRulesActivityTab().getCutOffIntervalUnit();
             while (startDate.isBefore(endDate) || startDate.equals(endDate)) {
                 if (!containsInInterval(intervalBalances, startDate)) {

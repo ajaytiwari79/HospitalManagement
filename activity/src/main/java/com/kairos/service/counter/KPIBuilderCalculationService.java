@@ -216,24 +216,36 @@ public class KPIBuilderCalculationService implements CounterService {
             case UNAVAILABILITY:
                 return unavailabilityCalculationKPIService.getUnavailabilityCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case PROTECTED_DAYS_OFF:
-
             case CARE_DAYS:
-                int count=0;
-                StaffKpiFilterDTO staffKpiFilterDTO =kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
-                List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-                for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                    List<WTAQueryResultDTO> wtaQueryResultDTOS=kpiCalculationRelatedInfo.employmentIdAndWtaMap.get(employmentWithCtaDetailsDTO.getId());
-                    List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> newHashSet(WTA_FOR_CARE_DAYS).contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
-                    List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalancesDTOS= workTimeAgreementBalancesCalculationService.getWorkTimeAgreementRuleTemplateBalancesDtos(kpiCalculationRelatedInfo.unitId,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate(),new StaffAdditionalInfoDTO(staffKpiFilterDTO.getCprNumber(),employmentWithCtaDetailsDTO.getSeniorAndChildCareDays()),wtaBaseRuleTemplates,kpiCalculationRelatedInfo.activityWrapperMap,kpiCalculationRelatedInfo.planningPeriod,shiftWithActivityDTOS,new HashMap<>());
-                    count=1;
-                }
             case SENIORDAYS:
             case TOTAL_ABSENCE_DAYS:
             case CHILD_CARE_DAYS:
+                return getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,null);
             default:
                 break;
         }
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
+    }
+
+    private int getLeaveCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig) {
+        int count=0;
+        List<WTAQueryResultDTO> wtaQueryResultDTOS;
+        List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS;
+        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalancesDTOS;
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId)?Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId,new StaffKpiFilterDTO())):kpiCalculationRelatedInfo.staffKpiFilterDTOS;
+        if(isCollectionNotEmpty(staffKpiFilterDTOS)) {
+            for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
+                shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(isNotNull(staffId) ? staffId : staffKpiFilterDTO.getId(), dateTimeInterval);
+                for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
+                    wtaQueryResultDTOS = kpiCalculationRelatedInfo.employmentIdAndWtaMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
+                    wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> kpiCalculationRelatedInfo.getWtaTemplateTypes(yAxisConfig).contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
+                    workTimeAgreementRuleTemplateBalancesDTOS = workTimeAgreementBalancesCalculationService.getWorkTimeAgreementRuleTemplateBalancesDtos(kpiCalculationRelatedInfo.unitId, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate(), new StaffAdditionalInfoDTO(staffKpiFilterDTO.getCprNumber(), employmentWithCtaDetailsDTO.getSeniorAndChildCareDays()), wtaBaseRuleTemplates, kpiCalculationRelatedInfo.activityWrapperMap, kpiCalculationRelatedInfo.planningPeriod, shiftWithActivityDTOS, new HashMap<>());
+                    count += workTimeAgreementRuleTemplateBalancesDTOS.stream().flatMap(workTimeAgreementRuleTemplateBalancesDTO -> workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().stream()).mapToInt(intervalBalance -> (int) intervalBalance.getAvailable()).sum();
+                }
+            }
+        }
+        return count;
     }
 
 
@@ -415,6 +427,13 @@ public class KPIBuilderCalculationService implements CounterService {
                         Double value = getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,value));
                         break;
+                    case PROTECTED_DAYS_OFF:
+                    case CARE_DAYS:
+                    case SENIORDAYS:
+                    case TOTAL_ABSENCE_DAYS:
+                    case CHILD_CARE_DAYS:
+                        Double count= new Double(getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
+                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,count));
                     default:
                         break;
 
@@ -638,7 +657,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
         public void  getWtaRuleDetails(){
             wtaQueryResultDTOS= workTimeAgreementService.getWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds),dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-            wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> getWtaTemplateTypes().contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
+            wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> getWtaTemplateTypes(null).contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
             employmentIdAndWtaMap = wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(), Collectors.toList()));
             wtaActivityIds =workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
             activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(wtaActivityIds));
@@ -654,20 +673,25 @@ public class KPIBuilderCalculationService implements CounterService {
             });
         }
 
-        public Set<WTATemplateType> getWtaTemplateTypes(){
+        public Set<WTATemplateType> getWtaTemplateTypes(YAxisConfig yAxis){
             Set<WTATemplateType> wtaTemplateTypes=new HashSet<>();
-            for (YAxisConfig yAxisConfig : yAxisConfigs) {
+            for (YAxisConfig yAxisConfig : isNull(yAxis) ? yAxisConfigs : Arrays.asList(yAxis)) {
                 switch (yAxisConfig){
                     case CHILD_CARE_DAYS:
                         wtaTemplateTypes.add(CHILD_CARE_DAYS_CHECK);
+                        break;
                     case SENIORDAYS:
                         wtaTemplateTypes.add(SENIOR_DAYS_PER_YEAR);
+                        break;
                     case PROTECTED_DAYS_OFF:
                         wtaTemplateTypes.add(PROTECTED_DAYS_OFF);
+                        break;
                     case CARE_DAYS:
                         wtaTemplateTypes.add(WTA_FOR_CARE_DAYS);
+                        break;
                     case TOTAL_ABSENCE_DAYS:
                         wtaTemplateTypes.addAll(newHashSet(CHILD_CARE_DAYS_CHECK,SENIOR_DAYS_PER_YEAR,PROTECTED_DAYS_OFF,WTA_FOR_CARE_DAYS));
+                        break;
                     default:break;
                 }
             }
