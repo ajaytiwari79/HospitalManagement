@@ -138,6 +138,18 @@ public class KPIBuilderCalculationService implements CounterService {
         return total;
     }
 
+    private double getNumberOfBreakInterrupt(Long staffId,DateTimeInterval dateTimeInterval,KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
+        ShiftActivityCriteria shiftActivityCriteria = getShiftActivityCriteria(kpiCalculationRelatedInfo);
+        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
+        long interruptShift= filterShiftActivity.shifts.stream().filter(k -> k.getBreakActivities().stream().anyMatch(ShiftActivityDTO::isBreakInterrupt)).count();
+        if (PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
+           return  isCollectionEmpty(filterShiftActivity.shifts)?(interruptShift/filterShiftActivity.shifts.size()) * 100:0;
+        }
+        else
+            return interruptShift;
+    }
+
     private double getTotalByPlannedTime(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
@@ -221,6 +233,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case TOTAL_ABSENCE_DAYS:
             case CHILD_CARE_DAYS:
                 return getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,null);
+            case BREAK_INTERRUPT:
+                return getNumberOfBreakInterrupt(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             default:
                 break;
         }
@@ -376,15 +390,10 @@ public class KPIBuilderCalculationService implements CounterService {
     private <T, E> Map<T, E> getStaffTotalByRepresentTotalData(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         Double totalHours = 0d;
         Map<T, E> staffTotalHours = new HashMap<>();
-        for (DateTimeInterval dateTimeInterval : kpiCalculationRelatedInfo.getDateTimeIntervals()) {
-            for (Long staffId : kpiCalculationRelatedInfo.getStaffIds()) {
-                if(!kpiCalculationRelatedInfo.getKpi().isMultiDimensional()){
-                    totalHours += getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getYAxisConfigs().get(0));
-                }
-            }
-        }
-
         DateTimeInterval totalDataInterval = new DateTimeInterval(kpiCalculationRelatedInfo.getDateTimeIntervals().get(0).getStartDate(), kpiCalculationRelatedInfo.getDateTimeIntervals().get(kpiCalculationRelatedInfo.getDateTimeIntervals().size() - 1).getEndDate());
+        if (!kpiCalculationRelatedInfo.getKpi().isMultiDimensional()) {
+            totalHours += getTotalByCalculationBased(null, totalDataInterval, kpiCalculationRelatedInfo, kpiCalculationRelatedInfo.getYAxisConfigs().get(0));
+        }
         T key = (T)getDateTimeintervalString(totalDataInterval);
         staffTotalHours.put(key, kpiCalculationRelatedInfo.getKpi().isMultiDimensional() ? (E)getClusteredBarChartDetails(null,totalDataInterval,kpiCalculationRelatedInfo) : (E)totalHours);
         return staffTotalHours;
@@ -434,6 +443,8 @@ public class KPIBuilderCalculationService implements CounterService {
                     case CHILD_CARE_DAYS:
                         Double count= new Double(getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,count));
+                        break;
+                    case BREAK_INTERRUPT:
                     default:
                         break;
 
@@ -449,7 +460,7 @@ public class KPIBuilderCalculationService implements CounterService {
             if (newHashSet(SCHEDULED_HOURS, PLANNED_HOURS_TIMEBANK, DURATION_HOURS, TOTAL_MINUTES, COLLECTIVE_TIME_BONUS_TIMEBANK, PAYOUT, COLLECTIVE_TIME_BONUS_PAYOUT, TOTAL_COLLECTIVE_BONUS, TOTAL_PLANNED_HOURS).contains(kpiCalculationRelatedInfo.currentCalculationType)) {
                 if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_IDS))) {
                     Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
+                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(calculationType.value, value));
                 } else {
                     for (Map.Entry<BigInteger, Activity> activityEntry : kpiCalculationRelatedInfo.getActivityMap().entrySet()) {
                         kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria().setActivityIds(newHashSet(activityEntry.getKey()));
@@ -508,15 +519,15 @@ public class KPIBuilderCalculationService implements CounterService {
         Map<T, E> staffTotalHours = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : kpiCalculationRelatedInfo.getDateTimeIntervals()) {
             Double totalHours = 0d;
-            for (Long staffId : kpiCalculationRelatedInfo.getStaffIds()) {
-                if(!kpiCalculationRelatedInfo.getKpi().isMultiDimensional()) {
-                    totalHours += getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getYAxisConfigs().get(0));
-                }
+            if(!kpiCalculationRelatedInfo.getKpi().isMultiDimensional()) {
+                totalHours += getTotalByCalculationBased(null, dateTimeInterval, kpiCalculationRelatedInfo,kpiCalculationRelatedInfo.getYAxisConfigs().get(0));
             }
             List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = getClusteredBarChartDetails(null,dateTimeInterval,kpiCalculationRelatedInfo);
             String key = getKeyByStaffRepresentation(kpiCalculationRelatedInfo, dateTimeInterval);
             staffTotalHours.put((T)key,kpiCalculationRelatedInfo.getKpi().isMultiDimensional() ? (E)subClusteredBarValue : (E)totalHours);
         }
+
+
         return staffTotalHours;
     }
 
@@ -835,6 +846,8 @@ public class KPIBuilderCalculationService implements CounterService {
             }
             return filteredStaffKpiFilterDTOS;
         }
+
+
     }
 
     @Setter

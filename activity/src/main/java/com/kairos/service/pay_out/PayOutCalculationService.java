@@ -220,6 +220,7 @@ public class PayOutCalculationService {
             List<PayOutPerShift> payOutPerShifts = payoutsIntervalMap.get(interval);
             List<PayOutTransaction> payOutTransactionList = payoutTransactionAndIntervalMap.get(interval);
             Long payoutChange = payOutPerShifts.stream().mapToLong(PayOutPerShift::getTotalPayOutMinutes).sum();
+            Long protectedDaysOffMinutes = payOutPerShifts.stream().mapToLong(PayOutPerShift::getProtectedDaysOffMinutes).sum();
             Double payoutCost = payOutPerShifts.stream().mapToDouble(payOutPerShift -> timeBankCalculationService.getCostByByMinutes(employmentWithCtaDetailsHourlyCostMap.get(payOutPerShift.getEmploymentId()),(int)payOutPerShift.getTotalPayOutMinutes(),payOutPerShift.getDate()).doubleValue()).sum();
             Long approvePayOut = payOutTransactionList.stream().filter(p -> p.getPayOutTrasactionStatus().equals(PayOutTrasactionStatus.APPROVED)).mapToLong(p -> (long) p.getMinutes()).sum();
             payoutChange += approvePayOut;
@@ -233,6 +234,7 @@ public class PayOutCalculationService {
             String title = getTitle(query, interval);
             PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate(), payoutAfter, payoutMinutesBefore, payoutChange, payOutCTADistributionDTO, DayOfWeek.of(interval.getStart().getDayOfWeek()), title,payoutCost.floatValue());
             payoutMinutesBefore+=payoutChange;
+            payOutIntervalDTO.setProtectedDaysOffMinutes(protectedDaysOffMinutes);
             payOutIntervalDTOS.add(payOutIntervalDTO);
         }
         Collections.reverse(payOutIntervalDTOS);

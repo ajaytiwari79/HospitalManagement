@@ -163,12 +163,12 @@ public class ActivityIntegrationService {
         });
     }
 
-    public Map<Long,Boolean> getNightWorkerDetails(StaffFilterDTO staffFilterDTO, Long unitId,LocalDate startDate,LocalDate endDate) {
+    public StaffFilterDTO getNightWorkerDetails(StaffFilterDTO staffFilterDTO, Long unitId,LocalDate startDate,LocalDate endDate) {
         List<NameValuePair> param = null;
         if(isNotNull(startDate) && isNotNull(endDate)) {
             param = newArrayList(new BasicNameValuePair("startDate", startDate.toString()), new BasicNameValuePair("endDate", endDate.toString()));
         }
-        return genericRestClient.publishRequest(staffFilterDTO, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<Long,Boolean>>>() {
+        return genericRestClient.publishRequest(staffFilterDTO, unitId, true, IntegrationOperation.CREATE, "/get_night_worker_details", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDTO>>() {
         });
     }
 
