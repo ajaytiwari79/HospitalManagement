@@ -18,6 +18,8 @@ public class StaffKpiFilterQueryResult {
     private List<Long> unitIds;
     private Long unitId;
     private String unitName;
+    private String cprNumber;
+    private int staffAge;
     private List<EmploymentQueryResult> employment;
     private List<DayTypeDTO> dayTypeDTOS;
 

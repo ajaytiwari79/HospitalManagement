@@ -57,6 +57,10 @@ public class StaffAdditionalInfoDTO {
     private boolean nightWorker;
     private Map<String, String> unitWiseAccessRole;
 
+    public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
+        this.cprNumber = cprNumber;
+        this.seniorAndChildCareDays = seniorAndChildCareDays;
+    }
 
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
         this.employment = employment;

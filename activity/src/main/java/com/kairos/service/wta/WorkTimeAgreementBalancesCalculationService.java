@@ -463,13 +463,13 @@ public class WorkTimeAgreementBalancesCalculationService {
         BigInteger activityId = BigInteger.ZERO;
         boolean borrowLeave = false;
         CutOffIntervalUnit cutOffIntervalUnit = null;
-        if (isCollectionNotEmpty(wtaForCareDays.getCareDayCounts())) {
+        if (isCollectionNotEmpty(wtaForCareDays.getCareDayCounts()) && activityWrapperMap.containsKey(wtaForCareDays.getCareDayCounts().get(0).getActivityId()) ) {
             Activity activity = activityWrapperMap.get(wtaForCareDays.getCareDayCounts().get(0).getActivityId()).getActivity();
             activityName = activity.getName();
             activityId = activity.getId();
             borrowLeave = activity.getRulesActivityTab().isBorrowLeave();
             cutOffIntervalUnit = activity.getRulesActivityTab().getCutOffIntervalUnit();
-            timetypeColor = timeTypeMap.get(activity.getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor();
+            timetypeColor = timeTypeMap.containsKey(activity.getBalanceSettingsActivityTab().getTimeTypeId()) ? timeTypeMap.get(activity.getBalanceSettingsActivityTab().getTimeTypeId()).getBackgroundColor() : "";
             while (startDate.isBefore(endDate) || startDate.equals(endDate)) {
                 if (!containsInInterval(intervalBalances, startDate)) {
                     DateTimeInterval dateTimeInterval = getIntervalByActivity(activityWrapperMap, asDate(startDate), Arrays.asList(wtaForCareDays.getCareDayCounts().get(0).getActivityId()), planningPeriodEndDate);

@@ -14,9 +14,11 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
@@ -216,11 +218,15 @@ public class KPIBuilderCalculationService implements CounterService {
             case PROTECTED_DAYS_OFF:
 
             case CARE_DAYS:
+                int count=0;
                 StaffKpiFilterDTO staffKpiFilterDTO =kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
                 List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-                List<WTAQueryResultDTO> wtaQueryResultDTOS=kpiCalculationRelatedInfo.employmentIdAndWtaMap.get(staffKpiFilterDTO.getEmployment());
-                List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).collect(Collectors.toList());
-                workTimeAgreementBalancesCalculationService.getWorkTimeAgreementRuleTemplateBalancesDtos(kpiCalculationRelatedInfo.unitId,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate(),null,wtaBaseRuleTemplates,kpiCalculationRelatedInfo.activityWrapperMap,kpiCalculationRelatedInfo.planningPeriod,shiftWithActivityDTOS,new HashMap<>());
+                for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
+                    List<WTAQueryResultDTO> wtaQueryResultDTOS=kpiCalculationRelatedInfo.employmentIdAndWtaMap.get(employmentWithCtaDetailsDTO.getId());
+                    List<WTABaseRuleTemplate> wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> newHashSet(WTA_FOR_CARE_DAYS).contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
+                    List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalancesDTOS= workTimeAgreementBalancesCalculationService.getWorkTimeAgreementRuleTemplateBalancesDtos(kpiCalculationRelatedInfo.unitId,dateTimeInterval.getStartLocalDate(),dateTimeInterval.getEndLocalDate(),new StaffAdditionalInfoDTO(staffKpiFilterDTO.getCprNumber(),employmentWithCtaDetailsDTO.getSeniorAndChildCareDays()),wtaBaseRuleTemplates,kpiCalculationRelatedInfo.activityWrapperMap,kpiCalculationRelatedInfo.planningPeriod,shiftWithActivityDTOS,new HashMap<>());
+                    count=1;
+                }
             case SENIORDAYS:
             case TOTAL_ABSENCE_DAYS:
             case CHILD_CARE_DAYS:
@@ -365,6 +371,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
             }
         }
+
         DateTimeInterval totalDataInterval = new DateTimeInterval(kpiCalculationRelatedInfo.getDateTimeIntervals().get(0).getStartDate(), kpiCalculationRelatedInfo.getDateTimeIntervals().get(kpiCalculationRelatedInfo.getDateTimeIntervals().size() - 1).getEndDate());
         T key = (T)getDateTimeintervalString(totalDataInterval);
         staffTotalHours.put(key, kpiCalculationRelatedInfo.getKpi().isMultiDimensional() ? (E)getClusteredBarChartDetails(null,totalDataInterval,kpiCalculationRelatedInfo) : (E)totalHours);
