@@ -68,6 +68,14 @@ public class ShiftController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO ,shiftActionType));
     }
 
+    @ApiOperation("Create Shifts of a staff")
+    @PostMapping(value = "/shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createShifts( @PathVariable Long unitId, @RequestBody @Valid List<ShiftDTO> shiftDTOS , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShifts(unitId, shiftDTOS ,shiftActionType));
+    }
+
 
     @ApiOperation("save Shift after validation")
     @PostMapping(value = "/shift/validated")
@@ -79,6 +87,13 @@ public class ShiftController {
                                                                         @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType,
                                                                         @RequestParam(required = false) TodoType todoType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, validatedByStaff, updateShiftState, unitId, shiftActionType,todoType));
+    }
+
+    @ApiOperation("update a Shifts of a staff")
+    @PutMapping(value = "/shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateShifts(@PathVariable Long unitId, @RequestBody @Valid List<ShiftDTO> shiftDTOS , @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShifts(shiftDTOS, false, false, shiftActionType));
     }
 
     @ApiOperation("update a Shift of a staff")
