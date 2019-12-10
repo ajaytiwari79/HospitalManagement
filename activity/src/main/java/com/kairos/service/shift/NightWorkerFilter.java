@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.kairos.enums.FilterType.NIGHT_WORKERS;
 
@@ -28,19 +29,8 @@ public class NightWorkerFilter implements ShiftFilter {
         boolean validFilter = filterCriteriaMap.containsKey(NIGHT_WORKERS) && filterCriteriaMap.get(NIGHT_WORKERS).size() == 1;
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
-            if(filterCriteriaMap.get(NIGHT_WORKERS).contains(StaffWorkingType.NIGHT_WORKER.toString())) {
-                for (ShiftDTO shiftDTO : shiftDTOS) {
-                    if (nightWorkerMap.get(shiftDTO.getStaffId())) {
-                        filteredShifts.add((T) shiftDTO);
-                    }
-                }
-            }else{
-                for (ShiftDTO shiftDTO : shiftDTOS) {
-                    if (!nightWorkerMap.containsKey(shiftDTO.getStaffId()) || !nightWorkerMap.get(shiftDTO.getStaffId())) {
-                        filteredShifts.add((T) shiftDTO);
-                    }
-                }
-            }
+            Set<Long> staffIds = filterCriteriaMap.get(NIGHT_WORKERS).contains(StaffWorkingType.NIGHT_WORKER.toString()) ? nightWorkerMap.keySet().stream().filter(k->nightWorkerMap.get(k)).collect(Collectors.toSet()) : nightWorkerMap.keySet().stream().filter(k->!nightWorkerMap.containsKey(k) || !nightWorkerMap.get(k)).collect(Collectors.toSet());
+            return shiftDTOS.stream().filter(k->staffIds.contains(k.getStaffId())).collect(Collectors.toList());
         }
         return filteredShifts;
     }
