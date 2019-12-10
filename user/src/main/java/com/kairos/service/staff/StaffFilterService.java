@@ -427,6 +427,7 @@ public class StaffFilterService {
         staffEmploymentTypeWrapper.setStaffList(staffs);
         Map<Long,List<Long>> mapOfStaffAndEmploymentIds = getMapOfStaffAndEmploymentIds(staffs);
         staffFilterDTO.setMapOfStaffAndEmploymentIds(mapOfStaffAndEmploymentIds);
+        staffFilterDTO.setIncludeWorkTimeAgreement(ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId));
         staffFilterDTO = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
         List<Map> staffList = new ArrayList<>();
         for (Map staffUndModifiable : staffs) {
@@ -434,9 +435,11 @@ public class StaffFilterService {
                 Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffUndModifiable, HashedMap.class);
                 staff.put("nightWorker", staffFilterDTO.getNightWorkerDetails().get(((Integer) ((Map) staff).get("id")).longValue()));
                 staffList.add(staff);
-                for (Map employment : ((Collection<Map>) staff.get("employments"))) {
-                    Long employmentId =((Integer)employment.get("id")).longValue();
-                    employment.put("workTimeAgreements",staffFilterDTO.getEmploymentIdAndWtaResponseMap().getOrDefault(employmentId,newArrayList()));
+                if(staffFilterDTO.isIncludeWorkTimeAgreement()){
+                    for (Map employment : ((Collection<Map>) staff.get("employments"))) {
+                        Long employmentId =((Integer)employment.get("id")).longValue();
+                        employment.put("workTimeAgreements",staffFilterDTO.getEmploymentIdAndWtaResponseMap().getOrDefault(employmentId,newArrayList()));
+                    }
                 }
             }
         }

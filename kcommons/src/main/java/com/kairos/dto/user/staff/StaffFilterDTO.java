@@ -38,6 +38,7 @@ public class StaffFilterDTO {
     private List<BigInteger> planningPeriodIds;
     private Map<Long, Boolean> nightWorkerDetails;
     private Map<Long,List<WTAResponseDTO>> employmentIdAndWtaResponseMap;
+    private boolean includeWorkTimeAgreement;
 
     public void setFiltersData(List<FilterSelectionDTO> filtersData) {
         this.filtersData = isNullOrElse(filtersData,new ArrayList<>());
