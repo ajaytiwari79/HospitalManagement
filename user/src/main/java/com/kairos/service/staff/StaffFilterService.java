@@ -205,6 +205,8 @@ public class StaffFilterService {
                 return getTags(unitId);
             case GROUPS:
                 return getGroups(unitId);
+            case NIGHT_WORKERS:
+                return dtoToQueryesultConverter(StaffWorkingType.getListOfStaffWorkingTypeForFilters(), objectMapper);
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
