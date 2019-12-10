@@ -65,7 +65,7 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
                 boolean isValid = isValid(MAXIMUM, allowSequenceShift, totalOccurrencesSequenceShift);
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                        limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
+                        limitAndCounter[2], DurationType.DAYS,String.valueOf(allowSequenceShift));
             }
         }
     }
@@ -91,15 +91,12 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         int totalOccurrencesSequenceShift = 0;
         for(int i=0; i<infoWrapper.getShifts().size()-1; i++){
             ShiftWithActivityDTO shift = infoWrapper.getShifts().get(i);
-            TimeInterval[] timeIntervals = getTimeSlotsByPartOfDay(newArrayList(sequenceShiftFrom,sequenceShiftTo), infoWrapper.getTimeSlotWrapperMap(),shift);
-            if(timeIntervals.length > 0){
-                ShiftWithActivityDTO nextShift = infoWrapper.getShifts().get(i+1);
-                TimeInterval[] nextTimeIntervals = getTimeSlotsByPartOfDay(newArrayList(sequenceShiftFrom,sequenceShiftTo), infoWrapper.getTimeSlotWrapperMap(),nextShift);
-                if(nextTimeIntervals.length > 0){
-                    totalOccurrencesSequenceShift++;
-                }else{
-                    i++;
-                }
+            ShiftWithActivityDTO nextShift = infoWrapper.getShifts().get(i+1);
+            TimeSlotWrapper timeSlot = getTimeSlotWrapper(infoWrapper, shift);
+            TimeSlotWrapper nextTimeSlot = getTimeSlotWrapper(infoWrapper, nextShift);
+            List<PartOfDay> partOfDays = newArrayList(sequenceShiftFrom,sequenceShiftTo);
+            if(partOfDays.contains(PartOfDay.valueOf(timeSlot.getName().toUpperCase())) && partOfDays.contains(PartOfDay.valueOf(nextTimeSlot.getName().toUpperCase())) && !timeSlot.getName().equals(nextTimeSlot.getName())){
+                totalOccurrencesSequenceShift++;
             }
         }
         return totalOccurrencesSequenceShift;
