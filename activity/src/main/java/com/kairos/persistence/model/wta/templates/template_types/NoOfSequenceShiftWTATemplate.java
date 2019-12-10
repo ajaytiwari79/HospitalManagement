@@ -20,11 +20,10 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoField;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
@@ -70,6 +69,25 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
         }
     }
 
+    private int getOccurrencesSequenceShift(RuleTemplateSpecificInfo infoWrapper){
+        int totalOccurrencesSequenceShift = 0;
+        List<ShiftWithActivityDTO> shifts = infoWrapper.getShifts();
+        shifts.add(infoWrapper.getShift());
+        shifts = infoWrapper.getShifts().stream().sorted(Comparator.comparing(k->k.getStartDate())).collect(Collectors.toList());
+        for(int i=0; i<shifts.size()-1; i++){
+            TimeSlotWrapper timeSlot = getTimeSlotWrapper(infoWrapper, shifts.get(i));
+            TimeSlotWrapper nextTimeSlot = getTimeSlotWrapper(infoWrapper, shifts.get(i+1));
+            List<PartOfDay> partOfDays = newArrayList(sequenceShiftFrom,sequenceShiftTo);
+            if(partOfDays.contains(PartOfDay.valueOf(timeSlot.getName().toUpperCase())) && partOfDays.contains(PartOfDay.valueOf(nextTimeSlot.getName().toUpperCase())) && !timeSlot.getName().equals(nextTimeSlot.getName())){
+                Period period = Period.between(asLocalDate(shifts.get(i).getStartDate()), asLocalDate(shifts.get(i+1).getStartDate()));
+                if(period.getYears() < 2) {
+                    totalOccurrencesSequenceShift++;
+                }
+            }
+        }
+        return totalOccurrencesSequenceShift;
+    }
+
     private TimeSlotWrapper getTimeSlotWrapper(RuleTemplateSpecificInfo infoWrapper, ShiftWithActivityDTO shift){
         TimeSlotWrapper timeSlotWrapper = null;
         for (String key : infoWrapper.getTimeSlotWrapperMap().keySet()) {
@@ -85,21 +103,6 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
             }
         }
         return timeSlotWrapper;
-    }
-
-    private int getOccurrencesSequenceShift(RuleTemplateSpecificInfo infoWrapper){
-        int totalOccurrencesSequenceShift = 0;
-        for(int i=0; i<infoWrapper.getShifts().size()-1; i++){
-            ShiftWithActivityDTO shift = infoWrapper.getShifts().get(i);
-            ShiftWithActivityDTO nextShift = infoWrapper.getShifts().get(i+1);
-            TimeSlotWrapper timeSlot = getTimeSlotWrapper(infoWrapper, shift);
-            TimeSlotWrapper nextTimeSlot = getTimeSlotWrapper(infoWrapper, nextShift);
-            List<PartOfDay> partOfDays = newArrayList(sequenceShiftFrom,sequenceShiftTo);
-            if(partOfDays.contains(PartOfDay.valueOf(timeSlot.getName().toUpperCase())) && partOfDays.contains(PartOfDay.valueOf(nextTimeSlot.getName().toUpperCase())) && !timeSlot.getName().equals(nextTimeSlot.getName())){
-                totalOccurrencesSequenceShift++;
-            }
-        }
-        return totalOccurrencesSequenceShift;
     }
 
     public NoOfSequenceShiftWTATemplate(String name, boolean disabled, String description,  PartOfDay sequenceShiftFrom, PartOfDay sequenceShiftTo, long intervalLength, String intervalUnit) {
