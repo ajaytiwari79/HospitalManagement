@@ -547,6 +547,9 @@ public class ShiftService extends MongoBaseService {
                 deleteShiftViolatedRules.add(shiftViolatedRule);
             }
         }
+        if (isCollectionNotEmpty(saveShifts)) {
+            shiftMongoRepository.saveEntities(saveShifts);
+        }
         shiftViolatedRulesMongoRepository.saveEntities(saveShiftViolatedRules);
         shiftViolatedRulesMongoRepository.deleteAll(deleteShiftViolatedRules);
         return saveShifts;
@@ -743,7 +746,9 @@ public class ShiftService extends MongoBaseService {
             originalShift.getDraftShift().setDraft(true);
         } else if (valid && ShiftActionType.SAVE.equals(shiftActionType)) {
             originalShift = shift;
+            originalShift.setDraft(false);
         } else {
+            originalShift.setDraft(false);
             originalShift.setDraftShift(null);
         }
         return originalShift;
