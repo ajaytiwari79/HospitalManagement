@@ -47,8 +47,8 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
             "RETURN id(function) as id,function.code as code,function.name as name")
     List<FunctionDTO> getFunctionsByOrganizationLevel(Long organizationLevelId);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true}) where id(expertise)={0}\n" +
-            "MATCH(expertise)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(:FunctionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(fpm:FunctionalPaymentMatrix) \n" +
+    @Query("MATCH(expertiseLine:ExpertiseLine{deleted:false,published:true}) where id(expertiseLine)={0}\n" +
+            "MATCH(expertiseLine)<-[:" + APPLICABLE_FOR_EXPERTISE + "]-(:FunctionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(fpm:FunctionalPaymentMatrix) \n" +
             "MATCH(fpm)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(slf:SeniorityLevelFunction) " +
             "MATCH(slf)-[:" + HAS_FUNCTIONAL_AMOUNT + "]-(fn:Function) \n" +
             "RETURN distinct id(fn) as id ,fn.code as code,fn.name as name")
@@ -56,8 +56,8 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
 
     @Query("MATCH (unit:Unit) where id(unit)={3} \n" +
             "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
-            "MATCH(expertise:Expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={0} \n" +
-            "MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
+            "MATCH(expertiseLine:ExpertiseLine)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} \n" +
+            "MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertiseLine) \n" +
             "WHERE  date(functionalPayment.startDate)<=DATE({1}) AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>=DATE({1}))\n" +
             "MATCH(sl)<-[:" + FOR_SENIORITY_LEVEL + "]-(slf:SeniorityLevelFunction)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(fpm:FunctionalPaymentMatrix)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPayment) \n" +
             "MATCH (fpm)-[:" + HAS_PAY_GROUP_AREA + "]-(payGroupArea) \n" +
@@ -68,8 +68,8 @@ public interface FunctionGraphRepository extends Neo4jBaseRepository<Function, L
 
     @Query("MATCH (unit:Unit) where id(unit)={0} \n" +
             "MATCH(unit)-[:" + CONTACT_ADDRESS + "]-(:ContactAddress)-[:" + MUNICIPALITY + "]-(municipality:Municipality)<-[rel:" + HAS_MUNICIPALITY + "]-(payGroupArea:PayGroupArea{deleted:false}) \n" +
-            "MATCH(expertise:Expertise)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2} AND id(expertise)={1} \n" +
-            "MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertise) \n" +
+            "MATCH(expertiseLine:ExpertiseLine)-[:" + FOR_SENIORITY_LEVEL + "]->(sl:SeniorityLevel) WHERE id(sl)={2}  \n" +
+            "MATCH(functionalPayment:FunctionalPayment{deleted:false,published:true})-[:" + APPLICABLE_FOR_EXPERTISE + "]->(expertiseLine) \n" +
             "WHERE  DATE(functionalPayment.startDate)<=DATE({3}) AND (functionalPayment.endDate IS NULL OR date(functionalPayment.endDate)>=DATE({3}))\n" +
             "MATCH(sl)<-[:" + FOR_SENIORITY_LEVEL + "]-(slf:SeniorityLevelFunction)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]-(fpm:FunctionalPaymentMatrix)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]-(functionalPayment) \n" +
             "MATCH (fpm)-[:" + HAS_PAY_GROUP_AREA + "]->(payGroupArea) \n" +

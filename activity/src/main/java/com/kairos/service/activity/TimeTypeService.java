@@ -335,7 +335,8 @@ public class TimeTypeService extends MongoBaseService {
         TimeType vetoTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", AppConstants.NON_WORKING_TYPE_COLOR, VETO, countryId, Collections.EMPTY_SET);
         TimeType stopBrickTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", AppConstants.NON_WORKING_TYPE_COLOR, STOP_BRICK, countryId, Collections.EMPTY_SET);
         TimeType availableTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Available Time", "", AppConstants.NON_WORKING_TYPE_COLOR, AVAILABLE_TIME, countryId, Collections.EMPTY_SET);
-        TimeType protectedDaysOff = new TimeType(TimeTypes.NON_WORKING_TYPE, "Protected Days off", "", AppConstants.NON_WORKING_TYPE_COLOR, PROTECTED_DAYS_OFF, countryId, Collections.EMPTY_SET);
+        TimeType protectedDaysOff = new TimeType(TimeTypes.NON_WORKING_TYPE, "Protected Days off", "", AppConstants.NON_WORKING_TYPE_COLOR, GAP, countryId, Collections.EMPTY_SET);
+        TimeType gap = new TimeType(TimeTypes.NON_WORKING_TYPE, "Gap", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.EMPTY_SET);
         nonWorkingTimeTypes.add(volunteerTimeType);
         nonWorkingTimeTypes.add(timeBankOffTimeType);
         nonWorkingTimeTypes.add(unPaidBreakTimeType);
@@ -348,6 +349,7 @@ public class TimeTypeService extends MongoBaseService {
         nonWorkingTimeTypes.add(stopBrickTimeType);
         nonWorkingTimeTypes.add(availableTimeType);
         nonWorkingTimeTypes.add(protectedDaysOff);
+        nonWorkingTimeTypes.add(gap);
         allTimeTypes.addAll(workingTimeTypes);
         allTimeTypes.addAll(nonWorkingTimeTypes);
 

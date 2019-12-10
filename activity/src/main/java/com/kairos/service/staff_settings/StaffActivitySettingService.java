@@ -128,6 +128,10 @@ public class StaffActivitySettingService extends MongoBaseService {
         return staffActivitySettingRepository.findByIdAndUnitIdAndDeletedFalse(staffActivitySettingId,unitId);
     }
 
+    public StaffActivitySettingDTO getStaffActivitySettingsByActivityId(Long unitId,BigInteger activityId,Long staffId){
+        return staffActivitySettingRepository.findByActivityIdAndStaffIdAndUnitIdAndDeletedFalse(activityId,staffId,unitId);
+    }
+
 
    public List<StaffActivitySettingDTO> updateBulkStaffActivitySettings(Long unitId,Long staffId,List<StaffActivitySettingDTO> staffActivitySettings){
         staffActivitySettings.forEach(staffActivitySetting->{
@@ -202,7 +206,4 @@ public class StaffActivitySettingService extends MongoBaseService {
        return responseMap;
    }
 
-    public StaffActivitySettingDTO getStaffActivitySettingsByActivityId(Long unitId,BigInteger activityId,Long staffId){
-        return staffActivitySettingRepository.findByActivityIdAndStaffIdAndUnitIdAndDeletedFalse(activityId,staffId,unitId);
-    }
 }

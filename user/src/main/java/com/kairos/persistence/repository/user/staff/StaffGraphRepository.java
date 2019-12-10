@@ -64,6 +64,14 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndEmploymentId(long employmentId);
 
 
+
+    @Query("MATCH (staff:Staff) WHERE id(staff) IN {1}  " +
+            "MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} \n" +
+            "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) \n" +
+            "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment)-[:" + IN_UNIT + "]->(organization) \n " +
+            "RETURN DISTINCT id(staff) AS id,user.cprNumber AS cprNumber,staff.firstName+\" \"+staff.lastName AS name,id(organization) AS unitId order by name")
+    List<StaffAdditionalInfoQueryResult> getAllStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds);
+
     @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit)<-[:"+IN_UNIT+"]-(employment:Employment) WHERE id(organization)={0} AND id(employment)={2} AND (employment.endDate is null OR date(employment.endDate) >= date({3})) WITH unitPermission,organization " +
             "MATCH (staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(up:UnitPermission) WHERE id(staff)={1} WITH staff,organization " +
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WITH staff,organization,user " +
@@ -84,6 +92,14 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (teams:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH user,staff,skills,collect(id(teams)) AS teams,organization\n" +
             "RETURN id(staff) AS id,user.cprNumber AS cprNumber,staff.firstName+\" \"+staff.lastName AS name,{2} + staff.profilePic AS profilePic,teams,skills,id(organization) AS unitId order by name")
     List<StaffAdditionalInfoQueryResult> getStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds, String imgUrl);
+
+
+    @Query("MATCH (staff:Staff) WHERE id(staff) IN {1}  " +
+            "MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} \n" +
+            "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) \n" +
+            "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment)-[:" + IN_UNIT + "]->(organization) \n " +
+            "RETURN id(staff) AS id,user.cprNumber AS cprNumber,staff.firstName+\" \"+staff.lastName AS name,id(organization) AS unitId order by name")
+    List<StaffAdditionalInfoQueryResult> getAllStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds);
 
     @Query("MATCH (staff:Staff) WHERE id(staff)={0} MATCH (team)-[r:" + TEAM_HAS_MEMBER + "]->(staff) SET r.isEnabled=false RETURN r")
     List<StaffTeamRelationship> removeStaffFromAllTeams(long staffId);
