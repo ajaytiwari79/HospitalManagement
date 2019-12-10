@@ -657,7 +657,7 @@ public class ShiftService extends MongoBaseService {
                 List<ShiftActivity> breakActivities=new ArrayList<>();
                 List<Shift> shiftList=getListOfShift(shift,activityWrapperMap);
                 for (Shift currentShift:shiftList) {
-                    List<ShiftActivity> breakActivityList = shiftBreakService.updateBreakInShift(false,currentShift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),oldStateOfShift);
+                    List<ShiftActivity> breakActivityList = shiftBreakService.updateBreakInShift(shift.isShiftUpdated(oldStateOfShift),currentShift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),oldStateOfShift);
                     breakActivities.addAll(breakActivityList);
                 }
                 shift.setBreakActivities(breakActivities);
@@ -1284,7 +1284,9 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shiftList=new ArrayList<>();
         Shift shift1=ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class);
         shift1.setActivities(new ArrayList<>());
-        for (ShiftActivity shiftActivity:shift.getActivities()) {
+        Iterator iterator=shift.getActivities().iterator();
+        while (iterator.hasNext()){
+            ShiftActivity shiftActivity=(ShiftActivity) iterator.next();
             if("GAP".equals(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getLabel())){
                 ShiftActivity breakActivity=shift.getBreakActivities().stream().filter(k->k.getStartDate().before(shiftActivity.getStartDate())).findFirst().orElse(null);
                 if(breakActivity!=null){
@@ -1296,6 +1298,10 @@ public class ShiftService extends MongoBaseService {
                 continue;
             }
             shift1.getActivities().add(shiftActivity);
+            if(!iterator.hasNext()){
+                shiftList.add(shift1);
+            }
+
         }
        return shiftList;
     }
