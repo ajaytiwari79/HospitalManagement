@@ -662,9 +662,9 @@ public class ExpertiseService {
        return expertiseGraphRepository.findById(id,depth).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_DATANOTFOUND, EXPERTISE, id)));
     }
 
-    public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseId) {
+    public Map<Long,SeniorAndChildCareDaysDTO> getSeniorAndChildCareDaysMapByExpertiseIds(List<Long> expertiseIds) {
         Map<Long,SeniorAndChildCareDaysDTO> seniorAndChildCareDaysDTOMap=new HashMap<>();
-        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseId);
+        List<Expertise> expertises = expertiseGraphRepository.findAllById(expertiseIds);
         for (Expertise expertise : expertises) {
             List<CareDaysDTO> childCareDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getChildCareDays(), CareDaysDTO.class);
             List<CareDaysDTO> seniorDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(expertise.getSeniorDays(), CareDaysDTO.class);

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
+import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,6 +38,8 @@ public class EmploymentWithCtaDetailsDTO {
     private LocalDate accumulatedTimebankDate;
     private Long unitId;
     private Long employmentTypeId;
+    private Long expertiseId;
+    private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
 
 
     public EmploymentWithCtaDetailsDTO(Long id) {

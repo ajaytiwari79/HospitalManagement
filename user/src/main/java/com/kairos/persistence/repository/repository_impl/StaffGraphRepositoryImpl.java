@@ -78,21 +78,22 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("employmentType", employmentType);
         }
         if(CollectionUtils.isNotEmpty(unitIds) || !parentOrganization){
-            stringBuilder.append(" MATCH (org)-[:" + IN_UNIT + "]-(employment:Employment{deleted:false})-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)");
+            stringBuilder.append(" MATCH (org)-[:" + IN_UNIT + "]-(employment:Employment{deleted:false})-[:" + BELONGS_TO_STAFF + "]-(staff:Staff)-[:" + BELONGS_TO + "]->(user:User) ");
         }else {
-            stringBuilder.append(" MATCH (org)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false}) ");
+            stringBuilder.append(" MATCH (org)-[:" + HAS_POSITIONS + "]-(position:Position)-[:" + BELONGS_TO + "]-(staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false}) MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) ");
         }
         if(CollectionUtils.isNotEmpty(staffIds)) {
             stringBuilder.append(" WHERE id(staff) IN {staffIds}");
             queryParameters.put("staffIds",staffIds);
         }
         stringBuilder.append(" MATCH (employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine)"+
+                "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)"+
                 "WHERE  date(employmentLine.startDate) <= date({endDate}) AND (NOT exists(employmentLine.endDate) OR date(employmentLine.endDate) >= date({startDate}))"+
                 "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
                 "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,\n" +
-                "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org "+
-                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,employmentLines:employmentLines } as employment,staff,org\n" +
-                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,id(org) as unitId,org.name as unitName,collect(employment) as employment");
+                "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,expertise "+
+                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,employmentLines:employmentLines ,expertiseId:id(expertise)} as employment,staff,org,user,expertise\n" +
+                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,user.cprNumber AS cprNumber,id(org) as unitId,org.name as unitName,collect(employment) as employment");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
 
