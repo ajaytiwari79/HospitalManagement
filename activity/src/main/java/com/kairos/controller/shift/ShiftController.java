@@ -69,7 +69,7 @@ public class ShiftController {
     }
 
     @ApiOperation("Create Shifts of a staff")
-    @PostMapping(value = "/shifts")
+    @PostMapping(value = "/create_shifts")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> createShifts( @PathVariable Long unitId, @RequestBody @Valid List<ShiftDTO> shiftDTOS , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
 
