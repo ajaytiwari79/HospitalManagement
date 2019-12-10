@@ -22,7 +22,14 @@ public class TabKPIDTO {
     private LocationType locationType;
     private int priority;
 
+    public TabKPIDTO() {
+    }
 
+    public TabKPIDTO(String tabId, KPIDTO kpi,CounterSize size) {
+        this.tabId = tabId;
+        this.kpi = kpi;
+        this.size=size;
+    }
 
     public String getTabId() {
         return tabId;

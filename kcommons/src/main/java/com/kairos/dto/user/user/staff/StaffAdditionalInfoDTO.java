@@ -54,7 +54,13 @@ public class StaffAdditionalInfoDTO {
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
     private List<TagDTO> tags;
+    private boolean nightWorker;
+    private Map<String, String> unitWiseAccessRole;
 
+    public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
+        this.cprNumber = cprNumber;
+        this.seniorAndChildCareDays = seniorAndChildCareDays;
+    }
 
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {
         this.employment = employment;

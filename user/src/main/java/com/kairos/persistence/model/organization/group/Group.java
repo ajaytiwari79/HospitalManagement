@@ -31,6 +31,7 @@ public class Group extends UserBaseEntity {
     @Relationship(type = "HAS_FILTERS")
     private List<FilterSelection> filtersData = new ArrayList<>();
     private List<Long> excludedStaffs = new ArrayList<>();
+    private String roomId;
 
     public Group(String name, String description) {
         this.name = name;

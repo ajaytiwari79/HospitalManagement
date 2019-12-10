@@ -22,7 +22,7 @@ import java.util.List;
 public class AssetType extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty or null")
-    @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$")
     private String name;
     private Long countryId;
     private Long organizationId;

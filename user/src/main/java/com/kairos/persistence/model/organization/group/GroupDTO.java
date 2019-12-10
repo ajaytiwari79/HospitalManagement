@@ -32,11 +32,13 @@ public class GroupDTO {
     private String description;
     private List<FilterSelectionDTO> filtersData;
     private List<Long> excludedStaffs;
+    private String roomId;
 
-    public GroupDTO(Long id, String name, String description, List<Long> excludedStaffs){
+    public GroupDTO(Long id, String name, String description, List<Long> excludedStaffs, String roomId){
         this.id = id;
         this.name = name;
         this.description = description;
         this.excludedStaffs = excludedStaffs;
+        this.roomId = roomId;
     }
 }

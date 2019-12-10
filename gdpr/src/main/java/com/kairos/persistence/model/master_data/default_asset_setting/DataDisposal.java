@@ -18,7 +18,7 @@ import java.time.LocalDate;
 public class DataDisposal extends BaseEntity {
 
     @NotBlank(message = "error.message.name.notNull.orEmpty")
-    @Pattern(message = "error.message.name.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "error.message.name.special.character.notAllowed",regexp = "^[a-zA-Z0-9\\s]+$")
     private String name;
     private Long countryId;
     private SuggestedDataStatus suggestedDataStatus;
@@ -35,7 +35,7 @@ public class DataDisposal extends BaseEntity {
         this.countryId = countryId;
     }
 
-    public DataDisposal(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z\\s]+$") String name) {
+    public DataDisposal(@NotBlank(message = "error.message.name.notNull.orEmpty") @Pattern(message = "error.message.name.special.character.notAllowed", regexp = "^[a-zA-Z0-9\\s]+$") String name) {
         this.name = name;
     }
 }

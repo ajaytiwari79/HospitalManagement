@@ -64,7 +64,7 @@ public class OrganizationDataSourceService{
 
                dataSourceRepository.saveAll(dataSources);
             }
-          return ObjectMapperUtils.copyPropertiesOfListByMapper(dataSources,DataSourceDTO.class);
+          return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSources,DataSourceDTO.class);
     }
 
     /**

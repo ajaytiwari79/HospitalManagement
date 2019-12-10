@@ -101,12 +101,12 @@ public interface CountryGraphRepository extends Neo4jBaseRepository<Country,Long
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} AND id(level)={1} RETURN level")
     Level getLevel(Long countryId, Long levelId);
 
-    @Query("MATCH(exl:ExpertiseLine)  WHERE id(exl)={0} " +
-            "OPTIONAL MATCH(exl)-[rel:"+IN_ORGANIZATION_LEVEL+"]-(l:Level)\n" +
-            "with exl,rel  " +
+    @Query("MATCH(ex:Expertise)  WHERE id(ex)={0} " +
+            "OPTIONAL MATCH(ex)-[rel:"+IN_ORGANIZATION_LEVEL+"]-(l:Level)\n" +
+            "with ex,rel  " +
             "MATCH(newLevel:Level) where id(newLevel)={1} \n" +
             "DETACH delete rel \n" +
-            "CREATE UNIQUE(exl)-[:"+IN_ORGANIZATION_LEVEL+"]-(newLevel) ")
+            "CREATE UNIQUE(ex)-[:"+IN_ORGANIZATION_LEVEL+"]-(newLevel) ")
     void addLevel(Long expertiseLineId, Long newLevelToBeLinked);
 
     @Query("MATCH (country:Country)-[:"+HAS_LEVEL+"]->(level:Level{isEnabled:true}) where id(country)={0} RETURN level")

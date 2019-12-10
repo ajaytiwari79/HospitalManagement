@@ -47,7 +47,7 @@ public class Staff extends UserBaseEntity {
     @KPermissionSubModel
     @Relationship(type = SECONDARY_CONTACT_ADDRESS)
     private ContactAddress secondaryContactAddress;
-
+    @KPermissionSubModel
     @Relationship(type = BELONGS_TO)
     private User user;
 
@@ -56,6 +56,7 @@ public class Staff extends UserBaseEntity {
     @Relationship(type = HAS_FAVOURITE_FILTERS)
     private List<StaffFavouriteFilter> staffFavouriteFilterList;
 
+    @KPermissionSubModel
     @Relationship(type = HAS_CHILDREN)
     private List<StaffChildDetail> staffChildDetails;
 
@@ -66,6 +67,7 @@ public class Staff extends UserBaseEntity {
     private boolean copyKariosMailToLogin;
     @KPermissionField
     private String sendNotificationBy;
+    @KPermissionField
     private String profilePic;
     @KPermissionField
     private String email;

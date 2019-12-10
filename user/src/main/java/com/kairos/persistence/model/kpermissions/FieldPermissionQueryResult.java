@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +16,8 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @QueryResult
 public class FieldPermissionQueryResult {
 
-    private Long fieldId;
+    private Long id;
+    private String fieldName;
 
-    private FieldLevelPermission fieldPermission;
+    private Set<FieldLevelPermission> permissions;
 }

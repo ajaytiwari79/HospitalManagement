@@ -3,6 +3,7 @@ package com.kairos.controller.user;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.enums.user.ChatStatus;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.service.access_permisson.AccessGroupService;
 import com.kairos.service.auth.UserService;
@@ -213,4 +214,11 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> getUnitWiseLastSelectedAccessRole() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getUnitWiseLastSelectedAccessRole());
     }
+
+    @ApiOperation("Update User Chat Status ")
+    @PutMapping("/user/chat_status")
+    public ResponseEntity<Map<String, Object>> updateChatStatus(@RequestBody ChatStatus chatStatus)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateChatStatus(chatStatus));
+    }
+
 }
