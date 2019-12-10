@@ -90,7 +90,7 @@ public class ShiftBreakService {
                             exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE, breakAvailabilitySettings.getShiftPercentage());
                         }
                         placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
-                        eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings);
+                        eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings,breakSettings);
                         placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSettings.getBreakDurationInMinute();
                         placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? roundDateByMinutes(eligibleBreakInterval.getStartDate(),15) : placeBreakAfterThisDate;
                     }
@@ -180,11 +180,11 @@ public class ShiftBreakService {
         return shiftActivity;
     }
 
-    private DateTimeInterval getBreakInterval(Shift shift,BreakAvailabilitySettings breakAvailabilitySettings){
-        ZonedDateTime startDate = asZoneDateTime(shift.getStartDate()).plusMinutes(breakAvailabilitySettings.getStartAfterMinutes());
+    private DateTimeInterval getBreakInterval(Shift shift,BreakAvailabilitySettings breakAvailabilitySettings,BreakSettings breakSettings){
+        asZoneDateTime(shift.getStartDate()).plusMinutes(breakAvailabilitySettings.getStartAfterMinutes());
         ZonedDateTime endDate = asZoneDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
         ZonedDateTime startDateWithShiftPercentage = asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100);
-        startDate = startDate.isAfter(startDateWithShiftPercentage) ? startDate : startDateWithShiftPercentage;
+        ZonedDateTime startDate=isEqualOrAfter(startDateWithShiftPercentage,endDate.minusMinutes(breakSettings.getBreakDurationInMinute()))?endDate.minusMinutes(breakSettings.getBreakDurationInMinute()):startDateWithShiftPercentage;
         return new DateTimeInterval(startDate,endDate);
     }
 

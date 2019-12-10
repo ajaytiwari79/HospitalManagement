@@ -623,7 +623,7 @@ public class ShiftService extends MongoBaseService {
                 List<ShiftActivity> breakActivities=new ArrayList<>();
                 List<Shift> shiftList=getListOfShift(shift,activityWrapperMap);
                 for (Shift currentShift:shiftList) {
-                    List<ShiftActivity> breakActivityList = shiftBreakService.updateBreakInShift(false,currentShift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),oldStateOfShift);
+                    List<ShiftActivity> breakActivityList = shiftBreakService.updateBreakInShift(shift.isShiftUpdated(oldStateOfShift),currentShift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),oldStateOfShift);
                     breakActivities.addAll(breakActivityList);
                 }
                 shift.setBreakActivities(breakActivities);

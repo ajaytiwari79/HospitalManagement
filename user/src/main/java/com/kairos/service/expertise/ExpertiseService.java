@@ -188,7 +188,9 @@ public class ExpertiseService {
             }
             currentExpertise.setEndDate(expertiseDTO.getEndDate());
             currentExpertise.getExpertiseLines().get(currentExpertise.getExpertiseLines().size()-1).setEndDate(expertiseDTO.getEndDate());
-            employmentService.setEndDateInEmploymentOfExpertise(expertiseDTO);
+            if(!isEquals(expertiseDTO.getEndDate(),currentExpertise.getEndDate())){
+                employmentService.setEndDateInEmploymentOfExpertise(expertiseDTO);
+            }
         }
         expertiseGraphRepository.save(currentExpertise);
         return updatedExpertiseData(currentExpertise);
