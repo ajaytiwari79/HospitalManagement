@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.user.staff;
 import com.kairos.enums.SkillLevel;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.*;
@@ -21,7 +20,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

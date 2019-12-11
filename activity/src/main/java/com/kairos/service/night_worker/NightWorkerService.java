@@ -429,10 +429,12 @@ public class NightWorkerService {
             staffIds.forEach(staffId->staffFilterDTO.getMapOfStaffAndEmploymentIds().remove(staffId));
         }
         staffFilterDTO.setNightWorkerDetails(getStaffIdAndNightWorkerMap(staffIds));
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(employmentIds->employmentIds.stream().filter(Objects::nonNull)).collect(Collectors.toList()));
-        List<WTAResponseDTO> wtaResponseDTOS = copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS,WTAResponseDTO.class);
-        Map<Long,List<WTAResponseDTO>> employmentIdAndwtaQueryResultDTOSMap = wtaResponseDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId()));
-        staffFilterDTO.setEmploymentIdAndWtaResponseMap(employmentIdAndwtaQueryResultDTOSMap);
+        if(staffFilterDTO.isIncludeWorkTimeAgreement()) {
+            List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(employmentIds -> employmentIds.stream()).collect(Collectors.toList()));
+            List<WTAResponseDTO> wtaResponseDTOS = copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+            Map<Long, List<WTAResponseDTO>> employmentIdAndwtaQueryResultDTOSMap = wtaResponseDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId()));
+            staffFilterDTO.setEmploymentIdAndWtaResponseMap(employmentIdAndwtaQueryResultDTOSMap);
+        }
         return staffFilterDTO;
     }
 

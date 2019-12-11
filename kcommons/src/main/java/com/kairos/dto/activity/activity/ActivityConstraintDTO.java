@@ -1,7 +1,7 @@
-package com.kairos.dto.planner.constarints.unit;
+package com.kairos.dto.activity.activity;
 
 import com.kairos.commons.planning_setting.PlanningSetting;
-import com.kairos.dto.planner.constarints.ConstraintDTO;
+import com.kairos.commons.utils.NotNullOrEmpty;
 import com.kairos.enums.constraint.ConstraintSubType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,17 +12,15 @@ import java.math.BigInteger;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UnitConstraintDTO  {
+public class ActivityConstraintDTO {
 
-    private Long unitId;
+    private BigInteger activityId;
     private PlanningSetting planningSetting;
     private ConstraintSubType constraintSubType;
 
-    public UnitConstraintDTO(Long unitId,PlanningSetting planningSetting, ConstraintSubType constraintSubType){
-        this.unitId = unitId;
+    public ActivityConstraintDTO( BigInteger activityId,PlanningSetting planningSetting,ConstraintSubType constraintSubType){
+        this.activityId = activityId;
         this.planningSetting = planningSetting;
         this.constraintSubType = constraintSubType;
     }
-
-
 }

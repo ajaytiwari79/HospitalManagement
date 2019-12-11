@@ -6,7 +6,6 @@ import com.kairos.enums.Employment;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
 import com.kairos.persistence.repository.organization.CustomUnitGraphRepository;
-import com.kairos.service.organization.GroupService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.session.Session;
