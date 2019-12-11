@@ -702,7 +702,7 @@ public class TimeBankCalculationService {
         Object[] calculatedPayoutValues = getSumOfPayoutValues(payOutPerShifts,employmentWithCtaDetailsDTOMap);
         long plannedMinutesOfPayout = (long)calculatedPayoutValues[0];
         long scheduledMinutesOfPayout = (long)calculatedPayoutValues[1];
-        long protectedDaysOffMinutes = (long)calculatedPayoutValues[5];
+        long protectedDaysOffMinutes = (long)calculatedTimebankValues[5];
         BigDecimal plannedPayoutCost = (BigDecimal) calculatedPayoutValues[2];
         timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore);
         totalTimeBankBefore += timeBankOfInterval;
@@ -1255,8 +1255,9 @@ public class TimeBankCalculationService {
 
         public List<ShiftActivityDTO> getShiftActivityByBreak(List<ShiftActivityDTO> shiftActivities, List<ShiftActivityDTO> breakActivities) {
             List<ShiftActivityDTO> updatedShiftActivities = new ArrayList<>();
-            if (isCollectionNotEmpty(breakActivities) && !(breakActivities.get(0)).isBreakNotHeld()) {
-                List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndIdsIn(newArrayList(breakActivities.get(0).getActivityId()));
+            if(isCollectionNotEmpty(breakActivities)){
+            for (ShiftActivityDTO currentBreakActivity : breakActivities) {
+                List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndIdsIn(newArrayList(currentBreakActivity.getActivityId()));
                 for (ShiftActivityDTO shiftActivity : shiftActivities) {
                     for (ShiftActivityDTO breakActivity : breakActivities) {
                         if (shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes()) {
@@ -1278,7 +1279,8 @@ public class TimeBankCalculationService {
                         }
                     }
                 }
-            } else {
+            }
+        } else {
                 updatedShiftActivities = shiftActivities;
             }
             Collections.sort(updatedShiftActivities);

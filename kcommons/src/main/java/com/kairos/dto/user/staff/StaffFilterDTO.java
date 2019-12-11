@@ -2,6 +2,7 @@ package com.kairos.dto.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.enums.FilterType;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
@@ -32,7 +34,11 @@ public class StaffFilterDTO {
     private String searchText;
     private String name;
     private List<Long> staffIds;
+    Map<Long,List<Long>> mapOfStaffAndEmploymentIds;
     private List<BigInteger> planningPeriodIds;
+    private Map<Long, Boolean> nightWorkerDetails;
+    private Map<Long,List<WTAResponseDTO>> employmentIdAndWtaResponseMap;
+    private boolean includeWorkTimeAgreement;
 
     public void setFiltersData(List<FilterSelectionDTO> filtersData) {
         this.filtersData = isNullOrElse(filtersData,new ArrayList<>());

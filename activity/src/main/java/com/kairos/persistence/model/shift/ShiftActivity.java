@@ -60,6 +60,7 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     private boolean breakNotHeld;
     private Set<ShiftStatus> status = new HashSet<>();
     private transient BigInteger plannedTimeId;
+    private boolean breakInterrupt;
 
 
     @IgnoreLogging
