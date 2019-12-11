@@ -67,8 +67,8 @@ public class StaffFilterController {
                                                                    @RequestParam String moduleId,
                                                                    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                                                    @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-                                                                   @RequestParam(required = false , name = "showAll" ,defaultValue = "true")  boolean showAll) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO,moduleId,startDate,endDate,showAll));
+                                                                   @RequestParam(required = false , name = "showAllStaffs" ,defaultValue = "true")  boolean showAllStaffs) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, filterService.getAllStaffByUnitId(unitId, staffFilterDTO,moduleId,startDate,endDate,showAllStaffs));
     }
 
 }

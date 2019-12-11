@@ -5,6 +5,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.enums.DurationType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -21,11 +22,13 @@ import static com.kairos.commons.utils.DateUtils.asDate;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@NoArgsConstructor
 public class PlanningPeriod extends MongoBaseEntity {
 
     private LocalDate startDate;
     private LocalDate endDate;
     private String name;
+    private String dateRange;
     @Indexed
     private Long unitId = -1L;
     private BigInteger currentPhaseId;
@@ -38,20 +41,19 @@ public class PlanningPeriod extends MongoBaseEntity {
     private Set<Long> publishEmploymentIds=new HashSet<>();
 
 
-    public PlanningPeriod(){
-        // default constructor
-    }
 
-    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId) {
+    public PlanningPeriod(String name, String dateRange, LocalDate startDate, LocalDate endDate, Long unitId) {
         this.name = name;
+        this.dateRange=dateRange;
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitId = unitId;
 
     }
 
-    public PlanningPeriod(String name, LocalDate startDate, LocalDate endDate, Long unitId,DurationType durationType,int duration) {
+    public PlanningPeriod(String name,String dateRange, LocalDate startDate, LocalDate endDate, Long unitId,DurationType durationType,int duration) {
         this.name = name;
+        this.dateRange=dateRange;
         this.startDate = startDate;
         this.endDate = endDate;
         this.unitId = unitId;

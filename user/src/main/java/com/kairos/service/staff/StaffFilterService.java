@@ -406,7 +406,7 @@ public class StaffFilterService {
         return mapOfFilters;
     }
 
-    public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId,LocalDate startDate,LocalDate endDate , boolean showAll) {
+    public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId,LocalDate startDate,LocalDate endDate , boolean showAllStaffs) {
         boolean unit=unitGraphRepository.existsById(unitId);
         Organization organization=organizationService.fetchParentOrganization(unitId);
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
@@ -422,7 +422,7 @@ public class StaffFilterService {
                 getMapOfFiltersToBeAppliedWithValue(unitId, staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
-        List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId , moduleId , showAll);
+        List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId , moduleId , showAllStaffs);
         staffs = staffs.stream().filter(distinctByKey(a -> a.get("id"))).collect(Collectors.toList());
         staffEmploymentTypeWrapper.setStaffList(staffs);
         Map<Long,List<Long>> mapOfStaffAndEmploymentIds = getMapOfStaffAndEmploymentIds(staffs);
@@ -453,7 +453,7 @@ public class StaffFilterService {
         return mapOfStaffAndEmploymentIds;
     }
 
-    private List<Map> filterStaffByRoles(List<Map> staffList, Long unitId ,String moduleId , boolean showAll) {
+    private List<Map> filterStaffByRoles(List<Map> staffList, Long unitId ,String moduleId , boolean showAllStaffs) {
         Long userId = UserContext.getUserDetails().getId();
         List<Map> staffListByRole = new ArrayList<>();
         Organization organization=organizationService.fetchParentOrganization(unitId);
@@ -465,7 +465,7 @@ public class StaffFilterService {
             String STAFF_CURRENT_ROLE;
             if (accessGroupQueryResult != null) {
                 STAFF_CURRENT_ROLE = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
-              if ((!showAll || !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) && AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
+              if ((!showAllStaffs || !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) && AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
                     Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().orElse(new HashMap());
                     if (isNotEmpty(staff)) {
                         staffListByRole.add(staff);

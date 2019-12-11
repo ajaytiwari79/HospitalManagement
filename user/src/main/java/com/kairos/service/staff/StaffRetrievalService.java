@@ -340,7 +340,7 @@ public class StaffRetrievalService {
 
         List<AccessGroup> roles = null;
         Map<String, Object> map = new HashMap<>();
-        map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId, null, null).getStaffList());
+        map.put("staffList", staffFilterService.getAllStaffByUnitId(unitId, staffFilterDTO, moduleId, null, null,false).getStaffList());
         roles = accessGroupService.getAccessGroups(unitId);
         map.put("roles", roles);
         List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
