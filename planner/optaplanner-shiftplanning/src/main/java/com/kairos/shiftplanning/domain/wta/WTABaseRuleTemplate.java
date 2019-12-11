@@ -27,7 +27,7 @@ public class WTABaseRuleTemplate{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
-    protected PlanningSetting planningSetting;
+
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -125,11 +125,5 @@ public class WTABaseRuleTemplate{
         this.managementCanIgnoreCounter = managementCanIgnoreCounter;
     }
 
-    public PlanningSetting getPlanningSetting() {
-        return planningSetting;
-    }
 
-    public void setPlanningSetting(PlanningSetting planningSetting) {
-        this.planningSetting = planningSetting;
-    }
 }

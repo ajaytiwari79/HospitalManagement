@@ -31,7 +31,7 @@ public class Activity {
     private int order;
     private int rank;
     private List<Long> expertises;
-    private PlanningSetting planningSetting;
+
 
     public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises) {
         this.id = id;
@@ -97,13 +97,7 @@ public class Activity {
         this.activityConstraints = activityConstraints;
     }
 
-    public PlanningSetting getPlanningSetting() {
-        return planningSetting;
-    }
 
-    public void setPlanningSetting(PlanningSetting planningSetting) {
-        this.planningSetting = planningSetting;
-    }
 
     public boolean isBlankActivity(){
         return this.name== ShiftPlanningGenerator.BLANK_ACTIVITY;
