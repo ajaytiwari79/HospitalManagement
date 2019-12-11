@@ -1,0 +1,8 @@
+//add dateRange
+db.planningPeriod.aggregate(
+    [
+        { "$addFields": {
+            "dateRange": { "$concat": [ "$name" ] }
+        }}
+    ]
+)
