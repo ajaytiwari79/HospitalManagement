@@ -27,7 +27,7 @@ public class WTABaseRuleTemplate{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
-    protected PlanningSetting planningSetting;
+
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
