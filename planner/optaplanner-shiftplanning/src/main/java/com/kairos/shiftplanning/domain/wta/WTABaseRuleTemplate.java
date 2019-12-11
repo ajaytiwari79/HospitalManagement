@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.wta;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.WTATemplateType;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +27,7 @@ public class WTABaseRuleTemplate{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
+    protected PlanningSetting planningSetting;
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
@@ -121,5 +123,13 @@ public class WTABaseRuleTemplate{
 
     public void setManagementCanIgnoreCounter(Integer managementCanIgnoreCounter) {
         this.managementCanIgnoreCounter = managementCanIgnoreCounter;
+    }
+
+    public PlanningSetting getPlanningSetting() {
+        return planningSetting;
+    }
+
+    public void setPlanningSetting(PlanningSetting planningSetting) {
+        this.planningSetting = planningSetting;
     }
 }

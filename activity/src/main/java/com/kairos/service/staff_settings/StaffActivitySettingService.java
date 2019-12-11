@@ -205,4 +205,5 @@ public class StaffActivitySettingService extends MongoBaseService {
        responseMap.put(ERROR,error);
        return responseMap;
    }
+
 }

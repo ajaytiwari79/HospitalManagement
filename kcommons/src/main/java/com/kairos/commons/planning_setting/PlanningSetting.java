@@ -13,5 +13,10 @@ public class PlanningSetting {
     private ConstraintLevel constraintLevel;
     private int constraintWeight;
 
+    public PlanningSetting(ConstraintLevel constraintLevel,int constraintWeight){
+        this.constraintLevel =constraintLevel;
+        this.constraintWeight = constraintWeight;
+    }
+
 
 }
