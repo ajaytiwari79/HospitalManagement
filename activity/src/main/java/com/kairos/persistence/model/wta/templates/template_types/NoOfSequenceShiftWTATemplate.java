@@ -80,7 +80,7 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
             List<PartOfDay> partOfDays = newArrayList(sequenceShiftFrom,sequenceShiftTo);
             if(partOfDays.contains(PartOfDay.valueOf(timeSlot.getName().toUpperCase())) && partOfDays.contains(PartOfDay.valueOf(nextTimeSlot.getName().toUpperCase())) && !timeSlot.getName().equals(nextTimeSlot.getName())){
                 Period period = Period.between(asLocalDate(shifts.get(i).getStartDate()), asLocalDate(shifts.get(i+1).getStartDate()));
-                if(period.getYears() < 2) {
+                if(period.getDays() < 2) {
                     totalOccurrencesSequenceShift++;
                 }
             }
