@@ -205,6 +205,8 @@ public class StaffFilterService {
                 return getTags(unitId);
             case GROUPS:
                 return getGroups(unitId);
+            case NIGHT_WORKERS:
+                return dtoToQueryesultConverter(StaffWorkingType.getListOfStaffWorkingTypeForFilters(), objectMapper);
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
@@ -399,8 +401,7 @@ public class StaffFilterService {
         filters.forEach(filterSelection -> {
             if (!filterSelection.getValue().isEmpty() && filterGroup.getFilterTypes().contains(
                     filterSelection.getName())) {
-                mapOfFilters.put(filterSelection.getName(), FilterType.GROUPS.equals(filterSelection.getName())? groupService.getAllStaffByGroupIds(unitId, new ArrayList<>(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(filterSelection.getValue(), Long.class))) : filterSelection.getValue());
-
+                mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
             }
         });
         return mapOfFilters;

@@ -183,7 +183,7 @@ public class GroupService {
         }
     }
 
-    public Set<Long> getAllStaffByGroupIds(Long unitId, List<Long> groupIds){
+    public Set<Long> getAllStaffIdsByGroupIds(Long unitId, List<Long> groupIds){
         Set<Long> staffIds = new HashSet<>();
         Set<Long> excludedStaffs = new HashSet<>();
         List<Group> groups = groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(groupIds);
