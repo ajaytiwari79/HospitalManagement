@@ -28,11 +28,6 @@ public class UnitGraphRepositoryImpl implements CustomUnitGraphRepository {
     @Inject
     private Session session;
 
-    public String appendWhereOrAndPreFixOnQueryString(int countOfSubString) {
-       String value = (countOfSubString == 0 ? " WHERE" : " AND" );
-       return countOfSubString<0 ? "" : value;
-    }
-
     public List<Map> getClientsWithFilterParameters(ClientFilterDTO clientFilterDTO, List<Long> citizenIds,
                                                     Long organizationId, String imagePath, String skip, String moduleId) {
         Map<String, Object> queryParameters = new HashMap();
