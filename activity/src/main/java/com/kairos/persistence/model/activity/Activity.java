@@ -74,7 +74,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     //time care id
     private String externalId;
-    private PlanningSetting planningSetting;
+
 
     public Activity(String name, String description, List<BigInteger> tags) {
         this.name = name;

@@ -16,10 +16,11 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
+import static com.planner.constants.ApiConstants.API_UNIT_CONSTRAINT;
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
 
 @RestController
-@RequestMapping(API_UNIT_URL+"/unitConstraint")
+@RequestMapping(API_UNIT_CONSTRAINT)
 public class UnitConstraintController {
     public static final String SUCCESS = "Success";
 
@@ -42,11 +43,10 @@ public class UnitConstraintController {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,unitConstraintService.getAllUnitConstraintByUnitId(unitId));
     }
 
-    @PatchMapping
+    @PutMapping
     @ApiOperation("Update UnitConstraint")
     public ResponseEntity<Map<String, Object>> updateUnitConstraint(@RequestBody @Valid UnitConstraintDTO unitConstraintDTO) {
-        unitConstraintService.updateUnitConstraint(unitConstraintDTO);
-        return ResponseHandler.generateResponse(SUCCESS, HttpStatus.OK);
+        return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,unitConstraintService.updateUnitConstraint(unitConstraintDTO));
     }
 
 

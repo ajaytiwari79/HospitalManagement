@@ -26,11 +26,8 @@ public class ActivityConstraintService {
     private ActivityConstraintRepository activityConstraintRepository;
 
     public ActivityConstraintDTO createActivityConstraint(ActivityConstraintDTO activityConstraintDTO){
-
-          if(isNotNull(activityConstraintDTO)) {
-              ActivityConstraint activityConstraint = ObjectMapperUtils.copyPropertiesByMapper(activityConstraintDTO, ActivityConstraint.class);
-              activityConstraintRepository.saveEntity(activityConstraint);
-          }
+        ActivityConstraint activityConstraint = ObjectMapperUtils.copyPropertiesByMapper(activityConstraintDTO, ActivityConstraint.class);
+        activityConstraintRepository.saveEntity(activityConstraint);
         return activityConstraintDTO;
     }
 

@@ -14,11 +14,12 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.planner.constants.ApiConstants.API_UNIT_URL;
+import static com.planner.constants.ApiConstants.API_ACTIVITY_CONSTRAINT;
+
 
 
 @RestController
-@RequestMapping(API_UNIT_URL+"/activityConstraint")
+@RequestMapping(API_ACTIVITY_CONSTRAINT)
 public class ActivityConstraintController {
     public static final String SUCCESS = "Success";
 
@@ -40,12 +41,10 @@ public class ActivityConstraintController {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,activityConstraintService.getAllActivityConstraintByActivityId(activityId));
     }
 
-    @PatchMapping
+    @PutMapping
     @ApiOperation("Update ActivityConstraint")
     public ResponseEntity<Map<String, Object>> updateActivityConstraint(@RequestBody @Valid ActivityConstraintDTO activityConstraintDTO) {
-
-        activityConstraintService.updateActivityConstraint(activityConstraintDTO);
-        return ResponseHandler.generateResponse(SUCCESS, HttpStatus.OK);
+        return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,activityConstraintService.updateActivityConstraint(activityConstraintDTO));
     }
 
 

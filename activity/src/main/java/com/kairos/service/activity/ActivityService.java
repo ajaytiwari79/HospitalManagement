@@ -171,9 +171,6 @@ public class ActivityService {
         }
         activity = buildActivity(activityDTO);
 
-        if(isNotNull(activityDTO.getPlanningSetting())){
-            activity.setPlanningSetting(activityDTO.getPlanningSetting());
-        }
 
         initializeActivityTabs(activity, countryId, activityDTO);
         activityMongoRepository.save(activity);

@@ -56,7 +56,7 @@ public class ActivityDTO  {
     private Boolean activityCanBeCopied=false;
     private ActivityPriorityDTO activityPriority;
     private List<ShiftStatus> activityStatus;
-    private PlanningSetting planningSetting;
+
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();

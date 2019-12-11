@@ -28,11 +28,9 @@ public class UnitConstraintService {
     private UnitConstraintRepository unitConstraintRepository;
 
     public UnitConstraintDTO createUnitConstraint(UnitConstraintDTO unitConstraintDTO){
-        if(ObjectUtils.isNotNull(unitConstraintDTO)) {
-            UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
-            unitConstraintRepository.save(unitConstraint);
-        }
-        return unitConstraintDTO;
+         UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
+         unitConstraintRepository.save(unitConstraint);
+         return unitConstraintDTO;
     }
 
 
