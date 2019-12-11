@@ -166,6 +166,7 @@ public class TodoService {
         }
         if (status.equals(DISAPPROVE)) {
             todo.setComment(comment);
+            todo.setDisApproveOn(new Date());
             todoRepository.save(todo);
         }
         todo.setStatus(status);
@@ -263,8 +264,8 @@ public class TodoService {
     }
 
 
-    public List<TodoDTO> getAllTodoByEntityIds(List<BigInteger> entityIds){
-        return todoRepository.findAllByEntityIdsAndTodoStatus(entityIds,newArrayList(APPROVE, REQUESTED));
+    public List<TodoDTO> getAllTodoByEntityIds( Date startDate, Date endDate){
+        return todoRepository.findAllByEntityIdsAndTodoStatus(startDate,endDate,newArrayList(APPROVE,DISAPPROVE, REQUESTED));
     }
 
 }

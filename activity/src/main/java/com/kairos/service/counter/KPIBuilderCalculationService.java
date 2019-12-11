@@ -24,6 +24,7 @@ import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
+import com.kairos.dto.user.organization.Shifts;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -34,6 +35,7 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -67,6 +69,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
@@ -75,9 +78,12 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
@@ -498,16 +504,21 @@ public class KPIBuilderCalculationService implements CounterService {
         FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
         List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
+        List<ClusteredBarChartKpiDataUnit> activitySubClusteredBarValue = new ArrayList<>();
         Set<BigInteger> activityIds=shiftActivityDTOS.stream().map(shiftActivityDTO  -> shiftActivityDTO.getActivityId()).collect(Collectors.toSet());
         for (BigInteger activityId : activityIds) {
             if(kpiCalculationRelatedInfo.getActivityMap().containsKey(activityId)){
                 Activity activity=kpiCalculationRelatedInfo.getActivityMap().get(activityId);
-                List<TodoDTO> todoDTOS=kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId);
+                ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(activity.getName(),activity.getGeneralActivityTab().getBackgroundColor(),0);
+                List<TodoDTO> todoDTOS= new CopyOnWriteArrayList(kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval,kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId)));
                 subClusteredBarValue.addAll(getPQlOfTodo(activity,todoDTOS));
+                clusteredBarChartKpiDataUnit.setSubValues(subClusteredBarValue);
+                activitySubClusteredBarValue.add(clusteredBarChartKpiDataUnit);
+                subClusteredBarValue = newArrayList();
             }
         }
 
-        return subClusteredBarValue;
+        return activitySubClusteredBarValue;
     }
 
     private List<ClusteredBarChartKpiDataUnit> getPQlOfTodo(Activity activity,List<TodoDTO> todoDTOS){
@@ -522,13 +533,28 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
     private void getDataByPQLSetting(Activity activity, List<TodoDTO> todoDTOS, List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits, ApprovalCriteria approvalCriteria,String color) {
-        Float approvalPercentage=approvalCriteria.getApprovalPercentage();
+
         Short approvalTime=approvalCriteria.getApprovalTime();
-        if(isNotNull(approvalPercentage) && isNotNull(approvalTime)) {
-            long size = todoDTOS.stream().filter(todoDTO -> new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime)).containsAndEqualsEndDate(asDate(todoDTO.getApprovedOn()))).count();
-            if (approvalPercentage < size * 100 / todoDTOS.size()) {
-                clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(activity.getName()+Math.random(), color, todoDTOS.size()));
+        if(isNotNull(approvalTime)) {
+            long count =0;
+            for(TodoDTO todoDTO:todoDTOS){
+                if(todoDTO.getStatus().equals(TodoStatus.APPROVE)){
+                    Boolean isApproveExist =new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime)).containsAndEqualsEndDate(asDate(todoDTO.getApprovedOn()));
+                    if(isApproveExist){
+                        count++;
+                    }
+                    todoDTOS.remove(todoDTO);
+                }
+                if(todoDTO.getStatus().equals(TodoStatus.DISAPPROVE)){
+                    Boolean isDisApproveExist =new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime)).containsAndEqualsEndDate(asDate(todoDTO.getDisApproveOn()));
+                    if(isDisApproveExist){
+                        count++;
+                    }
+                    todoDTOS.remove(todoDTO);
+                }
+
             }
+            clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(activity.getName(),activity.getGeneralActivityTab().getBackgroundColor(),count));
         }
     }
 
@@ -703,6 +729,7 @@ public class KPIBuilderCalculationService implements CounterService {
         PlanningPeriod planningPeriod;
 
 
+
         public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
             this.unitId = unitId;
@@ -822,8 +849,9 @@ public class KPIBuilderCalculationService implements CounterService {
 
 
         public void getTodoDetails(){
-            todoDTOS=todoService.getAllTodoByEntityIds(shifts.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList()));
+            todoDTOS=todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(k->k.getSubEntityId(),Collectors.toList()));
+
         }
 
         public List<TodoDTO> getTodosByInterval(DateTimeInterval dateTimeInterval , List<TodoDTO> todoDTOS){

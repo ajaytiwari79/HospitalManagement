@@ -37,5 +37,7 @@ public class TodoDTO {
     private LocalDateTime approvedOn;
     private String remark;
     private String comment;
+    private LocalDateTime disApproveOn;
+    private LocalDateTime pendingOn;
 
 }
