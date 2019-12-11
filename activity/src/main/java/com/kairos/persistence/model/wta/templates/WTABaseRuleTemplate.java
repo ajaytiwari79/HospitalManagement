@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.wta.templates;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -33,6 +34,7 @@ public class WTABaseRuleTemplate extends MongoBaseEntity{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
+    protected PlanningSetting planningSetting;
 
     public WTABaseRuleTemplate(String name,String description) {
         this.name = name;

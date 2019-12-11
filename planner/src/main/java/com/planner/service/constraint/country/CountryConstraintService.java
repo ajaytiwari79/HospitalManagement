@@ -69,7 +69,7 @@ public class CountryConstraintService {
                 UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraint, UnitConstraint.class);
                 unitConstraint.setId(null);//Unset Id
                 unitConstraint.setUnitId(unitId);
-                unitConstraint.setParentCountryConstraintId(countryConstraint.getId());
+              //  unitConstraint.setParentCountryConstraintId(countryConstraint.getId());
                 unitConstraintList.add(unitConstraint);
             }
 
