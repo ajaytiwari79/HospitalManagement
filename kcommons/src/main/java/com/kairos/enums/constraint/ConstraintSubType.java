@@ -7,6 +7,7 @@ public enum ConstraintSubType {
     ACTIVITY_VALID_DAYTYPE,
     ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS,
 
+
     //For Shifts
 
     //For WTA
