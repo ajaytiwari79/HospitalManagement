@@ -142,10 +142,6 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("tagIds",
                     convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
         }
-        if (Optional.ofNullable(filters.get(FilterType.GROUPS)).isPresent()) {
-            queryParameters.put("GroupStaffLists",
-                    filters.get(FilterType.GROUPS));
-        }
         if (Optional.ofNullable(filters.get(FilterType.FUNCTIONS)).isPresent()) {
             queryParameters.put("functionIds",
                     convertListOfStringIntoLong(filters.get(FilterType.FUNCTIONS)));
@@ -239,10 +235,6 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         if (Optional.ofNullable(filters.get(FilterType.GENDER)).isPresent()) {
             matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) + " user.gender IN {genderList} ";
-            countOfSubString += 1;
-        }
-        if (Optional.ofNullable(filters.get(FilterType.GROUPS)).isPresent()) {
-            matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) + "  id(staff) IN {GroupStaffLists} ";
             countOfSubString += 1;
         }
         if (StringUtils.isNotBlank(searchText)) {
