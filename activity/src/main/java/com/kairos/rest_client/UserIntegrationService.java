@@ -886,6 +886,10 @@ public class UserIntegrationService {
         }
         return tags;
     }
+
+    public Set<Long> getAllStaffIdsByGroupIds(Long unitId, List<Long> groupIds) {
+        return genericRestClient.publishRequest(groupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
+    }
 }
 
 

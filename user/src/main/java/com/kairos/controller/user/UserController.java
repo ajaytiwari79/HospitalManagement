@@ -217,7 +217,7 @@ public class UserController {
 
     @ApiOperation("Update User Chat Status ")
     @PutMapping("/user/chat_status")
-    public ResponseEntity<Map<String, Object>> updateChatStatus(@RequestBody ChatStatus chatStatus)  {
+    public ResponseEntity<Map<String, Object>> updateChatStatus(@RequestParam ChatStatus chatStatus)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateChatStatus(chatStatus));
     }
 
