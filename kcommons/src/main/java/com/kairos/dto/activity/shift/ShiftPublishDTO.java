@@ -18,5 +18,5 @@ import java.util.List;
 public class ShiftPublishDTO {
     private List<ShiftActivitiesIdDTO> shifts;
     private ShiftStatus status;
-
+    private String comment;
 }
