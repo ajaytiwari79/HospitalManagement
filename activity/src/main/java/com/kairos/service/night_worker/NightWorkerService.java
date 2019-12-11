@@ -9,6 +9,7 @@ import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
 import com.kairos.dto.activity.night_worker.QuestionAnswerDTO;
 import com.kairos.dto.activity.night_worker.QuestionnaireAnswerResponseDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.StaffDTO;
@@ -54,6 +55,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAIRE_FREQUENCY;
 
@@ -148,7 +150,7 @@ public class NightWorkerService {
             answerResponseDTO.setSubmitted(true);
             answerResponseDTO.setSubmittedOn(staffQuestionnaire.getSubmittedOn());
         }
-        staffQuestionnaire.setQuestionAnswerPair(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
+        staffQuestionnaire.setQuestionAnswerPair(copyPropertiesOfCollectionByMapper(answerResponseDTO.getQuestionAnswerPair(), QuestionAnswerPair.class));
         staffQuestionnaireMongoRepository.save(staffQuestionnaire);
         return answerResponseDTO;
     }
@@ -157,7 +159,7 @@ public class NightWorkerService {
         List<QuestionAnswerDTO> questionnaire = nightWorkerMongoRepository.getNightWorkerQuestions();
         StaffQuestionnaire staffQuestionnaire = new StaffQuestionnaire(
                 prepareNameOfQuestionnaireSet(),
-                ObjectMapperUtils.copyPropertiesOfCollectionByMapper(questionnaire, QuestionAnswerPair.class));
+                copyPropertiesOfCollectionByMapper(questionnaire, QuestionAnswerPair.class));
         staffQuestionnaireMongoRepository.save(staffQuestionnaire);
         return staffQuestionnaire;
     }
@@ -418,17 +420,25 @@ public class NightWorkerService {
         });
     }
 
-    public Map<Long, Boolean> getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO, LocalDate startDate, LocalDate endDate) {
-        List<Long> staffIds = staffFilterDTO.getStaffIds();
+    public StaffFilterDTO getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO, LocalDate startDate, LocalDate endDate) {
+        Collection<Long> staffIds = staffFilterDTO.getMapOfStaffAndEmploymentIds().keySet();
         if (staffFilterDTO.isValidFilterForShift()) {
             List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds(), startDate, endDate);
             shiftDTOS = shiftFilterService.getShiftsByFilters(shiftDTOS, staffFilterDTO);
             staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toList());
+            staffIds.forEach(staffId->staffFilterDTO.getMapOfStaffAndEmploymentIds().remove(staffId));
         }
-        return getStaffIdAndNightWorkerMap(staffIds);
+        staffFilterDTO.setNightWorkerDetails(getStaffIdAndNightWorkerMap(staffIds));
+        if(staffFilterDTO.isIncludeWorkTimeAgreement()) {
+            List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(employmentIds -> employmentIds.stream()).collect(Collectors.toList()));
+            List<WTAResponseDTO> wtaResponseDTOS = copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
+            Map<Long, List<WTAResponseDTO>> employmentIdAndwtaQueryResultDTOSMap = wtaResponseDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId()));
+            staffFilterDTO.setEmploymentIdAndWtaResponseMap(employmentIdAndwtaQueryResultDTOSMap);
+        }
+        return staffFilterDTO;
     }
 
-    public Map<Long, Boolean> getStaffIdAndNightWorkerMap(List<Long> staffIds) {
+    public Map<Long, Boolean> getStaffIdAndNightWorkerMap(Collection<Long> staffIds) {
         List<NightWorker> nightWorker = nightWorkerMongoRepository.findByStaffIds(staffIds);
         Map<Long, Boolean> staffIdAndNightWorkerMap = nightWorker.stream().filter(distinctByKey(NightWorker::getStaffId)).collect(Collectors.toMap(NightWorker::getStaffId, NightWorker::isNightWorker));
         for (Long staffId : staffIds) {

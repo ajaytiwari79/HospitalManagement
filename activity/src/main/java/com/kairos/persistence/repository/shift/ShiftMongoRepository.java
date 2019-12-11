@@ -27,7 +27,7 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
 
 
-    @Query(value = "{'planningPeriodId':{'$in':?2},employmentId:?0,staffId:?1,unitId:?3,deleted:false,disabled:false,draftShift:{$exists:true}}")
+    @Query(value = "{'planningPeriodId':{'$in':?2},employmentId:?0,staffId:?1,unitId:?3,deleted:false,disabled:false,'$or':[{draftShift:{$exists:true}},{draft:true}]}")
     List<Shift> getAllDraftShiftBetweenDuration(Long employmentId,Long staffId,List<BigInteger> planningPeriodIds,Long unitId);
 
     List<Shift> findByExternalIdIn(List<String> externalIds);

@@ -45,9 +45,9 @@ public class KPIDTO {
         //Not in use
     }
 
-    public KPIDTO(BigInteger id,CounterSize size) {
+    public KPIDTO(BigInteger id, CounterSize size) {
         this.id = id;
-        this.size=size;
+        this.size = size;
     }
 
     public ChartType getChart() {

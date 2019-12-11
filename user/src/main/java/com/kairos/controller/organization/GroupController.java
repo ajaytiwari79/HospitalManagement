@@ -2,7 +2,6 @@ package com.kairos.controller.organization;
 
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.organization.group.GroupDTO;
-import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.service.organization.GroupService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.ApiOperation;
@@ -73,6 +72,6 @@ public class GroupController {
     @PostMapping(value = "/groups")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getAllStaffByGroupIds(@PathVariable Long unitId, @RequestBody List<Long> groupIds) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getAllStaffByGroupIds(unitId, groupIds));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getAllStaffIdsByGroupIds(unitId, groupIds));
     }
 }

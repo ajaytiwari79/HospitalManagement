@@ -165,6 +165,11 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN protectedSetting")
     List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(Long expertiseId);
 
+    @Query("MATCH(expertise:Expertise{deleted:false,published:true}) WHERE id(expertise) IN {0}" +
+            "MATCH(expertise)-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(protectedSetting:ProtectedDaysOffSetting)\n" +
+            "RETURN protectedSetting")
+    List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(List<Long> expertiseId);
+
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) = {0} AND (DATE(exl.startDate)<=DATE({1}) AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE({1})))" +
             "RETURN exl LIMIT 1")
     ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
