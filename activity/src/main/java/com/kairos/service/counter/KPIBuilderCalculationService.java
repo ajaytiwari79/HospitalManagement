@@ -14,6 +14,7 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
+import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -57,6 +58,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.kafka.common.protocol.types.Field;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
@@ -634,6 +636,8 @@ public class KPIBuilderCalculationService implements CounterService {
         private List<CalculationType> calculationTypes;
         private CalculationType currentCalculationType;
         private DateTimeInterval planningPeriodInterval;
+        private List<TodoDTO> todoDTOS;
+        private Map<BigInteger,List<TodoDTO>> activityIdAndTodoListMap;
         List<WTAQueryResultDTO> wtaQueryResultDTOS;
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
         Map<Long, List<WTAQueryResultDTO>> employmentIdAndWtaMap;
