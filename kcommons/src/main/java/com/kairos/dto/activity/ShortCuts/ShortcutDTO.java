@@ -18,6 +18,7 @@ public class ShortcutDTO {
     private String name;
     private Long staffId;
     private Long unitId;
+    private boolean showAllStaffs;
     private String selectedRole;
     private StaffFilterDTO staffFilter;
     private List<TabKPIDTO> tabKPIs;
