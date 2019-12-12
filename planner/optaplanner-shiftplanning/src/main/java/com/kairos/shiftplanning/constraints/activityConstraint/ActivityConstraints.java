@@ -23,7 +23,6 @@ public class ActivityConstraints {
         this.maxDiffrentActivity = maxDiffrentActivity;
         this.minimumLengthofActivity = minimumLengthofActivity;
         this.activityDayType = activityDayType;
-        this.activityDayType = activityDayType;
         this.activityRequiredTag = activityRequiredTag;
     }
 
