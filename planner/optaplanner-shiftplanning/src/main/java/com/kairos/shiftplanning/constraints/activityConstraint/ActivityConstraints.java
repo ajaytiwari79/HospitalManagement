@@ -22,7 +22,10 @@ public class ActivityConstraints {
         this.maxDiffrentActivity = maxDiffrentActivity;
         this.minimumLengthofActivity = minimumLengthofActivity;
         this.activityDayType = activityDayType;
+        //this.activityStatus = activityStatus;
     }
+
+
 
     public ActivityDayType getActivityDayType() {
         return activityDayType;

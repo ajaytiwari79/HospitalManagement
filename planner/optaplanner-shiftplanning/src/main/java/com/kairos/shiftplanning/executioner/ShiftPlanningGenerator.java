@@ -283,6 +283,7 @@ public class ShiftPlanningGenerator {
         MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60,ScoreLevel.MEDIUM,-1);//5
         List<DayType> dayTypes = getDayTypes();
         ActivityDayType activityDayType = new ActivityDayType(dayTypes,ScoreLevel.SOFT,5);
+
         ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity,activityDayType);
         return activityConstraints;
     }
