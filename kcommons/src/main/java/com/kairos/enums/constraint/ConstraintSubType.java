@@ -8,7 +8,7 @@ public enum ConstraintSubType {
     MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF("Maximum Allocation Per Shift For This Activity PerStaff"),
     ACTIVITY_VALID_DAYTYPE("Activity Valid Daytype"),
     ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS("Activity Must Continuous Number Of Hours"),
-
+    ACTIVITY_REQUIRED_TAG("Activity Required Tag"),
 
     //For Shifts
 
