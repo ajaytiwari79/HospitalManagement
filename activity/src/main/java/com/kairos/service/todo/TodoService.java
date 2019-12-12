@@ -261,4 +261,7 @@ public class TodoService {
         todoRepository.saveEntities(todoList);
 
     }
+    public List<TodoDTO> getAllTodoByEntityIds( Date startDate, Date endDate){
+        return todoRepository.findAllByEntityIdsAndTodoStatus(startDate,endDate,newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
+    }
 }

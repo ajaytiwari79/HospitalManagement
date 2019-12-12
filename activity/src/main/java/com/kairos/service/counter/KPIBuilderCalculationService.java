@@ -28,6 +28,7 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -51,6 +52,7 @@ import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
+import com.kairos.service.todo.TodoService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.counter.KPIUtils;
@@ -122,6 +124,9 @@ public class KPIBuilderCalculationService implements CounterService {
     @Inject private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private TodoService todoService;
+    @Inject
+    private AbsencePlanningKPIService absencePlanningKPIService;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig) {
@@ -189,6 +194,12 @@ public class KPIBuilderCalculationService implements CounterService {
         }
         return ShiftActivityCriteria.builder().shiftStatuses(currentShiftActivityCriteria.shiftStatuses).activityIds(activityIds).teamActivityIds(currentShiftActivityCriteria.teamActivityIds).plannedTimeIds(plannedTimeIds).reasonCodeIds(currentShiftActivityCriteria.reasonCodeIds).timeTypeIds(timeTypeIds).build();
     }
+    public TodoActivityCriteria getTodoActivityCriteria(KPICalculationRelatedInfo kpiCalculationRelatedInfo ,List<TodoDTO> todoDTOS){
+
+
+
+    }
+
 
     private double getActivityAndTimeTypeTotalByCalulationType(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_TYPE))) {
@@ -631,6 +642,7 @@ public class KPIBuilderCalculationService implements CounterService {
         private Map<BigInteger, TimeTypeDTO> timeTypeMap = new HashMap<>();
         private Map<BigInteger, PlannedTimeType> plannedTimeMap = new HashMap<>();
         private ShiftActivityCriteria currentShiftActivityCriteria;
+        private TodoActivityCriteria todoActivityCriteria;
         private List<YAxisConfig> yAxisConfigs;
         private List<XAxisConfig> xAxisConfigs;
         private List<CalculationType> calculationTypes;
@@ -638,6 +650,7 @@ public class KPIBuilderCalculationService implements CounterService {
         private DateTimeInterval planningPeriodInterval;
         private List<TodoDTO> todoDTOS;
         private Map<BigInteger,List<TodoDTO>> activityIdAndTodoListMap;
+        private List<BigInteger> activityIds;
         List<WTAQueryResultDTO> wtaQueryResultDTOS;
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
         Map<Long, List<WTAQueryResultDTO>> employmentIdAndWtaMap;
@@ -662,11 +675,24 @@ public class KPIBuilderCalculationService implements CounterService {
             employmentIds = staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getEmployment().stream().map(EmploymentWithCtaDetailsDTO::getId)).collect(Collectors.toSet());
             startDate = dateTimeIntervals.get(0).getStartDate();
             endDate = dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate();
+
             getDailyTimeBankEntryByDate();
             getWtaRuleDetails();
+            getCountOfTodoStatus();
             updateActivityAndTimeTypeAndPlannedTimeMap();
             planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
         }
+
+        public void getCountOfTodoStatus(){
+            todoDTOS=todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(k->k.getSubEntityId(),Collectors.toList()));
+
+        }
+
+
+
+
+
 
         public CalculationType getCalculationType(){
             return isNotNull(currentCalculationType) ? currentCalculationType : calculationTypes.get(0);
@@ -868,5 +894,10 @@ public class KPIBuilderCalculationService implements CounterService {
         private Set<ShiftStatus> shiftStatuses;
     }
 
+    public static class TodoActivityCriteria{
+        private Set<BigInteger> activityIds;
+        private Set<TodoStatus> todoStatuses;
+
+    }
 }
 
