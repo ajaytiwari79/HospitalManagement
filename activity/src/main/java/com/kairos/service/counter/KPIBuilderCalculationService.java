@@ -231,6 +231,7 @@ public class KPIBuilderCalculationService implements CounterService {
             case CARE_DAYS:
             case SENIORDAYS:
             case TOTAL_ABSENCE_DAYS:
+            case ABSENCE_REQUEST:
             case CHILD_CARE_DAYS:
                 return getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,null);
             case BREAK_INTERRUPT:
@@ -440,6 +441,7 @@ public class KPIBuilderCalculationService implements CounterService {
                     case CARE_DAYS:
                     case SENIORDAYS:
                     case TOTAL_ABSENCE_DAYS:
+                    case ABSENCE_REQUEST:
                     case CHILD_CARE_DAYS:
                         Double count= new Double(getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,count));
