@@ -75,7 +75,7 @@ public class ObjectMapperUtils {
     }
 */
 
-    public static <T,E,F extends Collection> F copyPropertiesOfCollectionByMapper(Collection<T> objects, Class<E> elementClass) {
+    public static <T,E,F extends Collection> F copyPropertiesOfCollectionByMapper(Collection<T> objects, Class<E> elementClass,Class... type) {
         Class className = getClassByIntance(objects);
         try {
             return mapper.readValue(mapper.writeValueAsString(objects), mapper.getTypeFactory().constructCollectionType(
@@ -86,7 +86,10 @@ public class ObjectMapperUtils {
         return null;
     }
 
-    private static <T> Class getClassByIntance(Collection<T> object){
+    private static <T> Class getClassByIntance(Collection<T> object,Class... type){
+        if(type.length>0){
+            return type[0];
+        }
         if(object instanceof Set){
             return Set.class;
         }else if (object instanceof List){

@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.user.staff;
 import com.kairos.enums.SkillLevel;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.*;
@@ -21,7 +20,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +61,14 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             " RETURN id(staff) AS id,staff.firstName+\" \"+staff.lastName AS name,staff.profilePic AS profilePic,teams,skills,id(organization) AS unitId,id(user) AS staffUserId,user.cprNumber AS cprNumber,staffChildDetails order by name")
     StaffAdditionalInfoQueryResult getStaffInfoByUnitIdAndEmploymentId(long employmentId);
 
+
+
+    @Query("MATCH (staff:Staff) WHERE id(staff) IN {1}  " +
+            "MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit) WHERE id(organization)={0} \n" +
+            "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) \n" +
+            "MATCH(staff)-[:" + BELONGS_TO_STAFF + "]->(employment:Employment)-[:" + IN_UNIT + "]->(organization) \n " +
+            "RETURN DISTINCT id(staff) AS id,user.cprNumber AS cprNumber,staff.firstName+\" \"+staff.lastName AS name,id(organization) AS unitId order by name")
+    List<StaffAdditionalInfoQueryResult> getAllStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds);
 
     @Query("MATCH (unitPermission:UnitPermission)-[:" + APPLICABLE_IN_UNIT + "]->(organization:Unit)<-[:"+IN_UNIT+"]-(employment:Employment) WHERE id(organization)={0} AND id(employment)={2} AND (employment.endDate is null OR date(employment.endDate) >= date({3})) WITH unitPermission,organization " +
             "MATCH (staff:Staff)<-[:" + BELONGS_TO + "]-(position:Position)-[:" + HAS_UNIT_PERMISSIONS + "]->(up:UnitPermission) WHERE id(staff)={1} WITH staff,organization " +

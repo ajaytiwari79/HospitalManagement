@@ -5,6 +5,7 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.enums.BreakAction;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftFilterParam;
 import com.kairos.enums.shift.ViewType;
@@ -56,6 +57,8 @@ public class ShiftController {
     @Inject
     private ShiftStatusService shiftStatusService;
     @Inject private RequestAbsenceService requestAbsenceService;
+    @Inject
+    private ShiftBreakService shiftBreakService;
 
     @ApiOperation("Create Shift of a staff")
     @PostMapping(value = "/shift")
@@ -63,6 +66,14 @@ public class ShiftController {
     public ResponseEntity<Map<String, Object>> createShift( @PathVariable Long unitId, @RequestBody @Valid ShiftDTO shiftDTO , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
 
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShift(unitId, shiftDTO ,shiftActionType));
+    }
+
+    @ApiOperation("Create Shifts of a staff")
+    @PostMapping(value = "/create_shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> createShifts( @PathVariable Long unitId, @RequestBody @Valid List<ShiftDTO> shiftDTOS , @RequestParam(required = false ,value = "shiftActionType") ShiftActionType shiftActionType) {
+
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.createShifts(unitId, shiftDTOS ,shiftActionType));
     }
 
 
@@ -76,6 +87,13 @@ public class ShiftController {
                                                                         @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType,
                                                                         @RequestParam(required = false) TodoType todoType) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, validatedByStaff, updateShiftState, unitId, shiftActionType,todoType));
+    }
+
+    @ApiOperation("update a Shifts of a staff")
+    @PutMapping(value = "/shifts")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> updateShifts(@PathVariable Long unitId, @RequestBody @Valid List<ShiftDTO> shiftDTOS , @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.updateShifts(shiftDTOS, false, false, shiftActionType));
     }
 
     @ApiOperation("update a Shift of a staff")
@@ -237,5 +255,12 @@ public class ShiftController {
     @GetMapping("employment/{employmentId}/shift_count")
     public ResponseEntity<Map<String, Object>> getPublishShiftCount(@PathVariable Long employmentId){
         return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.getPublishShiftCount(employmentId));
+    }
+
+    @ApiOperation("update a break interrupt")
+    @PutMapping(value = "/shift/break_interrupt/{shiftId}")
+    //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> breakInterrupt(@PathVariable BigInteger shiftId, @RequestParam("breakAction") BreakAction breakAction) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftBreakService.interruptBreak(shiftId,breakAction));
     }
 }

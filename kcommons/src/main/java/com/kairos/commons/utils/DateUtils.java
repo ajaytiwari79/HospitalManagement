@@ -945,5 +945,9 @@ public  class DateUtils {
     public static LocalDateTime getLocaDateTimebyString(String localdate){
         return LocalDateTime.parse(localdate,DateTimeFormatter.ofPattern(ISO_FORMAT));}
 
+    public static boolean isEqualOrAfter(ZonedDateTime date1,ZonedDateTime date2){
+        return date1.equals(date2) || date1.isAfter(date2);
+    }
+
 
 }

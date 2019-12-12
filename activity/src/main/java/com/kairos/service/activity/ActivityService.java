@@ -170,6 +170,8 @@ public class ActivityService {
             exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
         }
         activity = buildActivity(activityDTO);
+
+
         initializeActivityTabs(activity, countryId, activityDTO);
         activityMongoRepository.save(activity);
         // Fetch tags detail

@@ -2,6 +2,7 @@ package com.kairos.dto.activity.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
@@ -55,6 +56,7 @@ public class ActivityDTO  {
     private Boolean activityCanBeCopied=false;
     private ActivityPriorityDTO activityPriority;
     private List<ShiftStatus> activityStatus;
+
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();

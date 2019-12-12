@@ -419,27 +419,42 @@ public class StaffFilterService {
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
         List<Long> allOrgIds=unit?Arrays.asList(organization.getId()):organizationGraphRepository.findAllOrganizationIdsInHierarchy(organization.getId());
-       staffEmploymentTypeWrapper.setStaffList(unitGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
+       staffEmploymentTypeWrapper.setStaffList(staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
                 getMapOfFiltersToBeAppliedWithValue(unitId, staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath()));
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
         List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId);
         staffs = staffs.stream().filter(distinctByKey(a -> a.get("id"))).collect(Collectors.toList());
         staffEmploymentTypeWrapper.setStaffList(staffs);
-        List<Long> staffIds = staffs.stream().map(staff -> ((Long)((Map)staff).get("id"))).collect(Collectors.toList());
-        staffFilterDTO.setStaffIds(staffIds);
-        Map<Long,Boolean> staffIdAndNightWorkerDetailsMap = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
+        Map<Long,List<Long>> mapOfStaffAndEmploymentIds = getMapOfStaffAndEmploymentIds(staffs);
+        staffFilterDTO.setMapOfStaffAndEmploymentIds(mapOfStaffAndEmploymentIds);
+        staffFilterDTO.setIncludeWorkTimeAgreement(ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId));
+        staffFilterDTO = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
         List<Map> staffList = new ArrayList<>();
         for (Map staffUndModifiable : staffs) {
-            if(staffIdAndNightWorkerDetailsMap.containsKey(staffUndModifiable.get("id"))) {
+            if(staffFilterDTO.getNightWorkerDetails().containsKey(staffUndModifiable.get("id"))) {
                 Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffUndModifiable, HashedMap.class);
-                staff.put("nightWorker", staffIdAndNightWorkerDetailsMap.get(((Integer) ((Map) staff).get("id")).longValue()));
+                staff.put("nightWorker", staffFilterDTO.getNightWorkerDetails().get(((Integer) ((Map) staff).get("id")).longValue()));
                 staffList.add(staff);
+                if(staffFilterDTO.isIncludeWorkTimeAgreement()){
+                    for (Map employment : ((Collection<Map>) staff.get("employments"))) {
+                        Long employmentId =((Integer)employment.get("id")).longValue();
+                        employment.put("workTimeAgreements",staffFilterDTO.getEmploymentIdAndWtaResponseMap().getOrDefault(employmentId,newArrayList()));
+                    }
+                }
             }
         }
         staffEmploymentTypeWrapper.setStaffList(staffList);
         return staffEmploymentTypeWrapper;
 
+    }
+
+    private Map<Long,List<Long>> getMapOfStaffAndEmploymentIds(List<Map> staffs){
+        Map<Long,List<Long>> mapOfStaffAndEmploymentIds = new HashMap<>();
+        for (Map staff : staffs) {
+                mapOfStaffAndEmploymentIds.put((Long) staff.get("id"),((Collection<Map>)staff.get("employments")).stream().map(employment -> (Long)employment.get("id")).collect(Collectors.toList()));
+        }
+        return mapOfStaffAndEmploymentIds;
     }
 
     private List<Map> filterStaffByRoles(List<Map> staffList, Long unitId) {

@@ -78,6 +78,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private boolean breakNotHeld;
     private Long employmentId;
     private BigInteger phaseId;
+    private boolean breakInterrupt;
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
