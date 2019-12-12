@@ -233,7 +233,7 @@ public class TodoService {
         } else {
             shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(todo.getEntityId(), shiftActivityIds));
         }
-        ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO = shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS, shiftStatus));
+        ShiftAndActivtyStatusDTO shiftAndActivtyStatusDTO = shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS, shiftStatus, todo.getComment()));
         boolean allUpdated = shiftAndActivtyStatusDTO.getShiftActivityStatusResponse().stream().flatMap(shiftActivityResponseDTO -> shiftActivityResponseDTO.getActivities().stream()).filter(shiftActivityDTO -> !shiftActivityDTO.isSuccess()).findAny().isPresent();
         if (allUpdated) {
             todo.setStatus(REQUESTED);

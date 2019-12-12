@@ -1,10 +1,7 @@
 package com.kairos.dto.activity.shift;
 
 import com.kairos.enums.shift.ShiftStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
