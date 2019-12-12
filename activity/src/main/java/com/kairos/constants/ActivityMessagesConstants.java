@@ -202,6 +202,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_VALIDATION_ACCESS  = "message.shift.validation.access";
     public static final String MESSAGE_SHIFT_SAVE_ACCESS  = "message.shift.save.access ";
     public static final String MESSAGE_SHIFT_SHIFTDATE  = "message.shift.shiftDate ";
+    public static final String MESSAGE_SHIFT_PERMISSION  = "message.shift.not.permission";
     public static final String MESSAGE_SHIFT_REASONCODE_REQUIRED = "message.shift.reasoncode.required";
     public static final String ACTIVITY_END_DATE_LESS_THAN_START_DATE = "activity.end_date.less_than.start_date";
     public static final String MESSAGE_SHIFT_NOT_PUBLISHED  = "message.shift.not.published ";
