@@ -70,6 +70,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.ss.formula.functions.T;
+import org.bouncycastle.util.StringList;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
@@ -506,10 +507,12 @@ public class KPIBuilderCalculationService implements CounterService {
 //        List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         List<ClusteredBarChartKpiDataUnit> activitySubClusteredBarValue = new ArrayList<>();
+        int activityCount =kpiCalculationRelatedInfo.activityIdAndTodoListMap.keySet().size();
         for (BigInteger activityId : kpiCalculationRelatedInfo.activityIdAndTodoListMap.keySet()) {
+
             if (kpiCalculationRelatedInfo.getActivityMap().containsKey(activityId)) {
                 Activity activity = kpiCalculationRelatedInfo.getActivityMap().get(activityId);
-                ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getGeneralActivityTab().getBackgroundColor(), 0);
+                ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getGeneralActivityTab().getBackgroundColor(), activityCount);
                 List<TodoDTO> todoDTOS = new CopyOnWriteArrayList(kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId)));
                 subClusteredBarValue.addAll(getPQlOfTodo(activity, todoDTOS));
                 clusteredBarChartKpiDataUnit.setSubValues(subClusteredBarValue);
@@ -525,14 +528,14 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
         PQLSettings pqlSettings = activity.getRulesActivityTab().getPqlSettings();
         if (isNotNull(pqlSettings)) {
-            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAppreciable(), "#4caf502e");
-            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAcceptable(), "#ffeb3b33");
-            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getCritical(), "#ff3b3b33");
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAppreciable(), "#4caf502e","High");
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAcceptable(), "#ffeb3b33","Midium");
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getCritical(), "#ff3b3b33","Low");
         }
         return clusteredBarChartKpiDataUnits;
     }
 
-    private void getDataByPQLSetting(Activity activity, List<TodoDTO> todoDTOS, List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits, ApprovalCriteria approvalCriteria, String color) {
+    private void getDataByPQLSetting(Activity activity, List<TodoDTO> todoDTOS, List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits, ApprovalCriteria approvalCriteria, String color ,String range) {
         Short approvalTime = approvalCriteria.getApprovalTime();
         LocalDateTime localDate = null;
         long count = 0;
@@ -549,7 +552,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
             }
         }
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getGeneralActivityTab().getBackgroundColor(), count));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(range,color, count));
     }
 
     private LocalDateTime getApproveOrDisApproveDateFromTODO(LocalDateTime localDate, TodoDTO todoDTO) {
