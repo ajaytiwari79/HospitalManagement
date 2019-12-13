@@ -4,6 +4,7 @@ import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityConstraintDTO;
 import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ConstraintSubType;
 import com.planner.domain.constraint.activity.ActivityConstraint;
 import com.planner.repository.constraint.ActivityConstraintRepository;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,14 @@ public class ActivityConstraintService {
     @Inject
     private ActivityConstraintRepository activityConstraintRepository;
 
-    public ActivityConstraintDTO createActivityConstraint(ActivityConstraintDTO activityConstraintDTO){
-        ActivityConstraint activityConstraint = ObjectMapperUtils.copyPropertiesByMapper(activityConstraintDTO, ActivityConstraint.class);
+    public ActivityConstraintDTO createOrUpdateActivityConstraint(ActivityConstraintDTO activityConstraintDTO){
+        ActivityConstraint activityConstraint = activityConstraintRepository.findByActivityIdAndConstraintSubTypeAndDeletedFalse(activityConstraintDTO.getActivityId(),activityConstraintDTO.getConstraintSubType());
+        if (isNotNull(activityConstraint)) {
+            activityConstraint.setPlanningSetting(activityConstraintDTO.getPlanningSetting());
+        }else {
+            activityConstraint = ObjectMapperUtils.copyPropertiesByMapper(activityConstraintDTO, ActivityConstraint.class);
+
+        }
         activityConstraintRepository.saveEntity(activityConstraint);
         return activityConstraintDTO;
     }
@@ -38,37 +45,26 @@ public class ActivityConstraintService {
         if(isCollectionNotEmpty(activityConstraintList)){
             return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(activityConstraintList, ActivityConstraintDTO.class);
         }else{
-           return defaultActivityConstraintList(activityId);
+           return getActivityConstraints();
         }
 
 
     }
 
 
-    public List<ActivityConstraintDTO> defaultActivityConstraintList(BigInteger activityId){
+    public List<ActivityConstraintDTO> getActivityConstraints(){
         List<ActivityConstraintDTO> activityConstraintDTOS = new ArrayList<>();
-        PlanningSetting planningSetting1 = new PlanningSetting(HARD,2);
-        ActivityConstraintDTO activityConstraintDTO1 = new ActivityConstraintDTO(activityId,planningSetting1, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH);
-        PlanningSetting planningSetting2 = new PlanningSetting(SOFT,2);
-        ActivityConstraintDTO activityConstraintDTO2 = new ActivityConstraintDTO(activityId,planningSetting2,ACTIVITY_VALID_DAYTYPE);
-        activityConstraintDTOS.add(activityConstraintDTO1);
-        activityConstraintDTOS.add(activityConstraintDTO2);
+
+        for(int i = 0; i < ConstraintSubType.values().length; i++) {
+            PlanningSetting planningSetting1 = new PlanningSetting(HARD,2);
+            ActivityConstraintDTO activityConstraintDTO1 = new ActivityConstraintDTO(planningSetting1,ConstraintSubType.values()[i]);
+            activityConstraintDTOS.add(activityConstraintDTO1);
+        }
+
         return activityConstraintDTOS;
     }
 
 
-    public ActivityConstraintDTO updateActivityConstraint(ActivityConstraintDTO activityConstraintDTO){
-
-        ActivityConstraint activityConstraint = activityConstraintRepository.findByActivityIdAndConstraintSubTypeAndDeletedFalse(activityConstraintDTO.getActivityId(),activityConstraintDTO.getConstraintSubType());
-           if (isNotNull(activityConstraint)) {
-               activityConstraint.setPlanningSetting(activityConstraintDTO.getPlanningSetting());
-           }else {
-               activityConstraint = ObjectMapperUtils.copyPropertiesByMapper(activityConstraintDTO, ActivityConstraint.class);
-
-           }
-        activityConstraintRepository.saveEntity(activityConstraint);
-        return activityConstraintDTO;
-    }
 
 
 

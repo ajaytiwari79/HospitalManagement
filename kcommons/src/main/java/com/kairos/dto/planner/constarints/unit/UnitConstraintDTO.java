@@ -18,8 +18,7 @@ public class UnitConstraintDTO  {
     private PlanningSetting planningSetting;
     private ConstraintSubType constraintSubType;
 
-    public UnitConstraintDTO(Long unitId,PlanningSetting planningSetting, ConstraintSubType constraintSubType){
-        this.unitId = unitId;
+    public UnitConstraintDTO(PlanningSetting planningSetting, ConstraintSubType constraintSubType){
         this.planningSetting = planningSetting;
         this.constraintSubType = constraintSubType;
     }
