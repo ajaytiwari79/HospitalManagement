@@ -71,6 +71,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.PLANNING_PERIOD_NAME;
 
 /**
  * Created by prerna on 6/4/18.
@@ -235,8 +236,8 @@ public class PlanningPeriodService extends MongoBaseService {
     }
 
     public PlanningPeriod createPlanningPeriodOnMigration(LocalDate startDate, LocalDate endDate, Long unitId, List<PhaseDTO> applicablePhases) {
-        String name = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate, AppConstants.DATE_FORMET_STRING);
-        PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId);
+        String dateRange = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate, AppConstants.DATE_FORMET_STRING);
+        PlanningPeriod planningPeriod = new PlanningPeriod(PLANNING_PERIOD_NAME+dateRange,dateRange, startDate, endDate, unitId);
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         return planningPeriod;
     }
@@ -286,8 +287,8 @@ public class PlanningPeriodService extends MongoBaseService {
     public void createPlanningPeriod(Long unitId, LocalDate startDate, List<PlanningPeriod> planningPeriods, List<PhaseDTO> applicablePhases, PlanningPeriodDTO planningPeriodDTO, int recurringNumber) {
         LocalDate endDate = getNextValidDateForPlanningPeriod(startDate, planningPeriodDTO);
         // Set name of period dynamically
-        String name = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate, AppConstants.DATE_FORMET_STRING);
-        PlanningPeriod planningPeriod = new PlanningPeriod(name, startDate, endDate, unitId, planningPeriodDTO.getDurationType(), planningPeriodDTO.getDuration());
+        String dateRange = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(endDate, AppConstants.DATE_FORMET_STRING);
+        PlanningPeriod planningPeriod = new PlanningPeriod(PLANNING_PERIOD_NAME+dateRange,dateRange, startDate, endDate, unitId, planningPeriodDTO.getDurationType(), planningPeriodDTO.getDuration());
         planningPeriod = setPhaseFlippingDatesForPlanningPeriod(startDate, applicablePhases, planningPeriod);
         // Add planning period object in list
 
@@ -800,8 +801,8 @@ public class PlanningPeriodService extends MongoBaseService {
                     LocalDate endDate = startDate.plusMonths(1);
                     while (startDate.isBefore(endDate)) {
                         LocalDate planningPeriodEndDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()).minusDays(1) : startDate.plusMonths(planningPeriod.getDuration()).minusDays(1);
-                        String name = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(planningPeriodEndDate, AppConstants.DATE_FORMET_STRING);
-                        PlanningPeriod planningPeriodOfUnit = new PlanningPeriod(name, startDate, planningPeriodEndDate, planningPeriod.getUnitId(), planningPeriod.getDurationType(), planningPeriod.getDuration());
+                        String dateRange = DateUtils.formatLocalDate(startDate, AppConstants.DATE_FORMET_STRING) + "  " + DateUtils.formatLocalDate(planningPeriodEndDate, AppConstants.DATE_FORMET_STRING);
+                        PlanningPeriod planningPeriodOfUnit = new PlanningPeriod(PLANNING_PERIOD_NAME+dateRange,dateRange, startDate, planningPeriodEndDate, planningPeriod.getUnitId(), planningPeriod.getDurationType(), planningPeriod.getDuration());
                         planningPeriodOfUnit = setPhaseFlippingDatesForPlanningPeriod(startDate, unitIdAndPhasesMap.get(planningPeriod.getUnitId()), planningPeriodOfUnit);
                         planningPeriodsViaJob.add(planningPeriodOfUnit);
                         startDate = planningPeriod.getDurationType().equals(DurationType.WEEKS) ? startDate.plusWeeks(planningPeriod.getDuration()) : startDate.plusMonths(planningPeriod.getDuration());

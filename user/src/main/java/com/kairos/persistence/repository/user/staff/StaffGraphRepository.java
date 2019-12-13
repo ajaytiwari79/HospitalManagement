@@ -91,6 +91,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "RETURN id(staff) AS id,user.cprNumber AS cprNumber,staff.firstName+\" \"+staff.lastName AS name,{2} + staff.profilePic AS profilePic,teams,skills,id(organization) AS unitId order by name")
     List<StaffAdditionalInfoQueryResult> getStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds, String imgUrl);
 
+
     @Query("MATCH (staff:Staff) WHERE id(staff)={0} MATCH (team)-[r:" + TEAM_HAS_MEMBER + "]->(staff) SET r.isEnabled=false RETURN r")
     List<StaffTeamRelationship> removeStaffFromAllTeams(long staffId);
 
