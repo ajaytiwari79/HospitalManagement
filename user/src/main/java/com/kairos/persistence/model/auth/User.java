@@ -52,19 +52,15 @@ import static com.kairos.utils.CPRUtil.getDateOfBirthFromCPR;
 public class User extends UserBaseEntity {
     @KPermissionField
     protected String cprNumber;
-    @KPermissionField
     private String userName;
     @KPermissionField
     protected String nickName;
-    @KPermissionField
+
     protected String firstName;
-    @KPermissionField
     protected String lastName;
-    @KPermissionField
     protected Gender gender;
     @KPermissionField
     private boolean pregnant;
-    @KPermissionField
     private String email;
     private ConfLevel confLevel;
     private Long lastSelectedOrganizationId;

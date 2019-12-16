@@ -12,7 +12,6 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.enums.IntegrationOperation;
@@ -22,6 +21,7 @@ import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
 import com.kairos.persistence.model.night_worker.NightWorker;
 import com.kairos.persistence.model.night_worker.QuestionAnswerPair;
 import com.kairos.persistence.model.night_worker.StaffQuestionnaire;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.unit_settings.UnitAgeSetting;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -214,16 +214,16 @@ public class NightWorkerService {
         nightWorkerMongoRepository.saveEntities(nightWorkers);
     }
 
-    public void checkIfStaffAreEligibleForNightWorker(UnitAgeSetting unitAgeSetting, List<StaffDTO> staffList,
+    public void checkIfStaffAreEligibleForNightWorker(UnitAgeSetting unitAgeSetting, List<StaffPersonalDetail> staffList,
                                                       Map<Long, List<Long>> staffEligibleForNightWorker, Map<Long, List<Long>> staffNotEligibleForNightWorker) {
 
         List<Long> staffIdsEligibleForNightWorker = new ArrayList<>();
         List<Long> staffIdsNotEligibleForNightWorker = new ArrayList<>();
         staffList.stream().forEach(staffDTO -> {
-            Specification<StaffDTO> nightWorkerAgeSpecification = new NightWorkerAgeEligibilitySpecification(unitAgeSetting.getYounger(),
+            Specification<StaffPersonalDetail> nightWorkerAgeSpecification = new NightWorkerAgeEligibilitySpecification(unitAgeSetting.getYounger(),
                     unitAgeSetting.getOlder());
-            Specification<StaffDTO> nightWorkerPregnancySpecification = new StaffNonPregnancySpecification();
-            Specification<StaffDTO> rulesSpecification = nightWorkerAgeSpecification.and(nightWorkerPregnancySpecification);
+            Specification<StaffPersonalDetail> nightWorkerPregnancySpecification = new StaffNonPregnancySpecification();
+            Specification<StaffPersonalDetail> rulesSpecification = nightWorkerAgeSpecification.and(nightWorkerPregnancySpecification);
 
             if (rulesSpecification.isSatisfied(staffDTO)) {
                 staffIdsEligibleForNightWorker.add(staffDTO.getId());

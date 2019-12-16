@@ -6,7 +6,7 @@ import com.kairos.dto.activity.task.AbsencePlanningStatus;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.dto.activity.task_type.TaskTypeDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
-import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
 import com.kairos.persistence.model.task.TaskReport;
@@ -404,13 +404,13 @@ public class AbsencePlanningService {
                         task.setEndAddress(AddressCode.valueOf(taskData.getEndAddress()));
                     // 0 - home address, -1 - unit address
                     if (taskData.getEndAddress() != null && task.getEndAddress().toString() == "0") {
-                        StaffDTO staff = userIntegrationService.getStaff(taskData.getResource());
+                        StaffPersonalDetail staff = userIntegrationService.getStaff(taskData.getResource());
                         // Staff staff = staffGraphRepository.findOne(taskData.getResource());
                         if (staff != null) {
                             TaskAddress taskAddress = new TaskAddress();
-                            taskAddress.setZip(staff.getContactAddress().getZipCode().intValue());
+                            taskAddress.setZip(staff.getContactAddress().getZipCode().getZipCode());
                             taskAddress.setCity(staff.getContactAddress().getCity());
-                            taskAddress.setStreet(staff.getContactAddress().getStreet1());
+                            taskAddress.setStreet(staff.getContactAddress().getStreet());
                             taskAddress.setHouseNumber(staff.getContactAddress().getHouseNumber());
                             taskAddress.setCountry("DK");
                             task.setAddress(taskAddress);
@@ -722,7 +722,7 @@ public class AbsencePlanningService {
      */
     public void syncPresentFullDayAbsencesTask(TaskDTO task, Map<String, String> flsCredentials, OrganizationDTO organization) {
 
-        StaffDTO staff = userIntegrationService.getStaff(task.getResource());
+        StaffPersonalDetail staff = userIntegrationService.getStaff(task.getResource());
         // Staff staff = staffGraphRepository.findOne(Long.valueOf(task.getResource()));
         TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(task.getTaskTypeId().toString()));
         int workScheduleResult;
@@ -784,7 +784,7 @@ public class AbsencePlanningService {
             }
 
         } else {
-            StaffDTO staff = userIntegrationService.getStaff(task.getResource());
+            StaffPersonalDetail staff = userIntegrationService.getStaff(task.getResource());
             //Staff staff = staffGraphRepository.findOne(Long.valueOf(task.getResource()));
 
             checkFullDayPresence(task.getStartDate(), staff.getId(), flsCredentials, organization);

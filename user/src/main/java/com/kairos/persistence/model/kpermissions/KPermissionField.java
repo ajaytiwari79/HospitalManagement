@@ -30,8 +30,10 @@ public class KPermissionField extends UserBaseEntity {
     private List<AccessGroup> accessGroups = new ArrayList<>();
 
     private Set<OrganizationCategory> organizationCategories;
+    private OtherPermissionDTO otherPermissionDTO;
 
-    public KPermissionField(@NotBlank(message = ERROR_NAME_NOTNULL) String fieldName,Set<OrganizationCategory> organizationCategories) {
+
+    public KPermissionField(@NotBlank(message = ERROR_NAME_NOTNULL) String fieldName, Set<OrganizationCategory> organizationCategories) {
         this.fieldName = fieldName;
         this.organizationCategories = organizationCategories;
     }

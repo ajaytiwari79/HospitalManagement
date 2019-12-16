@@ -3,9 +3,11 @@ package com.kairos.dto.user.country.experties;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.neo4j.ogm.annotation.Relationship;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -31,6 +33,7 @@ public class SeniorityLevelDTO {
     private BigDecimal freeChoicePercentage;
     private BigDecimal freeChoiceToPension;
     private Long payGradeLevel;
+
 
     @AssertTrue(message = "Incorrect Data")
     public boolean isValid() {

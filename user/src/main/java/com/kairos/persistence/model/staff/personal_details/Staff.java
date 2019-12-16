@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.annotations.KPermissionField;
 import com.kairos.annotations.KPermissionModel;
 import com.kairos.annotations.KPermissionSubModel;
+import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -20,6 +21,7 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -50,7 +52,10 @@ public class Staff extends UserBaseEntity {
     @KPermissionSubModel
     @Relationship(type = BELONGS_TO)
     private User user;
-
+    @KPermissionField
+    protected Gender gender;
+    @KPermissionField
+    private LocalDate dateOfBirth;
     private EngineerType engineerType;
 
     @Relationship(type = HAS_FAVOURITE_FILTERS)

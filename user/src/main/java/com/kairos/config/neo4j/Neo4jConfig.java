@@ -22,7 +22,6 @@ import static com.kairos.constants.Neo4jConstant.*;
  * 2. getConfiguration()
  */
 @Configuration
-
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 @ComponentScan("com.kairos.persistence")
 @EnableTransactionManagement

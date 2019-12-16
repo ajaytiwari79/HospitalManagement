@@ -23,9 +23,11 @@ public class ModelDTO {
     private String modelClass;
     private boolean permissionSubModel;
     private List<FieldDTO> fieldPermissions = new ArrayList<>();
+    private List<ActionDTO> actionPermissions = new ArrayList<>();
     private List<ModelDTO> subModelPermissions = new ArrayList<>();
     private Set<OrganizationCategory> organizationCategories;
     private Set<FieldLevelPermission> permissions;
+    private OtherPermissionDTO forOtherPermission;
 
     public Set<FieldLevelPermission> getPermissions() {
         return isCollectionNotEmpty(permissions) ? permissions : new HashSet<>();

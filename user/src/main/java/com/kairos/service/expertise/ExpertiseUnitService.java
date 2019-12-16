@@ -5,7 +5,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.services.OrganizationServicesAndLevelQueryResult;
 import com.kairos.persistence.model.organization.union.Location;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseLineQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseLocationStaffQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
@@ -95,7 +95,7 @@ public class ExpertiseUnitService {
     public Map<String, Object> getStaffListOfExpertise(Long expertiseId, Long unitId) {
         Map<String, Object> response = new HashMap<>();
         Organization organization = organizationService.fetchParentOrganization(unitId);
-        List<StaffPersonalDetailDTO> staffs = staffGraphRepository.getAllStaffByUnitIdAndExpertiseId(organization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), expertiseId);
+        List<StaffPersonalDetailQueryResult> staffs = staffGraphRepository.getAllStaffByUnitIdAndExpertiseId(organization.getId(), envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath(), expertiseId);
         List<Location> locations = expertiseGraphRepository.findAllLocationsOfUnionInExpertise(expertiseId);
 
         response.put("staffs", staffs);

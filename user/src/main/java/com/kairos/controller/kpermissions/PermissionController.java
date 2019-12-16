@@ -51,4 +51,10 @@ public class PermissionController {
 
     }
 
+    @GetMapping(value = "/get_default_data_of_permission")
+    public ResponseEntity getDefaultDataOfPermission(@RequestParam Long countryId)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getDefaultDataOfPermission(countryId));
+
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.kpermissions;
 
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,13 @@ public class ModelPermissionQueryResult {
     private List<ModelPermissionQueryResult> subModelPermissions= new ArrayList<>();
 
     private Set<FieldLevelPermission> permissions;
+    private Set<Long> expertiseIds;
+    private Set<Long> unionIds;
+    private Set<Long> teamIds;
+    private Set<Long> employmentTypeIds;
+    private Set<Long> tagIds;
+    private Set<StaffStatusEnum> staffStatuses;
+    private Set<FieldLevelPermission> forOtherFieldLevelPermissions;
 
 
 }

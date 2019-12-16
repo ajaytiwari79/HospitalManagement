@@ -25,7 +25,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StaffPersonalDetailDTO {
+public class StaffPersonalDetailQueryResult {
     private Long id;
     private String lastName;
     private Long employedSince;

@@ -124,11 +124,14 @@ public class StaffController {
     @ApiOperation("get personal information of staff")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPersonalInfo(@PathVariable long unitId, @PathVariable long staffId) {
-        Map<String, Object> personalInfo = staffRetrievalService.getPersonalInfo(staffId, unitId);
-        if (personalInfo == null) {
-            return null;
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, personalInfo);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getPersonalInfo(staffId, unitId));
+    }
+
+    @RequestMapping(value = "/{staffId}/get_default_data_of_staff", method = RequestMethod.GET)
+    @ApiOperation("get default data of staff")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataOfStaff(@PathVariable long unitId, @PathVariable long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getDefaultDataOfStaff(staffId, unitId));
     }
 
     @RequestMapping(value = "/{staffId}/unit_permission", method = RequestMethod.POST)

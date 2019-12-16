@@ -62,14 +62,14 @@ public class StaffFieldPermisionAspects {
     }
 
 
-    @Around("execution(public java.util.List<com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO> com.kairos.service.staff.*.*(..))")
-    public List<StaffPersonalDetailDTO> validateStaffDTOResponseAsPerPermission(JoinPoint proceedingJoinPoint) {
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOList = new ArrayList<>();
+    @Around("execution(public java.util.List<com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult> com.kairos.service.staff.*.*(..))")
+    public List<StaffPersonalDetailQueryResult> validateStaffDTOResponseAsPerPermission(JoinPoint proceedingJoinPoint) {
+        List<StaffPersonalDetailQueryResult> staffPersonalDetailDTOList = new ArrayList<>();
         try {
-            List<StaffPersonalDetailDTO> staffList = (List<StaffPersonalDetailDTO>) proceedingJoinPoint;
+            List<StaffPersonalDetailQueryResult> staffList = (List<StaffPersonalDetailQueryResult>) proceedingJoinPoint;
             if (!staffList.isEmpty()) {
                 List<KPermissionModelFieldDTO> kPermissionModelFieldDTOS = permissionService.fetchPermissionFields(Staff.class, newArrayList(FieldLevelPermission.WRITE, FieldLevelPermission.READ));
-                for (StaffPersonalDetailDTO staffObj : staffList) {
+                for (StaffPersonalDetailQueryResult staffObj : staffList) {
                     staffPersonalDetailDTOList.add(ObjectMapperUtils.copySpecificPropertiesByMapper(staffObj, null, kPermissionModelFieldDTOS));
                 }
             }
