@@ -225,6 +225,9 @@ public class ShiftBreakService {
             if (!dbShift.getBreakActivities().get(0).getStartDate().equals(breakActivity.getStartDate()) ||
                     !dbShift.getBreakActivities().get(0).getEndDate().equals(breakActivity.getEndDate())) {
                 ShiftActivity shiftActivity = shift.getActivities().stream().filter(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate()).contains(breakActivity.getStartDate())).findFirst().get();
+                if(!activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()){
+                    exceptionService.actionNotPermittedException(BREAK_NOT_VALID);
+                }
                 breakActivity.setBreakNotHeld(!activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed());
             }
         }
