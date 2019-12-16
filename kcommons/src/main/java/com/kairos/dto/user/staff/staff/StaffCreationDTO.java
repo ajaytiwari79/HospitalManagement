@@ -29,11 +29,11 @@ public class StaffCreationDTO {
     private String firstName;
     @NotBlank(message = "error.staff.lastname.notnull")
     private String lastName;
-    @NotBlank(message = "error.staff.cprNumber.notnull")
+    //@NotBlank(message = "error.staff.cprNumber.notnull")
     private String cprNumber;
     private String familyName;
     private String workPhone;
-    @Email(message = "error.email.valid")
+    //@Email(message = "error.email.valid")
     private String privateEmail;
     private Gender gender;
     private Long engineerTypeId;
@@ -41,11 +41,11 @@ public class StaffCreationDTO {
     private Date inactiveFrom;
     private String privatePhone;
     private String workEmail;
-    @NotBlank(message = "error.staff.userName.notnull")
+    //@NotBlank(message = "error.staff.userName.notnull")
     private String userName;
     private Long externalId;
 
-    @NotNull(message = "error.staff.accessGroup.id.notnull")
+    //@NotNull(message = "error.staff.accessGroup.id.notnull")
     private Long accessGroupId;
     private StaffStatusEnum currentStatus;
 
