@@ -1,8 +1,6 @@
 //add dateRange
-db.planningPeriod.aggregate(
-    [
-        { "$addFields": {
-            "dateRange": { "$concat": [ "$name" ] }
-        }}
-    ]
-)
+db.planningPeriod.find().forEach(
+    function (elem) {
+        elem.dateRange = elem.name;
+        db.planningPeriod.save(elem);
+        });
