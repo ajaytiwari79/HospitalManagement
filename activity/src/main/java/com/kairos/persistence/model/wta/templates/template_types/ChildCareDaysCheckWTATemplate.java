@@ -48,7 +48,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && validateRulesChildCareDayCheck(infoWrapper.getActivityWrapperMap())) {
+        if (!isDisabled() && validateRulesChildCareDayCheck(infoWrapper.getActivityWrapperMap()) && CollectionUtils.containsAny(activityIds,infoWrapper.getShift().getActivityIds())) {
             if (isCollectionNotEmpty(infoWrapper.getChildCareDays())) {
                 long leaveCount = calculateChildCareDaysLeaveCount(infoWrapper.getChildCareDays(), infoWrapper.getStaffChildAges());
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
