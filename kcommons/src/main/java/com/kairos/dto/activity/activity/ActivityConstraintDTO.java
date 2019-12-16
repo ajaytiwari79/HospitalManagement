@@ -17,6 +17,7 @@ public class ActivityConstraintDTO {
     private BigInteger activityId;
     private PlanningSetting planningSetting;
     private ConstraintSubType constraintSubType;
+    private Boolean mandatory;
 
     public ActivityConstraintDTO( PlanningSetting planningSetting,ConstraintSubType constraintSubType){
         this.planningSetting = planningSetting;

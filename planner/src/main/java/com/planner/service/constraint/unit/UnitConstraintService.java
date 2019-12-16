@@ -31,7 +31,9 @@ public class UnitConstraintService {
     public UnitConstraintDTO createUnitConstraint(UnitConstraintDTO unitConstraintDTO){
         UnitConstraint unitConstraint = unitConstraintRepository.findByUnitIdAndConstraintSubTypeAndDeletedFalse(unitConstraintDTO.getUnitId(),unitConstraintDTO.getConstraintSubType());
         if(ObjectUtils.isNotNull(unitConstraint)){
-            unitConstraint.setPlanningSetting(unitConstraintDTO.getPlanningSetting());
+            if(!unitConstraint.getMandatory()) {
+                unitConstraint.setPlanningSetting(unitConstraintDTO.getPlanningSetting());
+            }
         }else{
             unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(unitConstraintDTO, UnitConstraint.class);
 

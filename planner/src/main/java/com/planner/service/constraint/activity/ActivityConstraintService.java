@@ -29,7 +29,9 @@ public class ActivityConstraintService {
     public ActivityConstraintDTO createOrUpdateActivityConstraint(ActivityConstraintDTO activityConstraintDTO){
         ActivityConstraint activityConstraint = activityConstraintRepository.findByActivityIdAndConstraintSubTypeAndDeletedFalse(activityConstraintDTO.getActivityId(),activityConstraintDTO.getConstraintSubType());
         if (isNotNull(activityConstraint)) {
-            activityConstraint.setPlanningSetting(activityConstraintDTO.getPlanningSetting());
+            if(!activityConstraint.getMandatory()){
+                activityConstraint.setPlanningSetting(activityConstraintDTO.getPlanningSetting());
+            }
         }else {
             activityConstraint = ObjectMapperUtils.copyPropertiesByMapper(activityConstraintDTO, ActivityConstraint.class);
 
