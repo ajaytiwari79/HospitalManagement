@@ -27,7 +27,7 @@ public class CPRUtil {
         if (cprNumber == null) {
             return null;
         }
-        return Integer.valueOf(cprNumber.substring(cprNumber.length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
+        return Integer.parseInt(cprNumber.substring(cprNumber.length() - 1)) % 2 == 0 ? Gender.FEMALE : Gender.MALE;
     }
 
     //Method for getting the DateOfBirth From CPR Number
@@ -39,8 +39,8 @@ public class CPRUtil {
             cprNumber = "0" + cprNumber;
         }
         Integer year = Integer.valueOf(cprNumber.substring(4, 6));
-        Integer month = Integer.valueOf(cprNumber.substring(2, 4));
-        Integer day = Integer.valueOf(cprNumber.substring(0, 2));
+        int month = Integer.parseInt(cprNumber.substring(2, 4));
+        int day = Integer.parseInt(cprNumber.substring(0, 2));
         Integer centuryDigit = Integer.parseInt(cprNumber.substring(6, 7));
         LocalDate birthday;
         year = getYearFromCPR(year, centuryDigit);
