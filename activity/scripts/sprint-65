@@ -6,3 +6,292 @@ db.planningPeriod.aggregate(
         }}
     ]
 )
+
+
+
+db.kairos_sequence.find({"sequenceName" : "TimeTypeSequence"})
+db.getCollection('kairos_sequence').update({ "sequenceName" : "TimeTypeSequence	"},{"$set":{"sequenceNumber" : 86}})
+
+
+db.time_Type.insert({
+    "_id" : "86",
+    "countryId" : NumberLong(18712),
+    "timeTypes" : "NON_WORKING_TYPE",
+    "label" : "Gap",
+    "leafNode" : false,
+    "description" : "",
+    "childTimeTypeIds" : [],
+    "backgroundColor" : "#f7c8ec",
+    "secondLevelType" : "PROTECTED_DAYS_OFF",
+    "activityCanBeCopiedForOrganizationHierarchy" : [
+        "ORGANIZATION",
+        "UNIT"
+    ],
+    "partOfTeam" : false,
+    "allowChildActivities" : false,
+    "allowedConflicts" : false,
+    "rulesActivityTab" : {
+        "eligibleForFinalSchedule" : false,
+        "eligibleForDraftSchedule" : false,
+        "eligibleForRequest" : false,
+        "lockLengthPresent" : false,
+        "eligibleToBeForced" : false,
+        "dayTypes" : [
+            NumberLong(13988),
+            NumberLong(20484),
+            NumberLong(13989),
+            NumberLong(20487),
+            NumberLong(13990),
+            NumberLong(20486),
+            NumberLong(13991),
+            NumberLong(20481),
+            NumberLong(13984)
+        ],
+        "eligibleForStaffingLevel" : false,
+        "breakAllowed" : false,
+        "approvalAllowedPhaseIds" : [],
+        "cutOffStartFrom" : ISODate("2018-01-01T00:00:00.000Z"),
+        "cutOffIntervalUnit" : "YEARS",
+        "cutOffIntervals" : [
+            {
+                "startDate" : ISODate("2018-01-01T00:00:00.000Z"),
+                "endDate" : ISODate("2018-12-31T00:00:00.000Z")
+            }
+        ],
+        "eligibleForCopy" : false,
+        "plannedTimeInAdvance" : {
+            "value" : 0,
+            "type" : "DAYS"
+        },
+        "allowedAutoAbsence" : false,
+        "recurrenceDays" : 0,
+        "recurrenceTimes" : 0,
+        "pqlSettings" : {},
+        "reasonCodeRequired" : false,
+        "reasonCodeRequiredState" : "OPTIONAL"
+    },
+    "timeCalculationActivityTab" : {
+        "methodForCalculatingTime" : "WEEKLY_HOURS",
+        "fullDayCalculationType" : "FULL_TIME_WEEKLY_HOURS_TYPE",
+        "fullWeekCalculationType" : "FULL_TIME_WEEKLY_HOURS_TYPE",
+        "fixedTimeValue" : NumberLong(0),
+        "multiplyWith" : true,
+        "multiplyWithValue" : 0.5,
+        "historyDuration" : 0,
+        "defaultStartTime" : "07:00",
+        "dayTypes" : [
+            NumberLong(13988),
+            NumberLong(20484),
+            NumberLong(13989),
+            NumberLong(20487),
+            NumberLong(13990),
+            NumberLong(20486),
+            NumberLong(13991),
+            NumberLong(20481),
+            NumberLong(13984)
+        ]
+    },
+    "skillActivityTab" : {
+        "activitySkills" : []
+    },
+    "phaseSettingsActivityTab" : {
+        "activityId" : "13",
+        "phaseTemplateValues" : [
+            {
+                "phaseId" : "5",
+                "name" : "Request",
+                "description" : "Request phase",
+                "eligibleEmploymentTypes" : [],
+                "eligibleForManagement" : true,
+                "staffCanDelete" : false,
+                "managementCanDelete" : true,
+                "staffCanSell" : false,
+                "managementCanSell" : false,
+                "sequence" : 0,
+                "allowedSettings" : {
+                    "canEdit" : [
+                        "MANAGEMENT"
+                    ]
+                },
+                "activityShiftStatusSettings" : []
+            },
+            {
+                "phaseId" : "6",
+                "name" : "Puzzle",
+                "description" : "Puzzle phase",
+                "eligibleEmploymentTypes" : [],
+                "eligibleForManagement" : true,
+                "staffCanDelete" : false,
+                "managementCanDelete" : true,
+                "staffCanSell" : false,
+                "managementCanSell" : false,
+                "sequence" : 0,
+                "allowedSettings" : {
+                    "canEdit" : [
+                        "MANAGEMENT"
+                    ]
+                },
+                "activityShiftStatusSettings" : []
+            },
+            {
+                "phaseId" : "7",
+                "name" : "Construction",
+                "description" : "Construction phase",
+                "eligibleEmploymentTypes" : [
+                    NumberLong(20604),
+                    NumberLong(14046)
+                ],
+                "eligibleForManagement" : true,
+                "staffCanDelete" : false,
+                "managementCanDelete" : true,
+                "staffCanSell" : false,
+                "managementCanSell" : false,
+                "sequence" : 0,
+                "allowedSettings" : {
+                    "canEdit" : [
+                        "MANAGEMENT"
+                    ]
+                },
+                "activityShiftStatusSettings" : []
+            },
+            {
+                "phaseId" : "8",
+                "name" : "Draft",
+                "description" : "Draft phase",
+                "eligibleEmploymentTypes" : [
+                    NumberLong(20604),
+                    NumberLong(14046)
+                ],
+                "eligibleForManagement" : true,
+                "staffCanDelete" : false,
+                "managementCanDelete" : true,
+                "staffCanSell" : false,
+                "managementCanSell" : false,
+                "sequence" : 0,
+                "allowedSettings" : {
+                    "canEdit" : [
+                        "MANAGEMENT"
+                    ]
+                },
+                "activityShiftStatusSettings" : []
+            },
+            {
+                "phaseId" : "3",
+                "name" : "Tentative",
+                "description" : "TENTATIVE PHASE",
+                "eligibleEmploymentTypes" : [],
+                "eligibleForManagement" : true,
+                "staffCanDelete" : false,
+                "managementCanDelete" : true,
+                "staffCanSell" : false,
+                "managementCanSell" : false,
+                "sequence" : 0,
+                "allowedSettings" : {
+                    "canEdit" : [
+                        "MANAGEMENT"
+                    ]
+                },
+                "activityShiftStatusSettings" : []
+            },
+            {
+                "phaseId" : "1",
+                "name" : "Realtime",
+                "description" : "REALTIME PHASE",
+                "eligibleEmploymentTypes" : [],
+                "eligibleForManagement" : true,
+                "staffCanDelete" : false,
+                "managementCanDelete" : true,
+                "staffCanSell" : false,
+                "managementCanSell" : false,
+                "sequence" : 0,
+                "allowedSettings" : {
+                    "canEdit" : [
+                        "MANAGEMENT"
+                    ]
+                },
+                "activityShiftStatusSettings" : []
+            },
+            {
+                "phaseId" : "2",
+                "name" : "Time & Attendance",
+                "description" : "TIME & ATTENDANCE PHASE",
+                "eligibleEmploymentTypes" : [],
+                "eligibleForManagement" : true,
+                "staffCanDelete" : false,
+                "managementCanDelete" : true,
+                "staffCanSell" : false,
+                "managementCanSell" : false,
+                "sequence" : 0,
+                "allowedSettings" : {
+                    "canEdit" : [
+                        "MANAGEMENT"
+                    ]
+                },
+                "activityShiftStatusSettings" : []
+            },
+            {
+                "phaseId" : "4",
+                "name" : "Payroll",
+                "description" : "PAYROLL PHASE",
+                "eligibleEmploymentTypes" : [],
+                "eligibleForManagement" : true,
+                "staffCanDelete" : false,
+                "managementCanDelete" : true,
+                "staffCanSell" : false,
+                "managementCanSell" : false,
+                "sequence" : 0,
+                "allowedSettings" : {
+                    "canEdit" : [
+                        "MANAGEMENT"
+                    ]
+                },
+                "activityShiftStatusSettings" : []
+            }
+        ]
+    },
+    "expertises" : [
+        NumberLong(795)
+    ],
+    "organizationTypes" : [
+        NumberLong(20595),
+        NumberLong(20594),
+        NumberLong(14035)
+    ],
+    "organizationSubTypes" : [
+        NumberLong(20603),
+        NumberLong(14043),
+        NumberLong(20602),
+        NumberLong(14036),
+        NumberLong(20597),
+        NumberLong(14037),
+        NumberLong(20596),
+        NumberLong(14038),
+        NumberLong(14041),
+        NumberLong(20600),
+        NumberLong(14042)
+    ],
+    "regions" : [],
+    "levels" : [
+        NumberLong(20547),
+        NumberLong(14049),
+        NumberLong(20544),
+        NumberLong(14050)
+    ],
+    "employmentTypes" : [
+        NumberLong(14046),
+        NumberLong(20604)
+    ],
+    "breakNotHeldValid" : false,
+    "activityPriorityId" : "161",
+    "priorityFor" : "PRESENCE",
+    "createdAt" : ISODate("2017-12-08T08:13:10.829Z"),
+    "updatedAt" : ISODate("2019-11-09T11:45:11.790Z"),
+    "deleted" : false,
+    "lastModifiedBy" : {
+        "_id" : NumberLong(18728),
+        "email" : "ulrik@kairosplanning.com",
+        "fullName" : "Ulrik Rasmussen"
+    },
+    "_class" : "com.kairos.persistence.model.activity.TimeType",
+    "createdBy" : null
+})
