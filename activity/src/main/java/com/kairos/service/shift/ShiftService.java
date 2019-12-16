@@ -1290,7 +1290,7 @@ public class ShiftService extends MongoBaseService {
         Iterator iterator=shift.getActivities().iterator();
         while (iterator.hasNext()){
             ShiftActivity shiftActivity=(ShiftActivity) iterator.next();
-            if("GAP".equals(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getLabel())){
+            if("Gap".equals(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getLabel())){
                 ShiftActivity breakActivity=shift.getBreakActivities().stream().filter(k->k.getStartDate().before(shiftActivity.getStartDate())).findFirst().orElse(null);
                 if(breakActivity!=null){
                     shift1.setBreakActivities(Arrays.asList(breakActivity));
