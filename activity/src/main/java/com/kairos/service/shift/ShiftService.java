@@ -477,6 +477,7 @@ public class ShiftService extends MongoBaseService {
         shiftViolatedRules.setEscalationResolved(false);
         shiftViolatedRules.setActivities(updatedShiftWithViolatedInfo.getViolatedRules().getActivities());
         shiftViolatedRules.setWorkTimeAgreements(updatedShiftWithViolatedInfo.getViolatedRules().getWorkTimeAgreements());
+        shiftViolatedRules.setAccessGroupRole(UserContext.getUserDetails().isManagement() ? MANAGEMENT : AccessGroupRole.STAFF);
         shiftViolatedRulesMongoRepository.save(shiftViolatedRules);
     }
 
@@ -557,7 +558,9 @@ public class ShiftService extends MongoBaseService {
         Map<BigInteger, ShiftViolatedRules> draftShiftViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isDraft).collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
         for (ShiftViolatedRules shiftViolatedRule : shiftViolatedRules) {
             if (isNotNull(draftShiftViolatedRules.get(shiftViolatedRule.getShiftId()))) {
-                saveShiftViolatedRules.add(draftShiftViolatedRules.get(shiftViolatedRule.getShiftId()));
+                ShiftViolatedRules violatedRules = draftShiftViolatedRules.get(shiftViolatedRule.getShiftId());
+                violatedRules.setAccessGroupRole(UserContext.getUserDetails().isManagement() ? MANAGEMENT : AccessGroupRole.STAFF);
+                saveShiftViolatedRules.add(violatedRules);
                 deleteShiftViolatedRules.add(shiftViolatedRule);
             }
         }
