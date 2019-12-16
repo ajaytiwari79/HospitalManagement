@@ -292,7 +292,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return getShiftWithActivityByCriteria(Criteria.where(DELETED).is(false).and("id").in(shiftIds),false,ShiftWithActivityDTO.class);
     }
 
-    public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(List<Long> staffIds, LocalDate startDate, LocalDate endDate){
+    public List<ShiftDTO> findAllByStaffIdsAndDeleteFalse(Collection<Long> staffIds, LocalDate startDate, LocalDate endDate){
         Criteria criteria = Criteria.where(DELETED).is(false).and(DISABLED).is(false).and(STAFF_ID).in(staffIds);
         if(isNotNull(startDate) && isNotNull(endDate)){
             criteria.and(START_DATE).gte(startDate).lte(getEndOfDay(asDate(endDate)));

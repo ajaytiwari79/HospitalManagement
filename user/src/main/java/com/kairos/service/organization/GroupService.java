@@ -95,7 +95,7 @@ public class GroupService {
 
     public List<GroupDTO> getAllGroupsOfUnit(Long unitId) {
         Unit unit = unitGraphRepository.findOne(unitId);
-        List<Group> groups=groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(unit.getGroups().stream().map(k->k.getId()).collect(Collectors.toList()));
+        List<Group> groups = isNull(unit) ? new ArrayList<>() : groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(unit.getGroups().stream().map(k->k.getId()).collect(Collectors.toList()));
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for(Group group : groups){
             groupDTOS.add(getGroupDTOFromGroup(group));
