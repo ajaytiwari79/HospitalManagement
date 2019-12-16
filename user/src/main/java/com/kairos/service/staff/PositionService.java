@@ -12,6 +12,7 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.employment_type.EmploymentStatus;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
@@ -648,6 +649,20 @@ public class PositionService {
     }
 
     public void createPosition(Organization organization, Staff staff, Long accessGroupId, Long employedSince) {
+        Position position = new Position();
+        position.setName("Working as staff");
+        position.setStaff(staff);
+        position.setStartDateMillis(employedSince);
+        if(StaffStatusEnum.ACTIVE.equals(staff.getCurrentStatus())) {
+            createStaffPermission(organization, accessGroupId, position);
+        }
+        positionGraphRepository.save(position);
+        organization.getPositions().add(position);
+        organizationGraphRepository.save(organization);
+
+    }
+
+    private void createStaffPermission(Organization organization, Long accessGroupId, Position position) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
         if (!Optional.ofNullable(accessGroup).isPresent()) {
             exceptionService.dataNotFoundByIdException(ERROR_STAFF_ACCESSGROUP_NOTFOUND, accessGroupId);
@@ -656,18 +671,10 @@ public class PositionService {
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate())) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
-        Position position = new Position();
-        position.setName("Working as staff");
-        position.setStaff(staff);
-        position.setStartDateMillis(employedSince);
         UnitPermission unitPermission = new UnitPermission();
         unitPermission.setOrganization(organization);
         unitPermission.setAccessGroup(accessGroup);
         position.getUnitPermissions().add(unitPermission);
-        positionGraphRepository.save(position);
-        organization.getPositions().add(position);
-        organizationGraphRepository.save(organization);
-
     }
 
 }

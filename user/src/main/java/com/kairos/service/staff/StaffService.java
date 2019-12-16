@@ -288,7 +288,12 @@ public class StaffService {
         setStaffDetails(staffToUpdate, staffPersonalDetail);
         setStaffChildDetails(staffToUpdate, staffPersonalDetail);
 
-        updateUserDetails(staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
+        if (StaffStatusEnum.ACTIVE.equals(staffToUpdate.getCurrentStatus())) {
+            updateUserDetails(staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
+            // Set if user is female and pregnant
+            User user = updateUserDetails(staffId, staffPersonalDetail);
+            staffPersonalDetail.setPregnant(user.isPregnant());
+        }
 
         //saving addresses of staff
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
@@ -302,9 +307,6 @@ public class StaffService {
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
         staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE);
-        // Set if user is female and pregnant
-        User user = updateUserDetails(staffId, staffPersonalDetail);
-        staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
         teamService.assignStaffInTeams(staff, staffPersonalDetail.getTeamDetails(), unitId);
