@@ -918,4 +918,8 @@ public class OrganizationService {
         return organizationCategory;
     }
 
+    public List<Organization> getAllUnionsByOrganizationOrCountryId(Long organizationId,Long countryId){
+        return organizationGraphRepository.getAllUnionsByOrganizationOrCountryId(organizationId,countryId);
+    }
+
 }

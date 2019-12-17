@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.kpermissions;
 
+import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -30,7 +31,6 @@ public class KPermissionField extends UserBaseEntity {
     private List<AccessGroup> accessGroups = new ArrayList<>();
 
     private Set<OrganizationCategory> organizationCategories;
-    private OtherPermissionDTO otherPermissionDTO;
 
 
     public KPermissionField(@NotBlank(message = ERROR_NAME_NOTNULL) String fieldName, Set<OrganizationCategory> organizationCategories) {

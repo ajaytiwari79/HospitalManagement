@@ -8,6 +8,7 @@ import com.kairos.dto.kpermissions.PermissionDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.union.UnionDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
@@ -41,6 +42,7 @@ import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApplicationConstants.*;
+import static com.kairos.constants.CommonConstants.DEFAULT_ID;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATANOTFOUND;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_PERMISSION_FIELD;
 
@@ -48,6 +50,7 @@ import static com.kairos.constants.UserMessagesConstants.MESSAGE_PERMISSION_FIEL
 public class PermissionService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PermissionService.class);
+
 
     @Inject
     private PermissionModelRepository permissionModelRepository;
@@ -327,16 +330,19 @@ public class PermissionService {
     }
 
     public PermissionDefaultDataDTO getDefaultDataOfPermission(Long refrenceId, ConfLevel confLevel) {
-        List<TeamDTO> teamDTOS = copyPropertiesOfCollectionByMapper(teamGraphRepository.findAllTeamsInOrganization(refrenceId), TeamDTO.class);
-        //List<Organization> organizations = organizationService.getU
+        List<Organization> unions;
         OrganizationDTO organizationDTO = null;
-        if(ConfLevel.UNIT.equals(confLevel)){
+        if(ConfLevel.ORGANIZATION.equals(confLevel)){
             organizationDTO = organizationService.getOrganizationWithCountryId(refrenceId);
-
+            unions = organizationService.getAllUnionsByOrganizationOrCountryId(refrenceId, DEFAULT_ID);
+        }else {
+            unions = organizationService.getAllUnionsByOrganizationOrCountryId(DEFAULT_ID, refrenceId);
         }
         Long countryId = ConfLevel.COUNTRY.equals(confLevel) ? refrenceId : organizationDTO.getCountryId();
         List<ExpertiseDTO> expertises = copyPropertiesOfCollectionByMapper(expertiseGraphRepository.getExpertiesOfCountry(countryId),ExpertiseDTO.class);
         List<EmploymentTypeDTO> employmentTypeDTOS = copyPropertiesOfCollectionByMapper(employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId,false), EmploymentTypeDTO.class);
-        return new PermissionDefaultDataDTO(expertises,null,employmentTypeDTOS,teamDTOS,organizationDTO.getTagDTOS(),newArrayList(StaffStatusEnum.values()));
+        List<UnionDTO> unionDTOS = copyPropertiesOfCollectionByMapper(unions,UnionDTO.class);
+        List<TeamDTO> teamDTOS = copyPropertiesOfCollectionByMapper(teamGraphRepository.findAllTeamsInOrganization(refrenceId), TeamDTO.class);
+        return new PermissionDefaultDataDTO(expertises,unionDTOS,employmentTypeDTOS,teamDTOS,organizationDTO.getTagDTOS(),newArrayList(StaffStatusEnum.values()));
     }
 }

@@ -1102,4 +1102,9 @@ public class StaffService {
     public void unlinkTagFromStaff(Long tagId) {
         staffGraphRepository.unlinkTagFromStaff(tagId);
     }
+
+    public List<StaffPermissionRelatedDataQueryResult> getStaffDataForPermissionByUnitId(Long unitId) {
+        Organization organization = organizationService.fetchParentOrganization(unitId);
+        return staffGraphRepository.getStaffPermissionRelatedDataQueryResult(organization.getId());
+    }
 }

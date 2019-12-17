@@ -658,5 +658,12 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffPersonalDetailsByUnit(unitId));
     }
 
+    @GetMapping(value = "/get_staff_data_for_permission_by_unitId")
+    @ApiOperation("get staffs data for permission by unitId")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffDataForPermissionByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffDataForPermissionByUnitId(unitId));
+    }
+
 
 }

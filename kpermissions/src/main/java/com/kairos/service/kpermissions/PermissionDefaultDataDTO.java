@@ -15,7 +15,6 @@ import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 
-@Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +25,30 @@ public class PermissionDefaultDataDTO {
     private List<EmploymentTypeDTO> employmentTypes;
     private List<TeamDTO> teams;
     private List<TagDTO> tags;
-    private List<StaffStatusEnum> staffStatusEnums = newArrayList(StaffStatusEnum.values());
+    private List<StaffStatusEnum> staffStatuses = newArrayList(StaffStatusEnum.values());
 
+    //TODO Please Don't remove the Getters these all are the overrided method
+    public List<ExpertiseDTO> getExpertise() {
+        return expertises;
+    }
+
+    public List<UnionDTO> getUnion() {
+        return unions;
+    }
+
+    public List<EmploymentTypeDTO> getEmploymentType() {
+        return employmentTypes;
+    }
+
+    public List<TeamDTO> getTeam() {
+        return teams;
+    }
+
+    public List<TagDTO> getTag() {
+        return tags;
+    }
+
+    public List<StaffStatusEnum> getStaffStatuses() {
+        return staffStatuses;
+    }
 }

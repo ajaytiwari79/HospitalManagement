@@ -36,4 +36,5 @@ public class CommonConstants {
     public static final String DELETED = "deleted";
     public static final String DISABLED = "disabled";
     public static final String UNIT_ID = "unitId";
+    public static final long DEFAULT_ID = -1l;
 }

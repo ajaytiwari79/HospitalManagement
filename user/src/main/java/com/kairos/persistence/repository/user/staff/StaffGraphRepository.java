@@ -7,10 +7,7 @@ import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.*;
 import com.kairos.persistence.model.staff.permission.UnitStaffQueryResult;
-import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
-import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
+import com.kairos.persistence.model.staff.personal_details.*;
 import com.kairos.persistence.model.staff.position.StaffPositionDTO;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseLocationStaffQueryResult;
@@ -469,5 +466,14 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (staff:Staff)-[rel:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) where id(staff) = {0} detach delete staffChildDetail")
     void unlinkStaffChilds(Long staffId);
+
+    @Query("MATCH (organization:Organization) where id(organization)={0} \n" +
+            "MATCH (organization)-[:HAS_POSITIONS]->(position:Position)-[: BELONGS_TO]->(staff:Staff{deleted:false})\n" +
+            "OPTIONAL MATCH (staff)-[:TEAM_HAS_MEMBER]-(team:Team{deleted:false})\n" +
+            "OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(tag:Tag{deleted:false}) \n" +
+            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]-(employment:Employment{deleted:false})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[:HAS_EMPLOYMENT_TYPE]-(employmentType:EmploymentType)\n" +
+            "OPTIONAL MATCH(staff)-[:STAFF_HAS_EXPERTISE]-(expertise:Expertise)\n" +
+            "return distinct id(staff) as staffId,collect(distinct staff.currentStatus) as staffStatuses,collect(distinct id(team)) as teamIds,collect(distinct id(employmentType))as employmentTypeIds,collect(distinct id(expertise))as expertiseIds,collect(distinct id(tag))as tagIds")
+    List<StaffPermissionRelatedDataQueryResult> getStaffPermissionRelatedDataQueryResult(Long organizationId);
 }
 
