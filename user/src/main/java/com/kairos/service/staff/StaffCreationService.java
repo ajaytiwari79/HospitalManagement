@@ -319,9 +319,6 @@ public class StaffCreationService {
         if(ObjectUtils.isNull(staffCreationDTO.getPrivateEmail())){
             exceptionService.dataNotFoundByIdException(ERROR_EMAIL_VALID);
         }
-        if(ObjectUtils.isNull(staffCreationDTO.getAccessGroupId())){
-            exceptionService.dataNotFoundByIdException(ERROR_STAFF_ACCESSGROUP_NOTNULL);
-        }
         if(ObjectUtils.isNull(staffCreationDTO.getUserName())){
             exceptionService.dataNotFoundByIdException(ERROR_STAFF_USERNAME_NOTNULL);
         }

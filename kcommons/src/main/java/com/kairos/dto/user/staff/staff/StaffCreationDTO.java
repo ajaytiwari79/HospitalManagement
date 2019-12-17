@@ -44,8 +44,7 @@ public class StaffCreationDTO {
     //@NotBlank(message = "error.staff.userName.notnull")
     private String userName;
     private Long externalId;
-
-    //@NotNull(message = "error.staff.accessGroup.id.notnull")
+    @NotNull(message = "error.staff.accessGroup.id.notnull")
     private Long accessGroupId;
     private StaffStatusEnum currentStatus;
 

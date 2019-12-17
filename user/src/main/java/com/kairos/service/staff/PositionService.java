@@ -653,9 +653,7 @@ public class PositionService {
         position.setName("Working as staff");
         position.setStaff(staff);
         position.setStartDateMillis(employedSince);
-        if(StaffStatusEnum.ACTIVE.equals(staff.getCurrentStatus())) {
-            createStaffPermission(organization, accessGroupId, position);
-        }
+        createStaffPermission(organization, accessGroupId, position);
         positionGraphRepository.save(position);
         organization.getPositions().add(position);
         organizationGraphRepository.save(organization);
