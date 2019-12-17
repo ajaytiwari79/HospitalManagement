@@ -519,7 +519,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     public StaffActivitySettingDTO findStaffPersonalizedSettings(Long unitId, BigInteger activityId) {
         Aggregation aggregation = Aggregation.newAggregation(
                 match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and("_id").is(activityId)),
-                project("rulesActivityTab.shortestTime", "rulesActivityTab.longestTime", "rulesActivityTab.earliestStartTime", "rulesActivityTab.latestStartTime", "rulesActivityTab.maximumEndTime", "optaPlannerSettingActivityTab.maxThisActivityPerShift", "optaPlannerSettingActivityTab.minLength", "optaPlannerSettingActivityTab.eligibleForMove")
+                project("rulesActivityTab.shortestTime", "rulesActivityTab.longestTime", "rulesActivityTab.earliestStartTime", "rulesActivityTab.latestStartTime", "rulesActivityTab.maximumEndTime", "optaPlannerSettingActivityTab.maxThisActivityPerShift", "optaPlannerSettingActivityTab.minLength", "optaPlannerSettingActivityTab.eligibleForMove", "timeCalculationActivityTab.defaultStartTime")
         );
         AggregationResults<StaffActivitySettingDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, StaffActivitySettingDTO.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
