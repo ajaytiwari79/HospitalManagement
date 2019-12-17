@@ -22,7 +22,7 @@ db.time_Type.insert({
     "description" : "",
     "childTimeTypeIds" : [],
     "backgroundColor" : "#f7c8ec",
-    "secondLevelType" : "PROTECTED_DAYS_OFF",
+    "secondLevelType" : "GAP",
     "activityCanBeCopiedForOrganizationHierarchy" : [
         "ORGANIZATION",
         "UNIT"

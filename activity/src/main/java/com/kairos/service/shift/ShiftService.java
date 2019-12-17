@@ -91,6 +91,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
+import static com.kairos.enums.TimeTypeEnum.GAP;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 
@@ -1290,7 +1291,7 @@ public class ShiftService extends MongoBaseService {
         Iterator iterator=shift.getActivities().iterator();
         while (iterator.hasNext()){
             ShiftActivity shiftActivity=(ShiftActivity) iterator.next();
-            if("Gap".equals(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getLabel())){
+            if(GAP.equals(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getSecondLevelType())){
                 ShiftActivity breakActivity=shift.getBreakActivities().stream().filter(k->k.getStartDate().before(shiftActivity.getStartDate())).findFirst().orElse(null);
                 if(breakActivity!=null){
                     shift1.setBreakActivities(Arrays.asList(breakActivity));
