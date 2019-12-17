@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.shiftplanning.constraints.activityConstraint.ActivityConstraints;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
@@ -30,6 +31,7 @@ public class Activity {
     private int order;
     private int rank;
     private List<Long> expertises;
+
 
     public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises) {
         this.id = id;
@@ -94,6 +96,9 @@ public class Activity {
     public void setActivityConstraints(ActivityConstraints activityConstraints) {
         this.activityConstraints = activityConstraints;
     }
+
+
+
     public boolean isBlankActivity(){
         return this.name== ShiftPlanningGenerator.BLANK_ACTIVITY;
     }

@@ -57,7 +57,9 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         if (!isDisabled() && validateRulesChildCareDayCheck(infoWrapper.getActivityWrapperMap())) {
             WorkTimeAgreementBalancesCalculationService workTimeAgreementService= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
+
             //CareDaysDTO careDays = getCareDays(infoWrapper.getChildCareDays(), infoWrapper.getStaffAge());
+
             if (isCollectionNotEmpty(infoWrapper.getChildCareDays())) {
                 long leaveCount = calculateChildCareDaysLeaveCount(infoWrapper.getChildCareDays(), infoWrapper.getStaffChildAges());
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);

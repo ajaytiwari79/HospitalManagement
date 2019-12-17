@@ -1,5 +1,5 @@
 package com.planner.controller;
-
+/*
 import com.kairos.dto.planner.constarints.unit.UnitConstraintDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.constraint.unit.UnitConstraintService;
@@ -12,8 +12,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.planner.constants.ApiConstants.API_PARENT_ORGANIZATION_UNIT_CONSTRAINT_URL;
-
+import static com.planner.constants.ApiConstants.API_PARENT_ORGANIZATION_UNIT_CONSTRAINT_URL;*/
+/*
 @RestController
 @RequestMapping(API_PARENT_ORGANIZATION_UNIT_CONSTRAINT_URL)
 public class UnitConstraintController {
@@ -57,4 +57,4 @@ public class UnitConstraintController {
         return ResponseHandler.generateResponse(SUCCESS, HttpStatus.OK);
     }
 
-}
+}*/

@@ -1,37 +1,26 @@
 package com.planner.domain.constraint.unit;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.enums.constraint.ConstraintLevel;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.planner.domain.common.MongoBaseEntity;
 import com.planner.domain.constraint.common.Constraint;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 
-public class UnitConstraint extends Constraint{
 
-    private BigInteger parentCountryConstraintId;//copiedFrom
+@Getter
+@Setter
+@NoArgsConstructor
+@Document
+public class UnitConstraint extends MongoBaseEntity {
     private Long unitId;
+    private PlanningSetting planningSetting;
+    private ConstraintSubType constraintSubType;
 
-    public UnitConstraint() {
-    }
 
-    public UnitConstraint(ConstraintLevel constraintLevel, int penalty, String name) {
-        this.name = name;
-        this.constraintLevel = constraintLevel;
-        this.penalty = penalty;
-    }
-
-    public Long getUnitId() {
-        return unitId;
-    }
-
-    public void setUnitId(Long unitId) {
-        this.unitId = unitId;
-    }
-
-    public BigInteger getParentCountryConstraintId() {
-        return parentCountryConstraintId;
-    }
-
-    public void setParentCountryConstraintId(BigInteger parentCountryConstraintId) {
-        this.parentCountryConstraintId = parentCountryConstraintId;
-    }
 }

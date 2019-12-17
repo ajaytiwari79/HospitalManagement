@@ -10,11 +10,14 @@ import com.kairos.dto.activity.night_worker.QuestionAnswerDTO;
 import com.kairos.dto.activity.night_worker.QuestionnaireAnswerResponseDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlot;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
+import com.kairos.enums.FilterType;
 import com.kairos.enums.IntegrationOperation;
+import com.kairos.enums.StaffWorkingType;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
@@ -58,6 +61,7 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_QUESTIONNAIRE_FREQUENCY;
+import static com.kairos.enums.FilterType.NIGHT_WORKERS;
 
 /**
  * Created by prerna on 8/5/18.
@@ -421,14 +425,20 @@ public class NightWorkerService {
     }
 
     public StaffFilterDTO getFilteredStaffNightWorkerDetails(StaffFilterDTO staffFilterDTO, LocalDate startDate, LocalDate endDate) {
-        Collection<Long> staffIds = staffFilterDTO.getMapOfStaffAndEmploymentIds().keySet();
+        Set<Long> staffIds = staffFilterDTO.getMapOfStaffAndEmploymentIds().keySet();
+        Map<Long, Boolean> staffIdNightWorkerMap = getStaffIdAndNightWorkerMap(staffIds);
+        Map<FilterType, Set<String>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         if (staffFilterDTO.isValidFilterForShift()) {
-            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(staffFilterDTO.getStaffIds(), startDate, endDate);
+            List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(isCollectionEmpty(staffFilterDTO.getStaffIds()) ? staffIds : staffFilterDTO.getStaffIds(), startDate, endDate);
             shiftDTOS = shiftFilterService.getShiftsByFilters(shiftDTOS, staffFilterDTO);
-            staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toList());
+            staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toSet());
+            if(filterTypeMap.containsKey(NIGHT_WORKERS) && filterTypeMap.get(NIGHT_WORKERS).contains(StaffWorkingType.NOT_NIGHT_WORKER.toString())){
+                staffIds.addAll(staffIdNightWorkerMap.keySet().stream().filter(k->!staffIdNightWorkerMap.get(k)).collect(Collectors.toSet()));
+            }
             staffIds.forEach(staffId->staffFilterDTO.getMapOfStaffAndEmploymentIds().remove(staffId));
         }
-        staffFilterDTO.setNightWorkerDetails(getStaffIdAndNightWorkerMap(staffIds));
+        final Set<Long> filteredStaffIds = staffIds;
+        staffFilterDTO.setNightWorkerDetails(staffIdNightWorkerMap.entrySet().stream().filter(x->filteredStaffIds.contains(x.getKey())).collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue)));
         if(staffFilterDTO.isIncludeWorkTimeAgreement()) {
             List<WTAQueryResultDTO> wtaQueryResultDTOS = workingTimeAgreementMongoRepository.getAllWTAByEmploymentIds(staffFilterDTO.getMapOfStaffAndEmploymentIds().values().stream().flatMap(employmentIds -> employmentIds.stream()).collect(Collectors.toList()));
             List<WTAResponseDTO> wtaResponseDTOS = copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);

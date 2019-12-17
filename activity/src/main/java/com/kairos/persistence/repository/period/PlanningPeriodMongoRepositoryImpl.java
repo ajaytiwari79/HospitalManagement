@@ -75,6 +75,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         ProjectionOperation projectionOperation = Aggregation.project(DURATION, DURATION_TYPE).
                 and("id").as("id").
                 andInclude("name").
+                andInclude("dateRange").
                 andInclude(START_DATE).
                 andInclude(UNIT_ID).
                 andInclude(END_DATE).
@@ -103,6 +104,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         ProjectionOperation projectionOperation = Aggregation.project(DURATION, DURATION_TYPE).
                 and("id").as("id").
                 andInclude("name").
+                andInclude("dateRange").
                 andInclude(START_DATE).
                 andInclude(END_DATE).
                 andInclude(PUBLISH_EMPLOYMENT_IDS).
@@ -132,6 +134,7 @@ public class PlanningPeriodMongoRepositoryImpl implements CustomPlanningPeriodMo
         ProjectionOperation projectionOperation = Aggregation.project(DURATION, DURATION_TYPE).
                 and("id").as("id").
                 andInclude("name").
+                andInclude("dateRange").
                 andInclude(START_DATE).
                 andInclude(END_DATE).
                 andInclude(PUBLISH_EMPLOYMENT_IDS).

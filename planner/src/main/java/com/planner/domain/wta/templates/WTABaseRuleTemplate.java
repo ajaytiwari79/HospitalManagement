@@ -1,5 +1,6 @@
 package com.planner.domain.wta.templates;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.WTATemplateType;
 import org.springframework.beans.BeanUtils;
@@ -26,6 +27,7 @@ public class WTABaseRuleTemplate{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected Integer staffCanIgnoreCounter;
     protected Integer managementCanIgnoreCounter;
+
 
     public WTATemplateType getWtaTemplateType() {
         return wtaTemplateType;
