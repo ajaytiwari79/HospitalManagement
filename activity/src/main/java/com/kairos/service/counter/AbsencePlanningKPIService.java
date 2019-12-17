@@ -132,7 +132,7 @@ public class AbsencePlanningKPIService implements CounterService {
         return staffIdAndActivityStatusAndCountMap;
     }
 
-    private List<ClusteredBarChartKpiDataUnit> getActivityStatusCount(List<TodoDTO> todoDTOS) {
+    public List<ClusteredBarChartKpiDataUnit> getActivityStatusCount(List<TodoDTO> todoDTOS) {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
         int pending = 0;
         int disapprove = 0;

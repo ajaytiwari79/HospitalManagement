@@ -23,6 +23,7 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.cta.CalculationUnit;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
@@ -61,6 +62,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.kafka.common.protocol.types.Field;
+import org.apache.poi.ss.formula.functions.T;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
@@ -194,11 +196,70 @@ public class KPIBuilderCalculationService implements CounterService {
         }
         return ShiftActivityCriteria.builder().shiftStatuses(currentShiftActivityCriteria.shiftStatuses).activityIds(activityIds).teamActivityIds(currentShiftActivityCriteria.teamActivityIds).plannedTimeIds(plannedTimeIds).reasonCodeIds(currentShiftActivityCriteria.reasonCodeIds).timeTypeIds(timeTypeIds).build();
     }
-    public TodoActivityCriteria getTodoActivityCriteria(KPICalculationRelatedInfo kpiCalculationRelatedInfo ,List<TodoDTO> todoDTOS){
-
-
-
+    public TodoActivityCriteria getTodoActivityCriteria(KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+         TodoActivityCriteria todoActivityCriteria =kpiCalculationRelatedInfo.getTodoActivityCriteria();
+         Set<BigInteger> activityIds = kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS)?KPIUtils.getBigIntegerSet(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_IDS)):new HashSet<>();
+        return TodoActivityCriteria.builder().todoStatuses(todoActivityCriteria.todoStatuses).activityIds(activityIds).build();
     }
+
+    public double getCountOfStatusesOfTodo(KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+        Map<BigInteger,List<TodoDTO>> activityIdAndTodoListMap =kpiCalculationRelatedInfo.getActivityIdAndTodoListMap();
+        List<TodoDTO> todoDTOS =new ArrayList<>();
+        activityIdAndTodoListMap.forEach((k,v)->{
+            todoDTOS.addAll(v);
+        });
+
+
+        TodoActivityCriteria todoActivityCriteria =getTodoActivityCriteria(kpiCalculationRelatedInfo);
+        Set<BigInteger> activityIds = todoActivityCriteria.getActivityIds();
+        for(BigInteger activityId :activityIds){
+            if(activityIdAndTodoListMap.containsKey(activityId)) {
+                double pending = 0;
+                double disapprove = 0;
+                double approve = 0;
+                double requested = 0;
+                for (TodoDTO todoDTO : todoDTOS) {
+                    switch (todoDTO.getStatus()) {
+                        case REQUESTED:
+                            requested++;
+                        case DISAPPROVE:
+                            disapprove++;
+                        case PENDING:
+                            pending++;
+                        case APPROVE:
+                            approve++;
+                        default:
+                            break;
+                    }
+                    pending= COUNT.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))?pending:(pending*100)/todoDTOS.size();
+                    approve=COUNT.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))?approve:(approve*100)/todoDTOS.size();
+                    disapprove=COUNT.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))?disapprove:(disapprove*100)/todoDTOS.size();
+                    requested=COUNT.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))?requested:(requested*100)/todoDTOS.size();
+                }
+
+            }
+        }
+        return 0.0;
+    }
+
+    private double getTotalByCalculationUnitOfAbsenceRequest(KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, KPIBuilderCalculationService.TodoActivityCriteria todoActivityCriteria, double total ,List<TodoDTO> todoDTOS) {
+        XAxisConfig calculationUnit = (XAxisConfig) ((List)copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
+        switch (calculationUnit) {
+            case COUNT:
+                total = todoDTOS.size();
+                break;
+            case PERCENTAGE_OF_HOURS:
+                Set<BigInteger> activityIds = todoActivityCriteria.getActivityIds();
+                long todoDto = todoDTOS.size();
+                total = todoDto > 0 ? (total * 100 / todoDto) : todoDto;
+                total = KPIUtils.getValueWithDecimalFormat(total);
+                break;
+            default:
+                break;
+        }
+        return total;
+    }
+
 
 
     private double getActivityAndTimeTypeTotalByCalulationType(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -455,6 +516,14 @@ public class KPIBuilderCalculationService implements CounterService {
                     case SENIORDAYS:
                     case TOTAL_ABSENCE_DAYS:
                     case ABSENCE_REQUEST:
+                        Map<BigInteger,List<TodoDTO>> activityIdAndTodoListMap =kpiCalculationRelatedInfo.getActivityIdAndTodoListMap();
+                        List<TodoDTO> todoDTOS =new ArrayList<>();
+                        activityIdAndTodoListMap.forEach((k,v)->{
+                            todoDTOS.addAll(v);
+                        });
+                        List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits =absencePlanningKPIService.getActivityStatusCount(todoDTOS);
+                        subClusteredBarValue.addAll(clusteredBarChartKpiDataUnits);
+                        break;
                     case CHILD_CARE_DAYS:
                         Double count= new Double(getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,count));
@@ -678,21 +747,16 @@ public class KPIBuilderCalculationService implements CounterService {
 
             getDailyTimeBankEntryByDate();
             getWtaRuleDetails();
-            getCountOfTodoStatus();
+            getActivityTodoList();
             updateActivityAndTimeTypeAndPlannedTimeMap();
             planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
         }
 
-        public void getCountOfTodoStatus(){
+        public void getActivityTodoList(){
             todoDTOS=todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(k->k.getSubEntityId(),Collectors.toList()));
 
         }
-
-
-
-
-
 
         public CalculationType getCalculationType(){
             return isNotNull(currentCalculationType) ? currentCalculationType : calculationTypes.get(0);
@@ -894,9 +958,13 @@ public class KPIBuilderCalculationService implements CounterService {
         private Set<ShiftStatus> shiftStatuses;
     }
 
+    @Setter
+    @Getter
+    @Builder
     public static class TodoActivityCriteria{
         private Set<BigInteger> activityIds;
         private Set<TodoStatus> todoStatuses;
+
 
     }
 }
