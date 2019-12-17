@@ -1,0 +1,2 @@
+//set all shift violated rules caused by 'MANAGEMENT'
+db.getCollection('shiftViolatedRules').updateMany({"escalationReasons":{"$exists": true}},{"$set":{"escalationCausedBy":"MANAGEMENT"}});

@@ -35,7 +35,7 @@ public class ShiftViolatedRules extends MongoBaseEntity {
     private List<ActivityRuleViolation> activities;
     private Set<ShiftEscalationReason> escalationReasons;
     private boolean escalationResolved;
-    private AccessGroupRole accessGroupRole;
+    private AccessGroupRole escalationCausedBy;
     private boolean draft;
 
     public ShiftViolatedRules(BigInteger shiftId) {
