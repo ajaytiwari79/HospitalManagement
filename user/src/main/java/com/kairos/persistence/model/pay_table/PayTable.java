@@ -44,7 +44,7 @@ public class PayTable extends UserBaseEntity {
     private BigDecimal percentageValue; // this value is being used to update paygrade and functional amount
 
     public List<PayGrade> getPayGrades() {
-        return Optional.ofNullable(payGrades).orElse(new ArrayList<>());
+        return payGrades=Optional.ofNullable(payGrades).orElse(new ArrayList<>());
     }
 
     public PayTable(String name, String shortName, String description, Level level, LocalDate startDateMillis, LocalDate endDateMillis, String paymentUnit, boolean editable) {
