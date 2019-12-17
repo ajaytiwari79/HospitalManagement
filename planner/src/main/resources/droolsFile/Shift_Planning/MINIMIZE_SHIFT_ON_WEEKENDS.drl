@@ -1,0 +1,21 @@
+package com.kairos.shiftplanning.rules;
+    dialect "java"
+
+import java.util.List;
+import com.kairos.shiftplanning.domain.*;
+import com.kairos.shiftplanning.domain.staff.Employee;
+import com.kairos.shiftplanning.domain.unit.Unit;
+global HardMediumSoftLongScoreHolder scoreHolder;
+
+
+
+rule "Minimize Shift On Weekends"
+salience 20
+  when
+     $unit:Unit()
+     $shifts:List() from collect (ShiftImp(getInterval()!=null));
+     $constraintsPenality: Integer($penalty:intValue) from ($unit.checkActivityConstraints($shifts,1))
+  then
+     scoreHolder.addSoftConstraintMatch(kcontext,$penalty);
+end
+

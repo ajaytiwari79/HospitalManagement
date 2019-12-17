@@ -14,6 +14,7 @@ public class ActivityConstraints {
     private ActivityDayType activityDayType;//Activity is used on a DayType
 
 
+
     public ActivityConstraints(LongestDuration longestDuration, ShortestDuration shortestDuration, MaxAllocationPerShift maxAllocationPerShift,MaxDiffrentActivity maxDiffrentActivity,MinimumLengthofActivity minimumLengthofActivity,ActivityDayType activityDayType) {
         this.longestDuration = longestDuration;
         this.shortestDuration = shortestDuration;
@@ -21,8 +22,11 @@ public class ActivityConstraints {
         //this.continousActivityPerShift = continousActivityPerShift;
         this.maxDiffrentActivity = maxDiffrentActivity;
         this.minimumLengthofActivity = minimumLengthofActivity;
-        this.activityDayType = activityDayType;
+
+
     }
+
+
 
     public ActivityDayType getActivityDayType() {
         return activityDayType;

@@ -578,7 +578,7 @@ public class ShiftPlanningGenerator {
     }
 
     public LocalDate getPlanningWeekStart(){
-        return DateTimeFormat.forPattern("dd/MM/yyyy").parseLocalDate("11/12/2017");
+        return DateTimeFormat.forPattern("dd/MM/yyyy").parseLocalDate("20/12/2019");
     }
    /* public List<LocalDate> getPlanningWeek(){
         LocalDate weekStart=getPlanningWeekStart();
