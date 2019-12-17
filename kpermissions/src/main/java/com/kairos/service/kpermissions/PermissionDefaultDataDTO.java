@@ -6,7 +6,9 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.union.UnionDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.StaffStatusEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -15,6 +17,8 @@ import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PermissionDefaultDataDTO {
 
     private List<ExpertiseDTO> expertises;

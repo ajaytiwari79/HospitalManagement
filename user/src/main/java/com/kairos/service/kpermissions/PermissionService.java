@@ -2,16 +2,21 @@ package com.kairos.service.kpermissions;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.kpermissions.*;
+import com.kairos.dto.kpermissions.FieldDTO;
+import com.kairos.dto.kpermissions.ModelDTO;
+import com.kairos.dto.kpermissions.PermissionDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
-import com.kairos.persistence.model.organization.team.TeamDTO;
-import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
@@ -33,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
+import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ApplicationConstants.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_DATANOTFOUND;
@@ -88,7 +94,7 @@ public class PermissionService {
             }
 
         });
-        kPermissionModels.addAll(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(newModelDTO, KPermissionModel.class));
+        kPermissionModels.addAll(copyPropertiesOfCollectionByMapper(newModelDTO, KPermissionModel.class));
         return kPermissionModels;
     }
 
@@ -134,15 +140,15 @@ public class PermissionService {
         List<KPermissionModel> kPermissionModels = new ArrayList();
         permissionModelRepository.findAll().iterator().forEachRemaining(kPermissionModels::add);
         kPermissionModels = kPermissionModels.stream().filter(it -> !it.isPermissionSubModel()).collect(Collectors.toList());
-        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kPermissionModels, ModelDTO.class);
+        return copyPropertiesOfCollectionByMapper(kPermissionModels, ModelDTO.class);
     }
 
     public Map<String, Object> getPermissionSchema(List<Long> accessGroupIds){
         Map<String, Object> permissionSchemaMap = new HashMap<>();
         List<KPermissionModel> kPermissionModels = getkPermissionModels();
-        permissionSchemaMap.put(PERMISSIONS_SCHEMA,ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kPermissionModels, ModelDTO.class));
+        permissionSchemaMap.put(PERMISSIONS_SCHEMA, copyPropertiesOfCollectionByMapper(kPermissionModels, ModelDTO.class));
         permissionSchemaMap.put(PERMISSIONS, FieldLevelPermission.values());
-        permissionSchemaMap.put(PERMISSION_DATA, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(getModelPermission(newArrayList(),accessGroupIds,false),ModelDTO.class));
+        permissionSchemaMap.put(PERMISSION_DATA, copyPropertiesOfCollectionByMapper(getModelPermission(newArrayList(),accessGroupIds,false),ModelDTO.class));
             return permissionSchemaMap;
     }
 
@@ -282,7 +288,7 @@ public class PermissionService {
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
             boolean hubMember = UserContext.getUserDetails().isHubMember();
             List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
-            List<ModelDTO> modelDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
+            List<ModelDTO> modelDTOS = copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
             Map<String,ModelDTO> modelMap = modelDTOS.stream().collect(Collectors.toMap(k->k.getModelName(),v->v));
             Collection<Long> objectIds = objects.stream().filter(model->isNotNull(model.getId())).map(model->model.getId()).collect(Collectors.toList());
             Map<Long,E> mapOfDataBaseObject = getObjectByIds(objects);
@@ -321,14 +327,16 @@ public class PermissionService {
     }
 
     public PermissionDefaultDataDTO getDefaultDataOfPermission(Long refrenceId, ConfLevel confLevel) {
-        List<TeamDTO> teamDTOS = teamGraphRepository.findAllTeamsInOrganization(refrenceId);
-        List
+        List<TeamDTO> teamDTOS = copyPropertiesOfCollectionByMapper(teamGraphRepository.findAllTeamsInOrganization(refrenceId), TeamDTO.class);
+        //List<Organization> organizations = organizationService.getU
+        OrganizationDTO organizationDTO = null;
         if(ConfLevel.UNIT.equals(confLevel)){
-            OrganizationDTO organizationDTO = organizationService.getOrganizationWithCountryId(refrenceId);
-            List<>
+            organizationDTO = organizationService.getOrganizationWithCountryId(refrenceId);
+
         }
-        List<Expertise> expertise = expertiseGraphRepository.getExpertiesOfCountry(refrenceId);
-
-
+        Long countryId = ConfLevel.COUNTRY.equals(confLevel) ? refrenceId : organizationDTO.getCountryId();
+        List<ExpertiseDTO> expertises = copyPropertiesOfCollectionByMapper(expertiseGraphRepository.getExpertiesOfCountry(countryId),ExpertiseDTO.class);
+        List<EmploymentTypeDTO> employmentTypeDTOS = copyPropertiesOfCollectionByMapper(employmentTypeGraphRepository.getEmploymentTypeByCountry(countryId,false), EmploymentTypeDTO.class);
+        return new PermissionDefaultDataDTO(expertises,null,employmentTypeDTOS,teamDTOS,organizationDTO.getTagDTOS(),newArrayList(StaffStatusEnum.values()));
     }
 }
