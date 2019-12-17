@@ -256,7 +256,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (org) WHERE id(org)={1} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( DISTINCT {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule,sequence:accessPage.sequence}) as permissions\n" +
-            "RETURN id(org) as unitId,'Organization' IN labels(org) as parentOrganization,, permissions as permission")
+            "RETURN id(org) as unitId,'Organization' IN labels(org) as parentOrganization, permissions as permission")
     List<UserPermissionQueryResult> fetchStaffPermissions(Long userId,Long organizationId);
 
 
