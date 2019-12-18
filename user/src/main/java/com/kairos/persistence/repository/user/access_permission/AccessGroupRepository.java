@@ -326,7 +326,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     @Query("MATCH (staff:Staff),(org) WHERE id(staff)={0} AND id(org)={1} \n" +
             "WITH org,staff MATCH (staff)-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org) \n" +
             "MATCH(position)<-[:HAS_POSITIONS]-(organization:Organization)-[:BELONGS_TO]-(country:Country) \n" +
-            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup)-[r:DAY_TYPES]->(dayType:DayType) RETURN ag,collect(r),collect(dayType)")
+            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) " +
+            "OPTIONAL MATCH(ag)-[r:DAY_TYPES]->(dayType:DayType) RETURN ag,collect(r),collect(dayType)")
     List<AccessGroup> getAccessGroupWithDayTypesByStaffIdAndUnitId(Long staffId, Long unitId);
 }
 
