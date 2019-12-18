@@ -932,6 +932,7 @@ public class StaffingLevelService  {
         return staffingLevelDto;
     }
 
+    @Async
     public void removedActivityFromStaffingLevel(BigInteger activityId, boolean isPresence){
         List<StaffingLevel> staffingLevels = isPresence ? staffingLevelMongoRepository.findPresenceStaffingLevelsByActivityId(activityId) : staffingLevelMongoRepository.findAbsenceStaffingLevelsByActivityId(activityId);
         for(StaffingLevel staffingLevel : staffingLevels){
