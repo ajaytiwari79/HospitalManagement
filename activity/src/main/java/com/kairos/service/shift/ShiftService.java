@@ -873,7 +873,7 @@ public class ShiftService extends MongoBaseService {
         }
         ViolatedRulesDTO violatedRulesDTO;
         if (CommonConstants.FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())) {
-            violatedRulesDTO = deleteFullWeekShifts(shiftDTOS, getFullWeekShiftsByDate(shift.getStartDate(), shift.getEmploymentId(), activity), activity, staffAdditionalInfoDTO);
+            violatedRulesDTO = deleteFullWeekShifts(shiftDTOS, getFullWeekShiftsByDate(shift.getStartDate(), shift.getEmploymentId(), activity), staffAdditionalInfoDTO);
         } else {
             violatedRulesDTO = validateRule(shift, staffAdditionalInfoDTO);
             if(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements())) {
@@ -884,7 +884,7 @@ public class ShiftService extends MongoBaseService {
         return new ShiftWithViolatedInfoDTO(shiftDTOS, violatedRulesDTO);
     }
 
-    private ViolatedRulesDTO deleteFullWeekShifts(List<ShiftDTO> shiftDTOS, List<Shift> shifts, Activity activity, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    private ViolatedRulesDTO deleteFullWeekShifts(List<ShiftDTO> shiftDTOS, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
         boolean violatedRules = false;
         List<Shift> deletedShift = new ArrayList<>();
