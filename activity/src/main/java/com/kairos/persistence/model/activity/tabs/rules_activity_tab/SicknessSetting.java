@@ -16,6 +16,8 @@ public class SicknessSetting {
     private boolean childCare;
     private List<Tag> staffTags;
     private boolean topOnApprovedAbsences;
+    private boolean usedOnFreeDays;
+    private boolean usedOnProtecedDaysOff;
 
 
 
