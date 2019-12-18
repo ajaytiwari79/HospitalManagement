@@ -47,10 +47,12 @@ public class RulesActivityTab{
     private boolean eligibleForCopy;
     private DurationField plannedTimeInAdvance;
     private LocalTime maximumEndTime;// shift can't be extend this time
+    //remove after integration
     private boolean allowedAutoAbsence;
     private byte recurrenceDays;// if a staff fall sick and select this activity then for recurrence days and times --   -128 to 127
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.     -128 to 127
     private PQLSettings pqlSettings=new PQLSettings();
     private ReasonCodeRequiredState reasonCodeRequiredState;
+    private SicknessSetting sicknessSetting;
 
 }
