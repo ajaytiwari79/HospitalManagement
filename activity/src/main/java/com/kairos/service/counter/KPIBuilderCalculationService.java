@@ -164,7 +164,7 @@ public class KPIBuilderCalculationService implements CounterService {
         FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, shiftActivityCriteria, false).invoke();
         long interruptShift = filterShiftActivity.shifts.stream().filter(k -> k.getBreakActivities().stream().anyMatch(ShiftActivityDTO::isBreakInterrupt)).count();
         if (PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
-            return isCollectionEmpty(filterShiftActivity.shifts) ? (interruptShift / filterShiftActivity.shifts.size()) * 100 : 0;
+            return isCollectionNotEmpty(filterShiftActivity.shifts) ? getValueWithDecimalFormat((interruptShift * 100.0d) / filterShiftActivity.shifts.size()) : 0;
         } else
             return interruptShift;
     }
@@ -275,7 +275,7 @@ public class KPIBuilderCalculationService implements CounterService {
             escalatedShiftCount = filterShiftActivity.shifts.stream().filter(k -> k.isEscalationResolved()).count();
         }
         if (PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
-            return isCollectionEmpty(filterShiftActivity.shifts) ? (escalatedShiftCount / filterShiftActivity.shifts.size()) * 100 : 0;
+            return isCollectionNotEmpty(filterShiftActivity.shifts) ? getValueWithDecimalFormat((escalatedShiftCount * 100.0d) / filterShiftActivity.shifts.size()) : 0;
         } else {
             return escalatedShiftCount;
         }
