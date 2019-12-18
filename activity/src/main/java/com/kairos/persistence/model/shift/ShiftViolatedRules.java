@@ -3,6 +3,7 @@ package com.kairos.persistence.model.shift;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.shift.ActivityRuleViolation;
 import com.kairos.dto.activity.shift.WorkTimeAgreementRuleViolation;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class ShiftViolatedRules extends MongoBaseEntity {
     private List<ActivityRuleViolation> activities;
     private Set<ShiftEscalationReason> escalationReasons;
     private boolean escalationResolved;
+    private AccessGroupRole escalationCausedBy;
     private boolean draft;
 
     public ShiftViolatedRules(BigInteger shiftId) {

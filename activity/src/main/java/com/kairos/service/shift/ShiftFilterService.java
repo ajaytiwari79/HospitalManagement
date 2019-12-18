@@ -12,6 +12,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.StaffWorkingType;
 import com.kairos.persistence.model.shift.ShiftState;
+import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
@@ -42,6 +43,8 @@ public class ShiftFilterService {
     private TimeTypeService timeTypeService;
     @Inject
     private NightWorkerService nightWorkerService;
+    @Inject
+    private ShiftValidatorService shiftValidatorService;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
@@ -65,12 +68,19 @@ public class ShiftFilterService {
         ShiftFilter plannedByFilter = getPlannedByFilter(unitId,filterTypeMap);
         ShiftFilter phaseFilter = new PhaseFilter(filterTypeMap);
         ShiftFilter groupFilter = getGroupFilter(unitId, filterTypeMap);
+        ShiftFilter escalationFilter = getEscalationFilter(shiftWithActivityDTOS.stream().map(shift->shift.getId()).collect(Collectors.toList()), filterTypeMap);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter)
-                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter);
+                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter);
         shiftWithActivityDTOS = shiftFilter.meetCriteria(shiftWithActivityDTOS);
         List<Long> staffIds = shiftWithActivityDTOS.stream().map(s->s.getStaffId()).collect(Collectors.toList());
         ShiftFilter nightWorkerFilter = getNightWorkerFilter(staffIds, filterTypeMap);
         return nightWorkerFilter.meetCriteria(shiftWithActivityDTOS);
+    }
+
+    private ShiftFilter getEscalationFilter(List<BigInteger> shiftIds, Map<FilterType, Set<String>> filterTypeMap){
+        List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shiftIds,false);
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
+        return new EscalationFilter(shiftViolatedRulesMap, filterTypeMap);
     }
 
     private ShiftFilter getGroupFilter(Long unitId, Map<FilterType, Set<String>> filterTypeMap) {

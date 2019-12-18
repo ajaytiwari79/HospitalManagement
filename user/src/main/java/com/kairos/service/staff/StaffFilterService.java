@@ -207,6 +207,8 @@ public class StaffFilterService {
                 return getGroups(unitId);
             case NIGHT_WORKERS:
                 return dtoToQueryesultConverter(StaffWorkingType.getListOfStaffWorkingTypeForFilters(), objectMapper);
+            case ESCALATION_CAUSED_BY:
+                return dtoToQueryesultConverter(AccessGroupRole.getListOfAccessGroupRoleForFilters(), objectMapper);
             default:
                 exceptionService.invalidRequestException(MESSAGE_STAFF_FILTER_ENTITY_NOTFOUND, filterType.value);
 
