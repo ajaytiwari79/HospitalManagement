@@ -392,6 +392,18 @@ public class ShiftService extends MongoBaseService {
         todoService.createOrUpdateTodo(shifts.get(0), TodoType.APPROVAL_REQUIRED, isNull(shifts.get(0).getId()));
     }
 
+    public ShiftWithViolatedInfoDTO deleteShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo) {
+        List<ShiftDTO> responseShiftDTOS = new ArrayList<>();
+        List<Shift> shifts = shiftMongoRepository.findAllByIdInAndDeletedFalseOrderByStartDateAsc(shiftWithViolatedInfo.getShifts().stream().map(s->s.getId()).collect(Collectors.toList()));
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shifts.get(0).getActivities().get(0).getStartDate()), shifts.get(0).getStaffId(), shifts.get(0).getEmploymentId(), Collections.emptySet());
+        for (Shift shift : shifts) {
+            shift.setDeleted(true);
+            responseShiftDTOS.add(deleteShift(shift, staffAdditionalInfoDTO));
+        }
+        shiftWithViolatedInfo.setShifts(responseShiftDTOS);
+        return shiftWithViolatedInfo;
+    }
+
     public ShiftWithViolatedInfoDTO saveShiftAfterValidation(ShiftWithViolatedInfoDTO shiftWithViolatedInfo, Boolean validatedByStaff, boolean updateShiftState, Long unitId, ShiftActionType shiftActionType, TodoType todoType) {
         boolean updateWTACounterFlag = true;
         List<ShiftDTO> responseShiftDTOS = new ArrayList<>();
@@ -880,6 +892,8 @@ public class ShiftService extends MongoBaseService {
             if(isCollectionEmpty(violatedRulesDTO.getWorkTimeAgreements())) {
                 shift.setDeleted(true);
                 shiftDTOS.add(deleteShift(shift, staffAdditionalInfoDTO));
+            }else{
+                shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
             }
         }
         return new ShiftWithViolatedInfoDTO(shiftDTOS, violatedRulesDTO);
@@ -887,25 +901,22 @@ public class ShiftService extends MongoBaseService {
 
     private ViolatedRulesDTO deleteFullWeekShifts(List<ShiftDTO> shiftDTOS, List<Shift> shifts, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
-        boolean violatedRules = false;
-        List<Shift> deletedShift = new ArrayList<>();
         for (Shift shift : shifts) {
             violatedRulesDTO = validateRule(shift, staffAdditionalInfoDTO);
             if(isCollectionNotEmpty(violatedRulesDTO.getWorkTimeAgreements())) {
-                violatedRules = true;
                 break;
             }
             shift.setDeleted(true);
             shiftMongoRepository.save(shift);
-            deletedShift.add(shift);
         }
-        if(!violatedRules){
-            for (Shift shift : shifts) {
-                shiftDTOS.add(deleteShift(shift, staffAdditionalInfoDTO));
-            }
+        if(isCollectionNotEmpty(violatedRulesDTO.getWorkTimeAgreements())){
+            shifts.forEach(shift -> {
+                shift.setDeleted(false);
+                shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
+            });
+            shiftMongoRepository.saveAll(shifts);
         }else{
-            deletedShift.forEach(shift -> shift.setDeleted(false));
-            shiftMongoRepository.saveAll(deletedShift);
+            shifts.forEach(shift ->shiftDTOS.add(deleteShift(shift, staffAdditionalInfoDTO)));
         }
         return violatedRulesDTO;
     }
