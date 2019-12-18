@@ -208,7 +208,7 @@ public class PermissionService {
     private List<ModelPermissionQueryResult> getModelPermissionQueryResults(List<KPermissionModel> kPermissionModels, Map<Long, ModelPermissionQueryResult> modelPermissionMap, Map<Long, FieldPermissionQueryResult> fieldLevelPermissionMap,OrganizationCategory organizationCategory, boolean hubMember) {
         List<ModelPermissionQueryResult> modelPermissionQueryResults = new ArrayList<>();
         for (KPermissionModel kPermissionModel : kPermissionModels) {
-            ModelPermissionQueryResult modelPermissionQueryResult = modelPermissionMap.get(kPermissionModel.getId());
+            ModelPermissionQueryResult modelPermissionQueryResult = modelPermissionMap.getOrDefault(kPermissionModel.getId(),new ModelPermissionQueryResult(kPermissionModel.getId(),kPermissionModel.getModelName()));
             if (isCollectionNotEmpty(kPermissionModel.getFieldPermissions())) {
                 modelPermissionQueryResult.setFieldPermissions(getFieldLevelPermissionQueryResult(fieldLevelPermissionMap,kPermissionModel.getFieldPermissions()));
             }
@@ -227,7 +227,7 @@ public class PermissionService {
     private List<FieldPermissionQueryResult> getFieldLevelPermissionQueryResult(Map<Long,FieldPermissionQueryResult> fieldLevelPermissionMap,List<KPermissionField> fields){
         List<FieldPermissionQueryResult> fieldPermissionQueryResults = new ArrayList<>();
         for (KPermissionField field : fields) {
-            FieldPermissionQueryResult fieldLevelPermissions = fieldLevelPermissionMap.get(field.getId());
+            FieldPermissionQueryResult fieldLevelPermissions = fieldLevelPermissionMap.getOrDefault(field.getId(),new FieldPermissionQueryResult(field.getId(),field.getFieldName()));
             fieldPermissionQueryResults.add(fieldLevelPermissions);
         }
         return fieldPermissionQueryResults;

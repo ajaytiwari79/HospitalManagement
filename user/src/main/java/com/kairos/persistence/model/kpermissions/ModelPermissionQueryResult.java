@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -24,16 +25,19 @@ public class ModelPermissionQueryResult {
 
     private List<FieldPermissionQueryResult> fieldPermissions= new ArrayList<>();
 
-    private List<ModelPermissionQueryResult> subModelPermissions= new ArrayList<>();
+    private List<ModelPermissionQueryResult> subModelPermissions = new ArrayList<>();
 
     private Set<FieldLevelPermission> permissions;
-    private Set<Long> expertiseIds;
-    private Set<Long> unionIds;
-    private Set<Long> teamIds;
-    private Set<Long> employmentTypeIds;
-    private Set<Long> tagIds;
-    private Set<StaffStatusEnum> staffStatuses;
-    private Set<FieldLevelPermission> forOtherFieldLevelPermissions;
+    private Set<Long> expertiseIds = new HashSet<>();
+    private Set<Long> unionIds = new HashSet<>();
+    private Set<Long> teamIds = new HashSet<>();
+    private Set<Long> employmentTypeIds = new HashSet<>();
+    private Set<Long> tagIds = new HashSet<>();
+    private Set<StaffStatusEnum> staffStatuses = new HashSet<>();
+    private Set<FieldLevelPermission> forOtherFieldLevelPermissions = new HashSet<>();
 
-
+    public ModelPermissionQueryResult(Long id, String modelName) {
+        this.id = id;
+        this.modelName = modelName;
+    }
 }
