@@ -16,6 +16,7 @@ import com.kairos.persistence.model.user.filter.FilterGroup;
 import com.kairos.persistence.model.user.filter.FilterSelection;
 import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ public class GroupService {
     private EnvConfig envConfig;
     @Inject
     private OrganizationService organizationService;
+    @Inject private StaffGraphRepository staffGraphRepository;
 
     public GroupDTO createGroup(Long unitId, GroupDTO groupDTO) {
         Unit unit = unitGraphRepository.findOne(unitId);
@@ -93,7 +95,7 @@ public class GroupService {
 
     public List<GroupDTO> getAllGroupsOfUnit(Long unitId) {
         Unit unit = unitGraphRepository.findOne(unitId);
-        List<Group> groups=groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(unit.getGroups().stream().map(k->k.getId()).collect(Collectors.toList()));
+        List<Group> groups = isNull(unit) ? new ArrayList<>() : groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(unit.getGroups().stream().map(k->k.getId()).collect(Collectors.toList()));
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for(Group group : groups){
             groupDTOS.add(getGroupDTOFromGroup(group));
@@ -151,7 +153,7 @@ public class GroupService {
             }
         }
         Organization organization=organizationService.fetchParentOrganization(unitId);
-        List<Map> staffs = unitGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
+        List<Map> staffs = staffGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
         if(isNotNull(ageRange)) {
             final AgeRangeDTO age = new AgeRangeDTO(Integer.parseInt(ageRange.get("from").toString()), isNotNull(ageRange.get("to")) ? Integer.parseInt(ageRange.get("to").toString()) : null, DurationType.valueOf(ageRange.get("durationType").toString()));
             staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("age").toString()), age)).collect(Collectors.toList());

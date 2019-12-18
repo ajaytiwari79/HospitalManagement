@@ -824,28 +824,27 @@ public class StaffingLevelService  {
         List<StaffingLevel> staffingLevels = new ArrayList<>();
         dateWiseActivityDTOS.forEach(currentDateWiseActivities -> {
             Map<BigInteger, BigInteger> activityMap = currentDateWiseActivities.getActivityIds().stream().collect(Collectors.toMap(k -> k, v -> v));
-            Set<StaffingLevelActivity> selectedActivitiesForCurrentDate = new HashSet<>();
             List<StaffingLevelInterval> staffingLevelIntervals = new ArrayList<>();
-            staffingLevelTemplate.getPresenceStaffingLevelInterval().forEach(staffingLevelInterval -> {
+            for (StaffingLevelInterval staffingLevelInterval : staffingLevelTemplate.getPresenceStaffingLevelInterval()) {
+                Set<StaffingLevelActivity> selectedActivitiesForCurrentDate = new HashSet<>();
                 StaffingLevelInterval currentInterval = ObjectMapperUtils.copyPropertiesByMapper(staffingLevelInterval, StaffingLevelInterval.class);
-                AtomicInteger min = new AtomicInteger(0);
-                AtomicInteger max = new AtomicInteger(0);
-                staffingLevelInterval.getStaffingLevelActivities().forEach(activity -> {
-
-                    if (activityMap.get(activity.getActivityId()) != null && activityValidationErrorMap.get(activity.getActivityId()) == null) {
-                        selectedActivitiesForCurrentDate.add(activity);
-                        if(parentActivityIds.contains(activity.getActivityId())){
-                            min.addAndGet(activity.getMinNoOfStaff());
-                            max.addAndGet(activity.getMaxNoOfStaff());
+                int min = 0;
+                int max = 0;
+                for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
+                    if (activityMap.containsKey(staffingLevelActivity.getActivityId()) && !activityValidationErrorMap.containsKey(staffingLevelActivity.getActivityId())) {
+                        selectedActivitiesForCurrentDate.add(staffingLevelActivity);
+                        if(parentActivityIds.contains(staffingLevelActivity.getActivityId())){
+                            min+=staffingLevelActivity.getMinNoOfStaff();
+                            min+=staffingLevelActivity.getMaxNoOfStaff();
                         }
 
                     }
-                });
+                }
                 currentInterval.setStaffingLevelActivities(selectedActivitiesForCurrentDate);
-                currentInterval.setMinNoOfStaff(min.get());
-                currentInterval.setMaxNoOfStaff(max.get());
+                currentInterval.setMinNoOfStaff(min);
+                currentInterval.setMaxNoOfStaff(max);
                 staffingLevelIntervals.add(currentInterval);
-            });
+            }
             StaffingLevel staffingLevel = getStaffingLevelIfExist(dateStaffingLevelMap, currentDateWiseActivities, staffingLevelIntervals, staffingLevelTemplate, unitId);
             staffingLevels.add(staffingLevel);
         });
@@ -933,6 +932,7 @@ public class StaffingLevelService  {
         return staffingLevelDto;
     }
 
+    @Async
     public void removedActivityFromStaffingLevel(BigInteger activityId, boolean isPresence){
         List<StaffingLevel> staffingLevels = isPresence ? staffingLevelMongoRepository.findPresenceStaffingLevelsByActivityId(activityId) : staffingLevelMongoRepository.findAbsenceStaffingLevelsByActivityId(activityId);
         for(StaffingLevel staffingLevel : staffingLevels){

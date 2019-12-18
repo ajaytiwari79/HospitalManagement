@@ -10,9 +10,12 @@ import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.FilterType;
+import com.kairos.enums.StaffWorkingType;
 import com.kairos.persistence.model.shift.ShiftState;
+import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,11 @@ public class ShiftFilterService {
     private ShiftStateService shiftStateService;
     @Inject
     private TimeTypeService timeTypeService;
+    @Inject
+    private NightWorkerService nightWorkerService;
+    @Inject
+    private ShiftValidatorService shiftValidatorService;
+
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
         Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
@@ -45,6 +53,7 @@ public class ShiftFilterService {
             staffFilterDTO = new StaffFilterDTO();
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
+
         List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
         Map<FilterType, Set<String>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         ShiftFilter timeTypeFilter = getTimeTypeFilter(filterTypeMap);
@@ -58,9 +67,29 @@ public class ShiftFilterService {
         ShiftFilter realTimeStatusFilter = getSickTimeTypeFilter(unitId, filterTypeMap);
         ShiftFilter plannedByFilter = getPlannedByFilter(unitId,filterTypeMap);
         ShiftFilter phaseFilter = new PhaseFilter(filterTypeMap);
+        ShiftFilter groupFilter = getGroupFilter(unitId, filterTypeMap);
+        ShiftFilter escalationFilter = getEscalationFilter(shiftWithActivityDTOS.stream().map(shift->shift.getId()).collect(Collectors.toList()), filterTypeMap);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter)
-                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter);
-        return shiftFilter.meetCriteria(shiftWithActivityDTOS);
+                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter);
+        shiftWithActivityDTOS = shiftFilter.meetCriteria(shiftWithActivityDTOS);
+        List<Long> staffIds = shiftWithActivityDTOS.stream().map(s->s.getStaffId()).collect(Collectors.toList());
+        ShiftFilter nightWorkerFilter = getNightWorkerFilter(staffIds, filterTypeMap);
+        return nightWorkerFilter.meetCriteria(shiftWithActivityDTOS);
+    }
+
+    private ShiftFilter getEscalationFilter(List<BigInteger> shiftIds, Map<FilterType, Set<String>> filterTypeMap){
+        List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shiftIds,false);
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
+        return new EscalationFilter(shiftViolatedRulesMap, filterTypeMap);
+    }
+
+    private ShiftFilter getGroupFilter(Long unitId, Map<FilterType, Set<String>> filterTypeMap) {
+        Set<Long> groupMembers = new HashSet<>();
+        if(filterTypeMap.containsKey(GROUPS) && isCollectionNotEmpty(filterTypeMap.get(GROUPS))) {
+            List<Long> groupIds = filterTypeMap.get(GROUPS).stream().map(s -> new Long(s)).collect(Collectors.toList());
+            groupMembers = userIntegrationService.getAllStaffIdsByGroupIds(unitId, groupIds);
+        }
+        return new GroupFilter(groupMembers,filterTypeMap);
     }
 
     private ShiftFilter getSickTimeTypeFilter(Long unitId, Map<FilterType, Set<String>> filterTypeMap) {
@@ -134,5 +163,9 @@ public class ShiftFilterService {
         return new PlannedByFilter(staffUserIds,filterTypeMap);
     }
 
+    private ShiftFilter getNightWorkerFilter(List<Long> staffIds, Map<FilterType, Set<String>> filterTypeMap){
+        Map<Long, Boolean> nightWorkerMap = nightWorkerService.getStaffIdAndNightWorkerMap(staffIds);
+        return new NightWorkerFilter(nightWorkerMap, filterTypeMap);
+    }
 
 }

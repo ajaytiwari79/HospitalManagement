@@ -3,7 +3,6 @@ package com.kairos.persistence.repository.user.staff;
 import com.kairos.enums.SkillLevel;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.auth.User;
-import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.*;
@@ -21,7 +20,6 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,6 +90,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (teams:Team)-[:" + TEAM_HAS_MEMBER + "{isEnabled:true}]->(staff) WITH user,staff,skills,collect(id(teams)) AS teams,organization\n" +
             "RETURN id(staff) AS id,user.cprNumber AS cprNumber,staff.firstName+\" \"+staff.lastName AS name,{2} + staff.profilePic AS profilePic,teams,skills,id(organization) AS unitId order by name")
     List<StaffAdditionalInfoQueryResult> getStaffInfoByUnitIdAndStaffIds(long unitId, List<Long> staffIds, String imgUrl);
+
 
     @Query("MATCH (staff:Staff) WHERE id(staff)={0} MATCH (team)-[r:" + TEAM_HAS_MEMBER + "]->(staff) SET r.isEnabled=false RETURN r")
     List<StaffTeamRelationship> removeStaffFromAllTeams(long staffId);

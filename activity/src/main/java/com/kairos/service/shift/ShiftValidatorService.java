@@ -198,6 +198,13 @@ public class ShiftValidatorService {
         if (wtaQueryResultDTO.getEndDate() != null && wtaQueryResultDTO.getEndDate().isBefore(asLocalDate(shift.getEndDate()))) {
             exceptionService.actionNotPermittedException(MESSAGE_WTA_EXPIRED_UNIT);
         }
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.getPlanningPeriodContainsDate(shift.getUnitId(), asLocalDate(shift.getStartDate()));
+        if (planningPeriod == null) {
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PLANNING_PERIOD_EXITS, shift.getStartDate());
+        }
+        if(staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())){
+            exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
+        }
         shift.setPhaseId(phase.getId());
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, CREATE);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
@@ -318,6 +325,7 @@ public class ShiftValidatorService {
             shiftViolatedRules.setWorkTimeAgreements(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
         }
         if (isNotNull(shiftViolatedRules)) {
+            shiftViolatedRules.setEscalationCausedBy(UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
             shiftViolatedRulesMongoRepository.save(shiftViolatedRules);
         }
 
@@ -967,5 +975,9 @@ public class ShiftValidatorService {
             }
         }
         return shiftOverlap;
+    }
+
+    public List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds,boolean draft){
+        return shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds,draft);
     }
 }
