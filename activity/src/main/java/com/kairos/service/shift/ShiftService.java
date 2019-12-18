@@ -889,22 +889,22 @@ public class ShiftService extends MongoBaseService {
         ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
         boolean violatedRules = false;
         List<Shift> deletedShift = new ArrayList<>();
-        for (Shift shift1 : shifts) {
-            violatedRulesDTO = validateRule(shift1, staffAdditionalInfoDTO);
+        for (Shift shift : shifts) {
+            violatedRulesDTO = validateRule(shift, staffAdditionalInfoDTO);
             if(isCollectionNotEmpty(violatedRulesDTO.getWorkTimeAgreements())) {
                 violatedRules = true;
                 break;
             }
-            shift1.setDeleted(true);
-            shiftMongoRepository.save(shift1);
-            deletedShift.add(shift1);
+            shift.setDeleted(true);
+            shiftMongoRepository.save(shift);
+            deletedShift.add(shift);
         }
         if(!violatedRules){
-            for (Shift shift1 : shifts) {
-                shiftDTOS.add(deleteShift(shift1, staffAdditionalInfoDTO));
+            for (Shift shift : shifts) {
+                shiftDTOS.add(deleteShift(shift, staffAdditionalInfoDTO));
             }
         }else{
-            deletedShift.forEach(shift1 -> shift1.setDeleted(false));
+            deletedShift.forEach(shift -> shift.setDeleted(false));
             shiftMongoRepository.saveAll(deletedShift);
         }
         return violatedRulesDTO;
