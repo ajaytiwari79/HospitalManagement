@@ -15,12 +15,12 @@ import javax.validation.Valid;
 
 import java.math.BigInteger;
 import java.util.Map;
+import static com.planner.constants.ApiConstants.API_V1;
 
-import static com.planner.constants.ApiConstants.API_UNIT_CONSTRAINT;
-import static com.planner.constants.ApiConstants.API_UNIT_URL;
+
 
 @RestController
-@RequestMapping(API_UNIT_CONSTRAINT)
+@RequestMapping(API_V1)
 public class UnitConstraintController {
     public static final String SUCCESS = "Success";
 
@@ -28,25 +28,22 @@ public class UnitConstraintController {
     private UnitConstraintService unitConstraintService;
 
 
-    @PostMapping
+    @PostMapping(value="/createOrUpdateUnitConstraint")
     @ApiOperation("Create UnitConstraint")
     public ResponseEntity<Map<String, Object>> createUnitConstraint(@RequestBody @Valid UnitConstraintDTO unitConstraintDTO) {
-
-
-        unitConstraintService.createUnitConstraint(unitConstraintDTO);
-        return ResponseHandler.generateResponse(SUCCESS, HttpStatus.OK);
+        return ResponseHandler.generateResponseWithData(SUCCESS,HttpStatus.OK,unitConstraintService.createUnitConstraint(unitConstraintDTO));
     }
 
-    @GetMapping(value="/{unitId}")
+    @GetMapping(value="/unit/{unitId}/unitConstraints")
     @ApiOperation("Get UnitConstraint")
     public ResponseEntity<Map<String, Object>> getAllUnitConstraintByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,unitConstraintService.getAllUnitConstraintByUnitId(unitId));
     }
 
-    @PutMapping
-    @ApiOperation("Update UnitConstraint")
-    public ResponseEntity<Map<String, Object>> updateUnitConstraint(@RequestBody @Valid UnitConstraintDTO unitConstraintDTO) {
-        return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,unitConstraintService.updateUnitConstraint(unitConstraintDTO));
+    @GetMapping(value="/unitConstraints")
+    @ApiOperation("Get All  UnitConstraint")
+    public ResponseEntity<Map<String, Object>> getUnitConstraints() {
+        return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,unitConstraintService.getunitconstraints());
     }
 
 
