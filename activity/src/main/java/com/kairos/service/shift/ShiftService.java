@@ -898,7 +898,9 @@ public class ShiftService extends MongoBaseService {
                 shift.setDeleted(true);
                 shiftDTOS.add(deleteShift(shift, staffAdditionalInfoDTO));
             }else{
-                shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
+                ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
+                shiftDTO.setShiftDate(asLocalDate(shift.getStartDate()));
+                shiftDTOS.add(shiftDTO);
             }
         }
         return new ShiftWithViolatedInfoDTO(shiftDTOS, violatedRulesDTO);
@@ -917,7 +919,9 @@ public class ShiftService extends MongoBaseService {
         if(isCollectionNotEmpty(violatedRulesDTO.getWorkTimeAgreements())){
             shifts.forEach(shift -> {
                 shift.setDeleted(false);
-                shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
+                ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
+                shiftDTO.setShiftDate(asLocalDate(shift.getStartDate()));
+                shiftDTOS.add(shiftDTO);
             });
             shiftMongoRepository.saveAll(shifts);
         }else{
@@ -963,6 +967,7 @@ public class ShiftService extends MongoBaseService {
         shiftDTO.setEndDate(shift.getEndDate());
         shiftDTO.setUnitId(shift.getUnitId());
         shiftDTO.setDeleted(true);
+        shiftDTO.setShiftDate(asLocalDate(shift.getStartDate()));
         shiftDTO.setActivities(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shift.getActivities(), ShiftActivityDTO.class));
         setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
         todoService.deleteTodo(shift.getId(), null);
