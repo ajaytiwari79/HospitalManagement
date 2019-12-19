@@ -23,5 +23,6 @@ public class StaffPermissionRelatedDataQueryResult {
     private List<Long> expertiseIds;
     private List<StaffStatusEnum> staffStatuses;
     private List<Long> tagIds;
+    private List<Long> unionIds;
 
 }

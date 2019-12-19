@@ -549,11 +549,11 @@ public class StaffingLevelService  {
 
     private HttpUriRequest createPostRequest(JSONObject body, Map<String, Object> urlParameters, Map<String, String> headers, String url) {
         HttpPost postRequest = new HttpPost(url);
-        if (headers == null) headers = new HashMap<String, String>();
+        if (headers == null) headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         postRequest = (HttpPost) setHeaders(headers, postRequest);
         if (urlParameters != null) {
-            List<BasicNameValuePair> parametersList = new ArrayList<BasicNameValuePair>();
+            List<BasicNameValuePair> parametersList = new ArrayList<>();
             for (Map.Entry<String, Object> entry : urlParameters.entrySet()) {
                 parametersList.add(new BasicNameValuePair(entry.getKey(), (String) entry.getValue()));
             }

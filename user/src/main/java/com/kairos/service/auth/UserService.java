@@ -481,10 +481,12 @@ public class UserService {
             permissionData.setOrganizationPermissions(unitPermission);
         }
         updateLastSelectedOrganizationIdAndCountryId(organizationId);
-         permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
-         permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(),userAccessRoleDTO.getAccessGroupIds(),UserContext.getUserDetails().isHubMember()), ModelDTO.class));
-         updateChatStatus(ChatStatus.ONLINE);
-         return permissionData;
+        permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
+        permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isHubMember()), ModelDTO.class));
+        Organization parent = organizationService.fetchParentOrganization(organizationId);
+        permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
+        updateChatStatus(ChatStatus.ONLINE);
+        return permissionData;
     }
 
 

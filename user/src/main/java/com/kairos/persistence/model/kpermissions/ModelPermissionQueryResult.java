@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.kpermissions;
 
+import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class ModelPermissionQueryResult {
 
     private List<ModelPermissionQueryResult> subModelPermissions = new ArrayList<>();
 
-    private Set<FieldLevelPermission> permissions;
+    private Set<FieldLevelPermission> permissions = new HashSet<>();
     private Set<Long> expertiseIds = new HashSet<>();
     private Set<Long> unionIds = new HashSet<>();
     private Set<Long> teamIds = new HashSet<>();
@@ -39,5 +40,21 @@ public class ModelPermissionQueryResult {
     public ModelPermissionQueryResult(Long id, String modelName) {
         this.id = id;
         this.modelName = modelName;
+    }
+
+    public ModelPermissionQueryResult(Long id, Set<FieldLevelPermission> permissions, Set<Long> expertiseIds, Set<Long> unionIds, Set<Long> teamIds, Set<Long> employmentTypeIds, Set<Long> tagIds, Set<StaffStatusEnum> staffStatuses, Set<FieldLevelPermission> forOtherFieldLevelPermissions) {
+        this.id = id;
+        this.permissions = permissions;
+        this.expertiseIds = expertiseIds;
+        this.unionIds = unionIds;
+        this.teamIds = teamIds;
+        this.employmentTypeIds = employmentTypeIds;
+        this.tagIds = tagIds;
+        this.staffStatuses = staffStatuses;
+        this.forOtherFieldLevelPermissions = forOtherFieldLevelPermissions;
+    }
+
+    public OtherPermissionDTO getForOtherPermissions() {
+        return new OtherPermissionDTO(expertiseIds,unionIds,teamIds,employmentTypeIds,tagIds,staffStatuses,forOtherFieldLevelPermissions);
     }
 }

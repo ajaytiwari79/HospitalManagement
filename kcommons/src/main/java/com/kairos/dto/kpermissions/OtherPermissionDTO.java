@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class OtherPermissionDTO {
 
     private Set<Long> expertiseIds;
@@ -23,5 +25,5 @@ public class OtherPermissionDTO {
     private Set<Long> employmentTypeIds;
     private Set<Long> tagIds;
     private Set<StaffStatusEnum> staffStatuses;
-    private Set<FieldLevelPermission> forOtherFieldLevelPermissions;
+    private Set<FieldLevelPermission> permissions;
 }

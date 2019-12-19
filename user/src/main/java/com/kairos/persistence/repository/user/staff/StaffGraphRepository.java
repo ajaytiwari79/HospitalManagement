@@ -17,6 +17,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -472,8 +473,21 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
             "OPTIONAL MATCH (staff)-[:TEAM_HAS_MEMBER]-(team:Team{deleted:false})\n" +
             "OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(tag:Tag{deleted:false}) \n" +
             "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]-(employment:Employment{deleted:false})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[:HAS_EMPLOYMENT_TYPE]-(employmentType:EmploymentType)\n" +
-            "OPTIONAL MATCH(staff)-[:STAFF_HAS_EXPERTISE]-(expertise:Expertise)\n" +
-            "return distinct id(staff) as staffId,collect(distinct staff.currentStatus) as staffStatuses,collect(distinct id(team)) as teamIds,collect(distinct id(employmentType))as employmentTypeIds,collect(distinct id(expertise))as expertiseIds,collect(distinct id(tag))as tagIds")
-    List<StaffPermissionRelatedDataQueryResult> getStaffPermissionRelatedDataQueryResult(Long organizationId);
+            "OPTIONAL MATCH(staff)-[:STAFF_HAS_EXPERTISE]-(expertise:Expertise)-[:SUPPORTED_BY_UNION]-(union:Organization)\n" +
+            "return distinct id(staff) as staffId,collect(distinct staff.currentStatus) as staffStatuses,collect(distinct id(team)) as teamIds,collect(distinct id(employmentType))as employmentTypeIds,collect(distinct id(expertise))as expertiseIds,collect(distinct id(tag))as tagIds,collect(distinct id(union))as unionIds")
+    List<StaffPermissionRelatedDataQueryResult> getStaffsPermissionRelatedDataQueryResult(Long organizationId);
+
+    @Query("MATCH (staff:Staff{deleted:false}) where id(staff) In {0}\n" +
+            "OPTIONAL MATCH (staff)-[:TEAM_HAS_MEMBER]-(team:Team{deleted:false})\n" +
+            "OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(tag:Tag{deleted:false}) \n" +
+            "OPTIONAL MATCH(staff)-[:BELONGS_TO_STAFF]-(employment:Employment{deleted:false})-[:HAS_EMPLOYMENT_LINES]-(employmentLine:EmploymentLine)-[:HAS_EMPLOYMENT_TYPE]-(employmentType:EmploymentType)\n" +
+            "OPTIONAL MATCH(staff)-[:STAFF_HAS_EXPERTISE]-(expertise:Expertise)-[:SUPPORTED_BY_UNION]-(union:Organization)\n" +
+            "return distinct id(staff) as staffId,collect(distinct staff.currentStatus) as staffStatuses,collect(distinct id(team)) as teamIds,collect(distinct id(employmentType))as employmentTypeIds,collect(distinct id(expertise))as expertiseIds,collect(distinct id(tag))as tagIds,collect(distinct id(union))as unionIds")
+    List<StaffPermissionRelatedDataQueryResult> getStaffPermissionRelatedDataQueryResult(Collection<Long> staffIds);
+
+    @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE id(organization)={1}" +
+            "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WHERE id(user)={0} RETURN id(staff)")
+    Long getStaffIdByUserId(Long userId, Long parentOrganizationId);
+
 }
 

@@ -1103,8 +1103,16 @@ public class StaffService {
         staffGraphRepository.unlinkTagFromStaff(tagId);
     }
 
-    public List<StaffPermissionRelatedDataQueryResult> getStaffDataForPermissionByUnitId(Long unitId) {
+    public List<StaffPermissionRelatedDataQueryResult> getStaffsDataForPermissionByUnitId(Long unitId) {
         Organization organization = organizationService.fetchParentOrganization(unitId);
-        return staffGraphRepository.getStaffPermissionRelatedDataQueryResult(organization.getId());
+        return staffGraphRepository.getStaffsPermissionRelatedDataQueryResult(organization.getId());
+    }
+
+    public Map<Long,StaffPermissionRelatedDataQueryResult> getStaffDataForPermissionByStaffIds(Collection<Long> staffIds) {
+        return staffGraphRepository.getStaffPermissionRelatedDataQueryResult(staffIds).stream().collect(Collectors.toMap(StaffPermissionRelatedDataQueryResult::getStaffId,v->v));
+    }
+
+    public Long getStaffIdByUserId(Long userId,Long parentOrganizationId){
+        return staffGraphRepository.getStaffIdByUserId(userId,parentOrganizationId);
     }
 }

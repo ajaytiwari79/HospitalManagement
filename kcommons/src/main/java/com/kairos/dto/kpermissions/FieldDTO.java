@@ -20,7 +20,7 @@ public class FieldDTO {
     private String fieldName;
     private Set<OrganizationCategory> organizationCategories;
     private Set<FieldLevelPermission> permissions;
-    private OtherPermissionDTO forOtherPermission;
+    private OtherPermissionDTO forOtherPermissions;
 
     public Set<FieldLevelPermission> getPermissions() {
         return isCollectionNotEmpty(permissions) ? permissions : new HashSet<>();

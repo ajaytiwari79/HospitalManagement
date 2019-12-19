@@ -1,6 +1,5 @@
 package com.kairos.controller.staff;
 
-import com.google.common.primitives.Chars;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -8,7 +7,6 @@ import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
-import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
@@ -38,13 +36,9 @@ import javax.validation.Valid;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
-import static java.util.stream.Collectors.summingInt;
 
 /**
  * Created by prabjot on 24/10/16.
@@ -662,7 +656,7 @@ public class StaffController {
     @ApiOperation("get staffs data for permission by unitId")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffDataForPermissionByUnitId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffDataForPermissionByUnitId(unitId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsDataForPermissionByUnitId(unitId));
     }
 
 
