@@ -162,21 +162,19 @@ public class KPIBuilderCalculationService implements CounterService {
         return total;
     }
 
-    public Long getActualTimeBank(Long staffId,Long unitId,KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    public double getActualTimeBank(Long staffId,Long unitId,KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.staffKpiFilterDTOS;
          Long actualTimeBank =0l; ;
         if (isCollectionNotEmpty(staffKpiFilterDTOS)) {
             for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
-                actualTimeBank =0l;
                 for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
                     TimeBankService.CalculateActualTimebank calculateActualTimebank = timeBankService.new CalculateActualTimebank(unitId,employmentWithCtaDetailsDTO).invoke();
-                    Long actualTimebank = calculateActualTimebank.getActualTimebank();
-
+                    actualTimeBank = calculateActualTimebank.getActualTimebank();
                 }
             }
-
         }
-        return actualTimeBank;
+
+        return  getHoursByMinutes(actualTimeBank);
     }
 
     private double getNumberOfBreakInterrupt(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
