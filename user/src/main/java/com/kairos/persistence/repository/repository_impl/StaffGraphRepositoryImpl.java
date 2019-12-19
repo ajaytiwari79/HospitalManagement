@@ -109,9 +109,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
     public List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
                                          Map<FilterType, Set<String>> filters, String searchText, String imagePath) {
-        searchText=searchText.replaceAll(" ","");
         Map<String, Object> queryParameters = new HashMap<>();
-
         queryParameters.put("unitId", unitId);
         queryParameters.put("parentOrganizationId", parentOrganizationIds);
         if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent()) {
@@ -147,6 +145,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                     convertListOfStringIntoLong(filters.get(FilterType.FUNCTIONS)));
         }
         if (StringUtils.isNotBlank(searchText)) {
+            searchText=searchText.replaceAll(" ","");
             queryParameters.put("searchText", searchText);
         }
         queryParameters.put("imagePath", imagePath);
