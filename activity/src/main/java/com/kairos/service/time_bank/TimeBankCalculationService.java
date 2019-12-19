@@ -725,8 +725,8 @@ public class TimeBankCalculationService {
     private void updateTimebankIntervalWithDefaultValue(long totalTimeBankBefore, String query, List<TimeTypeDTO> timeTypeDTOS, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, Interval interval, List<ShiftWithActivityDTO> shifts, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut) {
         timeBankIntervalDTO.setTotalTimeBankAfterCtaMin(totalTimeBankBefore - approvePayOut);
         timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore + timeBankOfInterval);
-        timeBankIntervalDTO.setTotalTimeBankMin(-timeBankOfInterval + approvePayOut);
-        timeBankIntervalDTO.setTotalTimeBankDiff(-timeBankOfInterval + approvePayOut);
+        timeBankIntervalDTO.setTotalTimeBankMin(timeBankOfInterval + approvePayOut);
+        timeBankIntervalDTO.setTotalTimeBankDiff(timeBankOfInterval + approvePayOut);
         timeBankIntervalDTO.setTitle(getTitle(query, interval));
         timeBankIntervalDTO.setTimeBankDistribution(getDistributionOfTimeBank(new HashMap<>(), ctaRuleTemplateDTOS, 0,new HashMap<>()));
         timeBankIntervalDTO.setWorkingTimeType(isNotNull(timeTypeDTOS) ? getWorkingTimeType(interval, shifts, timeTypeDTOS) : null);

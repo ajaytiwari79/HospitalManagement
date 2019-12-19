@@ -55,6 +55,6 @@ public class ModelPermissionQueryResult {
     }
 
     public OtherPermissionDTO getForOtherPermissions() {
-        return new OtherPermissionDTO(expertiseIds,unionIds,teamIds,employmentTypeIds,tagIds,staffStatuses,forOtherFieldLevelPermissions);
+        return new OtherPermissionDTO(expertiseIds,unionIds,teamIds,employmentTypeIds,tagIds,staffStatuses,forOtherFieldLevelPermissions,null);
     }
 }

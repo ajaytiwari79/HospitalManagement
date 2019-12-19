@@ -26,4 +26,5 @@ public class OtherPermissionDTO {
     private Set<Long> tagIds;
     private Set<StaffStatusEnum> staffStatuses;
     private Set<FieldLevelPermission> permissions;
+    private Long staffId;
 }

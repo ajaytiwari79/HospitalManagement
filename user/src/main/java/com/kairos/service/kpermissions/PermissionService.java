@@ -352,10 +352,6 @@ public class PermissionService {
     public <T extends UserBaseEntity,E extends UserBaseEntity> List<T> updateModelBasisOfPermission(List<T> objects){
         try {
             FieldPermissionHelper fieldPermissionHelper = new FieldPermissionHelper(objects);
-            Map<String, ModelDTO> modelMap = fieldPermissionHelper.getModelMap();
-            Map<Long, E> mapOfDataBaseObject = fieldPermissionHelper.getMapOfDataBaseObject();
-            Map<Long, StaffPermissionRelatedDataQueryResult> staffPermissionRelatedDataQueryResultMap = fieldPermissionHelper.getStaffPermissionRelatedDataQueryResultMap();
-            Long currentUserStaffId = fieldPermissionHelper.getCurrentUserStaffId();
             updateObjectsPropertiesBeforeSave(fieldPermissionHelper);
         }catch (Exception e){
             LOGGER.error(e.getMessage());
@@ -366,7 +362,9 @@ public class PermissionService {
 
     public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(FieldPermissionHelper fieldPermissionHelper){
         for (T object : (List<T>)fieldPermissionHelper.getObjects()) {
-            ObjectMapperUtils.copySpecificPropertiesByMapper(object,fieldPermissionHelper.getMapOfDataBaseObject().get(object.getId()),modelMap.get(object.getClass().getSimpleName()));
+            E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(object.getId());
+            ModelDTO modelDTO = (ModelDTO) fieldPermissionHelper.getModelMap().get(object.getClass().getSimpleName());
+            ObjectMapperUtils.copySpecificPropertiesByMapper(object,databaseObject,modelDTO,fieldPermissionHelper.getCurrentUserStaffId(),fieldPermissionHelper.);
         }
     }
 
