@@ -23,17 +23,17 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
             "MATCH (region)-[:"+BELONGS_TO+"]->(country:Country) RETURN id(country)")
     Long getCountryIdByUnitId(long unitId);
 
-    @Query("Match(unit:Unit) where id(unit)={0} " +
-            "Match(staff:Staff)  where id(staff) in {1} with staff,unit " +
-            "Optional Match(skill:Skill{isEnabled:true})<-[:" + STAFF_HAS_SKILLS + "]-(staff) " +
-            "Optional Match(unit)<-[:" + IN_UNIT + "]-(employment:Employment)<-[:" + BELONGS_TO_STAFF + "]-(staff) " +
-            "return " +
-            "id(staff) as staffId,\n" +
-            "staff.firstName+staff.lastName as staffName,\n" +
-            "collect({skillId:id(skill),name:skill.name,weight:skill.weight}) as staffSkills,\n" +
-            "id(employment) as employmentId limit 1"
+    @Query("Match(unit:Unit) where id(unit)={0} Match(staff:Staff)  where id(staff) in {1} with staff,unit \n" +
+            "Optional Match(skill:Skill{isEnabled:true})<-[:STAFF_HAS_SKILLS]-(staff) \n" +
+            "Optional Match(unit)<-[:IN_UNIT]-(employment:Employment)<-[:BELONGS_TO_STAFF]-(staff) \n" +
+            " return DISTINCT id(staff) as staffId,\n" +
+            "staff.firstName+staff.lastName as staffName,CASE WHEN skill is null then [] else\n" +
+            "collect({skillId:id(skill),name:skill.name,weight:skill.weight}) END as staffSkills,\n" +
+            "collect(id(employment)) as employmentIds"
     )
     List<StaffQueryResult> getStaffWithSkillsAndEmploymentIds(Long unitId, List<Long> staffIds);
+
+
 
     /**
      * this method will return all OrganizationServices and Its SubServices
@@ -80,4 +80,7 @@ public interface UserNeo4jRepo extends Neo4jRepository<Dummy, Long> {
             "WITH case when os  is NULL then [] else collect({id:id(ss),name:ss.name}) END as organizationSubServices,os\n" +
             "RETURN  id(os) as id ,os.name as name,organizationSubServices as organizationSubServices")
     List<OrganizationServiceQueryResult> getAllOrganizationServicesByUnitId(Long unitId);
+
+
+
 }
