@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.service.mail.MailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
@@ -287,9 +288,10 @@ public class StaffService {
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
         setStaffChildDetails(staffToUpdate, staffPersonalDetail);
-
         updateUserDetails(staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
-
+        // Set if user is female and pregnant
+        User user = updateUserDetails(staffId, staffPersonalDetail);
+        staffPersonalDetail.setPregnant(user.isPregnant());
         //saving addresses of staff
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getPrimaryAddress(), staffPersonalDetail.getSecondaryAddress()));
         assignTags(staffId, staffPersonalDetail, staffToUpdate);
@@ -302,9 +304,6 @@ public class StaffService {
         }
         List<Long> expertiseIds = expertise.stream().map(Expertise::getId).collect(Collectors.toList());
         staffGraphRepository.updateSkillsByExpertise(staffToUpdate.getId(), expertiseIds, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime(), SkillLevel.ADVANCE);
-        // Set if user is female and pregnant
-        User user = updateUserDetails(staffId, staffPersonalDetail);
-        staffPersonalDetail.setPregnant(user.isPregnant());
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults));
         teamService.assignStaffInTeams(staff, staffPersonalDetail.getTeamDetails(), unitId);
@@ -313,11 +312,11 @@ public class StaffService {
 
     private User updateUserDetails(long staffId, StaffPersonalDetail staffPersonalDetail) {
         User user = userGraphRepository.getUserByStaffId(staffId);
-        if (!user.getCprNumber().equals(staffPersonalDetail.getCprNumber())) {
+        if(!ObjectUtils.isEquals(user.getCprNumber(),staffPersonalDetail.getCprNumber())){
             user.setCprNumber(staffPersonalDetail.getCprNumber());
             user.setDateOfBirth(CPRUtil.fetchDateOfBirthFromCPR(staffPersonalDetail.getCprNumber()));
+            user.setGender(CPRUtil.getGenderFromCPRNumber(staffPersonalDetail.getCprNumber()));
         }
-        user.setGender(staffPersonalDetail.getGender());
         user.setPregnant(Gender.FEMALE.equals(user.getGender()) && staffPersonalDetail.isPregnant());
         user.setUserName(staffPersonalDetail.getUserName());
         userGraphRepository.save(user);
@@ -343,7 +342,7 @@ public class StaffService {
 
     private void updateUserDetails(StaffPersonalDetail staffPersonalDetail, UserAccessRoleDTO userAccessRoleDTO, Staff staffToUpdate) {
         if (userAccessRoleDTO.getManagement() || staffToUpdate.getUser().getId().equals(UserContext.getUserDetails().getId())) {
-            if (!staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffPersonalDetail.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
+            if (isNull(staffToUpdate.getUser().getUserName()) || !staffToUpdate.getUser().getUserName().equalsIgnoreCase(staffPersonalDetail.getUserName()) && !staffToUpdate.getUser().isUserNameUpdated()) {
                 User user = userGraphRepository.findUserByUserName("(?i)" + staffPersonalDetail.getUserName());
                 if (!Optional.ofNullable(user).isPresent()) {
                     staffToUpdate.getUser().setUserName(staffPersonalDetail.getUserName());
@@ -380,10 +379,10 @@ public class StaffService {
         List<StaffExpertiseRelationShip> staffExpertiseRelationShips = new ArrayList<>();
         for (int i = 0; i < staffPersonalDetail.getExpertiseWithExperience().size(); i++) {
             Expertise expertise = expertiseMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
-            expertise=expertiseGraphRepository.findById(expertise.getId(),2).orElse(null);
+            expertise = expertiseGraphRepository.findById(expertise.getId(), 2).orElse(null);
             StaffExperienceInExpertiseDTO staffExperienceInExpertiseDTO = staffExperienceInExpertiseDTOMap.get(staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseId());
             Long id = null;
-            ExpertiseLine expertiseLine=expertise.getCurrentlyActiveLine(null);
+            ExpertiseLine expertiseLine = expertise.getCurrentlyActiveLine(null);
             if (Optional.ofNullable(staffExperienceInExpertiseDTO).isPresent())
                 id = staffExperienceInExpertiseDTO.getId();
             Date expertiseStartDate = staffPersonalDetail.getExpertiseWithExperience().get(i).getExpertiseStartDate();
