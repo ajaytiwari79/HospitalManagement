@@ -835,11 +835,11 @@ public class StaffingLevelService  {
                         selectedActivitiesForCurrentDate.add(staffingLevelActivity);
                         if(parentActivityIds.contains(staffingLevelActivity.getActivityId())){
                             min+=staffingLevelActivity.getMinNoOfStaff();
-                            min+=staffingLevelActivity.getMaxNoOfStaff();
+                            max+=staffingLevelActivity.getMaxNoOfStaff();
                         }
 
                     }
-                };
+                }
                 currentInterval.setStaffingLevelActivities(selectedActivitiesForCurrentDate);
                 currentInterval.setMinNoOfStaff(min);
                 currentInterval.setMaxNoOfStaff(max);
