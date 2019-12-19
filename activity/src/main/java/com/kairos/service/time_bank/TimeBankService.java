@@ -38,6 +38,8 @@ import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.shift.ShiftService;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -614,20 +616,18 @@ public class TimeBankService{
         StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaffByEmploymentId(unitId, null, ORGANIZATION, employmentId, new HashSet<>());
         EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = getEmploymentDetailDTO(staffAdditionalInfoDTO, unitId);
         T object;
-        DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
-        LocalDate periodEndDate = planningPeriodInterval.getEndLocalDate();
-        LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
-        Date startDate  = asDate(employmentStartDate);
-        Date endDate = asDate(periodEndDate);
-        List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, endDate);
-        long timeBankOffMinutes = timeBankRepository.getTimeBankOffMinutes(employmentId);
-        Long actualTimebank = timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate);
-        actualTimebank -= timeBankOffMinutes;
+        CalculateActualTimebank calculateActualTimebank = new CalculateActualTimebank(unitId, employmentWithCtaDetailsDTO).invoke();
+        DateTimeInterval planningPeriodInterval = calculateActualTimebank.getPlanningPeriodInterval();
+        LocalDate periodEndDate = calculateActualTimebank.getPeriodEndDate();
+        LocalDate employmentStartDate = calculateActualTimebank.getEmploymentStartDate();
+        Date startDate = calculateActualTimebank.getStartDate();
+        Date endDate = calculateActualTimebank.getEndDate();
+        Long actualTimebank = calculateActualTimebank.getActualTimebank();
         object = (T)actualTimebank;
         if(isNull(includeActualTimebank)) {
             List<CTARuleTemplateDTO> ruleTemplates = costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
             ruleTemplates = ruleTemplates.stream().filter(distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
-            dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, asDate(periodEndDate));
+            List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, asDate(periodEndDate));
             java.time.LocalDate firstRequestPhasePlanningPeriodEndDate = planningPeriodService.findFirstRequestPhasePlanningPeriodByUnitId(unitId).getEndDate();
             object = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)object,ruleTemplates);
         }
@@ -734,7 +734,34 @@ public class TimeBankService{
         }
     }
 
+    @Getter
+    @Setter
+    public class CalculateActualTimebank {
+        private Long unitId;
+        private EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO;
+        private DateTimeInterval planningPeriodInterval;
+        private LocalDate periodEndDate;
+        private LocalDate employmentStartDate;
+        private Date startDate;
+        private Date endDate;
+        private Long actualTimebank;
 
+        public CalculateActualTimebank(Long unitId, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
+            this.unitId = unitId;
+            this.employmentWithCtaDetailsDTO = employmentWithCtaDetailsDTO;
+        }
 
-
+        public CalculateActualTimebank invoke() {
+            planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
+            periodEndDate = planningPeriodInterval.getEndLocalDate();
+            employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
+            startDate = asDate(employmentStartDate);
+            endDate = asDate(periodEndDate);
+            List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentWithCtaDetailsDTO.getId(), endDate);
+            long timeBankOffMinutes = timeBankRepository.getTimeBankOffMinutes(employmentWithCtaDetailsDTO.getId());
+            actualTimebank = timeBankCalculationService.calculateActualTimebank(planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, periodEndDate, employmentStartDate);
+            actualTimebank -= timeBankOffMinutes;
+            return this;
+        }
+    }
 }

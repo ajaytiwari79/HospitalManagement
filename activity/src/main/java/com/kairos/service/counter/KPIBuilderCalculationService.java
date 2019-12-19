@@ -22,6 +22,7 @@ import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.gdpr.Staff;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -59,6 +60,7 @@ import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
@@ -140,6 +142,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
     @Inject
     private ShiftValidatorService shiftValidatorService;
+    @Inject
+    private TimeBankService timeBankService;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -156,6 +160,23 @@ public class KPIBuilderCalculationService implements CounterService {
                 break;
         }
         return total;
+    }
+
+    public Long getActualTimeBank(Long staffId,Long unitId,KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.staffKpiFilterDTOS;
+         Long actualTimeBank =0l; ;
+        if (isCollectionNotEmpty(staffKpiFilterDTOS)) {
+            for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
+                actualTimeBank =0l;
+                for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
+                    TimeBankService.CalculateActualTimebank calculateActualTimebank = timeBankService.new CalculateActualTimebank(unitId,employmentWithCtaDetailsDTO).invoke();
+                    Long actualTimebank = calculateActualTimebank.getActualTimebank();
+
+                }
+            }
+
+        }
+        return actualTimeBank;
     }
 
     private double getNumberOfBreakInterrupt(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -242,6 +263,8 @@ public class KPIBuilderCalculationService implements CounterService {
                 break;
             case DELTA_TIMEBANK:
                 return getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo, false);
+            case ACTUAL_TIMEBANK:
+                return  getActualTimeBank(staffId,kpiCalculationRelatedInfo.unitId,kpiCalculationRelatedInfo);
             case STAFFING_LEVEL_CAPACITY:
                 return getTotalTimeBankOrContractual(staffId, dateTimeInterval, kpiCalculationRelatedInfo, true);
             case UNAVAILABILITY:
@@ -494,6 +517,7 @@ public class KPIBuilderCalculationService implements CounterService {
                     subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
                     break;
                 case PROTECTED_DAYS_OFF:
+                case ACTUAL_TIMEBANK:
                 case CARE_DAYS:
                 case SENIORDAYS:
                 case TOTAL_ABSENCE_DAYS:
@@ -688,6 +712,7 @@ public class KPIBuilderCalculationService implements CounterService {
         kpiResponseDTO.setKpiId(kpi.getId());
         return kpiResponseDTO;
     }
+
 
     @Getter
     @Setter
