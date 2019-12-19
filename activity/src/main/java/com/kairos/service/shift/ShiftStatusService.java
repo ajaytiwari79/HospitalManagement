@@ -355,7 +355,7 @@ public class ShiftStatusService {
         templateParam.put("descriptionPart3", bodyPart3);
         templateParam.put("descriptionPart4", bodyPart4);
         templateParam.put("descriptionPart5", bodyPart5);
-        if(isNotNull(disapproveComments)){
+        if(isNotNull(disapproveComments) && !disapproveComments.equals("")){
             templateParam.put("descriptionPart6", bodyPart6);
             templateParam.put("descriptionPart7", bodyPart7);
             templateParam.put("descriptionPart8", bodyPart8);
