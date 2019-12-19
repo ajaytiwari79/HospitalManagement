@@ -4,6 +4,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.FieldDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
+import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.dto.kpermissions.PermissionDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.EmploymentTypeDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
@@ -19,7 +20,6 @@ import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.kpermissions.*;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPermissionRelatedDataQueryResult;
 import com.kairos.persistence.repository.custom_repository.CommonRepositoryImpl;
 import com.kairos.persistence.repository.kpermissions.PermissionFieldRepository;
 import com.kairos.persistence.repository.kpermissions.PermissionModelRepository;
@@ -363,8 +363,7 @@ public class PermissionService {
     public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(FieldPermissionHelper fieldPermissionHelper){
         for (T object : (List<T>)fieldPermissionHelper.getObjects()) {
             E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(object.getId());
-            ModelDTO modelDTO = (ModelDTO) fieldPermissionHelper.getModelMap().get(object.getClass().getSimpleName());
-            ObjectMapperUtils.copySpecificPropertiesByMapper(object,databaseObject,modelDTO,fieldPermissionHelper.getCurrentUserStaffId(),fieldPermissionHelper.);
+            ObjectMapperUtils.copySpecificPropertiesByMapper(object,databaseObject,fieldPermissionHelper.getPermissionHelper(object.getClass().getSimpleName(),FieldLevelPermission.WRITE));
         }
     }
 
@@ -391,21 +390,22 @@ public class PermissionService {
         private List<T> objects;
         private Map<String, ModelDTO> modelMap;
         private Map<Long, E> mapOfDataBaseObject;
-        private Map<Long, StaffPermissionRelatedDataQueryResult> staffPermissionRelatedDataQueryResultMap;
+        private Map<Long, OtherPermissionDTO> otherPermissionDTOMap;
         private Long currentUserStaffId;
+        private boolean hubMember;
 
         public FieldPermissionHelper(List<T> objects) {
             this.objects = objects;
             Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
             Set<String> modelNames = objects.stream().map(model->model.getClass().getSimpleName()).collect(Collectors.toSet());
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
-            boolean hubMember = UserContext.getUserDetails().isHubMember();
+            hubMember = UserContext.getUserDetails().isHubMember();
             List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
             List<ModelDTO> modelDTOS = copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
             modelMap = modelDTOS.stream().collect(Collectors.toMap(k -> k.getModelName(), v -> v));
             Map[] mapArray = getObjectByIds(objects);
             mapOfDataBaseObject = mapArray[0];
-            staffPermissionRelatedDataQueryResultMap = mapArray[1];
+            otherPermissionDTOMap = mapArray[1];
             Organization parentOrganisation = organizationService.fetchParentOrganization(unitId);
             currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
         }
@@ -426,8 +426,12 @@ public class PermissionService {
                     mapOfDataBaseObject.put((ID)object.getId(),object);
                 }
             }
-            Map<Long, StaffPermissionRelatedDataQueryResult> staffPermissionRelatedDataQueryResultMap = staffService.getStaffDataForPermissionByStaffIds((Set<Long>)objectIdsMap.get(Staff.class));
+            Map<Long, OtherPermissionDTO> staffPermissionRelatedDataQueryResultMap = staffService.getStaffDataForPermissionByStaffIds((Set<Long>)objectIdsMap.get(Staff.class));
             return new Map[]{mapOfDataBaseObject,staffPermissionRelatedDataQueryResultMap};
+        }
+
+        public ObjectMapperUtils.PermissionHelper getPermissionHelper(String className,FieldLevelPermission fieldLevelPermission){
+            return new ObjectMapperUtils.PermissionHelper(modelMap.get(className),currentUserStaffId,otherPermissionDTOMap,hubMember,fieldLevelPermission);
         }
     }
 }

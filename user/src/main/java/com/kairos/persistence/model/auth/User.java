@@ -118,6 +118,11 @@ public class User extends UserBaseEntity {
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
     private ChatStatus chatStatus;
 
+    public User(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;
         this.firstName = firstName;

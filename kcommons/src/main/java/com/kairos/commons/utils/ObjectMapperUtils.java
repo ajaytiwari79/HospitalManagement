@@ -10,9 +10,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.kairos.dto.kpermissions.FieldDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
+import com.kairos.dto.kpermissions.OtherPermissionDTO;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
@@ -153,47 +150,7 @@ public class ObjectMapperUtils {
         return mapper;
     }
 
-    /*public static <E extends Object>  E copyObjectSpecificPropertiesByMapper(Object src, Object target, List<KPermissionModelFieldDTO> accessibleFieldsWithModelName, Class baseClass) {
-        if (src != null) {
-            BeanWrapper targetWrapper = null;
-            try {
-                BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
-                if (target == null) {
-                    target = src.getClass().newInstance();
-                }
-                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
-                Map<String, Object> subModelObjects = new HashMap<>();
-                for (KPermissionModelFieldDTO kPermissionModelFieldDTO : accessibleFieldsWithModelName) {
-                    mapModelDataByPermission(src, baseClass, targetWrapper, srcWrapper, subModelObjects, kPermissionModelFieldDTO);
-                }
-                return (E) targetWrapper.getWrappedInstance();
-            } catch (Exception ex) {
-                LOGGER.error(ERROR,ex);
-            }
-        }else{
-            return null;
-        }
-        return null;
-    }*/
-
-    /*private static void mapModelDataByPermission(Object src, Class baseClass, BeanWrapper targetWrapper, BeanWrapper srcWrapper, Map<String, Object> subModelObjects, KPermissionModelFieldDTO kPermissionModelFieldDTO) {
-        String modelName = kPermissionModelFieldDTO.getModelName();
-        if (!modelName.equalsIgnoreCase(src.getClass().getSimpleName()) && srcWrapper.getPropertyType(modelName) != null && baseClass.isAssignableFrom(srcWrapper.getPropertyType(modelName)) ) {
-            Object validatedObject = copyObjectSpecificPropertiesByMapper(srcWrapper.getPropertyValue(modelName),
-                    targetWrapper.getPropertyValue(modelName), kPermissionModelFieldDTO.getFieldPermissions());
-            subModelObjects.put(modelName, validatedObject);
-        } else if (modelName.equalsIgnoreCase(src.getClass().getSimpleName())) {
-            for (String field : kPermissionModelFieldDTO.getFieldPermissions()) {
-                if (subModelObjects.containsKey(field)) {
-                    targetWrapper.setPropertyValue(field, subModelObjects.get(field));
-                } else {
-                    targetWrapper.setPropertyValue(field, srcWrapper.getPropertyValue(field));
-                }
-            }
-        }
-    }*/
-
-    public static <E>  E copySpecificPropertiesByMapper(E src, E target, ModelDTO modelDTO) {
+    public static <E>  E copySpecificPropertiesByMapper(E src, E target, PermissionHelper permissionHelper) {
         if (src != null) {
             BeanWrapper targetWrapper = null;
             try {
@@ -203,7 +160,7 @@ public class ObjectMapperUtils {
                // updateObjectByPermission(modelDTO,src,target);
                 BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
                 targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
-                updatePropertyByPermission(modelDTO, targetWrapper, srcWrapper,"");
+                updatePropertyByPermission(permissionHelper, targetWrapper, srcWrapper,"",permissionHelper.getModelDTO());
                 return (E) srcWrapper.getWrappedInstance();
             } catch (Exception ex) {
                 LOGGER.error(ERROR,ex);
@@ -214,89 +171,37 @@ public class ObjectMapperUtils {
         return null;
     }
 
-    private static <E> void updateObjectByPermission(ModelDTO modelDTO, E src, E target) {
-        try {
-            if(!(src instanceof Collection)){
-                if (isNull(target)) {
-                    target = (E) src.getClass().newInstance();
-                }
-                updatePermission(modelDTO, src, target);
-            }else {
-                /*for (E o : ((Collection) src)) {
-                    updateObjectByPermission()
-                }*/
-            }
-        } catch (NoSuchFieldException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
+    private static boolean verifyFieldPermission(FieldDTO fieldDTO,PermissionHelper permissionHelper) {
+        boolean fieldPermissionvalid = !fieldDTO.getPermissions().contains(FieldLevelPermission.WRITE);
+
+        return permissionHelper.isHubMember() || fieldPermissionvalid;
     }
 
-    private static <E> void updatePermission(ModelDTO modelDTO, E src, E target) throws NoSuchFieldException, IllegalAccessException {
+
+    private static void updatePropertyByPermission(PermissionHelper permissionHelper, BeanWrapper targetWrapper, BeanWrapper srcWrapper,String subFieldName,ModelDTO modelDTO) {
         for (FieldDTO field : modelDTO.getFieldPermissions()) {
-            updateFieldValueByPermission(src, target, field);
-            if (isCollectionNotEmpty(modelDTO.getSubModelPermissions())) {
-                for (ModelDTO subModelPermission : modelDTO.getSubModelPermissions()) {
-                    updateObjectByPermission(subModelPermission, src.getClass().getDeclaredField(subModelPermission.getModelName()), target.getClass().getDeclaredField(subModelPermission.getModelName()));
-
-                }
-            }
-        }
-    }
-
-    private static <E> void updateFieldValueByPermission(E src, E target, FieldDTO field) throws NoSuchFieldException, IllegalAccessException {
-        if (!field.getPermissions().contains(FieldLevelPermission.WRITE)) {
-            Field srcField = src.getClass().getDeclaredField(field.getFieldName());
-            srcField.setAccessible(true);
-            srcField.get(src);
-            Field targetField = src.getClass().getDeclaredField(field.getFieldName());
-            targetField.setAccessible(true);
-            srcField.set(src, targetField.get(target));
-        }
-    }
-
-
-    private static void updatePropertyByPermission(ModelDTO modelDTO, BeanWrapper targetWrapper, BeanWrapper srcWrapper,String subFieldName) {
-        for (FieldDTO field : modelDTO.getFieldPermissions()) {
-            if (!field.getPermissions().contains(FieldLevelPermission.WRITE) && targetWrapper.isReadableProperty(subFieldName+field.getFieldName()) && srcWrapper.isWritableProperty(subFieldName+field.getFieldName())) {
+            if (verifyFieldPermission(field,permissionHelper)) {
                 srcWrapper.setPropertyValue(subFieldName+field.getFieldName(), targetWrapper.getPropertyValue(subFieldName+field.getFieldName()));
             }
         }
         if(isCollectionNotEmpty(modelDTO.getSubModelPermissions())){
             for (ModelDTO subModelPermission : modelDTO.getSubModelPermissions()) {
-                updatePropertyByPermission(subModelPermission, targetWrapper, srcWrapper,subModelPermission.getModelName()+".");
+                updatePropertyByPermission(permissionHelper, targetWrapper, srcWrapper,subModelPermission.getModelName()+".",subModelPermission);
 
             }
         }
     }
 
-    /*private static void setPropertyByPermission(BeanWrapper targetWrapper, BeanWrapper srcWrapper, KPermissionModelFieldDTO kPermissionModelFieldDTO) {
-        for (String field : kPermissionModelFieldDTO.getModelFields()) {
-            if(targetWrapper.isWritableProperty(field) && srcWrapper.isReadableProperty(field)) {
-                targetWrapper.setPropertyValue(field, srcWrapper.getPropertyValue(field));
-            }
-        }
-    }*/
-
-    public static <E extends Object>  E copyObjectSpecificPropertiesByMapper(Object src, Object target, List<String> accessibleFieldNames) {
-        BeanWrapper targetWrapper = null;
-        if (src != null) {
-            try {
-                BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
-                if (target == null) {
-                    target = src.getClass().newInstance();
-                }
-                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
-                for (String prop : accessibleFieldNames) {
-                    targetWrapper.setPropertyValue(prop, srcWrapper.getPropertyValue(prop));
-                }
-                return (E)targetWrapper.getWrappedInstance();
-            } catch (Exception ex) {
-                LOGGER.error(ERROR,ex);
-            }
-        }else{
-            return null;
-        }
-        return null;
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class PermissionHelper{
+        private ModelDTO modelDTO;
+        private Long currentUserStaffId;
+        private Map<Long, OtherPermissionDTO> otherPermissionDTOMap;
+        private boolean hubMember;
+        //Permission To check
+        private FieldLevelPermission permission;
     }
 
 }

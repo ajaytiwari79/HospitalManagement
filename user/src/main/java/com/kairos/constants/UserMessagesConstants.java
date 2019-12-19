@@ -450,5 +450,8 @@ public class UserMessagesConstants {
     public static final String MESSAGE_PAYGROUP_USED = "message.paygroup.used";
     public static final String MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT = "message.group.already.exists.in.unit";
     public static final String MESSAGE_GROUP_NOT_FOUND = "message.group.not.Found";
-
+    public static  final String ERROR_STAFF_CPRNUMBER_NOTNULL="error.staff.cprNumber.notnull";
+    public static final String  ERROR_EMAIL_VALID="error.email.valid";
+    public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.staff.userName.notnull";
+    public static  final String ERROR_STAFF_ACCESSGROUP_NOTNULL="error.staff.accessGroup.id.notnull";
 }

@@ -31,6 +31,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -353,7 +354,7 @@ public class ShiftStatusService {
         templateParam.put("descriptionPart3", bodyPart3);
         templateParam.put("descriptionPart4", bodyPart4);
         templateParam.put("descriptionPart5", bodyPart5);
-        if(isNotNull(disapproveComments)){
+        if(StringUtils.isNotBlank(disapproveComments)){
             templateParam.put("descriptionPart6", bodyPart6);
             templateParam.put("descriptionPart7", bodyPart7);
             templateParam.put("descriptionPart8", bodyPart8);
