@@ -298,7 +298,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
             "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
-            "OPTIONAL MATCH (org)-[:"+HAS_SUB_ORGANIZATION+"*]->(subOrg:Organization{isEnable:true}) WITH position,org+[subOrg] as coll\n" +
+            "OPTIONAL MATCH (org)-[:"+HAS_UNIT+"]->(subOrg:Unit{isEnable:true}) WITH position,org+[subOrg] as coll\n" +
             "unwind coll as orgList WITH  DISTINCT orgList,position \n" +
             "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:"+HAS_SUB_ORGANIZATION+"*1..]->(orgList) \n" +
             "WITH o,position, [o]+orgList as units  unwind units as org  WITH DISTINCT org,o,position\n" +
