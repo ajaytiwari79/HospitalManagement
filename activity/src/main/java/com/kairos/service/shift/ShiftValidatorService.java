@@ -301,6 +301,7 @@ public class ShiftValidatorService {
             shiftViolatedRules.setWorkTimeAgreements(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
         }
         if (isNotNull(shiftViolatedRules)) {
+            shiftViolatedRules.setEscalationCausedBy(UserContext.getUserDetails().isManagement() ? AccessGroupRole.MANAGEMENT : AccessGroupRole.STAFF);
             shiftViolatedRulesMongoRepository.save(shiftViolatedRules);
         }
 
@@ -946,5 +947,9 @@ public class ShiftValidatorService {
             }
         }
         return shiftOverlap;
+    }
+
+    public List<ShiftViolatedRules> findAllViolatedRulesByShiftIds(List<BigInteger> shiftIds,boolean draft){
+        return shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds,draft);
     }
 }
