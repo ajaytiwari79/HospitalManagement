@@ -11,6 +11,7 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.StaffStatusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -55,6 +56,7 @@ public class StaffAdditionalInfoDTO {
     private boolean countryAdmin;
     private List<TagDTO> tags;
     private boolean nightWorker;
+    private StaffStatusEnum currentStatus;
     private Map<String, String> unitWiseAccessRole;
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
