@@ -16,5 +16,5 @@ public interface CustomTimeBankRepository {
 
     List<DailyTimeBankEntry> findAllDailyTimeBankByEmploymentIdAndBetweenDates(Long employmentId, Date startDate, Date endDate);
 
-    public long getTimeBankOffMinutes(Long employmentId);
+     long getTimeBankOffMinutes(Long employmentId);
 }

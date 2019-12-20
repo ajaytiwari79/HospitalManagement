@@ -92,7 +92,6 @@ public class SickService {
     }
 
     public void checkStatusOfUserAndUpdateStatus(Long unitId) {
-
         List<SickSettings> sickSettings = sickSettingsRepository.findAllSickUsersOfUnit(unitId);
         if (!sickSettings.isEmpty()) {
             Set<BigInteger> activityIds = sickSettings.stream().map(SickSettings::getActivityId).collect(Collectors.toSet());
