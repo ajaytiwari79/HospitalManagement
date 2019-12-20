@@ -250,10 +250,8 @@ public class ShiftValidatorService {
         for (ShiftActivity shiftActivity : shiftActivities[1]) {
             validateStaffingLevel(phase, shift, activityWrapperMap, false, staffAdditionalInfoDTO, shiftActivity, false);
         }
-
         Specification<Shift> shiftSpecification = new ShiftAllowedToDelete(activityWrapperMap,phase.getId());
         shiftSpecification.validateRules(shift);
-
         ViolatedRulesDTO violatedRulesDTO = new ViolatedRulesDTO();
         WTAQueryResultDTO wtaQueryResultDTO = workTimeAgreementService.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));
         if (isNotNull(wtaQueryResultDTO)) {

@@ -77,10 +77,10 @@ public class ShiftController {
     }
 
 
-    @ApiOperation("save Shift after validation")
+    @ApiOperation("save or delete Shift after validation")
     @PostMapping(value = "/shift/validated")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long unitId,
+    public ResponseEntity<Map<String, Object>> saveOrDeleteShiftAfterValidation(@PathVariable Long unitId,
                                                                         @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo,
                                                                         @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff,
                                                                         @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState,
