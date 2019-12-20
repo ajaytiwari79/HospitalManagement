@@ -12,6 +12,7 @@ import static org.reflections.Reflections.log;
 
 @XStreamAlias("Unit")
 public class Unit {
+    private String id;
     private UnitConstraints unitConstraints;
 
 
@@ -37,7 +38,19 @@ public class Unit {
 
     }
 
+    public UnitConstraints getUnitConstraints() {
+        return unitConstraints;
+    }
 
+    public void setUnitConstraints(UnitConstraints unitConstraints) {
+        this.unitConstraints = unitConstraints;
+    }
 
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 }

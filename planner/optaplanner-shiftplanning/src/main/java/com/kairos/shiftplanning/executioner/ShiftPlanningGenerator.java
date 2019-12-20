@@ -4,6 +4,8 @@ import com.kairos.enums.Day;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityConstraint.*;
+import com.kairos.shiftplanning.constraints.unitConstraint.ShiftOnWeekend;
+import com.kairos.shiftplanning.constraints.unitConstraint.UnitConstraints;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
@@ -15,6 +17,7 @@ import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staff.PrevShiftsInfo;
 import com.kairos.shiftplanning.domain.staffing_level.*;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
+import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.domain.wta.*;
 import com.kairos.shiftplanning.enums.SkillType;
 import com.kairos.shiftplanning.solution.BreaksIndirectAndActivityPlanningSolution;
@@ -62,10 +65,12 @@ public class ShiftPlanningGenerator {
         List<DailyStaffingLine> staffingLines = (List<DailyStaffingLine>)objects[1];
         List<Activity> activities = (List<Activity>)objects[0];
         List<Employee> employees= generateEmployeeList(activities);
+        Unit unit = getUnitId();
         unresolvedSolution.setEmployees(employees);
         List<ActivityLineInterval> activityLineIntervals= getActivityLineIntervalsList(staffingLines);
         //TODO sort activityLineIntervals
         List<SkillLineInterval> skillLineIntervals=staffingLines.stream().map(dailyStaffingLine -> dailyStaffingLine.getDailySkillLine().getSkillLineIntervals()).collect(ArrayList::new, List::addAll, List::addAll);
+        unresolvedSolution.setUnitId(new Long(unit.getId()));
         unresolvedSolution.setActivities(activities);
         unresolvedSolution.setActivitiesPerDay((Map<LocalDate, List<Activity>>) objects[2]);
         unresolvedSolution.setActivityLineIntervals(activityLineIntervals);
@@ -578,7 +583,7 @@ public class ShiftPlanningGenerator {
     }
 
     public LocalDate getPlanningWeekStart(){
-        return DateTimeFormat.forPattern("dd/MM/yyyy").parseLocalDate("20/12/2019");
+        return DateTimeFormat.forPattern("dd/MM/yyyy").parseLocalDate("21/12/2019");
     }
    /* public List<LocalDate> getPlanningWeek(){
         LocalDate weekStart=getPlanningWeekStart();
@@ -803,6 +808,17 @@ public class ShiftPlanningGenerator {
         return ids;
     }*/
 
+    public Unit getUnitId(){
+        ShiftOnWeekend shiftOnWeekend = new ShiftOnWeekend();
+        shiftOnWeekend.setLevel(ScoreLevel.HARD);
+        shiftOnWeekend.setWeight(3);
+        UnitConstraints unitConstraints = new UnitConstraints();
+        unitConstraints.setShiftOnWeekend(shiftOnWeekend);
+        Unit unit =new Unit();
+        unit.setUnitConstraints(unitConstraints);
+        unit.setId("1");
+        return unit;
+    }
 
 
 }
