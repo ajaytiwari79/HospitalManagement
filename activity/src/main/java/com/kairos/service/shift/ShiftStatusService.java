@@ -117,7 +117,7 @@ public class ShiftStatusService {
                     }
                 }
                 if (shift.isDeleted()) {
-                    shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()));
+                    shiftDTOS.addAll(shiftService.deleteAllLinkedShifts(shift.getId()).getShifts());
                 } else {
                     shiftDTOS.add(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class));
                 }
