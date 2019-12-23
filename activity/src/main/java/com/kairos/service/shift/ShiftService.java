@@ -19,6 +19,7 @@ import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
 import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeType;
@@ -26,6 +27,8 @@ import com.kairos.enums.shift.*;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
+import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.open_shift.OpenShift;
 import com.kairos.persistence.model.period.PlanningPeriod;
@@ -268,7 +271,7 @@ public class ShiftService extends MongoBaseService {
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
         shift.setShiftType(updateShiftType(activityWrapperMap, shift));
         updateAppliedFunctionDetail(activityWrapperMap, shift, functionId);
-
+        updateSicknessShift(activityWrapperMap,shift,staffAdditionalInfoDTO);
         if (updateShift && isNotNull(shiftAction) && !shift.getActivities().stream().anyMatch(shiftActivity -> !shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
             shift = updateShiftAfterPublish(shift, shiftAction);
         }
@@ -284,6 +287,35 @@ public class ShiftService extends MongoBaseService {
         shiftStateService.createShiftStateByPhase(Arrays.asList(shift), phase);
         timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, false);
         return shift;
+    }
+
+    private void updateSicknessShift(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate(), shift.getEndDate());
+        ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
+        if (isNotNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting())) {
+            SicknessSetting sicknessSetting = activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting();
+            if (!(sicknessSetting.isUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
+            }
+            if(isCollectionNotEmpty(sicknessSetting.getStaffTagIds())){
+                Set<BigInteger> tadIds=staffAdditionalInfoDTO.getTags().stream().map(tagDTO -> tagDTO.getId()).collect(Collectors.toSet());
+                if (!tadIds.contains(sicknessSetting.getStaffTagIds())){
+                    exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
+                }
+
+            }
+            if(sicknessSetting.isValidForChildCare() && isCollectionEmpty(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays())){
+                exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
+            }
+
+            if(sicknessSetting.isUsedOnFreeDays() && isCollectionNotEmpty(shifts)){
+                exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
+            }
+        }
+        for (Shift oldShift : shifts) {
+            oldShift.setDisabled(true);
+        }
+        shiftMongoRepository.saveEntities(shifts);
     }
 
     private void updateScheduledAndDurationHours(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {

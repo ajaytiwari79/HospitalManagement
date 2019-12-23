@@ -45,7 +45,6 @@ public class RulesActivityTabDTO {
     private Short shortestTime;
     private Short longestTime;
     private boolean eligibleForCopy;
-
     private DurationField plannedTimeInAdvance;
     private LocalTime maximumEndTime;
     private boolean allowedAutoAbsence;
@@ -57,7 +56,7 @@ public class RulesActivityTabDTO {
     private boolean borrowLeave;
     private boolean transferAll;
     private int noOfTransferLeave;
-
+    private SicknessSettingDTO sicknessSetting;
     public PQLSettings getPqlSettings() {
         return pqlSettings=Optional.ofNullable(pqlSettings).orElse(new PQLSettings());
     }

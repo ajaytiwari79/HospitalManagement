@@ -119,6 +119,7 @@ public class TimeTypeService extends MongoBaseService {
         timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
         timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
         timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
+        timeType.setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
         Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
         if (isCollectionNotEmpty(activityCanBeCopiedForOrganizationHierarchy)) {
             if (activityCanBeCopiedForOrganizationHierarchy.size() == 1 && activityCanBeCopiedForOrganizationHierarchy.contains(OrganizationHierarchy.UNIT)) { //user cannot allow copy acitivity for Unit, without allowing copy activity for Organization

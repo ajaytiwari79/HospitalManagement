@@ -38,6 +38,8 @@ public class TimeTypeDTO {
     private boolean breakNotHeldValid;
     private BigInteger activityPriorityId;
     private PriorityFor priorityFor;
+    private boolean sicknessSettingValid;
+
 
     public TimeTypeDTO(String timeTypes, String backgroundColor) {
         this.timeTypes = timeTypes;

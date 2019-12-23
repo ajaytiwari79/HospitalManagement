@@ -36,6 +36,7 @@ public class EmploymentUtility {
         employmentDetails.setEditable(employment.getEditable());
         employmentDetails.setAccumulatedTimebankMinutes(employment.getAccumulatedTimebankMinutes());
         employmentDetails.setAccumulatedTimebankDate(employment.getAccumulatedTimebankDate());
+        employmentDetails.setEmploymentSubType(employment.getEmploymentSubType());
         return employmentDetails;
     }
 
