@@ -101,12 +101,12 @@ public class UnitSolverConfigService {
         for (ConstraintDTO constraintDTO : unitSolverConfigDTO.getConstraints()) {
             if(countryConstraintDTOMap.containsKey(constraintDTO.getId())) {
                 UnitConstraint unitConstraint = countryConstraintDTOMap.get(constraintDTO.getId());
-                unitConstraint.setConstraintLevel(constraintDTO.getConstraintLevel());
-                unitConstraint.setPenalty(constraintDTO.getPenalty());
+               // unitConstraint.setConstraintLevel(constraintDTO.getConstraintLevel());
+                //unitConstraint.setPenalty(constraintDTO.getPenalty());
                 unitConstraints.add(unitConstraint);
             }
             else {
-                unitConstraints.add(new UnitConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
+                //unitConstraints.add(new UnitConstraint(constraintDTO.getConstraintLevel(),constraintDTO.getPenalty(),constraintDTO.getName()));
             }
         }
         if(isCollectionNotEmpty(unitConstraints)) {

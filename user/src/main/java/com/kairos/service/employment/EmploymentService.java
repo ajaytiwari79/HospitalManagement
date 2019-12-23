@@ -665,7 +665,7 @@ public class EmploymentService {
             DateTimeInterval expertiseLineInterval = new DateTimeInterval(expertiseLine.getStartDate(), expertiseLine.getEndDate());
             DateTimeInterval employmentInterval = new DateTimeInterval(employmentDTO.getStartDate(), employmentDTO.getEndDate());
             if (expertiseLineInterval.overlaps(employmentInterval)) {
-                List<PayTable> payTables = payTableGraphRepository.findAllActivePayTable(expertise.getOrganizationLevel().getId(), expertiseLine.getStartDate().toString(), expertiseLine.getEndDate() == null ? null : expertiseLine.getEndDate().toString());
+                List<PayTable> payTables = payTableGraphRepository.findAllActivePayTable(expertise.getOrganizationLevel().getId(), expertiseLine.getStartDate().toString(), expertiseLine.getEndDate() == null ? null : expertiseLine.getEndDate().toString(),employmentDTO.getStartDate().toString());
                 if (isCollectionEmpty(payTables)) {
                     addEmploymentLines(employmentDTO, employmentLines, expertiseLine, employmentDTO.getStartDate().isAfter(expertiseLine.getStartDate()) ? employmentDTO.getStartDate() : expertiseLine.getStartDate(), expertiseLine.getEndDate());
                 } else {

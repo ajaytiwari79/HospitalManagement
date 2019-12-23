@@ -212,7 +212,7 @@ public class CountrySolverConfigService {
                 MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,
                 ACTIVITY_VALID_DAYTYPE,
                 ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS));
-        constraintTypeSetMap.put(WTA,newHashSet(AVERAGE_SHEDULED_TIME,
+        constraintTypeSetMap.put(WTA,newHashSet( AVERAGE_SCHEDULED_TIME,
                 CONSECUTIVE_WORKING_PARTOFDAY,
                 DAYS_OFF_IN_PERIOD,
                 NUMBER_OF_PARTOFDAY,

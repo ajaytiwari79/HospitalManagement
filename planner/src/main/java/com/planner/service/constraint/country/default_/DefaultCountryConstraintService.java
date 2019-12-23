@@ -23,7 +23,7 @@ public class DefaultCountryConstraintService {
     static int penaltySoft = -1;
     static int penaltyMedium = -5;
     static int penaltyHard = -1;
-    static ConstraintSubType AVERAGE_SHEDULED_TIME=ConstraintSubType.AVERAGE_SHEDULED_TIME;
+    static ConstraintSubType AVERAGE_SHEDULED_TIME=ConstraintSubType. AVERAGE_SCHEDULED_TIME;
     static ConstraintSubType CONSECUTIVE_WORKING_PARTOFDAY=ConstraintSubType.CONSECUTIVE_WORKING_PARTOFDAY;
     static ConstraintSubType DAYS_OFF_IN_PERIOD=ConstraintSubType.DAYS_OFF_IN_PERIOD;
     static ConstraintSubType NUMBER_OF_PARTOFDAY=ConstraintSubType.NUMBER_OF_PARTOFDAY;

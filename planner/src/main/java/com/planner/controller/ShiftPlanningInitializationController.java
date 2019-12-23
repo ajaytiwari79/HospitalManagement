@@ -45,7 +45,6 @@ public class ShiftPlanningInitializationController {
 
     @PostMapping(value = "/shiftPlanningInitialization")
     ResponseEntity<Map<String, Object>> initializeShiftPlanning(@RequestBody ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
-        Long[] staffIds = {34246L, 27075L, 27079L, 34251L, 34246L, 34272L};
         shiftPlanningInitializationService.initializeShiftPlanning(shiftPlanningProblemSubmitDTO);
 
         return ResponseHandler.generateResponse(" Data fetched sucessFully", HttpStatus.OK);
