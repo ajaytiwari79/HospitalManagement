@@ -10,6 +10,7 @@ public enum ConstraintSubType {
     ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS("Activity Must Continuous Number Of Hours"),
     MINIMIZE_SHIFT_ON_WEEKENDS("Minimize Number of Shift On Weekend"),
 
+
     //For Shifts
 
     //For WTA
