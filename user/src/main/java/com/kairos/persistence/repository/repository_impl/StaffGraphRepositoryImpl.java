@@ -92,7 +92,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
                 "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
                 "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,\n" +
                 "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,expertise "+
-                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,unitId:employment.unitId,employmentLines:employmentLines ,expertiseId:id(expertise)} as employment,staff,org,user,expertise\n" +
+                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,unitId:employment.unitId,accumulatedTimebankMinutes:employment.accumulatedTimebankMinutes,accumulatedTimebankDate:employment.accumulatedTimebankDate, employmentLines:employmentLines ,expertiseId:id(expertise)} as employment,staff,org,user,expertise\n" +
                 "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,user.cprNumber AS cprNumber,id(org) as unitId,org.name as unitName,collect(employment) as employment");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
