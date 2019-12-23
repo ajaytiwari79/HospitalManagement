@@ -43,7 +43,6 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
     private long intervalLength;
     @NotEmpty(message = "message.ruleTemplate.interval.notNull")
     private String intervalUnit;
-    private int allowSequenceShift;
     private boolean restingTimeAllowed;
     private int restingTime;
     private PartOfDay sequenceShiftFrom;
@@ -62,9 +61,9 @@ public class NoOfSequenceShiftWTATemplate extends WTABaseRuleTemplate{
             if(isNotNull(timeSlotWrapper)) {
                 int totalOccurrencesSequenceShift = getOccurrencesSequenceShift(infoWrapper);
                 Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
-                boolean isValid = isValid(MAXIMUM, allowSequenceShift, totalOccurrencesSequenceShift);
+                boolean isValid = isValid(MAXIMUM, limitAndCounter[0], totalOccurrencesSequenceShift);
                 brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                        limitAndCounter[2], DurationType.DAYS,String.valueOf(allowSequenceShift));
+                        limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
             }
         }
     }

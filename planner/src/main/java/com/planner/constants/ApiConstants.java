@@ -10,10 +10,10 @@ public class ApiConstants {
     public static final String CONSTRAINT_URL ="/constraint";
     public static final String API_UNIT_URL = API_V1  + UNIT_URL;
     public static final String SHIFTPLANNING = "/shift_planning";
-    public static final String ACTIVITYCONSTRAINT="/activityConstraint";
-    public static final String UNITCONSTRAINT="/unitConstraint";
-    public static final String API_UNIT_CONSTRAINT=API_V1  + UNIT_URL+UNITCONSTRAINT;
-    public static final String API_ACTIVITY_CONSTRAINT=API_V1 + UNIT_URL+ACTIVITYCONSTRAINT;
+
+
+
+
 
     public static final String API_PARENT_ORGANIZATION_COUNTRY_URL=API_V1+COUNTRY_URL;
     public static final String API_PARENT_ORGANIZATION_UNIT_URL=API_V1+UNIT_URL;

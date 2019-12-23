@@ -51,7 +51,7 @@ public class GroupController {
     @GetMapping(value = "/group/{groupId}")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getGroupDetails(@PathVariable Long groupId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getGroupDetails( groupId));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, groupService.getGroupDetail( groupId));
     }
 
     @ApiOperation(value = "Get Group's Staff Details")

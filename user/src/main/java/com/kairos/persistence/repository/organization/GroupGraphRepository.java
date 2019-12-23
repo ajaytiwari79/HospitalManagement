@@ -20,15 +20,15 @@ public interface GroupGraphRepository extends Neo4jBaseRepository<Group,Long> {
     boolean existsByName(Long unitId, Long groupId, String name);
 
     @Query("MATCH(group:Group{deleted:false}) WHERE id(group)={0} " +
-            "OPTIONAL MATCH (group)-[rel:HAS_FILTERS]->(filterSelection:FilterSelection)" +
+            "OPTIONAL MATCH (group)-[rel:" + HAS_FILTERS + "]->(filterSelection:FilterSelection)" +
             "RETURN group,COLLECT(rel),COLLECT(filterSelection)")
     Group findGroupByIdAndDeletedFalse(Long groupId);
 
     @Query("MATCH(group:Group{deleted:false}) WHERE id(group) IN {0} " +
-            "OPTIONAL MATCH (group)-[rel:HAS_FILTERS]->(filterSelection:FilterSelection)" +
+            "OPTIONAL MATCH (group)-[rel:" + HAS_FILTERS + "]->(filterSelection:FilterSelection)" +
             "RETURN group,COLLECT(rel),COLLECT(filterSelection)")
     List<Group> findAllGroupsByIdSAndDeletedFalse(List<Long> groupIds);
 
-    @Query("MATCH (group:Group)-[rel:HAS_FILTERS]->(filterSelection:FilterSelection) WHERE id(group)={0} detach delete filterSelection")
+    @Query("MATCH (group:Group)-[rel:" + HAS_FILTERS + "]->(filterSelection:FilterSelection) WHERE id(group)={0} detach delete filterSelection")
     void deleteAllFiltersByGroupId(Long groupId);
 }
