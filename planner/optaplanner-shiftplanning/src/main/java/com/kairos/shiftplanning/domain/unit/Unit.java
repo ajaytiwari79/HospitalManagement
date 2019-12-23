@@ -17,7 +17,7 @@ public class Unit {
 
 
 
-    public int checkActivityConstraints(List<ShiftImp> shifts, int index) {
+    public int checkUnitConstraints(List<ShiftImp> shifts, int index) {
         switch (index){
             case 1:return unitConstraints.getShiftOnWeekend().checkConstraints(shifts);
 
@@ -26,8 +26,8 @@ public class Unit {
         return 0;
     }
 
-    public void breakActivityContraints( HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, int index) {
-        log.debug("breaking Activity constraint: {}", index);
+    public void breakUnitContraints( HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, int index) {
+        log.debug("breaking Unit constraint: {}", index);
         switch (index) {
             case 1:
                 unitConstraints.getShiftOnWeekend().breakLevelConstraints(scoreHolder, kContext,constraintPenality);

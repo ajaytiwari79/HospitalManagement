@@ -65,12 +65,11 @@ public class ShiftPlanningGenerator {
         List<DailyStaffingLine> staffingLines = (List<DailyStaffingLine>)objects[1];
         List<Activity> activities = (List<Activity>)objects[0];
         List<Employee> employees= generateEmployeeList(activities);
-        Unit unit = getUnitId();
         unresolvedSolution.setEmployees(employees);
         List<ActivityLineInterval> activityLineIntervals= getActivityLineIntervalsList(staffingLines);
         //TODO sort activityLineIntervals
         List<SkillLineInterval> skillLineIntervals=staffingLines.stream().map(dailyStaffingLine -> dailyStaffingLine.getDailySkillLine().getSkillLineIntervals()).collect(ArrayList::new, List::addAll, List::addAll);
-        unresolvedSolution.setUnitId(new Long(unit.getId()));
+        unresolvedSolution.setUnit(getUnit());
         unresolvedSolution.setActivities(activities);
         unresolvedSolution.setActivitiesPerDay((Map<LocalDate, List<Activity>>) objects[2]);
         unresolvedSolution.setActivityLineIntervals(activityLineIntervals);
@@ -808,7 +807,7 @@ public class ShiftPlanningGenerator {
         return ids;
     }*/
 
-    public Unit getUnitId(){
+    public Unit getUnit(){
         ShiftOnWeekend shiftOnWeekend = new ShiftOnWeekend();
         shiftOnWeekend.setLevel(ScoreLevel.HARD);
         shiftOnWeekend.setWeight(3);

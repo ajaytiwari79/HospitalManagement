@@ -4,6 +4,7 @@ import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
+import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.listeners.ShiftStartTimeListener;
 import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
 import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
@@ -54,6 +55,15 @@ public class ShiftImp implements Shift{
 
     private boolean isLocked;
     private boolean isCreatedByStaff;
+    private Unit unit;
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
 
     public ShiftImp(Employee employee, LocalDate date) {
         this.employee = employee;

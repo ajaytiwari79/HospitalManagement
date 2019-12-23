@@ -40,7 +40,7 @@ public class ShiftOnWeekend implements ConstraintHandler {
     public  int checkConstraints(List<ShiftImp> shifts){
         List<ShiftImp> shiftImps= new ArrayList<>();
         for(ShiftImp shiftImp:shifts){
-            if(shiftImp.getDate().dayOfWeek().equals(DayOfWeek.SATURDAY) || shiftImp.getDate().dayOfWeek().equals(DayOfWeek.SUNDAY)){
+            if(shiftImp.getDate().dayOfWeek().get() == DayOfWeek.SATURDAY.getValue() || shiftImp.getDate().dayOfWeek().get() == DayOfWeek.SUNDAY.getValue()){
                 shiftImps.add(shiftImp);
             }
         }
