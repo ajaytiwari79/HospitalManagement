@@ -55,16 +55,6 @@ public class ShiftImp implements Shift{
 
     private boolean isLocked;
     private boolean isCreatedByStaff;
-    private Unit unit;
-
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public void setUnit(Unit unit) {
-        this.unit = unit;
-    }
-
     public ShiftImp(Employee employee, LocalDate date) {
         this.employee = employee;
         this.date = date;
