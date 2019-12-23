@@ -184,42 +184,30 @@ public class ShiftBreakService {
         ZonedDateTime endDate = asZoneDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
         ZonedDateTime startDateWithShiftPercentage = asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100);
         ZonedDateTime startDate=isEqualOrAfter(startDateWithShiftPercentage,endDate.minusMinutes(breakSettings.getBreakDurationInMinute()))?endDate.minusMinutes(breakSettings.getBreakDurationInMinute()):startDateWithShiftPercentage;
-//        if(shift.getActivities().size()>1 && shift.getActivities().stream().anyMatch(k->!activityWrapperMap.get(k.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(k.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && k.getInterval().contains(startDate))){
-//            return getDateTimeInterval(shift, breakSettings, activityWrapperMap, endDate, startDate);
-//        }
+        if(shift.getActivities().size()>1 && shift.getActivities().stream().anyMatch(k->!activityWrapperMap.get(k.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(k.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && k.getInterval().contains(startDate))){
+            return getDateTimeInterval(shift, breakSettings, activityWrapperMap, endDate, startDate);
+        }
         return new DateTimeInterval(startDate,endDate);
     }
 
     private DateTimeInterval getDateTimeInterval(Shift shift, BreakSettings breakSettings, Map<BigInteger, ActivityWrapper> activityWrapperMap, ZonedDateTime endDate, ZonedDateTime startDate) {
-        ShiftActivity currentShiftActivity=shift.getActivities().get(0);
         ShiftActivity nextShiftActivity;
         ShiftActivity previousShiftActivity;
-        for (int i = 1; i < shift.getActivities().size(); i++) {
-            if(!activityWrapperMap.get(currentShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(currentShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && currentShiftActivity.getInterval().contains(startDate)){
-
-            }
-        }
-
-
-
-        ListIterator iterator=shift.getActivities().listIterator();
-        while (iterator.hasNext()){
-            ShiftActivity shiftActivity=(ShiftActivity) iterator.next();
-            if(!activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && shiftActivity.getInterval().contains(startDate)){
-                if(iterator.hasPrevious()){
-                    ShiftActivity previousActivity=(ShiftActivity) iterator.previous();
-                    if(!activityWrapperMap.get(previousActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || !activityWrapperMap.get(previousActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()){
-                        endDate=asZoneDateTime(previousActivity.getEndDate());
+        for (int i = 0; i < shift.getActivities().size(); i++) {
+            if(!activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && shift.getActivities().get(i).getInterval().contains(startDate)){
+                if(i>0){
+                    previousShiftActivity=shift.getActivities().get(i-1);
+                    if(activityWrapperMap.get(previousShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(previousShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()){
+                        endDate=asZoneDateTime(previousShiftActivity.getEndDate());
                         startDate=endDate.minusMinutes(breakSettings.getBreakDurationInMinute());
                     }
-                } else if(iterator.hasNext()){
-                    ShiftActivity nextActivity=(ShiftActivity) iterator.next();
-                    if(!activityWrapperMap.get(nextActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || !activityWrapperMap.get(nextActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()){
-                        endDate=asZoneDateTime(nextActivity.getEndDate());
+                }else if(i<shift.getActivities().size()-1){
+                    nextShiftActivity=shift.getActivities().get(i+1);
+                    if(activityWrapperMap.get(nextShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(nextShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()){
+                        endDate=asZoneDateTime(nextShiftActivity.getEndDate());
                         startDate=endDate.minusMinutes(breakSettings.getBreakDurationInMinute());
                     }
                 }
-
             }
         }
         return new DateTimeInterval(startDate,endDate);
