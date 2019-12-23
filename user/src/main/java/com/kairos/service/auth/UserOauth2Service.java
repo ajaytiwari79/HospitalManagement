@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_USER_USERNAME_NOTFOUND;
 
 @Service
@@ -46,6 +47,7 @@ public class UserOauth2Service implements UserDetailsService {
             exceptionService.usernameNotFoundException(MESSAGE_USER_USERNAME_NOTFOUND, username);
         }
         user.setHubMember(accessPageService.isHubMember(user.getId()));
+        updateLastSelectedOrganization(user);
         Optional<User> loggedUser = Optional.ofNullable(user);
         String otpString = HttpRequestHolder.getCurrentRequest().getParameter("verificationCode");
         String password = HttpRequestHolder.getCurrentRequest().getParameter("password");
@@ -63,6 +65,14 @@ public class UserOauth2Service implements UserDetailsService {
             exceptionService.usernameNotFoundException(MESSAGE_USER_USERNAME_NOTFOUND, username);
         }
         return null;
+    }
+
+    private void updateLastSelectedOrganization(User user) {
+        if(isNull(user.getLastSelectedOrganizationId())){
+            Long lastSelectedOrgId=userGraphRepository.getLastSelectedOrganizationId(user.getId());
+            user.setLastSelectedOrganizationId(lastSelectedOrgId);
+            userGraphRepository.save(user);
+        }
     }
 
     private List<GrantedAuthority> getPermission(User user) {
