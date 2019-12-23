@@ -1297,13 +1297,18 @@ public class ShiftService extends MongoBaseService {
                 if(breakActivity!=null){
                     shift1.setBreakActivities(Arrays.asList(breakActivity));
                 }
+                shift1.setEndDate(shiftActivity.getEndDate());
                 shiftList.add(shift1);
                 shift1=ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class);
                 shift1.setActivities(new ArrayList<>());
+
                 continue;
             }
             shift1.getActivities().add(shiftActivity);
+
             if(!iterator.hasNext()){
+                shift1.setStartDate(shift1.getActivities().get(0).getStartDate());
+                shift1.setEndDate(shift1.getActivities().get(shift1.getActivities().size()-1).getEndDate());
                 shiftList.add(shift1);
             }
 

@@ -90,7 +90,7 @@ public class ShiftBreakService {
                             exceptionService.actionNotPermittedException(SHIFT_PERCENTAGE_IN_BREAK_RULETEMPLATE, breakAvailabilitySettings.getShiftPercentage());
                         }
                         placeBreakAnyWhereInShift = (breakAvailabilitySettings.getStartAfterMinutes() + breakAvailabilitySettings.getEndBeforeMinutes()) >= shift.getMinutes();
-                        eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings,breakSettings);
+                        eligibleBreakInterval = placeBreakAnyWhereInShift ? null : getBreakInterval(shift, breakAvailabilitySettings,breakSettings,activityWrapperMap);
                         placeBreakAnyWhereInShift = placeBreakAnyWhereInShift ? placeBreakAnyWhereInShift : eligibleBreakInterval.getMinutes() < breakSettings.getBreakDurationInMinute();
                         placeBreakAfterThisDate = isNotNull(eligibleBreakInterval) ? roundDateByMinutes(eligibleBreakInterval.getStartDate(),15) : placeBreakAfterThisDate;
                     }
@@ -180,11 +180,36 @@ public class ShiftBreakService {
         return shiftActivity;
     }
 
-    private DateTimeInterval getBreakInterval(Shift shift,BreakAvailabilitySettings breakAvailabilitySettings,BreakSettings breakSettings){
-        asZoneDateTime(shift.getStartDate()).plusMinutes(breakAvailabilitySettings.getStartAfterMinutes());
+    private DateTimeInterval getBreakInterval(Shift shift,BreakAvailabilitySettings breakAvailabilitySettings,BreakSettings breakSettings,Map<BigInteger, ActivityWrapper> activityWrapperMap){
         ZonedDateTime endDate = asZoneDateTime(shift.getEndDate()).minusMinutes(breakAvailabilitySettings.getEndBeforeMinutes());
         ZonedDateTime startDateWithShiftPercentage = asZoneDateTime(shift.getStartDate()).plusMinutes(shift.getMinutes() * breakAvailabilitySettings.getShiftPercentage() / 100);
         ZonedDateTime startDate=isEqualOrAfter(startDateWithShiftPercentage,endDate.minusMinutes(breakSettings.getBreakDurationInMinute()))?endDate.minusMinutes(breakSettings.getBreakDurationInMinute()):startDateWithShiftPercentage;
+        if(shift.getActivities().size()>1 && shift.getActivities().stream().anyMatch(k->!activityWrapperMap.get(k.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(k.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && k.getInterval().contains(startDate))){
+            return getDateTimeInterval(shift, breakSettings, activityWrapperMap, endDate, startDate);
+        }
+        return new DateTimeInterval(startDate,endDate);
+    }
+
+    private DateTimeInterval getDateTimeInterval(Shift shift, BreakSettings breakSettings, Map<BigInteger, ActivityWrapper> activityWrapperMap, ZonedDateTime endDate, ZonedDateTime startDate) {
+        ShiftActivity nextShiftActivity;
+        ShiftActivity previousShiftActivity;
+        for (int i = 0; i < shift.getActivities().size(); i++) {
+            if(!activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() && !activityWrapperMap.get(shift.getActivities().get(i).getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed() && shift.getActivities().get(i).getInterval().contains(startDate)){
+                if(i>0){
+                    previousShiftActivity=shift.getActivities().get(i-1);
+                    if(activityWrapperMap.get(previousShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(previousShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()){
+                        endDate=asZoneDateTime(previousShiftActivity.getEndDate());
+                        startDate=endDate.minusMinutes(breakSettings.getBreakDurationInMinute());
+                    }
+                }else if(i<shift.getActivities().size()-1){
+                    nextShiftActivity=shift.getActivities().get(i+1);
+                    if(activityWrapperMap.get(nextShiftActivity.getActivityId()).getTimeTypeInfo().isBreakNotHeldValid() || activityWrapperMap.get(nextShiftActivity.getActivityId()).getActivity().getRulesActivityTab().isBreakAllowed()){
+                        endDate=asZoneDateTime(nextShiftActivity.getEndDate());
+                        startDate=endDate.minusMinutes(breakSettings.getBreakDurationInMinute());
+                    }
+                }
+            }
+        }
         return new DateTimeInterval(startDate,endDate);
     }
 
