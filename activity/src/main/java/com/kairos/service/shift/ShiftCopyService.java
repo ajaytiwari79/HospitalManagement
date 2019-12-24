@@ -124,9 +124,6 @@ public class ShiftCopyService extends MongoBaseService {
             exceptionService.actionNotPermittedException("message.shift.planning.period.exits", copyShiftDTO.getStartDate());
         }
 
-        Set<LocalDateTime> dates = shifts.stream().flatMap(s -> s.getShifts().stream().map(ss -> DateUtils.asLocalDateTime(ss.getActivities().get(0).getStartDate()))).collect(Collectors.toSet());
-        Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(unitId, dates);
-
         Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap = planningPeriods.stream().collect(Collectors.toMap(k -> new DateTimeInterval(k.getStartDate(), k.getEndDate().plusDays(1)), v -> v));
         CopyShiftResponse copyShiftResponse = new CopyShiftResponse();
         List<ShiftResponseDTO> previousShiftBetweenDatesByEmployment = shiftMongoRepository.findShiftsBetweenDurationByEmploymentIds(employmentIds, asDate(copyShiftDTO.getStartDate().atTime(LocalTime.MIN)), asDate(copyShiftDTO.getEndDate().atTime(LocalTime.MAX)));
@@ -137,7 +134,7 @@ public class ShiftCopyService extends MongoBaseService {
             List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaMapByEmploymentId.get(staffEmployment.getId());
             List<Shift> currentStaffPreviousShifts = employmentWiseShifts.get(staffEmployment.getId());
 
-            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffEmployment, activityMap, copyShiftDTO,dataWrapper, wtaQueryResultDTOS, planningPeriodMap, activityConfigurations, currentStaffPreviousShifts, phaseListByDate);
+            Map<String, List<ShiftResponse>> response = copyForThisStaff(shifts, staffEmployment, activityMap, copyShiftDTO,dataWrapper, wtaQueryResultDTOS, planningPeriodMap, activityConfigurations, currentStaffPreviousShifts);
             StaffWiseShiftResponse successfullyCopied = new StaffWiseShiftResponse(staffEmployment.getStaff(), response.get("success"));
             StaffWiseShiftResponse errorInCopy = new StaffWiseShiftResponse(staffEmployment.getStaff(), response.get(ERROR));
             unCopiedShiftCount += response.get(ERROR).size();
@@ -148,7 +145,7 @@ public class ShiftCopyService extends MongoBaseService {
         return copyShiftResponse;
     }
 
-    private Map<String, List<ShiftResponse>> copyForThisStaff(List<ShiftResponseDTO> shifts, StaffEmploymentDetails staffEmployment, Map<BigInteger, ActivityWrapper> activityMap, CopyShiftDTO copyShiftDTO,  StaffEmploymentUnitDataWrapper dataWrapper, List<WTAQueryResultDTO> wtaQueryResultDTOS, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, List<ActivityConfiguration> activityConfigurations, List<Shift> currentStaffPreviousShifts, Map<Date, Phase> phaseListByDate) {
+    private Map<String, List<ShiftResponse>> copyForThisStaff(List<ShiftResponseDTO> shifts, StaffEmploymentDetails staffEmployment, Map<BigInteger, ActivityWrapper> activityMap, CopyShiftDTO copyShiftDTO,  StaffEmploymentUnitDataWrapper dataWrapper, List<WTAQueryResultDTO> wtaQueryResultDTOS, Map<DateTimeInterval, PlanningPeriodDTO> planningPeriodMap, List<ActivityConfiguration> activityConfigurations, List<Shift> currentStaffPreviousShifts) {
         List<Shift> newShifts = new ArrayList<>(shifts.size());
         Map<String, List<ShiftResponse>> statusMap = new HashMap<>();
         List<ShiftWithActivityDTO> newCreatedShiftWithActivityDTOs = new ArrayList<>();
@@ -182,11 +179,12 @@ public class ShiftCopyService extends MongoBaseService {
                     ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap);
                     shiftWithActivityDTO.setEndDate(endDate);
                     shiftWithActivityDTO.setStartDate(startDate);
+                    shiftWithActivityDTO.setStaffId(staffEmployment.getStaff().getId());
                     String shiftExistsMessage = validateShiftExistanceBetweenDuration(shiftCreationStartDate, sourceShift, currentStaffPreviousShifts);
                     if (shiftExistsMessage != null) {
                         validationMessages.add(shiftExistsMessage);
                     }
-                    validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffEmployment, wtaQueryResultDTOS, planningPeriod, activityMap, newCreatedShiftWithActivityDTOs, phaseListByDate));
+                    validationMessages.addAll(shiftValidatorService.validateShiftWhileCopy(dataWrapper, shiftWithActivityDTO, staffEmployment, wtaQueryResultDTOS, planningPeriod, activityMap, newCreatedShiftWithActivityDTOs));
                 } else {
                     validationMessages.add(convertMessage(MESSAGE_EMPLOYMENT_NOT_ACTIVE, shiftCreationStartDate));
                 }

@@ -20,7 +20,6 @@ public class DayTypeSpecification extends AbstractSpecification<ShiftWithActivit
 
 
     private Set<DayOfWeek> validDays;
-    private Set<Day> days = new HashSet<>();
     private Date shiftStartDateTime;
     @Autowired
     private ExceptionService exceptionService;
