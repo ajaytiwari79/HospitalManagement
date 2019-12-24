@@ -6,13 +6,12 @@ import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 global HardMediumSoftLongScoreHolder scoreHolder;
 
-rule "Minimize Shift On Weekends"
+rule "Prefer Permannent Employee"
 salience 20
   when
     $unit:Unit(unitConstraints != null)
-    $shifts:List() from collect (ShiftImp(getInterval()!=null));
-    $constraintsPenality: Integer(intValue>0) from ($unit.checkUnitConstraints($shifts,1))
+    $shifts:List() from collect(ShiftImp(employee!=null))
+    $constraintsPenality: Integer(intValue>0) from ($unit.checkUnitConstraints($shifts,2))
   then
-   $unit.breakUnitContraints(scoreHolder,kcontext, $constraintsPenality,1);
+   $unit.breakUnitContraints(scoreHolder,kcontext, $constraintsPenality,2);
 end
-

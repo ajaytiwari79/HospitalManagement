@@ -51,6 +51,7 @@ public class ShiftPlanningSolverTest {
         constraintDTOS.add(new ConstraintDTO("Shortest duration for this activity, relative to shift length","Shortest duration for this activity, relative to shift length", ConstraintType.ACTIVITY, ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH, ConstraintLevel.HARD, 5, 5l));
         constraintDTOS.add(new ConstraintDTO("Max number of allocations pr. shift for this activity per staff", "Max number of allocations pr. shift for this activity per staff",  ConstraintType.ACTIVITY, MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF, ConstraintLevel.HARD, 5,5l));
         constraintDTOS.add(new ConstraintDTO("Minimize No of Shift on weekend", "Minimize No of Shift on weekend",  ConstraintType.ACTIVITY, MINIMIZE_SHIFT_ON_WEEKENDS, ConstraintLevel.HARD, 5,5l));
+        constraintDTOS.add(new ConstraintDTO("Prefer Permament Employee","Shift Assignment Permanent Employee",ConstraintType.ACTIVITY,PREFER_PERMANENT_EMPLOYEE,ConstraintLevel.HARD,2,5l));
         return new SolverConfigDTO(constraintDTOS);
     }
 

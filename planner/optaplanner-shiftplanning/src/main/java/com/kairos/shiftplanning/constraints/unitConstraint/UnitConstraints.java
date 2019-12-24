@@ -11,5 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UnitConstraints {
     private ShiftOnWeekend shiftOnWeekend;
+    private PreferedEmployementType preferedEmployementType;
 
 }

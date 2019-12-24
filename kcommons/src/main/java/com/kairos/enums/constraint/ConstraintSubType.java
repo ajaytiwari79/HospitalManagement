@@ -9,6 +9,7 @@ public enum ConstraintSubType {
     ACTIVITY_VALID_DAYTYPE("Activity Valid Daytype"),
     ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS("Activity Must Continuous Number Of Hours"),
     MINIMIZE_SHIFT_ON_WEEKENDS("Minimize Number of Shift On Weekend"),
+    PREFER_PERMANENT_EMPLOYEE("Prefer Permanent Employee"),
 
 
     //For Shifts

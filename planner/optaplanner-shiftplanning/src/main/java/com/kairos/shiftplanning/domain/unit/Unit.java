@@ -17,10 +17,17 @@ public class Unit {
 
 
 
+
+
+
+
+
+
+
     public int checkUnitConstraints(List<ShiftImp> shifts, int index) {
         switch (index){
             case 1:return unitConstraints.getShiftOnWeekend().checkConstraints(shifts);
-
+            case 2:return unitConstraints.getPreferedEmployementType().checkConstraints(shifts);
 
         }
         return 0;
@@ -31,6 +38,9 @@ public class Unit {
         switch (index) {
             case 1:
                 unitConstraints.getShiftOnWeekend().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
+                break;
+            case 2:
+                unitConstraints.getPreferedEmployementType().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
                 break;
             default:
                 break;
