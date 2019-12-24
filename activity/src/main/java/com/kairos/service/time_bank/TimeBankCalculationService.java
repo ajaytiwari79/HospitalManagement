@@ -1182,10 +1182,12 @@ public class TimeBankCalculationService {
                     List<ShiftActivityDTO> shiftActivities = getShiftActivityByBreak(shift.getActivities(), shift.getBreakActivities());
                     for (ShiftActivityDTO shiftActivity : shiftActivities) {
                         ShiftActivityDTO shiftActivityDTO = getShiftActivityDTO(shift, shiftActivity);
-                        ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getStartDate(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
-                        LOGGER.debug("rule template : {} valid {}", ruleTemplate.getId(), ruleTemplateValid);
-                        if (ruleTemplateValid) {
-                            updateScheduledAndBonusMinutes(ruleTemplate, shift, shiftActivity, shiftActivityDTO);
+                        if(isNotNull(shiftActivityDTO)){
+                            ruleTemplateValid = validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, staffAdditionalInfoDTO.getEmployment(), shift.getPhaseId(), shiftActivity.getActivity().getId(), shiftActivity.getActivity().getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getStartDate(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(TIMEBANK_ACCOUNT);
+                            LOGGER.debug("rule template : {} valid {}", ruleTemplate.getId(), ruleTemplateValid);
+                            if (ruleTemplateValid) {
+                                updateScheduledAndBonusMinutes(ruleTemplate, shift, shiftActivity, shiftActivityDTO);
+                            }
                         }
                     }
                 }
