@@ -200,6 +200,8 @@ public class StaffRetrievalService {
         staffPersonalDetail.setSectorWiseExpertise(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(getSectorWiseStaffAndExpertise(staffExpertiseQueryResults), SectorAndStaffExpertiseDTO.class));
         staffPersonalDetail.setTeams(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(teamGraphRepository.getTeamDetailsOfStaff(staff.getId(), unitId), TeamDTO.class));
         staffPersonalDetail.setLanguageId(staffGraphRepository.getLanguageId(staff.getId()));
+        staffPersonalDetail.setUserName(staff.getUser().getUserName());
+        staffPersonalDetail.setExpertiseIds(getExpertiseIds(staffExpertiseQueryResults));
         return staffPersonalDetail;
     }
 

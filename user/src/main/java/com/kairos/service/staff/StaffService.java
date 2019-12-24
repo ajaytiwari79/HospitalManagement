@@ -281,9 +281,11 @@ public class StaffService {
             redisService.invalidateAllTokenOfUser(staffToUpdate.getUser().getUserName());
         }
         List<Expertise> oldExpertise = assignExpertise(staffId, staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
-        Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
+        if(isNotNull(staffPersonalDetail.getLanguageId())) {
+            Language language = languageGraphRepository.findOne(staffPersonalDetail.getLanguageId());
+            staffToUpdate.setLanguage(language);
+        }
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
-        staffToUpdate.setLanguage(language);
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
         setStaffChildDetails(staffToUpdate, staffPersonalDetail);
@@ -306,7 +308,7 @@ public class StaffService {
         List<SectorAndStaffExpertiseQueryResult> staffExpertiseQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffExpertiseRelationShipGraphRepository.getSectorWiseExpertiseWithExperience(staffId), SectorAndStaffExpertiseQueryResult.class);
         staffPersonalDetail.setSectorWiseExpertise(copyPropertiesOfCollectionByMapper(staffRetrievalService.getSectorWiseStaffAndExpertise(staffExpertiseQueryResults),SectorAndStaffExpertiseDTO.class));
         teamService.assignStaffInTeams(staff, staffPersonalDetail.getTeams(), unitId);
-        return staffPersonalDetail;
+        return staffRetrievalService.getPersonalInfo(staffId,unitId);
     }
 
     private User updateUserDetails(long staffId, StaffPersonalDetail staffPersonalDetail) {

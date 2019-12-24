@@ -38,6 +38,7 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "permission.staffStatuses as staffStatuses,\n" +
             "permission.tagIds as tagIds,\n" +
             "permission.teamIds as teamIds,\n" +
+            "permission.employmentTypeIds as employmentTypeIds,\n" +
             "permission.unionIds as unionIds,id(field) as id,field.fieldName as fieldName")
     List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds);
 
@@ -48,6 +49,7 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "permission.staffStatuses as staffStatuses,\n" +
             "permission.tagIds as tagIds,\n" +
             "permission.teamIds as teamIds,\n" +
+            "permission.employmentTypeIds as employmentTypeIds,\n" +
             "permission.unionIds as unionIds,id(model) as id,model.modelName as modelName")
     List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds);
 

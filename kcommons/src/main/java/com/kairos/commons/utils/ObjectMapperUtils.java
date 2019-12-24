@@ -27,8 +27,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static java.time.format.DateTimeFormatter.ofPattern;
 
 /**
@@ -150,58 +149,5 @@ public class ObjectMapperUtils {
         return mapper;
     }
 
-    public static <E>  E copySpecificPropertiesByMapper(E src, E target, PermissionHelper permissionHelper) {
-        if (src != null) {
-            BeanWrapper targetWrapper = null;
-            try {
-                if (isNull(target)) {
-                    target = (E)src.getClass().newInstance();
-                }
-               // updateObjectByPermission(modelDTO,src,target);
-                BeanWrapper srcWrapper = PropertyAccessorFactory.forBeanPropertyAccess(src);
-                targetWrapper = PropertyAccessorFactory.forBeanPropertyAccess(target);
-                updatePropertyByPermission(permissionHelper, targetWrapper, srcWrapper,"",permissionHelper.getModelDTO());
-                return (E) srcWrapper.getWrappedInstance();
-            } catch (Exception ex) {
-                LOGGER.error(ERROR,ex);
-            }
-        }else{
-            return null;
-        }
-        return null;
-    }
-
-    private static boolean verifyFieldPermission(FieldDTO fieldDTO,PermissionHelper permissionHelper) {
-        boolean fieldPermissionvalid = !fieldDTO.getPermissions().contains(FieldLevelPermission.WRITE);
-
-        return permissionHelper.isHubMember() || fieldPermissionvalid;
-    }
-
-
-    private static void updatePropertyByPermission(PermissionHelper permissionHelper, BeanWrapper targetWrapper, BeanWrapper srcWrapper,String subFieldName,ModelDTO modelDTO) {
-        for (FieldDTO field : modelDTO.getFieldPermissions()) {
-            if (verifyFieldPermission(field,permissionHelper)) {
-                srcWrapper.setPropertyValue(subFieldName+field.getFieldName(), targetWrapper.getPropertyValue(subFieldName+field.getFieldName()));
-            }
-        }
-        if(isCollectionNotEmpty(modelDTO.getSubModelPermissions())){
-            for (ModelDTO subModelPermission : modelDTO.getSubModelPermissions()) {
-                updatePropertyByPermission(permissionHelper, targetWrapper, srcWrapper,subModelPermission.getModelName()+".",subModelPermission);
-
-            }
-        }
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class PermissionHelper{
-        private ModelDTO modelDTO;
-        private Long currentUserStaffId;
-        private Map<Long, OtherPermissionDTO> otherPermissionDTOMap;
-        private boolean hubMember;
-        //Permission To check
-        private FieldLevelPermission permission;
-    }
 
 }
