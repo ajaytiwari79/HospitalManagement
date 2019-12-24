@@ -54,6 +54,7 @@ public class StaffAdditionalInfoDTO {
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
     private List<TagDTO> tags;
+    private Map<String, String> unitWiseAccessRole=new HashMap<>();
 
 
     public StaffAdditionalInfoDTO(StaffEmploymentDetails employment) {

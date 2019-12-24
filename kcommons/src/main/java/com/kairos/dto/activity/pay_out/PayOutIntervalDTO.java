@@ -26,6 +26,7 @@ public class PayOutIntervalDTO {
     private String title;
     private PayOutCTADistributionDTO payOutDistribution;
     private DayOfWeek dayOfWeek;
+    private int sequence;
 
 
 

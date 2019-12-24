@@ -45,6 +45,7 @@ import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
@@ -399,8 +400,10 @@ public class UserIntegrationService {
         if (CollectionUtils.isNotEmpty(reasonCodeIds)) {
             queryParamList.add(new BasicNameValuePair("reasonCodeIds", RestClientUrlUtil.arrayToDelimitedString(reasonCodeIds)));
         }
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO= genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, VERIFY_UNIT_EMPLOYEMNT_BY_STAFF_ID_UNIT_EMPLOYEMENT_ID, queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffAdditionalInfoDTO>>() {
         }, staffId, unitEmploymentId);
+        UserContext.getUserDetails().setUnitWiseAccessRole(staffAdditionalInfoDTO.getUnitWiseAccessRole());
+        return staffAdditionalInfoDTO;
     }
 
     public StaffAdditionalInfoDTO verifyUnitEmploymentOfStaffWithUnitId(Long unitId, LocalDate shiftDate, Long staffId, String type, Long unitEmploymentId) {
