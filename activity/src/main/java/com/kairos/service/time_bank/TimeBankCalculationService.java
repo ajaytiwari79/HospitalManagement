@@ -1540,7 +1540,8 @@ public class TimeBankCalculationService {
             int value = 0;
             if (UNUSED_DAYOFF_LEAVES.equals(ruleTemplate.getCalculationFor())) {
                 if (CompensationMeasurementType.FIXED_VALUE.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType())) {
-                    value += !getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate()).equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf((contractualMinutes / 60) * ruleTemplate.getCalculateValueAgainst().getFixedValue().getAmount()).divide(staffEmploymentDetails.getHourlyCost(), 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
+                    BigDecimal hourlyCost = getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate());
+                    value += !hourlyCost.equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf((contractualMinutes / 60) * ruleTemplate.getCompensationTable().getUnusedDaysOffvalue()).divide(hourlyCost, 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
                 } else if (CompensationMeasurementType.PERCENT.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType())) {
                     value += contractualMinutes * ruleTemplate.getCompensationTable().getUnusedDaysOffvalue() / 100;
                 }
