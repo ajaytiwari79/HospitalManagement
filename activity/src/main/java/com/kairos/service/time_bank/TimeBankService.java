@@ -261,6 +261,7 @@ public class TimeBankService{
         long totalTimeBankBeforeStartDate = 0;
         List<ShiftWithActivityDTO> shiftQueryResultWithActivities;
         List<TimeTypeDTO> timeTypeDTOS = null;
+        Map<Interval,Integer> sequenceIntervalMap  = new HashMap<>();
         if(isNotNull(endDate)){
             shiftQueryResultWithActivities = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(employmentId, startDate, endDate,null);
             endDate = asDate(DateUtils.asLocalDate(endDate).plusDays(1));
@@ -282,6 +283,10 @@ public class TimeBankService{
             Interval planningPeriodInterval = new Interval(asDate(planningPeriod.getStartDate()).getTime(),getEndOfDay(asDate(planningPeriod.getEndDate())).getTime());
             Interval yearTillDate = new Interval(asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())).getTime(),asDate(planningPeriod.getStartDate().with(TemporalAdjusters.lastDayOfYear()).plusDays(1)).getTime());
             intervals = newArrayList(todayInterval,planningPeriodInterval,yearTillDate);
+            sequenceIntervalMap = new HashMap<>();
+            sequenceIntervalMap.put(todayInterval,1);
+            sequenceIntervalMap.put(planningPeriodInterval,2);
+            sequenceIntervalMap.put(yearTillDate,3);
             if(isNotNull(employmentId)){
                 EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO = updateCostTimeAgreementDetails(employmentId, startDate, endDate);
                 employmentDetails = newArrayList(employmentWithCtaDetailsDTO);
@@ -294,7 +299,7 @@ public class TimeBankService{
         List<Long> employmentIds = isNotNull(employmentId) ? newArrayList(employmentId) : employmentDetails.stream().map(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId()).collect(toList());
         List<DailyTimeBankEntry> dailyTimeBanks = timeBankRepository.findAllByEmploymentIdsAndBeforDate(employmentIds, endDate);
         Map<Interval, List<PayOutTransaction>> payoutTransactionIntervalMap = timeBankCalculationService.getPayoutTrasactionIntervalsMap(intervals, startDate,endDate,employmentId);
-        return timeBankCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap);
+        return timeBankCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,sequenceIntervalMap);
     }
 
     /**
