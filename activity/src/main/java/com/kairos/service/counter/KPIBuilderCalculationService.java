@@ -532,11 +532,6 @@ public class KPIBuilderCalculationService implements CounterService {
 
 
     private List<ClusteredBarChartKpiDataUnit> geTodoSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
-//        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-//        ShiftActivityCriteria shiftActivityCriteria = getShiftActivityCriteria(kpiCalculationRelatedInfo);
-////        shiftActivityCriteria.setActivityIds(newHashSet());
-//        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, shiftActivityCriteria, false).invoke();
-//        List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         List<ClusteredBarChartKpiDataUnit> activitySubClusteredBarValue = new ArrayList<>();
         int activityCount =kpiCalculationRelatedInfo.activityIdAndTodoListMap.keySet().size();

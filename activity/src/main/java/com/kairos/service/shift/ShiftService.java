@@ -292,6 +292,7 @@ public class ShiftService extends MongoBaseService {
 
     private void updateSicknessShift(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate(), shift.getEndDate());
+        List<Activity> activities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
         List<Shift> oldShifts=new CopyOnWriteArrayList<>(shifts);
         ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
         if (isNotNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting())) {
@@ -313,7 +314,6 @@ public class ShiftService extends MongoBaseService {
                 exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
             }
             if(sicknessSetting.isUsedOnProtecedDaysOff()){
-                List<Activity> activities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
                 Set<BigInteger> activityIds=activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
                 for (Shift oldShift : oldShifts) {
                     if(!activityIds.contains(oldShift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()))){
