@@ -29,7 +29,7 @@ public interface TimeBankRepository extends MongoBaseRepository<DailyTimeBankEnt
     @Query(value = "{staffId:{$in:?0},deleted:false,date:{$gte:?1 , $lte:?2}}")
     List<DailyTimeBankEntry> findAllDailyTimeBankByStaffIdsAndBetweenDates(List<Long> staffIds, LocalDate startDate, LocalDate endDate);
 
-    @Query("{employmentId:?0,deleted:false,date:{$lt:?1}}")
+    @Query("{employmentId:?0,deleted:false,date:{$lte:?1}}")
     List<DailyTimeBankEntry> findAllByEmploymentIdAndBeforeDate(Long employmentId, Date timeBankDate);
 
 

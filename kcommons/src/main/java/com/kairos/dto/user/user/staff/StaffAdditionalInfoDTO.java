@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+
 /**
  * Created by oodles on 28/11/17.
  */
@@ -90,5 +92,9 @@ public class StaffAdditionalInfoDTO {
                 }
             }
         return roles;
+    }
+
+    public Long getUnitId() {
+        return isNull(unitId) ? this.employment.getUnitId() : unitId;
     }
 }
