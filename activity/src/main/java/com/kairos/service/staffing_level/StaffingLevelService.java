@@ -694,7 +694,7 @@ public class StaffingLevelService  {
         return staffingLevel;
     }
 
-    private StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, List<Shift> shifts) {
+    public StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, List<Shift> shifts) {
         Map[] activityAndParentActivityMap = getActivityAndParentActivityMap(shifts);
         Map<BigInteger,BigInteger> childAndParentActivityIdMap = activityAndParentActivityMap[0];
         Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
@@ -958,5 +958,9 @@ public class StaffingLevelService  {
         staffingLevelInterval.setMinNoOfStaff(staffingLevelInterval.getMinNoOfStaff() - minNoOfStaff);
         staffingLevelInterval.setMaxNoOfStaff(staffingLevelInterval.getMaxNoOfStaff() - maxNoOfStaff);
         staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
+    }
+
+    public List<StaffingLevel> findByUnitIdAndDates(Long unitId, Date startDate, Date endDate){
+        return staffingLevelMongoRepository.findByUnitIdAndDates(unitId, startDate, endDate);
     }
 }
