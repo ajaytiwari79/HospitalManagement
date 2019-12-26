@@ -1484,8 +1484,8 @@ public class TimeBankCalculationService {
                 if(addValueInProtectedDaysOff){
                     dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + value);
                 }
-                dailyTimeBankEntry.setPlannedMinutesOfTimebank(dailyTimeBankEntry.getPlannedMinutesOfTimebank() + value);
-                dailyTimeBankEntry.setDeltaTimeBankMinutes(dailyTimeBankEntry.getDeltaTimeBankMinutes() + value);
+//                dailyTimeBankEntry.setPlannedMinutesOfTimebank(dailyTimeBankEntry.getPlannedMinutesOfTimebank() + value);
+//                dailyTimeBankEntry.setDeltaTimeBankMinutes(dailyTimeBankEntry.getDeltaTimeBankMinutes() + value);
                 dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() + value);
                 if (dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() > MINIMUM_VALUE) {
                     dailyTimeBankEntry.setPublishedSomeActivities(true);
@@ -1541,7 +1541,7 @@ public class TimeBankCalculationService {
             if (UNUSED_DAYOFF_LEAVES.equals(ruleTemplate.getCalculationFor())) {
                 if (CompensationMeasurementType.FIXED_VALUE.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType())) {
                     BigDecimal hourlyCost = getHourlyCostByDate(staffEmploymentDetails.getEmploymentLines(), dateTimeInterval.getStartLocalDate());
-                    value += !hourlyCost.equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf((contractualMinutes / 60) * ruleTemplate.getCompensationTable().getUnusedDaysOffvalue()).divide(hourlyCost, 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
+                    value += !hourlyCost.equals(BigDecimal.valueOf(0)) ? BigDecimal.valueOf( ruleTemplate.getCompensationTable().getUnusedDaysOffvalue()).divide(hourlyCost, 6, RoundingMode.HALF_UP).multiply(new BigDecimal(60)).intValue() : 0;
                 } else if (CompensationMeasurementType.PERCENT.equals(ruleTemplate.getCompensationTable().getUnusedDaysOffType())) {
                     value += contractualMinutes * ruleTemplate.getCompensationTable().getUnusedDaysOffvalue() / 100;
                 }
