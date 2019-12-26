@@ -270,8 +270,7 @@ public class WorkTimeAgreementBalancesCalculationService {
     }
 
     private boolean leaveAvailableForCareDaysWTA(long leaveCount, boolean isLeaveCountAvailable, DateTimeInterval nextCutOffdateTimeInterval, List<ShiftWithActivityDTO> shiftWithActivityDTOS, ActivityCareDayCount careDayCount) {
-        ActivityCutOffCount activityLeaveCount;
-        activityLeaveCount = careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(nextCutOffdateTimeInterval.getStartLocalDate())).findFirst().get();
+        ActivityCutOffCount activityLeaveCount = careDayCount.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(nextCutOffdateTimeInterval.getStartLocalDate())).findFirst().get();
         if (leaveCount + activityLeaveCount.getCount() + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount() > shiftWithActivityDTOS.size()) {
             activityLeaveCount.setBorrowLeaveCount(activityLeaveCount.getBorrowLeaveCount() + 1);
             isLeaveCountAvailable = true;

@@ -28,7 +28,6 @@ import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
-import com.kairos.enums.cta.CalculationUnit;
 import com.kairos.enums.kpi.CalculationType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
@@ -69,13 +68,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-
-
-import org.apache.kafka.common.protocol.types.Field;
-import org.apache.poi.ss.formula.functions.T;
-
-import org.apache.poi.ss.formula.functions.T;
-import org.bouncycastle.util.StringList;
 
 
 import org.joda.time.Interval;
@@ -153,6 +145,9 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Inject
     private AbsencePlanningKPIService absencePlanningKPIService;
+
+    @Inject
+    private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -271,6 +266,9 @@ public class KPIBuilderCalculationService implements CounterService {
             case ESCALATED_SHIFTS:
             case ESCALATION_RESOLVED_SHIFTS:
                 return getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+            case UNDER_STAFFING:
+            case OVER_STAFFING:
+                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             default:
                 break;
         }
@@ -283,7 +281,7 @@ public class KPIBuilderCalculationService implements CounterService {
         FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, shiftActivityCriteria, false).invoke();
         setEscalationDetailInShift(filterShiftActivity.getShifts());
         long escalatedShiftCount;
-        if(CalculationType.ESCALATED_SHIFTS.equals(kpiCalculationRelatedInfo.getCalculationType())) {
+        if(ESCALATED_SHIFTS.equals(kpiCalculationRelatedInfo.getCalculationType())) {
             escalatedShiftCount = filterShiftActivity.shifts.stream().filter(k -> isCollectionNotEmpty(k.getEscalationReasons()) && !k.isEscalationResolved()).count();
         }else{
             escalatedShiftCount = filterShiftActivity.shifts.stream().filter(k -> k.isEscalationResolved()).count();
