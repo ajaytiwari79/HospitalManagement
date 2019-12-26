@@ -34,6 +34,8 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.ShiftType;
+import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -79,6 +81,7 @@ import org.bouncycastle.util.StringList;
 
 
 import org.joda.time.Interval;
+import org.joda.time.Weeks;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -153,6 +156,8 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Inject
     private AbsencePlanningKPIService absencePlanningKPIService;
+
+
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -360,9 +365,28 @@ public class KPIBuilderCalculationService implements CounterService {
             total = shiftActivityDTOS.size();
         } else if (VARIABLE_COST.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
             total = costCalculationKPIService.calculateTotalCostOfStaff(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+        }else if (AVERAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
+            if(DurationType.WEEKS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
+                int countOfAbsenceDays =getCountOfAbsenceDays(kpiCalculationRelatedInfo,shiftActivityDTOS);
+            }
+
         }
         return total;
     }
+
+    private int getCountOfAbsenceDays(KPICalculationRelatedInfo kpiCalculationRelatedInfo, List<ShiftActivityDTO> shiftActivityDTOS){
+        List<ShiftActivityDTO> presenceDaysList = shiftActivityDTOS.stream().filter(shiftActivityDTO -> ShiftType.PRESENCE.equals(shiftActivityDTO.getShiftType())).collect(Collectors.toList());
+        System.out.println("presenceDaysList"+presenceDaysList);
+        Map<Date,List<ShiftActivityDTO>> dateListMap = presenceDaysList.stream().collect(Collectors.groupingBy(shiftActivityDTO -> shiftActivityDTO.getStartDate(), Collectors.toList()));
+
+        int count =0;
+        for(Map.Entry<Date,List<ShiftActivityDTO>> entry : dateListMap.entrySet() ) {
+            System.out.println("key"+entry.getKey()+" value =="+entry.getValue());
+        }
+        return 0;
+
+    }
+
 
     private List<CommonKpiDataUnit> getTotalHoursKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         double multiplicationFactor = 1;
@@ -550,11 +574,6 @@ public class KPIBuilderCalculationService implements CounterService {
 
 
     private List<ClusteredBarChartKpiDataUnit> geTodoSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
-//        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
-//        ShiftActivityCriteria shiftActivityCriteria = getShiftActivityCriteria(kpiCalculationRelatedInfo);
-////        shiftActivityCriteria.setActivityIds(newHashSet());
-//        FilterShiftActivity filterShiftActivity = new FilterShiftActivity(shiftWithActivityDTOS, shiftActivityCriteria, false).invoke();
-//        List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         List<ClusteredBarChartKpiDataUnit> activitySubClusteredBarValue = new ArrayList<>();
         int activityCount =kpiCalculationRelatedInfo.activityIdAndTodoListMap.keySet().size();
