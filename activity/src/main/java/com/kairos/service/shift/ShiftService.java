@@ -853,6 +853,9 @@ public class ShiftService extends MongoBaseService {
                 if (isNotNull(shift.getDraftShift())) {
                     ShiftDTO shiftDTO = shift.getDraftShift();
                     shiftDTO.setDraft(true);
+                    if(!shift.isDraft()) {
+                        shiftDTO.setHasOriginalShift(true);
+                    }
                     shiftDTO.setId(shift.getId());
                     shiftDTOS.add(shiftDTO);
                 } else {
