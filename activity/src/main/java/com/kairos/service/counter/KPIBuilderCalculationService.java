@@ -279,7 +279,6 @@ public class KPIBuilderCalculationService implements CounterService {
             case CARE_DAYS:
             case SENIORDAYS:
             case TOTAL_ABSENCE_DAYS:
-            case ABSENCE_REQUEST:
             case CHILD_CARE_DAYS:
                 return getLeaveCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo, null);
             case BREAK_INTERRUPT:
@@ -289,9 +288,11 @@ public class KPIBuilderCalculationService implements CounterService {
                 return getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case PRESENCE_OVER_STAFFING:
             case PRESENCE_UNDER_STAFFING:
+                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo, true);
             case ABSENCE_OVER_STAFFING:
             case ABSENCE_UNDER_STAFFING:
-                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo, false);
+            case ABSENCE_REQUEST:
             default:
                 break;
         }
@@ -527,20 +528,23 @@ public class KPIBuilderCalculationService implements CounterService {
                         Double value = getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,value));
                         break;
+                    case PLANNING_QUALITY_LEVEL:
+                        subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
+                        break;
                     case PROTECTED_DAYS_OFF:
                     case CARE_DAYS:
                     case SENIORDAYS:
                     case TOTAL_ABSENCE_DAYS:
-                    case ACTUAL_TIMEBANK:
+                    case CHILD_CARE_DAYS:
+                        Double count= new Double(getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
+                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,count));
+                        break;
                     case ABSENCE_REQUEST:
                         List<TodoDTO> todoDTOList=kpiCalculationRelatedInfo.getTodosByStaffIdAndInterval(staffId,dateTimeInterval);
                         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits =absencePlanningKPIService.getActivityStatusCount(todoDTOList,kpiCalculationRelatedInfo.xAxisConfigs.get(0));
                         subClusteredBarValue.addAll(clusteredBarChartKpiDataUnits);
                         break;
-                    case CHILD_CARE_DAYS:
-                        Double count= new Double(getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
-                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,count));
-                        break;
+                    case ACTUAL_TIMEBANK:
                     case BREAK_INTERRUPT:
                     default:
                         break;
@@ -571,7 +575,6 @@ public class KPIBuilderCalculationService implements CounterService {
 
 
     private List<ClusteredBarChartKpiDataUnit> geTodoSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
-
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         List<ClusteredBarChartKpiDataUnit> activitySubClusteredBarValue = new ArrayList<>();
         int activityCount =kpiCalculationRelatedInfo.activityIdAndTodoListMap.keySet().size();

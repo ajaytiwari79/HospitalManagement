@@ -336,13 +336,17 @@ public class SkillService {
         return map;
     }
 
-    public List<StaffDTO> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedDate) {
-        List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds,selectedDate.toString());
-        List<StaffDTO> staffDTOS = new ArrayList<>();
-        if(isCollectionNotEmpty(staffQueryResults)) {
-            staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffDTO(staffQueryResult.getStaff().getId(), staffQueryResult.getSkillInfo())));
+    public Map<String, List<StaffDTO>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, List<LocalDate> selectedDates) {
+        Map<String, List<StaffDTO>> staffSkillsMap = new HashMap<>();
+        for (LocalDate selectedDate : selectedDates) {
+            List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds, selectedDate.toString());
+            List<StaffDTO> staffDTOS = new ArrayList<>();
+            if(isCollectionNotEmpty(staffQueryResults)) {
+                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffDTO(staffQueryResult.getStaff().getId(), staffQueryResult.getSkillInfo())));
+            }
+            staffSkillsMap.put(selectedDate.toString(), staffDTOS);
         }
-        return staffDTOS;
+        return staffSkillsMap;
     }
 
 
