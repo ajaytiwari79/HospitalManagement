@@ -527,6 +527,9 @@ public class KPIBuilderCalculationService implements CounterService {
                         Double value = getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,value));
                         break;
+                    case PLANNING_QUALITY_LEVEL:
+                        subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
+                        break;
                     case PROTECTED_DAYS_OFF:
                     case CARE_DAYS:
                     case SENIORDAYS:
@@ -571,7 +574,6 @@ public class KPIBuilderCalculationService implements CounterService {
 
 
     private List<ClusteredBarChartKpiDataUnit> geTodoSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
-
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         List<ClusteredBarChartKpiDataUnit> activitySubClusteredBarValue = new ArrayList<>();
         int activityCount =kpiCalculationRelatedInfo.activityIdAndTodoListMap.keySet().size();
