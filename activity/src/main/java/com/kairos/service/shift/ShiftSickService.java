@@ -4,6 +4,7 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.period.PeriodDTO;
+import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
 import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
@@ -274,9 +275,12 @@ public class ShiftSickService extends MongoBaseService {
 
     //TODO Refactor db queries
     public void disableSicknessShiftsOfStaff(Long staffId, Long unitId) {
+        PlanningPeriod planningPeriod = planningPeriodMongoRepository.findCurrentDatePlanningPeriod(unitId, DateUtils.getCurrentLocalDate(), DateUtils.getCurrentLocalDate());
+        List<Activity> protectedDaysOffActivitys = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(unitId));
         List<Shift> oldShift = new ArrayList<>();
         List<Shift> newShift = new ArrayList<>();
         StaffEmploymentDetails staffEmploymentDetails = userIntegrationService.verifyUnitEmploymentOfStaff(staffId, unitId);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null, staffId, staffEmploymentDetails.getId(), Collections.emptySet());
         if (!Optional.ofNullable(staffEmploymentDetails).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFFEMPLOYMENT_NOTFOUND);
         }
@@ -286,34 +290,40 @@ public class ShiftSickService extends MongoBaseService {
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
         for (Shift shift : shifts) {
-          updateShift(shift,activityWrapperMap,dateAndShiftMap,oldShift,newShift);
+          updateShift(shift,activityWrapperMap,dateAndShiftMap,oldShift,newShift,isCollectionNotEmpty(protectedDaysOffActivitys) ? protectedDaysOffActivitys.get(0) : null,planningPeriod,staffEmploymentDetails);
         }
-        if(isCollectionNotEmpty(newShift)){
+            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = new ShiftWithViolatedInfoDTO();
+         if(isCollectionNotEmpty(newShift)){
+                shiftWithViolatedInfoDTO = saveShifts(protectedDaysOffActivitys.add(0), staffAdditionalInfoDTO, shiftDTOS, shiftActionType);
 
-        }
+            }
         shiftMongoRepository.saveEntities(oldShift);
         if (CollectionUtils.isNotEmpty(shifts)) {
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(null, shifts.get(0).getStaffId(), shifts.get(0).getEmploymentId(), Collections.emptySet());
             timeBankService.updateDailyTimeBankEntries(shifts, staffEmploymentDetails, staffAdditionalInfoDTO.getDayTypes());
         }
     }
 
 
-    private Shift updateShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<LocalDate, List<Shift>> dateAndShiftMap, List<Shift> oldShift, List<Shift> newShift) {
+    private Shift updateShift(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, Map<LocalDate, List<Shift>> dateAndShiftMap, List<Shift> oldShift, List<Shift> newShift, Activity protectedDaysOffActivity,PlanningPeriod planningPeriod,StaffEmploymentDetails staffEmploymentDetails) {
         if (shift.isSickShift()) {
             List<Shift> shifts = dateAndShiftMap.get(DateUtils.asLocalDate(shift.getStartDate()));
             for (Shift shift1 : shifts) {
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
-                updateShift(activityWrapper, shift1,oldShift,newShift);
+                updateShift(activityWrapper, shift1,oldShift,newShift,protectedDaysOffActivity,planningPeriod,staffEmploymentDetails);
             }
         }
         return shift;
     }
 
-    private void updateShift(ActivityWrapper activityWrapper, Shift shift, List<Shift> oldShift, List<Shift> newShifts) {
+    private void updateShift(ActivityWrapper activityWrapper, Shift shift, List<Shift> oldShift, List<Shift> newShifts , Activity protectedDaysOffActivity , PlanningPeriod planningPeriod,StaffEmploymentDetails staffEmploymentDetails) {
         Shift newShift=null;
         switch (activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting().getReplaceSkillActivityEnum()) {
             case PROTECTED_DAYS_OFF:
+                ShiftActivity newShiftActivity = new ShiftActivity();
+                newShiftActivity.setStartDate(shift.getStartDate());
+                newShiftActivity.setEndDate(shift.getEndDate());
+                newShift= new Shift(shift.getStartDate(), shift.getEndDate(), shift.getStaffId(), Arrays.asList(newShiftActivity), staffEmploymentDetails.getId(), shift.getUnitId(), planningPeriod.getCurrentPhaseId(), planningPeriod.getId());
+                newShift.setShiftType(ShiftType.NON_WORKING);
                 break;
             case FREE_DAY:
                 shift.setDeleted(true);
@@ -334,6 +344,9 @@ public class ShiftSickService extends MongoBaseService {
                 break;
             default:
                 break;
+        }
+        isNotNull(newShift){
+            newShifts.add(newShift);
         }
         oldShift.add(shift);
     }
