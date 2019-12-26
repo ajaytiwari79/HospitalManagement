@@ -551,6 +551,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'payoutCtaBonusMinutes':1,\n" +
                 "        'createdBy':1,\n" +
                 "    'staffId' : 1,\n" +
+                "    'shiftType' : 1,\n" +
                 "    'startDate' : 1,\n" +
                 "    'endDate' : 1,\n" +
                 "    'employmentId' : 1,\n" +
@@ -585,7 +586,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
     private String groupByShiftAndActivity() {
         return "{'$group':{'_id':'$_id', 'durationMinutes':{'$first':'$durationMinutes'},\n" +
-                "'staffId':{'$first':'$staffId'},'startDate':{'$first':'$startDate'},'createdBy':{'$first':'$createdBy'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'phaseId':{'$first':'$phaseId'},'breakActivities':{'$first':'$breakActivities'},'activities':{'$addToSet':'$activities'}}}";
+                "'staffId':{'$first':'$staffId'},'shiftType':{'$first':'$shiftType'},'startDate':{'$first':'$startDate'},'createdBy':{'$first':'$createdBy'},'endDate':{'$first':'$endDate'},'employmentId':{'$first':'$employmentId'},'phaseId':{'$first':'$phaseId'},'breakActivities':{'$first':'$breakActivities'},'activities':{'$addToSet':'$activities'}}}";
     }
 
 

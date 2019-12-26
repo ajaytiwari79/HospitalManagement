@@ -235,7 +235,7 @@ public class KPIBuilderCalculationService implements CounterService {
             return kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria();
         }
         ShiftActivityCriteria currentShiftActivityCriteria = kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria();
-        Set<BigInteger> timeTypeIds = kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(TIME_TYPE) ? KPIUtils.getBigIntegerSet(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TIME_TYPE)) : new HashSet<>();
+        Set<BigInteger> timeTypeIds = kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(TIME_TYPE) ? kpiCalculationRelatedInfo.getTimeTypeMap().keySet() : new HashSet<>();
         Set<BigInteger> plannedTimeIds = kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerSet(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(PLANNED_TIME_TYPE)) : new HashSet<>();
         Set<BigInteger> activityIds = kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ACTIVITY_IDS) ? KPIUtils.getBigIntegerSet(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ACTIVITY_IDS)) : new HashSet<>();
         if (kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(ABSENCE_ACTIVITY))) {
@@ -387,27 +387,17 @@ public class KPIBuilderCalculationService implements CounterService {
         } else if (VARIABLE_COST.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
             total = costCalculationKPIService.calculateTotalCostOfStaff(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
         }else if (AVERAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
+            Set<LocalDate> localDates = shiftActivityDTOS.stream().map(shiftActivityDTO -> asLocalDate(shiftActivityDTO.getStartDate())).collect(Collectors.toSet());
             if(DurationType.WEEKS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
-                int countOfAbsenceDays =getCountOfAbsenceDays(kpiCalculationRelatedInfo,shiftActivityDTOS);
+                total = localDates.size() / kpiCalculationRelatedInfo.getApplicableKPI().getValue();
+            }
+            if(DurationType.MONTHS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
+                total=localDates.size()/(kpiCalculationRelatedInfo.getApplicableKPI().getValue()*4);
             }
 
         }
         return total;
     }
-
-    private int getCountOfAbsenceDays(KPICalculationRelatedInfo kpiCalculationRelatedInfo, List<ShiftActivityDTO> shiftActivityDTOS){
-        List<ShiftActivityDTO> presenceDaysList = shiftActivityDTOS.stream().filter(shiftActivityDTO -> ShiftType.PRESENCE.equals(shiftActivityDTO.getShiftType())).collect(Collectors.toList());
-        System.out.println("presenceDaysList"+presenceDaysList);
-        Map<Date,List<ShiftActivityDTO>> dateListMap = presenceDaysList.stream().collect(Collectors.groupingBy(shiftActivityDTO -> shiftActivityDTO.getStartDate(), Collectors.toList()));
-
-        int count =0;
-        for(Map.Entry<Date,List<ShiftActivityDTO>> entry : dateListMap.entrySet() ) {
-            System.out.println("key"+entry.getKey()+" value =="+entry.getValue());
-        }
-        return 0;
-
-    }
-
 
     private List<CommonKpiDataUnit> getTotalHoursKpiData(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         double multiplicationFactor = 1;
