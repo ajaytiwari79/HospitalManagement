@@ -1,5 +1,6 @@
 package com.kairos.service.kpermissions;
 
+import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.FieldDTO;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -81,7 +83,7 @@ public class PermissionService {
     @Inject private StaffService staffService;
 
     public List<ModelDTO> createPermissionSchema(List<ModelDTO> modelDTOS){
-        Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll().spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
+        Map<String,KPermissionModel> modelNameAndModelMap = StreamSupport.stream(permissionModelRepository.findAll(2).spliterator(), false).filter(it -> !it.isPermissionSubModel()).collect(Collectors.toMap(k->k.getModelName().toLowerCase(),v->v));
         List<KPermissionModel> kPermissionModels = buildPermissionModelData(modelDTOS, modelNameAndModelMap, false);
         permissionModelRepository.save(kPermissionModels,2);
         return modelDTOS;
@@ -352,23 +354,23 @@ public class PermissionService {
         return kPermissionFieldQueryResult;
     }
 
-    public <T extends UserBaseEntity,E extends UserBaseEntity> void updateModelBasisOfPermission(List<T> objects){
+    public <T,E extends UserBaseEntity> void updateModelBasisOfPermission(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions){
         try {
             if(UserContext.getUserDetails().isHubMember()){
                 return;
             }
-            FieldPermissionHelper fieldPermissionHelper = new FieldPermissionHelper(objects);
-            updateObjectsPropertiesBeforeSave(fieldPermissionHelper);
+            FieldPermissionHelper fieldPermissionHelper = new FieldPermissionHelper(objects,fieldLevelPermissions);
+            updateObjectsPropertiesBeforeSave(fieldPermissionHelper,fieldLevelPermissions);
         }catch (Exception e){
             LOGGER.error(e.getMessage());
         }
     }
 
 
-    public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(FieldPermissionHelper fieldPermissionHelper){
+    public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(FieldPermissionHelper fieldPermissionHelper,Set<FieldLevelPermission> fieldLevelPermissions){
         for (T object : (List<T>)fieldPermissionHelper.getObjects()) {
             E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(object.getId());
-            PermissionMapperUtils.PermissionHelper permissionHelper = fieldPermissionHelper.getPermissionHelper(object.getClass().getSimpleName(),FieldLevelPermission.WRITE);
+            PermissionMapperUtils.PermissionHelper permissionHelper = fieldPermissionHelper.getPermissionHelper(object.getClass().getSimpleName(),fieldLevelPermissions);
             if(PermissionMapperUtils.personalisedModel.contains(object.getClass().getSimpleName())){
                 permissionHelper.setSameStaff(permissionHelper.getCurrentUserStaffId().equals(object.getId()));
                 permissionHelper.setOtherPermissions(permissionHelper.getOtherPermissionDTOMap().getOrDefault(object.getId(),new OtherPermissionDTO()));
@@ -405,44 +407,68 @@ public class PermissionService {
         private boolean hubMember;
         private Long staffId;
 
-        public FieldPermissionHelper(List<T> objects) {
+        public FieldPermissionHelper(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions) {
             this.objects = objects;
             Long unitId = UserContext.getUserDetails().getLastSelectedOrganizationId();
-            Set<String> modelNames = objects.stream().map(model->model.getClass().getSimpleName()).collect(Collectors.toSet());
+            Set<String> modelNames = getModelNames(objects);
             List<AccessGroup> accessGroups =  accessGroupService.validAccessGroupByDate(unitId,getDate());
             hubMember = UserContext.getUserDetails().isHubMember();
             List<ModelPermissionQueryResult> modelPermissionQueryResults = getModelPermission(new ArrayList(modelNames),accessGroups.stream().map(accessGroup -> accessGroup.getId()).collect(Collectors.toSet()),hubMember);
             List<ModelDTO> modelDTOS = copyPropertiesOfCollectionByMapper(modelPermissionQueryResults,ModelDTO.class);
             modelMap = modelDTOS.stream().collect(Collectors.toMap(k -> k.getModelName(), v -> v));
-            Map[] mapArray = getObjectByIds(objects);
+            Map[] mapArray = getObjectByIds(objects,fieldLevelPermissions);
             mapOfDataBaseObject = mapArray[0];
             otherPermissionDTOMap = mapArray[1];
             Organization parentOrganisation = organizationService.fetchParentOrganization(unitId);
             currentUserStaffId = staffService.getStaffIdByUserId(UserContext.getUserDetails().getId(), parentOrganisation.getId());
         }
 
-        private <ID,E extends UserBaseEntity,T extends UserBaseEntity> Map[] getObjectByIds(List<T> objects){
+        private Set<String> getModelNames(List<T> objects) {
+            return objects.stream().map(model->{
+                if(model.getClass().isAnnotationPresent(com.kairos.annotations.KPermissionModel.class)) {
+                    return model.getClass().getSimpleName();
+                }else if(model.getClass().isAnnotationPresent(PermissionClass.class)){
+                    PermissionClass permissionClass = model.getClass().getAnnotation(PermissionClass.class);
+                    return permissionClass.name();
+                }
+                return "";
+            }).collect(Collectors.toSet());
+        }
+
+        private <ID,E,T> Map[] getObjectByIds(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions){
             Map<Class,Set<ID>> objectIdsMap = new HashMap<>();
             for (T object : objects) {
-                if(isNotNull(object.getId())){
-                    Set<ID> ids = objectIdsMap.getOrDefault(object.getClass(),new HashSet<>());
-                    ids.add((ID) object.getId());
-                    objectIdsMap.put(object.getClass(),ids);
+                try {
+                    ID id = (ID) object.getClass().getMethod("getId").invoke(object);
+                    if (isNotNull(id)) {
+                        Set<ID> ids = objectIdsMap.getOrDefault(object.getClass(), new HashSet<>());
+                        ids.add(id);
+                        objectIdsMap.put(object.getClass(), ids);
+                    }
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
                 }
             }
             Map<ID,E> mapOfDataBaseObject = new HashMap<>();
-            for (Map.Entry<Class, Set<ID>> classIdSetEntry : objectIdsMap.entrySet()) {
-                Collection<E> databaseObject = commonRepository.findByIds(classIdSetEntry.getKey(),(Collection<? extends Serializable>) classIdSetEntry.getValue(),2);
-                for (E object : databaseObject) {
-                    mapOfDataBaseObject.put((ID)object.getId(),object);
+            if(fieldLevelPermissions.contains(FieldLevelPermission.WRITE)){
+                for (Map.Entry<Class, Set<ID>> classIdSetEntry : objectIdsMap.entrySet()) {
+                    Collection<E> databaseObject = commonRepository.findByIds(classIdSetEntry.getKey(),(Collection<? extends Serializable>) classIdSetEntry.getValue(),2);
+                    for (E object : databaseObject) {
+                        try {
+                            ID id = (ID) object.getClass().getMethod("getId").invoke(object);
+                            mapOfDataBaseObject.put(id,object);
+                        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
             Map<Long, OtherPermissionDTO> staffPermissionRelatedDataQueryResultMap = staffService.getStaffDataForPermissionByStaffIds((Set<Long>)objectIdsMap.get(Staff.class));
             return new Map[]{mapOfDataBaseObject,staffPermissionRelatedDataQueryResultMap};
         }
 
-        public PermissionMapperUtils.PermissionHelper getPermissionHelper(String className,FieldLevelPermission fieldLevelPermission){
-            return new PermissionMapperUtils.PermissionHelper(modelMap.get(className),currentUserStaffId,otherPermissionDTOMap,hubMember,fieldLevelPermission);
+        public PermissionMapperUtils.PermissionHelper getPermissionHelper(String className,Set<FieldLevelPermission> fieldLevelPermissions){
+            return new PermissionMapperUtils.PermissionHelper(modelMap.get(className),currentUserStaffId,otherPermissionDTOMap,hubMember,fieldLevelPermissions);
         }
     }
 }

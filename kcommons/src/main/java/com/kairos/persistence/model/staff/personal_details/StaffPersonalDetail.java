@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.staff.personal_details;
 
+import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.AddressDTO;
@@ -28,6 +29,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@PermissionClass(name = "Staff")
 public class StaffPersonalDetail {
 
     private Long id;
