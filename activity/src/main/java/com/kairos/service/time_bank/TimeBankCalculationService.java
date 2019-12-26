@@ -1145,12 +1145,8 @@ public class TimeBankCalculationService {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
                 deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() - dailyTimeBankEntry.getTimeBankOffMinutes();
                 actualTimebank += deltaTimeBankMinutes;
-                LOGGER.debug("delta timebank {}", dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes());
-                LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
             } else if (validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate)) || publishPlanningPeriodDateMap.get(employmentStartDate)) {
                 actualTimebank += deltaTimeBankMinutes;
-                LOGGER.debug("delta timebank {}", deltaTimeBankMinutes);
-                LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
             }
             employmentStartDate = employmentStartDate.plusDays(1);
         }
