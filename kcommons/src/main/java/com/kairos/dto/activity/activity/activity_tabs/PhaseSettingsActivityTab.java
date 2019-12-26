@@ -38,6 +38,7 @@ public class PhaseSettingsActivityTab implements Serializable {
     }
 
     public List<PhaseTemplateValue> getPhaseTemplateValues() {
+        Collections.sort(phaseTemplateValues);
         return phaseTemplateValues;
     }
 
