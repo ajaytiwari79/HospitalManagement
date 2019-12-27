@@ -88,11 +88,25 @@ public class ShiftDTO {
     protected RequestAbsenceDTO requestAbsence;
     protected List<ShiftActivityDTO> breakActivities;
     protected boolean hasOriginalShift;
+    private boolean sickShift;
     protected UserInfo createdBy;
 
 
     public ShiftDTO() {
         //default Const
+    }
+
+    public ShiftDTO(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivityDTO> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.staffId = staffId;
+        this.activities = activities;
+        this.employmentId = employmentId;
+        this.unitId = unitId;
+        this.sickShift = true;
+        this.phaseId = phaseId;
+        this.planningPeriodId = planningPeriodId;
+
     }
 
     public ShiftDTO(@NotNull(message = "message.shift.shiftDate") LocalDate shiftDate,List<ShiftActivityDTO> activities,BigInteger id) {
