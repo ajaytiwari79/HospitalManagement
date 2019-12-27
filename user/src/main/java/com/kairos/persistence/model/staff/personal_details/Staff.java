@@ -124,6 +124,7 @@ public class Staff extends UserBaseEntity {
     private String user_id; //specially required for chat server only
 
     @Relationship(type = BELONGS_TO_TAGS)
+    @KPermissionField
     private List<Tag> tags;
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {

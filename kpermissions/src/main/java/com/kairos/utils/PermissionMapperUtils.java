@@ -70,12 +70,8 @@ public class PermissionMapperUtils {
 
     private static void updatePropertyByPermission(PermissionHelper permissionHelper, BeanWrapper targetWrapper, BeanWrapper srcWrapper, String subFieldName, ModelDTO modelDTO) {
         for (FieldDTO field : modelDTO.getFieldPermissions()) {
-            try {
-                if (verifyFieldPermission(field,permissionHelper) || CollectionUtils.containsAny(permissionHelper.getFieldLevelPermissions(),newHashSet(FieldLevelPermission.READ,FieldLevelPermission.WRITE))) {
-                    srcWrapper.setPropertyValue(subFieldName+field.getFieldName(), getPropertyValue(targetWrapper, subFieldName, field,permissionHelper));
-                }
-            }catch (Exception exception){
-               LOGGER.error("Error {}",exception);
+            if (verifyFieldPermission(field, permissionHelper)) {
+                srcWrapper.setPropertyValue(subFieldName + field.getFieldName(), getPropertyValue(targetWrapper, subFieldName, field, permissionHelper));
             }
         }
         if(isCollectionNotEmpty(modelDTO.getSubModelPermissions())){
@@ -87,10 +83,14 @@ public class PermissionMapperUtils {
     }
 
     private static Object getPropertyValue(BeanWrapper targetWrapper, String subFieldName, FieldDTO field,PermissionHelper permissionHelper) {
-        if(permissionHelper.getFieldLevelPermissions().contains(FieldLevelPermission.WRITE)) {
-            return targetWrapper.getPropertyValue(subFieldName + field.getFieldName());
-        } else if ((!permissionHelper.isPersonalizedClass() || permissionHelper.isSameStaff()) && (!field.getPermissions().contains(FieldLevelPermission.READ)) || field.getPermissions().contains(FieldLevelPermission.HIDE)) {
-            return getValueByPropertyType(targetWrapper.getPropertyType(subFieldName + field.getFieldName()));
+        try {
+            if (permissionHelper.getFieldLevelPermissions().contains(FieldLevelPermission.WRITE)) {
+                return targetWrapper.getPropertyValue(subFieldName + field.getFieldName());
+            } else if ((!permissionHelper.isPersonalizedClass() || permissionHelper.isSameStaff()) && (!field.getPermissions().contains(FieldLevelPermission.READ)) || field.getPermissions().contains(FieldLevelPermission.HIDE)) {
+                return getValueByPropertyType(targetWrapper.getPropertyType(subFieldName + field.getFieldName()));
+            }
+        } catch (Exception exception) {
+            LOGGER.error("Error {}", exception);
         }
         return null;
     }

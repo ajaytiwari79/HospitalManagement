@@ -33,9 +33,9 @@ public class ReadPermissionAspect {
     //@Before("execution(* com.kairos.utils.response.ResponseHandler.generateResponse(..))")
     public static <T> void validateStaffResponseAsPerPermission(Object object) {
         Object[] objectArray = object instanceof Collection ? ((Collection) object).toArray() : new Object[]{object};
-        List<T> objects = checkAndReturnValidModel(objectArray);
+        /*List<T> objects = checkAndReturnValidModel(objectArray);
         if(isCollectionNotEmpty(objects)) {
             permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.READ,FieldLevelPermission.HIDE));
-        }
+        }*/
     }
 }
