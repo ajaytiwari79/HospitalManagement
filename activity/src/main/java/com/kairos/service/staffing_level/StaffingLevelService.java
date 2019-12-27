@@ -698,9 +698,9 @@ public class StaffingLevelService  {
         Map[] activityAndParentActivityMap = getActivityAndParentActivityMap(shifts);
         Map<BigInteger,BigInteger> childAndParentActivityIdMap = activityAndParentActivityMap[0];
         Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
-        if(isNotNull(staffSkillsMap)) {
+        if(isNull(staffSkillsMap)) {
             List<Long> staffIds = shifts.stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
-            List<StaffDTO> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, newArrayList(asLocalDate(staffingLevel.getCurrentDate()))).get(asLocalDate(staffingLevel.getCurrentDate()).toString());
+            List<StaffDTO> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate())).get(asLocalDate(staffingLevel.getCurrentDate()).toString());
             staffSkillsMap = staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSkillInfo()));
         }
         for (Shift shift : shifts) {

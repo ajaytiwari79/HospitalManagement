@@ -2,7 +2,6 @@ package com.kairos.dto.activity.kpi;
 
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -3,19 +3,13 @@ package com.kairos.service.counter;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.dto.activity.staffing_level.StaffingLevelDto;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.dto.user.staff.StaffDTO;
-import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.kpi.CalculationType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
-import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,8 +17,8 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.getHoursByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.enums.kpi.CalculationType.ABSENCE_UNDER_STAFFING;
-import static com.kairos.enums.kpi.CalculationType.PRESENCE_UNDER_STAFFING;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.utils.counter.KPIUtils.getValueWithDecimalFormat;
 
 
@@ -37,22 +31,21 @@ public class StaffingLevelCalculationKPIService {
     private StaffingLevelService staffingLevelService;
     @Inject
     private KPIBuilderCalculationService kpiBuilderCalculationService;
-    @Inject
-    private UserIntegrationService userIntegrationService;
 
-    public double getStaffingLevelCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean isPresenceStaffingLevelData) {
+    public double getStaffingLevelCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
         KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
         List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate());
-        List<Long> staffIds = filterShiftActivity.getShifts().stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
-        List<LocalDate> dateList = staffingLevels.stream().map(staffingLevel -> asLocalDate(staffingLevel.getCurrentDate())).collect(Collectors.toList());
-        Map<String, List<StaffDTO>> staffDTOSMap = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, dateList);
         double staffingLevelData = 0 ;
+        boolean isPresenceStaffingLevelData = PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) || PRESENCE_OVER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType());
         if(isCollectionNotEmpty(filterShiftActivity.getShifts())) {
             for (StaffingLevel staffingLevel : staffingLevels) {
-                Map<Long, List<Map<String, Object>>> staffSkillsMap = staffDTOSMap.get(asLocalDate(staffingLevel.getCurrentDate()).toString()).stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSkillInfo()));
-                staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftWithActivityDTOS, Shift.class), staffSkillsMap);
+                List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> shift.getStartDate().equals(staffingLevel.getCurrentDate())).collect(Collectors.toList());
+                if(isCollectionNotEmpty(currentDateShifts)) {
+                    Map<Long, List<Map<String, Object>>> staffSkillsMap = kpiCalculationRelatedInfo.getSelectDateAndStaffDTOSMap().get(asLocalDate(staffingLevel.getCurrentDate()).toString()).stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSkillInfo()));
+                    staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(currentDateShifts, Shift.class), staffSkillsMap);
+                }
                 staffingLevelData += isPresenceStaffingLevelData ? getPresenceStaffingLevelCalculationData(staffingLevel, kpiCalculationRelatedInfo) : getAbsenceStaffingLevelCalculationData(staffingLevel, kpiCalculationRelatedInfo);
             }
         }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ApiConstants.API_V1;
 
 
@@ -67,7 +68,7 @@ public class SkillController {
 
     @PostMapping("/country/{countryId}/get_Skill_and_level_by_staff_ids")
     @ApiOperation("Get Staff's SkillId And Level")
-    public ResponseEntity<Map<String, Object>> getStaffSkillAndLevelByStaffIds(@RequestBody List<Long> StaffIds, @RequestParam("selectedDates")@DateTimeFormat(pattern="yyyy-MM-dd") List<LocalDate> selectedDates) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffSkillAndLevelByStaffIds(StaffIds,selectedDates));
+    public ResponseEntity<Map<String, Object>> getStaffSkillAndLevelByStaffIds(@RequestBody List<Long> StaffIds, @RequestParam("selectedFromDate")@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate selectedFromDate, @RequestParam(value = "selectedToDate", required = false)@DateTimeFormat(pattern="yyyy-MM-dd") LocalDate selectedToDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, skillService.getStaffSkillAndLevelByStaffIds(StaffIds, selectedFromDate, isNull(selectedToDate) ? selectedFromDate : selectedToDate));
     }
 }
