@@ -34,8 +34,6 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.enums.shift.ShiftType;
-import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -75,7 +73,6 @@ import org.apache.commons.collections.CollectionUtils;
 
 
 import org.joda.time.Interval;
-import org.joda.time.Weeks;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -218,7 +215,7 @@ public class KPIBuilderCalculationService implements CounterService {
         XAxisConfig calculationUnit = (XAxisConfig) ((List) copyPropertiesOfCollectionByMapper(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
         if (PERCENTAGE.equals(calculationUnit)) {
             int sumOfShifts = shiftWithActivityDTOS.stream().flatMap(shiftWithActivityDTO -> shiftWithActivityDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream())).mapToInt(plannedTime -> (int) plannedTime.getInterval().getMinutes()).sum();
-            total = sumOfShifts > 0 ? (valuesSumInMinutes / sumOfShifts) * 100 : valuesSumInMinutes;
+            total = sumOfShifts > 0 ? (valuesSumInMinutes * 100.0) / sumOfShifts  : valuesSumInMinutes;
         } else if (COUNT.equals(calculationUnit)) {
             total = filterShiftActivity.getShiftActivityDTOS().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getPlannedTimes().stream()).filter(plannedTime -> plannedTimeIds.contains(plannedTime.getPlannedTimeId())).count();
         }
@@ -312,7 +309,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if(ESCALATED_SHIFTS.equals(kpiCalculationRelatedInfo.getCalculationType())) {
             escalatedShiftCount = filterShiftActivity.shifts.stream().filter(k -> isCollectionNotEmpty(k.getEscalationReasons()) && !k.isEscalationResolved()).count();
         }else{
-            escalatedShiftCount = filterShiftActivity.shifts.stream().filter(k -> k.isEscalationResolved()).count();
+            escalatedShiftCount = filterShiftActivity.shifts.stream().filter(ShiftDTO::isEscalationResolved).count();
         }
         if (PERCENTAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
             return isCollectionNotEmpty(filterShiftActivity.shifts) ? getValueWithDecimalFormat((escalatedShiftCount * 100.0d) / filterShiftActivity.shifts.size()) : 0;
@@ -322,8 +319,8 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
     private void setEscalationDetailInShift(List<ShiftWithActivityDTO> shifts){
-        List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shifts.stream().map(shift->shift.getId()).collect(Collectors.toList()),false);
-        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
+        List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shifts.stream().map(ShiftDTO::getId).collect(Collectors.toList()),false);
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, v -> v));
         for (ShiftWithActivityDTO shift : shifts) {
             if(shiftViolatedRulesMap.containsKey(shift.getId())){
                 shift.setEscalationReasons(shiftViolatedRulesMap.get(shift.getId()).getEscalationReasons());
@@ -444,15 +441,15 @@ public class KPIBuilderCalculationService implements CounterService {
     @Override
     public KPIRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, kpi, null);
-        XAxisConfig XAxisConfig = (XAxisConfig) ((List) copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(XAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
+        XAxisConfig xAxisConfig = (XAxisConfig) ((List) copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), xAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.STAFF, AppConstants.LABEL), new KPIAxisData(xAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 
     @Override
     public KPIRepresentationData getCalculatedKPI(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         List<CommonKpiDataUnit> dataList = getTotalHoursKpiData(filterBasedCriteria, organizationId, kpi, applicableKPI);
-        XAxisConfig XAxisConfig = (XAxisConfig) ((List) copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
-        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(XAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
+        XAxisConfig xAxisConfig = (XAxisConfig) ((List) copyPropertiesOfCollectionByMapper(filterBasedCriteria.get(CALCULATION_UNIT), XAxisConfig.class)).get(0);
+        return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), xAxisConfig, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF) ? AppConstants.STAFF : AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(xAxisConfig.getDisplayValue(), AppConstants.VALUE_FIELD));
     }
 
 
@@ -626,7 +623,7 @@ public class KPIBuilderCalculationService implements CounterService {
             for (TodoDTO todoDTO : todoDTOS) {
                 localDate = getApproveOrDisApproveDateFromTODO(localDate, todoDTO);
                 if (isNotNull(localDate)) {
-                    Boolean isApproveExist = new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime)).containsAndEqualsEndDate(asDate(localDate));
+                    boolean isApproveExist = new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime)).containsAndEqualsEndDate(asDate(localDate));
                     if (isApproveExist) {
                         count++;
                         todoDTOS.remove(todoDTO);
@@ -857,7 +854,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
         public void getActivityTodoList(){
             todoDTOS=todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
-            activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(k->k.getSubEntityId(),Collectors.toList()));
+            activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId,Collectors.toList()));
 
         }
 
@@ -868,7 +865,7 @@ public class KPIBuilderCalculationService implements CounterService {
         public void  getWtaRuleDetails(){
             wtaQueryResultDTOS= workTimeAgreementService.getWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds),dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> getWtaTemplateTypes(null).contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
-            employmentIdAndWtaMap = wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(wtaQueryResultDTO -> wtaQueryResultDTO.getEmploymentId(), Collectors.toList()));
+            employmentIdAndWtaMap = wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(WTAQueryResultDTO::getEmploymentId, Collectors.toList()));
             wtaActivityIds =workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
             activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(wtaActivityIds));
             activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
@@ -963,7 +960,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 todoDTOS = todoDTOS.stream().filter(todoDTO -> activityIds.contains(todoDTO.getSubEntityId())).collect(Collectors.toList());
             }
             staffIdAndTodoMap=todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
-            activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(k->k.getSubEntityId(),Collectors.toList()));
+            activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId,Collectors.toList()));
         }
 
         public List<TodoDTO> getTodosByStaffIdAndInterval(Long staffId, DateTimeInterval dateTimeInterval) {
