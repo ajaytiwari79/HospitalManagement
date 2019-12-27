@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.TimeCalaculationType;
 
@@ -30,6 +31,7 @@ public class TimeCalculationActivityDTO {
     private DayOfWeek fullWeekStart;
     private DayOfWeek fullWeekEnd;
     private int historyDuration;
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime defaultStartTime;
     private boolean availableAllowActivity;
 

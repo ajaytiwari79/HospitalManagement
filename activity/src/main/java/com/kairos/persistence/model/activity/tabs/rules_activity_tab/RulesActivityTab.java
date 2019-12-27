@@ -40,6 +40,7 @@ public class RulesActivityTab{
     private boolean transferAll;
     private int noOfTransferLeave;
     // in Minutes
+
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
     private Short shortestTime;
