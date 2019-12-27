@@ -234,7 +234,7 @@ public class StaffingLevelService  {
         if (isNull(staffingLevel)) {
             staffingLevel = createDefaultStaffingLevel(unitId, startDate);
         }
-        return updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftDTOS,Shift.class));
+        return updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftDTOS,Shift.class), null);
 
     }
 
@@ -694,13 +694,15 @@ public class StaffingLevelService  {
         return staffingLevel;
     }
 
-    private StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, List<Shift> shifts) {
+    public StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, List<Shift> shifts, Map<Long, List<Map<String, Object>>> staffSkillsMap) {
         Map[] activityAndParentActivityMap = getActivityAndParentActivityMap(shifts);
         Map<BigInteger,BigInteger> childAndParentActivityIdMap = activityAndParentActivityMap[0];
         Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
-        List<Long> staffIds = shifts.stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
-        List<StaffDTO> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds,asLocalDate(staffingLevel.getCurrentDate()));
-        Map<Long, List<Map<String,Object>>> staffSkillsMap = staffDTOS.stream().collect(Collectors.toMap(k->k.getId(),v->v.getSkillInfo()));
+        if(isNull(staffSkillsMap)) {
+            List<Long> staffIds = shifts.stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
+            List<StaffDTO> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate())).get(asLocalDate(staffingLevel.getCurrentDate()).toString());
+            staffSkillsMap = staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSkillInfo()));
+        }
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 Activity activity = activityMap.get(shiftActivity.getActivityId());
@@ -958,5 +960,9 @@ public class StaffingLevelService  {
         staffingLevelInterval.setMinNoOfStaff(staffingLevelInterval.getMinNoOfStaff() - minNoOfStaff);
         staffingLevelInterval.setMaxNoOfStaff(staffingLevelInterval.getMaxNoOfStaff() - maxNoOfStaff);
         staffingLevelInterval.setStaffingLevelActivities(staffingLevelActivities);
+    }
+
+    public List<StaffingLevel> findByUnitIdAndDates(Long unitId, Date startDate, Date endDate){
+        return staffingLevelMongoRepository.findByUnitIdAndDates(unitId, startDate, endDate);
     }
 }
