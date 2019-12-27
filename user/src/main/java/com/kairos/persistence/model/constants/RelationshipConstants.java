@@ -235,5 +235,6 @@ public abstract class RelationshipConstants {
     public static final String HAS_FIELD = "HAS_FIELD";
     public static final String HAS_SUB_MODEL = "HAS_SUB_MODEL";
     public static final String HAS_PERMISSION = "HAS_PERMISSION";
+    public static final String HAS_FILTERS = "HAS_FILTERS";
 
 }

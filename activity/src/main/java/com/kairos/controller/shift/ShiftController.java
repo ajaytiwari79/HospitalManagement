@@ -77,16 +77,17 @@ public class ShiftController {
     }
 
 
-    @ApiOperation("save Shift after validation")
+    @ApiOperation("save or delete Shift after validation")
     @PostMapping(value = "/shift/validated")
     //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> saveShiftAfterValidation(@PathVariable Long unitId,
+    public ResponseEntity<Map<String, Object>> saveOrDeleteShiftAfterValidation(@PathVariable Long unitId,
                                                                         @RequestBody @Valid ShiftWithViolatedInfoDTO shiftWithViolatedInfo,
                                                                         @RequestParam(value = "validatedByStaff", required = false) Boolean validatedByStaff,
                                                                         @RequestParam(value = "updateShiftState", required = false) boolean updateShiftState,
                                                                         @RequestParam(required = false, value = "shiftActionType") ShiftActionType shiftActionType,
                                                                         @RequestParam(required = false) TodoType todoType) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, validatedByStaff, updateShiftState, unitId, shiftActionType,todoType));
+        ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = ShiftActionType.DELETE.equals(shiftActionType) ? shiftService.deleteShiftAfterValidation(shiftWithViolatedInfo) : shiftService.saveShiftAfterValidation(shiftWithViolatedInfo, validatedByStaff, updateShiftState, unitId, shiftActionType,todoType);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, shiftWithViolatedInfoDTO);
     }
 
     @ApiOperation("update a Shifts of a staff")

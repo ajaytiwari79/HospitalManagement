@@ -18,5 +18,6 @@ public class ActivityConstraint extends MongoBaseEntity {
     private BigInteger activityId;
     private PlanningSetting planningSetting;
     private ConstraintSubType constraintSubType;
+    private Boolean  mandatory;
 
 }

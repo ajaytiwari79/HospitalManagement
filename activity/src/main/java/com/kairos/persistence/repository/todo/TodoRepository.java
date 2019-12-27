@@ -58,4 +58,6 @@ public interface TodoRepository extends MongoBaseRepository<Todo, BigInteger>,Cu
 
     @Query(value ="{subEntityId:?0,deleted:false,entityId:?1,status:{$in:?2}}")
     Todo findTodoBySubEntityId(BigInteger shiftActivityId,BigInteger shiftId,Collection<TodoStatus> statuses);
+
+
 }
