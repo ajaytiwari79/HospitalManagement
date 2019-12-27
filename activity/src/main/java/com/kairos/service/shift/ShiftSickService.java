@@ -278,7 +278,6 @@ public class ShiftSickService extends MongoBaseService {
         return shiftActivity;
     }
 
-    //TODO Refactor db queries
     public void disableSicknessShiftsOfStaff(Long staffId, Long unitId) {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.findCurrentDatePlanningPeriod(unitId, DateUtils.getCurrentLocalDate(), DateUtils.getCurrentLocalDate());
         List<Activity> protectedDaysOffActivitys = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(unitId));
@@ -314,17 +313,17 @@ public class ShiftSickService extends MongoBaseService {
             List<Shift> shifts = dateAndShiftMap.get(DateUtils.asLocalDate(shift.getStartDate()));
             for (Shift shift1 : shifts) {
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
-                updateShift(activityWrapper, shift1,oldShift,newShift,protectedDaysOffActivity,planningPeriod,staffEmploymentDetails);
+                validateAndUpdateShift(activityWrapper, shift1,oldShift,newShift,protectedDaysOffActivity,planningPeriod,staffEmploymentDetails);
             }
         }
         return shift;
     }
 
-    private void updateShift(ActivityWrapper activityWrapper, Shift shift, List<Shift> oldShift, List<ShiftDTO> newShifts , Activity protectedDaysOffActivity , PlanningPeriod planningPeriod,StaffEmploymentDetails staffEmploymentDetails) {
+    private void validateAndUpdateShift(ActivityWrapper activityWrapper, Shift shift, List<Shift> oldShift, List<ShiftDTO> newShifts , Activity protectedDaysOffActivity , PlanningPeriod planningPeriod,StaffEmploymentDetails staffEmploymentDetails) {
         ShiftDTO newShift=null;
         switch (activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting().getReplaceSkillActivityEnum()) {
             case PROTECTED_DAYS_OFF:
-              ShiftActivityDTO shiftActivityDTOS=  new ShiftActivityDTO(activityWrapper.getActivity().getId(),activityWrapper.getActivity().getName(),newHashSet(ShiftStatus.APPROVE));
+              ShiftActivityDTO shiftActivityDTOS=  new ShiftActivityDTO(protectedDaysOffActivity.getId(),protectedDaysOffActivity.getName(),newHashSet(ShiftStatus.APPROVE));
                 shiftActivityDTOS.setStartDate(shift.getStartDate());
                 shiftActivityDTOS.setEndDate(shift.getEndDate());
                 newShift= new ShiftDTO(shift.getStartDate(), shift.getEndDate(), shift.getStaffId(), Arrays.asList(shiftActivityDTOS), staffEmploymentDetails.getId(), shift.getUnitId(), planningPeriod.getCurrentPhaseId(), planningPeriod.getId());

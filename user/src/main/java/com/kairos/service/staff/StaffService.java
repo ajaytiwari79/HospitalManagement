@@ -266,6 +266,9 @@ public class StaffService {
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
 
         Staff staffToUpdate = staffGraphRepository.findOne(staffId);
+        if(StaffStatusEnum.ACTIVE.equals(staffPersonalDetail.getCurrentStatus())){
+            exceptionService.actionNotPermittedException(MESSAGE_STAFF_USERNAME_NOTEXIST);
+        }
         if (staffToUpdate == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
         }

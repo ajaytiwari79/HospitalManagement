@@ -353,6 +353,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_TASKGIVER_ACCESGROUP_NOTPRESENT = "message.taskgiver.accesgroup.notPresent";
     public static final String MESSAGE_STAFF_ALREADYEXIST = "message.staff.alreadyexist";
     public static final String MESSAGE_STAFF_USERNAME_ALREADYEXIST  = "message.staff.userName.alreadyexist ";
+    public static final String MESSAGE_STAFF_USERNAME_NOTEXIST  = "error.Staff.userName.notnull";
     public static final String MESSAGE_EXCEPTION_TASKMICROSERVICE = "message.exception.taskmicroservice";
     public static final String MESSAGE_DATE_SOMETHINGWRONG = "message.date.somethingwrong";
     public static final String MESSAGE_CITIZEN_STAFF_ALREADYEXIST = "message.citizen.staff.alreadyexist";
