@@ -389,10 +389,10 @@ public class KPIBuilderCalculationService implements CounterService {
         }else if (AVERAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
             Set<LocalDate> localDates = shiftActivityDTOS.stream().map(shiftActivityDTO -> asLocalDate(shiftActivityDTO.getStartDate())).collect(Collectors.toSet());
             if(DurationType.WEEKS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
-                total = localDates.size() / kpiCalculationRelatedInfo.getApplicableKPI().getValue();
+                total = getValueWithDecimalFormat(((double)localDates.size() / kpiCalculationRelatedInfo.getApplicableKPI().getValue()));
             }
             if(DurationType.MONTHS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
-                total=localDates.size()/(kpiCalculationRelatedInfo.getApplicableKPI().getValue()*4);
+                total=getValueWithDecimalFormat(((double)localDates.size()/(kpiCalculationRelatedInfo.getApplicableKPI().getValue()*4)));
             }
 
         }
