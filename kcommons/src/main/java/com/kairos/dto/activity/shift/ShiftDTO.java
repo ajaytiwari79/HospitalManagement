@@ -186,6 +186,11 @@ public class ShiftDTO {
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
     }
 
+    public List<ShiftActivityDTO> getBreakActivities() {
+        this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
+        return breakActivities;
+    }
+
     @Override
     public String toString() {
         return "ShiftDTO{" +
