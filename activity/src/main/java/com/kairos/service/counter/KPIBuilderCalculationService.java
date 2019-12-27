@@ -816,7 +816,7 @@ public class KPIBuilderCalculationService implements CounterService {
         private List<TodoDTO> todoDTOS;
         private Map<BigInteger,List<TodoDTO>> activityIdAndTodoListMap;
         private Set<BigInteger> activityIds;
-        private Map<String, List<StaffDTO>> selectDateAndStaffDTOSMap;
+        private Map<String, List<StaffDTO>> selectedDatesAndStaffDTOSMap;
         List<WTAQueryResultDTO> wtaQueryResultDTOS;
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
         Map<Long, List<WTAQueryResultDTO>> employmentIdAndWtaMap;
@@ -950,7 +950,7 @@ public class KPIBuilderCalculationService implements CounterService {
             StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
             shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             currentShiftActivityCriteria = getDefaultShiftActivityCriteria();
-            selectDateAndStaffDTOSMap = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, dateTimeIntervals.get(0).getStartLocalDate(),dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate());
+            selectedDatesAndStaffDTOSMap = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, dateTimeIntervals.get(0).getStartLocalDate(),dateTimeIntervals.get(dateTimeIntervals.size()-1).getEndLocalDate());
         }
 
         public void getTodoDetails(){
