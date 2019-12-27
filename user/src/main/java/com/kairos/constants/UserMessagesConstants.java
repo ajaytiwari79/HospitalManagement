@@ -452,6 +452,6 @@ public class UserMessagesConstants {
     public static final String MESSAGE_GROUP_NOT_FOUND = "message.group.not.Found";
     public static  final String ERROR_STAFF_CPRNUMBER_NOTNULL="error.staff.cprNumber.notnull";
     public static final String  ERROR_EMAIL_VALID="error.email.valid";
-    public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.staff.userName.notnull";
+    public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.Staff.userName.notnull";
     public static  final String ERROR_STAFF_ACCESSGROUP_NOTNULL="error.staff.accessGroup.id.notnull";
 }
