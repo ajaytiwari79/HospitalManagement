@@ -338,15 +338,14 @@ public class SkillService {
 
     public Map<String, List<StaffDTO>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedFromDate,  LocalDate selectedToDate) {
         Map<String, List<StaffDTO>> staffSkillsMap = new HashMap<>();
-        LocalDate selectedDate = selectedFromDate;
-        while (selectedToDate.compareTo(selectedDate) >= 0){
-            List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds, selectedDate.toString());
+        while (!selectedFromDate.isAfter(selectedToDate)){
+            List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds, selectedFromDate.toString());
             List<StaffDTO> staffDTOS = new ArrayList<>();
             if(isCollectionNotEmpty(staffQueryResults)) {
                 staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffDTO(staffQueryResult.getStaff().getId(), staffQueryResult.getSkillInfo())));
             }
-            staffSkillsMap.put(selectedDate.toString(), staffDTOS);
-            selectedDate = selectedDate.plusDays(1);
+            staffSkillsMap.put(selectedFromDate.toString(), staffDTOS);
+            selectedFromDate = selectedFromDate.plusDays(1);
         }
         return staffSkillsMap;
     }

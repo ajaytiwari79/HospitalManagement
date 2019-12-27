@@ -41,7 +41,7 @@ public class StaffingLevelCalculationKPIService {
         boolean isPresenceStaffingLevelData = PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) || PRESENCE_OVER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType());
         if(isCollectionNotEmpty(filterShiftActivity.getShifts())) {
             for (StaffingLevel staffingLevel : staffingLevels) {
-                List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> shift.getStartDate().equals(staffingLevel.getCurrentDate())).collect(Collectors.toList());
+                List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> asLocalDate(shift.getStartDate()).equals(asLocalDate(staffingLevel.getCurrentDate()))).collect(Collectors.toList());
                 if(isCollectionNotEmpty(currentDateShifts)) {
                     Map<Long, List<Map<String, Object>>> staffSkillsMap = kpiCalculationRelatedInfo.getSelectedDatesAndStaffDTOSMap().get(asLocalDate(staffingLevel.getCurrentDate()).toString()).stream().collect(Collectors.toMap(StaffDTO::getId, StaffDTO::getSkillInfo));
                     staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(currentDateShifts, Shift.class), staffSkillsMap);
