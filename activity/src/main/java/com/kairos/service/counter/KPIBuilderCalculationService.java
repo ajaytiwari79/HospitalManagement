@@ -35,6 +35,8 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.ShiftType;
+import com.kairos.enums.wta.IntervalUnit;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -81,6 +83,7 @@ import org.bouncycastle.util.StringList;
 
 
 import org.joda.time.Interval;
+import org.joda.time.Weeks;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -157,6 +160,8 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Inject
     private AbsencePlanningKPIService absencePlanningKPIService;
+
+
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -381,6 +386,15 @@ public class KPIBuilderCalculationService implements CounterService {
             total = shiftActivityDTOS.size();
         } else if (VARIABLE_COST.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
             total = costCalculationKPIService.calculateTotalCostOfStaff(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+        }else if (AVERAGE.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))){
+            Set<LocalDate> localDates = shiftActivityDTOS.stream().map(shiftActivityDTO -> asLocalDate(shiftActivityDTO.getStartDate())).collect(Collectors.toSet());
+            if(DurationType.WEEKS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
+                total = getValueWithDecimalFormat(((double)localDates.size() / kpiCalculationRelatedInfo.getApplicableKPI().getValue()));
+            }
+            if(DurationType.MONTHS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
+                total=getValueWithDecimalFormat(((double)localDates.size()/(kpiCalculationRelatedInfo.getApplicableKPI().getValue()*4)));
+            }
+
         }
         return total;
     }
