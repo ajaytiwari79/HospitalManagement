@@ -272,7 +272,6 @@ public class ShiftService extends MongoBaseService {
         //As discuss with Arvind Presence and Absence type of activity cann't be perform in a Shift
         shift.setShiftType(updateShiftType(activityWrapperMap, shift));
         updateAppliedFunctionDetail(activityWrapperMap, shift, functionId);
-        updateSicknessShift(activityWrapperMap,shift,staffAdditionalInfoDTO);
         if (!shift.isSickShift() && updateShift && isNotNull(shiftAction) && !shift.getActivities().stream().anyMatch(shiftActivity -> !shiftActivity.getStatus().contains(ShiftStatus.PUBLISH)) && newHashSet(PhaseDefaultName.CONSTRUCTION, PhaseDefaultName.DRAFT, PhaseDefaultName.TENTATIVE).contains(phase.getPhaseEnum())) {
             shift = updateShiftAfterPublish(shift, shiftAction);
         }
@@ -290,50 +289,57 @@ public class ShiftService extends MongoBaseService {
         return shift;
     }
 
-    private void updateSicknessShift(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
-        List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), shift.getStartDate(), shift.getEndDate());
-        List<Activity> activities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
-        List<Shift> oldShifts=new CopyOnWriteArrayList<>(shifts);
+    public ActivityRuleViolation validateAndUpdateSicknessShift(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         ActivityWrapper activityWrapper = activityWrapperMap.get(shift.getActivities().get(0).getActivityId());
-        if (isNotNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting())) {
-            SicknessSetting sicknessSetting = activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting();
-            if (!(sicknessSetting.isUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
-            exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
-            }
-            if(isCollectionNotEmpty(sicknessSetting.getStaffTagIds())){
-                Set<BigInteger> tadIds=staffAdditionalInfoDTO.getTags().stream().map(tagDTO -> tagDTO.getId()).collect(Collectors.toSet());
-                if (!tadIds.contains(sicknessSetting.getStaffTagIds())){
-                    exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
+        List<String> errorMessages = new ArrayList<>();
+        if (isNotNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting()) && !activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting().isAllowedAutoAbsence()) {
+            List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), getStartOfDay(shift.getStartDate()), DateUtils.getEndOfDay(shift.getEndDate()));
+            List<Activity> protectedDaysOffActivities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
+            validateSicknessShift(shift, staffAdditionalInfoDTO, activityWrapper, errorMessages, shifts, protectedDaysOffActivities, shifts);
+            if(isCollectionEmpty(errorMessages)) {
+                for (Shift oldShift : shifts) {
+                    oldShift.setDisabled(true);
                 }
+                shiftMongoRepository.saveEntities(shifts);
+                shift.setSickShift(true);
+            }
+        }
+       return new ActivityRuleViolation(activityWrapper.getActivity().getId(), activityWrapper.getActivity().getName(), 0, errorMessages);
+    }
 
+    private void validateSicknessShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<String> errorMessages, List<Shift> shifts, List<Activity> activities, List<Shift> oldShifts) {
+        SicknessSetting sicknessSetting = activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting();
+        if (!(sicknessSetting.isUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
+            errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+        }
+        if(isCollectionNotEmpty(sicknessSetting.getStaffTagIds())){
+            Set<BigInteger> tadIds=staffAdditionalInfoDTO.getTags().stream().map(tagDTO -> tagDTO.getId()).collect(Collectors.toSet());
+            if (!tadIds.contains(sicknessSetting.getStaffTagIds())){
+                errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
             }
-            if(sicknessSetting.isValidForChildCare() && isCollectionEmpty(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays())){
-                exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
-            }
-            if(sicknessSetting.isUsedOnFreeDays() && isCollectionNotEmpty(shifts)){
-                exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
-            }
-            if(sicknessSetting.isUsedOnProtecedDaysOff()){
-                Set<BigInteger> activityIds=activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
-                for (Shift oldShift : oldShifts) {
-                    if(!activityIds.contains(oldShift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()))){
 
-                    }
-                }
-            }
-            if(!sicknessSetting.isAllowedAutoAbsence()){
-                for (Shift shift1 : oldShifts) {
-                    if(ShiftType.ABSENCE.equals(shift1.getShiftType()) && !shift.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getStatus().contains(ShiftStatus.APPROVE))){
-                        exceptionService.actionNotPermittedException(MESSAGE_STAFF_UNIT);
-                    }
+        }
+        if(sicknessSetting.isValidForChildCare() && isCollectionEmpty(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays())){
+            errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+        }
+        if(sicknessSetting.isUsedOnFreeDays() && isCollectionNotEmpty(shifts)){
+            errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+        }
+        if(sicknessSetting.isUsedOnProtecedDaysOff()){
+            Set<BigInteger> activityIds=activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+            for (Shift oldShift : oldShifts) {
+                if(!activityIds.contains(oldShift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()))){
+                    errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
                 }
             }
         }
-        for (Shift oldShift : oldShifts) {
-            oldShift.setDisabled(true);
+        if(!sicknessSetting.isAllowedAutoAbsence()){
+            for (Shift currentElement : oldShifts) {
+                if(ShiftType.ABSENCE.equals(currentElement.getShiftType()) && !shift.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getStatus().contains(ShiftStatus.APPROVE))){
+                    errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+                }
+            }
         }
-        shiftMongoRepository.saveEntities(shifts);
-        shift.setSickShift(true);
     }
 
     private void updateScheduledAndDurationHours(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {

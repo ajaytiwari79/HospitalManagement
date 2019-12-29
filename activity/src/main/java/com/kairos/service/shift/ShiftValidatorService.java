@@ -241,6 +241,10 @@ public class ShiftValidatorService {
         }
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
         activitySpecification.validateRules(shift);
+        ActivityRuleViolation activityRuleViolation = shiftService.validateAndUpdateSicknessShift(activityWrapperMap,shift,staffAdditionalInfoDTO);
+        if(isCollectionNotEmpty(activityRuleViolation.getErrorMessages())){
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+    }
         return new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
     }
 
