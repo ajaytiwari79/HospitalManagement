@@ -55,7 +55,7 @@ public class StaffAdditionalInfoDTO {
     private boolean countryAdmin;
     private List<TagDTO> tags;
     private boolean nightWorker;
-    private Map<String, String> unitWiseAccessRole;
+    private Map<String, String> unitWiseAccessRole=new HashMap<>();
 
     public StaffAdditionalInfoDTO(String cprNumber, SeniorAndChildCareDaysDTO seniorAndChildCareDays) {
         this.cprNumber = cprNumber;
