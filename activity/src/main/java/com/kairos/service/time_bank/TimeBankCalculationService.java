@@ -1148,7 +1148,7 @@ public class TimeBankCalculationService {
             if (dateDailyTimeBankEntryMap.containsKey(employmentStartDate) && dateDailyTimeBankEntryMap.get(employmentStartDate).isPublishedSomeActivities()) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
                 deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() - dailyTimeBankEntry.getTimeBankOffMinutes();
-                System.out.println("delta time bank minutes  "+deltaTimeBankMinutes);
+
                 actualTimebank += deltaTimeBankMinutes;
             } else if (validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate)) || publishPlanningPeriodDateMap.get(employmentStartDate)) {
                 actualTimebank += deltaTimeBankMinutes;
