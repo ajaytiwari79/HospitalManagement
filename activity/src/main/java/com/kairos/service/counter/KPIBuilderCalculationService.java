@@ -866,6 +866,7 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         public List<TodoDTO> getTodosByInterval(DateTimeInterval dateTimeInterval , List<TodoDTO> todoDTOS){
+
             return todoDTOS.stream().filter(todoDTO -> dateTimeInterval.containsAndEqualsEndDate(todoDTO.getRequestedOn())).collect(Collectors.toList());
         }
 
