@@ -298,10 +298,10 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (unitPermission)-[:" + HAS_ACCESS_GROUP + "]->(accessGroup:AccessGroup)-[:" + ORGANIZATION_HAS_ACCESS_GROUPS + "]-(organization)\n" +
             "OPTIONAL MATCH(accessGroup)-[:" + DAY_TYPES + "]->(dayType:DayType)\n" +
             "OPTIONAL MATCH(dayType)-[:" + DAY_TYPE + "]-(chc:CountryHolidayCalender)\n" +
-            "WITH organization,id(staff) AS staffId,accessGroup,dayType,\n" +
-            "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc.holidayType,startTime:chc.startTime,endTime:chc.endTime}) AS countryHolidayCalender\n" +
-            "WITH organization, staffId,accessGroup,countryHolidayCalender,\n" +
-            "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) AS dayType\n" +
+            "WITH organization,id(staff) AS staffId,accessGroup,dayType,CASE WHEN dayType IS NULL THEN [] ELSE \n" +
+            "COLLECT(DISTINCT {id:id(chc),holidayDate:chc.holidayDate,holidayType:chc.holidayType,startTime:chc.startTime,endTime:chc.endTime}) END AS countryHolidayCalender\n" +
+            "WITH organization, staffId,accessGroup,countryHolidayCalender,CASE WHEN dayType IS NULL THEN [] ELSE\n" +
+            "COLLECT(DISTINCT {id:id(dayType),holidayType:dayType.holidayType,validDays:dayType.validDays,name:dayType.name,allowTimeSettings:dayType.allowTimeSettings,countryHolidayCalenders:countryHolidayCalender}) END AS dayType\n" +
             "RETURN\n" +
             "organization,staffId,COLLECT({accessGroup:{id:id(accessGroup),name:accessGroup.name,role:accessGroup.role,startDate:accessGroup.startDate,allowedDayTypes:accessGroup.allowedDayTypes},dayTypes:dayType}) AS dayTypesByAccessGroup")
     AccessGroupStaffQueryResult getAccessGroupDayTypesAndUserId(Long unitId, Long userId);
@@ -326,7 +326,8 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
     @Query("MATCH (staff:Staff),(org) WHERE id(staff)={0} AND id(org)={1} \n" +
             "WITH org,staff MATCH (staff)-[:BELONGS_TO]-(position:Position)-[:HAS_UNIT_PERMISSIONS]-(up:UnitPermission)-[:APPLICABLE_IN_UNIT]-(org) \n" +
             "MATCH(position)<-[:HAS_POSITIONS]-(organization:Organization)-[:BELONGS_TO]-(country:Country) \n" +
-            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup)-[r:DAY_TYPES]->(dayType:DayType) RETURN ag,collect(r),collect(dayType)")
+            "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) " +
+            "OPTIONAL MATCH(ag)-[r:DAY_TYPES]->(dayType:DayType) RETURN ag,collect(r),collect(dayType)")
     List<AccessGroup> getAccessGroupWithDayTypesByStaffIdAndUnitId(Long staffId, Long unitId);
 }
 

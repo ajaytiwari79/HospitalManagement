@@ -396,7 +396,7 @@ public class UserService {
     public boolean updatePassword(FirstTimePasswordUpdateDTO firstTimePasswordUpdateDTO) {
         User user = userGraphRepository.findByEmail("(?i)" + firstTimePasswordUpdateDTO.getEmail());
         if (user == null) {
-            LOGGER.error("User not found belongs to this email " + firstTimePasswordUpdateDTO.getEmail());
+            LOGGER.error("User not found belongs to this email {}" , firstTimePasswordUpdateDTO.getEmail());
             exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, firstTimePasswordUpdateDTO.getEmail());
 
         }
@@ -490,7 +490,7 @@ public class UserService {
 
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if (!currentUser.getLastSelectedOrganizationId().equals(organizationId)) {
+        if (!organizationId.equals(currentUser.getLastSelectedOrganizationId())) {
             OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);
             Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);

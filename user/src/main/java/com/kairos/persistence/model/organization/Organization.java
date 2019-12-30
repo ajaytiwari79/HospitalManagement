@@ -50,10 +50,6 @@ public class Organization extends OrganizationBaseEntity {
     @Relationship(type = HAS_UNIT)
     private List<Unit> units = new ArrayList<>();
 
-
-    @Relationship(type = ORGANIZATION_HAS_ACCESS_GROUPS)
-    private List<AccessGroup> accessGroups = new ArrayList<>();
-
     @Relationship(type = HAS_POSITIONS)
     private List<Position> positions = new ArrayList<>();
 
