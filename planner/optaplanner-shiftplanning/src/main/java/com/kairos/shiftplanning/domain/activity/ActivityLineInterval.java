@@ -35,6 +35,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
 
 
 
+
     public ActivityLineInterval() {
     }
 
@@ -49,9 +50,6 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         this.activity = activity;
         this.staffNo = staffNo;
     }
-
-
-
 
     public Activity getActivity() {
         return activity;
