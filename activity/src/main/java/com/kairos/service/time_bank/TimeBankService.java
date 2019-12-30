@@ -38,6 +38,8 @@ import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.pay_out.PayOutTransaction;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.shift.ShiftService;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.NameValuePair;
@@ -617,14 +619,11 @@ public class TimeBankService{
         T object;
         DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(unitId);
         LocalDate periodEndDate = planningPeriodInterval.getEndLocalDate();
-        LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
-        Date startDate  = asDate(employmentStartDate);
         Date endDate = asDate(periodEndDate);
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, endDate);
-        long timeBankOffMinutes = timeBankRepository.getTimeBankOffMinutes(employmentId);
-        Long actualTimebank = timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate);
-        actualTimebank -= timeBankOffMinutes;
-        object = (T)actualTimebank;
+        LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
+        Date startDate  = asDate(employmentStartDate);
+        object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate);
         if(isNull(includeActualTimebank)) {
             List<CTARuleTemplateDTO> ruleTemplates = costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
             ruleTemplates = ruleTemplates.stream().filter(distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
@@ -734,8 +733,5 @@ public class TimeBankService{
             timeBankRepository.save(dailyTimeBankEntry);
         }
     }
-
-
-
 
 }

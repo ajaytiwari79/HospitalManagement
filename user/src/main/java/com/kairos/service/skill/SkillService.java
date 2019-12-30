@@ -336,13 +336,18 @@ public class SkillService {
         return map;
     }
 
-    public List<StaffPersonalDetail> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedDate) {
-        List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds,selectedDate.toString());
-        List<StaffPersonalDetail> staffDTOS = new ArrayList<>();
-        if(isCollectionNotEmpty(staffQueryResults)) {
-            staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffPersonalDetail(staffQueryResult.getStaff().getId(), staffQueryResult.getSkills())));
+    public Map<String, List<StaffPersonalDetail>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedFromDate,  LocalDate selectedToDate) {
+        Map<String, List<StaffPersonalDetail>> staffSkillsMap = new HashMap<>();
+        while (!selectedFromDate.isAfter(selectedToDate)){
+            List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds, selectedFromDate.toString());
+            List<StaffPersonalDetail> staffDTOS = new ArrayList<>();
+            if(isCollectionNotEmpty(staffQueryResults)) {
+                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffPersonalDetail(staffQueryResult.getStaff().getId(), staffQueryResult.getSkills())));
+            }
+            staffSkillsMap.put(selectedFromDate.toString(), staffDTOS);
+            selectedFromDate = selectedFromDate.plusDays(1);
         }
-        return staffDTOS;
+        return staffSkillsMap;
     }
 
 

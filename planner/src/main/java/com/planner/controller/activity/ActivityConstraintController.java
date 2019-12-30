@@ -14,12 +14,12 @@ import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.planner.constants.ApiConstants.API_ACTIVITY_CONSTRAINT;
 
+import static com.planner.constants.ApiConstants.API_UNIT_URL;
 
 
 @RestController
-@RequestMapping(API_ACTIVITY_CONSTRAINT)
+@RequestMapping(API_UNIT_URL)
 public class ActivityConstraintController {
     public static final String SUCCESS = "Success";
 
@@ -27,24 +27,23 @@ public class ActivityConstraintController {
    private ActivityConstraintService activityConstraintService;
 
 
-    @PostMapping
-    @ApiOperation("Create ActivityConstraint")
+    @PostMapping(value = "/createOrUpdateActivityConstraint")
+    @ApiOperation("Create Or Update ActivityConstraint")
     public ResponseEntity<Map<String, Object>> createActivityConstraint(@RequestBody  @Valid ActivityConstraintDTO activityConstraintDTO) {
-
-         activityConstraintService.createActivityConstraint(activityConstraintDTO);
-        return ResponseHandler.generateResponse(SUCCESS, HttpStatus.OK);
+        return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK, activityConstraintService.createOrUpdateActivityConstraint(activityConstraintDTO));
     }
 
-    @GetMapping(value="/{activityId}")
+    @GetMapping(value="/activityConstraints")
+    @ApiOperation("Get All  ActivityConstraint")
+    public ResponseEntity<Map<String, Object>> getActivityConstraints() {
+        return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,activityConstraintService.getActivityConstraints());
+    }
+
+
+    @GetMapping(value="activity/{activityId}/activityConstraints")
     @ApiOperation("Get ActivityConstraint")
     public ResponseEntity<Map<String, Object>> getAllActivityConstraintByActivityId(@PathVariable BigInteger activityId) {
         return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,activityConstraintService.getAllActivityConstraintByActivityId(activityId));
-    }
-
-    @PutMapping
-    @ApiOperation("Update ActivityConstraint")
-    public ResponseEntity<Map<String, Object>> updateActivityConstraint(@RequestBody @Valid ActivityConstraintDTO activityConstraintDTO) {
-        return ResponseHandler.generateResponseWithData(SUCCESS, HttpStatus.OK,activityConstraintService.updateActivityConstraint(activityConstraintDTO));
     }
 
 

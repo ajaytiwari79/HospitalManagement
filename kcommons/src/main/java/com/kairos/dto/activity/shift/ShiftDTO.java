@@ -191,6 +191,7 @@ public class ShiftDTO {
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
     }
 
+
     @Override
     public String toString() {
         return "ShiftDTO{" +

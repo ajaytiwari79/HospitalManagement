@@ -66,7 +66,7 @@ public class StaffPersonalDetail {
     private AddressDTO contactAddress;
     private AddressDTO secondaryContactAddress;
     private Set<Long> teamIdsOfStaff;
-    @NotBlank(message = "error.Staff.userName.notnull")
+//    @NotBlank(message = "error.Staff.userName.notnull")
     private String userName;
     private boolean userNameUpdated;
     private List<TeamDTO> teams;
@@ -116,7 +116,7 @@ public class StaffPersonalDetail {
         return Objects.hash(id, firstName, contactDetail, currentStatus, expertiseIds, expertiseWithExperience, cprNumber, familyName, gender, sectorWiseExpertise);
     }
 
-    @AssertTrue(message = "Please provide a valid user name")
+
     public boolean isValid() {
         if(StringUtils.isBlank(userName) || StringUtils.containsWhitespace(userName.trim())){
             return false;

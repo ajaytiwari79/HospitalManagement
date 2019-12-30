@@ -486,7 +486,7 @@ public class UserService {
         Organization parent = organizationService.fetchParentOrganization(organizationId);
         permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
         updateChatStatus(ChatStatus.ONLINE);
-        return permissionData;
+         return permissionData;
     }
 
 

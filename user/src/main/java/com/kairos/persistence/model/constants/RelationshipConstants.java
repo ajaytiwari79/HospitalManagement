@@ -237,5 +237,6 @@ public abstract class RelationshipConstants {
     public static final String HAS_PERMISSION = "HAS_PERMISSION";
     public static final String HAS_ACTION = "HAS_ACTION";
     public static final String OTHER_PERMISSION = "OTHER_PERMISSION";
+    public static final String HAS_FILTERS = "HAS_FILTERS";
 
 }
