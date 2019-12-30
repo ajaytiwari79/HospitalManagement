@@ -53,6 +53,7 @@ public class TimeType extends MongoBaseEntity{
     private boolean breakNotHeldValid;
     private BigInteger activityPriorityId;
     private PriorityFor priorityFor = PRESENCE;
+    private boolean sicknessSettingValid;
 
     public TimeType(TimeTypes timeTypes, String label, String description,String backgroundColor,TimeTypeEnum secondLevelType,Long countryId,Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy) {
         this.timeTypes = timeTypes;

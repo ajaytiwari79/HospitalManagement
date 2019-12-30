@@ -4,6 +4,7 @@ import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.country.tag.Tag;
 import com.kairos.persistence.model.organization.time_slot.TimeSlotWrapper;
 import com.kairos.persistence.model.user.employment.query_result.StaffEmploymentDetails;
@@ -46,5 +47,6 @@ public class StaffAdditionalInfoQueryResult {
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
     private List<Tag> tags;
+    private StaffStatusEnum currentStatus;
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
 }

@@ -82,13 +82,13 @@ public class GroupService {
                 filterSelections.add(filterSelection);
             });
             group.setFiltersData(filterSelections);
-            group.setExcludedStaffs(groupDTO.getExcludedStaffs());
+            group.setExcludedStaffIds(groupDTO.getExcludedStaffs());
         }
         groupGraphRepository.save(group);
         return groupDTO;
     }
 
-    public GroupDTO getGroupDetails(Long groupId) {
+    public GroupDTO getGroupDetail(Long groupId) {
         Group group = groupGraphRepository.findOne(groupId);
         return getGroupDTOFromGroup(group);
     }
@@ -104,7 +104,7 @@ public class GroupService {
     }
 
     private GroupDTO getGroupDTOFromGroup(Group group) {
-        GroupDTO groupDTO = new GroupDTO(group.getId(), group.getName(), group.getDescription(), group.getExcludedStaffs(), group.getRoomId());
+        GroupDTO groupDTO = new GroupDTO(group.getId(), group.getName(), group.getDescription(), group.getExcludedStaffIds(), group.getRoomId());
         List<FilterSelectionDTO> filterSelectionDTOS = new ArrayList<>();
         for(FilterSelection filterSelection : group.getFiltersData()){
             filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), newHashSet(ObjectMapperUtils.jsonStringToObject(filterSelection.getValue().get(0),Object.class))));
@@ -189,12 +189,11 @@ public class GroupService {
         List<Group> groups = groupGraphRepository.findAllGroupsByIdSAndDeletedFalse(groupIds);
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for(Group group : groups){
-            groupDTOS.add(getGroupDetails(group.getId()));
-        }
-        for (GroupDTO groupDTO : groupDTOS) {
+            GroupDTO groupDTO = getGroupDTOFromGroup(group);
             List<Map> staffs = getMapsOfStaff(unitId, groupDTO.getFiltersData());
             staffIds.addAll(staffs.stream().map(map-> Long.valueOf(map.get("id").toString())).collect(Collectors.toSet()));
             excludedStaffs.addAll(groupDTO.getExcludedStaffs());
+            groupDTOS.add(groupDTO);
         }
         staffIds.removeAll(excludedStaffs);
         return staffIds;

@@ -295,6 +295,7 @@ public class EmploymentTypeService {
         for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
             kpiFilterQueryResult.setDayTypeDTOS(dayTypeDTOS);
             for (EmploymentQueryResult employmentQueryResult : kpiFilterQueryResult.getEmployment()) {
+                employmentQueryResult.setUnitId(staffEmploymentTypeDTO.getOrganizationId());
                 employmentQueryResult.setSeniorAndChildCareDays(expertiseIdsAndSeniorAndChildCareDaysMap.get(employmentQueryResult.getExpertiseId()));
                 for (EmploymentLinesQueryResult employmentLine : employmentQueryResult.getEmploymentLines()) {
                     if(hourlyCostMap.containsKey(employmentLine.getId())) {
