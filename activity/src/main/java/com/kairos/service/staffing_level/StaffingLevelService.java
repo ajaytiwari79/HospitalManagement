@@ -846,6 +846,7 @@ public class StaffingLevelService  {
                 staffingLevelIntervals.add(currentInterval);
             }
             StaffingLevel staffingLevel = getStaffingLevelIfExist(dateStaffingLevelMap, currentDateWiseActivities, staffingLevelIntervals, staffingLevelTemplate, unitId);
+            staffingLevel.setStaffingLevelSetting(staffingLevelTemplate.getStaffingLevelSetting());
             staffingLevels.add(staffingLevel);
         });
         if (!staffingLevels.isEmpty()) {
