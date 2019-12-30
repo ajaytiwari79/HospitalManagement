@@ -247,4 +247,6 @@ public class AppConstants {
     public static final String LEVEL = "level";
     public static final String SKILL_ID = "skillId";
 
+    public static final String PLANNING_PERIOD_NAME="PP_";
+
 }

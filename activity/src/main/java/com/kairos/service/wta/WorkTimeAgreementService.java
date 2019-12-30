@@ -155,6 +155,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
         }
 
         WorkingTimeAgreement wta = new WorkingTimeAgreement();
+
         if (isNotNull(wtaDTO.getEndDate())) {
             if (wtaDTO.getStartDate().isAfter(wtaDTO.getEndDate())) {
                 exceptionService.invalidRequestException(MESSAGE_WTA_START_ENDDATE);

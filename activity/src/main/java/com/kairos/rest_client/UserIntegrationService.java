@@ -853,9 +853,10 @@ public class UserIntegrationService {
 
     }
 
-    public List<StaffDTO> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds,LocalDate selectedDate) {
-        BasicNameValuePair appliedDate = new BasicNameValuePair("selectedDate", selectedDate.toString());
-        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", Collections.singletonList(appliedDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffDTO>>>() {});
+    public Map<String, List<StaffDTO>> getSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds,LocalDate selectedFromDate, LocalDate selectedToDate) {
+        BasicNameValuePair appliedFromDate = new BasicNameValuePair("selectedFromDate", selectedFromDate.toString());
+        BasicNameValuePair appliedToDate = new BasicNameValuePair("selectedToDate", selectedToDate.toString());
+        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", newArrayList(appliedFromDate, appliedToDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<StaffDTO>>>>() {});
     }
 
     public List<EmploymentWithCtaDetailsDTO> getAllEmploymentByUnitId(Long unitId) {
@@ -885,6 +886,10 @@ public class UserIntegrationService {
             }
         }
         return tags;
+    }
+
+    public Set<Long> getAllStaffIdsByGroupIds(Long unitId, List<Long> groupIds) {
+        return genericRestClient.publishRequest(groupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
     }
 }
 

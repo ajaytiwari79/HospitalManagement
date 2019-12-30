@@ -161,7 +161,7 @@ public class RequestAbsenceService {
             for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
                 shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().filter(shiftActivityDTO -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivityDTO.getStatus())).map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
             }
-            response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
+            response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE,todo.getComment()));
             shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
             shiftOptional.get().setRequestAbsence(null);
             shiftMongoRepository.save(shiftOptional.get());

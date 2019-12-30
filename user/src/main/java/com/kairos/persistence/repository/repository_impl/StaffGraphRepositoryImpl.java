@@ -88,11 +88,10 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         stringBuilder.append(" MATCH (employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine)"+
                 "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)"+
-                "WHERE  date(employmentLine.startDate) <= date({endDate}) AND (NOT exists(employmentLine.endDate) OR date(employmentLine.endDate) >= date({startDate}))"+
                 "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
                 "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,\n" +
                 "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,expertise "+
-                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,employmentLines:employmentLines ,expertiseId:id(expertise)} as employment,staff,org,user,expertise\n" +
+                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,unitId:employment.unitId,accumulatedTimebankMinutes:employment.accumulatedTimebankMinutes,accumulatedTimebankDate:employment.accumulatedTimebankDate, employmentLines:employmentLines ,expertiseId:id(expertise)} as employment,staff,org,user,expertise\n" +
                 "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,user.cprNumber AS cprNumber,id(org) as unitId,org.name as unitName,collect(employment) as employment");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
@@ -109,9 +108,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
     public List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
                                          Map<FilterType, Set<String>> filters, String searchText, String imagePath) {
-        searchText=searchText.replaceAll(" ","");
         Map<String, Object> queryParameters = new HashMap<>();
-
         queryParameters.put("unitId", unitId);
         queryParameters.put("parentOrganizationId", parentOrganizationIds);
         if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent()) {
@@ -142,15 +139,12 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("tagIds",
                     convertListOfStringIntoLong(filters.get(FilterType.TAGS)));
         }
-        if (Optional.ofNullable(filters.get(FilterType.GROUPS)).isPresent()) {
-            queryParameters.put("GroupStaffLists",
-                    filters.get(FilterType.GROUPS));
-        }
         if (Optional.ofNullable(filters.get(FilterType.FUNCTIONS)).isPresent()) {
             queryParameters.put("functionIds",
                     convertListOfStringIntoLong(filters.get(FilterType.FUNCTIONS)));
         }
         if (StringUtils.isNotBlank(searchText)) {
+            searchText=searchText.replaceAll(" ","");
             queryParameters.put("searchText", searchText);
         }
         queryParameters.put("imagePath", imagePath);
@@ -184,7 +178,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         query += " RETURN distinct {id:id(staff),tags:tags, employments:employments,expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " +
                 "firstName:user.firstName,lastName:user.lastName,employedSince :staff.employedSince," +
                 "age:duration.between(date(user.dateOfBirth),date()).years,experienceInYears:duration.between(date(user.joiningDate),date()).years," +
-                "badgeNumber:staff.badgeNumber, userName:staff.userName,externalId:staff.externalId, access_token:staff.access_token," +
+                "badgeNumber:staff.badgeNumber, userName:staff.userName,currentStatus:staff.currentStatus,externalId:staff.externalId, access_token:staff.access_token," +
                 "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, " +
                 "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType),user_id:staff.user_id } as staff ORDER BY staff.id\n";
 
@@ -225,7 +219,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
             query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
         }
-        query +=" WITH user, staff, employment,organization ";;
+        query +=" WITH user, staff, employment,organization ";
 
         return query;
     }
@@ -239,10 +233,6 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
         if (Optional.ofNullable(filters.get(FilterType.GENDER)).isPresent()) {
             matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) + " user.gender IN {genderList} ";
-            countOfSubString += 1;
-        }
-        if (Optional.ofNullable(filters.get(FilterType.GROUPS)).isPresent()) {
-            matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) + "  id(staff) IN {GroupStaffLists} ";
             countOfSubString += 1;
         }
         if (StringUtils.isNotBlank(searchText)) {

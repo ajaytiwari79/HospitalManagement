@@ -665,7 +665,7 @@ public class EmploymentService {
             DateTimeInterval expertiseLineInterval = new DateTimeInterval(expertiseLine.getStartDate(), expertiseLine.getEndDate());
             DateTimeInterval employmentInterval = new DateTimeInterval(employmentDTO.getStartDate(), employmentDTO.getEndDate());
             if (expertiseLineInterval.overlaps(employmentInterval)) {
-                List<PayTable> payTables = payTableGraphRepository.findAllActivePayTable(expertise.getOrganizationLevel().getId(), expertiseLine.getStartDate().toString(), expertiseLine.getEndDate() == null ? null : expertiseLine.getEndDate().toString());
+                List<PayTable> payTables = payTableGraphRepository.findAllActivePayTable(expertise.getOrganizationLevel().getId(), expertiseLine.getStartDate().toString(), expertiseLine.getEndDate() == null ? null : expertiseLine.getEndDate().toString(),employmentDTO.getStartDate().toString());
                 if (isCollectionEmpty(payTables)) {
                     addEmploymentLines(employmentDTO, employmentLines, expertiseLine, employmentDTO.getStartDate().isAfter(expertiseLine.getStartDate()) ? employmentDTO.getStartDate() : expertiseLine.getStartDate(), expertiseLine.getEndDate());
                 } else {
@@ -1043,11 +1043,11 @@ public class EmploymentService {
     }
 
     public List<EmploymentQueryResult> getMainEmploymentOfStaffs() {
-        return employmentGraphRepository.getMainEmploymentOfStaffs(EmploymentSubType.MAIN);
+        List<EmploymentQueryResult> employments =  employmentGraphRepository.getMainEmploymentOfStaffs(EmploymentSubType.MAIN);
+        return setHourlyCostInEmployments(employments);
     }
 
-    public List<EmploymentQueryResult> findEmploymentByUnitId(Long unitId) {
-        List<EmploymentQueryResult> employments = employmentGraphRepository.findEmploymentByUnitId(unitId);
+    private List<EmploymentQueryResult> setHourlyCostInEmployments(List<EmploymentQueryResult> employments) {
         List<EmploymentLinesQueryResult> hourlyCostPerLine = employmentGraphRepository.findFunctionalHourlyCost(employments.stream().map(employmentQueryResult -> employmentQueryResult.getId()).collect(Collectors.toList()));
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
         employments = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employments, EmploymentQueryResult.class);
@@ -1058,6 +1058,11 @@ public class EmploymentService {
             }
         }
         return employments;
+    }
+
+    public List<EmploymentQueryResult> findEmploymentByUnitId(Long unitId) {
+        List<EmploymentQueryResult> employments = employmentGraphRepository.findEmploymentByUnitId(unitId);
+        return setHourlyCostInEmployments(employments);
     }
 
     public void setEndDateInEmploymentOfExpertise(ExpertiseDTO expertiseDTO) {

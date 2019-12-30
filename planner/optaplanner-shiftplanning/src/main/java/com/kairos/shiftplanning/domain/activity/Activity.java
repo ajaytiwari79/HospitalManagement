@@ -1,8 +1,10 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.shiftplanning.constraints.activityConstraint.ActivityConstraints;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
+import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
@@ -14,6 +16,7 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @XStreamAlias("Activity")
@@ -30,8 +33,10 @@ public class Activity {
     private int order;
     private int rank;
     private List<Long> expertises;
+    private List<Tag> tags;
 
-    public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises) {
+
+    public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, List<Tag> tags) {
         this.id = id;
         this.skills = skills;
         this.priority = priority;
@@ -40,10 +45,18 @@ public class Activity {
         this.order = order;
         this.rank=rank;
         this.expertises = expertises;
+        this.tags = tags;
     }
     public Activity() {
     }
 
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
 
     public TimeType getTimeType() {
         return timeType;
@@ -94,6 +107,9 @@ public class Activity {
     public void setActivityConstraints(ActivityConstraints activityConstraints) {
         this.activityConstraints = activityConstraints;
     }
+
+
+
     public boolean isBlankActivity(){
         return this.name== ShiftPlanningGenerator.BLANK_ACTIVITY;
     }
@@ -127,6 +143,7 @@ public class Activity {
                 //case 5:return skillsSatisFaction(shift);
                 case 6:return activityConstraints.getMinimumLengthofActivity().checkConstraints(this,shift);
                 case 7:return activityConstraints.getActivityDayType().checkConstraints(shift);
+                case 8:return activityConstraints.getActivityRequiredTag().checkConstraints(this,shift);
                 default:
                     break;
 
@@ -162,6 +179,9 @@ public class Activity {
             case 7:
                 activityConstraints.getActivityDayType().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
                 break;
+            case 8:
+                activityConstraints.getActivityRequiredTag().breakLevelConstraints(scoreHolder,kContext,constraintPenality);
+
             default:
                 break;
         }

@@ -6,6 +6,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
@@ -21,6 +22,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
+import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
 import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -52,14 +55,16 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues)) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues) && MAXIMUM.equals(minMaxSetting) || ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())) {
             if (CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())) {
                 TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), infoWrapper.getShift());
                 if (timeInterval != null) {
                     List<ShiftWithActivityDTO> shiftQueryResultWithActivities = filterShiftsByPlannedTypeAndTimeTypeIds(infoWrapper.getShifts(), timeTypeIds, plannedTimeIds);
                     DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
                     shiftQueryResultWithActivities = getShiftsByInterval(dateTimeInterval, shiftQueryResultWithActivities, timeInterval);
-                    shiftQueryResultWithActivities.add(infoWrapper.getShift());
+                    if(MAXIMUM.equals(minMaxSetting)){
+                        shiftQueryResultWithActivities.add(infoWrapper.getShift());
+                    }
                     Set<LocalDate> shiftDates = getSortedAndUniqueDates(shiftQueryResultWithActivities);
                     int consecutiveDays = getConsecutiveDaysInDate(new ArrayList<>(shiftDates));
                     Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
