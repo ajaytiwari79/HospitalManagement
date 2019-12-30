@@ -659,6 +659,7 @@ public class ShiftService extends MongoBaseService {
         if (isNotNull(shiftDTO)) {
             activityIds.addAll(shiftDTO.getActivities().stream().flatMap(shiftActivityDTO -> shiftActivityDTO.getChildActivities().stream()).map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
             activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
+            activityIds.addAll(shiftDTO.getBreakActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toList()));
         }
         List<ActivityWrapper> activities = activityRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         return activities.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
@@ -1394,26 +1395,39 @@ public class ShiftService extends MongoBaseService {
         List<Shift> shiftList=new ArrayList<>();
         Shift shift1=ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class);
         shift1.setActivities(new ArrayList<>());
+        shift1.setBreakActivities(new ArrayList<>());
         Iterator iterator=shift.getActivities().iterator();
         while (iterator.hasNext()){
             ShiftActivity shiftActivity=(ShiftActivity) iterator.next();
             if(GAP.equals(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getSecondLevelType())){
-                ShiftActivity breakActivity=shift.getBreakActivities().stream().filter(k->k.getStartDate().before(shiftActivity.getStartDate())).findFirst().orElse(null);
-                if(breakActivity!=null){
-                    shift1.setBreakActivities(Arrays.asList(breakActivity));
-                }
+                shift1.setEndDate(shiftActivity.getStartDate());
+                updateBreak(shift, shift1, shiftActivity);
                 shiftList.add(shift1);
                 shift1=ObjectMapperUtils.copyPropertiesByMapper(shift,Shift.class);
                 shift1.setActivities(new ArrayList<>());
+                shift1.setBreakActivities(new ArrayList<>());
+
                 continue;
             }
             shift1.getActivities().add(shiftActivity);
+
             if(!iterator.hasNext()){
+                shift1.setStartDate(shift1.getActivities().get(0).getStartDate());
+                shift1.setEndDate(shift1.getActivities().get(shift1.getActivities().size()-1).getEndDate());
+                updateBreak(shift, shift1, shiftActivity);
                 shiftList.add(shift1);
             }
 
         }
        return shiftList;
+    }
+
+    private void updateBreak(Shift shift, Shift shift1, ShiftActivity shiftActivity) {
+        ShiftActivity breakActivity = shift.getBreakActivities().stream().filter(k -> k.getStartDate().before(shiftActivity.getEndDate())).findFirst().orElse(null);
+        shift.getBreakActivities().remove(breakActivity);
+        if (breakActivity != null) {
+            shift1.setBreakActivities(Arrays.asList(breakActivity));
+        }
     }
 
     @Getter

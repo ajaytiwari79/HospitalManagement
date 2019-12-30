@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.open_shift.DurationField;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
@@ -40,7 +41,9 @@ public class RulesActivityTabDTO {
     private List<CutOffInterval> cutOffIntervals = new ArrayList<>();
     private CutOffIntervalUnit.CutOffBalances cutOffBalances;
     // in Minutes
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime earliestStartTime;
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime latestStartTime;
     private Short shortestTime;
     private Short longestTime;

@@ -428,12 +428,15 @@ public class FunctionalPaymentService {
         return seniorityLevelFunctions;
     }
 
-    private Map<Set<Long>, List<SeniorityLevelFunctionQR>> constructMapOfFunctionalPaymentMatrixQueryResult(List<FunctionalPaymentQueryResult> functionalPaymentQueryResults) {
+    private Map<Set<Long>, List<SeniorityLevelFunctionQR>> constructMapOfFunctionalPaymentMatrixQueryResult(List<FunctionalPaymentQueryResult> functionalPaymentQueryResults1) {
+        List<FunctionalPaymentQueryResult> functionalPaymentQueryResults=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(functionalPaymentQueryResults1,FunctionalPaymentQueryResult.class);
         Map<Set<Long>, List<SeniorityLevelFunctionQR>> payGroupAreaWiseMap = new HashMap<>();
         functionalPaymentQueryResults.forEach(functionalPaymentQueryResult -> {
             functionalPaymentQueryResult.getFunctionalPaymentMatrices().forEach(functionalPaymentMatrixQueryResult -> {
                 if (payGroupAreaWiseMap.containsKey(functionalPaymentMatrixQueryResult.getPayGroupAreasIds())) {
-                    payGroupAreaWiseMap.get(functionalPaymentMatrixQueryResult.getPayGroupAreasIds()).addAll(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction());
+                    List<SeniorityLevelFunctionQR> seniorityLevelFunctionQRS=payGroupAreaWiseMap.get(functionalPaymentMatrixQueryResult.getPayGroupAreasIds());
+                    seniorityLevelFunctionQRS.addAll(functionalPaymentMatrixQueryResult.getSeniorityLevelFunction());
+                    payGroupAreaWiseMap.put(functionalPaymentMatrixQueryResult.getPayGroupAreasIds(),seniorityLevelFunctionQRS);
                 } else {
                     payGroupAreaWiseMap.put(functionalPaymentMatrixQueryResult.getPayGroupAreasIds(), functionalPaymentMatrixQueryResult.getSeniorityLevelFunction());
                 }

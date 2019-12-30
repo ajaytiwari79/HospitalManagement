@@ -480,7 +480,7 @@ public class UserService {
             }
             permissionData.setOrganizationPermissions(unitPermission);
         }
-        updateLastSelectedOrganizationIdAndCountryId(organizationId);
+         updateLastSelectedOrganizationIdAndCountryId(organizationId);
          permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
          permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(),userAccessRoleDTO.getAccessGroupIds(),UserContext.getUserDetails().isHubMember()), ModelDTO.class));
          updateChatStatus(ChatStatus.ONLINE);
