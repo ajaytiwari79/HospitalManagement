@@ -725,8 +725,8 @@ public class TimeBankCalculationService {
     private void updateTimebankIntervalWithDefaultValue(long totalTimeBankBefore, String query, List<TimeTypeDTO> timeTypeDTOS, List<CTARuleTemplateDTO> ctaRuleTemplateDTOS, Interval interval, List<ShiftWithActivityDTO> shifts, TimeBankIntervalDTO timeBankIntervalDTO, long timeBankOfInterval, Long approvePayOut) {
         timeBankIntervalDTO.setTotalTimeBankAfterCtaMin(totalTimeBankBefore - approvePayOut);
         timeBankIntervalDTO.setTotalTimeBankBeforeCtaMin(totalTimeBankBefore + timeBankOfInterval);
-        timeBankIntervalDTO.setTotalTimeBankMin(-timeBankOfInterval + approvePayOut);
-        timeBankIntervalDTO.setTotalTimeBankDiff(-timeBankOfInterval + approvePayOut);
+        timeBankIntervalDTO.setTotalTimeBankMin(timeBankOfInterval + approvePayOut);
+        timeBankIntervalDTO.setTotalTimeBankDiff(timeBankOfInterval + approvePayOut);
         timeBankIntervalDTO.setTitle(getTitle(query, interval));
         timeBankIntervalDTO.setTimeBankDistribution(getDistributionOfTimeBank(new HashMap<>(), ctaRuleTemplateDTOS, 0,new HashMap<>()));
         timeBankIntervalDTO.setWorkingTimeType(isNotNull(timeTypeDTOS) ? getWorkingTimeType(interval, shifts, timeTypeDTOS) : null);
@@ -1152,6 +1152,7 @@ public class TimeBankCalculationService {
                 LOGGER.debug("delta timebank {}", deltaTimeBankMinutes);
                 LOGGER.debug("actual timebank {} till date {} phase {}", actualTimebank, employmentStartDate, datePhaseDefaultNameMap.get(employmentStartDate));
             }
+            actualTimebank+=dateDailyTimeBankEntryMap.containsKey(employmentStartDate) ? dateDailyTimeBankEntryMap.get(employmentStartDate).getProtectedDaysOffMinutes() : 0;
             employmentStartDate = employmentStartDate.plusDays(1);
         }
         return actualTimebank;
@@ -1484,13 +1485,15 @@ public class TimeBankCalculationService {
             if (isNotNull(dailyTimeBankEntry)) {
                 if(addValueInProtectedDaysOff){
                     dailyTimeBankEntry.setProtectedDaysOffMinutes(dailyTimeBankEntry.getProtectedDaysOffMinutes() + value);
+                }else {
+                    dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() + value);
+                    if (dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() > MINIMUM_VALUE) {
+                        dailyTimeBankEntry.setPublishedSomeActivities(true);
+                    }
                 }
 //                dailyTimeBankEntry.setPlannedMinutesOfTimebank(dailyTimeBankEntry.getPlannedMinutesOfTimebank() + value);
 //                dailyTimeBankEntry.setDeltaTimeBankMinutes(dailyTimeBankEntry.getDeltaTimeBankMinutes() + value);
-                dailyTimeBankEntry.setDeltaAccumulatedTimebankMinutes(dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() + value);
-                if (dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() > MINIMUM_VALUE) {
-                    dailyTimeBankEntry.setPublishedSomeActivities(true);
-                }
+
             }
         }
 
