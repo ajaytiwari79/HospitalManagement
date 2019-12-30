@@ -10,7 +10,7 @@ import java.util.Optional;
  */
 
 //This for Activity
-public class PhaseTemplateValue {
+public class PhaseTemplateValue implements Comparable<PhaseTemplateValue>{
     private BigInteger phaseId;
     private String name;
     private String description;
@@ -136,5 +136,10 @@ public class PhaseTemplateValue {
 
     public void setActivityShiftStatusSettings(List<ActivityShiftStatusSettings> activityShiftStatusSettings) {
         this.activityShiftStatusSettings = activityShiftStatusSettings;
+    }
+
+    @Override
+    public int compareTo(PhaseTemplateValue phaseTemplateValue) {
+        return Integer.compare(this.sequence,phaseTemplateValue.sequence);
     }
 }

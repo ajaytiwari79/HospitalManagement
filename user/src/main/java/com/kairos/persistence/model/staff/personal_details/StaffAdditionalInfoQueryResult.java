@@ -14,6 +14,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,5 +46,5 @@ public class StaffAdditionalInfoQueryResult {
     private List<SkillLevelDTO> skillLevelDTOS;
     private boolean countryAdmin;
     private List<Tag> tags;
-    private Map<String, String> unitWiseAccessRole;
+    private Map<String, String> unitWiseAccessRole=new HashMap<>();
 }

@@ -23,7 +23,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="local,qa">
+    <springProfile name="local">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -42,7 +42,7 @@
     </springProfile>
 
 
-    <springProfile name="development,test">
+    <springProfile name="development,test,production,qa">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -60,7 +60,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="production">
+   <!-- <springProfile name="production">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -80,7 +80,7 @@
         <root level="INFO">
             <appender-ref ref="ROLLING-FILE"/>
         </root>
-    </springProfile>
+    </springProfile>-->
 
 </configuration>
 

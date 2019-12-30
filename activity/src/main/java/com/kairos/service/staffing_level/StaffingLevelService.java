@@ -835,7 +835,7 @@ public class StaffingLevelService  {
                         selectedActivitiesForCurrentDate.add(staffingLevelActivity);
                         if(parentActivityIds.contains(staffingLevelActivity.getActivityId())){
                             min+=staffingLevelActivity.getMinNoOfStaff();
-                            min+=staffingLevelActivity.getMaxNoOfStaff();
+                            max+=staffingLevelActivity.getMaxNoOfStaff();
                         }
 
                     }
@@ -846,6 +846,7 @@ public class StaffingLevelService  {
                 staffingLevelIntervals.add(currentInterval);
             }
             StaffingLevel staffingLevel = getStaffingLevelIfExist(dateStaffingLevelMap, currentDateWiseActivities, staffingLevelIntervals, staffingLevelTemplate, unitId);
+            staffingLevel.setStaffingLevelSetting(staffingLevelTemplate.getStaffingLevelSetting());
             staffingLevels.add(staffingLevel);
         });
         if (!staffingLevels.isEmpty()) {
