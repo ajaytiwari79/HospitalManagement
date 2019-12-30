@@ -80,6 +80,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -528,9 +529,9 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
         PQLSettings pqlSettings = activity.getRulesActivityTab().getPqlSettings();
         if (isNotNull(pqlSettings)) {
-            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAppreciable(), "#4caf502e","High");
-            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAcceptable(), "#ffeb3b33","Midium");
-            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getCritical(), "#ff3b3b33","Low");
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAppreciable(), "#4caf502e","Green");
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAcceptable(), "#ffeb3b33","Yellow");
+            getDataByPQLSetting(activity, todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getCritical(), "#ff3b3b33","Red");
         }
         return clusteredBarChartKpiDataUnits;
     }
@@ -543,7 +544,8 @@ public class KPIBuilderCalculationService implements CounterService {
             for (TodoDTO todoDTO : todoDTOS) {
                 localDate = getApproveOrDisApproveDateFromTODO(localDate, todoDTO);
                 if (isNotNull(localDate)) {
-                    Boolean isApproveExist = new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime)).containsAndEqualsEndDate(asDate(localDate));
+                    Long weekDays =calcWeekDays(asLocalDate(todoDTO.getRequestedOn()),asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime));
+                    Boolean isApproveExist = new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(weekDays)).containsAndEqualsEndDate(asDate(localDate));
                     if (isApproveExist) {
                         count++;
                         todoDTOS.remove(todoDTO);
@@ -553,6 +555,15 @@ public class KPIBuilderCalculationService implements CounterService {
             }
         }
         clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(range,color, count));
+    }
+
+    public static long calcWeekDays(final LocalDate start, final LocalDate end) {
+        final DayOfWeek startW = start.getDayOfWeek();
+        final DayOfWeek endW = end.getDayOfWeek();
+
+        final long days = ChronoUnit.DAYS.between(start, end);
+        final long daysWithoutWeekends = days - 2 * ((days + startW.getValue())/7);
+        return daysWithoutWeekends + (startW == DayOfWeek.SUNDAY ? 1 : 0) + (endW == DayOfWeek.SUNDAY ? 1 : 0);
     }
 
     private LocalDateTime getApproveOrDisApproveDateFromTODO(LocalDateTime localDate, TodoDTO todoDTO) {
