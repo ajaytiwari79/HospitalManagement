@@ -295,7 +295,7 @@ public class ShiftService extends MongoBaseService {
         if (isNotNull(activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting()) && !activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting().isAllowedAutoAbsence()) {
             List<Shift> shifts = shiftMongoRepository.findAllShiftByIntervalAndEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), getStartOfDay(shift.getStartDate()), DateUtils.getEndOfDay(shift.getEndDate()));
             List<Activity> protectedDaysOffActivities = activityRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, newHashSet(shift.getUnitId()));
-            validateSicknessShift(shift, staffAdditionalInfoDTO, activityWrapper, errorMessages, shifts, protectedDaysOffActivities, shifts);
+            validateSicknessShift(shift, staffAdditionalInfoDTO, activityWrapper, errorMessages, shifts, protectedDaysOffActivities);
             if(isCollectionEmpty(errorMessages)) {
                 for (Shift oldShift : shifts) {
                     oldShift.setDisabled(true);
@@ -307,36 +307,37 @@ public class ShiftService extends MongoBaseService {
        return new ActivityRuleViolation(activityWrapper.getActivity().getId(), activityWrapper.getActivity().getName(), 0, errorMessages);
     }
 
-    private void validateSicknessShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<String> errorMessages, List<Shift> shifts, List<Activity> activities, List<Shift> oldShifts) {
+    public void validateSicknessShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<String> errorMessages, List<Shift> shifts, List<Activity> activities) {
+        errorMessages=new ArrayList<>();
         SicknessSetting sicknessSetting = activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting();
         if (!(sicknessSetting.isUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
-            errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND));
         }
         if(isCollectionNotEmpty(sicknessSetting.getStaffTagIds())){
             Set<BigInteger> tadIds=staffAdditionalInfoDTO.getTags().stream().map(tagDTO -> tagDTO.getId()).collect(Collectors.toSet());
             if (!tadIds.contains(sicknessSetting.getStaffTagIds())){
-                errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+                errorMessages.add(exceptionService.convertMessage(STAFF_NOT_ALLOWED_ON_TAG));
             }
 
         }
         if(sicknessSetting.isValidForChildCare() && isCollectionEmpty(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays())){
-            errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_CARE_DAYS_NOT_FOUND));
         }
         if(sicknessSetting.isUsedOnFreeDays() && isCollectionNotEmpty(shifts)){
-            errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_FREEDAY));
         }
         if(sicknessSetting.isUsedOnProtecedDaysOff()){
             Set<BigInteger> activityIds=activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
-            for (Shift oldShift : oldShifts) {
+            for (Shift oldShift : shifts) {
                 if(!activityIds.contains(oldShift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()))){
-                    errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+                    errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF));
                 }
             }
         }
-        if(!sicknessSetting.isAllowedAutoAbsence()){
-            for (Shift currentElement : oldShifts) {
+        if(!sicknessSetting.isTopOnApprovedAbsences()){
+            for (Shift currentElement : shifts) {
                 if(ShiftType.ABSENCE.equals(currentElement.getShiftType()) && !shift.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getStatus().contains(ShiftStatus.APPROVE))){
-                    errorMessages.add(exceptionService.convertMessage(ERROR_START_TIME_LESS_THAN_LATEST_TIME));
+                    errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES));
                 }
             }
         }
