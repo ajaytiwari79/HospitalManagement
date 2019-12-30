@@ -336,9 +336,9 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "MATCH(employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine) WHERE  NOT EXISTS(employmentLine.endDate) OR date(employmentLine.endDate) >= date()" +
             "MATCH (employmentLine)-[relation:" + HAS_EMPLOYMENT_TYPE + "]->(employmentType:EmploymentType)\n" +
             "WITH CASE employmentLine when null then [] else COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek ,\n" +
-            "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,employmentType:employmentType,startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines, expertise,staff,unit,employment,employmentLine,employmentType,protectedDaysOffSetting\n" +
+            "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,employmentType:employmentType,startDate:employmentLine.startDate,endDate:employmentLine.endDate,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes}) end as employmentLines, expertise,staff,unit,employment,employmentLine,employmentType, protectedDaysOffSetting\n" +
             "RETURN id(employment) as id,id(staff) as staffId,id(unit) as unitId,expertise ,employment.endDate as endDate,employment.employmentSubType as employmentSubType,employment.published as published,employment.startDate as startDate ,\n" +
-            "employmentLines,collect(protectedDaysOffSetting) as protectedDaysOffSettings")
+            "employmentLines,collect(DISTINCT protectedDaysOffSetting) as protectedDaysOffSettings")
     List<EmploymentQueryResult> getMainEmploymentOfStaffs(EmploymentSubType employmentSubType);
 
     @Query("MATCH(exp:Expertise)-[:"+HAS_EXPERTISE_IN+"]-(e:Employment)-[r:"+HAS_EMPLOYMENT_LINES+"]-(el:EmploymentLine) WHERE id(exp)={0}" +

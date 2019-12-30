@@ -1386,6 +1386,7 @@ public class TimeBankCalculationService {
                 protectedDaysOffSettings = employmentDetails.getProtectedDaysOffSettings();
                 if(isNotNull(protectedDaysOffSettings)) {
                     protectedDaysOffSettings = protectedDaysOffSettings.stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.getPublicHolidayDate().isAfter(employmentDetails.getStartDate()) || (isNull(employmentDetails.getEndDate()) || !protectedDaysOffSetting.getPublicHolidayDate().isAfter(employmentDetails.getEndDate()))).collect(Collectors.toList());
+                    protectedDaysOffSettings =protectedDaysOffSettings.stream().filter(distinctByKey(protectedDaysOffSetting -> protectedDaysOffSetting.getPublicHolidayDate())).collect(toList());
                     employmentDetails.setProtectedDaysOffSettings(protectedDaysOffSettings);
                     switch (protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings()) {
                         case UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR:
@@ -1526,7 +1527,10 @@ public class TimeBankCalculationService {
             Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap = new HashMap<>();
             for (Map.Entry<BigInteger, Activity> bigIntegerActivityEntry : activityWrapperMap.entrySet()) {
                 Activity activityWrapper = bigIntegerActivityEntry.getValue();
-                activityIdDateTimeIntervalMap.putIfAbsent(bigIntegerActivityEntry.getKey(), getCutoffInterval(activityWrapper.getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), getLocalDate()));
+                DateTimeInterval dateTimeInterval= getCutoffInterval(activityWrapper.getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getRulesActivityTab().getCutOffdayValue(), asDate(getLocalDate().minusDays(1)), getLocalDate());
+                if(isNotNull(dateTimeInterval)) {
+                    activityIdDateTimeIntervalMap.putIfAbsent(bigIntegerActivityEntry.getKey(),dateTimeInterval);
+                }
             }
             List<DateTimeInterval> dateTimeIntervals = new ArrayList<>(activityIdDateTimeIntervalMap.values());
             dateTimeIntervals.sort((dateTimeInterval, t1) -> dateTimeInterval.getStartLocalDate().compareTo(t1.getStartLocalDate()));
