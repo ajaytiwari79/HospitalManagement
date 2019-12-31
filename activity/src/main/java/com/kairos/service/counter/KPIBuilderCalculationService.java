@@ -80,6 +80,9 @@ import java.math.BigInteger;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -596,7 +599,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 List<TodoDTO> todoDTOS = new CopyOnWriteArrayList(kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId)));
                 ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getGeneralActivityTab().getBackgroundColor(),todoDTOS.size());
                 subClusteredBarValue.addAll(getPQlOfTodo(activity, todoDTOS));
-                clusteredBarChartKpiDataUnit.setSubValues(subClusteredBarValue);
+                  clusteredBarChartKpiDataUnit.setSubValues(subClusteredBarValue);
                 activitySubClusteredBarValue.add(clusteredBarChartKpiDataUnit);
                 subClusteredBarValue = newArrayList();
             }
@@ -609,7 +612,6 @@ public class KPIBuilderCalculationService implements CounterService {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
         PQLSettings pqlSettings = activity.getRulesActivityTab().getPqlSettings();
         if (isNotNull(pqlSettings)) {
-
             getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAppreciable(), "#4caf502e","Green");
             getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAcceptable(), "#ffeb3b33","Yellow");
             getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getCritical(), "#ff3b3b33","Red");
@@ -619,13 +621,14 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private void getDataByPQLSetting(List<TodoDTO> todoDTOS, List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits, ApprovalCriteria approvalCriteria, String color ,String range) {
         Short approvalTime = approvalCriteria.getApprovalTime();
-        LocalDateTime localDate = null;
+        LocalDate localDate = null;
         long count = 0;
         if (isNotNull(approvalTime)) {
             for (TodoDTO todoDTO : todoDTOS) {
                 localDate = getApproveOrDisApproveDateFromTODO(localDate, todoDTO);
                 if (isNotNull(localDate)) {
-                    boolean isApproveExist = new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), asLocalDate(todoDTO.getRequestedOn()).plusDays(approvalTime)).containsAndEqualsEndDate(asDate(localDate));
+                     LocalDate endDate =add(asLocalDate(todoDTO.getRequestedOn()),approvalTime);
+                     Boolean isApproveExist = new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), endDate).containsAndEqualsEndDate(asDate(localDate));
                     if (isApproveExist) {
                         count++;
                         todoDTOS.remove(todoDTO);
@@ -637,13 +640,30 @@ public class KPIBuilderCalculationService implements CounterService {
         clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(range,color, count));
     }
 
-    private LocalDateTime getApproveOrDisApproveDateFromTODO(LocalDateTime localDate, TodoDTO todoDTO) {
+    public LocalDate add(LocalDate date, int workdays) {
+        if (workdays < 1) {
+            return date;
+        }
+
+        LocalDate result = date;
+        int addedDays = 0;
+        while (addedDays < workdays) {
+            result = result.plusDays(1);
+            if (!(result.getDayOfWeek() == DayOfWeek.SATURDAY ||
+                    result.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+                ++addedDays;
+            }
+        }
+
+        return result;
+    }
+    private LocalDate getApproveOrDisApproveDateFromTODO(LocalDate localDate, TodoDTO todoDTO) {
         switch (todoDTO.getStatus()){
             case APPROVE:
-                localDate=todoDTO.getApprovedOn();
+                localDate=asLocalDate(asDate(todoDTO.getApprovedOn()));
                 break;
             case DISAPPROVE:
-                localDate=todoDTO.getDisApproveOn();
+                localDate=asLocalDate(asDate(todoDTO.getDisApproveOn()));
                 break;
             default:break;
         }
@@ -968,8 +988,10 @@ public class KPIBuilderCalculationService implements CounterService {
 
         private void updateTodoDtosByStaffId(Long staffId) {
             List<TodoDTO> todoDTOList=staffIdAndTodoMap.get(staffId);
-            if(isCollectionNotEmpty(todoDTOList)){
+            if(isNotNull(todoDTOList)){
                 activityIdAndTodoListMap=todoDTOList.stream().collect(Collectors.groupingBy(k->k.getSubEntityId(),Collectors.toList()));
+            }else {
+                activityIdAndTodoListMap=new HashMap<>(0);
             }
         }
 
@@ -982,6 +1004,7 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         public List<TodoDTO> getTodosByInterval(DateTimeInterval dateTimeInterval , List<TodoDTO> todoDTOS){
+
             return todoDTOS.stream().filter(todoDTO -> dateTimeInterval.containsAndEqualsEndDate(todoDTO.getRequestedOn())).collect(Collectors.toList());
         }
 
