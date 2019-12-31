@@ -1335,7 +1335,9 @@ public class TimeBankCalculationService {
             Map<Long, List<StaffEmploymentDetails>> unitAndStaffEmploymentDetailsMap = staffEmploymentDetails.stream().collect(groupingBy(StaffEmploymentDetails::getUnitId));
             Set<Long> employmentIds = staffEmploymentDetails.stream().map(StaffEmploymentDetails::getId).collect(toSet());
             List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankService.findAllByEmploymentIdsAndBetweenDate(employmentIds, getLocalDate(), getLocalDate());
+            List<PayOutPerShift> payOutPerShifts=payOutRepository.findByEmploymentsAndDateShiftId(employmentIds,asDate(getLocalDate()),asDate(getLocalDate()),BigInteger.valueOf(-1l));
             Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(DailyTimeBankEntry::getEmploymentId, v -> v));
+            Map<Long, PayOutPerShift> employmentIdAndPayOutPerShiftMap = payOutPerShifts.stream().collect(Collectors.toMap(PayOutPerShift::getEmploymentId, v -> v));
             List<Activity> activities = activityMongoRepository.findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum.PROTECTED_DAYS_OFF, unitIds);
             Set<BigInteger> activityIds = activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
             Map<BigInteger, Activity> activityMap = activities.stream().collect(Collectors.toMap(MongoBaseEntity::getId, v -> v));
@@ -1346,7 +1348,7 @@ public class TimeBankCalculationService {
             List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementRepository.getCTAByEmploymentIdsAndDate(new ArrayList<>(employmentIds), getDate(), getDate());
             Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap = ctaResponseDTOS.stream().collect(Collectors.toMap(CTAResponseDTO::getEmploymentId, v -> v));
             for (Long unitId : unitIds) {
-                getDailyTimeBankEntryAndPaidOutPerUnit(dailyTimeBankEntriesToSave, payOutOfStaffs, unitIdAndProtectedDaysOffSettingDTOMap, unitAndStaffEmploymentDetailsMap, employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId);
+                getDailyTimeBankEntryAndPaidOutPerUnit(dailyTimeBankEntriesToSave, payOutOfStaffs, unitIdAndProtectedDaysOffSettingDTOMap, unitAndStaffEmploymentDetailsMap, employmentIdAndDailyTimeBankEntryMap,employmentIdAndPayOutPerShiftMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId);
             }
             if (isCollectionNotEmpty(dailyTimeBankEntriesToSave)) {
                 timeBankRepository.saveEntities(dailyTimeBankEntriesToSave);
@@ -1357,7 +1359,7 @@ public class TimeBankCalculationService {
             return true;
         }
 
-        private Object[] getDailyTimeBankEntryAndPaidOutPerUnit(List<DailyTimeBankEntry> dailyTimeBankEntriesToSave, List<PayOutPerShift> payOutOfStaffs, Map<Long, ProtectedDaysOffSettingDTO> unitIdAndProtectedDaysOffSettingDTOMap, Map<Long, List<StaffEmploymentDetails>> unitAndStaffEmploymentDetailsMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId) {
+        private Object[] getDailyTimeBankEntryAndPaidOutPerUnit(List<DailyTimeBankEntry> dailyTimeBankEntriesToSave, List<PayOutPerShift> payOutOfStaffs, Map<Long, ProtectedDaysOffSettingDTO> unitIdAndProtectedDaysOffSettingDTOMap, Map<Long, List<StaffEmploymentDetails>> unitAndStaffEmploymentDetailsMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, PayOutPerShift> employmentIdAndPayOutPerShiftMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId) {
             Object[] dailyTimeBankAndPayoutByOnceInAYear = new Object[]{};
             try {
                 ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = unitIdAndProtectedDaysOffSettingDTOMap.get(unitId);
@@ -1365,7 +1367,7 @@ public class TimeBankCalculationService {
                 if (isNotNull(protectedDaysOffSettingDTO) && isNotNull(activity)) {
                     List<StaffEmploymentDetails> staffEmploymentDetailsList = unitAndStaffEmploymentDetailsMap.get(unitId);
                     for (StaffEmploymentDetails employmentDetails : staffEmploymentDetailsList) {
-                        dailyTimeBankAndPayoutByOnceInAYear = setDailyTimeBankAndPayoutPerStaff(dailyTimeBankAndPayoutByOnceInAYear, employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, protectedDaysOffSettingDTO, employmentDetails);
+                        dailyTimeBankAndPayoutByOnceInAYear = setDailyTimeBankAndPayoutPerStaff(dailyTimeBankAndPayoutByOnceInAYear,employmentIdAndPayOutPerShiftMap,employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, protectedDaysOffSettingDTO, employmentDetails);
                         if (dailyTimeBankAndPayoutByOnceInAYear.length > AppConstants.MINIMUM_VALUE && isNotNull(dailyTimeBankAndPayoutByOnceInAYear[0])) {
                             dailyTimeBankEntriesToSave.add((DailyTimeBankEntry) dailyTimeBankAndPayoutByOnceInAYear[0]);
                         }
@@ -1381,7 +1383,7 @@ public class TimeBankCalculationService {
             return dailyTimeBankAndPayoutByOnceInAYear;
         }
 
-        private Object[] setDailyTimeBankAndPayoutPerStaff(Object[] dailyTimeBankAndPayoutByOnceInAYear, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO, StaffEmploymentDetails employmentDetails) {
+        private Object[] setDailyTimeBankAndPayoutPerStaff(Object[] dailyTimeBankAndPayoutByOnceInAYear, Map<Long, PayOutPerShift> employmentIdAndPayOutPerShiftMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO, StaffEmploymentDetails employmentDetails) {
             List<ProtectedDaysOffSetting> protectedDaysOffSettings;
             try {
                 protectedDaysOffSettings = employmentDetails.getProtectedDaysOffSettings();
@@ -1391,13 +1393,13 @@ public class TimeBankCalculationService {
                     employmentDetails.setProtectedDaysOffSettings(protectedDaysOffSettings);
                     switch (protectedDaysOffSettingDTO.getProtectedDaysOffUnitSettings()) {
                         case UPDATE_IN_TIMEBANK_ON_FIRST_DAY_OF_YEAR:
-                            dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankAndPayoutByUpdateInTimeBank(employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, employmentIdAndCtaResponseDTOMap, unitId, employmentDetails, true);
+                            dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankAndPayoutByUpdateInTimeBank(employmentIdAndDailyTimeBankEntryMap,employmentIdAndPayOutPerShiftMap, unitIdAndActivityMap, employmentIdAndCtaResponseDTOMap, unitId, employmentDetails, true);
                             break;
                         case ONCE_IN_A_YEAR:
-                            dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankAndPayoutByOnceInAYear(employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, employmentDetails);
+                            dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankAndPayoutByOnceInAYear(employmentIdAndDailyTimeBankEntryMap,employmentIdAndPayOutPerShiftMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, employmentIdAndCtaResponseDTOMap, unitId, employmentDetails);
                             break;
                         case ACTIVITY_CUT_OFF_INTERVAL:
-                            dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankEntryAndPayoutByCutOffInterval(employmentIdAndCtaResponseDTOMap, employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, unitId, employmentDetails);
+                            dailyTimeBankAndPayoutByOnceInAYear = getDailyTimeBankEntryAndPayoutByCutOffInterval(employmentIdAndCtaResponseDTOMap,employmentIdAndPayOutPerShiftMap, employmentIdAndDailyTimeBankEntryMap, unitIdAndActivityMap, activityIdDateTimeIntervalMap, employmentIdAndShiftMap, unitId, employmentDetails);
                             break;
                         default:
                             break;
@@ -1409,7 +1411,7 @@ public class TimeBankCalculationService {
             return dailyTimeBankAndPayoutByOnceInAYear;
         }
 
-        private Object[] getDailyTimeBankAndPayoutByUpdateInTimeBank(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, StaffEmploymentDetails employmentDetails, boolean addValueInProtectedDaysOff) {
+        private Object[] getDailyTimeBankAndPayoutByUpdateInTimeBank(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, PayOutPerShift> employmentIdAndPayOutPerShiftMap, Map<Long, Activity> unitIdAndActivityMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, StaffEmploymentDetails employmentDetails, boolean addValueInProtectedDaysOff) {
             DailyTimeBankEntry dailyTimeBankEntry = null;
             PayOutPerShift payOutPerShift = null;
             Activity activity = (unitIdAndActivityMap.get(unitId));
@@ -1421,13 +1423,13 @@ public class TimeBankCalculationService {
                 DateTimeInterval cutOffDateTimeInterval = dateTimeInterval;
                 int count = (int) employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && cutOffDateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
                 dailyTimeBankEntry = getDailyTimeBankEntry(employmentIdAndDailyTimeBankEntryMap, employmentIdAndCtaResponseDTOMap, employmentDetails, dateTimeInterval, count,addValueInProtectedDaysOff);
-                payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap, employmentDetails, dateTimeInterval, count,addValueInProtectedDaysOff);
+                payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap,employmentIdAndPayOutPerShiftMap, employmentDetails, dateTimeInterval, count,addValueInProtectedDaysOff);
             }
             return new Object[]{dailyTimeBankEntry, payOutPerShift};
         }
 
 
-        private Object[] getDailyTimeBankEntryAndPayoutByCutOffInterval(Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Long unitId, StaffEmploymentDetails employmentDetails) {
+        private Object[] getDailyTimeBankEntryAndPayoutByCutOffInterval(Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Map<Long, PayOutPerShift> employmentIdAndPayOutPerShiftMap, Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Long unitId, StaffEmploymentDetails employmentDetails) {
             int[] scheduledAndApproveActivityCount;
             Activity activity = unitIdAndActivityMap.get(unitId);
             DateTimeInterval activityDateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
@@ -1444,18 +1446,18 @@ public class TimeBankCalculationService {
             scheduledAndApproveActivityCount = workTimeAgreementBalancesCalculationService.getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId())) ? employmentIdAndShiftMap.get(employmentDetails.getId()) : new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
             count = count - scheduledAndApproveActivityCount[0];
             DailyTimeBankEntry dailyTimeBankEntry = getDailyTimeBankEntry(employmentIdAndDailyTimeBankEntryMap, employmentIdAndCtaResponseDTOMap, employmentDetails, protectedDaysDateTimeInterval, count,false);
-            PayOutPerShift payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap, employmentDetails, protectedDaysDateTimeInterval, count ,false);
+            PayOutPerShift payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap,employmentIdAndPayOutPerShiftMap, employmentDetails, protectedDaysDateTimeInterval, count ,false);
             return new Object[]{dailyTimeBankEntry, payOutPerShift};
         }
 
-        private Object[] getDailyTimeBankAndPayoutByOnceInAYear(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, StaffEmploymentDetails employmentDetails) {
+        private Object[] getDailyTimeBankAndPayoutByOnceInAYear(Map<Long, DailyTimeBankEntry> employmentIdAndDailyTimeBankEntryMap, Map<Long, PayOutPerShift> employmentIdAndPayOutPerShiftMap, Map<Long, Activity> unitIdAndActivityMap, Map<BigInteger, DateTimeInterval> activityIdDateTimeIntervalMap, Map<Long, List<ShiftWithActivityDTO>> employmentIdAndShiftMap, Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Long unitId, StaffEmploymentDetails employmentDetails) {
             int[] scheduledAndApproveActivityCount;
             DateTimeInterval activityDateTimeInterval = activityIdDateTimeIntervalMap.get(unitIdAndActivityMap.get(unitId).getId());
             int count = (int) employmentDetails.getProtectedDaysOffSettings().stream().filter(protectedDaysOffSetting -> protectedDaysOffSetting.isProtectedDaysOff() && activityDateTimeInterval.contains(protectedDaysOffSetting.getPublicHolidayDate())).count();
             scheduledAndApproveActivityCount = workTimeAgreementBalancesCalculationService.getShiftsActivityCountByInterval(activityDateTimeInterval, isNotNull(employmentIdAndShiftMap.get(employmentDetails.getId())) ? employmentIdAndShiftMap.get(employmentDetails.getId()) : new ArrayList<>(), newHashSet(unitIdAndActivityMap.get(unitId).getId()));
             count = count - scheduledAndApproveActivityCount[0];
             DailyTimeBankEntry dailyTimeBankEntry = getDailyTimeBankEntry(employmentIdAndDailyTimeBankEntryMap, employmentIdAndCtaResponseDTOMap, employmentDetails, activityDateTimeInterval, count ,false);
-            PayOutPerShift payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap, employmentDetails, activityDateTimeInterval, count,false);
+            PayOutPerShift payOutPerShift = getPayoutData(employmentIdAndCtaResponseDTOMap, employmentIdAndPayOutPerShiftMap, employmentDetails, activityDateTimeInterval, count,false);
             return new Object[]{dailyTimeBankEntry, payOutPerShift};
         }
 
@@ -1497,8 +1499,8 @@ public class TimeBankCalculationService {
             }
         }
 
-        private PayOutPerShift getPayoutData(Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, StaffEmploymentDetails employmentDetails, DateTimeInterval activityDateTimeInterval, int count, boolean addValueInProtectedDaysOff) {
-            PayOutPerShift payOutPerShift = null;
+        private PayOutPerShift getPayoutData(Map<Long, CTAResponseDTO> employmentIdAndCtaResponseDTOMap, Map<Long, PayOutPerShift> employmentIdAndPayOutPerShiftMap, StaffEmploymentDetails employmentDetails, DateTimeInterval activityDateTimeInterval, int count, boolean addValueInProtectedDaysOff) {
+            PayOutPerShift payOutPerShift = employmentIdAndPayOutPerShiftMap.get(employmentDetails.getId());
             if (count > 0) {
                 CTAResponseDTO ctaResponseDTO = employmentIdAndCtaResponseDTOMap.get(employmentDetails.getId());
                 int contractualMinutes = getContractualMinutesByDate(activityDateTimeInterval, getLocalDate(), employmentDetails.getEmploymentLines());
@@ -1510,7 +1512,6 @@ public class TimeBankCalculationService {
                         }
                         int bonusByRuletemplate = getBonusOfUnusedDaysOff(activityDateTimeInterval, employmentDetails, contractualMinutes, ruleTemplate);
                         value += (bonusByRuletemplate * count);
-
                         payOutPerShift.getPayOutPerShiftCTADistributions().add(new PayOutPerShiftCTADistribution(ruleTemplate.getName(), value, ruleTemplate.getId(), 0f));
                     }
                 }
