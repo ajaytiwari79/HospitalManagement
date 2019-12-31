@@ -34,6 +34,8 @@ public class TimeCalculationActivityDTO {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime defaultStartTime;
     private boolean availableAllowActivity;
+    private boolean replaceWithPublishedShiftTime;
+    private boolean replaceWithUnapprovedAbsenceRequest;
 
     public TimeCalculationActivityDTO() {
         //dc
@@ -197,5 +199,21 @@ public class TimeCalculationActivityDTO {
 
     public void setAvailableAllowActivity(boolean availableAllowActivity) {
         this.availableAllowActivity = availableAllowActivity;
+    }
+
+    public boolean isReplaceWithPublishedShiftTime() {
+        return replaceWithPublishedShiftTime;
+    }
+
+    public void setReplaceWithPublishedShiftTime(boolean replaceWithPublishedShiftTime) {
+        this.replaceWithPublishedShiftTime = replaceWithPublishedShiftTime;
+    }
+
+    public boolean isReplaceWithUnapprovedAbsenceRequest() {
+        return replaceWithUnapprovedAbsenceRequest;
+    }
+
+    public void setReplaceWithUnapprovedAbsenceRequest(boolean replaceWithUnapprovedAbsenceRequest) {
+        this.replaceWithUnapprovedAbsenceRequest = replaceWithUnapprovedAbsenceRequest;
     }
 }

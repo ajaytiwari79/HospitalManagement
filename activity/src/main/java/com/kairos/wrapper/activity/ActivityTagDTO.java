@@ -49,6 +49,7 @@ public class ActivityTagDTO {
     private BigInteger activityPriorityId;
     private boolean allowChildActivities;
     private boolean applicableForChildActivities;
+    private boolean sicknessSettingValid;
     private Set<BigInteger> childActivityIds=new HashSet<>();
     // for filter FullDay and Full week activity
     private String methodForCalculatingTime;
