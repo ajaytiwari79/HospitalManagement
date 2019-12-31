@@ -1,6 +1,7 @@
 package com.kairos.utils;
 
 import com.kairos.annotations.KPermissionModel;
+import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.dto.kpermissions.FieldDTO;
 import com.kairos.dto.kpermissions.ModelDTO;
@@ -52,8 +53,6 @@ public class PermissionMapperUtils {
             } catch (Exception ex) {
                 LOGGER.error("Error {}",ex);
             }
-        }else{
-            return null;
         }
         return null;
     }
@@ -124,7 +123,8 @@ public class PermissionMapperUtils {
             boolean accessGroupValid = !UserContext.getUserDetails().isHubMember();
             boolean argsValid = objects.length!=0;
             if(accessGroupValid && argsValid){
-                validModels = Arrays.stream(objects).filter(arg -> arg.getClass().isAnnotationPresent(KPermissionModel.class) || arg.getClass().isAnnotationPresent(PermissionClass.class)).map(model->(T)model).collect(Collectors.toList());
+                Set<Class> permissionAnnotatons = newHashSet(KPermissionModel.class,PermissionClass.class,KPermissionRelatedModel.class);
+                validModels = Arrays.stream(objects).filter(arg -> CollectionUtils.containsAny(permissionAnnotatons,newHashSet(arg.getClass().getAnnotations()))).map(model->(T)model).collect(Collectors.toList());
             }
         }
         return validModels;

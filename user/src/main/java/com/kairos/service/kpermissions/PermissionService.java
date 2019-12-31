@@ -1,5 +1,7 @@
 package com.kairos.service.kpermissions;
 
+import com.kairos.annotations.KPermissionRelatedModel;
+import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.commons.annotation.PermissionClass;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
@@ -38,9 +40,11 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.inject.Inject;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -369,13 +373,19 @@ public class PermissionService {
 
     public <T extends UserBaseEntity,E extends UserBaseEntity> void updateObjectsPropertiesBeforeSave(FieldPermissionHelper fieldPermissionHelper,Set<FieldLevelPermission> fieldLevelPermissions){
         for (T object : (List<T>)fieldPermissionHelper.getObjects()) {
-            E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(object.getId());
-            PermissionMapperUtils.PermissionHelper permissionHelper = fieldPermissionHelper.getPermissionHelper(object.getClass().getSimpleName(),fieldLevelPermissions);
-            if(PermissionMapperUtils.personalisedModel.contains(object.getClass().getSimpleName())){
-                permissionHelper.setSameStaff(permissionHelper.getCurrentUserStaffId().equals(object.getId()));
-                permissionHelper.setOtherPermissions(permissionHelper.getOtherPermissionDTOMap().getOrDefault(object.getId(),new OtherPermissionDTO()));
+            Set<Class> permissionAnnotatons = newHashSet(com.kairos.annotations.KPermissionModel.class,PermissionClass.class);
+            if(CollectionUtils.containsAny(permissionAnnotatons,newHashSet(object.getClass().getAnnotations()))){
+                E databaseObject = (E)fieldPermissionHelper.getMapOfDataBaseObject().get(object.getId());
+                PermissionMapperUtils.PermissionHelper permissionHelper = fieldPermissionHelper.getPermissionHelper(object.getClass().getSimpleName(),fieldLevelPermissions);
+                if(PermissionMapperUtils.personalisedModel.contains(object.getClass().getSimpleName())){
+                    permissionHelper.setSameStaff(permissionHelper.getCurrentUserStaffId().equals(object.getId()));
+                    permissionHelper.setOtherPermissions(permissionHelper.getOtherPermissionDTOMap().getOrDefault(object.getId(),new OtherPermissionDTO()));
+                }
+                PermissionMapperUtils.copySpecificPropertiesByMapper(object,databaseObject,permissionHelper);
+            }else if(object.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
+
             }
-            PermissionMapperUtils.copySpecificPropertiesByMapper(object,databaseObject,permissionHelper);
+
         }
     }
 
@@ -430,9 +440,19 @@ public class PermissionService {
                 }else if(model.getClass().isAnnotationPresent(PermissionClass.class)){
                     PermissionClass permissionClass = model.getClass().getAnnotation(PermissionClass.class);
                     return permissionClass.name();
+                }else if(model.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
+                    return getRelationShipModelPermissionModelName(model.getClass());
                 }
                 return "";
             }).collect(Collectors.toSet());
+        }
+
+        private String getRelationShipModelPermissionModelName(Class<? extends UserBaseEntity> aClass) {
+            Optional<Field> relationShipField = Arrays.stream(aClass.getFields()).filter(field -> field.isAnnotationPresent(KPermissionRelationshipFrom.class)).findFirst();
+            if(relationShipField.isPresent()){
+                return relationShipField.get().getClass().getSimpleName();
+            }
+            return "";
         }
 
         private <ID,E,T> Map[] getObjectByIds(List<T> objects,Set<FieldLevelPermission> fieldLevelPermissions){
