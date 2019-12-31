@@ -6,10 +6,12 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelMatrix;
+import com.kairos.shiftplanning.domain.unit.Unit;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import org.joda.time.LocalDate;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
+import org.optaplanner.core.api.domain.solution.PlanningEntityProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
@@ -41,6 +43,9 @@ public class ShiftRequestPhasePlanningSolution {
     private List<ActivityLineInterval> activityLineIntervals;
     @PlanningEntityCollectionProperty
     private List<SkillLineInterval> skillLineIntervals;
+    @ProblemFactProperty
+    private Unit unit;
+
     //@PlanningEntityCollectionProperty
     //private List<DateTime> possibleStartDateTimes;
     private Map<LocalDate,List<Activity>> activitiesPerDay;
@@ -147,5 +152,13 @@ public class ShiftRequestPhasePlanningSolution {
 
     public void setActivitiesIntervalsGroupedPerDay(Map<String, List<ActivityLineInterval>> activitiesIntervalsGroupedPerDay) {
         this.activitiesIntervalsGroupedPerDay = activitiesIntervalsGroupedPerDay;
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 }
