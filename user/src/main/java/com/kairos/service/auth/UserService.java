@@ -428,7 +428,7 @@ public class UserService {
         return unitPermissionMap;
     }
 
-    boolean isAccessPageRead(AccessPageQueryResult currentAccessPage, List<AccessPageQueryResult> accessPages, Map<Long,List<Long>> accessPageIdAndChildrenId){
+    private boolean isAccessPageRead(AccessPageQueryResult currentAccessPage, List<AccessPageQueryResult> accessPages, Map<Long,List<Long>> accessPageIdAndChildrenId){
         boolean read = currentAccessPage.isRead();
         if(!read) {
             List<AccessPageQueryResult> childAccessPages = new ArrayList<>();
@@ -436,7 +436,8 @@ public class UserService {
                 childAccessPages = accessPages.stream().filter(accessPageQueryResult -> accessPageIdAndChildrenId.get(currentAccessPage.getId()).contains(accessPageQueryResult.getId())).collect(Collectors.toList());
             }
             for (AccessPageQueryResult childAccessPage : childAccessPages) {
-                if (read = isAccessPageRead(childAccessPage, accessPages, accessPageIdAndChildrenId)) {
+                read = isAccessPageRead(childAccessPage, accessPages, accessPageIdAndChildrenId);
+                if (read) {
                     break;
                 }
             }
@@ -444,7 +445,7 @@ public class UserService {
         return read;
     }
 
-    boolean isAccessPageWrite(AccessPageQueryResult currentAccessPage, List<AccessPageQueryResult> accessPages, Map<Long,List<Long>> accessPageIdAndChildrenId){
+    private boolean isAccessPageWrite(AccessPageQueryResult currentAccessPage, List<AccessPageQueryResult> accessPages, Map<Long,List<Long>> accessPageIdAndChildrenId){
         boolean write = currentAccessPage.isWrite();
         if(write){
             return true;
@@ -454,7 +455,8 @@ public class UserService {
             childAccessPages = accessPages.stream().filter(accessPageQueryResult -> accessPageIdAndChildrenId.get(currentAccessPage.getId()).contains(accessPageQueryResult.getId())).collect(Collectors.toList());
         }
         for (AccessPageQueryResult childAccessPage : childAccessPages) {
-            if (write = isAccessPageWrite(childAccessPage, accessPages, accessPageIdAndChildrenId)) {
+            write = isAccessPageWrite(childAccessPage, accessPages, accessPageIdAndChildrenId);
+            if (write) {
                 break;
             }
         }
