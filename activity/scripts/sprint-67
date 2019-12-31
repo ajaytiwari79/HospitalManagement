@@ -1,0 +1,26 @@
+db.todo.find().forEach(
+       function (elem) {
+            elem.requestedOn = elem.createdAt;
+            db.todo.save(elem);
+            });
+
+
+db.todo.find().forEach(
+       function (elem) {
+            if(elem.status == "PENDING"){
+            elem.pendingOn = elem.updatedAt;
+            db.todo.save(elem);
+            }});
+
+ db.todo.find().forEach(
+        function (elem) {
+             if(elem.status == "APPROVE"){
+             elem.approvedOn = elem.updatedAt;
+             db.todo.save(elem);
+             }});
+
+ db.todo.find().forEach(
+        function (elem) {
+             if(elem.status == "DISAPPROVE"){
+             elem.disapproveOn = elem.updatedAt;
+             db.todo.save(elem);
