@@ -149,8 +149,9 @@ public class PayOutCalculationService {
         long payoutBefore = payoutCalculatedValue[1];
         long payoutAfter = payoutCalculatedValue[2];
         long payoutFromCTA = payoutCalculatedValue[3];
+        long protectedDaysOffMinutes = payoutCalculatedValue[4];
         PayOutCTADistributionDTO payOutCTADistributionDTO = new PayOutCTADistributionDTO(scheduledCTADistributions, getCTABonusDistributions(ctaBonusDistributionMap, employmentWithCtaDetailsDTOS.get(0)),payoutFromCTA);
-        return new PayOutDTO(intervals.get(0).getStart().toDate(), intervals.get(intervals.size() - 1).getEnd().toDate(), payoutAfter, payoutBefore, payoutChange, payoutIntervalDTOS, payOutCTADistributionDTO);
+        return new PayOutDTO(intervals.get(0).getStart().toDate(), intervals.get(intervals.size() - 1).getEnd().toDate(), payoutAfter, payoutBefore, payoutChange, payoutIntervalDTOS, payOutCTADistributionDTO,protectedDaysOffMinutes);
     }
 
     private CTARuletemplateBonus getCTABonusDistributions(Map<String, Integer> ctaDistributionMap, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
@@ -310,12 +311,14 @@ public class PayOutCalculationService {
         long payoutChange = 0l;
         long payoutBefore = timeBankIntervalDTOS.get(timeBankIntervalDTOS.size() - 1).getTotalPayOutBeforeCtaMin();
         long payoutFromCTA = 0l;
+        long protectedDaysOffMinutes = 0l;
         for (PayOutIntervalDTO payOutIntervalDTO : timeBankIntervalDTOS) {
             payoutChange += payOutIntervalDTO.getPayoutChange();
             payoutFromCTA += payOutIntervalDTO.getPayOutDistribution().getPlannedMinutesOfPayout();
+            protectedDaysOffMinutes += payOutIntervalDTO.getProtectedDaysOffMinutes();
         }
         long payoutAfter = payoutBefore + payoutChange;
-        return new long[]{payoutChange, payoutBefore, payoutAfter, payoutFromCTA};
+        return new long[]{payoutChange, payoutBefore, payoutAfter, payoutFromCTA,protectedDaysOffMinutes};
 
     }
 

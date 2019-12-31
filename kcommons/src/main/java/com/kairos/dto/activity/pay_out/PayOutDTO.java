@@ -33,7 +33,7 @@ public class PayOutDTO {
     public PayOutDTO() {
     }
 
-    public PayOutDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin,long payOutChange, List<PayOutIntervalDTO> timeIntervals, PayOutCTADistributionDTO payOutDistribution) {
+    public PayOutDTO(Date startDate, Date endDate, long totalPayOutAfterCtaMin, long totalPayOutBeforeCtaMin,long payOutChange, List<PayOutIntervalDTO> timeIntervals, PayOutCTADistributionDTO payOutDistribution,long protectedDaysOffMinutes) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.totalPayOutAfterCtaMin = totalPayOutAfterCtaMin;
@@ -41,6 +41,7 @@ public class PayOutDTO {
         this.payOutChange = payOutChange;
         this.timeIntervals = timeIntervals;
         this.payOutDistribution = payOutDistribution;
+        this.protectedDaysOffMinutes = protectedDaysOffMinutes;
     }
 
     public Date getStartDate() {
