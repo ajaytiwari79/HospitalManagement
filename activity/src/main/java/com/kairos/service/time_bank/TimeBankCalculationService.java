@@ -1146,13 +1146,16 @@ public class TimeBankCalculationService {
             int deltaTimeBankMinutes = (-getContractualMinutesByDate(dateTimeInterval, employmentStartDate, employmentWithCtaDetailsDTO.getEmploymentLines()));
             if (dateDailyTimeBankEntryMap.containsKey(employmentStartDate) && dateDailyTimeBankEntryMap.get(employmentStartDate).isPublishedSomeActivities()) {
                 DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
-                deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes() - dailyTimeBankEntry.getTimeBankOffMinutes();
-
+                deltaTimeBankMinutes = dailyTimeBankEntry.getDeltaAccumulatedTimebankMinutes();
                 actualTimebank += deltaTimeBankMinutes;
             } else if (validPhaseForActualTimeBank.contains(datePhaseDefaultNameMap.get(employmentStartDate)) || publishPlanningPeriodDateMap.get(employmentStartDate)) {
                 actualTimebank += deltaTimeBankMinutes;
             }
-            actualTimebank+=dateDailyTimeBankEntryMap.containsKey(employmentStartDate) ? dateDailyTimeBankEntryMap.get(employmentStartDate).getProtectedDaysOffMinutes() : 0;
+            if(dateDailyTimeBankEntryMap.containsKey(employmentStartDate)){
+                DailyTimeBankEntry dailyTimeBankEntry = dateDailyTimeBankEntryMap.get(employmentStartDate);
+                actualTimebank -= dailyTimeBankEntry.getTimeBankOffMinutes();
+                actualTimebank += dailyTimeBankEntry.getProtectedDaysOffMinutes();
+            }
             employmentStartDate = employmentStartDate.plusDays(1);
         }
         return actualTimebank;
