@@ -41,6 +41,7 @@ import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
+import static com.kairos.enums.TimeTypeEnum.TIME_BANK;
 import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
 import static com.kairos.enums.shift.TodoStatus.PENDING;
 import static org.apache.commons.collections.CollectionUtils.containsAny;
@@ -87,7 +88,7 @@ public class RequestAbsenceService {
             exceptionService.actionNotPermittedException(REQUEST_ABSENCE_APPROVED);
         }
         TimeTypeEnum timeTypeEnum = activityMongoRepository.findTimeTypeByActivityId(requestAbsenceDTO.getActivityId());
-        if(!timeTypeEnum.equals(TimeTypeEnum.ABSENCE)){
+        if(!timeTypeEnum.equals(TimeTypeEnum.ABSENCE) && !TIME_BANK.equals(timeTypeEnum)){
             exceptionService.actionNotPermittedException(REQUEST_ABSENCE_ACTIVITY_TYPE);
         }
         if(isNotNull(requestAbsenceDTO.getStartDate()) && isNotNull(requestAbsenceDTO.getEndDate())){
