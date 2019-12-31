@@ -407,28 +407,46 @@ public class UserService {
     }
 
 
-    public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, List<Long> accessibleModules, boolean parentOrganization) {
+    public Map<String, AccessPageQueryResult> prepareUnitPermissions(List<AccessPageQueryResult> accessPageQueryResults, boolean parentOrganization) {
         List<AccessPage> accessPagesDetails = accessPageRepository.findAllById(accessPageQueryResults.stream().map(accessPageQueryResult -> accessPageQueryResult.getId()).collect(Collectors.toList()));
         Map<Long,List<Long>> accessPageIdAndChildrenId = accessPagesDetails.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSubPages().stream().map(accessPage -> accessPage.getId()).collect(Collectors.toList())));
         Map<String, AccessPageQueryResult> unitPermissionMap = new HashMap<>();
         for (AccessPageQueryResult permission : accessPageQueryResults) {
             if (unitPermissionMap.containsKey(permission.getModuleId()) && parentOrganization) {
                 AccessPageQueryResult existingPermission = unitPermissionMap.get(permission.getModuleId());
-                existingPermission.setRead(existingPermission.isRead() || permission.isRead());
-                existingPermission.setWrite(existingPermission.isWrite() || permission.isWrite());
-                existingPermission.setActive(existingPermission.isActive() || isAccessPageActive(permission, accessPageQueryResults, accessPageIdAndChildrenId));
+                existingPermission.setRead(existingPermission.isRead() || isAccessPageRead(permission, accessPageQueryResults, accessPageIdAndChildrenId));
+                existingPermission.setWrite(existingPermission.isWrite() || isAccessPageWrite(permission, accessPageQueryResults, accessPageIdAndChildrenId));
+                existingPermission.setActive(existingPermission.isRead() || existingPermission.isWrite());
                 unitPermissionMap.put(permission.getModuleId(), existingPermission);
             } else {
-                permission.setActive(isAccessPageActive(permission, accessPageQueryResults, accessPageIdAndChildrenId));
+                permission.setRead(isAccessPageRead(permission, accessPageQueryResults, accessPageIdAndChildrenId));
+                permission.setWrite(isAccessPageWrite(permission, accessPageQueryResults, accessPageIdAndChildrenId));
+                permission.setActive(permission.isRead() || permission.isWrite());
                 unitPermissionMap.put(permission.getModuleId(), permission);
             }
         }
         return unitPermissionMap;
     }
 
-    boolean isAccessPageActive(AccessPageQueryResult currentAccessPage, List<AccessPageQueryResult> accessPages, Map<Long,List<Long>> accessPageIdAndChildrenId){
-        boolean active = currentAccessPage.isRead() || currentAccessPage.isWrite();
-        if(active){
+    boolean isAccessPageRead(AccessPageQueryResult currentAccessPage, List<AccessPageQueryResult> accessPages, Map<Long,List<Long>> accessPageIdAndChildrenId){
+        boolean read = currentAccessPage.isRead();
+        if(!read) {
+            List<AccessPageQueryResult> childAccessPages = new ArrayList<>();
+            if (isCollectionNotEmpty(accessPageIdAndChildrenId.get(currentAccessPage.getId()))) {
+                childAccessPages = accessPages.stream().filter(accessPageQueryResult -> accessPageIdAndChildrenId.get(currentAccessPage.getId()).contains(accessPageQueryResult.getId())).collect(Collectors.toList());
+            }
+            for (AccessPageQueryResult childAccessPage : childAccessPages) {
+                if (read = isAccessPageRead(childAccessPage, accessPages, accessPageIdAndChildrenId)) {
+                    break;
+                }
+            }
+        }
+        return read;
+    }
+
+    boolean isAccessPageWrite(AccessPageQueryResult currentAccessPage, List<AccessPageQueryResult> accessPages, Map<Long,List<Long>> accessPageIdAndChildrenId){
+        boolean write = currentAccessPage.isWrite();
+        if(write){
             return true;
         }
         List<AccessPageQueryResult> childAccessPages = new ArrayList<>();
@@ -436,11 +454,11 @@ public class UserService {
             childAccessPages = accessPages.stream().filter(accessPageQueryResult -> accessPageIdAndChildrenId.get(currentAccessPage.getId()).contains(accessPageQueryResult.getId())).collect(Collectors.toList());
         }
         for (AccessPageQueryResult childAccessPage : childAccessPages) {
-            if (active = isAccessPageActive(childAccessPage, accessPages, accessPageIdAndChildrenId)) {
+            if (write = isAccessPageWrite(childAccessPage, accessPages, accessPageIdAndChildrenId)) {
                 break;
             }
         }
-        return active;
+        return write;
     }
 
     public UnitWiseStaffPermissionsDTO getPermission(Long organizationId) {
@@ -478,11 +496,9 @@ public class UserService {
             }
             HashMap<Long, Object> unitPermission = new HashMap<>();
 
-            List<AccessPageDTO> modules = accessPageRepository.getMainActiveTabs(countryId);
-            List<Long> accessibleModules = modules.stream().map(AccessPageDTO::getId).collect(Collectors.toList());
             for (UserPermissionQueryResult userPermissionQueryResult : unitWisePermissions) {
                 unitPermission.put(userPermissionQueryResult.getUnitId(),
-                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), accessibleModules, userPermissionQueryResult.isParentOrganization()));
+                        prepareUnitPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(userPermissionQueryResult.getPermission(), AccessPageQueryResult.class), userPermissionQueryResult.isParentOrganization()));
             }
             permissionData.setOrganizationPermissions(unitPermission);
         }
