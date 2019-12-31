@@ -1241,11 +1241,12 @@ public class TimeBankCalculationService {
             List<ShiftActivityDTO> updatedShiftActivities = new ArrayList<>();
             if (isCollectionNotEmpty(breakActivities) && !(breakActivities.get(0)).isBreakNotHeld()) {
                 List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndIdsIn(newArrayList(breakActivities.get(0).getActivityId()));
+                boolean scheduledHourAdded = false;
                 for (ShiftActivityDTO shiftActivity : shiftActivities) {
                     for (ShiftActivityDTO breakActivity : breakActivities) {
                         if (shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes()) {
                             List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(breakActivity.getInterval());
-                            updateShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, dateTimeIntervals);
+                            scheduledHourAdded = updateShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, dateTimeIntervals,scheduledHourAdded);
                             List<PlannedTime> plannedTimes = new ArrayList<>();
                             for (PlannedTime plannedTime : shiftActivity.getPlannedTimes()) {
                                 if (breakActivity.getInterval().overlaps(plannedTime.getInterval())) {
@@ -1269,7 +1270,7 @@ public class TimeBankCalculationService {
             return updatedShiftActivities;
         }
 
-        private void updateShiftActivityByBreakInterval(List<ShiftActivityDTO> updatedShiftActivities, ShiftActivityDTO shiftActivity, List<DateTimeInterval> dateTimeIntervals) {
+        private boolean updateShiftActivityByBreakInterval(List<ShiftActivityDTO> updatedShiftActivities, ShiftActivityDTO shiftActivity, List<DateTimeInterval> dateTimeIntervals,boolean scheduledHourAdded) {
             for (DateTimeInterval timeInterval : dateTimeIntervals) {
                 ShiftActivityDTO updatedShiftActivity = ObjectMapperUtils.copyPropertiesByMapper(shiftActivity, ShiftActivityDTO.class);
                 updatedShiftActivity.setStartDate(timeInterval.getStartDate());
@@ -1285,8 +1286,15 @@ public class TimeBankCalculationService {
                 }
                 updatedShiftActivity.setActivity(shiftActivity.getActivity());
                 updatedShiftActivity.setPlannedTimes(plannedTimes);
+                if(scheduledHourAdded){
+                    updatedShiftActivity.setScheduledMinutes(0);
+                    updatedShiftActivity.setDurationMinutes(0);
+                }else{
+                    scheduledHourAdded = true;
+                }
                 updatedShiftActivities.add(updatedShiftActivity);
             }
+            return scheduledHourAdded;
         }
 
         public Double getAndUpdateCtaBonusMinutes(DateTimeInterval dateTimeInterval, CTARuleTemplateDTO ruleTemplate, ShiftActivityDTO shiftActivity, StaffEmploymentDetails staffEmploymentDetails) {
