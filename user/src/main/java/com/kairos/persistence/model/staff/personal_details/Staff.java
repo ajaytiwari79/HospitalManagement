@@ -20,6 +20,7 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -114,6 +115,8 @@ public class Staff extends UserBaseEntity {
     private Integer capacity;
     private Long kmdExternalId;
     private String careOfName;
+    @KPermissionField
+    private LocalDate dateOfBirth;
 
     private String access_token; // specially required for chat server only
     private String user_id; //specially required for chat server only
