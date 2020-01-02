@@ -270,6 +270,18 @@ public class ActivityTagDTO {
         this.methodForCalculatingTime = methodForCalculatingTime;
     }
 
+    public Boolean getActivityCanBeCopied() {
+        return activityCanBeCopied;
+    }
+
+    public boolean isSicknessSettingValid() {
+        return sicknessSettingValid;
+    }
+
+    public void setSicknessSettingValid(boolean sicknessSettingValid) {
+        this.sicknessSettingValid = sicknessSettingValid;
+    }
+
     public ActivityTagDTO buildActivityTagDTO(Activity activity, List<TagDTO> tags) {
         this.id = activity.getId();
         this.name = activity.getName();
