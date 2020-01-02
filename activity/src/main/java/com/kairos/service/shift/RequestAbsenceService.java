@@ -76,7 +76,8 @@ public class RequestAbsenceService {
         Shift shift = shiftOptional.get();
         shift.setRequestAbsence(requestAbsence);
         shiftMongoRepository.save(shift);
-        todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE,true);
+        StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), shift.getEmploymentId(), newHashSet());
+        todoService.createOrUpdateTodo(shift, TodoType.REQUEST_ABSENCE,true,staffAdditionalInfoDTO);
         return shiftDetailsService.shiftDetailsById(shift.getUnitId(), newArrayList(shift.getId()), false);
     }
 

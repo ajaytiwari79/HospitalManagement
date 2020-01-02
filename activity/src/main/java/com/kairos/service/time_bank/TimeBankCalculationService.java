@@ -591,9 +591,9 @@ public class TimeBankCalculationService {
 
 
     public Object[] calculateDeltaTimeBankForInterval(DateTimeInterval planningPeriodInterval, Interval interval, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO,Set<DayOfWeek> dayOfWeeks,List<DailyTimeBankEntry> dailyTimeBankEntries, boolean calculateContractual) {
-        Map<LocalDate,DailyTimeBankEntry> dailyTimeBanksDatesMap = new HashMap<>();
+        Map<String,DailyTimeBankEntry> dailyTimeBanksDatesMap = new HashMap<>();
         if (!calculateContractual) {
-            dailyTimeBanksDatesMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(d -> toJodaDateTime(d.getDate()).toLocalDate(),v->v));
+            dailyTimeBanksDatesMap = dailyTimeBankEntries.stream().collect(Collectors.toMap(d -> toJodaDateTime(d.getDate()).toLocalDate()+"-"+employmentWithCtaDetailsDTO.getId(),v->v));
         }
         interval = getIntervalValidIntervalForTimebank(employmentWithCtaDetailsDTO, interval, planningPeriodInterval);
         //It can be contractual or Delta Timebank minutes it calculate on the basis of calculateContractual param
@@ -603,7 +603,7 @@ public class TimeBankCalculationService {
             DateTime startDate = interval.getStart();
             while (!startDate.isAfter(interval.getEnd())) {
                 if(isCollectionEmpty(dayOfWeeks) || dayOfWeeks.contains(asLocalDate(startDate.toDate()).getDayOfWeek())){
-                    if (calculateContractual || !dailyTimeBanksDatesMap.containsKey(startDate.toLocalDate())) {
+                    if (calculateContractual || !dailyTimeBanksDatesMap.containsKey(startDate.toLocalDate()+"-"+employmentWithCtaDetailsDTO.getId())) {
                         boolean vaild = (employmentWithCtaDetailsDTO.getWorkingDaysInWeek() == 7) || (startDate.getDayOfWeek() != DateTimeConstants.SATURDAY && startDate.getDayOfWeek() != DateTimeConstants.SUNDAY);
                         if (vaild) {
                             int contractualMin = getContractualMinutesByDate(planningPeriodInterval, DateUtils.asLocalDate(startDate), employmentWithCtaDetailsDTO.getEmploymentLines());
@@ -614,8 +614,8 @@ public class TimeBankCalculationService {
                             }
                             cost = cost.add(getCostByByMinutes(employmentWithCtaDetailsDTO.getEmploymentLines(), contractualMin, asLocalDate(startDate)));
                         }
-                    }else if(!calculateContractual && dailyTimeBanksDatesMap.containsKey(startDate.toLocalDate())){
-                        int contractualMin =  dailyTimeBanksDatesMap.get(startDate.toLocalDate()).getDeltaTimeBankMinutes();
+                    }else if(!calculateContractual && dailyTimeBanksDatesMap.containsKey(startDate.toLocalDate()+"-"+employmentWithCtaDetailsDTO.getId())){
+                        int contractualMin =  dailyTimeBanksDatesMap.get(startDate.toLocalDate()+"-"+employmentWithCtaDetailsDTO.getId()).getDeltaTimeBankMinutes();
                         contractualOrDeltaMinutes += contractualMin;
                         cost = cost.add(getCostByByMinutes(employmentWithCtaDetailsDTO.getEmploymentLines(),contractualMin,asLocalDate(startDate)));
                     }
@@ -680,10 +680,12 @@ public class TimeBankCalculationService {
         long totalContractual = 0;
         BigDecimal totalTimebankCost = new BigDecimal(0);
         BigDecimal totalContractualCost = new BigDecimal(0);
+        Map<Long,List<DailyTimeBankEntry>> dailyTimeBankMap = dailyTimeBankEntries.stream().collect(groupingBy(dailyTimeBankEntry -> dailyTimeBankEntry.getEmploymentId()));
         for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : employmentWithCtaDetailsDTOS) {
-            Object[] deltaTimebankAndCost =  calculateDeltaTimeBankForInterval(planningPeriodInterval, interval, employmentWithCtaDetailsDTO, new HashSet<>(), dailyTimeBankEntries, false);
+            List<DailyTimeBankEntry> employmentDailyTimeBankEntries = dailyTimeBankMap.getOrDefault(employmentWithCtaDetailsDTO.getId(),new ArrayList<>());
+            Object[] deltaTimebankAndCost =  calculateDeltaTimeBankForInterval(planningPeriodInterval, interval, employmentWithCtaDetailsDTO, new HashSet<>(),employmentDailyTimeBankEntries , false);
             totalTimebank += (int)deltaTimebankAndCost[0];
-            Object[] contractualAndCost = calculateDeltaTimeBankForInterval(planningPeriodInterval, interval, employmentWithCtaDetailsDTO, new HashSet<>(), dailyTimeBankEntries, true);
+            Object[] contractualAndCost = calculateDeltaTimeBankForInterval(planningPeriodInterval, interval, employmentWithCtaDetailsDTO, new HashSet<>(), employmentDailyTimeBankEntries, true);
             totalContractual += (int)contractualAndCost[0];
             totalTimebankCost = totalTimebankCost.add((BigDecimal) deltaTimebankAndCost[1]);
             totalContractualCost = totalContractualCost.add((BigDecimal) contractualAndCost[1]);

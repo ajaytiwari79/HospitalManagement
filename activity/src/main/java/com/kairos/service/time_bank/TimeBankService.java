@@ -729,9 +729,8 @@ public class TimeBankService{
         return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,asDate(startDate),asDate(endDate));
     }
 
-    public void updateTimeBanOnApproveTimebankOFF(ShiftActivity shiftActivity,Long employmentId,Map<BigInteger, Activity> activityIdAndActivityMap,Map<Long, StaffAdditionalInfoDTO> staffAdditionalInfoMap){
+    public void updateTimeBanOnApproveTimebankOFF(ShiftActivity shiftActivity,Long employmentId,Map<BigInteger, Activity> activityIdAndActivityMap,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         if(TimeTypeEnum.TIME_BANK.equals(activityIdAndActivityMap.get(shiftActivity.getActivityId()).getBalanceSettingsActivityTab().getTimeType())){
-            StaffAdditionalInfoDTO staffAdditionalInfoDTO = staffAdditionalInfoMap.get(employmentId);
             timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity,activityIdAndActivityMap.get(shiftActivity.getActivityId()),staffAdditionalInfoDTO.getEmployment(),true);
             DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findByEmploymentAndDate(employmentId, asLocalDate(shiftActivity.getStartDate()));
             if(isNull(dailyTimeBankEntry)){
