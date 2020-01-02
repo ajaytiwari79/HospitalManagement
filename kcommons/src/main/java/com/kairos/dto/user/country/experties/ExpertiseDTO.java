@@ -43,6 +43,7 @@ public class ExpertiseDTO {
     private LocalDate endDate;
     private Long expertiseLineId;
     private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+    private List<ExpertiseLineDTO> expertiseLines = new ArrayList<>();
 
 
     @AssertTrue(message = "message.start_date.less_than.end_date")

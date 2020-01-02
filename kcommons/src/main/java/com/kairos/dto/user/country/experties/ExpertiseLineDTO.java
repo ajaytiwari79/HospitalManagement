@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class ExpertiseLineDTO {
+public class  ExpertiseLineDTO {
     private Long id;
     private LocalDate startDate;
     private LocalDate endDate;
