@@ -117,6 +117,7 @@ public class Staff extends UserBaseEntity {
     private String careOfName;
     @KPermissionField
     private LocalDate dateOfBirth;
+
     private String access_token; // specially required for chat server only
     private String user_id; //specially required for chat server only
 
