@@ -245,7 +245,7 @@ public class ShiftStatusService {
             case APPROVE:
                 shiftActivity.getStatus().removeAll(Arrays.asList(PENDING, REQUEST));
                 shiftActivity.getStatus().add(APPROVE);
-                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap);
+                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap.get(shift.getEmploymentId()));
                 break;
             case DISAPPROVE:
                 updateShiftOnDisapprove(shift, shiftActivity);
