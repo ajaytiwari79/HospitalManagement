@@ -199,6 +199,10 @@ public class PayGroupAreaService {
         if (payGroupAreaGraphRepository.isLinkedWithPayTable(payGroupAreaId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_USED);
         }
+        if(payGroupAreaGraphRepository.isLinkedWithPayTable(payGroupAreaId)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_USED);
+        }
+
         payGroupArea.setDeleted(true);
         payGroupAreaGraphRepository.save(payGroupArea);
         return true;
@@ -231,6 +235,7 @@ public class PayGroupAreaService {
             LOGGER.info("pay group area not found for deletion  ");
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_ID_NOTFOUND, payGroupAreaId);
         }
+
         if (payGroupAreaGraphRepository.isLinkedWithPayTable(payGroupAreaId)) {
             exceptionService.dataNotFoundByIdException(MESSAGE_PAYGROUP_USED);
         }

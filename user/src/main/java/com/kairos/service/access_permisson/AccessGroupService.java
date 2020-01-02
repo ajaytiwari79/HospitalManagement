@@ -3,21 +3,29 @@ package com.kairos.service.access_permisson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.commons.custom_exception.ActionNotPermittedException;
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.user.access_group.CountryAccessGroupDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.access_permission.AccessPermissionDTO;
 import com.kairos.dto.user.access_permission.StaffAccessGroupDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.AccessGroupDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.organization.OrganizationCategoryDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.enums.Day;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.access_permission.query_result.AccessGroupDayTypesQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
+import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.country.default_data.DayType;
@@ -26,6 +34,7 @@ import com.kairos.persistence.model.country.default_data.account_type.AccountTyp
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.access_permission.AccessGroupsByCategoryDTO;
 import com.kairos.persistence.model.user.counter.StaffIdsQueryResult;
@@ -52,12 +61,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalTime;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.SUPER_ADMIN;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -93,8 +105,6 @@ public class AccessGroupService {
     @Inject
     private AccountTypeGraphRepository accountTypeGraphRepository;
     @Inject
-    private StaffService staffService;
-    @Inject
     private DayTypeGraphRepository dayTypeGraphRepository;
     @Inject
     private StaffGraphRepository staffGraphRepository;
@@ -126,7 +136,7 @@ public class AccessGroupService {
 
         //set default permission of access page while creating access group
         Long countryId = organization.getCountry().getId();
-        setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), organizationService.getOrganizationCategory(organization.getCompanyType()));
+        setAccessPageRelationshipWithAccessGroupByOrgCategory(countryId, accessGroup.getId(), organization.getOrganizationCategory());
         accessGroupDTO.setId(accessGroup.getId());
         return accessGroupDTO;
 
@@ -190,7 +200,7 @@ public class AccessGroupService {
         Long countryId = countryService.getCountryIdByUnitId(organization.getId());
         List<AccessGroup> accessGroupList = null;
         if (parent == null) {
-            List<AccessGroupQueryResult> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organizationService.getOrganizationCategory(organization.getCompanyType()).toString());
+            List<AccessGroupQueryResult> countryAccessGroups = accessGroupRepository.getCountryAccessGroupByCategory(countryId, organization.getOrganizationCategory().toString());
             accessGroupList = new ArrayList<>(countryAccessGroups.size());
             for (AccessGroupQueryResult countryAccessGroup : countryAccessGroups) {
                 AccessGroup accessGroup = new AccessGroup(countryAccessGroup.getName(), countryAccessGroup.getDescription(), countryAccessGroup.getRole(), countryAccessGroup.getDayTypes(), countryAccessGroup.getStartDate(), countryAccessGroup.getEndDate());
@@ -787,12 +797,12 @@ public class AccessGroupService {
         Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), userId);
         UserAccessRoleDTO userAccessRoleDTO = null;
         if (staffAtHub != null) {
-            userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
+            userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staffAtHub.getId(),false, true);
         } else {
             Long hubIdByOrganizationId = unitGraphRepository.getHubIdByOrganizationId(parent.getId());
             staffAtHub = staffGraphRepository.getStaffOfHubByHubIdAndUserId(parent.isKairosHub() ? parent.getId() : hubIdByOrganizationId, userId);
             if (staffAtHub != null) {
-                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, false, true);
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,staffAtHub.getId(), false, true);
             } else if (isNull(userAccessRoleDTO)) {
                 AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
                 if (isNull(accessGroupQueryResult)) {
@@ -824,7 +834,7 @@ public class AccessGroupService {
 
     public ReasonCodeWrapper getAbsenceReasonCodesAndAccessRole(Long unitId) {
         UserAccessRoleDTO userAccessRoleDTO = findUserAccessRole(unitId);
-        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfListByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
+        List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.TIME_TYPE), ReasonCodeDTO.class);
 
         return new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO);
     }
@@ -836,7 +846,7 @@ public class AccessGroupService {
 
 
     public List<StaffAccessGroupDTO> getStaffAndAccessGroupsByUnitId(Long unitId, List<Long> accessGroupId) {
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsByUnitId(unitId, accessGroupId), StaffAccessGroupDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessGroupRepository.getStaffIdsAndAccessGroupsByUnitId(unitId, accessGroupId), StaffAccessGroupDTO.class);
     }
 
     public StaffAccessGroupQueryResult getAccessGroupIdsByStaffIdAndUnitId(Long unitId) {
@@ -875,7 +885,7 @@ public class AccessGroupService {
 
     public void linkParentOrganizationAccessGroup(Unit unit, Long parentOrganizationId) {
         List<AccessGroupQueryResult> accessGroupQueryResults = getOrganizationAccessGroups(parentOrganizationId);
-        List<AccessGroup> accessGroupList = ObjectMapperUtils.copyPropertiesOfListByMapper(accessGroupQueryResults, AccessGroup.class);
+        List<AccessGroup> accessGroupList = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessGroupQueryResults, AccessGroup.class);
         unit.setAccessGroups(accessGroupList);
         accessGroupRepository.saveAll(accessGroupList);
 
@@ -898,5 +908,46 @@ public class AccessGroupService {
 
         accessGroupStaffQueryResult.setAccessGroups(accessGroups);
         return  accessGroupStaffQueryResult;
+    }
+
+    public List<AccessGroup> validAccessGroupByDate(Long unitId,Date date){
+        AccessGroupStaffQueryResult accessGroupStaffQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId,UserContext.getUserDetails().getId());
+        List<AccessGroup> accessGroups = new ArrayList<>();
+        List<AccessGroupDayTypesQueryResult> accessGroupDayTypesQueryResults = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessGroupStaffQueryResult.getDayTypesByAccessGroup(),AccessGroupDayTypesQueryResult.class);
+        for (AccessGroupDayTypesQueryResult accessGroupDayTypesQueryResult : accessGroupDayTypesQueryResults) {
+            if(isNotNull(accessGroupDayTypesQueryResult.getAccessGroup())){
+                if(!accessGroupDayTypesQueryResult.getAccessGroup().isAllowedDayTypes() && isDayTypeValid(date,accessGroupDayTypesQueryResult.getDayTypes()));{
+                    accessGroups.add(accessGroupDayTypesQueryResult.getAccessGroup());
+                }
+            }
+        }
+        return accessGroups;
+    }
+
+    public boolean isDayTypeValid(Date date, List<DayTypeCountryHolidayCalenderQueryResult> dayTypeCountryHolidayCalenderQueryResults) {
+        boolean valid = false;
+        for (DayTypeCountryHolidayCalenderQueryResult dayTypeCountryHolidayCalenderQueryResult : dayTypeCountryHolidayCalenderQueryResults) {
+            if (dayTypeCountryHolidayCalenderQueryResult.isHolidayType()) {
+                for (CountryHolidayCalendarQueryResult countryHolidayCalendarQueryResult : dayTypeCountryHolidayCalenderQueryResult.getCountryHolidayCalenders()) {
+                    DateTimeInterval dateTimeInterval;
+                    if (dayTypeCountryHolidayCalenderQueryResult.isAllowTimeSettings()) {
+                        LocalTime holidayEndTime = countryHolidayCalendarQueryResult.getEndTime().get(ChronoField.MINUTE_OF_DAY) == 0 ? LocalTime.MAX : countryHolidayCalendarQueryResult.getEndTime();
+                        dateTimeInterval = new DateTimeInterval(asDate(countryHolidayCalendarQueryResult.getHolidayDate(), countryHolidayCalendarQueryResult.getStartTime()), asDate(countryHolidayCalendarQueryResult.getHolidayDate(), holidayEndTime));
+                    } else {
+                        dateTimeInterval = new DateTimeInterval(asDate(countryHolidayCalendarQueryResult.getHolidayDate()), asDate(countryHolidayCalendarQueryResult.getHolidayDate().plusDays(1)));
+                    }
+                    valid = dateTimeInterval.contains(date);
+                    if (valid) {
+                        break;
+                    }
+                }
+            } else {
+                valid = isCollectionNotEmpty(dayTypeCountryHolidayCalenderQueryResult.getValidDays()) && dayTypeCountryHolidayCalenderQueryResult.getValidDays().contains(Day.fromValue(asLocalDate(date).getDayOfWeek().toString()));
+            }
+            if (valid) {
+                break;
+            }
+        }
+        return valid;
     }
 }

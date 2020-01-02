@@ -48,8 +48,8 @@ public class DataSubjectService {
             exceptionService.duplicateDataException("message.duplicate", "message.dataSubject", dataSubjectDto.getName());
         }
         DataSubject dataSubject = new DataSubject(dataSubjectDto.getName(), dataSubjectDto.getDescription());
-        dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationTypes(), OrganizationType.class));
-        dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationSubTypes(), OrganizationSubType.class));
+        dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSubjectDto.getOrganizationTypes(), OrganizationType.class));
+        dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSubjectDto.getOrganizationSubTypes(), OrganizationSubType.class));
         dataSubject.setDataCategories(dataCategoryService.getAllDataCategoriesByIds(dataSubjectDto.getDataCategories()));
         dataSubject.setCountryId(countryId);
         dataSubjectRepository.save(dataSubject);
@@ -73,10 +73,10 @@ public class DataSubjectService {
         dataSubjectResponse.setName(dataSubject.getName());
         dataSubjectResponse.setDescription(dataSubject.getDescription());
         if(isMasterData) {
-            dataSubjectResponse.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getOrganizationTypes(), OrganizationTypeDTO.class));
-            dataSubjectResponse.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
+            dataSubjectResponse.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSubject.getOrganizationTypes(), OrganizationTypeDTO.class));
+            dataSubjectResponse.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSubject.getOrganizationSubTypes(), OrganizationSubTypeDTO.class));
         }
-        dataSubjectResponse.setDataCategories(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubject.getDataCategories(), DataCategory.class));
+        dataSubjectResponse.setDataCategories(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSubject.getDataCategories(), DataCategory.class));
         return dataSubjectResponse;
     }
 
@@ -111,8 +111,8 @@ public class DataSubjectService {
         }
         dataSubject.setName(dataSubjectDto.getName());
         dataSubject.setDescription(dataSubjectDto.getDescription());
-        dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationTypes(), OrganizationType.class));
-        dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfListByMapper(dataSubjectDto.getOrganizationSubTypes(), OrganizationSubType.class));
+        dataSubject.setOrganizationTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSubjectDto.getOrganizationTypes(), OrganizationType.class));
+        dataSubject.setOrganizationSubTypes(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dataSubjectDto.getOrganizationSubTypes(), OrganizationSubType.class));
         dataSubject.setDataCategories(dataCategoryService.getAllDataCategoriesByIds(dataSubjectDto.getDataCategories()));
         dataSubjectRepository.save(dataSubject);
         return dataSubjectDto;

@@ -22,7 +22,7 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 @NoArgsConstructor
 public class FunctionalPayment extends UserBaseEntity {
     @Relationship(type = APPLICABLE_FOR_EXPERTISE)
-    private Expertise expertise;
+    private ExpertiseLine expertiseLine;
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean published;
@@ -39,8 +39,8 @@ public class FunctionalPayment extends UserBaseEntity {
     private BigDecimal percentageValue;
     private boolean oneTimeUpdatedAfterPublish;
 
-    public FunctionalPayment(Expertise expertise, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paymentUnit) {
-        this.expertise = expertise;
+    public FunctionalPayment(ExpertiseLine expertiseLine, LocalDate startDate, LocalDate endDate, PaidOutFrequencyEnum paymentUnit) {
+        this.expertiseLine = expertiseLine;
         this.startDate = startDate;
         this.endDate = endDate;
         this.published = false;

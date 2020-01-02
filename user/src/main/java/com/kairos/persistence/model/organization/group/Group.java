@@ -28,9 +28,10 @@ import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 public class Group extends UserBaseEntity {
     private String name;
     private String description;
-    @Relationship(type = "HAS_FILTERS")
+    @Relationship(type = HAS_FILTERS)
     private List<FilterSelection> filtersData = new ArrayList<>();
-    private List<Long> excludedStaffs = new ArrayList<>();
+    private List<Long> excludedStaffIds = new ArrayList<>();
+    private String roomId;
 
     public Group(String name, String description) {
         this.name = name;

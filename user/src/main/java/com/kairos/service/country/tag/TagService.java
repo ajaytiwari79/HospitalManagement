@@ -86,7 +86,7 @@ public class TagService {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
 
         }
-        Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), true, tagDTO.getOrgTypeId(), tagDTO.getOrgSubTypeIds());
+        Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), true, tagDTO.getOrgTypeId(), tagDTO.getOrgSubTypeIds(), tagDTO.getColor(),tagDTO.getShortName(),tagDTO.getUltraShortName());
         if (CollectionUtils.isNotEmpty(country.getTags())) {
             country.getTags().add(tag);
         } else {
@@ -103,7 +103,7 @@ public class TagService {
         List<Organization> organizations = organizationGraphRepository.getOrganizationsBySubOrgTypeIds(tagDTO.getOrgSubTypeIds());
         if(isCollectionNotEmpty(organizations)) {
             for(Organization org : organizations) {
-                Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0));
+                Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, new PenaltyScore(PenaltyScoreLevel.SOFT,0), tagDTO.getColor(),tagDTO.getShortName(),tagDTO.getUltraShortName());
                 if (isCollectionNotEmpty(org.getTags())) {
                     org.getTags().add(tag);
                 } else {
@@ -117,9 +117,8 @@ public class TagService {
     public List<Tag> getCountryTagByOrgSubTypes(Long countryId, List<Long> orgSubTypeId){
         Country country = countryGraphRepository.findOne(countryId);
         List<Tag> tags = new ArrayList<>();
-        for(Tag tag : country.getTags().stream().filter(tag -> MasterDataTypeEnum.STAFF.equals(tag.getMasterDataType()) && CollectionUtils.containsAny(tag.getOrgSubTypeIds(),orgSubTypeId)).collect(Collectors.toList()))
-        {
-            tags.add(new Tag(tag.getName(),tag.getMasterDataType(),false,new PenaltyScore(PenaltyScoreLevel.SOFT,0)));
+        for(Tag tag : country.getTags().stream().filter(tag -> MasterDataTypeEnum.STAFF.equals(tag.getMasterDataType()) && CollectionUtils.containsAny(tag.getOrgSubTypeIds(),orgSubTypeId)).collect(Collectors.toList())){
+            tags.add(new Tag(tag.getName(),tag.getMasterDataType(),false,new PenaltyScore(PenaltyScoreLevel.SOFT,0),tag.getColor(),tag.getShortName(),tag.getUltraShortName()));
         }
         return  tags;
     }
@@ -138,6 +137,9 @@ public class TagService {
 
         }
         tag.setName(tagDTO.getName());
+        tag.setColor(tagDTO.getColor());
+        tag.setShortName(tagDTO.getShortName());
+        tag.setUltraShortName(tagDTO.getUltraShortName());
         return tagGraphRepository.save(tag);
     }
 
@@ -185,7 +187,7 @@ public class TagService {
         if (tagGraphRepository.isOrganizationTagExistsWithSameNameAndDataType("(?i)" + tagDTO.getName(), organizationId, tagDTO.getMasterDataType().toString(), false)) {
             exceptionService.duplicateDataException(MESSAGE_TAG_NAME_ALREADYEXIST, tagDTO.getName());
         }
-        Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, ObjectMapperUtils.copyPropertiesByMapper(tagDTO.getPenaltyScore(), PenaltyScore.class));
+        Tag tag = new Tag(tagDTO.getName(), tagDTO.getMasterDataType(), false, ObjectMapperUtils.copyPropertiesByMapper(tagDTO.getPenaltyScore(), PenaltyScore.class), tagDTO.getColor(),tagDTO.getShortName(),tagDTO.getUltraShortName());
         if (CollectionUtils.isNotEmpty(org.getTags())) {
             org.getTags().add(tag);
         } else {
@@ -212,6 +214,9 @@ public class TagService {
         if(MasterDataTypeEnum.STAFF.equals(tagDTO.getMasterDataType())){
             tag.getPenaltyScore().setPenaltyScoreLevel(tagDTO.getPenaltyScore().getPenaltyScoreLevel());
             tag.getPenaltyScore().setValue(tagDTO.getPenaltyScore().getValue());
+            tag.setColor(tagDTO.getColor());
+            tag.setShortName(tagDTO.getShortName());
+            tag.setUltraShortName(tagDTO.getUltraShortName());
         }
         tagGraphRepository.save(tag);
         return tag;
@@ -338,7 +343,7 @@ public class TagService {
             orgId = organizationBaseRepository.findParentOrgId(orgId);
         }
         List<TagQueryResult> tagQueryResults = tagGraphRepository.getListOfStaffOrganizationTags(orgId,false,"", masterDataType.toString());
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(tagQueryResults,TagDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(tagQueryResults,TagDTO.class);
     }
 }
 

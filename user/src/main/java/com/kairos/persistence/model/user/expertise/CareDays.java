@@ -15,12 +15,6 @@ public class CareDays extends UserBaseEntity implements Comparable<CareDays> {
     private Integer to;
     private Integer leavesAllowed;
 
-    public CareDays(int from, int to, int leavesAllowed) {
-        this.from = from;
-        this.to = to;
-        this.leavesAllowed = leavesAllowed;
-    }
-
     @Override
     public int compareTo(CareDays o) {
         return o.from-this.from;

@@ -38,6 +38,7 @@ public class GeneralActivityTab implements Serializable {
     private LocalDate startDate;
     private LocalDate endDate;
 
+
     private List<BigInteger> tags = new ArrayList<>();
 
     public GeneralActivityTab(String name, String description, String ultraShortName) {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +55,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query(value = "{childActivityIds:{$in:?0}, deleted:false}",fields ="{'_id':1,'childActivityIds':1}")
     List<Activity> findByChildActivityIds(Collection<BigInteger> childActivityIds);
 
-    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'phaseSettingsActivityTab':1 ,'rulesActivityTab':1,'name':1}")
+    @Query(value = "{_id:{$in:?0}, deleted:false}",fields = "{'_id':1, 'phaseSettingsActivityTab':1 ,'rulesActivityTab':1,'name':1,'balanceSettingsActivityTab':1,'timeCalculationActivityTab':1}")
     List<Activity> findAllPhaseSettingsByActivityIds(Collection<BigInteger> activityIds);
 
     List<Activity> findAllByUnitIdAndDeletedFalse(Long unitId);
@@ -84,9 +85,12 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     List<Activity>  findAllBySecondLevelTimeType(TimeTypeEnum timeTypeEnum);
 
 
-    @Query(value = "{'balanceSettingsActivityTab.timeType':?0,unitId:{$in:?1 }}, deleted:false}")
+    @Query(value = "{'balanceSettingsActivityTab.timeType':?0,unitId:{$in:?1 }, deleted:false}")
     List<Activity> findAllBySecondLevelTimeTypeAndUnitIds(TimeTypeEnum timeTypeEnum, Set<Long> unitIds);
 
     @Query(value = "{'generalActivityTab.tags':?0}")
     List<Activity> findActivitiesByTagId(BigInteger tagId);
+
+    @Query(value = "{unitId:?0, 'timeCalculationActivityTab.methodForCalculatingTime':{$in:?1 }, 'rulesActivityTab.approvalAllowedPhaseIds':?2, deleted:false}")
+    List<Activity> findAllAbsenceActivities(Long unitId, Set<String> methodForCalculatingTimes, BigInteger phaseId);
 }

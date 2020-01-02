@@ -202,6 +202,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_SHIFT_VALIDATION_ACCESS  = "message.shift.validation.access";
     public static final String MESSAGE_SHIFT_SAVE_ACCESS  = "message.shift.save.access ";
     public static final String MESSAGE_SHIFT_SHIFTDATE  = "message.shift.shiftDate ";
+    public static final String MESSAGE_SHIFT_PERMISSION  = "message.shift.not.permission";
     public static final String MESSAGE_SHIFT_REASONCODE_REQUIRED = "message.shift.reasoncode.required";
     public static final String ACTIVITY_END_DATE_LESS_THAN_START_DATE = "activity.end_date.less_than.start_date";
     public static final String MESSAGE_SHIFT_NOT_PUBLISHED  = "message.shift.not.published ";
@@ -397,5 +398,8 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY_CONFIGURATION_DEFAULT_SETTINGS_ALREADY_EXISTS = "activity.configuration.default.settings.already.exists";
     public static final String CALCULATION_TYPE_NOT_VALID="calculation.type.not.valid";
     public static final String STAFF_NOT_ALLOWED_ON_TAG="staff.not.allowed";
-
+    public static final String SHORTCUT_NOT_FOUND="message.shortcut.not.found";
+    public static final String SHORTCUT_ALREADY_EXISTS_NAME="message.shortcut.already.exists.name";
+    public static final String ERROR_BLOCK_SETTING_NOT_FOUND = "error.block.setting.not.found";
+    public static final String MESSAGE_BLOCKED_FOR_SHIFT_ENTER_AT_DATE = "message.blocked.for.shift.entered.at.date";
 }

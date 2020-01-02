@@ -15,6 +15,7 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +52,7 @@ public class ExpertiseQueryResult {
     private Map<String,Object> unionRepresentative;// in case of expertise at unit level only
     private Location unionLocation;// in case of expertise at unit level only
     private Set<Long> supportedUnitIds;
-    private List<ExpertiseLineQueryResult> expertiseLines;
+    private List<ExpertiseLineQueryResult> expertiseLines=new ArrayList<>();
 
     @JsonIgnore
     public ExpertiseLineQueryResult getCurrentlyActiveLine(){
@@ -63,5 +64,10 @@ public class ExpertiseQueryResult {
             }
         }
         return currentExpertiseLineQueryResult;
+    }
+
+    public List<ExpertiseLineQueryResult> getExpertiseLines() {
+        expertiseLines.forEach(k->k.setBreakPaymentSetting(this.breakPaymentSetting));
+        return expertiseLines;
     }
 }

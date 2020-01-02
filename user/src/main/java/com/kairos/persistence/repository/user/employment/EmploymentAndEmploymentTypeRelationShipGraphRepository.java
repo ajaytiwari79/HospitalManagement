@@ -20,4 +20,7 @@ public interface EmploymentAndEmploymentTypeRelationShipGraphRepository extends 
     "MERGE(employmentLine)-[newRelation:"+HAS_EMPLOYMENT_TYPE+"]->(newEmployment) "+
     "set newRelation.employmentTypeCategory={2} ")
     void updateEmploymentTypeInCurrentEmploymentLine(Long employmentLineId, Long newEmploymentType, EmploymentCategory newCategory);
+
+    @Query("MATCH(employmentLine:EmploymentLine)-[rel:"+HAS_EMPLOYMENT_TYPE+"]-(empType:EmploymentType) WHERE ID(employmentLine)={0} return employmentLine,rel,empType" )
+    EmploymentLineEmploymentTypeRelationShip findByEmploymentLineId(Long employmentLineId);
 }

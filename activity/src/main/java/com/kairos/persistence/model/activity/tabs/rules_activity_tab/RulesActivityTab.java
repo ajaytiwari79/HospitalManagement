@@ -36,7 +36,11 @@ public class RulesActivityTab{
     private Integer cutOffdayValue;
     private List<CutOffInterval> cutOffIntervals;
     private CutOffIntervalUnit.CutOffBalances cutOffBalances;
+    private boolean borrowLeave;
+    private boolean transferAll;
+    private int noOfTransferLeave;
     // in Minutes
+
     private LocalTime earliestStartTime;
     private LocalTime latestStartTime;
     private Short shortestTime;

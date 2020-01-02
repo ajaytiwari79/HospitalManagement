@@ -105,7 +105,7 @@ public class VRPClientService {
         vrpClientGraphRepository.saveAll(vrpClientList);
         createTask((List<VRPTaskDTO>)objects[1],unitId);
 
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(vrpClientList, VRPClientDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(vrpClientList, VRPClientDTO.class);
     }
 
     public void createTask(List<VRPTaskDTO> vrpTaskDTOS,Long unitId){
@@ -121,7 +121,7 @@ public class VRPClientService {
 
     public List<VRPClientDTO> getAllClient(Long unitId){
         List<VRPClient> vrpClients = vrpClientGraphRepository.getAllClient(unitId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(vrpClients, VRPClientDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(vrpClients, VRPClientDTO.class);
     }
 
     public VRPClientDTO getClient(Long clientId){
@@ -155,7 +155,7 @@ public class VRPClientService {
         if(preferedTimeWindows.isEmpty() && organization.isPresent()){
             preferedTimeWindows = Arrays.asList(new PreferedTimeWindow(LocalTime.of(07,00),LocalTime.of(11,30),organization.get(),"Time window 1"),new PreferedTimeWindow(LocalTime.of(12,00),LocalTime.of(16,00),organization.get(),"Time window 2"));
             preferedTimeWindowRepository.saveAll(preferedTimeWindows);
-            preferedTimeWindowDTOS =  ObjectMapperUtils.copyPropertiesOfListByMapper(preferedTimeWindows, PreferedTimeWindowDTO.class);
+            preferedTimeWindowDTOS =  ObjectMapperUtils.copyPropertiesOfCollectionByMapper(preferedTimeWindows, PreferedTimeWindowDTO.class);
         }
         return preferedTimeWindowDTOS;
     }
@@ -166,7 +166,7 @@ public class VRPClientService {
     }
     public List<PreferedTimeWindowDTO> getPreferedTimeWindow(Long unitId){
         List<PreferedTimeWindow> preferedTimeWindows = preferedTimeWindowRepository.getAllByUnitId(unitId);
-        List<PreferedTimeWindowDTO> preferedTimeWindowDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(preferedTimeWindows,PreferedTimeWindowDTO.class);
+        List<PreferedTimeWindowDTO> preferedTimeWindowDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(preferedTimeWindows,PreferedTimeWindowDTO.class);
         preferedTimeWindowDTOS.forEach(p->{
             p.setTimeWindow(p.getFromTime()+"-"+p.getToTime());
         });

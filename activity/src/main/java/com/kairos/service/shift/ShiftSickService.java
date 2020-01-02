@@ -46,9 +46,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.ENTERED_MANUALLY;
-import static com.kairos.constants.AppConstants.ORGANIZATION;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
@@ -183,8 +183,10 @@ public class ShiftSickService extends MongoBaseService {
                 }
                 staffAdditionalInfoDTO.getEmployment().setCtaRuleTemplates(ctaResponseDTO.getRuleTemplates());
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
-                List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,shift,activityWrapperMap,staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(), staffAdditionalInfoDTO.getTimeSlotSets());
-                shift.setBreakActivities(breakActivities);
+                if(!TIME_AND_ATTENDANCE.equals(phaseListByDate.get(shift.getStartDate()).getName()) || isCollectionNotEmpty(shift.getBreakActivities())){
+                    List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,shift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),shift);
+                    shift.setBreakActivities(breakActivities);
+                }
                 shiftService.saveShiftWithActivity( activityWrapperMap, shift, staffAdditionalInfoDTO,false,null ,phaseListByDate.get(shift.getStartDate()),null);
             }
 

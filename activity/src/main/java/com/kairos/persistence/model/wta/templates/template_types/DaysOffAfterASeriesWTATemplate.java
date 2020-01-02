@@ -46,28 +46,43 @@ public class DaysOffAfterASeriesWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(infoWrapper.isNightWorker() && isNotNull(infoWrapper.getExpertiseNightWorkerSetting())){
+        if(!isDisabled() && infoWrapper.isNightWorker() && isNotNull(infoWrapper.getExpertiseNightWorkerSetting())){
             DateTimeInterval dateTimeInterval = getIntervalByRuleTemplate(infoWrapper.getShift(),this.intervalUnit,this.intervalLength);
             List<ShiftWithActivityDTO> shiftWithActivityDTOS = infoWrapper.getShifts();
             shiftWithActivityDTOS.add(infoWrapper.getShift());
             List<ShiftWithActivityDTO> nightShifts = getNightMinutesOrCount(infoWrapper.getExpertiseNightWorkerSetting(),shiftWithActivityDTOS,dateTimeInterval);
             Set<LocalDate> shiftDates = getSortedAndUniqueDates(nightShifts);
+            LocalDate shiftDate = asLocalDate(infoWrapper.getShift().getActivities().get(0).getStartDate());
+            boolean currentNightShift = shiftDates.removeIf(date -> date.equals(shiftDate));
             int consecutiveNightDays = getConsecutiveDaysInDate(new ArrayList<>(shiftDates));
+            if(currentNightShift){
+                shiftDates.add(shiftDate);
+            }
             int daysOffCount = 0;
             Integer[] limitAndCounter = getValueByPhaseAndCounter(infoWrapper, getPhaseTemplateValues(), this);
-            if(consecutiveNightDays>=nightShiftSequence){
-                LocalDate shiftDate = asLocalDate(infoWrapper.getShift().getActivities().get(0).getStartDate());
-                LocalDate daysOffDate = shiftDate.minusDays(limitAndCounter[0]);
+            boolean isValid = true;
+            if(currentNightShift && consecutiveNightDays>=nightShiftSequence){
+                LocalDate daysOffDate = shiftDate.minusDays(restingTime);
                 while (!daysOffDate.isAfter(shiftDate)){
                     if(!shiftDates.contains(daysOffDate)){
                         daysOffCount++;
                     }
                     daysOffDate = daysOffDate.plusDays(1);
                 }
+                isValid = isValid(MinMaxSetting.MINIMUM, restingTime, daysOffCount);
+                if(isValid){
+                    daysOffDate = shiftDate.plusDays(restingTime);
+                    while (!daysOffDate.isBefore(shiftDate)){
+                        if(!shiftDates.contains(daysOffDate)){
+                            daysOffCount++;
+                        }
+                        daysOffDate = daysOffDate.minusDays(1);
+                    }
+                    isValid = isValid(MinMaxSetting.MINIMUM, restingTime, daysOffCount);
+                }
             }
-            boolean isValid = isValid(MinMaxSetting.MINIMUM, limitAndCounter[0], daysOffCount);
             brakeRuleTemplateAndUpdateViolationDetails(infoWrapper,limitAndCounter[1],isValid, this,
-                    limitAndCounter[2], DurationType.DAYS,String.valueOf(limitAndCounter[0]));
+                    limitAndCounter[2], DurationType.DAYS,String.valueOf(restingTime));
         }
     }
 

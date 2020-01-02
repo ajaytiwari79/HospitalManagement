@@ -1,2 +1,4 @@
 //kpi set changes
 db.getCollection('kPISet').updateMany({},{"$set":{"kpiSetType" : "VERTICAL"}})
+
+db.getCollection('time_Type').updateMany({"activityPriorityId":{$exists:false}},{$set:{"activityPriorityId":"161"}})

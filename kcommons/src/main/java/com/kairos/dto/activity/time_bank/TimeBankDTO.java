@@ -63,6 +63,8 @@ public class TimeBankDTO {
     private long totalContractedCost;
     private long totalPlannedCost;
     private long totalTimeBankDiffCost;
+    private long timeBankOffMinutes;
+    private long protectedDaysOffMinutes;
 
 
 

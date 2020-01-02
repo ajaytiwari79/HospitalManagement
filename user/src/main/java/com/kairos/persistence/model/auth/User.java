@@ -1,9 +1,12 @@
 package com.kairos.persistence.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.annotations.KPermissionField;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
+import com.kairos.enums.OrganizationCategory;
+import com.kairos.enums.user.ChatStatus;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
@@ -47,16 +50,25 @@ import static com.kairos.utils.CPRUtil.getDateOfBirthFromCPR;
 @Setter
 @NoArgsConstructor
 public class User extends UserBaseEntity {
+    @KPermissionField
     protected String cprNumber;
+    @KPermissionField
     private String userName;
+    @KPermissionField
     protected String nickName;
+    @KPermissionField
     protected String firstName;
+    @KPermissionField
     protected String lastName;
+    @KPermissionField
     protected Gender gender;
+    @KPermissionField
     private boolean pregnant;
+    @KPermissionField
     private String email;
     private ConfLevel confLevel;
     private Long lastSelectedOrganizationId;
+    private OrganizationCategory lastSelectedOrganizationCategory;
     private LocalDate dateOfBirth;
     @NotNull(message = ERROR_USER_PASSCODE_NOTNULL)
     @Size(min = 8, max = 50, message = ERROR_USER_PASSCODE_SIZE)
@@ -108,6 +120,12 @@ public class User extends UserBaseEntity {
     private String googleCalenderAccessToken;
     @Properties
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
+    private ChatStatus chatStatus;
+
+    public User(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
     public User(String firstName, String lastName, String cprNumber, LocalDate dateOfBirth) {
         this.cprNumber = cprNumber;

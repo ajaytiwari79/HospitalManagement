@@ -440,6 +440,11 @@ public class RuletemplateUtils {
                     validateRuleTemplate(consecutiveWorkWTATemplate.getIntervalLength(), consecutiveWorkWTATemplate.getIntervalUnit());
                     interval = interval.addInterval(getIntervalByRuleTemplate(shift, consecutiveWorkWTATemplate.getIntervalUnit(), consecutiveWorkWTATemplate.getIntervalLength()));
                     break;
+                case NO_OF_SEQUENCE_SHIFT:
+                    NoOfSequenceShiftWTATemplate noOfSequenceShiftWTATemplate = (NoOfSequenceShiftWTATemplate) ruleTemplate;
+                    validateRuleTemplate(noOfSequenceShiftWTATemplate.getIntervalLength(), noOfSequenceShiftWTATemplate.getIntervalUnit());
+                    interval = interval.addInterval(getIntervalByRuleTemplate(shift, noOfSequenceShiftWTATemplate.getIntervalUnit(), noOfSequenceShiftWTATemplate.getIntervalLength()));
+                    break;
                 case DURATION_BETWEEN_SHIFTS:
                     interval = interval.addInterval(new DateTimeInterval(minusMonths(shift.getStartDate(),1),plusMonths(shift.getStartDate(),1)));
                 break;

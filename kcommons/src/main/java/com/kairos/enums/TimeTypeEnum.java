@@ -19,5 +19,6 @@ public enum TimeTypeEnum {
     AVAILABLE_TIME,
     UNAVAILABLE_TIME,
     RESTING_TIME,
-    PROTECTED_DAYS_OFF
+    PROTECTED_DAYS_OFF,
+    GAP
 }

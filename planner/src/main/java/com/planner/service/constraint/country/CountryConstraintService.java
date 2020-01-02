@@ -69,7 +69,7 @@ public class CountryConstraintService {
                 UnitConstraint unitConstraint = ObjectMapperUtils.copyPropertiesByMapper(countryConstraint, UnitConstraint.class);
                 unitConstraint.setId(null);//Unset Id
                 unitConstraint.setUnitId(unitId);
-                unitConstraint.setParentCountryConstraintId(countryConstraint.getId());
+              //  unitConstraint.setParentCountryConstraintId(countryConstraint.getId());
                 unitConstraintList.add(unitConstraint);
             }
 
@@ -95,7 +95,7 @@ public class CountryConstraintService {
 
     public List<CountryConstraint> getAllCountryConstraintByCountryId(Long countryId) {
         List<Constraint> constraintList = constraintsRepository.findAllObjectsNotDeletedById(true, countryId);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(constraintList, CountryConstraint.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(constraintList, CountryConstraint.class);
     }
 
     public void updateCountryConstraint(CountryConstraintDTO countryConstraintDTO) {

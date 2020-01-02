@@ -25,6 +25,7 @@ import com.kairos.persistence.repository.widget.WidgetMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -65,6 +66,8 @@ public class WidgetService {
     private TimeTypeService timeTypeService;
     @Inject
     private ExceptionService exceptionService;
+    @Inject
+    private NightWorkerService nightWorkerService;
 
     public DashboardWidgetDTO getWidgetData(Long unitId) {
         DashboardWidgetDTO dashBoardWidgetDTO = null;
@@ -87,6 +90,7 @@ public class WidgetService {
         dashBoardWidgetDTO = new DashboardWidgetDTO(null, shiftDTOs, new HashMap<>(), realTimePhase.getRealtimeDuration(), timeTypeDTOS);
         if (isCollectionNotEmpty(staffAdditionalInfoDTOS)) {
             Map<Long, StaffAdditionalInfoDTO> idAndStaffMap = staffAdditionalInfoDTOS.stream().filter(distinctByKey(staffAdditionalInfoDTO -> staffAdditionalInfoDTO.getId())).collect(Collectors.toMap(StaffAdditionalInfoDTO::getId, v -> v));
+            setStaffNightWorker(idAndStaffMap);
             Map<Long, List<ShiftWithActivityDTO>> employementIdAndStaffMap = shiftDTOs.stream().collect(Collectors.groupingBy(ShiftWithActivityDTO::getEmploymentId, Collectors.toList()));
             TimeSlotWrapper nightTimeSlotWrapper = staffAdditionalInfoDTOS.get(0).getTimeSlotSets().stream().filter(timeSlotWrapper -> timeSlotWrapper.getName().equals(PartOfDay.NIGHT.getValue())).findFirst().orElseGet(null);
             TimeSlotDTO nightTimeSlot = ObjectMapperUtils.copyPropertiesByMapper(nightTimeSlotWrapper, TimeSlotDTO.class);
@@ -105,6 +109,14 @@ public class WidgetService {
         dashBoardWidgetDTO.setTimeTypeIds(dashboardWidget.getTimeTypeIds());
         dashBoardWidgetDTO.setWidgetFilterTypes(dashboardWidget.getWidgetFilterTypes());
         return dashBoardWidgetDTO;
+    }
+
+    private void setStaffNightWorker(Map<Long, StaffAdditionalInfoDTO> idAndStaffMap) {
+        List<Long> staffIds = idAndStaffMap.keySet().stream().collect(Collectors.toList());
+        Map<Long, Boolean> staffIdAndNightWorkerMap = nightWorkerService.getStaffIdAndNightWorkerMap(staffIds);
+        for (Long staffId : staffIds) {
+            idAndStaffMap.get(staffId).setNightWorker(staffIdAndNightWorkerMap.get(staffId));
+        }
     }
 
     private Object[] getEmploymentIdsAndStaffIds(List<ShiftWithActivityDTO> shiftDTOs) {
