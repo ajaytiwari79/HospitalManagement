@@ -504,21 +504,22 @@ public class UserService {
             }
             permissionData.setOrganizationPermissions(unitPermission);
         }
-         updateLastSelectedOrganizationIdAndCountryId(organizationId);
-         permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
-         permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(),userAccessRoleDTO.getAccessGroupIds(),UserContext.getUserDetails().isHubMember()), ModelDTO.class));
-         updateChatStatus(ChatStatus.ONLINE);
+        updateLastSelectedOrganizationIdAndCountryId(organizationId);
+        permissionData.setRole((userAccessRoleDTO.getManagement()) ? MANAGEMENT : AccessGroupRole.STAFF);
+        permissionData.setModelPermissions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(permissionService.getModelPermission(new ArrayList<>(), userAccessRoleDTO.getAccessGroupIds(), UserContext.getUserDetails().isHubMember()), ModelDTO.class));
+        Organization parent = organizationService.fetchParentOrganization(organizationId);
+        permissionData.setStaffId(staffGraphRepository.getStaffIdByUserId(currentUserId,parent.getId()));
+        updateChatStatus(ChatStatus.ONLINE);
          return permissionData;
     }
 
 
     private void updateLastSelectedOrganizationIdAndCountryId(Long organizationId) {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
-        if (!currentUser.getLastSelectedOrganizationId().equals(organizationId)) {
-            OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);
+        if (!organizationId.equals(currentUser.getLastSelectedOrganizationId())) {
             Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
-            currentUser.setLastSelectedOrganizationCategory(organizationCategory);
+          //  currentUser.setLastSelectedOrganizationCategory(organizationCategory);
             currentUser.setCountryId(countryId);
         }
         if(!currentUser.getUnitWiseAccessRole().containsKey(organizationId.toString())){

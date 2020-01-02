@@ -1,5 +1,6 @@
 package com.kairos.persistence.repository.kpermissions;
 
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.kpermissions.FieldPermissionQueryResult;
 import com.kairos.persistence.model.kpermissions.KPermissionModel;
@@ -23,20 +24,33 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "with distinct CASE WHEN subModelField IS NULL THEN [] else collect(distinct{id:id(subModelField),fieldPermission:subModelFieldPermission.fieldLevelPermissions}) END as subModelData,model,permissions, field,fieldPermission,subModel,subModelPermission WITH distinct subModelData,collect(distinct {id:id(subModel),  modelPermission:subModelPermission.fieldLevelPermissions,  permissions:subModelData}) as subModelPermissions,model,modelPermission, field,fieldPermission return distinct id(model) as id, modelPermission.fieldLevelPermissions as modelPermission,CASE WHEN field IS NULL THEN [] else collect( DISTINCT {id:id(field),fieldPermission:fieldPermission.fieldLevelPermissions}) END as permissions,subModelPermissions")
     List<ModelPermissionQueryResult> getModelPermissionsByAccessGroupId(Long accessGroupId);
 
-    @Query(value = "MATCH (kPermissionField:KPermissionField),(accessGroup:AccessGroup) where id(kPermissionField)={0} AND id(accessGroup) IN{1} CREATE UNIQUE (kPermissionField)-[r:"+HAS_PERMISSION+"]->(accessGroup) SET r.fieldLevelPermissions={2}")
-    void createAccessGroupPermissionFieldRelationshipType(Long kpermissionFieldId, List<Long> accessGroupIds, Set<FieldLevelPermission> fieldLevelPermissions);
+    @Query(value = "MATCH (kPermissionField:KPermissionField),(accessGroup:AccessGroup) where id(kPermissionField)={0} AND id(accessGroup) IN{1} CREATE UNIQUE (kPermissionField)-[r:"+HAS_PERMISSION+"]->(accessGroup) " +
+            "SET r.fieldLevelPermissions={2},r.expertiseIds={3},r.unionIds={4},r.teamIds={5},r.employmentTypeIds={6},r.tagIds={7},r.staffStatuses={8},r.forOtherFieldLevelPermissions={9}")
+    void createAccessGroupPermissionFieldRelationshipType(Long kpermissionModelId, List<Long> accessGroupIds, Set<FieldLevelPermission> fieldLevelPermissions,Set<Long> expertiseIds,Set<Long> unionIds,Set<Long> teamIds,Set<Long> employmentTypeIds,Set<Long> tagIds,Set<StaffStatusEnum> staffStatuses,Set<FieldLevelPermission> forOtherFieldLevelPermissions);
 
-    @Query(value = "MATCH (kPermissionModel:KPermissionModel),(accessGroup:AccessGroup) where id(kPermissionModel)={0} AND id(accessGroup) IN{1} CREATE UNIQUE (kPermissionModel)-[r:"+HAS_PERMISSION+"]->(accessGroup) SET r.fieldLevelPermissions={2}")
-    void createAccessGroupPermissionModelRelationship(Long kpermissionModelId, List<Long> accessGroupIds, Set<FieldLevelPermission> fieldLevelPermissions);
+    @Query(value = "MATCH (kPermissionModel:KPermissionModel),(accessGroup:AccessGroup) where id(kPermissionModel)={0} AND id(accessGroup) IN{1} CREATE UNIQUE (kPermissionModel)-[r:"+HAS_PERMISSION+"]->(accessGroup) " +
+            "SET r.fieldLevelPermissions={2},r.expertiseIds={3},r.unionIds={4},r.teamIds={5},r.employmentTypeIds={6},r.tagIds={7},r.staffStatuses={8},r.forOtherFieldLevelPermissions={9}")
+    void createAccessGroupPermissionModelRelationship(Long kpermissionModelId, List<Long> accessGroupIds, Set<FieldLevelPermission> fieldLevelPermissions,Set<Long> expertiseIds,Set<Long> unionIds,Set<Long> teamIds,Set<Long> employmentTypeIds,Set<Long> tagIds,Set<StaffStatusEnum> staffStatuses,Set<FieldLevelPermission> forOtherFieldLevelPermissions);
 
-    @Query("MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {0} MATCH (ag)<-[permission:HAS_PERMISSION]-(field:KPermissionField) WITH permission.fieldLevelPermissions AS coll,field\n" +
-            "UNWIND coll AS permission\n" +
-            "WITH DISTINCT permission,field\n" +
-            "RETURN collect(permission) AS permissions,id(field) as id,field.fieldName as fieldName")
+    @Query("MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {0} MATCH (ag)<-[permission:HAS_PERMISSION]-(field:KPermissionField) RETURN permission.fieldLevelPermissions AS permissions,\n" +
+            "permission.expertiseIds as expertiseIds,\n" +
+            "permission.forOtherFieldLevelPermissions as forOtherFieldLevelPermissions,\n" +
+            "permission.staffStatuses as staffStatuses,\n" +
+            "permission.tagIds as tagIds,\n" +
+            "permission.teamIds as teamIds,\n" +
+            "permission.employmentTypeIds as employmentTypeIds,\n" +
+            "permission.unionIds as unionIds,id(field) as id,field.fieldName as fieldName")
     List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds);
 
     @Query("MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {0} MATCH (ag)<-[permission:HAS_PERMISSION]-(model:KPermissionModel) \n" +
-            "WITH permission.fieldLevelPermissions AS coll,model UNWIND coll AS permission WITH DISTINCT permission,model RETURN collect(permission) AS permissions,id(model) as id,model.modelName as modelName")
+            "RETURN permission.fieldLevelPermissions AS permissions,\n" +
+            "permission.expertiseIds as expertiseIds,\n" +
+            "permission.forOtherFieldLevelPermissions as forOtherFieldLevelPermissions,\n" +
+            "permission.staffStatuses as staffStatuses,\n" +
+            "permission.tagIds as tagIds,\n" +
+            "permission.teamIds as teamIds,\n" +
+            "permission.employmentTypeIds as employmentTypeIds,\n" +
+            "permission.unionIds as unionIds,id(model) as id,model.modelName as modelName")
     List<ModelPermissionQueryResult> getAllModelPermission(Collection<Long> accessGroupIds);
 
     @Query("MATCH(model:KPermissionModel{deleted:false})  OPTIONAL MATCH(model)-[orgRel:HAS_SUB_MODEL*]->(subModel:KPermissionModel)  OPTIONAL MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField)  OPTIONAL MATCH(subModel)-[orgUnitRel:HAS_FIELD]->(fieldn:KPermissionField) where model.modelName in {0} \n" +

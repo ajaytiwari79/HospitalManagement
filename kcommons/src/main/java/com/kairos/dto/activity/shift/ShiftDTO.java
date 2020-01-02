@@ -153,6 +153,11 @@ public class ShiftDTO {
         this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
     }
 
+    public List<ShiftActivityDTO> getBreakActivities() {
+        this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
+        return breakActivities;
+    }
+
     public boolean isMultipleActivity() {
         Set<BigInteger> multipleActivityCount = new HashSet<>();
         for (ShiftActivityDTO activity : this.getActivities()) {
@@ -186,10 +191,6 @@ public class ShiftDTO {
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
     }
 
-    public List<ShiftActivityDTO> getBreakActivities() {
-        this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
-        return breakActivities;
-    }
 
     @Override
     public String toString() {

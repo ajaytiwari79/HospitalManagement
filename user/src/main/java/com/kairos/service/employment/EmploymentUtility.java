@@ -36,6 +36,8 @@ public class EmploymentUtility {
         employmentDetails.setEditable(employment.getEditable());
         employmentDetails.setAccumulatedTimebankMinutes(employment.getAccumulatedTimebankMinutes());
         employmentDetails.setAccumulatedTimebankDate(employment.getAccumulatedTimebankDate());
+        List<FunctionDTO> appliedFunctionDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employment.getAppliedFunctions(), FunctionDTO.class);
+        employmentDetails.setAppliedFunctions(appliedFunctionDTOS);
         return employmentDetails;
     }
 

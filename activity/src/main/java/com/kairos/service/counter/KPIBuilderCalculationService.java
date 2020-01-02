@@ -16,14 +16,10 @@ import com.kairos.dto.activity.phase.PhaseDTO;
 import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-
 import com.kairos.dto.activity.todo.TodoDTO;
-
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
-
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -43,6 +39,7 @@ import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
@@ -59,19 +56,15 @@ import com.kairos.service.phase.PhaseService;
 import com.kairos.service.shift.ShiftFilterService;
 import com.kairos.service.shift.ShiftValidatorService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
-
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
-
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
-
-
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
@@ -838,7 +831,7 @@ public class KPIBuilderCalculationService implements CounterService {
         private List<TodoDTO> todoDTOS;
         private Map<BigInteger,List<TodoDTO>> activityIdAndTodoListMap;
         private Set<BigInteger> activityIds;
-        private Map<String, List<StaffDTO>> selectedDatesAndStaffDTOSMap;
+        private Map<String, List<StaffPersonalDetail>> selectedDatesAndStaffDTOSMap;
         List<WTAQueryResultDTO> wtaQueryResultDTOS;
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
         Map<Long, List<WTAQueryResultDTO>> employmentIdAndWtaMap;

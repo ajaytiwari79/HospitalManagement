@@ -16,7 +16,6 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
-import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.TimeTypeEnum;
@@ -34,6 +33,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftState;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
@@ -1234,8 +1234,8 @@ public class ShiftService extends MongoBaseService {
     public CompactViewDTO getDetailedAndCompactViewData(Long selectedStaffId, Long unitId, Date shiftStartDate, StaffFilterDTO staffFilterDTO) {
         List<Long> staffIds;
         if (isNull(selectedStaffId)) {
-            List<StaffDTO> staffResponseDTOS = userIntegrationService.getStaffListByUnit();
-            staffIds = staffResponseDTOS.stream().map(StaffDTO::getId).collect(Collectors.toList());
+            List<StaffPersonalDetail> staffResponseDTOS = userIntegrationService.getStaffListByUnit();
+            staffIds = staffResponseDTOS.stream().map(StaffPersonalDetail::getId).collect(Collectors.toList());
         } else {
             staffIds = Arrays.asList(selectedStaffId);
         }

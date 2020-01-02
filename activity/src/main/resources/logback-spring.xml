@@ -26,7 +26,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="development,test,local">
+    <springProfile name="development,test,local,production,qa">
         <logger name="org.springframework.kafka" level="OFF"/>
         <logger name="org.apache.kafka" level="OFF"/>
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
@@ -46,7 +46,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="production,qa">
+    <!--<springProfile name="production,qa">
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
             <encoder>
@@ -65,7 +65,7 @@
         <root level="INFO">
             <appender-ref ref="ROLLING-FILE"/>
         </root>
-    </springProfile>
+    </springProfile>-->
 
 </configuration>
 

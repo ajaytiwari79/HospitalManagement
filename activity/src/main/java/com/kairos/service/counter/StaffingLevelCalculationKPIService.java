@@ -4,8 +4,9 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
-import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.dto.user.skill.SkillLevelDTO;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class StaffingLevelCalculationKPIService {
             for (StaffingLevel staffingLevel : staffingLevels) {
                 List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> asLocalDate(shift.getStartDate()).equals(asLocalDate(staffingLevel.getCurrentDate()))).collect(Collectors.toList());
                 if(isCollectionNotEmpty(currentDateShifts)) {
-                    Map<Long, List<Map<String, Object>>> staffSkillsMap = kpiCalculationRelatedInfo.getSelectedDatesAndStaffDTOSMap().get(asLocalDate(staffingLevel.getCurrentDate()).toString()).stream().collect(Collectors.toMap(StaffDTO::getId, StaffDTO::getSkillInfo));
+                    Map<Long, List<SkillLevelDTO>> staffSkillsMap = kpiCalculationRelatedInfo.getSelectedDatesAndStaffDTOSMap().get(asLocalDate(staffingLevel.getCurrentDate()).toString()).stream().collect(Collectors.toMap(StaffPersonalDetail::getId, StaffPersonalDetail::getSkills));
                     staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(currentDateShifts, Shift.class), staffSkillsMap);
                 }
                 staffingLevelData += isPresenceStaffingLevelData ? getPresenceStaffingLevelCalculationData(staffingLevel, kpiCalculationRelatedInfo) : getAbsenceStaffingLevelCalculationData(staffingLevel, kpiCalculationRelatedInfo);

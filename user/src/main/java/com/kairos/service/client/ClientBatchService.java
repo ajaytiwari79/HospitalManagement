@@ -293,7 +293,7 @@ public class ClientBatchService {
                 addressDTO = new AddressDTO();
                 addressDTO.setCity(city);
                 addressDTO.setHouseNumber(hnr.toString());
-                addressDTO.setZipCodeValue(zipCode);
+                addressDTO.getZipCode().setZipCode(zipCode);
                 addressDTO.setStreet(street);
 
                 Map<String, Object> result = addressVerificationService.verifyAddressSheet(addressDTO, unitId);
@@ -353,7 +353,7 @@ public class ClientBatchService {
                     contactAddress.setLatitude(Float.valueOf(String.valueOf(result.get("yCoordinates"))));
                     contactAddress.setHouseNumber(addressDTO.getHouseNumber());
 
-                    zipCodeDb = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+                    zipCodeDb = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
                     if (zipCodeDb == null) {
                         exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
 

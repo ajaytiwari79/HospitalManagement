@@ -1,5 +1,6 @@
 package com.kairos.controller.kpermissions;
 
+import com.kairos.dto.activity.counter.enums.ConfLevel;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.dto.kpermissions.PermissionDTO;
 import com.kairos.service.kpermissions.PermissionService;
@@ -48,6 +49,12 @@ public class PermissionController {
     @PutMapping(value = "/update_permission")
     public ResponseEntity createFieldPermissions(@Valid @RequestBody PermissionDTO permissionDTO,@RequestParam boolean updateOrganisationCategories)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.createPermissions(permissionDTO,updateOrganisationCategories));
+
+    }
+
+    @GetMapping(value = "/get_default_data_of_permission")
+    public ResponseEntity getDefaultDataOfPermission(@RequestParam Long referenceId, @RequestParam ConfLevel confLevel)  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, permissionService.getDefaultDataOfPermission(referenceId,confLevel));
 
     }
 

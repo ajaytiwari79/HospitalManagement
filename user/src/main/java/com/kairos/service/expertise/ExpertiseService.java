@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -18,6 +19,7 @@ import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -144,8 +146,8 @@ public class ExpertiseService {
         setBasicDetails(expertiseDTO, country, expertise);
         linkProtectedDaysOffSetting(new ArrayList<>(), Arrays.asList(expertise));
         TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
-        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
-                null, null, null, null, countryId, expertise.getId());
+        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, 0,
+                DurationType.WEEKS, 0, 0, XAxisConfig.HOURS, countryId, expertise.getId());
         genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
                 "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return updatedExpertiseData(expertise);
