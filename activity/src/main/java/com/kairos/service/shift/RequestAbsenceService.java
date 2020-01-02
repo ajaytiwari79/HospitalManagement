@@ -41,7 +41,9 @@ import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesByMapper;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
+import static com.kairos.enums.TimeTypeEnum.TIME_BANK;
 import static com.kairos.enums.shift.TodoStatus.DISAPPROVE;
+import static com.kairos.enums.shift.TodoStatus.PENDING;
 import static org.apache.commons.collections.CollectionUtils.containsAny;
 
 /**
@@ -86,7 +88,7 @@ public class RequestAbsenceService {
             exceptionService.actionNotPermittedException(REQUEST_ABSENCE_APPROVED);
         }
         TimeTypeEnum timeTypeEnum = activityMongoRepository.findTimeTypeByActivityId(requestAbsenceDTO.getActivityId());
-        if(!timeTypeEnum.equals(TimeTypeEnum.ABSENCE)){
+        if(!timeTypeEnum.equals(TimeTypeEnum.ABSENCE) && !TIME_BANK.equals(timeTypeEnum)){
             exceptionService.actionNotPermittedException(REQUEST_ABSENCE_ACTIVITY_TYPE);
         }
         if(isNotNull(requestAbsenceDTO.getStartDate()) && isNotNull(requestAbsenceDTO.getEndDate())){
@@ -113,6 +115,7 @@ public class RequestAbsenceService {
         if(!shiftOptional.isPresent()){
             exceptionService.dataNotFoundException(MESSAGE_SHIFT_ID,todo.getEntityId());
         }
+        ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
         if(TodoStatus.APPROVE.equals(todo.getStatus())){
             ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
             if(isNull(shiftOptional.get().getRequestAbsence())){
@@ -124,7 +127,6 @@ public class RequestAbsenceService {
                 todo.setStatus(TodoStatus.REQUESTED);
                 return (T)shiftAndActivtyStatusDTO;
             }
-            ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(asLocalDate(shift.getStartDate()), shift.getStaffId(), shift.getEmploymentId(), new HashSet<>());
             if(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime())){
                 Date startDate = getStartOfDay(shift.getStartDate());
@@ -137,10 +139,14 @@ public class RequestAbsenceService {
                 shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
             }
             response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTO);
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
         }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
             //todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
+        }else if(PENDING.equals(todo.getStatus())){
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
         }
         return response;
     }
@@ -156,7 +162,7 @@ public class RequestAbsenceService {
             for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
                 shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().filter(shiftActivityDTO -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivityDTO.getStatus())).map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
             }
-            response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE));
+            response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE,todo.getComment()));
             shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
             shiftOptional.get().setRequestAbsence(null);
             shiftMongoRepository.save(shiftOptional.get());

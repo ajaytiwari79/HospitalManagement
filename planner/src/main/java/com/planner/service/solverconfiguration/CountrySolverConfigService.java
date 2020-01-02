@@ -87,7 +87,7 @@ public class CountrySolverConfigService {
                     UnitSolverConfig unitSolverConfig = ObjectMapperUtils.copyPropertiesByMapper(countrySolverConfig, UnitSolverConfig.class);
                     unitSolverConfig.setId(null);//Unset Id
                     unitSolverConfig.setUnitId(unitId);
-                    List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfListByMapper(solverConfigConstraints,UnitConstraint.class);
+                    List<UnitConstraint> unitConstraints = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(solverConfigConstraints,UnitConstraint.class);
                     if(isCollectionNotEmpty(unitConstraints)) {
                         constraintsRepository.saveList(unitConstraints);
                     }
@@ -197,7 +197,7 @@ public class CountrySolverConfigService {
     }
 
     public DefaultDataDTO getDefaultData(Long countryId) {
-        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
+        List<PlanningProblemDTO> planningProblemDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(planningProblemRepository.findAll(),PlanningProblemDTO.class);
         DefaultDataDTO defaultDataDTO = new DefaultDataDTO()
                 .setOrganizationServicesBuilder(getOrganizationServicesAndItsSubServices(countryId))
                 .setPhaseDTOSBuilder(getAllPhases(countryId)).setTimeTypeEnumSBuilder(newArrayList(PRESENCE,ABSENCE,PAID_BREAK,UNPAID_BREAK))
@@ -212,7 +212,7 @@ public class CountrySolverConfigService {
                 MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,
                 ACTIVITY_VALID_DAYTYPE,
                 ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS));
-        constraintTypeSetMap.put(WTA,newHashSet(AVERAGE_SHEDULED_TIME,
+        constraintTypeSetMap.put(WTA,newHashSet( AVERAGE_SCHEDULED_TIME,
                 CONSECUTIVE_WORKING_PARTOFDAY,
                 DAYS_OFF_IN_PERIOD,
                 NUMBER_OF_PARTOFDAY,
@@ -238,7 +238,7 @@ public class CountrySolverConfigService {
 
     private List<OrganizationServiceDTO> getOrganizationServicesAndItsSubServices(Long countryId) {
         List<OrganizationServiceQueryResult> organizationServiceQueryResults = userNeo4jRepo.getAllOrganizationServices(countryId);
-        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
+        List<OrganizationServiceDTO> organizationServiceDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(organizationServiceQueryResults, OrganizationServiceDTO.class);
 
         return organizationServiceDTOS;
     }

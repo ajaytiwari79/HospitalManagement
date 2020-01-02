@@ -8,6 +8,7 @@ import com.kairos.dto.activity.time_bank.TimeBankDistributionDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.ShiftType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -78,6 +79,8 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private boolean breakNotHeld;
     private Long employmentId;
     private BigInteger phaseId;
+    private ShiftType shiftType;
+    private boolean breakInterrupt;
     public ShiftActivityDTO(Date startDate, Date endDate) {
         this.startDate = startDate;
         this.endDate = endDate;

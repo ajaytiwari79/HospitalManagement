@@ -12,9 +12,10 @@ public class ActivityConstraints {
     private MaxDiffrentActivity maxDiffrentActivity;
     private MinimumLengthofActivity minimumLengthofActivity;
     private ActivityDayType activityDayType;//Activity is used on a DayType
+    private ActivityRequiredTag activityRequiredTag;
 
 
-    public ActivityConstraints(LongestDuration longestDuration, ShortestDuration shortestDuration, MaxAllocationPerShift maxAllocationPerShift,MaxDiffrentActivity maxDiffrentActivity,MinimumLengthofActivity minimumLengthofActivity,ActivityDayType activityDayType) {
+    public ActivityConstraints(LongestDuration longestDuration, ShortestDuration shortestDuration, MaxAllocationPerShift maxAllocationPerShift,MaxDiffrentActivity maxDiffrentActivity,MinimumLengthofActivity minimumLengthofActivity,ActivityDayType activityDayType,ActivityRequiredTag activityRequiredTag) {
         this.longestDuration = longestDuration;
         this.shortestDuration = shortestDuration;
         this.maxAllocationPerShift = maxAllocationPerShift;
@@ -22,6 +23,15 @@ public class ActivityConstraints {
         this.maxDiffrentActivity = maxDiffrentActivity;
         this.minimumLengthofActivity = minimumLengthofActivity;
         this.activityDayType = activityDayType;
+        this.activityRequiredTag = activityRequiredTag;
+    }
+
+    public ActivityRequiredTag getActivityRequiredTag() {
+        return activityRequiredTag;
+    }
+
+    public void setActivityRequiredTag(ActivityRequiredTag activityRequiredTag) {
+        this.activityRequiredTag = activityRequiredTag;
     }
 
     public ActivityDayType getActivityDayType() {

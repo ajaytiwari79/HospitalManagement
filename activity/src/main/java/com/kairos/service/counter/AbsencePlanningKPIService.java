@@ -41,7 +41,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.dto.activity.counter.enums.XAxisConfig.COUNT;
+import static com.kairos.dto.activity.counter.enums.XAxisConfig.PERCENTAGE;
 import static com.kairos.utils.counter.KPIUtils.*;
 
 @Service
@@ -99,7 +102,7 @@ public class AbsencePlanningKPIService implements CounterService {
                     todoDTOs.add(todoDTO);
                 }
             }
-            timeSlotAndActivityStatusAndCountMap.put(timeSlotDTO.getName(), getActivityStatusCount(todoDTOs));
+            timeSlotAndActivityStatusAndCountMap.put(timeSlotDTO.getName(), getActivityStatusCount(todoDTOs, COUNT));
         }
         return timeSlotAndActivityStatusAndCountMap;
     }
@@ -109,7 +112,7 @@ public class AbsencePlanningKPIService implements CounterService {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndActivityStatusAndCountMap = new HashedMap();
         Map<Long, List<TodoDTO>> staffTodoShiftMapping = todoDTOS.parallelStream().collect(Collectors.groupingBy(TodoDTO::getStaffId, Collectors.toList()));
         for (Long staffId : staffIds) {
-            staffIdAndActivityStatusAndCountMap.put(staffId, getActivityStatusCount(staffTodoShiftMapping.getOrDefault(staffId, new ArrayList<>())));
+            staffIdAndActivityStatusAndCountMap.put(staffId, getActivityStatusCount(staffTodoShiftMapping.getOrDefault(staffId, new ArrayList<>()),COUNT));
         }
         return staffIdAndActivityStatusAndCountMap;
     }
@@ -121,18 +124,18 @@ public class AbsencePlanningKPIService implements CounterService {
             dateTimeIntervalListMap.put(dateTimeInterval, todoDTOS.stream().filter(todoDTO -> dateTimeInterval.contains(todoDTO.getShiftDateTime())).collect(Collectors.toList()));
         }
         for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
-            staffIdAndActivityStatusAndCountMap.put(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), getActivityStatusCount(dateTimeIntervalListMap.get(dateTimeInterval)));
+            staffIdAndActivityStatusAndCountMap.put(DurationType.DAYS.equals(frequencyType) ? getStartDateTimeintervalString(dateTimeInterval) : getDateTimeintervalString(dateTimeInterval), getActivityStatusCount(dateTimeIntervalListMap.get(dateTimeInterval),COUNT));
         }
         return staffIdAndActivityStatusAndCountMap;
     }
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> getTodoCountByRepresentTotalData(List<DateTimeInterval> dateTimeIntervals, List<TodoDTO> todoDTOS) {
         Map<Object, List<ClusteredBarChartKpiDataUnit>> staffIdAndActivityStatusAndCountMap = new HashedMap();
-        staffIdAndActivityStatusAndCountMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), getActivityStatusCount(todoDTOS));
+        staffIdAndActivityStatusAndCountMap.put(getDateTimeintervalString(new DateTimeInterval(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate())), getActivityStatusCount(todoDTOS,COUNT));
         return staffIdAndActivityStatusAndCountMap;
     }
 
-    private List<ClusteredBarChartKpiDataUnit> getActivityStatusCount(List<TodoDTO> todoDTOS) {
+    public List<ClusteredBarChartKpiDataUnit> getActivityStatusCount(List<TodoDTO> todoDTOS ,XAxisConfig xAxisConfig) {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
         int pending = 0;
         int disapprove = 0;
@@ -156,11 +159,19 @@ public class AbsencePlanningKPIService implements CounterService {
                     break;
             }
         }
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toString(), AppConstants.REQUESTED_COLOR_CODE, Double.valueOf(requested)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toString(), AppConstants.PENDING_COLOR_CODE, Double.valueOf(pending)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toString(), AppConstants.APPROVE_COLOR_CODE, Double.valueOf(approve)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toString(), AppConstants.DISAPPROVE_COLOR_CODE, Double.valueOf(disapprove)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toString(), AppConstants.REQUESTED_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,requested)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toString(), AppConstants.PENDING_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,pending)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toString(), AppConstants.APPROVE_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,approve)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toString(), AppConstants.DISAPPROVE_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,disapprove)));
         return clusteredBarChartKpiDataUnits;
+    }
+
+    public double getValueOfTodo(List<TodoDTO> todoDTOS,XAxisConfig xAxisConfig,int todoCount){
+        double value =0;
+        if(isCollectionNotEmpty(todoDTOS)) {
+            value =  PERCENTAGE.equals(xAxisConfig) ? (todoCount * 100) / todoDTOS.size() : todoCount;
+        }
+        return value;
     }
 
     private Map<Object, List<ClusteredBarChartKpiDataUnit>> calculateDataByKpiRepresentation(List<Long> staffIds, List<DateTimeInterval> dateTimeIntervals, ApplicableKPI applicableKPI, List<TodoDTO> todoDTOS, List<TimeSlotDTO> timeSlotDTOS) {
@@ -185,6 +196,7 @@ public class AbsencePlanningKPIService implements CounterService {
     @Override
     public CommonRepresentationData getCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi) {
         List<CommonKpiDataUnit> dataList = getAbsencePlanningKpiData(organizationId, filterBasedCriteria, null);
+
         return new KPIRepresentationData(kpi.getId(), kpi.getTitle(), kpi.getChart(), XAxisConfig.COUNT, RepresentationUnit.DECIMAL, dataList, new KPIAxisData(AppConstants.DATE, AppConstants.LABEL), new KPIAxisData(AppConstants.HOURS, AppConstants.VALUE_FIELD));
     }
 

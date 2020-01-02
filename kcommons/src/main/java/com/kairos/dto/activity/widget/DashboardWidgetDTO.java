@@ -6,6 +6,7 @@ import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.widget.WidgetFilterType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
@@ -20,6 +21,7 @@ import java.util.Set;
  */
 @Setter
 @Getter
+@NoArgsConstructor
 public class DashboardWidgetDTO {
     private TimeSlotDTO nightTimeSlot;
     private List<ShiftWithActivityDTO> shifts;
@@ -28,9 +30,6 @@ public class DashboardWidgetDTO {
     private Set<BigInteger> timeTypeIds;
     private Set<WidgetFilterType> widgetFilterTypes;
     private List<TimeTypeDTO> timeTypes;
-
-    public DashboardWidgetDTO() {
-    }
 
     public DashboardWidgetDTO(TimeSlotDTO nightTimeSlot, List<ShiftWithActivityDTO> shifts, Map<Long, StaffAdditionalInfoDTO> staffIdAndstaffInfoMap,int realtimeDurationInMinutes,List<TimeTypeDTO> timeTypes) {
         this.nightTimeSlot = nightTimeSlot;

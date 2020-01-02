@@ -61,7 +61,7 @@ public class AccessorPartyService {
             }
             accessorPartyRepository.saveAll(accessorParties);
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(accessorParties, AccessorPartyDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(accessorParties, AccessorPartyDTO.class);
     }
 
 

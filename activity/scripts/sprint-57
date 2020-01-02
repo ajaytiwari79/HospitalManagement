@@ -49,7 +49,7 @@ db.getCollection('applicableKPI').insert({
 });
 
 
-db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 1775}})
+db.getCollection('kairos_sequence').update({ "sequenceName" : "ApplicableKPISequence"},{"$set":{"sequenceNumber" : 2740}})
 
 
 //find

@@ -6,6 +6,7 @@ package com.kairos.persistence.model.organization;
 
 import com.kairos.dto.user.organization.CompanyType;
 import com.kairos.dto.user.organization.CompanyUnitType;
+import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.UnionState;
 import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -120,7 +121,9 @@ public class Organization extends OrganizationBaseEntity {
     }
 
 
-
+    public OrganizationCategory getOrganizationCategory(){
+        return this.isKairosHub ? OrganizationCategory.HUB : this.union ? OrganizationCategory.UNION : OrganizationCategory.ORGANIZATION;
+    }
 
 
 }

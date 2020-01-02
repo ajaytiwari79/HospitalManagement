@@ -44,6 +44,8 @@ public class TimeBankIntervalDTO {
     private float totalContractedCost;
     private float totalPlannedCost;
     private float totalTimeBankDiffCost;
+    private long timeBankOffMinutes;
+    private long protectedDaysOffMinutes;
     private int sequence;
 
     public TimeBankIntervalDTO(String title) {

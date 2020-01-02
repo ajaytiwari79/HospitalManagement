@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
 import lombok.Getter;
@@ -183,6 +184,11 @@ public class ShiftDTO {
     }
     public Set<BigInteger> getEscalationFreeShiftIds() {
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
+    }
+
+    public List<ShiftActivityDTO> getBreakActivities() {
+        this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
+        return breakActivities;
     }
 
     @Override

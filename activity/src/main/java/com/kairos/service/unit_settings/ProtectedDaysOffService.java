@@ -42,8 +42,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
     private UserIntegrationService userIntegrationService;
     @Inject private ActivityMongoRepository activityMongoRepository;
     @Inject private ShiftMongoRepository shiftMongoRepository;
-    @Inject
-    private SchedulerServiceRestClient schedulerRestClient;
+
 
     public ProtectedDaysOffSettingDTO saveProtectedDaysOff(Long unitId, ProtectedDaysOffUnitSettings protectedDaysOffUnitSettings){
         ProtectedDaysOffSettingDTO protectedDaysOffSettingDTO = new ProtectedDaysOffSettingDTO(unitId, protectedDaysOffUnitSettings);
@@ -76,7 +75,7 @@ public class ProtectedDaysOffService extends MongoBaseService {
 
     public List<ProtectedDaysOffSettingDTO> getAllProtectedDaysOffByUnitIds(List<Long> unitIds){
         List<ProtectedDaysOffSetting> protectedDaysOffSettings =protectedDaysOffRepository.getAllProtectedDaysOffByUnitIdsAndDeletedFalse(unitIds);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(protectedDaysOffSettings,ProtectedDaysOffSettingDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(protectedDaysOffSettings,ProtectedDaysOffSettingDTO.class);
     }
 
     public Boolean createAutoProtectedDaysOffOfAllUnits(Long countryId){
@@ -86,9 +85,5 @@ public class ProtectedDaysOffService extends MongoBaseService {
     }
 
 
-    public void registerJobForProtectedDaysOff() {
-        SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(newArrayList(DayOfWeek.values()), LocalTime.of(0, 5), JobType.SYSTEM, JobSubType.PROTECTED_DAYS_OFF, ZoneId.systemDefault().toString());
-        schedulerRestClient.publishRequest(newArrayList(schedulerPanelDTO), null, false, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
-    }
 
 }

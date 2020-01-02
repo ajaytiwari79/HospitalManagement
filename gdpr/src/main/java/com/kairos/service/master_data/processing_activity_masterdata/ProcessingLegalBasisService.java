@@ -63,7 +63,7 @@ public class ProcessingLegalBasisService {
 
             processingLegalBasisRepository.saveAll(processingLegalBases);
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(processingLegalBases, ProcessingLegalBasisDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(processingLegalBases, ProcessingLegalBasisDTO.class);
     }
 
 

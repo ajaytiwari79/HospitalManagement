@@ -15,7 +15,8 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SkillLevelSetting {
+public class
+SkillLevelSetting {
     private int noOfStaff;
     private SkillLevel skillLevel;
     private int availableNoOfStaff;

@@ -76,7 +76,7 @@ public class DynamicTabService extends MongoBaseService {
         if (ConfLevel.UNIT.equals(level)) {
             createTabsForStaff(unitId, kpiDashboards, staffDTOS.stream().map(StaffDTO::getId).collect(Collectors.toList()));
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
 
     public List<KPIDashboardDTO> addDashboardDefaultTabToRef(KPIDashboardDTO kpiDashboardDTO, ConfLevel level) {
@@ -95,7 +95,7 @@ public class DynamicTabService extends MongoBaseService {
             kpiDashboards.stream().forEach(kpiDashboard -> kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId())));
             save(kpiDashboards);
         }
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
 
     private String createModuleId(BigInteger id, String parentModuleId) {
@@ -146,7 +146,7 @@ public class DynamicTabService extends MongoBaseService {
         List<KPIDashboard> kpiDashboards = modifyCategories(dashboardTabs.getUpdateDashboardTab(), existingDashboardTab, level, refId);
         List<String> deletableCategoryIds = deletableDashboardTab.stream().filter(k -> !k.isDefaultTab()).map(KPIDashboardDTO::getModuleId).collect(Collectors.toList());
         counterRepository.removeAll("moduleId", deletableCategoryIds, KPIDashboard.class, level);
-        return ObjectMapperUtils.copyPropertiesOfListByMapper(kpiDashboards, KPIDashboardDTO.class);
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kpiDashboards, KPIDashboardDTO.class);
     }
 
     private List<KPIDashboardDTO> getExistingDashboardTab(List<KPIDashboardDTO> dashboardTabs, ConfLevel level, Long refId) {

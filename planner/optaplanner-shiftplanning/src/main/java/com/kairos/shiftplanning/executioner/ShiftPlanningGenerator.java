@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.executioner;
 
 import com.kairos.enums.Day;
+import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityConstraint.*;
@@ -14,6 +15,7 @@ import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.staff.PrevShiftsInfo;
 import com.kairos.shiftplanning.domain.staffing_level.*;
+import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.wta.*;
 import com.kairos.shiftplanning.enums.SkillType;
@@ -37,9 +39,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.kairos.enums.MasterDataTypeEnum.*;
 
 public class ShiftPlanningGenerator {
 
@@ -283,8 +288,13 @@ public class ShiftPlanningGenerator {
         MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60,ScoreLevel.MEDIUM,-1);//5
         List<DayType> dayTypes = getDayTypes();
         ActivityDayType activityDayType = new ActivityDayType(dayTypes,ScoreLevel.SOFT,5);
-        ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity,activityDayType);
+        ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(requiredTagId(),ScoreLevel.HARD,1);
+        ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity,activityDayType,activityRequiredTag);
         return activityConstraints;
+    }
+    public  Tag requiredTagId(){
+        Tag tag = new Tag(new BigInteger("1"),"StaffTag", STAFF, false, 958);;
+        return tag;
     }
 
 
@@ -779,14 +789,18 @@ public class ShiftPlanningGenerator {
     }
     private List<Activity> getActivities(){
         TimeType[] timeTypes= createTimeTypes();
+        List<Tag> tags1 = createTags1();
+        List<Tag> tags2 = createTags2();
+        List<Tag> tags3 = createTags3();
+        List<Tag> tags4 = createTags4();
         List<Activity> activityPlannerEntities = new ArrayList<>();
-        Activity activity = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null);
+        Activity activity = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null,tags1);
         activity.setActivityConstraints(getActivityContraints());
-        Activity activity2 =new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, null);
+        Activity activity2 =new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, null, tags2);
         activity2.setActivityConstraints(getActivityContraints());
-        Activity activity3 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null);
+        Activity activity3 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null,tags3 );
         activity3.setActivityConstraints(getActivityContraints());
-        Activity activity4 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1, null);
+        Activity activity4 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1, null,tags4);
         activity4.setActivityConstraints(getActivityContraints());
         activityPlannerEntities.add(activity);
         activityPlannerEntities.add(activity2);
@@ -794,6 +808,49 @@ public class ShiftPlanningGenerator {
         activityPlannerEntities.add(activity4);
         return activityPlannerEntities;
     }
+
+    public List<Tag> createTags1(){
+        List<Tag> tags = new ArrayList<>();
+        Tag tag1 = new Tag(new BigInteger("1"),"StaffTag", STAFF, false, 958);
+        Tag tag2 = new Tag(new BigInteger("2"),"ActivityTag", ACTIVITY, true, 18712);
+        Tag tag3 = new Tag(new BigInteger("3"),"SkillTag", SKILL, false, 958);
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+        return tags;
+    }
+
+    public List<Tag> createTags2(){
+        List<Tag> tags = new ArrayList<>();
+        Tag tag1 = new Tag(new BigInteger("1"),"StaffTag",EXPERTISE , false, 958);
+        Tag tag2 = new Tag(new BigInteger("2"),"ActivityTag", ACTIVITY, true, 18712);
+        Tag tag3 = new Tag(new BigInteger("3"),"SkillTag", SKILL, false, 958);
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+        return tags;
+    }
+    public List<Tag> createTags3(){
+        List<Tag> tags = new ArrayList<>();
+        Tag tag1 = new Tag(new BigInteger("1"),"StaffTag", WTA, false, 958);
+        Tag tag2 = new Tag(new BigInteger("2"),"ActivityTag", ACTIVITY, true, 18712);
+        Tag tag3 = new Tag(new BigInteger("3"),"SkillTag", SKILL, false, 958);
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+        return tags;
+    }
+    public List<Tag>  createTags4(){
+        List<Tag> tags = new ArrayList<>();
+        Tag tag1 = new Tag(new BigInteger("1"),"StaffTag", CTA, false, 958);
+        Tag tag2 = new Tag(new BigInteger("2"),"ActivityTag", ACTIVITY, true, 18712);
+        Tag tag3 = new Tag(new BigInteger("3"),"SkillTag", SKILL, false, 958);
+        tags.add(tag1);
+        tags.add(tag2);
+        tags.add(tag3);
+        return tags;
+    }
+
 
     /*private List<String> getActivityIds(){
         List<String> ids = new ArrayList<>(2);

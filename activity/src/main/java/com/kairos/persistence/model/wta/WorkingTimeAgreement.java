@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.wta;
 
+import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -56,6 +57,17 @@ public class WorkingTimeAgreement extends MongoBaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private Date expiryDate;
+
+    private PlanningSetting planningSetting;
+
+
+    public PlanningSetting getPlanningSetting() {
+        return planningSetting;
+    }
+
+    public void setPlanningSetting(PlanningSetting planningSetting) {
+        this.planningSetting = planningSetting;
+    }
 
     public List<BigInteger> getRuleTemplateIds() {
         return ruleTemplateIds=Optional.ofNullable(ruleTemplateIds).orElse(new ArrayList<>());

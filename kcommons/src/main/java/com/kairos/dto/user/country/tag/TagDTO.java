@@ -37,6 +37,11 @@ public class TagDTO {
 
     private PenaltyScoreDTO penaltyScore;
 
+    private String color;
+
+    private String shortName;
+    private String ultraShortName;
+
     public TagDTO(String name, MasterDataTypeEnum masterDataType){
         this.name = name;
         this.masterDataType = masterDataType;

@@ -19,7 +19,7 @@ public class ResponsibilityType extends BaseEntity {
 
 
     @NotBlank(message = "error.message.name.cannot.be.null.or.empty")
-    @Pattern(message = "error.message.name.special.character.notAllowed",regexp = "^[a-zA-Z\\s]+$")
+    @Pattern(message = "error.message.name.special.character.notAllowed",regexp = "^[a-zA-Z0-9\\s]+$")
     private String name;
     private Long countryId;
     private SuggestedDataStatus suggestedDataStatus;

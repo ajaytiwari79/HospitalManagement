@@ -7,6 +7,7 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithViolatedInfoDTO;
+import com.kairos.dto.user.staff.staff_settings.StaffActivitySettingDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.phase.PhaseDefaultName;
@@ -25,6 +26,7 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.staff_settings.StaffActivitySettingService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.wta.WTARuleTemplateCalculationService;
 import org.apache.commons.lang.StringUtils;
@@ -41,6 +43,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_WTA_NOTFOUND;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
@@ -70,7 +73,8 @@ public class AbsenceShiftService {
     private WTARuleTemplateCalculationService wtaRuleTemplateCalculationService;
     @Inject
     private ShiftStatusService shiftStatusService;
-
+    @Inject
+    private StaffActivitySettingService staffActivitySettingService;
 
     public ShiftWithViolatedInfoDTO createAbsenceTypeShift(ActivityWrapper activityWrapper, ShiftDTO shiftDTO, StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean shiftOverlappedWithNonWorkingType, ShiftActionType shiftActionType) {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO;
@@ -151,9 +155,11 @@ public class AbsenceShiftService {
             startAverageMin = getStartAverage(new DateTime(fromDate).getDayOfWeek(), shifts);
 
         }
+        StaffActivitySettingDTO staffActivitySetting = staffActivitySettingService.getStaffActivitySettingsByActivityId(activity.getUnitId(), activity.getId(),staffAdditionalInfoDTO.getId());
+        LocalTime defaultStartTime = isNotNull(staffActivitySetting) && isNotNull(staffActivitySetting.getDefaultStartTime()) ? staffActivitySetting.getDefaultStartTime() : activity.getTimeCalculationActivityTab().getDefaultStartTime();
         DateTime startDateTime = (startAverageMin != null) ?
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes(startAverageMin) :
-                new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes((activity.getTimeCalculationActivityTab().getDefaultStartTime().getHour() * 60) + activity.getTimeCalculationActivityTab().getDefaultStartTime().getMinute());
+                new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes((defaultStartTime.getHour() * 60) + defaultStartTime.getMinute());
 
         shiftActivity.setStartDate(startDateTime.toDate());
         shiftActivity.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
@@ -221,7 +227,7 @@ public class AbsenceShiftService {
         Phase phase = phaseMapByDate.get(shiftDTOS.get(0).getActivities().get(0).getStartDate());
         if ((PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty()) && shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty()) {
             shiftService.saveShiftWithActivity(phaseMapByDate, shifts, staffAdditionalInfoDTO);
-            shiftDTOS = ObjectMapperUtils.copyPropertiesOfListByMapper(shifts, ShiftDTO.class);
+            shiftDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shifts, ShiftDTO.class);
             shiftDTOS = wtaRuleTemplateCalculationService.updateRestingTimeInShifts(shiftDTOS);
             shiftDTOS = timeBankService.updateTimebankDetailsInShiftDTO(shiftDTOS);
         }

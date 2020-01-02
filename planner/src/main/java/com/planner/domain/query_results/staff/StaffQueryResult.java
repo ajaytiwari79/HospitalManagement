@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,10 @@ import java.util.Map;
 @Setter
 public class StaffQueryResult {
 
-    private Long staffId ;
+     private Long staffId ;
      private String staffName;
-     private Long employmentId;
+     private List<Long> employmentIds=new ArrayList<>();
      private HashSet<Map> staffSkills;
-     private List<ExpertiseQueryResult> employmentExpertise;
+
 
 }

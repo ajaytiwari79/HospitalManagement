@@ -1,6 +1,7 @@
 package com.kairos.rule_validator.functional_paymment;
 
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.service.exception.ExceptionService;
@@ -13,21 +14,21 @@ import static com.kairos.constants.UserMessagesConstants.*;
 
 public class IsGreaterThanStartDate extends AbstractSpecification<FunctionalPaymentDTO> {
     private Logger logger = LoggerFactory.getLogger(IsGreaterThanStartDate.class);
-    private Expertise expertise;
+    private ExpertiseLine expertiseLine;
     private ExceptionService exceptionService;
 
-    public IsGreaterThanStartDate(Expertise expertise,ExceptionService exceptionService) {
-        this.expertise = expertise;
+    public IsGreaterThanStartDate(ExpertiseLine expertiseLine, ExceptionService exceptionService) {
+        this.expertiseLine = expertiseLine;
         this.exceptionService=exceptionService;
     }
 
     @Override
     public boolean isSatisfied(FunctionalPaymentDTO functionalPaymentDTO) {
-        if (expertise.getStartDate().isAfter(functionalPaymentDTO.getStartDate())) {
+        if (expertiseLine.getStartDate().isAfter(functionalPaymentDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_FUNCTIONALPAYMENTSTARTDATE_GREATER);
         }
-        if ( Optional.ofNullable(expertise.getEndDate()).isPresent() &&  Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() &&
-                expertise.getEndDate().isAfter(functionalPaymentDTO.getEndDate())) {
+        if ( Optional.ofNullable(expertiseLine.getEndDate()).isPresent() &&  Optional.ofNullable(functionalPaymentDTO.getEndDate()).isPresent() &&
+                expertiseLine.getEndDate().isAfter(functionalPaymentDTO.getEndDate())) {
             exceptionService.actionNotPermittedException(MESSAGE_DATE_GREATERTHAN_DATE,FUNCTIONALPAYMENT,EXPERTISE);
         }
 

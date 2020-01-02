@@ -23,9 +23,10 @@ public class UserAccessRoleDTO {
         this.management = management;
     }
 
-    public UserAccessRoleDTO(Long userId, Long unitId, Boolean staff, Boolean management){
+    public UserAccessRoleDTO(Long userId, Long unitId, Long staffId,Boolean staff, Boolean management){
         this.userId = userId;
         this.unitId = unitId;
+        this.staffId=staffId;
         this.staff = staff;
         this.management = management;
     }
@@ -33,6 +34,7 @@ public class UserAccessRoleDTO {
     public UserAccessRoleDTO(Long userId, Long unitId, Boolean staff, Boolean management, Set<Long> accessGroupIds){
         this.userId = userId;
         this.unitId = unitId;
+        this.staffId=staffId;
         this.staff = staff;
         this.management = management;
         this.accessGroupIds = accessGroupIds;
