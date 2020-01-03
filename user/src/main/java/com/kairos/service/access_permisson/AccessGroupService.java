@@ -132,6 +132,7 @@ public class AccessGroupService {
         accessGroup.setDayTypes(dayTypes);
 
         organization.getAccessGroups().add(accessGroup);
+        organization.getUnits().forEach(unit->unit.getAccessGroups().add(accessGroup));
         organizationGraphRepository.save(organization, 2);
 
         //set default permission of access page while creating access group

@@ -35,6 +35,7 @@ public class TimeCalculationActivityDTO {
     private DayOfWeek fullWeekStart;
     private DayOfWeek fullWeekEnd;
     private int historyDuration;
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime defaultStartTime;
     private boolean availableAllowActivity;
 }

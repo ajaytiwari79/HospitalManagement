@@ -243,7 +243,7 @@ public class ShiftStatusService {
             case APPROVE:
                 shiftActivity.getStatus().removeAll(Arrays.asList(PENDING, REQUEST));
                 shiftActivity.getStatus().add(APPROVE);
-                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap);
+                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap.get(shift.getEmploymentId()));
                 break;
             case DISAPPROVE:
                 updateShiftOnDisapprove(shift, shiftActivity);
@@ -330,6 +330,12 @@ public class ShiftStatusService {
                 if (activityWrapperMap.get(shiftActivity.getActivityId()).getActivity().getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())) {
                     shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
                 }
+            }
+            if(shiftActivity.getStatus().contains(APPROVE)){
+                ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
+                Map<BigInteger,Activity> activityMap = new HashMap<>();
+                activityMap.put(activityWrapper.getActivity().getId(),activityWrapper.getActivity());
+                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,mainShift.getEmploymentId(),activityMap,staffAdditionalInfoDTO);
             }
         }
     }
