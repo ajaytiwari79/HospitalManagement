@@ -1271,13 +1271,12 @@ public class TimeBankCalculationService {
         public List<ShiftActivityDTO> getShiftActivityByBreak(List<ShiftActivityDTO> shiftActivities, List<ShiftActivityDTO> breakActivities) {
             List<ShiftActivityDTO> updatedShiftActivities = new ArrayList<>();
             if(isCollectionNotEmpty(breakActivities)){
-            for (ShiftActivityDTO currentBreakActivity : breakActivities) {
-                if(!currentBreakActivity.isBreakNotHeld()) {
-                    List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndIdsIn(newArrayList(currentBreakActivity.getActivityId()));
-                    for (ShiftActivityDTO shiftActivity : shiftActivities) {
-                        boolean scheduledHourAdded = false;
-                        for (ShiftActivityDTO breakActivity : breakActivities) {
-                            if (shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes()) {
+                for (ShiftActivityDTO shiftActivity : shiftActivities) {
+                    boolean scheduledHourAdded = false;
+                    for (ShiftActivityDTO breakActivity : breakActivities) {
+                        if (shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes()) {
+                            if (!breakActivity.isBreakNotHeld()) {
+                                List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndIdsIn(newArrayList(breakActivity.getActivityId()));
                                 List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(breakActivity.getInterval());
                                 scheduledHourAdded = updateShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, dateTimeIntervals, scheduledHourAdded);
                                 List<PlannedTime> plannedTimes = new ArrayList<>();
@@ -1293,12 +1292,14 @@ public class TimeBankCalculationService {
                                 breakActivity.setActivity(activityDTOS.get(0));
                                 breakActivity.setPlannedTimes(plannedTimes);
                                 updatedShiftActivities.add(breakActivity);
+                            }else {
+                                updatedShiftActivities.add(shiftActivity);
                             }
                         }
                     }
                 }
-            }
-        } else {
+
+            } else {
                 updatedShiftActivities = shiftActivities;
             }
             Collections.sort(updatedShiftActivities);
