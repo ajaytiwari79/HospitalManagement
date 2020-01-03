@@ -366,8 +366,15 @@ public class TimeBankCalculationService {
 
     private Object[] getShiftsByDate(Interval interval, List<ShiftWithActivityDTO> shifts, List<PayOutPerShift> payOutPerShifts) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = new ArrayList<>();
-        Map<BigInteger, PayOutPerShift> payOutPerShiftMap = payOutPerShifts.stream().collect(Collectors.toMap(PayOutPerShift::getShiftId, v -> v));
+        Map<BigInteger, PayOutPerShift> payOutPerShiftMap = new HashMap<>();
         List<PayOutPerShift> intervalPayOutPerShifts = new ArrayList<>();
+        for (PayOutPerShift payOutPerShift : payOutPerShifts) {
+            if(!BigInteger.valueOf(-1l).equals(payOutPerShift.getShiftId())){
+                payOutPerShiftMap.put(payOutPerShift.getShiftId(),payOutPerShift);
+            }else if(interval.contains(asDate(payOutPerShift.getDate()).getTime())){
+                intervalPayOutPerShifts.add(payOutPerShift);
+            }
+        }
         shifts.forEach(shift -> {
             if (interval.contains(shift.getStartDate().getTime()) || interval.contains(shift.getEndDate().getTime())) {
                 shiftWithActivityDTOS.add(shift);
@@ -1265,26 +1272,28 @@ public class TimeBankCalculationService {
             List<ShiftActivityDTO> updatedShiftActivities = new ArrayList<>();
             if(isCollectionNotEmpty(breakActivities)){
             for (ShiftActivityDTO currentBreakActivity : breakActivities) {
-                List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndIdsIn(newArrayList(currentBreakActivity.getActivityId()));
-                for (ShiftActivityDTO shiftActivity : shiftActivities) {
-                    boolean scheduledHourAdded = false;
-                    for (ShiftActivityDTO breakActivity : breakActivities) {
-                        if (shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes()) {
-                            List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(breakActivity.getInterval());
-                            scheduledHourAdded = updateShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, dateTimeIntervals,scheduledHourAdded);
-                            List<PlannedTime> plannedTimes = new ArrayList<>();
-                            for (PlannedTime plannedTime : shiftActivity.getPlannedTimes()) {
-                                if (breakActivity.getInterval().overlaps(plannedTime.getInterval())) {
-                                    DateTimeInterval breakDateTimeInterval = breakActivity.getInterval().overlap(plannedTime.getInterval());
-                                    PlannedTime breakPlannedTime = ObjectMapperUtils.copyPropertiesByMapper(plannedTime, PlannedTime.class);
-                                    breakPlannedTime.setStartDate(breakDateTimeInterval.getStartDate());
-                                    breakPlannedTime.setEndDate(breakDateTimeInterval.getEndDate());
-                                    plannedTimes.add(breakPlannedTime);
+                if(!currentBreakActivity.isBreakNotHeld()) {
+                    List<ActivityDTO> activityDTOS = activityMongoRepository.findByDeletedFalseAndIdsIn(newArrayList(currentBreakActivity.getActivityId()));
+                    for (ShiftActivityDTO shiftActivity : shiftActivities) {
+                        boolean scheduledHourAdded = false;
+                        for (ShiftActivityDTO breakActivity : breakActivities) {
+                            if (shiftActivity.getInterval().overlaps(breakActivity.getInterval()) && shiftActivity.getInterval().overlap(breakActivity.getInterval()).getMinutes() == breakActivity.getInterval().getMinutes()) {
+                                List<DateTimeInterval> dateTimeIntervals = shiftActivity.getInterval().minusInterval(breakActivity.getInterval());
+                                scheduledHourAdded = updateShiftActivityByBreakInterval(updatedShiftActivities, shiftActivity, dateTimeIntervals, scheduledHourAdded);
+                                List<PlannedTime> plannedTimes = new ArrayList<>();
+                                for (PlannedTime plannedTime : shiftActivity.getPlannedTimes()) {
+                                    if (breakActivity.getInterval().overlaps(plannedTime.getInterval())) {
+                                        DateTimeInterval breakDateTimeInterval = breakActivity.getInterval().overlap(plannedTime.getInterval());
+                                        PlannedTime breakPlannedTime = ObjectMapperUtils.copyPropertiesByMapper(plannedTime, PlannedTime.class);
+                                        breakPlannedTime.setStartDate(breakDateTimeInterval.getStartDate());
+                                        breakPlannedTime.setEndDate(breakDateTimeInterval.getEndDate());
+                                        plannedTimes.add(breakPlannedTime);
+                                    }
                                 }
+                                breakActivity.setActivity(activityDTOS.get(0));
+                                breakActivity.setPlannedTimes(plannedTimes);
+                                updatedShiftActivities.add(breakActivity);
                             }
-                            breakActivity.setActivity(activityDTOS.get(0));
-                            breakActivity.setPlannedTimes(plannedTimes);
-                            updatedShiftActivities.add(breakActivity);
                         }
                     }
                 }
