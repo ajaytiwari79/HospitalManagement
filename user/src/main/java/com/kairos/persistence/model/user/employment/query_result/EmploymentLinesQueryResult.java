@@ -2,6 +2,7 @@ package com.kairos.persistence.model.user.employment.query_result;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
+import com.kairos.enums.EmploymentSubType;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.math.BigDecimal;
@@ -31,6 +32,15 @@ public class EmploymentLinesQueryResult {
     private long accumulatedTimebankMinutes;
     private LocalDate accumulatedTimebankDate;
     private Long employmentTypeId;
+    private EmploymentSubType employmentSubType;
+
+    public EmploymentSubType getEmploymentSubType() {
+        return employmentSubType;
+    }
+
+    public void setEmploymentSubType(EmploymentSubType employmentSubType) {
+        this.employmentSubType = employmentSubType;
+    }
 
     public EmploymentLinesQueryResult() {
         //DC

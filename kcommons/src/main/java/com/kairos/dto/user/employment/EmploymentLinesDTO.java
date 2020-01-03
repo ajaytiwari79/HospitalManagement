@@ -2,6 +2,7 @@ package com.kairos.dto.user.employment;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,6 +32,7 @@ public class EmploymentLinesDTO {
     private long accumulatedTimebankMinutes;
     private BigDecimal hourlyCost;
     private Long employmentTypeId;
+    private EmploymentSubType employmentSubType;
 
 
     //This getter is used for Accumulated Timebank calculation

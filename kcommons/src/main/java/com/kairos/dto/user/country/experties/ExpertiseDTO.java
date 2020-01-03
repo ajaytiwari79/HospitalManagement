@@ -46,6 +46,7 @@ public class ExpertiseDTO {
     private List<ExpertiseLineDTO> expertiseLines = new ArrayList<>();
 
 
+
     @AssertTrue(message = "message.start_date.less_than.end_date")
     public boolean isValid() {
         if (!Optional.ofNullable(this.startDate).isPresent() && Optional.ofNullable(this.endDate).isPresent()) {

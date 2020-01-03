@@ -45,6 +45,7 @@ public class EmploymentWithCtaDetailsDTO {
     private ExpertiseDTO expertiseQueryResult;
 
 
+
     public EmploymentWithCtaDetailsDTO(Long id) {
         this.id = id;
     }
