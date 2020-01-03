@@ -2,6 +2,7 @@ package com.kairos.dto.user.employment;
 
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
 import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
  */
 @Getter
 @Setter
-public class EmploymentLinesDTO {
+public class EmploymentLinesDTO implements Comparable<EmploymentLinesDTO> {
 
     private Long id;
     private Long employmentId;
@@ -48,4 +49,13 @@ public class EmploymentLinesDTO {
 
         return isNull(hourlyCost) ? new BigDecimal(0): hourlyCost;
     }
+
+    @Override
+    public int compareTo(EmploymentLinesDTO employmentLinesDTO) {
+
+            if (getStartDate() == null || employmentLinesDTO.getStartDate() == null) {
+                return 0;
+            }
+            return getStartDate().compareTo(employmentLinesDTO.getStartDate());
+        }
 }
