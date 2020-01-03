@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -29,6 +30,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT;
@@ -168,7 +171,7 @@ public class GroupService {
     }
 
     private boolean validate(String date, AgeRangeDTO dateRange){
-        long inDays = ChronoUnit.DAYS.between(LocalDate.parse(date), LocalDate.now());
+        long inDays = ChronoUnit.DAYS.between(asLocalDate(date), getCurrentLocalDate());
         long from = getDataInDays(dateRange.getFrom(), dateRange.getDurationType());
         long to = isNotNull(dateRange.getTo()) ? getDataInDays(dateRange.getTo(), dateRange.getDurationType()) : MAX_LONG_VALUE ;
         return from <= inDays && to >= inDays;
