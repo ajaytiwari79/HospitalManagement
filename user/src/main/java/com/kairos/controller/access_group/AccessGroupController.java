@@ -33,7 +33,7 @@ import static com.kairos.constants.ApiConstants.*;
 public class AccessGroupController {
 
     @Inject
-    AccessGroupService accessGroupService;
+    private AccessGroupService accessGroupService;
 
 
     @PostMapping(value = UNIT_URL+"/access_group")
