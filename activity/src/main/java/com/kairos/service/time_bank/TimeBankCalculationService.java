@@ -1274,7 +1274,7 @@ public class TimeBankCalculationService {
                                     plannedTimes.add(breakPlannedTime);
                                 }
                             }
-                            //breakActivity.setActivity(activityDTOS.get(0));
+                            breakActivity.setActivity(activityDTOS.get(0));
                             breakActivity.setPlannedTimes(plannedTimes);
                             updatedShiftActivities.add(breakActivity);
                         }
