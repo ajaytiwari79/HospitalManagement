@@ -93,7 +93,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         if (isCollectionNotEmpty(staffChildAges)) {
             for (Integer staffChildAge : staffChildAges) {
                 for (CareDaysDTO careDaysDTO : careDaysDTOS) {
-                    if (staffChildAge >= careDaysDTO.getFrom() && isNull(careDaysDTO.getTo()) || staffChildAge <= careDaysDTO.getTo()) {
+                    if (staffChildAge >= careDaysDTO.getFrom() && isNull(careDaysDTO.getTo()) || staffChildAge < careDaysDTO.getTo()) {
                         leaveCount += careDaysDTO.getLeavesAllowed();
                         break;
                     }
