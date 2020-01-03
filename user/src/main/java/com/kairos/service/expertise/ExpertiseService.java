@@ -458,6 +458,11 @@ public class ExpertiseService {
     }
 
     public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {
+        if(SENIOR_DAYS.equalsIgnoreCase(wtaType)){
+            expertiseGraphRepository.removeSeniorDays(expertiseId);
+        }else if(CHILD_CARE.equalsIgnoreCase(wtaType)){
+            expertiseGraphRepository.removeChildCareDays(expertiseId);
+        }
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (isNull(expertise) || expertise.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
@@ -466,9 +471,9 @@ public class ExpertiseService {
         validateAgeRange(ageRangeDTO);
 
         List<CareDays> careDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(ageRangeDTO, CareDays.class);
-        if (wtaType.equalsIgnoreCase(SENIOR_DAYS)) {
+        if (SENIOR_DAYS.equalsIgnoreCase(wtaType)) {
             expertise.setSeniorDays(careDays);
-        } else if (wtaType.equalsIgnoreCase(CHILD_CARE)) {
+        } else if (CHILD_CARE.equalsIgnoreCase(wtaType)) {
             expertise.setChildCareDays(careDays);
         }
         expertiseGraphRepository.save(expertise);
