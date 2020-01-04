@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 
@@ -109,8 +110,8 @@ public class ShiftDTO {
 
     public ShiftDTO(BigInteger id, Date startDate, Date endDate, Long unitId, Long staffId) {
        this.id = id;
-       this.startDate = startDate;
-       this.endDate = endDate;
+       this.startDate = roundDateByMinutes(startDate,15);
+       this.endDate = roundDateByMinutes(endDate,15);
        this.unitId = unitId;
        this.staffId = staffId;
    }
@@ -127,8 +128,8 @@ public class ShiftDTO {
         this.unitId = unitId;
         this.staffId = staffId;
         this.employmentId = employmentId;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = roundDateByMinutes(startDate,15);
+        this.endDate = roundDateByMinutes(endDate,15);
     }
 
     @JsonIgnore
@@ -189,6 +190,14 @@ public class ShiftDTO {
     public List<ShiftActivityDTO> getBreakActivities() {
         this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
         return breakActivities;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = roundDateByMinutes(startDate,15);
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = roundDateByMinutes(endDate,15);;
     }
 
     @Override

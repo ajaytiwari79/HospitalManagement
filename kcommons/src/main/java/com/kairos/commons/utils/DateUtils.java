@@ -928,7 +928,7 @@ public  class DateUtils {
 
     public static Date roundDateByMinutes(Date date,int minutes){
         ZonedDateTime zonedDateTime = asZoneDateTime(date);
-        return asDate(zonedDateTime.truncatedTo(ChronoUnit.HOURS).plusMinutes((int)Math.ceil((double)zonedDateTime.get(ChronoField.MINUTE_OF_HOUR)/minutes)*minutes));
+        return asDate(zonedDateTime.truncatedTo(ChronoUnit.HOURS).plusMinutes((int)Math.round((double)zonedDateTime.get(ChronoField.MINUTE_OF_HOUR)/minutes)*minutes));
     }
     public static Set<DayOfWeek> getAllDaysBetweenDays(DayOfWeek startDayOfWeek, DayOfWeek endDayOfWeek) {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
@@ -948,6 +948,7 @@ public  class DateUtils {
     public static boolean isEqualOrAfter(ZonedDateTime date1,ZonedDateTime date2){
         return date1.equals(date2) || date1.isAfter(date2);
     }
+
 
 
 }
