@@ -103,15 +103,15 @@ public class ShiftDTO {
     }
 
     public ShiftDTO(Date startDate, Date endDate, List<ShiftActivityDTO> activities) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
+        this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
         this.activities = activities;
     }
 
     public ShiftDTO(BigInteger id, Date startDate, Date endDate, Long unitId, Long staffId) {
        this.id = id;
-       this.startDate = roundDateByMinutes(startDate,15);
-       this.endDate = roundDateByMinutes(endDate,15);
+       this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
+       this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
        this.unitId = unitId;
        this.staffId = staffId;
    }
@@ -123,13 +123,14 @@ public class ShiftDTO {
         this.employmentId = employmentId;
     }
 
+    //Todo this constructor is only for absenceType of Activity
     public ShiftDTO(List<ShiftActivityDTO> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.employmentId.notnull") Long employmentId, Date startDate, Date endDate) {
         this.activities = activities;
         this.unitId = unitId;
         this.staffId = staffId;
         this.employmentId = employmentId;
-        this.startDate = roundDateByMinutes(startDate,15);
-        this.endDate = roundDateByMinutes(endDate,15);
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     @JsonIgnore
@@ -154,6 +155,7 @@ public class ShiftDTO {
         this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
     }
 
+    //todo don't remove this method it is for frontend
     public boolean isMultipleActivity() {
         Set<BigInteger> multipleActivityCount = new HashSet<>();
         for (ShiftActivityDTO activity : this.getActivities()) {
@@ -193,11 +195,16 @@ public class ShiftDTO {
     }
 
     public void setStartDate(Date startDate) {
-        this.startDate = roundDateByMinutes(startDate,15);
+        this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = roundDateByMinutes(endDate,15);;
+        this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);;
+    }
+
+    public void setStartDateAndEndDate(Date startDate,Date endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     @Override
