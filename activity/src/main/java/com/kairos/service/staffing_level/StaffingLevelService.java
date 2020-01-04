@@ -700,8 +700,8 @@ public class StaffingLevelService  {
         Map<BigInteger,Activity> activityMap = activityAndParentActivityMap[1];
         if(isNull(staffSkillsMap)) {
             List<Long> staffIds = shifts.stream().map(shift-> shift.getStaffId()).collect(Collectors.toList());
-            List<StaffPersonalDetail> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate())).get(asLocalDate(staffingLevel.getCurrentDate()).toString());
-            staffSkillsMap = staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSkills()));
+            List<StaffPersonalDetail> staffDTOS = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate())).getOrDefault(asLocalDate(staffingLevel.getCurrentDate()).toString(),new ArrayList<>());
+            staffSkillsMap = isCollectionNotEmpty(staffDTOS) ? staffDTOS.stream().collect(Collectors.toMap(k -> k.getId(), v -> v.getSkills())) : new HashMap<>();
         }
         for (Shift shift : shifts) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
@@ -746,7 +746,7 @@ public class StaffingLevelService  {
                 updateShiftActivityStaffingLevel(durationMinutes, childActivity, staffingLevelInterval, interval,breakActivities);
             }
             staffingLevelInterval.setAvailableNoOfStaff(availableNoOfStaff);
-            if(isCollectionNotEmpty(staffingLevelInterval.getStaffingLevelSkills()) && isNotEmpty(staffSkillsMap)){
+            if(isCollectionNotEmpty(staffingLevelInterval.getStaffingLevelSkills()) && isMapNotEmpty(staffSkillsMap)){
                 updateStaffingLevelSkills(staffingLevelInterval,staffId, staffSkillsMap,interval,shiftActivity);
             }
         }
