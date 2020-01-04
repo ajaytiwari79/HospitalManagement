@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
@@ -342,7 +343,7 @@ public class SkillService {
             List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds, selectedFromDate.toString());
             List<StaffPersonalDetail> staffDTOS = new ArrayList<>();
             if(isCollectionNotEmpty(staffQueryResults)) {
-                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffPersonalDetail(staffQueryResult.getStaff().getId(), staffQueryResult.getSkills())));
+                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffPersonalDetail(isNotNull(staffQueryResult.getStaff()) ? staffQueryResult.getStaff().getId() : staffQueryResult.getId(), staffQueryResult.getSkills())));
             }
             staffSkillsMap.put(selectedFromDate.toString(), staffDTOS);
             selectedFromDate = selectedFromDate.plusDays(1);
