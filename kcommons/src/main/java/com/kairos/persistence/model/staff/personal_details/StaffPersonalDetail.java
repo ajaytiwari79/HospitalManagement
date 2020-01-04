@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+
 
 /**
  * Created by prabjot on 10/1/17.
@@ -90,7 +92,9 @@ public class StaffPersonalDetail {
 
     public void setContactAddress(AddressDTO contactAddress) {
         this.contactAddress = contactAddress;
-        this.contactAddress.setPrimary(true);
+        if(isNotNull(this.contactAddress)){
+            this.contactAddress.setPrimary(true);
+        }
     }
 
     @Override
