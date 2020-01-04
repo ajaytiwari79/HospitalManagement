@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
@@ -82,21 +83,21 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private ShiftType shiftType;
     private boolean breakInterrupt;
     public ShiftActivityDTO(Date startDate, Date endDate) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = roundDateByMinutes(startDate,15);
+        this.endDate = roundDateByMinutes(endDate,15);
     }
 
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, Long absenceReasonCodeId) {
         this.activityId = activityId;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = roundDateByMinutes(startDate,15);
+        this.endDate = roundDateByMinutes(endDate,15);
         this.activityName = activityName;
         this.absenceReasonCodeId=absenceReasonCodeId;
     }
     public ShiftActivityDTO(String activityName, Date startDate, Date endDate, BigInteger activityId, String message, boolean success){
         this.activityName=activityName;
-        this.startDate=startDate;
-        this.endDate=endDate;
+        this.startDate=roundDateByMinutes(startDate,15);
+        this.endDate=roundDateByMinutes(endDate,15);
         this.activityId=activityId;
         this.message=message;
         this.success=success;
@@ -119,8 +120,8 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     public ShiftActivityDTO(String activityName, Date startDate,Date endDate,BigInteger activityId,int scheduledMinutes,Set<ShiftStatus> status,ActivityDTO activity) {
         this.activityId = activityId;
         this.scheduledMinutes = scheduledMinutes;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = roundDateByMinutes(startDate,15);
+        this.endDate = roundDateByMinutes(endDate,15);
         this.activityName = activityName;
         this.status=status;
         this.activity = activity;
@@ -184,6 +185,14 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
 
     public int getTotalCtaBonusMinutes(){
         return payoutCtaBonusMinutes + timeBankCtaBonusMinutes;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = roundDateByMinutes(startDate,15);
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = roundDateByMinutes(endDate,15);;
     }
 
     public void resetTimebankDetails(){
