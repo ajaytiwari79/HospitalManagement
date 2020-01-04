@@ -468,6 +468,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     void unlinkAllTagsFromStaff(Long staffId);
 
     @Query("MATCH (staff:Staff)-[rel:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail) where id(staff) = {0} detach delete staffChildDetail")
-    void unlinkStaffChilds(Long staffId);
+    void unlinkStaffChild(Long staffId);
 }
 

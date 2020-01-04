@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -24,9 +25,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT;
@@ -156,19 +161,19 @@ public class GroupService {
         List<Map> staffs = staffGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
         if(isNotNull(ageRange)) {
             final AgeRangeDTO age = new AgeRangeDTO(Integer.parseInt(ageRange.get("from").toString()), isNotNull(ageRange.get("to")) ? Integer.parseInt(ageRange.get("to").toString()) : null, DurationType.valueOf(ageRange.get("durationType").toString()));
-            staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("age").toString()), age)).collect(Collectors.toList());
+            staffs = staffs.stream().filter(map -> validate(map.get("dateOfBirth").toString(), age)).collect(Collectors.toList());
         }
         if(isNotNull(experienceRange)){
             final AgeRangeDTO joining = new AgeRangeDTO(Integer.parseInt(experienceRange.get("from").toString()), isNotNull(experienceRange.get("to")) ? Integer.parseInt(experienceRange.get("to").toString()) : null,DurationType.valueOf(experienceRange.get("durationType").toString()));
-            staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("experienceInYears").toString()), joining)).collect(Collectors.toList());
+            staffs = staffs.stream().filter(map -> validate(map.get("joiningDate").toString(), joining)).collect(Collectors.toList());
         }
         return staffs;
     }
 
-    private boolean validate(int inYears, AgeRangeDTO ageRangeDTO){
-        long inDays = Math.round(inYears *  DAYS_IN_ONE_YEAR);
-        long from = getDataInDays(ageRangeDTO.getFrom(), ageRangeDTO.getDurationType());
-        long to = isNotNull(ageRangeDTO.getTo()) ? getDataInDays(ageRangeDTO.getTo(), ageRangeDTO.getDurationType()) : MAX_LONG_VALUE ;
+    private boolean validate(String date, AgeRangeDTO dateRange){
+        long inDays = ChronoUnit.DAYS.between(asLocalDate(date), getCurrentLocalDate());
+        long from = getDataInDays(dateRange.getFrom(), dateRange.getDurationType());
+        long to = isNotNull(dateRange.getTo()) ? getDataInDays(dateRange.getTo(), dateRange.getDurationType()) : MAX_LONG_VALUE ;
         return from <= inDays && to >= inDays;
     }
 

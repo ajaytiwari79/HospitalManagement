@@ -333,6 +333,12 @@ public class ShiftStatusService {
                     shiftActivity.getStatus().add(UserContext.getUserDetails().isManagement() ? ShiftStatus.APPROVE : ShiftStatus.REQUEST);
                 }
             }
+            if(shiftActivity.getStatus().contains(APPROVE)){
+                ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
+                Map<BigInteger,Activity> activityMap = new HashMap<>();
+                activityMap.put(activityWrapper.getActivity().getId(),activityWrapper.getActivity());
+                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,mainShift.getEmploymentId(),activityMap,staffAdditionalInfoDTO);
+            }
         }
     }
 

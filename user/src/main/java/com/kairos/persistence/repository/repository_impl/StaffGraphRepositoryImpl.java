@@ -177,7 +177,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
 
         query += " RETURN distinct {id:id(staff),tags:tags, employments:employments,expertiseList:expertiseList,employmentList:collect(employmentList[0]),city:contactAddress.city,province:contactAddress.province, " +
                 "firstName:user.firstName,lastName:user.lastName,employedSince :staff.employedSince," +
-                "age:duration.between(date(user.dateOfBirth),date()).years,experienceInYears:duration.between(date(user.joiningDate),date()).years," +
+                "age:duration.between(date(user.dateOfBirth),date()).years,joiningDate:user.joiningDate,dateOfBirth:user.dateOfBirth," +
                 "badgeNumber:staff.badgeNumber, userName:staff.userName,currentStatus:staff.currentStatus,externalId:staff.externalId, access_token:staff.access_token," +
                 "cprNumber:user.cprNumber, visitourTeamId:staff.visitourTeamId, familyName: staff.familyName, " +
                 "gender:user.gender, pregnant:user.pregnant,  profilePic:{imagePath} + staff.profilePic, engineerType:id(engineerType),user_id:staff.user_id } as staff ORDER BY staff.id\n";
