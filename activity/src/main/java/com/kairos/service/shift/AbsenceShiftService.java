@@ -160,12 +160,12 @@ public class AbsenceShiftService {
         DateTime startDateTime = (startAverageMin != null) ?
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes(startAverageMin) :
                 new DateTime(fromDate).withTimeAtStartOfDay().plusMinutes((defaultStartTime.getHour() * 60) + defaultStartTime.getMinute());
-
-        shiftActivity.setStartDate(startDateTime.toDate());
-        shiftActivity.setEndDate(startDateTime.plusMinutes(contractualMinutesInADay).toDate());
+        Date startDate = startDateTime.toDate();
+        Date endDate = startDateTime.plusMinutes(contractualMinutesInADay).toDate();
+        shiftActivity.setStartDateAndEndDate(startDate,endDate);
         shiftActivity.setActivityName(activity.getName());
         shiftActivity.setAbsenceReasonCodeId(absenceReasonCodeId);
-        return new ShiftDTO(Arrays.asList(shiftActivity), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), startDateTime.toDate(), startDateTime.plusMinutes(contractualMinutesInADay).toDate());
+        return new ShiftDTO(Arrays.asList(shiftActivity), staffAdditionalInfoDTO.getUnitId(), staffAdditionalInfoDTO.getId(), staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate);
     }
 
     private Integer getStartAverage(int day, List<ShiftDTO> shifts) {
