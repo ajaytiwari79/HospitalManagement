@@ -300,11 +300,11 @@ public class ClientAddressService{
     private ContactAddress persistAddress(AddressDTO addressDTO, Client client, ContactAddress contactAddress, long unitId) {
         ZipCode zipCode;
         if (addressDTO.isVerifiedByGoogleMap()) {
-            if (addressDTO.getZipCodeValue() == 0) {
+            if (addressDTO.getZipCode().getZipCode() == 0) {
                 logger.debug("No ZipCode value received");
                 return null;
             }
-            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
             if (zipCode == null) {
                 logger.debug("ZipCode Not Found returning null");
                 return null;
@@ -322,14 +322,14 @@ public class ClientAddressService{
             contactAddress.setVerifiedByVisitour(true);
             contactAddress.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
             contactAddress.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
+            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
             if (zipCode == null) {
                 logger.debug("ZipCode Not Found returning null");
                 return null;
             }
         }
 
-        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
+        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
         if (municipality == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 

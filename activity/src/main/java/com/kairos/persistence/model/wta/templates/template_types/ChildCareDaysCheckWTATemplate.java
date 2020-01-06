@@ -55,11 +55,8 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if (!isDisabled() && validateRulesChildCareDayCheck(infoWrapper.getActivityWrapperMap())) {
+        if (!isDisabled() && validateRulesChildCareDayCheck(infoWrapper.getActivityWrapperMap()) && CollectionUtils.containsAny(activityIds,infoWrapper.getShift().getActivityIds())) {
             WorkTimeAgreementBalancesCalculationService workTimeAgreementService= ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
-
-            //CareDaysDTO careDays = getCareDays(infoWrapper.getChildCareDays(), infoWrapper.getStaffAge());
-
             if (isCollectionNotEmpty(infoWrapper.getChildCareDays())) {
                 long leaveCount = calculateChildCareDaysLeaveCount(infoWrapper.getChildCareDays(), infoWrapper.getStaffChildAges());
                 DateTimeInterval dateTimeInterval = getIntervalByActivity(infoWrapper.getActivityWrapperMap(), infoWrapper.getShift().getStartDate(), activityIds);
@@ -96,7 +93,7 @@ public class ChildCareDaysCheckWTATemplate extends WTABaseRuleTemplate {
         if (isCollectionNotEmpty(staffChildAges)) {
             for (Integer staffChildAge : staffChildAges) {
                 for (CareDaysDTO careDaysDTO : careDaysDTOS) {
-                    if (staffChildAge >= careDaysDTO.getFrom() && isNull(careDaysDTO.getTo()) || staffChildAge <= careDaysDTO.getTo()) {
+                    if (staffChildAge >= careDaysDTO.getFrom() && isNull(careDaysDTO.getTo()) || staffChildAge < careDaysDTO.getTo()) {
                         leaveCount += careDaysDTO.getLeavesAllowed();
                         break;
                     }

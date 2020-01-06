@@ -218,6 +218,7 @@ public class UserMessagesConstants {
     public static final String ERROR_WEEKLY_MINUTES_EXCEEDS = "error.weekly_minutes.exceeds";
     public static final String ERROR_FUNCTION_NAME_NOTEMPTY = "error.function.name.notEmpty";
     public static final String MESSAGE_FUNCTION_NAME_ALREADYEXIST = "message.function.name.alreadyExist";
+    public static final String MESSAGE_FUNCTION_NAME_OR_CODE_ALREADYEXIST ="message.function.name.or.code.alreadyExist";
     public static final String MESSAGE_FUNCTION_ID_NOTFOUND = "message.function.id.notFound";
     public static final String MESSAGE_PRESENCETYPE_NAME_ALREADYEXIST = "message.presenceType.name.alreadyExist";
     public static final String MESSAGE_PRESENCETYPE_ID_NOTFOUND = "message.presenceType.id.notFound";
@@ -453,6 +454,6 @@ public class UserMessagesConstants {
     public static final String MESSAGE_GROUP_NOT_FOUND = "message.group.not.Found";
     public static  final String ERROR_STAFF_CPRNUMBER_NOTNULL="error.staff.cprNumber.notnull";
     public static final String  ERROR_EMAIL_VALID="error.email.valid";
-    public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.staff.userName.notnull";
+    public static  final String ERROR_STAFF_USERNAME_NOTNULL="error.Staff.userName.notnull";
     public static  final String ERROR_STAFF_ACCESSGROUP_NOTNULL="error.staff.accessGroup.id.notnull";
 }

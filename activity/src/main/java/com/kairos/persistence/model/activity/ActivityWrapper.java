@@ -18,6 +18,12 @@ public class ActivityWrapper {
         this.timeType = timeType;
     }
 
+    public ActivityWrapper(Activity activity, String timeType, TimeType timeTypeInfo) {
+        this.activity = activity;
+        this.timeType = timeType;
+        this.timeTypeInfo = timeTypeInfo;
+    }
+
     public ActivityWrapper(Activity activity) {
         this.activity = activity;
     }

@@ -5,13 +5,10 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.UnitManagerDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.enums.IntegrationOperation;
-import com.kairos.enums.MasterDataTypeEnum;
-import com.kairos.enums.PenaltyScoreLevel;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -23,14 +20,11 @@ import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.country.default_data.CompanyCategory;
 import com.kairos.persistence.model.country.default_data.UnitType;
 import com.kairos.persistence.model.country.default_data.account_type.AccountType;
-import com.kairos.persistence.model.country.tag.PenaltyScore;
-import com.kairos.persistence.model.country.tag.Tag;
-import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.persistence.model.organization.*;
 import com.kairos.persistence.model.organization.time_slot.TimeSlot;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -398,7 +392,7 @@ public class CompanyCreationService {
         user.setGender(CPRUtil.getGenderFromCPRNumber(unitManagerDTO.getCprNumber()));
     }
 
-    public StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId) {
+    public StaffPersonalDetailQueryResult getUnitManagerOfOrganization(Long unitId) {
         return userGraphRepository.getUnitManagerOfOrganization(unitId);
     }
 
@@ -495,16 +489,16 @@ public class CompanyCreationService {
     }
 
     private void prepareAddress(ContactAddress contactAddress, AddressDTO addressDTO) {
-        if(addressDTO.getZipCodeId() != null) {
-            ZipCode zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId(), 0);
+        if(addressDTO.getZipCode() != null) {
+            ZipCode zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId(), 0);
             if(zipCode == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
             }
             contactAddress.setCity(zipCode.getName());
             contactAddress.setZipCode(zipCode);
         }
-        if(addressDTO.getMunicipalityId() != null) {
-            Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId(), 0);
+        if(addressDTO.getMunicipality().getId() != null) {
+            Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId(), 0);
             if(municipality == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
             }
@@ -569,7 +563,7 @@ public class CompanyCreationService {
         // If it has any error then it will throw exception
         // Here a list is created and organization with all its childrens are sent to function to validate weather any of organization
         //or parent has any missing required details
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
+        List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults;
         List<Long> unitIds = new ArrayList<>();
         List<OrganizationBaseEntity> units = new ArrayList<>();
         units.add(organization);
@@ -586,8 +580,8 @@ public class CompanyCreationService {
             unitIds.add(organizationId);
         }
         //todo we don't need to fetch the existing staffs
-        staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, parent.getId());
-        validateUserDetails(staffPersonalDetailDTOS, exceptionService);
+        staffPersonalDetailQueryResults = userGraphRepository.getUnitManagerOfOrganization(unitIds, parent.getId());
+        validateUserDetails(staffPersonalDetailQueryResults, exceptionService);
         List<OrganizationContactAddress> organizationContactAddresses = unitGraphRepository.getContactAddressOfOrganizations(unitIds);
         validateAddressDetails(organizationContactAddresses, exceptionService);
         organization.setBoardingCompleted(true);
@@ -602,7 +596,7 @@ public class CompanyCreationService {
         } catch (Exception e) {
             LOGGER.info("schedular is not running , unable to create job");
         }
-        addStaffsInChatServer(staffPersonalDetailDTOS.stream().map(StaffPersonalDetailDTO::getStaff).collect(Collectors.toList()));
+        addStaffsInChatServer(staffPersonalDetailQueryResults.stream().map(StaffPersonalDetailQueryResult::getStaff).collect(Collectors.toList()));
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(parent.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();
         List<Long> orgSubTypeIds = organization.getOrganizationSubTypes().stream().map(orgSubType -> orgSubType.getId()).collect(Collectors.toList());
@@ -622,7 +616,7 @@ public class CompanyCreationService {
             childQueryResults.add(childUnit);
         }
         organizationQueryResult.setChildren(childQueryResults);
-        Map<Long, Long> unitAndStaffIdMap = staffPersonalDetailDTOS.stream().filter(distinctByKey(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId())).collect(Collectors.toMap(staffPersonalDetailDTO->staffPersonalDetailDTO.getOrganizationId(), v -> v.getStaff().getId()));
+        Map<Long, Long> unitAndStaffIdMap = staffPersonalDetailQueryResults.stream().filter(distinctByKey(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId())).collect(Collectors.toMap(staffPersonalDetailDTO->staffPersonalDetailDTO.getOrganizationId(), v -> v.getStaff().getId()));
         unitIds.stream().forEach(unitId -> {
             if(unitAndStaffIdMap.containsKey(unitId)) {
                 activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(unitAndStaffIdMap.get(unitId))), unitId);

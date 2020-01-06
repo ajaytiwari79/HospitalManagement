@@ -8,7 +8,10 @@ import com.kairos.dto.user.organization.OrganizationTypeDTO;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * @author pradeep
@@ -25,4 +28,9 @@ public class WTABasicDetailsDTO {
     private List<OrganizationBasicDTO> organizations;
     private OrganizationTypeDTO organizationSubType;
     private CountryDTO countryDTO;
+
+    public List<OrganizationBasicDTO> getOrganizations() {
+        return isNullOrElse(organizations,new ArrayList<>());
+    }
+
 }
