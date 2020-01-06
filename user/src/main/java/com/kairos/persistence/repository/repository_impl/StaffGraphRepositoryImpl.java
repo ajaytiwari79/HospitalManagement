@@ -1,4 +1,4 @@
-package com.kairos.persistence.repository.repository_impl;
+ package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
@@ -87,11 +87,12 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("staffIds",staffIds);
         }
         stringBuilder.append(" MATCH (employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine)"+
-                "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)"+
-                "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
-                "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,\n" +
-                "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,expertise "+
-                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,unitId:employment.unitId,accumulatedTimebankMinutes:employment.accumulatedTimebankMinutes,accumulatedTimebankDate:employment.accumulatedTimebankDate, employmentLines:employmentLines ,expertiseId:id(expertise)} as employment,staff,org,user,expertise\n" +
+                "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)-[r:HAS_EXPERTISE_LINES]-(expertiseLine:ExpertiseLine)"+
+                "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType) " +
+                " WITH  collect({id:id(expertiseLine),numberOfWorkingDaysInWeek:expertiseLine.numberOfWorkingDaysInWeek,fullTimeWeeklyMinutes:expertiseLine.fullTimeWeeklyMinutes,startDate:expertiseLine.startDate,endDate:expertiseLine.endDate}) as explinew,employmentLine,empType,employment,staff,expertise,org,user " +
+                "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),employmentStatus:employmentLine.employmentStatus, hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,employmentSubType:employmentLine.employmentSubType,\n" +
+                "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,{id:id(expertise),expertiseLines:explinew} as expertiseQueryResult\n" +
+                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,unitId:employment.unitId,accumulatedTimebankMinutes:employment.accumulatedTimebankMinutes,accumulatedTimebankDate:employment.accumulatedTimebankDate, employmentLines:employmentLines ,expertiseQueryResult:expertiseQueryResult} as employment,staff,org,user\n" +
                 "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,user.cprNumber AS cprNumber,id(org) as unitId,org.name as unitName,collect(employment) as employment");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
