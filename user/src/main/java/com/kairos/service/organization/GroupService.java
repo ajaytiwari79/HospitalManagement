@@ -9,6 +9,7 @@ import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.group.Group;
@@ -131,15 +132,17 @@ public class GroupService {
     public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         List<Map> filteredStaff = new ArrayList<>();
         for(Map staff : getMapsOfStaff(unitId, filterSelectionDTOS)){
-            Map<String, Object> fStaff = new HashMap<>();
-            fStaff.put("id",staff.get("id"));
-            fStaff.put("firstName",staff.get("firstName"));
-            fStaff.put("lastName",staff.get("lastName"));
-            fStaff.put("profilePic",staff.get("profilePic"));
-            fStaff.put("userName",staff.get("userName"));
-            fStaff.put("user_id",staff.get("user_id"));
-            fStaff.put("access_token",staff.get("access_token"));
-            filteredStaff.add(fStaff);
+            if(StaffStatusEnum.ACTIVE.toString().equals(staff.get("currentStatus"))) {
+                Map<String, Object> fStaff = new HashMap<>();
+                fStaff.put("id", staff.get("id"));
+                fStaff.put("firstName", staff.get("firstName"));
+                fStaff.put("lastName", staff.get("lastName"));
+                fStaff.put("profilePic", staff.get("profilePic"));
+                fStaff.put("userName", staff.get("userName"));
+                fStaff.put("user_id", staff.get("user_id"));
+                fStaff.put("access_token", staff.get("access_token"));
+                filteredStaff.add(fStaff);
+            }
         }
         return filteredStaff;
     }
