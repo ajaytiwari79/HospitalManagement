@@ -185,13 +185,14 @@ public class TeamService {
         map.put("skillList", skillService.getSkillsOfOrganization(unitId));
 
         List<ActivityDTO> activityDTOList = activityIntegrationService.getActivitiesWithCategories(unitId);
+        List<ActivityCategoryListDTO> activityCategoryListDTOS=new ArrayList<>();
         if(isCollectionNotEmpty(activityDTOList)) {
             Map<ActivityCategoryDTO, List<ActivityDTO>> activityTypeCategoryListMap = activityDTOList.stream().collect(
                     Collectors.groupingBy(activityType -> new ActivityCategoryDTO(activityType.getCategoryId(), activityType.getCategoryName()), Collectors.toList()));
-            List<ActivityCategoryListDTO> activityCategoryListDTOS = activityTypeCategoryListMap.entrySet().stream().map(activity -> new ActivityCategoryListDTO(activity.getKey(),
+            activityCategoryListDTOS = activityTypeCategoryListMap.entrySet().stream().map(activity -> new ActivityCategoryListDTO(activity.getKey(),
                     activity.getValue())).collect(Collectors.toList());
-            map.put("activityList", activityCategoryListDTOS);
         }
+        map.put("activityList", activityCategoryListDTOS);
         return map;
     }
 

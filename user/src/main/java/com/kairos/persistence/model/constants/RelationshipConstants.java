@@ -79,7 +79,6 @@ public abstract class RelationshipConstants {
     public static final  String ACCESS_GROUP_HAS_ACCESS_TO_PAGE = "ACCESS_GROUP_HAS_ACCESS_TO_PAGE";
     public static final  String STAFF_HAS_ACCESS_GROUP = "STAFF_HAS_ACCESS_GROUP";
     public static final  String ORGANIZATION_HAS_ACCESS_GROUPS = "ORGANIZATION_HAS_ACCESS_GROUPS";
-    public static final  String UNIT_HAS_ACCESS_GROUPS = "UNIT_HAS_ACCESS_GROUPS";
 
     //client
     public static final  String GET_SERVICE_FROM = "GET_SERVICE_FROM";
