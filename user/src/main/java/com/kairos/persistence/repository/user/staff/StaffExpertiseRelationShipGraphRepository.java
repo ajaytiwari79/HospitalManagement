@@ -30,8 +30,8 @@ public interface StaffExpertiseRelationShipGraphRepository extends Neo4jBaseRepo
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} return expertise")
     List<Expertise> getAllExpertiseByStaffId(Long staffId);
 
-    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} AND NOT id(expertise) IN{1} detach delete rel")
-    void unlinkExpertiseFromStaffExcludingCurrent(Long staffId, List<Long> ids);
+    @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) where id(staff) = {0} AND NOT id(expertise) IN{1} RETURN rel")
+    List<StaffExpertiseRelationShip> getRelationShipByStaffExcludingCurrentExpertise(Long staffId, List<Long> ids);
 
 
     @Query("MATCH (staff:Staff)-[rel:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) WHERE id(staff) = {0} AND id(expertise) IN {1}" +

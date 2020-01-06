@@ -54,6 +54,7 @@ public class ModelPermissionQueryResult {
         this.forOtherFieldLevelPermissions = forOtherFieldLevelPermissions;
     }
 
+    //Todo Don't remove it
     public OtherPermissionDTO getForOtherPermissions() {
         return new OtherPermissionDTO(expertiseIds,unionIds,teamIds,employmentTypeIds,tagIds,staffStatuses,forOtherFieldLevelPermissions,null);
     }

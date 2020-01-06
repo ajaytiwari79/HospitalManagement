@@ -17,7 +17,6 @@ import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.client.ClientStaffInfoDTO;
 import com.kairos.dto.user.staff.staff.StaffChatDetails;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
-import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.enums.EmploymentSubType;
@@ -369,7 +368,8 @@ public class StaffService {
         Map<Long, Expertise> expertiseMap = expertiseList.stream().collect(Collectors.toMap(Expertise::getId, Function.identity()));
         List<StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOList = staffExpertiseRelationShipGraphRepository.getExpertiseWithExperienceByStaffIdAndExpertiseIds(staffId, expertises);
         Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap = staffExperienceInExpertiseDTOList.stream().collect(Collectors.toMap(StaffExperienceInExpertiseDTO::getExpertiseId, Function.identity()));
-        staffExpertiseRelationShipGraphRepository.unlinkExpertiseFromStaffExcludingCurrent(staffId, expertises);
+        List<StaffExpertiseRelationShip> staffExpertiseRelationShips = staffExpertiseRelationShipGraphRepository.getRelationShipByStaffExcludingCurrentExpertise(staffId, expertises);
+        staffExpertiseRelationShipGraphRepository.deleteAll(staffExpertiseRelationShips);
         assignExpertiseToStaff(staffPersonalDetail, staffToUpdate, expertiseMap, staffExperienceInExpertiseDTOMap);
         return oldExpertise;
     }
