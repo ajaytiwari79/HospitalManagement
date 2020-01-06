@@ -6,6 +6,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.night_worker.ExpertiseNightWorkerSettingDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
@@ -18,6 +19,7 @@ import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.union.SectorDTO;
 import com.kairos.dto.user.organization.union.UnionIDNameDTO;
+import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
@@ -144,8 +146,8 @@ public class ExpertiseService {
         setBasicDetails(expertiseDTO, country, expertise);
         linkProtectedDaysOffSetting(new ArrayList<>(), Arrays.asList(expertise));
         TimeSlot timeSlot = new TimeSlot(NIGHT_START_HOUR, NIGHT_END_HOUR);
-        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, null,
-                null, null, null, null, countryId, expertise.getId());
+        ExpertiseNightWorkerSettingDTO expertiseNightWorkerSettingDTO = new ExpertiseNightWorkerSettingDTO(timeSlot, 0,
+                DurationType.WEEKS, 0, 0, XAxisConfig.HOURS, countryId, expertise.getId());
         genericRestClient.publish(expertiseNightWorkerSettingDTO, countryId, false, IntegrationOperation.CREATE,
                 "/expertise/" + expertise.getId() + "/night_worker_setting", null);
         return updatedExpertiseData(expertise);
@@ -456,6 +458,11 @@ public class ExpertiseService {
     }
 
     public List<AgeRangeDTO> updateAgeRangeInExpertise(Long expertiseId, List<AgeRangeDTO> ageRangeDTO, String wtaType) {
+        if(SENIOR_DAYS.equalsIgnoreCase(wtaType)){
+            expertiseGraphRepository.removeSeniorDays(expertiseId);
+        }else if(CHILD_CARE.equalsIgnoreCase(wtaType)){
+            expertiseGraphRepository.removeChildCareDays(expertiseId);
+        }
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId);
         if (isNull(expertise) || expertise.isDeleted()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_EXPERTISE_ID_NOTFOUND, expertiseId);
@@ -464,9 +471,9 @@ public class ExpertiseService {
         validateAgeRange(ageRangeDTO);
 
         List<CareDays> careDays = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(ageRangeDTO, CareDays.class);
-        if (wtaType.equalsIgnoreCase(SENIOR_DAYS)) {
+        if (SENIOR_DAYS.equalsIgnoreCase(wtaType)) {
             expertise.setSeniorDays(careDays);
-        } else if (wtaType.equalsIgnoreCase(CHILD_CARE)) {
+        } else if (CHILD_CARE.equalsIgnoreCase(wtaType)) {
             expertise.setChildCareDays(careDays);
         }
         expertiseGraphRepository.save(expertise);

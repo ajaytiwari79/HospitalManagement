@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
@@ -8,6 +9,7 @@ import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.group.Group;
@@ -24,9 +26,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT;
@@ -126,15 +132,17 @@ public class GroupService {
     public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         List<Map> filteredStaff = new ArrayList<>();
         for(Map staff : getMapsOfStaff(unitId, filterSelectionDTOS)){
-            Map<String, Object> fStaff = new HashMap<>();
-            fStaff.put("id",staff.get("id"));
-            fStaff.put("firstName",staff.get("firstName"));
-            fStaff.put("lastName",staff.get("lastName"));
-            fStaff.put("profilePic",staff.get("profilePic"));
-            fStaff.put("userName",staff.get("userName"));
-            fStaff.put("user_id",staff.get("user_id"));
-            fStaff.put("access_token",staff.get("access_token"));
-            filteredStaff.add(fStaff);
+            if(StaffStatusEnum.ACTIVE.toString().equals(staff.get("currentStatus"))) {
+                Map<String, Object> fStaff = new HashMap<>();
+                fStaff.put("id", staff.get("id"));
+                fStaff.put("firstName", staff.get("firstName"));
+                fStaff.put("lastName", staff.get("lastName"));
+                fStaff.put("profilePic", staff.get("profilePic"));
+                fStaff.put("userName", staff.get("userName"));
+                fStaff.put("user_id", staff.get("user_id"));
+                fStaff.put("access_token", staff.get("access_token"));
+                filteredStaff.add(fStaff);
+            }
         }
         return filteredStaff;
     }
@@ -156,20 +164,23 @@ public class GroupService {
         List<Map> staffs = staffGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
         if(isNotNull(ageRange)) {
             final AgeRangeDTO age = new AgeRangeDTO(Integer.parseInt(ageRange.get("from").toString()), isNotNull(ageRange.get("to")) ? Integer.parseInt(ageRange.get("to").toString()) : null, DurationType.valueOf(ageRange.get("durationType").toString()));
-            staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("age").toString()), age)).collect(Collectors.toList());
+            staffs = staffs.stream().filter(map -> validate(map.get("dateOfBirth"), age)).collect(Collectors.toList());
         }
         if(isNotNull(experienceRange)){
             final AgeRangeDTO joining = new AgeRangeDTO(Integer.parseInt(experienceRange.get("from").toString()), isNotNull(experienceRange.get("to")) ? Integer.parseInt(experienceRange.get("to").toString()) : null,DurationType.valueOf(experienceRange.get("durationType").toString()));
-            staffs = staffs.stream().filter(map -> validate(Integer.parseInt(map.get("experienceInYears").toString()), joining)).collect(Collectors.toList());
+            staffs = staffs.stream().filter(map -> validate(map.get("joiningDate"), joining)).collect(Collectors.toList());
         }
         return staffs;
     }
 
-    private boolean validate(int inYears, AgeRangeDTO ageRangeDTO){
-        long inDays = Math.round(inYears *  DAYS_IN_ONE_YEAR);
-        long from = getDataInDays(ageRangeDTO.getFrom(), ageRangeDTO.getDurationType());
-        long to = isNotNull(ageRangeDTO.getTo()) ? getDataInDays(ageRangeDTO.getTo(), ageRangeDTO.getDurationType()) : MAX_LONG_VALUE ;
-        return from <= inDays && to >= inDays;
+    private boolean validate(Object date, AgeRangeDTO dateRange){
+        if(isNotNull(date)) {
+            long inDays = ChronoUnit.DAYS.between(asLocalDate(date.toString()), getCurrentLocalDate());
+            long from = getDataInDays(dateRange.getFrom(), dateRange.getDurationType());
+            long to = isNotNull(dateRange.getTo()) ? getDataInDays(dateRange.getTo(), dateRange.getDurationType()) : MAX_LONG_VALUE;
+            return from <= inDays && to >= inDays;
+        }
+        return false;
     }
 
     private long getDataInDays(long value, DurationType durationType){

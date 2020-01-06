@@ -40,6 +40,7 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_NOT
 import static com.kairos.constants.UserMessagesConstants.ERROR_USER_PASSCODE_SIZE;
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
 import static com.kairos.utils.CPRUtil.getDateOfBirthFromCPR;
+import static com.kairos.utils.CPRUtil.getGenderFromCPRNumber;
 
 /**
  * User Domain & it's properties
@@ -52,19 +53,15 @@ import static com.kairos.utils.CPRUtil.getDateOfBirthFromCPR;
 public class User extends UserBaseEntity {
     @KPermissionField
     protected String cprNumber;
-    @KPermissionField
     private String userName;
     @KPermissionField
     protected String nickName;
-    @KPermissionField
+
     protected String firstName;
-    @KPermissionField
     protected String lastName;
-    @KPermissionField
     protected Gender gender;
     @KPermissionField
     private boolean pregnant;
-    @KPermissionField
     private String email;
     private ConfLevel confLevel;
     private Long lastSelectedOrganizationId;
@@ -143,6 +140,7 @@ public class User extends UserBaseEntity {
         this.userName = userName;
         this.setDateOfBirth(getDateOfBirthFromCPR(cprNumber));
         this.setJoiningDate(getCurrentLocalDate());
+        this.setGender(getGenderFromCPRNumber(cprNumber));
     }
 
     public User(String cprNumber, String firstName, String lastName, String email, String userName, boolean isUserNameUpdated) {

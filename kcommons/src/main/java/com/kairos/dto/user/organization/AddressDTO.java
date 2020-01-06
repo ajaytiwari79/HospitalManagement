@@ -20,12 +20,8 @@ public class AddressDTO {
     private String houseNumber;
     private String billingPerson;
     private String city;
-    private String municipalityName;
     private float longitude;
     private float latitude;
-    private Long zipCodeId;
-    private int zipCodeValue;
-    private String zipCodeName;
 
     private Long typeOfHouseId;
 
@@ -41,22 +37,12 @@ public class AddressDTO {
     private long endDate;
 
     private String description;
-    private Long municipalityId;
     private String locationName;
     private boolean updateHouseholdAddress;
     private boolean primary;
+    private ZipCodeDTO zipCode;
+    private MunicipalityDTO municipality;
 
 
-    public AddressDTO(Long id, String street, String houseNumber, String city, String municipalityName, Long zipCodeId, String regionName, String province, Long municipalityId) {
-        this.id = id;
-        this.street = street;
-        this.houseNumber = houseNumber;
-        this.city = city;
-        this.municipalityName = municipalityName;
-        this.zipCodeId = zipCodeId;
-        this.regionName = regionName;
-        this.province = province;
-        this.municipalityId = municipalityId;
-    }
 
 }

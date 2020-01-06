@@ -168,8 +168,8 @@ public class NextToKinDTO {
         this.lastName = nextToKin.getLastName();
         this.civilianStatusId = nextToKinDTO.getCivilianStatusId();
         this.homeAddress = objectMapper.convertValue(nextToKinDTO.getHomeAddress(), AddressDTO.class);
-        this.homeAddress.setMunicipalityId(nextToKinDTO.getHomeAddress().getMunicipalityId());
-        this.homeAddress.setZipCodeId((long) nextToKinDTO.getHomeAddress().getZipCodeValue());
+        this.homeAddress.getMunicipality().setId(nextToKinDTO.getHomeAddress().getMunicipality().getId());
+        this.homeAddress.getZipCode().setZipCode(nextToKinDTO.getHomeAddress().getZipCode().getZipCode());
         this.gender = nextToKin.getGender();
         this.age = nextToKin.getAge();
         this.nickName = nextToKin.getNickName();

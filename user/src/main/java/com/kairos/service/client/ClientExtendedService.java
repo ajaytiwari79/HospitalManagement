@@ -204,18 +204,18 @@ public class ClientExtendedService{
     private ContactAddress verifyAndSaveAddressOfNextToKin(long unitId, AddressDTO addressDTO,
                                                            ContactAddress contactAddressToSave) {
 
-        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
+        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
         if (municipality == null) {
-            logger.debug("Finding municipality using id " + addressDTO.getMunicipalityId());
+            logger.debug("Finding municipality using id " + addressDTO.getMunicipality().getId());
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
         }
 
         ZipCode zipCode;
         if (addressDTO.isVerifiedByGoogleMap()) {
-            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
             if (!Optional.ofNullable(zipCode).isPresent()) {
-                logger.debug("Finding zip code in database by zip code value " + addressDTO.getZipCodeValue());
+                logger.debug("Finding zip code in database by zip code value " + addressDTO.getZipCode().getZipCode());
                 exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
 
             }
@@ -227,7 +227,7 @@ public class ClientExtendedService{
             }
             contactAddressToSave.setLongitude(Float.valueOf(String.valueOf(tomtomResponse.get("yCoordinates"))));
             contactAddressToSave.setLatitude(Float.valueOf(String.valueOf(tomtomResponse.get("xCoordinates"))));
-            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
+            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
             if (zipCode == null) {
                 logger.debug("ZipCode Not Found returning null");
                 return null;

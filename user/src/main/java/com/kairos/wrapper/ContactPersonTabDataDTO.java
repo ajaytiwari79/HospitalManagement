@@ -3,7 +3,7 @@ package com.kairos.wrapper;
 import com.kairos.persistence.model.client.query_results.ClientMinimumDTO;
 import com.kairos.persistence.model.organization.services.OrganizationServiceQueryResult;
 import com.kairos.persistence.model.query_wrapper.ClientContactPersonStructuredData;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.List;
 public class ContactPersonTabDataDTO {
 
     private List<OrganizationServiceQueryResult> organizationServices;
-    private List<StaffPersonalDetailDTO> staffPersonalDetailDTOS;
+    private List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults;
     private List<ClientMinimumDTO> peopleHouseHolds;
     private List<ClientContactPersonStructuredData> contactPersonDataList;
 

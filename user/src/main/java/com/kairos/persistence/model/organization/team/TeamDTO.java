@@ -1,7 +1,12 @@
 package com.kairos.persistence.model.organization.team;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.team.LeaderType;
+import com.kairos.enums.team.TeamType;
+import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import com.kairos.persistence.model.staff.StaffTeamDTO;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
@@ -19,6 +24,8 @@ import static com.kairos.constants.UserMessagesConstants.ERROR_NAME_NOTNULL;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @QueryResult
+@Getter
+@Setter
 public class TeamDTO {
 
     private Long id;
@@ -31,78 +38,8 @@ public class TeamDTO {
     private Set<Long> mainTeamLeaderIds;
     private Set<Long> actingTeamLeaderIds;
     private List<StaffTeamDTO> staffDetails;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public boolean isHasAddressOfUnit() {
-        return hasAddressOfUnit;
-    }
-
-    public void setHasAddressOfUnit(boolean hasAddressOfUnit) {
-        this.hasAddressOfUnit = hasAddressOfUnit;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<BigInteger> getActivityIds() {
-        return activityIds;
-    }
-
-    public void setActivityIds(List<BigInteger> activityIds) {
-        this.activityIds = activityIds;
-    }
-
-    public List<Long> getSkillIds() {
-        return skillIds;
-    }
-
-    public void setSkillIds(List<Long> skillIds) {
-        this.skillIds = skillIds;
-    }
-
-    public Set<Long> getMainTeamLeaderIds() {
-        return mainTeamLeaderIds;
-    }
-
-    public void setMainTeamLeaderIds(Set<Long> mainTeamLeaderIds) {
-        this.mainTeamLeaderIds = mainTeamLeaderIds;
-    }
-
-    public Set<Long> getActingTeamLeaderIds() {
-        return actingTeamLeaderIds;
-    }
-
-    public void setActingTeamLeaderIds(Set<Long> actingTeamLeaderIds) {
-        this.actingTeamLeaderIds = actingTeamLeaderIds;
-    }
-
-    public List<StaffTeamDTO> getStaffDetails() {
-        return staffDetails;
-    }
-
-    public void setStaffDetails(List<StaffTeamDTO> staffDetails) {
-        this.staffDetails = staffDetails;
-    }
+    private TeamType teamType;
+    private LeaderType leaderType;
 
     @AssertTrue(message = "message.same_staff.belongs_to.both_lead")
     public boolean isValid() {

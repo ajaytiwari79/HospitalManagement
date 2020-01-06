@@ -1,6 +1,5 @@
 package com.kairos.controller.staff;
 
-import com.google.common.primitives.Chars;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -8,7 +7,6 @@ import com.kairos.dto.user.employment.PositionDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateByAdminDTO;
-import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
@@ -38,13 +36,9 @@ import javax.validation.Valid;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.parseDate;
 import static com.kairos.constants.ApiConstants.API_ORGANIZATION_UNIT_URL;
 import static com.kairos.persistence.model.constants.RelationshipConstants.ORGANIZATION;
-import static java.util.stream.Collectors.summingInt;
 
 /**
  * Created by prabjot on 24/10/16.
@@ -124,11 +118,14 @@ public class StaffController {
     @ApiOperation("get personal information of staff")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getPersonalInfo(@PathVariable long unitId, @PathVariable long staffId) {
-        Map<String, Object> personalInfo = staffRetrievalService.getPersonalInfo(staffId, unitId);
-        if (personalInfo == null) {
-            return null;
-        }
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, personalInfo);
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getPersonalInfo(staffId, unitId));
+    }
+
+    @RequestMapping(value = "/{staffId}/get_default_data_of_staff", method = RequestMethod.GET)
+    @ApiOperation("get default data of staff")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getDefaultDataOfStaff(@PathVariable long unitId, @PathVariable long staffId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffRetrievalService.getDefaultDataOfStaff(staffId, unitId));
     }
 
     @RequestMapping(value = "/{staffId}/unit_permission", method = RequestMethod.POST)
@@ -653,6 +650,13 @@ public class StaffController {
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getStaffsByUnitId(@PathVariable Long unitId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffPersonalDetailsByUnit(unitId));
+    }
+
+    @GetMapping(value = "/get_staff_data_for_permission_by_unitId")
+    @ApiOperation("get staffs data for permission by unitId")
+    // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getStaffDataForPermissionByUnitId(@PathVariable Long unitId) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsDataForPermissionByUnitId(unitId));
     }
 
 
