@@ -228,6 +228,8 @@ public class TimeBankService{
             }
             List<Shift> shifts = shiftMongoRepository.findAllOverlappedShiftsAndEmploymentId(newArrayList(staffAdditionalInfoDTO.getEmployment().getId()), startDate, endDate);
             for (Shift shift : shifts) {
+                shift.setScheduledMinutesOfPayout(0);
+                shift.setScheduledMinutesOfTimebank(0);
                 renewDailyTimeBank(staffAdditionalInfoDTO,shift,false);
             }
         }
