@@ -22,7 +22,6 @@ import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
