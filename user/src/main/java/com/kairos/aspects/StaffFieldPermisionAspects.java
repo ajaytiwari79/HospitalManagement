@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,12 +83,22 @@ public class StaffFieldPermisionAspects {
         return null;
     }*/
 
-    //@Around("execution(public com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail com.kairos.persistence.repository.user.staff.StaffGraphRepository*.*(..))")
-    @Before("execution(* org.neo4j.ogm.session.Session.save(..))")
-    public <T extends UserBaseEntity> void validateStaffResponseAsPerPermissdsaadion(JoinPoint joinPoint) {
+    @Before("execution(* com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository.save(..))")
+    public <T extends UserBaseEntity> void validateStaffPermission(JoinPoint joinPoint) {
         List<T> objects = checkAndReturnValidModel(joinPoint.getArgs());
         if(isCollectionNotEmpty(objects)) {
-            //permissionService.updateModelBasisOfPermission(objects,newHashSet(FieldLevelPermission.WRITE));
+            permissionService.updateModelBasisOfPermission(objects,newHashSet(FieldLevelPermission.WRITE));
+        }
+    }
+
+    @Before("execution(* com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository.saveAll(..))")
+    public <T extends UserBaseEntity> void validateStaffsPermission(JoinPoint joinPoint) {
+        if(joinPoint.getArgs().length>0) {
+            Collection collection = (Collection) joinPoint.getArgs()[0];
+            List<T> objects = checkAndReturnValidModel(collection.toArray());
+            if (isCollectionNotEmpty(objects)) {
+                permissionService.updateModelBasisOfPermission(objects, newHashSet(FieldLevelPermission.WRITE));
+            }
         }
     }
 

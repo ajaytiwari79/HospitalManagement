@@ -37,11 +37,12 @@ public class FieldPermissionQueryResult {
         this.fieldName = fieldName;
     }
 
+    //Todo Don't remove it
     public OtherPermissionDTO getForOtherPermissions() {
         return new OtherPermissionDTO(expertiseIds,unionIds,teamIds,employmentTypeIds,tagIds,staffStatuses,forOtherFieldLevelPermissions,null);
     }
 
-    public FieldPermissionQueryResult(Long id, Set<FieldLevelPermission> permissions, Set<Long> expertiseIds, Set<Long> unionIds, Set<Long> teamIds, Set<Long> employmentTypeIds, Set<Long> tagIds, Set<StaffStatusEnum> staffStatuses, Set<FieldLevelPermission> forOtherFieldLevelPermissions) {
+    public FieldPermissionQueryResult(Long id, Set<FieldLevelPermission> permissions, Set<Long> expertiseIds, Set<Long> unionIds, Set<Long> teamIds, Set<Long> employmentTypeIds, Set<Long> tagIds, Set<StaffStatusEnum> staffStatuses, Set<FieldLevelPermission> forOtherFieldLevelPermissions,String fieldName) {
         this.id = id;
         this.permissions = permissions;
         this.expertiseIds = expertiseIds;
@@ -51,5 +52,6 @@ public class FieldPermissionQueryResult {
         this.tagIds = tagIds;
         this.staffStatuses = staffStatuses;
         this.forOtherFieldLevelPermissions = forOtherFieldLevelPermissions;
+        this.fieldName = fieldName;
     }
 }

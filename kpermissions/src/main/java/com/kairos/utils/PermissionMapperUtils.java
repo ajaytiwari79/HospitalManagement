@@ -90,6 +90,7 @@ public class PermissionMapperUtils {
             }
         } catch (Exception exception) {
             LOGGER.error("Error {}", exception);
+            return getValueByPropertyType(targetWrapper.getPropertyType(subFieldName + field.getFieldName()));
         }
         return null;
     }
@@ -123,8 +124,7 @@ public class PermissionMapperUtils {
             boolean accessGroupValid = !UserContext.getUserDetails().isHubMember();
             boolean argsValid = objects.length!=0;
             if(accessGroupValid && argsValid){
-                Set<Class> permissionAnnotatons = newHashSet(KPermissionModel.class,PermissionClass.class,KPermissionRelatedModel.class);
-                validModels = Arrays.stream(objects).filter(arg -> CollectionUtils.containsAny(permissionAnnotatons,newHashSet(arg.getClass().getAnnotations()))).map(model->(T)model).collect(Collectors.toList());
+                validModels = Arrays.stream(objects).filter(arg -> arg.getClass().isAnnotationPresent(KPermissionModel.class) || arg.getClass().isAnnotationPresent(PermissionClass.class) || arg.getClass().isAnnotationPresent(KPermissionRelatedModel.class)).map(model->(T)model).collect(Collectors.toList());
             }
         }
         return validModels;

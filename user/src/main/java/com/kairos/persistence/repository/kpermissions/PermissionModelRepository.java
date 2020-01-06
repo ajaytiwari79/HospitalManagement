@@ -42,6 +42,14 @@ public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermiss
             "permission.unionIds as unionIds,id(field) as id,field.fieldName as fieldName")
     List<FieldPermissionQueryResult> getAllFieldPermission(Collection<Long> accessGroupIds);
 
+    @Query("MATCH(model:KPermissionModel) where model.modelName={0} MATCH(model)-[unitRel:HAS_FIELD]->(field:KPermissionField) where field.fieldName IN {1}\n" +
+            "MATCH (field)-[permission:HAS_PERMISSION]->(ag:AccessGroup{deleted:false}) where id(ag) in {2} \n" +
+            "RETURN permission.fieldLevelPermissions AS permissions,permission.expertiseIds as expertiseIds," +
+            "permission.forOtherFieldLevelPermissions as forOtherFieldLevelPermissions,permission.staffStatuses as staffStatuses,permission.tagIds as tagIds," +
+            "permission.teamIds as teamIds,permission.employmentTypeIds as employmentTypeIds," +
+            "permission.unionIds as unionIds,id(field) as id,field.fieldName as fieldName")
+    List<FieldPermissionQueryResult> getAllFieldPermissionByFieldNames(String modelName,Collection<String> fieldNames,Collection<Long> accessGroupIds);
+
     @Query("MATCH(ag:AccessGroup{deleted:false}) where id(ag) in {0} MATCH (ag)<-[permission:HAS_PERMISSION]-(model:KPermissionModel) \n" +
             "RETURN permission.fieldLevelPermissions AS permissions,\n" +
             "permission.expertiseIds as expertiseIds,\n" +
