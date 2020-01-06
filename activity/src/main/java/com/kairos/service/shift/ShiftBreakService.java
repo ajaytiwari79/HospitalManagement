@@ -75,7 +75,7 @@ public class ShiftBreakService {
     public List<ShiftActivity> updateBreakInShift(boolean shiftUpdated, Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap, StaffAdditionalInfoDTO staffAdditionalInfoDTO, BreakWTATemplate breakWTATemplate, List<TimeSlotWrapper> timeSlot, Shift dbShift) {
 
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
-        if (TIME_AND_ATTENDANCE.equals(phase.getName())) {
+        if (TIME_AND_ATTENDANCE.equals(phase.getName())|| isCollectionNotEmpty(shift.getBreakActivities())) {
             return getBreakActivity(shift, dbShift, activityWrapperMap);
         }
         BreakSettings breakSettings = breakSettingMongoRepository.findAllByDeletedFalseAndExpertiseId(staffAdditionalInfoDTO.getEmployment().getExpertise().getId());
