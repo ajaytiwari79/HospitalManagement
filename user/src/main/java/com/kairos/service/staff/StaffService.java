@@ -290,7 +290,7 @@ public class StaffService {
         List<Expertise> expertise = expertiseGraphRepository.getExpertiseByIdsIn(staffPersonalDetail.getExpertiseIds());
         // Setting Staff Details)
         setStaffDetails(staffToUpdate, staffPersonalDetail);
-        setStaffChildDetails(staffToUpdate, staffPersonalDetail);
+        staffToUpdate.setStaffChildDetails(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
         updateUserDetails(staffPersonalDetail, userAccessRoleDTO, staffToUpdate);
         // Set if user is female and pregnant
         User user = updateUserDetails(staffId, staffPersonalDetail);
@@ -300,7 +300,7 @@ public class StaffService {
         assignTags(staffId, staffPersonalDetail, staffToUpdate);
         Staff staff = staffGraphRepository.save(staffToUpdate);
         staffPersonalDetail.setUserName(staff.getUser().getUserName());
-        staffPersonalDetail.setStaffChildDetails(copyPropertiesOfCollectionByMapper(staff.getStaffChildDetails(), StaffChildDetailDTO.class));
+        setStaffChildDetailsInPersonalDetail(staff, staffPersonalDetail);
         if (oldExpertise != null) {
             List<Long> expertiseIds = oldExpertise.stream().map(Expertise::getId).collect(Collectors.toList());
             staffGraphRepository.removeSkillsByExpertise(staffToUpdate.getId(), expertiseIds);
@@ -374,9 +374,14 @@ public class StaffService {
         return oldExpertise;
     }
 
-    private void setStaffChildDetails(Staff staffToUpdate, StaffPersonalDetail staffPersonalDetail) {
-        staffToUpdate.setStaffChildDetails(copyPropertiesOfCollectionByMapper(staffPersonalDetail.getStaffChildDetails(), StaffChildDetail.class));
-        //staffGraphRepository.unlinkStaffChilds(staffToUpdate.getId());
+    private void setStaffChildDetailsInPersonalDetail(Staff staff, StaffPersonalDetail staffPersonalDetail) {
+        Map<Long,StaffChildDetailDTO> staffChildDetailDTOMap = new HashMap<>();
+        staff.getStaffChildDetails().forEach(staffChildDetail -> {
+            if(!staffChildDetailDTOMap.containsKey(staffChildDetail.getId())){
+                staffChildDetailDTOMap.put(staffChildDetail.getId(),ObjectMapperUtils.copyPropertiesByMapper(staffChildDetail,StaffChildDetailDTO.class));
+            }
+        });
+        staffPersonalDetail.setStaffChildDetails(staffChildDetailDTOMap.values().stream().collect(Collectors.toList()));
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {

@@ -249,6 +249,14 @@ public class Shift extends MongoBaseEntity {
         return shiftActivitiesList;
     }
 
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
 
     @Override
     public String toString() {
