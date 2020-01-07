@@ -147,9 +147,6 @@ public class SkillService {
         return null;
     }
 
-    public SkillCategory safeDeleteSkill(Long categoryId, Long skillId) {
-        return skillGraphRepository.safeDelete(categoryId, skillId);
-    }
 
     public List<Skill> getSkillsByCategoryId(Long id) {
         return skillGraphRepository.skillsByCategoryId(id);
@@ -307,9 +304,9 @@ public class SkillService {
 
         long lastModificationDate = DateUtils.getCurrentDate().getTime();
         if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, SkillLevel.ADVANCE, true);
+            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, SkillLevel.ADVANCE, true);
         } else {
-            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, SkillLevel.ADVANCE, false);
+            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, SkillLevel.ADVANCE, false);
         }
         return true;
     }
