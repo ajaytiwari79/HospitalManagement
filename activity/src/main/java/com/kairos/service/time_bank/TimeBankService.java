@@ -223,14 +223,12 @@ public class TimeBankService{
         Date endDate = isNotNull(endDateTime) ? getEndOfDay(endDateTime) : null;
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate,null);
         if(isCollectionNotEmpty(shiftWithActivityDTOS)) {
-            shiftWithActivityDTOS = shiftWithActivityDTOS.stream().sorted(Comparator.comparing(ShiftWithActivityDTO::getEndDate)).collect(Collectors.toList());
+            shiftWithActivityDTOS = shiftWithActivityDTOS.stream().sorted(Comparator.comparing(ShiftWithActivityDTO::getStartDate)).collect(Collectors.toList());
             if(isNull(endDate)) {
                 endDate = getEndOfDay(shiftWithActivityDTOS.get(shiftWithActivityDTOS.size() - 1).getEndDate());
             }
             List<Shift> shifts = shiftMongoRepository.findAllOverlappedShiftsAndEmploymentId(newArrayList(staffAdditionalInfoDTO.getEmployment().getId()), startDate, endDate);
             for (Shift shift : shifts) {
-                shift.setScheduledMinutesOfPayout(0);
-                shift.setScheduledMinutesOfTimebank(0);
                 renewDailyTimeBank(staffAdditionalInfoDTO,shift,false);
             }
         }
@@ -438,7 +436,8 @@ public class TimeBankService{
                     }
                 }
                 if(isCollectionNotEmpty(shiftWithActivityDTO.getBreakActivities())){
-                    shiftActivityDTOMap.put(shiftWithActivityDTO.getBreakActivities().get(0).getActivityId()+"_"+shiftWithActivityDTO.getBreakActivities().get(0).getStartDate(),shiftWithActivityDTO.getBreakActivities().get(0));
+                    shiftWithActivityDTO.getBreakActivities().forEach(shiftActivityDTO ->shiftActivityDTOMap.put(shiftActivityDTO.getActivityId()+"_"+shiftActivityDTO.getStartDate(),shiftActivityDTO));
+
                 }
             }
             for (Shift shift : shifts) {
@@ -460,10 +459,12 @@ public class TimeBankService{
                     }
                 }
                 if(isCollectionNotEmpty(shift.getBreakActivities())){
-                    updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, shift.getBreakActivities().get(0));
-                    timeBankCtaBonusMinutes += shift.getBreakActivities().get(0).getTimeBankCtaBonusMinutes();
-                    plannedMinutesOfTimebank += shift.getBreakActivities().get(0).getPlannedMinutesOfTimebank();
-                    timeBankScheduledMinutes+=shift.getBreakActivities().get(0).getScheduledMinutesOfTimebank();
+                    for (ShiftActivity breakActivity : shift.getBreakActivities()) {
+                        updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, breakActivity);
+                        timeBankCtaBonusMinutes += breakActivity.getTimeBankCtaBonusMinutes();
+                        plannedMinutesOfTimebank += breakActivity.getPlannedMinutesOfTimebank();
+                        timeBankScheduledMinutes+=breakActivity.getScheduledMinutesOfTimebank();
+                    }
                 }
                 shift.setScheduledMinutesOfTimebank(timeBankScheduledMinutes);
                 shift.setTimeBankCtaBonusMinutes(timeBankCtaBonusMinutes);
