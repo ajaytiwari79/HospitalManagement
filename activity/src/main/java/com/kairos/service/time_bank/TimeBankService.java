@@ -184,25 +184,27 @@ public class TimeBankService{
         }
         shiftWithActivityDTOS.forEach(shiftWithActivityDTO -> {
             shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
-                shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
-                shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
-                shiftActivityDTO.setPlannedMinutesOfPayout(0);
-                shiftActivityDTO.setPlannedMinutesOfTimebank(0);
-                shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
+                resetCTARelatedData(shiftActivityDTO);
             });
             if(isCollectionNotEmpty(shiftWithActivityDTO.getBreakActivities())){
                 shiftWithActivityDTO.getBreakActivities().forEach(shiftActivityDTO -> {
-                    shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
-                    shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
-                    shiftActivityDTO.setPlannedMinutesOfPayout(0);
-                    shiftActivityDTO.setPlannedMinutesOfTimebank(0);
-                    shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
+                    resetCTARelatedData(shiftActivityDTO);
                 });
             }
         });
         dailyTimeBankEntry = timeBankCalculationService.calculateDailyTimeBank(staffAdditionalInfoDTO, interval, shiftWithActivityDTOS, dailyTimeBankEntry, planningPeriodInterval, staffAdditionalInfoDTO.getDayTypes(), validatedByPlanner);
         updateBonusHoursOfTimeBankInShift(shiftWithActivityDTOS, Arrays.asList(shift));
         return dailyTimeBankEntry;
+    }
+
+    private void resetCTARelatedData(ShiftActivityDTO shiftActivityDTO) {
+        shiftActivityDTO.setPayoutPerShiftCTADistributions(new ArrayList<>());
+        shiftActivityDTO.setTimeBankCTADistributions(new ArrayList<>());
+        shiftActivityDTO.setPlannedMinutesOfPayout(0);
+        shiftActivityDTO.setPlannedMinutesOfTimebank(0);
+        shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
+        shiftActivityDTO.setScheduledMinutesOfTimebank(0);
+        shiftActivityDTO.setPlannedMinutesOfPayout(0);
     }
 
     private List<ShiftWithActivityDTO> getDraftShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS){
