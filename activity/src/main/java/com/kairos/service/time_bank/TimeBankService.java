@@ -189,6 +189,8 @@ public class TimeBankService{
                 shiftActivityDTO.setPlannedMinutesOfPayout(0);
                 shiftActivityDTO.setPlannedMinutesOfTimebank(0);
                 shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
+                shiftActivityDTO.setScheduledMinutesOfTimebank(0);
+                shiftActivityDTO.setPlannedMinutesOfPayout(0);
             });
             if(isCollectionNotEmpty(shiftWithActivityDTO.getBreakActivities())){
                 shiftWithActivityDTO.getBreakActivities().forEach(shiftActivityDTO -> {
@@ -197,6 +199,8 @@ public class TimeBankService{
                     shiftActivityDTO.setPlannedMinutesOfPayout(0);
                     shiftActivityDTO.setPlannedMinutesOfTimebank(0);
                     shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
+                    shiftActivityDTO.setScheduledMinutesOfTimebank(0);
+                    shiftActivityDTO.setPlannedMinutesOfPayout(0);
                 });
             }
         });
