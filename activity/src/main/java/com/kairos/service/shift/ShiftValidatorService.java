@@ -319,6 +319,10 @@ public class ShiftValidatorService {
                 shiftViolatedRules.setEscalationReasons(newHashSet(ShiftEscalationReason.SHIFT_OVERLAPPING));
                 shiftViolatedRules.setEscalationResolved(false);
             }
+            if(shift.getBreakActivities().stream().anyMatch(ShiftActivity::isBreakNotHeld)){
+                shiftViolatedRules.getEscalationReasons().add(ShiftEscalationReason.BREAK_NOT_HELD);
+                shiftViolatedRules.setEscalationResolved(false);
+            }
             shiftViolatedRules.setActivities(shiftWithViolatedInfoDTO.getViolatedRules().getActivities());
             shiftViolatedRules.setWorkTimeAgreements(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements());
         }
@@ -923,14 +927,34 @@ public class ShiftValidatorService {
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(overLappedShifts.stream().map(Shift::getId).collect(Collectors.toList()), false);
         Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
         overLappedShifts.forEach(overLappedShift -> {
+
             if (!shiftOverLappedWithOther(overLappedShift) && shiftViolatedRulesMap.containsKey(overLappedShift.getId()) && isCollectionEmpty(shiftViolatedRulesMap.get(overLappedShift.getId()).getWorkTimeAgreements())) {
-                shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
-                shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
+                if(getEsclationResolved(shift,shiftViolatedRulesMap,overLappedShift)) {
+                    shiftDTO.getEscalationFreeShiftIds().add(overLappedShift.getId());
+                    shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
+                }
             }
+            getEsclationResolved(shift, shiftViolatedRulesMap, overLappedShift);
         });
 
         shiftViolatedRulesMongoRepository.saveAll(shiftViolatedRulesMap.values());
         return shiftDTO;
+    }
+
+    private boolean getEsclationResolved(Shift shift, Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap, Shift overLappedShift) {
+        boolean isResolved=true;
+        if(shift.getId().equals(overLappedShift.getId())){
+            if(shift.getBreakActivities().stream().anyMatch(ShiftActivity::isBreakNotHeld)){
+                shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(false);
+                isResolved =false;
+            }
+            else {
+                shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(true);
+                isResolved =true;
+            }
+
+        }
+        return isResolved;
     }
 
     public Set<BigInteger> getEscalationFreeShifts(List<BigInteger> shiftIds) {
