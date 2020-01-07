@@ -52,6 +52,7 @@ import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.SkillLevel.BASIC;
 
 /**
  * Created by oodles on 15/9/16.
@@ -273,7 +274,7 @@ public class SkillService {
         Map<String, Object> map = new HashMap<>();
         map.put("tableData", list);
         map.put("treeData", treeData);
-        map.put("skillLevels", Arrays.asList(SkillLevel.ADVANCE, SkillLevel.BASIC, SkillLevel.EXPERT));
+        map.put("skillLevels", Arrays.asList(SkillLevel.ADVANCE, BASIC, SkillLevel.EXPERT));
         return map;
     }
 
@@ -304,9 +305,9 @@ public class SkillService {
 
         long lastModificationDate = DateUtils.getCurrentDate().getTime();
         if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, SkillLevel.ADVANCE, true);
+            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, BASIC, true);
         } else {
-            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, SkillLevel.ADVANCE, false);
+            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, BASIC, false);
         }
         return true;
     }
@@ -423,7 +424,7 @@ public class SkillService {
         }
         List<Map<String, Object>> response;
         if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), SkillLevel.BASIC, true);
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), BASIC, true);
             response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
         } else {
             staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());
