@@ -9,6 +9,7 @@ import com.kairos.dto.activity.wta.AgeRange;
 import com.kairos.dto.activity.wta.templates.ActivityCutOffCount;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
@@ -53,7 +54,7 @@ public class SeniorDaysPerYearWTATemplate extends WTABaseRuleTemplate {
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
         WorkTimeAgreementBalancesCalculationService workTimeAgreementService = ApplicationContextProviderNonManageBean.getApplicationContext().getBean(WorkTimeAgreementBalancesCalculationService.class);
-        if (!isDisabled()) {
+        if (!isDisabled() && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())) {
             CareDaysDTO careDays = getCareDays(infoWrapper.getSeniorCareDays(), infoWrapper.getStaffAge());
             if (isNotNull(careDays)) {
                 int leaveCount = careDays.getLeavesAllowed();
