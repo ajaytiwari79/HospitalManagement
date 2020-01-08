@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.addMinutes;
-import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
@@ -83,8 +82,8 @@ public class Shift extends MongoBaseEntity {
 
 
     public Shift(Date startDate, Date endDate, Long employmentId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> shiftActivities) {
-        this.startDate = roundDateByMinutes(startDate,15);
-        this.endDate = roundDateByMinutes(endDate,15);
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.employmentId = employmentId;
         this.activities = shiftActivities;
     }
@@ -92,8 +91,8 @@ public class Shift extends MongoBaseEntity {
     public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
                  long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, Long employmentId) {
         this.id = id;
-        this.startDate = roundDateByMinutes(startDate,15);
-        this.endDate = roundDateByMinutes(endDate,15);
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.bid = bid;
         this.pId = pId;
         this.bonusTimeBank = bonusTimeBank;
@@ -110,8 +109,8 @@ public class Shift extends MongoBaseEntity {
 
     // This is used in absance shift
     public Shift(Date startDate, Date endDate, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, Long employmentId, Long unitId, BigInteger phaseId, BigInteger planningPeriodId) {
-        this.startDate = roundDateByMinutes(startDate,15);
-        this.endDate = roundDateByMinutes(endDate,15);
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.staffId = staffId;
         this.activities = activities;
         this.employmentId = employmentId;
@@ -123,8 +122,8 @@ public class Shift extends MongoBaseEntity {
     }
 
     public Shift(Date startDate, Date endDate, String remarks, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, int scheduledMinutes, int durationMinutes, String externalId, Long employmentId, BigInteger parentOpenShiftId, BigInteger copiedFromShiftId, BigInteger phaseId, BigInteger planningPeriodId, Long staffUserId, ShiftType shiftType) {
-        this.startDate = roundDateByMinutes(startDate,15);
-        this.endDate = roundDateByMinutes(endDate,15);
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.remarks = remarks;
         this.activities = activities;
         this.staffId = staffId;
@@ -251,11 +250,11 @@ public class Shift extends MongoBaseEntity {
     }
 
     public void setStartDate(Date startDate) {
-        this.startDate = roundDateByMinutes(startDate,15);
+        this.startDate = startDate;
     }
 
     public void setEndDate(Date endDate) {
-        this.endDate = roundDateByMinutes(endDate,15);;
+        this.endDate = endDate;
     }
 
 

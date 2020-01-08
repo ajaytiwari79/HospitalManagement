@@ -154,4 +154,8 @@ public class Staff extends UserBaseEntity {
         staffFavouriteFilterList.add(staffFavouriteFilter);
         this.staffFavouriteFilterList = staffFavouriteFilterList;
     }
+
+    public List<StaffChildDetail> getStaffChildDetails() {
+        return staffChildDetails=Optional.ofNullable(staffChildDetails).orElse(new ArrayList<>());
+    }
 }

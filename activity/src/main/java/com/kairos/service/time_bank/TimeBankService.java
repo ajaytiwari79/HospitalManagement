@@ -189,6 +189,8 @@ public class TimeBankService{
                 shiftActivityDTO.setPlannedMinutesOfPayout(0);
                 shiftActivityDTO.setPlannedMinutesOfTimebank(0);
                 shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
+                shiftActivityDTO.setScheduledMinutesOfTimebank(0);
+                shiftActivityDTO.setPlannedMinutesOfPayout(0);
             });
             if(isCollectionNotEmpty(shiftWithActivityDTO.getBreakActivities())){
                 shiftWithActivityDTO.getBreakActivities().forEach(shiftActivityDTO -> {
@@ -197,6 +199,8 @@ public class TimeBankService{
                     shiftActivityDTO.setPlannedMinutesOfPayout(0);
                     shiftActivityDTO.setPlannedMinutesOfTimebank(0);
                     shiftActivityDTO.setTimeBankCtaBonusMinutes(0);
+                    shiftActivityDTO.setScheduledMinutesOfTimebank(0);
+                    shiftActivityDTO.setPlannedMinutesOfPayout(0);
                 });
             }
         });
@@ -223,11 +227,14 @@ public class TimeBankService{
         Date endDate = isNotNull(endDateTime) ? getEndOfDay(endDateTime) : null;
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentId(staffAdditionalInfoDTO.getEmployment().getId(), startDate, endDate,null);
         if(isCollectionNotEmpty(shiftWithActivityDTOS)) {
+            shiftWithActivityDTOS = shiftWithActivityDTOS.stream().sorted(Comparator.comparing(ShiftWithActivityDTO::getEndDate)).collect(Collectors.toList());
             if(isNull(endDate)) {
                 endDate = getEndOfDay(shiftWithActivityDTOS.get(shiftWithActivityDTOS.size() - 1).getEndDate());
             }
             List<Shift> shifts = shiftMongoRepository.findAllOverlappedShiftsAndEmploymentId(newArrayList(staffAdditionalInfoDTO.getEmployment().getId()), startDate, endDate);
             for (Shift shift : shifts) {
+                shift.setScheduledMinutesOfPayout(0);
+                shift.setScheduledMinutesOfTimebank(0);
                 renewDailyTimeBank(staffAdditionalInfoDTO,shift,false);
             }
         }

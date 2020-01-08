@@ -9,6 +9,7 @@ import com.kairos.dto.user.country.experties.AgeRangeDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
+import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.organization.group.Group;
@@ -131,15 +132,17 @@ public class GroupService {
     public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         List<Map> filteredStaff = new ArrayList<>();
         for(Map staff : getMapsOfStaff(unitId, filterSelectionDTOS)){
-            Map<String, Object> fStaff = new HashMap<>();
-            fStaff.put("id",staff.get("id"));
-            fStaff.put("firstName",staff.get("firstName"));
-            fStaff.put("lastName",staff.get("lastName"));
-            fStaff.put("profilePic",staff.get("profilePic"));
-            fStaff.put("userName",staff.get("userName"));
-            fStaff.put("user_id",staff.get("user_id"));
-            fStaff.put("access_token",staff.get("access_token"));
-            filteredStaff.add(fStaff);
+            if(StaffStatusEnum.ACTIVE.toString().equals(staff.get("currentStatus"))) {
+                Map<String, Object> fStaff = new HashMap<>();
+                fStaff.put("id", staff.get("id"));
+                fStaff.put("firstName", staff.get("firstName"));
+                fStaff.put("lastName", staff.get("lastName"));
+                fStaff.put("profilePic", staff.get("profilePic"));
+                fStaff.put("userName", staff.get("userName"));
+                fStaff.put("user_id", staff.get("user_id"));
+                fStaff.put("access_token", staff.get("access_token"));
+                filteredStaff.add(fStaff);
+            }
         }
         return filteredStaff;
     }
@@ -161,20 +164,23 @@ public class GroupService {
         List<Map> staffs = staffGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
         if(isNotNull(ageRange)) {
             final AgeRangeDTO age = new AgeRangeDTO(Integer.parseInt(ageRange.get("from").toString()), isNotNull(ageRange.get("to")) ? Integer.parseInt(ageRange.get("to").toString()) : null, DurationType.valueOf(ageRange.get("durationType").toString()));
-            staffs = staffs.stream().filter(map -> validate(map.get("dateOfBirth").toString(), age)).collect(Collectors.toList());
+            staffs = staffs.stream().filter(map -> validate(map.get("dateOfBirth"), age)).collect(Collectors.toList());
         }
         if(isNotNull(experienceRange)){
             final AgeRangeDTO joining = new AgeRangeDTO(Integer.parseInt(experienceRange.get("from").toString()), isNotNull(experienceRange.get("to")) ? Integer.parseInt(experienceRange.get("to").toString()) : null,DurationType.valueOf(experienceRange.get("durationType").toString()));
-            staffs = staffs.stream().filter(map -> validate(map.get("joiningDate").toString(), joining)).collect(Collectors.toList());
+            staffs = staffs.stream().filter(map -> validate(map.get("joiningDate"), joining)).collect(Collectors.toList());
         }
         return staffs;
     }
 
-    private boolean validate(String date, AgeRangeDTO dateRange){
-        long inDays = ChronoUnit.DAYS.between(asLocalDate(date), getCurrentLocalDate());
-        long from = getDataInDays(dateRange.getFrom(), dateRange.getDurationType());
-        long to = isNotNull(dateRange.getTo()) ? getDataInDays(dateRange.getTo(), dateRange.getDurationType()) : MAX_LONG_VALUE ;
-        return from <= inDays && to >= inDays;
+    private boolean validate(Object date, AgeRangeDTO dateRange){
+        if(isNotNull(date)) {
+            long inDays = ChronoUnit.DAYS.between(asLocalDate(date.toString()), getCurrentLocalDate());
+            long from = getDataInDays(dateRange.getFrom(), dateRange.getDurationType());
+            long to = isNotNull(dateRange.getTo()) ? getDataInDays(dateRange.getTo(), dateRange.getDurationType()) : MAX_LONG_VALUE;
+            return from <= inDays && to >= inDays;
+        }
+        return false;
     }
 
     private long getDataInDays(long value, DurationType durationType){
