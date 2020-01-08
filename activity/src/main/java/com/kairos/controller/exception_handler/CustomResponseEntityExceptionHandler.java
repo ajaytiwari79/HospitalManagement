@@ -113,32 +113,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         return message;
     }
 
-
-//    @Override
-//    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-//        logger.error("exception in activity service", ex);
-//        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
-//        List<ObjectError> globalErrors = ex.getBindingResult().getGlobalErrors();
-//        List<FieldErrorDTO> errors = new ArrayList<FieldErrorDTO>(fieldErrors.size() + globalErrors.size());
-//        //  String error;
-//        for (FieldError fieldError : fieldErrors) {
-//            FieldErrorDTO error = new FieldErrorDTO(fieldError.getField(), convertMessage(fieldError.getDefaultMessage()));
-//            errors.add(error);
-//        }
-//        for (ObjectError objectError : globalErrors) {
-//            FieldErrorDTO error = new FieldErrorDTO(objectError.getObjectName(), convertMessage(objectError.getDefaultMessage()));
-//            errors.add(error);
-//        }
-//
-//        ResponseEnvelope errorMessage = new ResponseEnvelope();
-//        errorMessage.setErrors(errors);
-//        errorMessage.setSuccess(false);
-//
-//        return new ResponseEntity<Object>(errorMessage, headers, HttpStatus.UNPROCESSABLE_ENTITY);
-//
-//    }
-
-
     @Override
     public ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error(EXCEPTION_IN_ACTIVITY_SERVICE, ex);
@@ -418,8 +392,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         errorMessage.setData(ex.getMessage());
         errorMessage.setPath(httprequest.getRequestURL().toString());
-        //mailService.sendMailToBackendOnException(ex);
-        logger.info("exception {}", ex.getCause());
+        mailService.sendMailToBackendOnException(ex);
+        logger.error("exception {}", ex.getCause());
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
