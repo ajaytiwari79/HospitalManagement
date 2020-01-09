@@ -83,8 +83,10 @@ public interface OrganizationTypeGraphRepository extends Neo4jBaseRepository<Org
             "ON MATCH SET r.lastModificationDate = {3},r.deleted=false")
     void addSkillInOrgType(long orgTypeId, long skillId, Long creationDate, Long lastModificationDate);
 
-    @Query("Match (orgType:OrganizationType),(skill:Skill) where id(orgType)={0} AND id(skill)={1} " +
-            "match (orgType)-[r:" + ORG_TYPE_HAS_SKILL + "]->(skill) set r.deleted=true,r.lastModificationDate={2} ")
+    @Query("MATCH (orgType:OrganizationType),(skill:Skill) where id(orgType)={0} AND id(skill)={1} \n" +
+            "MATCH (orgType)-[r:"+ORG_TYPE_HAS_SKILL+"]->(skill) \n" +
+            "MATCH(orgType)<-[:"+SUB_TYPE_OF+"]-(organization:OrganizationBaseEntity)-[rel:"+ORGANISATION_HAS_SKILL+"]->(skill)\n" +
+            "SET r.deleted=true,r.lastModificationDate={2} , rel.isEnabled=false, rel.lastModificationDate={2} ")
     void deleteSkillFromOrgType(long orgTypeId, long skillId, Long lastModificationDate);
 
     @Query("Match (orgType:OrganizationType)-[r:ORG_TYPE_HAS_SKILL{deleted:false}]->(skill) where id(orgType)={0} " +
