@@ -159,8 +159,6 @@ public class KPIBuilderCalculationService implements CounterService {
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
 
 
-
-
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
         if (isCollectionEmpty(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(CALCULATION_BASED_ON))) {
             exceptionService.dataNotFoundException(EXCEPTION_INVALIDREQUEST);
@@ -358,7 +356,6 @@ public class KPIBuilderCalculationService implements CounterService {
         return count;
     }
 
-
     private double getTotalTimeBankOrContractual(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, boolean calculateContractual) {
         double totalTimeBankOrContractual = 0;
         for (StaffKpiFilterDTO staffKpiFilterDTO : kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffId)) {
@@ -396,7 +393,6 @@ public class KPIBuilderCalculationService implements CounterService {
             if(DurationType.MONTHS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())){
                 total=getValueWithDecimalFormat(((double)localDates.size()/(kpiCalculationRelatedInfo.getApplicableKPI().getValue()*4)));
             }
-
         }
         return total;
     }
@@ -520,8 +516,6 @@ public class KPIBuilderCalculationService implements CounterService {
     private List<ClusteredBarChartKpiDataUnit> getClusteredBarChartDetails(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (YAxisConfig yAxisConfig : kpiCalculationRelatedInfo.getYAxisConfigs()) {
-
-
                 kpiCalculationRelatedInfo.setCurrentCalculationType(null);
                 switch (yAxisConfig){
                     case ACTIVITY:
@@ -544,7 +538,7 @@ public class KPIBuilderCalculationService implements CounterService {
                         subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,value));
                         break;
                     case PLANNING_QUALITY_LEVEL:
-                        subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId,dateTimeInterval, kpiCalculationRelatedInfo,yAxisConfig));
+                        subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId,dateTimeInterval, kpiCalculationRelatedInfo));
                         break;
                     case PROTECTED_DAYS_OFF:
                     case CARE_DAYS:
@@ -589,7 +583,7 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
 
-    private List<ClusteredBarChartKpiDataUnit> geTodoSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
+    private List<ClusteredBarChartKpiDataUnit> geTodoSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         List<ClusteredBarChartKpiDataUnit> activitySubClusteredBarValue = new ArrayList<>();
         if(isNotNull(staffId)){
@@ -636,7 +630,6 @@ public class KPIBuilderCalculationService implements CounterService {
                         todoDTOS.remove(todoDTO);
                     }
                 }
-
             }
         }
         clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(range,color, count));
@@ -656,7 +649,6 @@ public class KPIBuilderCalculationService implements CounterService {
                 ++addedDays;
             }
         }
-
         return result;
     }
     private LocalDate getApproveOrDisApproveDateFromTODO(LocalDate localDate, TodoDTO todoDTO) {
@@ -694,8 +686,6 @@ public class KPIBuilderCalculationService implements CounterService {
         return subClusteredBarValue;
     }
 
-
-
     private List<ClusteredBarChartKpiDataUnit> getPlannedTimeSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig){
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (CalculationType calculationType : kpiCalculationRelatedInfo.getCalculationTypes()) {
@@ -727,8 +717,6 @@ public class KPIBuilderCalculationService implements CounterService {
             String key = getKeyByStaffRepresentation(kpiCalculationRelatedInfo, dateTimeInterval);
             staffTotalHours.put((T)key,kpiCalculationRelatedInfo.getKpi().isMultiDimensional() ? (E)subClusteredBarValue : (E)totalHours);
         }
-
-
         return staffTotalHours;
     }
 
@@ -849,8 +837,6 @@ public class KPIBuilderCalculationService implements CounterService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap;
         PlanningPeriod planningPeriod;
 
-
-
         public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
             this.unitId = unitId;
@@ -875,11 +861,9 @@ public class KPIBuilderCalculationService implements CounterService {
             getDailyTimeBankEntryByEmploymentId();
         }
 
-
         public void getActivityTodoList(){
             todoDTOS=todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId,Collectors.toList()));
-
         }
 
         public CalculationType getCalculationType(){
