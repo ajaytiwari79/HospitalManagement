@@ -52,15 +52,15 @@ public class StaffingLevelCalculationKPIService {
                 }
             }
             if (isPresenceStaffingLevelData) {
-                staffingLevelData += getPresenceStaffingLevelCalculationData(staffingLevel.getPresenceStaffingLevelInterval(), staffingLevel, PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), shiftActivityCriteria.getTeamActivityIds(), staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
+                staffingLevelData += getStaffingLevelCalculationData(staffingLevel.getPresenceStaffingLevelInterval(), staffingLevel, PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), shiftActivityCriteria.getTeamActivityIds(), staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
             }else{
-                staffingLevelData += getPresenceStaffingLevelCalculationData(staffingLevel.getAbsenceStaffingLevelInterval(), staffingLevel, ABSENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), shiftActivityCriteria.getTeamActivityIds(), 1);
+                staffingLevelData += getStaffingLevelCalculationData(staffingLevel.getAbsenceStaffingLevelInterval(), staffingLevel, ABSENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), shiftActivityCriteria.getTeamActivityIds(), 1);
             }
         }
         return isPresenceStaffingLevelData ? getValueWithDecimalFormat(getHoursByMinutes(staffingLevelData)) : staffingLevelData;
     }
 
-    private long getPresenceStaffingLevelCalculationData(List<StaffingLevelInterval> staffingLevelIntervals, StaffingLevel staffingLevel, boolean getUnderStaffingData, Set<BigInteger> teamActivityIds, int multiplyBy){
+    private long getStaffingLevelCalculationData(List<StaffingLevelInterval> staffingLevelIntervals, StaffingLevel staffingLevel, boolean getUnderStaffingData, Set<BigInteger> teamActivityIds, int multiplyBy){
         long staffingData = 0 ;
         if (isCollectionNotEmpty(staffingLevelIntervals)) {
             for (StaffingLevelInterval staffingLevelInterval : staffingLevelIntervals) {
@@ -71,17 +71,17 @@ public class StaffingLevelCalculationKPIService {
     }
 
     private long getUnderStaffingLevelData(StaffingLevelInterval staffingLevelInterval, Set<BigInteger> teamActivityIds, int multiplyBy) {
-        long overStaffingLevelData = 0;
+        long underStaffingLevelData = 0;
         if(isCollectionNotEmpty(teamActivityIds)){
             for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
                 if(teamActivityIds.contains(staffingLevelActivity.getActivityId()) && staffingLevelActivity.getMinNoOfStaff() > staffingLevelActivity.getAvailableNoOfStaff()){
-                    overStaffingLevelData += (staffingLevelActivity.getMinNoOfStaff() - staffingLevelActivity.getAvailableNoOfStaff()) * multiplyBy;
+                    underStaffingLevelData += (staffingLevelActivity.getMinNoOfStaff() - staffingLevelActivity.getAvailableNoOfStaff()) * multiplyBy;
                 }
             }
         }else if (staffingLevelInterval.getMinNoOfStaff() > staffingLevelInterval.getAvailableNoOfStaff()) {
-            overStaffingLevelData += (staffingLevelInterval.getMinNoOfStaff() - staffingLevelInterval.getAvailableNoOfStaff()) * multiplyBy;
+            underStaffingLevelData += (staffingLevelInterval.getMinNoOfStaff() - staffingLevelInterval.getAvailableNoOfStaff()) * multiplyBy;
         }
-        return overStaffingLevelData;
+        return underStaffingLevelData;
     }
 
     private long getOverStaffingLevelData(StaffingLevelInterval staffingLevelInterval, Set<BigInteger> teamActivityIds, int multiplyBy) {
