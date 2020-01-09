@@ -160,6 +160,7 @@ public class ShiftDTO {
         return breakActivities;
     }
 
+
     public boolean isMultipleActivity() {
         Set<BigInteger> multipleActivityCount = new HashSet<>();
         for (ShiftActivityDTO activity : this.getActivities()) {

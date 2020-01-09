@@ -381,7 +381,7 @@ public class StaffService {
                 staffChildDetailDTOMap.put(staffChildDetail.getId(),ObjectMapperUtils.copyPropertiesByMapper(staffChildDetail,StaffChildDetailDTO.class));
             }
         });
-        staffPersonalDetail.setStaffChildDetails(staffChildDetailDTOMap.values().stream().collect(Collectors.toList()));
+        staffPersonalDetail.setStaffChildDetails(new ArrayList<>(staffChildDetailDTOMap.values()));
     }
 
     private void assignExpertiseToStaff(StaffPersonalDetail staffPersonalDetail, Staff staffToUpdate, Map<Long, Expertise> expertiseMap, Map<Long, StaffExperienceInExpertiseDTO> staffExperienceInExpertiseDTOMap) {

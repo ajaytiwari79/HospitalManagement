@@ -111,6 +111,9 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
     User findUserByUserNameInAnyOrganization(String userName);
 
     @Query("MATCH (user:User) WHERE id(user)={0} " +
-            "MATCH (user)<-[:"+BELONGS_TO+"]-(:Staff)<-[:"+BELONGS_TO+"]-(:Position)<-[:"+ HAS_POSITIONS +"]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) RETURN id(organization) LIMIT 1")
+            "MATCH (user)<-[:BELONGS_TO]-(staff:Staff)<-[:BELONGS_TO]-(:Position)<-[:HAS_POSITIONS]-(organization:Organization{isEnable:true,boardingCompleted: true,deleted:false}) \n" +
+            "OPTIONAL MATCH (staff)-[:BELONGS_TO_STAFF]-(e:Employment)-[:IN_UNIT]-(u:Unit)\n" +
+            "\n" +
+            "RETURN CASE WHEN e IS NULL THEN id(organization) ELSE id(u) END LIMIT 1")
     Long getLastSelectedOrganizationId(Long id);
 }

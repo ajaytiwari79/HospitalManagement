@@ -175,11 +175,6 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH (c:Client) , (s:Staff) WHERE id(c)={0}  AND id(s) IN {1}  MATCH  (c)-[r:SERVED_BY_STAFF]->(s)  delete r RETURN count(r)")
     int deleteClientStaffRelation(Long clientId, List<Long> staffIds);
 
-    @Query("MATCH (staff:Staff),(skill:Skill) WHERE id (staff)={0} AND id(skill) IN {1} WITH staff,skill\n" +
-            "Merge (staff)-[r:" + STAFF_HAS_SKILLS + "]->(skill)\n" +
-            "ON CREATE SET r.creationDate={2},r.lastModificationDate={3},r.startDate={3},r.endDate=0,r.skillLevel={4},r.isEnabled={5}\n" +
-            "ON MATCH SET r.lastModificationDate={3},r.startDate={3},r.endDate=0,r.skillLevel={4},r.isEnabled={5} RETURN true")
-    void addSkillInStaff(long staffId, List<Long> skillId, long creationDate, long lastModificationDate, SkillLevel skillLevel, boolean isEnabled);
 
     @Query("MATCH (staff:Staff) WHERE id(staff)={0} WITH staff\n" +
             "MATCH (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{isEnabled:true}]->(skill:Skill) WHERE id(expertise) IN {1} WITH staff,skill\n" +
