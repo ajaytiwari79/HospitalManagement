@@ -76,14 +76,14 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
 
     @Query("MATCH (organization:Unit) WHERE id(organization)={0} \n" +
             "MATCH (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) \n" +
-            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH DISTINCT skill,organization\n" +
+            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true,deleted:false}]->(skill:Skill) WITH DISTINCT skill,organization\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH distinct skill,skillCategory,organization\n" +
             "OPTIONAL MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) WITH\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:r.customName,description:skill.description,visitourId:r.visitourId,isEdited:true})} as availableSkills\n" +
             "RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             "UNION\n" +
             "MATCH (organization:Organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
-            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH distinct skill,organization\n" +
+            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true,deleted:false}]->(skill:Skill) WITH distinct skill,organization\n" +
             "OPTIONAL MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,r\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:r.customName,description:skill.description,visitourId:r.visitourId, customName:r.customName, isEdited:true})} as selectedSkills\n" +
