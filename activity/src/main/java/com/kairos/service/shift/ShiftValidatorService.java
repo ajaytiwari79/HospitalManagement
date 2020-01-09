@@ -218,7 +218,7 @@ public class ShiftValidatorService {
         shift.setPlannedMinutesOfTimebank(calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes());
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkillLevelDTOS(), ruleTemplateSpecificInfo, exceptionService);
         Specification<ShiftWithActivityDTO> tagSpecification = new TagSpecification(staffAdditionalInfoDTO.getTags(),ruleTemplateSpecificInfo, exceptionService);
-        List<BigInteger> activities =userIntegrationService.getTeamActivitiesOfStaff(shift.getStaffId());
+        Set<BigInteger> activities =userIntegrationService.getTeamActivitiesOfStaff(shift.getUnitId(),shift.getStaffId());
         List<StaffActivitySetting> activitySettings=staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shift.getStaffId(), ActivityUtil.getAllActivities(shift));
         Set<BigInteger> allActivities=activitySettings.stream().map(k->k.getActivityId()).collect(Collectors.toSet());
         allActivities.addAll(activities);
@@ -501,7 +501,7 @@ public class ShiftValidatorService {
         Set<DayOfWeek> validDays = isCollectionNotEmpty(dayTypeIds) ? getValidDays(dayTypeDTOMap, dayTypeIds) : new HashSet<>();
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftWithActivityDTO.getUnitId(),ruleTemplateSpecificInfo.getShift().getActivities().get(0).getStartDate(), ruleTemplateSpecificInfo.getShift().getActivities().get(0).getEndDate());
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTOS.get(0).getRuleTemplates());
-        List<BigInteger> activities =userIntegrationService.getTeamActivitiesOfStaff(staffEmploymentDetails.getStaffId());
+        Set<BigInteger> activities =userIntegrationService.getTeamActivitiesOfStaff(shiftWithActivityDTO.getUnitId(),staffEmploymentDetails.getStaffId());
         List<StaffActivitySetting> activitySettings=staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(staffEmploymentDetails.getStaffId(), ActivityUtil.getAllActivities(shiftWithActivityDTO));
         Set<BigInteger> allActivities=activitySettings.stream().map(k->k.getActivityId()).collect(Collectors.toSet());
         allActivities.addAll(activities);
