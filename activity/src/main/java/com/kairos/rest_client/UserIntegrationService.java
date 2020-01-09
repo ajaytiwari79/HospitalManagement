@@ -624,11 +624,6 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_TEAM_ACTIVITIES_OF_STAFF, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<BigInteger>>>() {
         }, staffId);
     }
-    public List<TeamDTO> getAllTeamsOfOrganization(Long unitId){
-        return genericRestClient.publishRequest(null, null, RestClientUrlType.UNIT, HttpMethod.GET, GET_ALL_TEAMS_OF_ORGANIZATIONS, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<TeamDTO>>>() {
-        }, unitId);
-    }
-
     public OrganizationDTO getParentOrganizationOfCityLevel(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_PARENT_ORGANIZATION_OF_CITY_LEVEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
         });

@@ -16,5 +16,4 @@ public class TeamDTO {
     private String name;
     private TeamType teamType;
     private LeaderType leaderType;
-    private List<BigInteger> activities;
 }
