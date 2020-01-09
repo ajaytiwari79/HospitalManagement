@@ -1,6 +1,7 @@
 package com.kairos.service.counter;
 
 import com.kairos.commons.utils.DateTimeInterval;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.activity_tabs.ApprovalCriteria;
 import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
@@ -42,6 +43,7 @@ import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
 import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
@@ -295,7 +297,7 @@ public class KPIBuilderCalculationService implements CounterService {
             case PRESENCE_UNDER_STAFFING:
             case ABSENCE_OVER_STAFFING:
             case ABSENCE_UNDER_STAFFING:
-                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(dateTimeInterval, kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
             default:
                 break;
@@ -968,7 +970,13 @@ public class KPIBuilderCalculationService implements CounterService {
             List<Integer> dayOfWeeksNo = new ArrayList<>();
             daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
             daysOfWeeks.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
-            shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            if(CollectionUtils.containsAny(newArrayList(PRESENCE_UNDER_STAFFING.toString()), filterBasedCriteria.get(FilterType.CALCULATION_TYPE))){
+                List<Shift> shiftData =  shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), isCollectionNotEmpty(unitIds) ? unitIds : newArrayList(organizationId));
+                shifts = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftData, ShiftWithActivityDTO.class);
+            }else {
+                shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            }
+
             StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
             shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             currentShiftActivityCriteria = getDefaultShiftActivityCriteria();

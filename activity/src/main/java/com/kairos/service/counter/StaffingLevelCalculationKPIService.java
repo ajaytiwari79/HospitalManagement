@@ -32,16 +32,17 @@ public class StaffingLevelCalculationKPIService {
     @Inject
     private KPIBuilderCalculationService kpiBuilderCalculationService;
 
-    public double getStaffingLevelCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
+    public double getStaffingLevelCalculationData(DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShifts().stream().filter(shift -> dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());;
         KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
         List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate());
-        double staffingLevelData = 0 ;
+        long staffingLevelData = 0 ;
         boolean isPresenceStaffingLevelData = PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) || PRESENCE_OVER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType());
         for (StaffingLevel staffingLevel : staffingLevels) {
             if(isCollectionNotEmpty(filterShiftActivity.getShifts())) {
-                List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> asLocalDate(shift.getStartDate()).equals(asLocalDate(staffingLevel.getCurrentDate()))).collect(Collectors.toList());
+                DateTimeInterval staffingLevelInterval = new DateTimeInterval(asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate()).plusDays(1));
+                List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> staffingLevelInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
                 if (isCollectionNotEmpty(currentDateShifts)) {
                     Map<Long, List<Map<String, Object>>> staffSkillsMap = kpiCalculationRelatedInfo.getSelectedDatesAndStaffDTOSMap().get(asLocalDate(staffingLevel.getCurrentDate()).toString()).stream().collect(Collectors.toMap(StaffDTO::getId, StaffDTO::getSkillInfo));
                     staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(currentDateShifts, Shift.class), staffSkillsMap);
@@ -49,10 +50,10 @@ public class StaffingLevelCalculationKPIService {
             }
             staffingLevelData += isPresenceStaffingLevelData ? getPresenceStaffingLevelCalculationData(staffingLevel, kpiCalculationRelatedInfo) : getAbsenceStaffingLevelCalculationData(staffingLevel, kpiCalculationRelatedInfo);
         }
-        return getValueWithDecimalFormat(staffingLevelData);
+        return isPresenceStaffingLevelData ? getValueWithDecimalFormat(getHoursByMinutes(staffingLevelData)) : staffingLevelData;
     }
 
-    private double getPresenceStaffingLevelCalculationData(StaffingLevel staffingLevel, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
+    private long getPresenceStaffingLevelCalculationData(StaffingLevel staffingLevel, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
         long underStaffingDataInMinutes = 0 ;
         long overStaffingDataInMinutes = 0 ;
         if (isCollectionNotEmpty(staffingLevel.getPresenceStaffingLevelInterval())) {
@@ -64,7 +65,7 @@ public class StaffingLevelCalculationKPIService {
                 }
             }
         }
-        return getHoursByMinutes(PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) ? underStaffingDataInMinutes : overStaffingDataInMinutes);
+        return PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) ? underStaffingDataInMinutes : overStaffingDataInMinutes;
     }
 
     private double getAbsenceStaffingLevelCalculationData(StaffingLevel staffingLevel, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo){
