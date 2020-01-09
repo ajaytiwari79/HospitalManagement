@@ -36,6 +36,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -119,6 +120,18 @@ public class UserService {
     private OrganizationService organizationService;
     @Inject private UnitService unitService;
     @Inject private PermissionService permissionService;
+    private static UserGraphRepository userRepository;
+
+    private static AccessPageService accessPageService;
+
+    @Inject
+    public void setUserRepository(UserGraphRepository userRepository) {
+        UserService.userRepository = userRepository;
+    }
+    @Inject
+    public void setAccessPageService(AccessPageService accessPageService) {
+        UserService.accessPageService = accessPageService;
+    }
 
     /**
      * Calls UserGraphRepository,
@@ -626,5 +639,11 @@ public class UserService {
         user.setChatStatus(chatStatus);
         userGraphRepository.save(user);
         return true;
+    }
+
+    public static User getCurrentUser(){
+        User user = userRepository.findOne(UserContext.getUserDetails().getId());
+        user.setHubMember(accessPageService.isHubMember(user.getId()));
+        return user;
     }
 }

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.rest_client.UserIntegrationService.getCurrentUser;
 
 /**
  * Created by anil on 10/8/17.
@@ -33,7 +34,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(pathVariables==null){
             throw new InvalidRequestException("Url or Parameter is not correct");
         }        String orgIdString=pathVariables.get("organizationId");
-
+        UserContext.setUserDetails(getCurrentUser());
         String unitIdString=pathVariables.get("unitId");
         LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationId ,Unit Id " +orgIdString+" ,"+unitIdString+" ]");
