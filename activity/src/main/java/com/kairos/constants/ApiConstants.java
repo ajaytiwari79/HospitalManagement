@@ -122,6 +122,8 @@ public final class ApiConstants {
     public static final String AUTO_GENERATE_TASK_SETTINGS = "/auto_generate_task_settings";
     public static final String TIME_SLOT_NAME = "/time_slot_name";
     public static final String GET_ORGANIZATION_BY_TEAM_ID = "/getOrganizationByTeamId/{teamId}";
+    public static final String GET_TEAM_ACTIVITIES_OF_STAFF="/staff/{staffId}/team_activities";
+    public static final String GET_ALL_TEAMS_OF_ORGANIZATIONS ="/teams";
     public static final String GET_PARENT_ORGANIZATION_OF_CITY_LEVEL = "/getParentOrganizationOfCityLevel";
     public static final String GET_PARENT_OF_ORGANIZATION = "/getParentOfOrganization";
     public static final String EXTERNAL_ID_URL = "/external/{externalId}";
