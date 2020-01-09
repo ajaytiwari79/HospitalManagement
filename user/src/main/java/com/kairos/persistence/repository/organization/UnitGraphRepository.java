@@ -65,7 +65,7 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "UNION\n" +
             "MATCH (organization:Organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
             "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH distinct skill,organization\n" +
-            "MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,r\n" +
+            "OPTIONAL MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,r\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:r.customName,description:skill.description,visitourId:r.visitourId, customName:r.customName, isEdited:true})} as selectedSkills\n" +
             "RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
