@@ -218,10 +218,7 @@ public class ShiftValidatorService {
         shift.setPlannedMinutesOfTimebank(calculatePlannedHoursAndScheduledHours.getTotalDailyPlannedMinutes());
         Specification<ShiftWithActivityDTO> activitySkillSpec = new StaffAndSkillSpecification(staffAdditionalInfoDTO.getSkillLevelDTOS(), ruleTemplateSpecificInfo, exceptionService);
         Specification<ShiftWithActivityDTO> tagSpecification = new TagSpecification(staffAdditionalInfoDTO.getTags(),ruleTemplateSpecificInfo, exceptionService);
-        Set<BigInteger> activities =userIntegrationService.getTeamActivitiesOfStaff(shift.getUnitId(),shift.getStaffId());
-        List<StaffActivitySetting> activitySettings=staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shift.getStaffId(), ActivityUtil.getAllActivities(shift));
-        Set<BigInteger> allActivities=activitySettings.stream().map(k->k.getActivityId()).collect(Collectors.toSet());
-        allActivities.addAll(activities);
+        Set<BigInteger> allActivities =getAllActivitiesOfTeam(shift);
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffAdditionalInfoDTO.getEmployment().getExpertise(), ruleTemplateSpecificInfo,allActivities);
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTO.getRuleTemplates());
         Specification<ShiftWithActivityDTO> activitySpecification = activityExpertiseSpecification.and(activitySkillSpec).and(wtaRulesSpecification).and(tagSpecification);
@@ -247,6 +244,14 @@ public class ShiftValidatorService {
         shift.setTimeType(activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getTimeType());
         activitySpecification.validateRules(shift);
         return new ShiftWithViolatedInfoDTO(ruleTemplateSpecificInfo.getViolatedRules());
+    }
+
+    public Set<BigInteger> getAllActivitiesOfTeam(ShiftWithActivityDTO shift){
+        Set<BigInteger> activities =userIntegrationService.getTeamActivitiesOfStaff(shift.getUnitId(),shift.getStaffId());
+        List<StaffActivitySetting> activitySettings=staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(shift.getStaffId(), ActivityUtil.getAllActivities(shift));
+        Set<BigInteger> allActivities=activitySettings.stream().map(k->k.getActivityId()).collect(Collectors.toSet());
+        allActivities.addAll(activities);
+        return allActivities;
     }
 
     public ViolatedRulesDTO validateRuleOnShiftDelete(Map<BigInteger, ActivityWrapper> activityWrapperMap,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
@@ -501,10 +506,7 @@ public class ShiftValidatorService {
         Set<DayOfWeek> validDays = isCollectionNotEmpty(dayTypeIds) ? getValidDays(dayTypeDTOMap, dayTypeIds) : new HashSet<>();
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shiftWithActivityDTO.getUnitId(),ruleTemplateSpecificInfo.getShift().getActivities().get(0).getStartDate(), ruleTemplateSpecificInfo.getShift().getActivities().get(0).getEndDate());
         Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaQueryResultDTOS.get(0).getRuleTemplates());
-        Set<BigInteger> activities =userIntegrationService.getTeamActivitiesOfStaff(shiftWithActivityDTO.getUnitId(),staffEmploymentDetails.getStaffId());
-        List<StaffActivitySetting> activitySettings=staffActivitySettingRepository.findByStaffIdAndActivityIdInAndDeletedFalse(staffEmploymentDetails.getStaffId(), ActivityUtil.getAllActivities(shiftWithActivityDTO));
-        Set<BigInteger> allActivities=activitySettings.stream().map(k->k.getActivityId()).collect(Collectors.toSet());
-        allActivities.addAll(activities);
+        Set<BigInteger> allActivities =getAllActivitiesOfTeam(shiftWithActivityDTO);
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffEmploymentDetails.getExpertise(), ruleTemplateSpecificInfo,allActivities);
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> activityDayTypeSpecification = new DayTypeSpecification(validDays, ruleTemplateSpecificInfo.getShift().getStartDate());
