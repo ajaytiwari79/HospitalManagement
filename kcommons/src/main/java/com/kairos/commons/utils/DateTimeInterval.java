@@ -225,7 +225,7 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
     }
 
     public boolean containsNow() {
-        Date date = new Date();
+        Date date = getDate();
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (date.getTime() >= thisStart && date.getTime() < thisEnd);

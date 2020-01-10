@@ -108,7 +108,7 @@ public class EquipmentService{
         equipment.setCategory(equipmentCategoryGraphRepository.findOne(equipmentDTO.getEquipmentCategory().getId(),0));
         equipmentGraphRepository.save(equipment);
         return equipment;
-        //return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), new Date().getTime());
+        //return featureGraphRepository.updateFeature(featureId, countryId, featureDTO.getName(), featureDTO.getDescription(), getDate().getTime());
     }
 
     public Boolean deleteEquipment(Long countryId, Long equipmentId){
