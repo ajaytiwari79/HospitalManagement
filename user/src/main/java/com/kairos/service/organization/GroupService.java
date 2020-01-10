@@ -161,7 +161,7 @@ public class GroupService {
             }
         }
         Organization organization=organizationService.fetchParentOrganization(unitId);
-        List<Map> staffs = staffGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath());
+        List<Map> staffs = staffGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null);
         if(isNotNull(ageRange)) {
             final AgeRangeDTO age = new AgeRangeDTO(Integer.parseInt(ageRange.get("from").toString()), isNotNull(ageRange.get("to")) ? Integer.parseInt(ageRange.get("to").toString()) : null, DurationType.valueOf(ageRange.get("durationType").toString()));
             staffs = staffs.stream().filter(map -> validate(map.get("dateOfBirth"), age)).collect(Collectors.toList());
