@@ -439,7 +439,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
     }
 
     public CTAWTAAndAccumulatedTimebankWrapper getWTACTAByEmploymentIds(Set<Long> employmentIds) {
-        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByUpIds(employmentIds, new Date());
+        List<WTAQueryResultDTO> wtaQueryResultDTOS = wtaRepository.getAllWTAByUpIds(employmentIds, getDate());
         List<WTAResponseDTO> wtaResponseDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(wtaQueryResultDTOS, WTAResponseDTO.class);
         List<CTAResponseDTO> ctaResponseDTOS = costTimeAgreementService.getCTAByEmploymentIds(employmentIds);
         return new CTAWTAAndAccumulatedTimebankWrapper(ctaResponseDTOS, wtaResponseDTOS);
