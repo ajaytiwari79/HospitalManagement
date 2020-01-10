@@ -169,15 +169,12 @@ public class ShiftDTO {
         this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
     }
 
-<<<<<<< HEAD
     public List<ShiftActivityDTO> getBreakActivities() {
         this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
         return breakActivities;
     }
 
-=======
     //todo don't remove this method it is for frontend
->>>>>>> d3f062882ddb64e9c6f1ee4f5d64b68f6a683558
     public boolean isMultipleActivity() {
         Set<BigInteger> multipleActivityCount = new HashSet<>();
         for (ShiftActivityDTO activity : this.getActivities()) {

@@ -118,7 +118,7 @@ public class RequestAbsenceService {
         }
         ActivityWrapper activityWrapper = activityMongoRepository.findActivityAndTimeTypeByActivityId(todo.getSubEntityId());
         if(TodoStatus.APPROVE.equals(todo.getStatus())){
-            ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
+            List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
             if(isNull(shiftOptional.get().getRequestAbsence())){
                 exceptionService.actionNotPermittedException(REQUEST_ABSENCE_APPROVED);
             }
@@ -134,12 +134,12 @@ public class RequestAbsenceService {
                 Date endDate = CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? asDate(asZoneDateTime(shift.getStartDate()).plusWeeks(1).plusDays(1).truncatedTo(ChronoUnit.DAYS)) : asDate(asZoneDateTime(shift.getStartDate()).plusDays(1).truncatedTo(ChronoUnit.DAYS));
                 ShiftDTO shiftDTO = new ShiftDTO(asLocalDate(startDate),newArrayList(new ShiftActivityDTO(activityWrapper.getActivity().getId(),activityWrapper.getActivity().getName(),newHashSet(ShiftStatus.REQUEST))),shift.getId());
                 shiftDTO.setUnitId(shift.getUnitId());
-                shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper,shiftDTO,staffAdditionalInfoDTO, false,ShiftActionType.SAVE);
-                shiftMongoRepository.deleteShiftBetweenDatesByEmploymentId(shift.getEmploymentId(),startDate,endDate,shiftWithViolatedInfoDTO.getShifts().stream().filter(shiftDTO1->isNotNull(shiftDTO1.getId())).map(shiftDTO1->shiftDTO1.getId()).collect(Collectors.toList()));
+                shiftWithViolatedInfoDTOS = absenceShiftService.createAbsenceTypeShift(activityWrapper,shiftDTO,staffAdditionalInfoDTO, false,ShiftActionType.SAVE);
+                shiftMongoRepository.deleteShiftBetweenDatesByEmploymentId(shift.getEmploymentId(),startDate,endDate, getShiftIds(shiftWithViolatedInfoDTOS));
             }else {
-                shiftWithViolatedInfoDTO =  updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
+                shiftWithViolatedInfoDTOS = updateShiftWithRequestAbsence(activityWrapper,shift,staffAdditionalInfoDTO);
             }
-            response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTO);
+            response = updateStatusAfterUpdateShift(todo, shiftWithViolatedInfoDTOS);
             shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
         }else if(DISAPPROVE.equals(todo.getStatus())){
             shiftOptional.get().setRequestAbsence(null);
@@ -152,16 +152,22 @@ public class RequestAbsenceService {
         return response;
     }
 
-    private <T> T updateStatusAfterUpdateShift(Todo todo, ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO) {
+    private Collection<BigInteger> getShiftIds(List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS) {
+        return shiftWithViolatedInfoDTOS.stream().flatMap(shiftWithViolatedInfoDTO -> shiftWithViolatedInfoDTO.getShifts().stream()).filter(shiftDTO1->isNotNull(shiftDTO1.getId())).map(shiftDTO1->shiftDTO1.getId()).collect(Collectors.toList());
+    }
+
+    private <T> T updateStatusAfterUpdateShift(Todo todo, List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS) {
         T response;
         Optional<Shift> shiftOptional;
-        if(isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements()) || isCollectionNotEmpty(shiftWithViolatedInfoDTO.getViolatedRules().getActivities())){
+        if(absenceShiftService.isRuleViolated(shiftWithViolatedInfoDTOS)){
             todo.setStatus(TodoStatus.REQUESTED);
-            response = (T)shiftWithViolatedInfoDTO;
+            response = (T)shiftWithViolatedInfoDTOS;
         }else {
             List<ShiftActivitiesIdDTO> shiftActivitiesIdDTOS = new ArrayList<>();
-            for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
-                shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().filter(shiftActivityDTO -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivityDTO.getStatus())).map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
+            for (ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO : shiftWithViolatedInfoDTOS) {
+                for (ShiftDTO shiftDTO : shiftWithViolatedInfoDTO.getShifts()) {
+                    shiftActivitiesIdDTOS.add(new ShiftActivitiesIdDTO(shiftDTO.getId(),shiftDTO.getActivities().stream().filter(shiftActivityDTO -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivityDTO.getStatus())).map(shiftActivityDTO -> shiftActivityDTO.getId()).collect(Collectors.toList())));
+                }
             }
             response = (T)shiftStatusService.updateStatusOfShifts(todo.getUnitId(), new ShiftPublishDTO(shiftActivitiesIdDTOS,ShiftStatus.APPROVE,todo.getComment()));
             shiftOptional = shiftMongoRepository.findById(todo.getEntityId());
@@ -188,7 +194,7 @@ public class RequestAbsenceService {
         return shiftAndActivtyStatusDTO;
     }
 
-    private ShiftWithViolatedInfoDTO updateShiftWithRequestAbsence(ActivityWrapper activityWrapper,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
+    private List<ShiftWithViolatedInfoDTO> updateShiftWithRequestAbsence(ActivityWrapper activityWrapper,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
         List<ShiftActivity> shiftActivities = new ArrayList<>();
         RequestAbsence requestAbsence = shift.getRequestAbsence();
         DateTimeInterval dateTimeInterval = new DateTimeInterval(requestAbsence.getStartDate(),requestAbsence.getEndDate());

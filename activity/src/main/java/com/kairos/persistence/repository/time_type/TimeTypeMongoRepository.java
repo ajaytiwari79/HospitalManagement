@@ -64,4 +64,8 @@ public interface TimeTypeMongoRepository extends MongoBaseRepository<TimeType, B
     boolean existsByIdAndCountryIdAndDeletedFalse(BigInteger id, Long countryId);
 
     boolean existsByIdAndPartOfTeam(BigInteger id, boolean partOfTeam);
+
+
+    @Query(value = "{deleted:false, sicknessSettingValid:true}")
+    List<TimeType> findAllSickTimeTypes();
 }

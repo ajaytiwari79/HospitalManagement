@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -14,13 +15,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.addMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.enums.shift.ShiftType.SICK;
 
 /**
  * Created by vipul on 30/8/17.
@@ -60,7 +60,6 @@ public class Shift extends MongoBaseEntity {
     private BigInteger parentOpenShiftId;
     // from which shift it is copied , if we need to undo then we need this
     private BigInteger copiedFromShiftId;
-    private boolean sickShift;
     private Long functionId;
     private Long staffUserId;
     private ShiftType shiftType;
@@ -115,7 +114,6 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
         this.employmentId = employmentId;
         this.unitId = unitId;
-        this.sickShift = true;
         this.phaseId = phaseId;
         this.planningPeriodId = planningPeriodId;
 
@@ -154,6 +152,9 @@ public class Shift extends MongoBaseEntity {
         this.activities = activities;
     }
 
+    public List<ShiftActivity> getActivities() {
+        return isNullOrElse(activities,new ArrayList<>());
+    }
 
     public int getMinutes() {
         DateTimeInterval interval = getInterval();
@@ -257,6 +258,14 @@ public class Shift extends MongoBaseEntity {
         this.endDate = endDate;
     }
 
+
+    public boolean isSickShift() {
+        return SICK.equals(this.shiftType);
+    }
+
+    public Set<ShiftStatus> getShiftStatuses() {
+        return getActivities().stream().flatMap(shiftActivity -> shiftActivity.getStatus().stream()).collect(Collectors.toSet());
+    }
 
     @Override
     public String toString() {

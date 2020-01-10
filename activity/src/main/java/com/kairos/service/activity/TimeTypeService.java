@@ -109,7 +109,7 @@ public class TimeTypeService extends MongoBaseService {
             //User Cannot Update NAME for TimeTypes of Second Level
             exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_RENAME_NOTALLOWED, timeType.getLabel());
         }
-        activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), timeType.getBackgroundColor(),timeType.getId());
+        activityService.updateBackgroundColorInShifts(timeTypeDTO, timeType.getBackgroundColor(),timeType.getId());
         timeType.setLabel(timeTypeDTO.getLabel());
         timeType.setDescription(timeTypeDTO.getDescription());
         timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
@@ -151,7 +151,7 @@ public class TimeTypeService extends MongoBaseService {
         boolean priorityForUpdate = false;
         boolean sicknessSettingUpdate  = false;
         for (TimeType childTimeType : childTimeTypeList) {
-            activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), childTimeType.getBackgroundColor(),childTimeType.getId());
+            activityService.updateBackgroundColorInShifts(timeTypeDTO, childTimeType.getBackgroundColor(),childTimeType.getId());
             if (childTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && childTimeType.getChildTimeTypeIds().isEmpty()) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
                 partOfTeamUpdated = true;
@@ -183,7 +183,7 @@ public class TimeTypeService extends MongoBaseService {
 
     private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, boolean priorityForUpdate, TimeType childTimeType, boolean sicknessSettingUpdate) {
         for (TimeType leafTimeType : childTimeTypeList) {
-            activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), leafTimeType.getBackgroundColor(),leafTimeType.getId());
+            activityService.updateBackgroundColorInShifts(timeTypeDTO, leafTimeType.getBackgroundColor(),leafTimeType.getId());
             leafTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             if (leafTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && !partOfTeamUpdated && timeType.getUpperLevelTimeTypeId() != null) {
                 childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
@@ -449,6 +449,7 @@ public class TimeTypeService extends MongoBaseService {
         if (!timeType.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
             timeType.getTimeCalculationActivityTab().setDayTypes(timeType.getRulesActivityTab().getDayTypes());
         }
+        activityService.updateColorInActivity(new TimeTypeDTO(timeType.getBackgroundColor(),rulesActivityDTO.isSicknessSettingValid(),rulesActivityDTO),timeTypeId);
         timeTypeMongoRepository.save(timeType);
         return new ActivityTabsWrapper(rulesActivityTab);
     }

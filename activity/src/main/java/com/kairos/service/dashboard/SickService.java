@@ -15,6 +15,7 @@ import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
+import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
@@ -56,35 +57,22 @@ public class SickService {
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
     private PlanningPeriodMongoRepository planningPeriodMongoRepository;
+    @Inject private TimeTypeMongoRepository timeTypeMongoRepository;
 
     public UserSickDataWrapper getDefaultDataOnUserSick(Long unitId) {
         UserSickDataWrapper userSickDataWrapper = new UserSickDataWrapper();
-        if (unitId == null) {
-            Long userId = UserContext.getUserDetails().getId();
-            BasicNameValuePair sickSettingsRequired = new BasicNameValuePair("sickSettingsRequired", "YES");
-            List<StaffResultDTO> staffAndOrganizationDetails = userIntegrationService.getStaffAndOrganizationDetails(userId,sickSettingsRequired);
-            if (isCollectionEmpty(staffAndOrganizationDetails)) {
-                exceptionService.actionNotPermittedException(MESSAGE_STAFF_NOTFOUND);
-            }
-            if (staffAndOrganizationDetails.size() == 1) {
-                List<ActivityDTO> activities = activityMongoRepository.findAllByTimeTypeIdAndUnitId(staffAndOrganizationDetails.get(0).getAllowedTimeTypesForSick(), staffAndOrganizationDetails.get(0).getUnitId());
-                userSickDataWrapper.setActivities(activities);
-            }
-            userSickDataWrapper.setStaffOrganizations(staffAndOrganizationDetails);
-        } else {
-            Set<BigInteger> sickTimeTypeIds = userIntegrationService.getSickTimeTypeIds(unitId);
-            List<ActivityDTO> activities = activityMongoRepository.findAllByTimeTypeIdAndUnitId(sickTimeTypeIds, unitId);
-            userSickDataWrapper.setActivities(activities);
-        }
+        Set<BigInteger> sickTimeTypeIds = timeTypeMongoRepository.findAllSickTimeTypes().stream().map(timeType -> timeType.getId()).collect(Collectors.toSet());
+        List<ActivityDTO> activities = activityMongoRepository.findAllByTimeTypeIdAndUnitId(sickTimeTypeIds, unitId);
+        userSickDataWrapper.setActivities(activities);
         return userSickDataWrapper;
     }
 
-    public Map<String, Long> markUserAsFine(Long staffId, Long unitId) {
+    public Map<String, Long> markUserAsFine(Long staffId, Long unitId,Date startDate) {
         Map<String, Long> response = new HashMap<>();
         if (unitId == null || staffId == null) {
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_UNIT_SETTING);
         }
-        shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId);
+        shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate);
         sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.
         response.put("unitId", unitId);
         response.put("staffId", staffId);

@@ -4,11 +4,13 @@ import com.kairos.service.dashboard.SickService;
 import com.kairos.utils.response.ResponseHandler;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.Date;
 import java.util.Map;
 
 import static com.kairos.constants.ApiConstants.API_V1;
@@ -32,8 +34,10 @@ public class SickController {
 
     @ApiOperation("API is used to call the user as fine")
     @GetMapping("/fine")
-    public ResponseEntity<Map<String, Object>> markUserAsFine(@RequestParam(value = "unitId", required = false) Long unitId, @RequestParam(value = "staffId") Long staffId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.markUserAsFine(staffId, unitId));
+    public ResponseEntity<Map<String, Object>> markUserAsFine(@RequestParam(value = "unitId", required = false) Long unitId,
+                                                              @RequestParam(value = "staffId") Long staffId,
+                                                              @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.markUserAsFine(staffId, unitId,startDate));
     }
 
     @ApiOperation("API is used to call the user as fine")

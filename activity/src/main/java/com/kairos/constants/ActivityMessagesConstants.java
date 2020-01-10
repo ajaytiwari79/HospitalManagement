@@ -404,7 +404,8 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_BLOCKED_FOR_SHIFT_ENTER_AT_DATE = "message.blocked.for.shift.entered.at.date";
     public static final String MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND= "message.staff.main.employment.notfound";
     public static final String MESSAGE_STAFF_CARE_DAYS_NOT_FOUND = "message.staff.caredays.setting.notfound";
-    public static final String MESSAGE_ACTIVITY_USEDON_FREEDAY= "message.activity.usedon.freedays";
-    public static final String MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF= "message.activity.usedon.protecteddaysoff";
+    public static final String MESSAGE_ACTIVITY_USEDON_FREEDAY= "message.activity.used.on.freedays";
+    public static final String MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF= "message.activity.used.on.protecteddaysoff";
+    public static final String MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND="message.protected.day.off.activity.not.found";
     public static final String MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES= "message.activity.usedon.approve.absences";
 }

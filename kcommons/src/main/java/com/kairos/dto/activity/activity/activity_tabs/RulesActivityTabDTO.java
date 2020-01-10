@@ -60,6 +60,8 @@ public class RulesActivityTabDTO {
     private boolean transferAll;
     private int noOfTransferLeave;
     private SicknessSettingDTO sicknessSetting;
+    private boolean sicknessSettingValid;
+
     public PQLSettings getPqlSettings() {
         return pqlSettings=Optional.ofNullable(pqlSettings).orElse(new PQLSettings());
     }

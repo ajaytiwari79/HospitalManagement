@@ -2,6 +2,7 @@ package com.kairos.dto.activity.time_type;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.activity.activity_tabs.RulesActivityTabDTO;
 import com.kairos.enums.OrganizationHierarchy;
 import com.kairos.enums.PriorityFor;
 import com.kairos.enums.TimeTypeEnum;
@@ -39,7 +40,14 @@ public class TimeTypeDTO {
     private BigInteger activityPriorityId;
     private PriorityFor priorityFor;
     private boolean sicknessSettingValid;
+    private RulesActivityTabDTO rulesActivityTab;
 
+
+    public TimeTypeDTO(String backgroundColor, boolean sicknessSettingValid,RulesActivityTabDTO rulesActivityTab) {
+        this.backgroundColor = backgroundColor;
+        this.sicknessSettingValid = sicknessSettingValid;
+        this.rulesActivityTab = rulesActivityTab;
+    }
 
     public TimeTypeDTO(String timeTypes, String backgroundColor) {
         this.timeTypes = timeTypes;

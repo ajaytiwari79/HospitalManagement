@@ -1,6 +1,7 @@
 package com.kairos.persistence.repository.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
@@ -67,8 +68,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{'deleted':false,'disabled':false, 'unitId':?2,'startDate':{$lt:?1} , 'endDate': {$gt:?0}}")
     List<Shift> findShiftBetweenDurationAndUnitIdAndDeletedFalse(LocalDateTime startDate, LocalDateTime endDate, Long unitId);
 
-   @Query("{'deleted':false, 'unitId':?1, 'startDate':{$gte:?2}, 'employmentId':?0, '$or':[{disabled:true},{sickShift:true}] }")
-    List<Shift> findAllDisabledOrSickShiftsByEmploymentIdAndUnitId(Long employmentId, Long unitId, LocalDate startDate);
+   @Query("{'deleted':false, 'unitId':?1, 'startDate':{$gte:?2}, 'employmentId':?0, '$or':[{disabled:true},{shiftType:?3}] }")
+    List<Shift> findAllDisabledOrSickShiftsByEmploymentIdAndUnitId(Long employmentId, Long unitId, LocalDate startDate, ShiftType shiftType);
 
     @Query("{deleted:false, disabled:false, planningPeriodId:?0,unitId:?1}")
     List<Shift> findAllShiftsByPlanningPeriod(BigInteger planningPeriodId, Long unitId);
@@ -95,8 +96,8 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,employmentId:?0, 'disabled':false, startDate:{$gte:?1,$lt:?2}}")
     List<Shift> findAllShiftsByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate);
 
-    @Query("{deleted:false,employmentId:?0, startDate:{$gte:?1}}")
+    @Query("{deleted:false,employmentId:?0,'disabled':false, startDate:{$gte:?1}}")
     List<Shift> findAllShiftsByEmploymentIdAfterDate(Long employmentId, Date startDate);
 
-    Shift findByIdAndDeletedFalse(BigInteger shiftId);
+    Shift findByIdAndDeletedFalseAndDisabledFalse(BigInteger shiftId);
 }

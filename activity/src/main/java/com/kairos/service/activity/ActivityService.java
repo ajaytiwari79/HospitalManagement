@@ -41,6 +41,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
 import com.kairos.persistence.model.period.PlanningPeriod;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
@@ -388,6 +389,8 @@ public class ActivityService {
             activity.setLevels(timeType.getLevels());
             activity.setActivityPriorityId(timeType.getActivityPriorityId());
         }
+        activity.getRulesActivityTab().setSicknessSettingValid(timeType.isSicknessSettingValid());
+        activity.getRulesActivityTab().setSicknessSetting(timeType.getRulesActivityTab().getSicknessSetting());
         activity.getGeneralActivityTab().setBackgroundColor(timeType.getBackgroundColor());
         activity.getGeneralActivityTab().setColorPresent(true);
         Long countryId = activity.getCountryId();
@@ -1007,20 +1010,26 @@ public class ActivityService {
         return new ActivityWithTimeTypeDTO(activityDTOS, timeTypeDTOS, intervals, counters);
     }
 
-    public void updateBackgroundColorInShifts(String newTimeTypeColor, String existingTimeTypeColor,BigInteger timeTypeId) {
-        if(!existingTimeTypeColor.equals(newTimeTypeColor)){
+    public void updateBackgroundColorInShifts(TimeTypeDTO timeTypeDTO, String existingTimeTypeColor,BigInteger timeTypeId) {
+        if(!existingTimeTypeColor.equals(timeTypeDTO.getBackgroundColor())){
             new Thread(() -> {
-                Set<BigInteger> activityIds = updateColorInActivity(newTimeTypeColor, timeTypeId);
-                updateColorInShift(newTimeTypeColor, timeTypeId,activityIds);
+                Set<BigInteger> activityIds = updateColorInActivity(timeTypeDTO, timeTypeId);
+                updateColorInShift(timeTypeDTO.getBackgroundColor(), timeTypeId,activityIds);
             }).start();
 
         }
     }
 
-    private Set<BigInteger> updateColorInActivity(String newTimeTypeColor,BigInteger timeTypeId) {
+    public Set<BigInteger> updateColorInActivity(TimeTypeDTO timeTypeDTO,BigInteger timeTypeId) {
         List<Activity> activities = activityMongoRepository.findAllByTimeTypeId(timeTypeId);
         if (isCollectionNotEmpty(activities)) {
-            activities.forEach(activity -> activity.getGeneralActivityTab().setBackgroundColor(newTimeTypeColor));
+            activities.forEach(activity -> {
+                activity.getGeneralActivityTab().setBackgroundColor(timeTypeDTO.getBackgroundColor());
+                activity.getRulesActivityTab().setSicknessSettingValid(timeTypeDTO.isSicknessSettingValid());
+                if(isNotNull(timeTypeDTO.getRulesActivityTab())){
+                    activity.getRulesActivityTab().setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(timeTypeDTO.getRulesActivityTab().getSicknessSetting(), SicknessSetting.class));
+                }
+            });
             activityMongoRepository.saveEntities(activities);
         }
         return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());

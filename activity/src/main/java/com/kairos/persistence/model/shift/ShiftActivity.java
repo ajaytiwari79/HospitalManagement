@@ -14,8 +14,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
-import static com.kairos.commons.utils.ObjectUtils.isEquals;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * @author pradeep
@@ -103,6 +102,10 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
 
     public void setChildActivities(List<ShiftActivity> childActivities) {
         this.childActivities = isNullOrElse(childActivities,new ArrayList<>());
+    }
+
+    public Set<ShiftStatus> getStatus() {
+        return isNullOrElse(status,newHashSet());
     }
 
     @Override

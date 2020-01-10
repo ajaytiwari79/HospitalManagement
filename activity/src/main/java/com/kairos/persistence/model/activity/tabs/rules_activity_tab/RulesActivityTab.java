@@ -54,6 +54,8 @@ public class RulesActivityTab{
     private byte recurrenceTimes;// -- the  shift of that staff will be entered.     -128 to 127
     private PQLSettings pqlSettings=new PQLSettings();
     private ReasonCodeRequiredState reasonCodeRequiredState;
+    private List<BigInteger> staffTagIds;
     private SicknessSetting sicknessSetting;
+    private boolean sicknessSettingValid;
 
 }
