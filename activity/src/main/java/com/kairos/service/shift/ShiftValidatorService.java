@@ -264,7 +264,7 @@ public class ShiftValidatorService {
     }
 
     private boolean isValidWTARuleForDelete(WTABaseRuleTemplate wtaRule) {
-        if(newHashSet(NUMBER_OF_SHIFTS_IN_INTERVAL,CONSECUTIVE_WORKING_PARTOFDAY).contains(wtaRule.getWtaTemplateType())){
+        if(newHashSet(NUMBER_OF_PARTOFDAY,CONSECUTIVE_WORKING_PARTOFDAY).contains(wtaRule.getWtaTemplateType())){
             return true;
         }
         return false;
