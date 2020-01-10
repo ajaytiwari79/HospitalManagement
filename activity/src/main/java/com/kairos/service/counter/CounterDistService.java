@@ -503,7 +503,7 @@ public class CounterDistService extends MongoBaseService {
     private void addStaffAccessGroupKPISetting(Long unitId, AccessGroupPermissionCounterDTO accessGroupAndStaffDTO, List<BigInteger> kpiIds) {
         List<ApplicableKPI> applicableKPISToSave = new ArrayList<>();
         Map<Long, Map<BigInteger, BigInteger>> staffIdKpiMap = new HashMap<>();
-        staffIdKpiMap.put(accessGroupAndStaffDTO.getStaffId(), new HashMap<BigInteger, BigInteger>());
+        staffIdKpiMap.put(accessGroupAndStaffDTO.getStaffId(), new HashMap<>());
         List<ApplicableKPI> applicableKPISForStaff = counterRepository.getApplicableKPIByReferenceId(kpiIds, Arrays.asList(accessGroupAndStaffDTO.getStaffId()), ConfLevel.STAFF);
         applicableKPISForStaff.forEach(applicableKPI -> staffIdKpiMap.get(applicableKPI.getStaffId()).put(applicableKPI.getBaseKpiId(), applicableKPI.getBaseKpiId()));
         List<ApplicableKPI> applicableKpis = counterRepository.getApplicableKPIByReferenceId(kpiIds, Arrays.asList(unitId), ConfLevel.UNIT);
@@ -519,6 +519,9 @@ public class CounterDistService extends MongoBaseService {
             }
         });
         List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, ConfLevel.UNIT, unitId);
+        List<KPIDashboardDTO> allStaffTabs=counterRepository.getKPIDashboard(null, ConfLevel.STAFF, unitId);
+        Set<String> tabs=allStaffTabs.stream().map(KPIDashboardDTO::getName).collect(toSet());
+        kpiDashboardDTOS=kpiDashboardDTOS.stream().filter(k->!tabs.contains(k.getName())).collect(Collectors.toList());
         List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(), dashboard.getModuleId(), dashboard.getName(), null, unitId, accessGroupAndStaffDTO.getStaffId(), ConfLevel.STAFF, dashboard.isDefaultTab())).collect(Collectors.toList());
         if (!kpiDashboards.isEmpty()) {
             save(kpiDashboards);
@@ -639,7 +642,7 @@ public class CounterDistService extends MongoBaseService {
             applicableKPIS.add(new ApplicableKPI(applicableKPI.getActiveKpiId(), applicableKPI.getBaseKpiId(), null, unitId, staffId, ConfLevel.STAFF, applicableFilter, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getTitle(), false, kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getKpiRepresentation(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getInterval(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getValue(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFrequencyType(), kpiIdAndApplicableKpi.get(applicableKPI.getActiveKpiId()).getFibonacciKPIConfigs()));
         }));
         List<DashboardKPIConf> dashboardKPIConfToSave = new ArrayList<>();
-        List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, ConfLevel.UNIT, unitId);
+        List<KPIDashboardDTO> kpiDashboardDTOS = counterRepository.getKPIDashboard(null, ConfLevel.UNIT, defaultKPISettingDTO.getParentUnitId());
         List<KPIDashboard> kpiDashboardsTosave = new ArrayList<>();
         defaultKPISettingDTO.getStaffIds().forEach(staffId -> {
             List<KPIDashboard> kpiDashboards = kpiDashboardDTOS.stream().map(dashboard -> new KPIDashboard(dashboard.getParentModuleId(), dashboard.getModuleId(), dashboard.getName(), null, unitId, staffId, ConfLevel.STAFF, dashboard.isDefaultTab())).collect(Collectors.toList());
