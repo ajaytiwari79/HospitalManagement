@@ -16,6 +16,7 @@ import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user.staff.staff.StaffAccessRoleDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.TimeTypeEnum;
@@ -195,6 +196,7 @@ public class ShiftService extends MongoBaseService {
             shiftDTO.setStartDate(asDate(shiftDTO.getShiftDate()));
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
             shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(activityWrapper, shiftDTO, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType, shiftActionType);
+
         } else {
             boolean shiftOverlappedWithNonWorkingType = shiftValidatorService.validateStaffDetailsAndShiftOverlapping(staffAdditionalInfoDTO, shiftDTO, activityWrapper, false);
             Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, shiftDTO.getActivities().get(0).getStartDate(), null);
@@ -204,7 +206,6 @@ public class ShiftService extends MongoBaseService {
         addReasonCode(shiftWithViolatedInfoDTO.getShifts(), staffAdditionalInfoDTO.getReasonCodes());
         return shiftWithViolatedInfoDTO;
     }
-
     private void addReasonCode(List<ShiftDTO> shiftDTOS, List<ReasonCodeDTO> reasonCodes) {
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodes.stream().collect(Collectors.toMap(ReasonCodeDTO::getId, v -> v));
         for (ShiftDTO shift : shiftDTOS) {
@@ -1498,14 +1499,6 @@ public class ShiftService extends MongoBaseService {
                 }
                 this.collectiveTimeAgreementMap.put(employmentId + "-" + localDate, ctaResponseDTO);
             }
-        }
-
-        public ActivityWrapper getActivityWrapper(BigInteger activityId){
-            if(!this.activityWrapperMap.containsKey(activityId)) {
-                ActivityWrapper activityWrapper = activityRepository.findActivityAndTimeTypeByActivityId(activityId);
-                this.activityWrapperMap.put(activityId,activityWrapper);
-            }
-            return this.activityWrapperMap.get(activityId);
         }
     }
 

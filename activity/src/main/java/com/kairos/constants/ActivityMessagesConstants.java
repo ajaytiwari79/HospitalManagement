@@ -244,6 +244,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_STAFFINGLEVEL_CURRENTDATE_NOT_EXISTS  = "message.staffingLevel.currentDate.not.exists ";
     public static final String MESSAGE_STAFFINGLEVEL_UPDATEDAT_NOT_EXISTS  = "message.staffingLevel.updatedAt.not.exists ";
     public static final String MESSAGE_WTA_NOTFOUND = "message.wta.notFound";
+    public static final String MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN = "message.team.activity.not.assign";
     public static final String MESSAGE_WTA_NAME_DUPLICATE = "message.wta.name.duplicate";
     public static final String MESSAGE_WTA_ID = "message.wta.id";
     public static final String MESSAGE_WTA_EXPIRED_UNIT = "message.wta.expired-unit";

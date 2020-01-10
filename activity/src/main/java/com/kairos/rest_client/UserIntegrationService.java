@@ -47,6 +47,7 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
+import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -619,7 +620,6 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, GET_ORGANIZATION_BY_TEAM_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
         }, teamId);
     }
-
     public OrganizationDTO getParentOrganizationOfCityLevel(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_PARENT_ORGANIZATION_OF_CITY_LEVEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
         });
@@ -629,6 +629,7 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_PARENT_OF_ORGANIZATION, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<OrganizationDTO>>() {
         });
     }
+
 
     public OrganizationStaffWrapper getOrganizationAndStaffByExternalId(String externalId, String staffTimeCare, String staffTimeCareEmploymentId) {
         List<NameValuePair> queryParamList = new ArrayList<>();
