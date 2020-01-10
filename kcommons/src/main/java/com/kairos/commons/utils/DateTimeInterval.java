@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static javax.management.timer.Timer.ONE_MINUTE;
 

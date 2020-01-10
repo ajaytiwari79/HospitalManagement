@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
