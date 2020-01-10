@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.WTATemplateType;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
@@ -16,6 +18,8 @@ import javax.validation.constraints.Positive;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class DaysOffInPeriodWTATemplateDTO extends WTABaseRuleTemplateDTO {
 
     @Positive(message = "message.ruleTemplate.interval.notNull")

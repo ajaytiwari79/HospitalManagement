@@ -64,6 +64,7 @@ public class WTABaseRuleTemplateDTO{
     protected List<PhaseTemplateValue> phaseTemplateValues;
     protected PlanningSetting planningSetting;
 
+
     public WTABaseRuleTemplateDTO(String name, String description) {
         this.name = name;
         this.description = description;
