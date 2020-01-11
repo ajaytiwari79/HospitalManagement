@@ -221,4 +221,10 @@ public class UserController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.updateChatStatus(chatStatus));
     }
 
+    @ApiOperation("Get Current User")
+    @GetMapping("/get_current_user")
+    public ResponseEntity<Map<String, Object>> getCurrentUser()  {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, userService.getCurrentUser());
+    }
+
 }

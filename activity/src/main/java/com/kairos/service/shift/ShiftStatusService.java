@@ -254,6 +254,8 @@ public class ShiftStatusService {
                 break;
             case PUBLISH:
                 shiftActivity.getStatus().add(PUBLISH);
+                shiftActivity.getStatus().removeAll(Arrays.asList(REQUEST));
+                timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityIdAndActivityMap,staffAdditionalInfoMap.get(shift.getEmploymentId()));
                 break;
             case VALIDATE:
                 shiftActivity.getStatus().add(VALIDATE);
