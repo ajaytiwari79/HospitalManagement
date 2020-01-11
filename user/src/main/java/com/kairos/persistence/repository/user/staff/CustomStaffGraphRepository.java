@@ -15,5 +15,5 @@ public interface CustomStaffGraphRepository {
      List<StaffEmploymentQueryResult> getStaffByPriorityGroupStaffIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId);
     List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitId, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds,boolean parentOrganization);
     List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
-                                  Map<FilterType, Set<String>> filters, String searchText, String imagePath);
+                                  Map<FilterType, Set<String>> filters, String searchText, String imagePath,Long loggedInStaffId);
 }

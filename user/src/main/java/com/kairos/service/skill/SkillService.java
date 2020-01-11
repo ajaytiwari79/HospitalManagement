@@ -164,14 +164,14 @@ public class SkillService {
     public HashMap<String, Object> getAllAvailableSkills(long id) {
 
         HashMap<String, Object> response = new HashMap<>();
+
         Organization parent = organizationService.fetchParentOrganization(id);
         List<Map<String, Object>> organizationSkills;
-        if (parent == null) {
-            organizationSkills = unitGraphRepository.getSkillsOfParentOrganizationWithActualName(id);
-        } else {
-            organizationSkills = unitGraphRepository.getSkillsOfChildOrganizationWithActualName(parent.getId(), id);
+        if(parent.getId().equals(id)){
+            organizationSkills=unitGraphRepository.getSkillsForParentOrganization(parent.getId(), id);
+        }else {
+            organizationSkills=unitGraphRepository.getSkillsOfChildUnit(parent.getId(), id);
         }
-
         List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
         for (Map<String, Object> map : organizationSkills) {
             orgSkillRel.add((Map<String, Object>) map.get("data"));

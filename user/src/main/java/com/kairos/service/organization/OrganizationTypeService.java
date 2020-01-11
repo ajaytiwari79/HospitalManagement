@@ -142,7 +142,7 @@ public class OrganizationTypeService{
     }
 
     /**
-     * @param expertiseId
+     * @param skillId
      * @param orgTypeId
      * @param isSelected
      * @author prabjot
@@ -150,11 +150,11 @@ public class OrganizationTypeService{
      * new relationship b/w skill and organization type will be created or updated(if relationship already exist) if parameter value is false
      * then relationship will be inactive (deleted param of relationship will set to true)
      */
-    public List<OrgTypeSkillQueryResult> addSkillInOrgType(long orgTypeId, long expertiseId, boolean isSelected) {
+    public List<OrgTypeSkillQueryResult> addSkillInOrgType(long orgTypeId, long skillId, boolean isSelected) {
         if (isSelected) {
-            organizationTypeGraphRepository.addSkillInOrgType(orgTypeId, expertiseId, DateUtils.getCurrentDateMillis(), DateUtils.getCurrentDateMillis());
+            organizationTypeGraphRepository.addSkillInOrgType(orgTypeId, skillId, DateUtils.getCurrentDateMillis(), DateUtils.getCurrentDateMillis());
         } else {
-            organizationTypeGraphRepository.deleteSkillFromOrgType(orgTypeId, expertiseId, DateUtils.getCurrentDateMillis());
+            organizationTypeGraphRepository.deleteSkillFromOrgType(orgTypeId, skillId, DateUtils.getCurrentDateMillis());
         }
 
         // TODO remove As per request of FE its added for now
