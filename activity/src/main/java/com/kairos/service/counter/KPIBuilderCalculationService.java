@@ -568,7 +568,7 @@ public class KPIBuilderCalculationService implements CounterService {
                     subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
                     break;
                 case PLANNING_QUALITY_LEVEL:
-                    subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
+                    subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo));
                     break;
                 case PROTECTED_DAYS_OFF:
                 case CARE_DAYS:
@@ -998,7 +998,7 @@ public class KPIBuilderCalculationService implements CounterService {
             List<Integer> dayOfWeeksNo = new ArrayList<>();
             daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
             daysOfWeeks.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
-            shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
+            shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),false);
             StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
             shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             currentShiftActivityCriteria = getDefaultShiftActivityCriteria();
