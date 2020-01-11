@@ -354,14 +354,15 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     }
 
     // 500
-
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
     @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class, Exception.class, MessagingException.class})
     public ResponseEntity<Object> handleInternal(final Exception ex, final WebRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
-        //mailService.sendMailToBackendOnException(ex);
+        mailService.sendMailToBackendOnException(ex);
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
