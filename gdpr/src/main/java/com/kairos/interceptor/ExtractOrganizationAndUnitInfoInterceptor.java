@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 
 /**
  * Created by anil on 10/8/17.
@@ -41,13 +42,9 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-        if (pathVariables == null) {
-            throw new InvalidRequestException("Url or Parameter is not correct");
-        }
-
-        String orgIdString = pathVariables.get("organizationId");
-        String unitIdString = pathVariables.get("unitId");
-        String countryIdString = pathVariables.get("countryId");
+        String unitIdString=isNull(pathVariables) ? null : pathVariables.get("unitId");
+        String orgIdString=isNull(pathVariables) ? null : pathVariables.get("organizationId");
+        String countryIdString = isNull(pathVariables) ? null : pathVariables.get("countryId");
         LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI() + "[ organizationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
 

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.service.auth.UserService.getCurrentUser;
 
 /**
@@ -35,16 +36,13 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            if(pathVariables==null){
-            throw new InvalidRequestException("Url or Parameter is not correct");
-        }
         try {
             UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
         } catch (Exception e) {
             LOGGER.error("exception {}",e);
         }
-        String orgIdString=pathVariables.get("organizationId");
-        String unitIdString=pathVariables.get("unitId");
+        String unitIdString=isNull(pathVariables) ? null : pathVariables.get("unitId");
+        String orgIdString=isNull(pathVariables) ? null : pathVariables.get("organizationId");
         LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
 
