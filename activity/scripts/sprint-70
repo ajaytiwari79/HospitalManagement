@@ -9,3 +9,32 @@ db.kPICategory.remove({"_id":categoryId});
 }
 }
 });
+
+
+
+
+db.kPIDashboard.aggregate([
+{ $group: {
+_id: { moduleId: "$moduleId",name:"$name",unitId:"$unitId",staffId:"$staffId",level:"$level"},
+dups: { "$addToSet": "$_id" },
+count: { "$sum": 1 }
+}},
+{ $match: {
+count: { "$gt": 1 }
+}}
+],
+{allowDiskUse: true}
+).forEach(function(doc) {
+doc.dups.shift();
+var valid = false;
+doc.dups.forEach( function(dupId){
+if(valid){
+print("dups id"+ dupId);
+// db.kPIDashboard.remove({"_id":dupId});
+}else{
+valid = true;
+}
+
+}
+)
+})
