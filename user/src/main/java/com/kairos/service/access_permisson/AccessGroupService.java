@@ -730,6 +730,7 @@ public class AccessGroupService {
         AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), currentAccessGroup.getDayTypes(), currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
         accessGroupRepository.save(accessGroup);
         organization.getAccessGroups().add(accessGroup);
+        organization.getUnits().forEach(unit->unit.getAccessGroups().add(accessGroup));
         organizationGraphRepository.save(organization);
         accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(), accessGroup.getId());
         accessGroupDTO.setId(accessGroup.getId());
