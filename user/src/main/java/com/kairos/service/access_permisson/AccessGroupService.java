@@ -718,7 +718,7 @@ public class AccessGroupService {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
         Organization organization = organizationService.fetchParentOrganization(organizationId);
-        if (Optional.ofNullable(organization).isPresent()) {
+        if (!Optional.ofNullable(organization).isPresent()) {
             exceptionService.actionNotPermittedException(MESSAGE_ACCESSGROUP_COPIED);
 
         }
