@@ -181,7 +181,7 @@ public class Activity {
                 break;
             case 8:
                 activityConstraints.getActivityRequiredTag().breakLevelConstraints(scoreHolder,kContext,constraintPenality);
-
+                break;
             default:
                 break;
         }

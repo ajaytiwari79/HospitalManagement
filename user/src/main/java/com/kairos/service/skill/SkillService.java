@@ -53,6 +53,7 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.SkillLevel.BASIC;
 
 /**
  * Created by oodles on 15/9/16.
@@ -148,9 +149,6 @@ public class SkillService {
         return null;
     }
 
-    public SkillCategory safeDeleteSkill(Long categoryId, Long skillId) {
-        return skillGraphRepository.safeDelete(categoryId, skillId);
-    }
 
     public List<Skill> getSkillsByCategoryId(Long id) {
         return skillGraphRepository.skillsByCategoryId(id);
@@ -166,14 +164,14 @@ public class SkillService {
     public HashMap<String, Object> getAllAvailableSkills(long id) {
 
         HashMap<String, Object> response = new HashMap<>();
+
         Organization parent = organizationService.fetchParentOrganization(id);
         List<Map<String, Object>> organizationSkills;
-        if (parent == null) {
-            organizationSkills = unitGraphRepository.getSkillsOfParentOrganizationWithActualName(id);
-        } else {
-            organizationSkills = unitGraphRepository.getSkillsOfChildOrganizationWithActualName(parent.getId(), id);
+        if(parent.getId().equals(id)){
+            organizationSkills=unitGraphRepository.getSkillsForParentOrganization(parent.getId(), id);
+        }else {
+            organizationSkills=unitGraphRepository.getSkillsOfChildUnit(parent.getId(), id);
         }
-
         List<Map<String, Object>> orgSkillRel = new ArrayList<>(organizationSkills.size());
         for (Map<String, Object> map : organizationSkills) {
             orgSkillRel.add((Map<String, Object>) map.get("data"));
@@ -277,7 +275,7 @@ public class SkillService {
         Map<String, Object> map = new HashMap<>();
         map.put("tableData", list);
         map.put("treeData", treeData);
-        map.put("skillLevels", Arrays.asList(SkillLevel.ADVANCE, SkillLevel.BASIC, SkillLevel.EXPERT));
+        map.put("skillLevels", Arrays.asList(SkillLevel.ADVANCE, BASIC, SkillLevel.EXPERT));
         return map;
     }
 
@@ -308,9 +306,9 @@ public class SkillService {
 
         long lastModificationDate = DateUtils.getCurrentDate().getTime();
         if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, SkillLevel.ADVANCE, true);
+            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, BASIC, true);
         } else {
-            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), lastModificationDate, lastModificationDate, SkillLevel.ADVANCE, false);
+            staffGraphRepository.addSkillInStaff(staffId, Arrays.asList(skillId), getCurrentLocalDate().toString(), lastModificationDate, BASIC, false);
         }
         return true;
     }
@@ -427,7 +425,7 @@ public class SkillService {
         }
         List<Map<String, Object>> response;
         if (isSelected) {
-            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), SkillLevel.BASIC, true);
+            staffGraphRepository.addSkillInStaff(staffId, removedSkillIds, getCurrentLocalDate().toString(), DateUtils.getCurrentDate().getTime(), BASIC, true);
             response = prepareSelectedSkillResponse(staffId, removedSkillIds, unitId);
         } else {
             staffGraphRepository.deleteSkillFromStaff(staffId, removedSkillIds, DateUtils.getCurrentDate().getTime());

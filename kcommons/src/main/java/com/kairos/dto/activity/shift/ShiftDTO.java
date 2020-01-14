@@ -34,7 +34,7 @@ import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class ShiftDTO {
+public class ShiftDTO implements Comparable<ShiftDTO>{
 
     protected BigInteger id;
     protected Date startDate;
@@ -261,5 +261,10 @@ public class ShiftDTO {
                 ", unitId=" + unitId +
                 ", staffId=" + staffId +
                 '}';
+    }
+
+    @Override
+    public int compareTo(ShiftDTO shiftDTO) {
+        return this.startDate.compareTo(shiftDTO.startDate);
     }
 }

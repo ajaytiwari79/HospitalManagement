@@ -307,7 +307,9 @@ public class StaffCreationService {
         positionService.createPosition(organization, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis());
         if(StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())) {
             staffService.addStaffInChatServer(staff);
-            activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
+            DefaultKPISettingDTO defaultKPISettingDTO = new DefaultKPISettingDTO(Arrays.asList(staff.getId()));
+            defaultKPISettingDTO.setParentUnitId(organization.getId());
+            activityIntegrationService.createDefaultKPISettingForStaff(defaultKPISettingDTO, unitId);
         }
         StaffPersonalDetail staffPersonalDetail = ObjectMapperUtils.copyPropertiesByMapper(staff,StaffPersonalDetail.class);
         staffPersonalDetail.setGender(user.getGender());

@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
@@ -81,7 +82,7 @@ public class PriorityGroupRulesDataGetterService {
             openShiftMap.put(openShift.getId(),openShift);
         }
         calculateTimeBankAndPlannedHours(priorityGroupDTO.getUnitId(),employmentDailyTimeBankEntryMap,openShiftStaffMap,openShiftMap);
-        List<ShiftCountDTO> shiftCountDTOS = shiftMongoRepository.getAssignedShiftsCountByEmploymentId(employmentIds, new Date() );
+        List<ShiftCountDTO> shiftCountDTOS = shiftMongoRepository.getAssignedShiftsCountByEmploymentId(employmentIds, getDate() );
         Map<Long,Integer> assignedOpenShiftMap = shiftCountDTOS.stream().collect(Collectors.toMap(ShiftCountDTO::getEmploymentId,ShiftCountDTO::getCount));
         List<Shift> shifts = getShifts(priorityGroupDTO,maxDate,minDate,employmentIds);
 

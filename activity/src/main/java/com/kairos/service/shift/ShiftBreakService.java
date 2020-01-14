@@ -128,9 +128,7 @@ public class ShiftBreakService {
     }
 
     public List<ShiftActivity> getBreakActivity(Shift shift, Shift dbShift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
-        shift.getBreakActivities().forEach(k -> {
-            updateBreakHeldInShift(k, shift, dbShift, activityWrapperMap);
-        });
+        shift.getBreakActivities().forEach(k -> updateBreakHeldInShift(k, shift, dbShift, activityWrapperMap));
         return shift.getBreakActivities();
     }
 
