@@ -104,4 +104,5 @@ public interface CustomActivityMongoRepository {
     TimeTypeEnum findTimeTypeByActivityId(BigInteger activityId);
 
     List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId);
+    List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType);
 }

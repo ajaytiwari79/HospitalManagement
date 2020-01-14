@@ -26,7 +26,7 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
 
 
     public DateTimeInterval() {
-        //default constructor
+        //default constructor please don't use for initialization
     }
 
     public DateTimeInterval(ZonedDateTime start, ZonedDateTime end) {
@@ -61,90 +61,90 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         checkInterval();
     }
 
-    public ZonedDateTime getStart() {
+    public final ZonedDateTime getStart() {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(start), ZoneId.systemDefault());
     }
 
-    public void checkInterval(){
+    public final void checkInterval(){
         if(this.start>this.end){
             //throw new IllegalArgumentException("The end instant must be greater than the start instant");
         }
     }
 
-    public Date getStartDate() {
+    public final Date getStartDate() {
         return new Date(this.start);
     }
 
-    public Date getEndDate() {
+    public final Date getEndDate() {
         return new Date(this.end);
     }
 
-    public long getStartMillis() {
+    public final long getStartMillis() {
         return start;
     }
 
-    public void setStart(ZonedDateTime start) {
+    public final void setStart(ZonedDateTime start) {
         this.start = start.toInstant().toEpochMilli();
     }
 
-    public void setStart(long start) {
+    public final void setStart(long start) {
         this.start = start;
     }
 
-    public ZonedDateTime getEnd() {
+    public final ZonedDateTime getEnd() {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(end), ZoneId.systemDefault());
     }
 
-    public long getEndMillis() {
+    public final long getEndMillis() {
         return end;
     }
 
-    public void setStartFrom(LocalDateTime startFrom) {
+    public final void setStartFrom(LocalDateTime startFrom) {
         this.start = startFrom.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
-    public void setEndTo(LocalDateTime endTo) {
+    public final void setEndTo(LocalDateTime endTo) {
         this.start = endTo.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
-    public LocalDate getStartLocalDate() {
+    public final LocalDate getStartLocalDate() {
         return getStart().toLocalDate();
     }
 
-    public LocalDate getEndLocalDate() {
+    public final LocalDate getEndLocalDate() {
         return getEnd().toLocalDate();
     }
 
 
-    public LocalTime getStartLocalTime() {
+    public final LocalTime getStartLocalTime() {
         return getStart().toLocalTime();
     }
 
-    public LocalTime getEndLocalTime() {
+    public final LocalTime getEndLocalTime() {
         return getEnd().toLocalTime();
     }
 
-    public LocalDateTime getStartLocalDateTime() {
+    public final LocalDateTime getStartLocalDateTime() {
         return getStart().toLocalDateTime();
     }
 
-    public LocalDateTime getEndLocalDateTime() {
+    public final LocalDateTime getEndLocalDateTime() {
         return getEnd().toLocalDateTime();
     }
 
-    public Date getMiddleOfTheInterval(){
+    public final Date getMiddleOfTheInterval(){
         return asDate(getStart().plusMinutes(this.getMinutes()/2));
     }
 
-    public void setEnd(ZonedDateTime end) {
+    public final void setEnd(ZonedDateTime end) {
         this.end = end.toInstant().toEpochMilli();
     }
 
-    public void setEnd(long end) {
+    public final void setEnd(long end) {
         this.end = end;
     }
 
-    public DateTimeInterval overlap(DateTimeInterval interval) {
+    public final DateTimeInterval overlap(DateTimeInterval interval) {
         if (!overlaps(interval)) {
             return null;
         }
@@ -153,7 +153,7 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         return new DateTimeInterval(start, end);
     }
 
-    public DateTimeInterval addInterval(DateTimeInterval interval) {
+    public final DateTimeInterval addInterval(DateTimeInterval interval) {
         DateTimeInterval dateTimeInterval = null;
         if (isNull(interval)) {
             dateTimeInterval = this;
@@ -165,7 +165,7 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         return dateTimeInterval;
     }
 
-    public boolean overlaps(DateTimeInterval interval) {
+    public final boolean overlaps(DateTimeInterval interval) {
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         if (interval == null) {
@@ -178,7 +178,7 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         }
     }
 
-    public DateTimeInterval gap(DateTimeInterval interval) {
+    public final DateTimeInterval gap(DateTimeInterval interval) {
         long otherStart = interval.getStartMillis();
         long otherEnd = interval.getEndMillis();
         long thisStart = getStartMillis();
@@ -192,46 +192,46 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         }
     }
 
-    public boolean contains(long millisInstant) {
+    public final boolean contains(long millisInstant) {
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (millisInstant >= thisStart && millisInstant < thisEnd);
     }
 
-    public boolean contains(LocalDate localDate) {
+    public final boolean contains(LocalDate localDate) {
         long millisInstant = asDate(localDate).getTime();
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (millisInstant >= thisStart && millisInstant < thisEnd);
     }
 
-    public boolean contains(ZonedDateTime dateTime) {
+    public final boolean contains(ZonedDateTime dateTime) {
         long millisInstant = dateTime.toInstant().toEpochMilli();
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (millisInstant >= thisStart && millisInstant < thisEnd);
     }
 
-    public boolean contains(Date date) {
+    public final boolean contains(Date date) {
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (date.getTime() >= thisStart && date.getTime() < thisEnd);
     }
 
-    public boolean containsAndEqualsEndDate(Date date) {
+    public final boolean containsAndEqualsEndDate(Date date) {
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
     }
 
-    public boolean containsNow() {
+    public final boolean containsNow() {
         Date date = new Date();
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (date.getTime() >= thisStart && date.getTime() < thisEnd);
     }
 
-    public boolean abuts(DateTimeInterval interval) {
+    public final boolean abuts(DateTimeInterval interval) {
         if (interval == null) {
             long now = ZonedDateTime.now().toInstant().toEpochMilli();
             return (getStartMillis() == now || getEndMillis() == now);
@@ -241,37 +241,37 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
         }
     }
 
-    public boolean containsInterval(DateTimeInterval interval) {
+    public final boolean containsInterval(DateTimeInterval interval) {
         return this.start <= interval.getStartMillis() && this.end >= interval.getEndMillis();
     }
 
-    public long getMinutes() {
+    public final long getMinutes() {
         return (this.end - this.start) / ONE_MINUTE;
     }
 
-    public int getHours() {
+    public final int getHours() {
         return (int) (this.end - this.start) / 3600000;
     }
 
-    public int getSeconds() {
+    public final int getSeconds() {
         return (int) (this.end - this.start) / 1000;
     }
 
-    public Long getMilliSeconds() {
+    public final Long getMilliSeconds() {
         return (this.end - this.start);
     }
 
-    public long getDays() {
+    public final long getDays() {
         return ChronoUnit.DAYS.between(getStart(), getEnd());
     }
 
-    public boolean containsStartOrEnd(Date date) {
+    public final boolean containsStartOrEnd(Date date) {
         long thisStart = getStartMillis();
         long thisEnd = getEndMillis();
         return (date.getTime() >= thisStart && date.getTime() <= thisEnd);
     }
 
-    public List<DateTimeInterval> minusInterval(DateTimeInterval dateTimeInterval){
+    public final List<DateTimeInterval> minusInterval(DateTimeInterval dateTimeInterval){
         List<DateTimeInterval> dateTimeIntervals = new ArrayList<>();
         if(this.overlaps(dateTimeInterval)){
             if(this.start<dateTimeInterval.start && this.end>dateTimeInterval.end){
@@ -282,6 +282,14 @@ public final class DateTimeInterval implements Comparable<DateTimeInterval>{
             }else if (this.contains(dateTimeInterval.end) && dateTimeInterval.contains(this.start)){
                 dateTimeIntervals.add(new DateTimeInterval(dateTimeInterval.end,this.end));
             }
+        }
+        return dateTimeIntervals;
+    }
+
+    public final List<DateTimeInterval> minusIntervals(List<DateTimeInterval> dateTimeIntervals){
+        List<DateTimeInterval> updatedDateTimeIntervals = new ArrayList<>();
+        for (DateTimeInterval dateTimeInterval : dateTimeIntervals) {
+            updatedDateTimeIntervals.addAll(minusInterval(dateTimeInterval));
         }
         return dateTimeIntervals;
     }

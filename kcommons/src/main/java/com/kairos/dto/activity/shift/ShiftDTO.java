@@ -174,6 +174,31 @@ public class ShiftDTO {
         return breakActivities;
     }
 
+    @JsonIgnore
+    public void mergeShiftActivity(){
+        List<ShiftActivityDTO> updatedShftActivityDTO = new ArrayList<>();
+        Map<BigInteger,List<ShiftActivityDTO>> shiftActivityDTOMap = activities.stream().collect(Collectors.groupingBy(shiftActivityDTO -> shiftActivityDTO.getActivityId()));
+        for (Map.Entry<BigInteger, List<ShiftActivityDTO>> activityIdAndShiftActivityDTOSEntry : shiftActivityDTOMap.entrySet()) {
+            Collections.sort(activityIdAndShiftActivityDTOSEntry.getValue());
+            if(activityIdAndShiftActivityDTOSEntry.getValue().size()>1){
+                for (int i = 1; i < activityIdAndShiftActivityDTOSEntry.getValue().size()-1; i++) {
+                    ShiftActivityDTO prevShiftActivityDTO = activityIdAndShiftActivityDTOSEntry.getValue().get(i-1);
+                    ShiftActivityDTO shiftActivityDTO = activityIdAndShiftActivityDTOSEntry.getValue().get(i);
+                    if(prevShiftActivityDTO.getEndDate().equals(shiftActivityDTO.getStartDate())){
+                        shiftActivityDTO.setStartDate(prevShiftActivityDTO.getStartDate());
+                        i++;
+                    }else {
+                        updatedShftActivityDTO.add(prevShiftActivityDTO);
+                        i++;
+                    }
+                }
+            }else {
+                updatedShftActivityDTO.addAll(activityIdAndShiftActivityDTOSEntry.getValue());
+            }
+        }
+        activities =  updatedShftActivityDTO;
+    }
+
     //todo don't remove this method it is for frontend
     public boolean isMultipleActivity() {
         Set<BigInteger> multipleActivityCount = new HashSet<>();

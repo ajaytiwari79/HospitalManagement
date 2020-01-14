@@ -479,8 +479,12 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<ActivityWrapper> findActivitiesAndTimeTypeByActivityId(Collection<BigInteger> activityIds) {
+        return getActivityWrappersByCriteria(Criteria.where("id").in(activityIds).and(DELETED).is(false));
+    }
+
+    private List<ActivityWrapper> getActivityWrappersByCriteria(Criteria criteria) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where("id").in(activityIds).and(DELETED).is(false)),
+                match(criteria),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
                         TIME_TYPE1),
                 lookup("activityPriority", "activityPriorityId", "_id",
@@ -510,6 +514,11 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
         return result.getMappedResults();
+    }
+
+    @Override
+    public List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType){
+        return getActivityWrappersByCriteria(Criteria.where("balanceSettingsActivityTab.timeType").is(secondLevelTimeType).and(DELETED).is(false));
     }
 
     public List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds) {
