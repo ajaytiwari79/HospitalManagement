@@ -11,14 +11,19 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * @author pradeep
@@ -27,6 +32,8 @@ import java.util.Map;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class RuleTemplateSpecificInfo {
 
     private List<ShiftWithActivityDTO> shifts = new ArrayList<>();
@@ -52,7 +59,8 @@ public class RuleTemplateSpecificInfo {
 
 
     public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum, List<Integer> staffChildAges, ShiftOperationType shiftOperationType) {
-        this.shifts = shifts;
+        this.shifts = isNullOrElse(shifts,new ArrayList<>());
+        Collections.sort(this.shifts);
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
         this.phaseId = phaseId;
@@ -74,7 +82,8 @@ public class RuleTemplateSpecificInfo {
     }
 
     public RuleTemplateSpecificInfo(List<ShiftWithActivityDTO> shifts, ShiftWithActivityDTO shift, Map<String,TimeSlotWrapper> timeSlotWrapperMap, BigInteger phaseId, DateTimeInterval planningPeriod, Map<BigInteger,Integer> counterMap, Map<Long, DayTypeDTO> dayTypeMap, long totalTimeBank, Map<BigInteger, ActivityWrapper> activityWrapperMap, int staffAge, List<CareDaysDTO> childCareDays,List<CareDaysDTO> seniorCareDays,LocalDate lastPlanningPeriodEndDate,ExpertiseNightWorkerSetting expertiseNightWorkerSetting,boolean nightWorker, PhaseDefaultName phaseEnum) {
-        this.shifts = shifts;
+        this.shifts = isNullOrElse(shifts,new ArrayList<>());
+        Collections.sort(this.shifts);
         this.shift = shift;
         this.timeSlotWrapperMap = timeSlotWrapperMap;
         this.phaseId = phaseId;
