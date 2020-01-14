@@ -1,6 +1,7 @@
 package com.kairos.service.integration;
 
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
+import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -9,6 +10,7 @@ import com.kairos.dto.activity.activity.TableConfiguration;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
+import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.unit_settings.TAndAGracePeriodSettingDTO;
@@ -202,6 +204,10 @@ public class ActivityIntegrationService {
 
     public Boolean unlinkTagFromActivity(Long unitId, Long tagId) {
         return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/tag/{tagId}/unlink", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>(){}, tagId);
+    }
+
+    public PlanningPeriodDTO getPlanningPeriodIntervalByUnitId(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/get_planning_period_range", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PlanningPeriodDTO>>(){});
     }
 }
 
