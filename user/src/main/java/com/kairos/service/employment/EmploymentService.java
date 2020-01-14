@@ -554,10 +554,7 @@ public class EmploymentService {
         }
         if (isNull(employmentDTO.getEndDate())) {
             employment.setEndDate(null);
-        } else if (isNotNull(employmentDTO.getEndDate()) && isNull(employment.getEndDate())) {
-            employment.setEndDate(employmentDTO.getEndDate());
-            setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
-        } else if (isNotNull(employmentDTO.getEndDate()) && isNotNull(employment.getEndDate()) && employment.getEndDate().isBefore(employmentDTO.getEndDate())) {
+        } else if (isNotNull(employmentDTO.getEndDate()) && isNull(employment.getEndDate()) || employment.getEndDate().isBefore(employmentDTO.getEndDate())) {
             employment.setEndDate(employmentDTO.getEndDate());
             setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
         }
