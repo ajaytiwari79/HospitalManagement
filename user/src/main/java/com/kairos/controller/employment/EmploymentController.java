@@ -48,8 +48,8 @@ public class EmploymentController {
 
     @ApiOperation(value = "Create a New Position")
     @PostMapping(value = "/employment")
-    public ResponseEntity<Map<String, Object>> createEmployment(@PathVariable Long unitId,  @RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") boolean saveAsDraft) throws Exception {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(unitId, employmentDTO, false, saveAsDraft));
+    public ResponseEntity<Map<String, Object>> createEmployment(@RequestBody @Valid EmploymentDTO employmentDTO, @RequestParam("saveAsDraft") boolean saveAsDraft) throws Exception {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.createEmployment(employmentDTO, saveAsDraft));
     }
 
     /*
@@ -57,8 +57,8 @@ public class EmploymentController {
      * used to get all employments of organization n by organization and staff Id
      * */
     @ApiOperation(value = "Get all employment by organization and staff")
-    @RequestMapping(value = "/employment/staff/{staffId}")
-    ResponseEntity<Map<String, Object>> getEmploymentsOfStaff(@PathVariable Long unitId, @RequestParam(value = "type",required = false) String type, @PathVariable Long staffId, @RequestParam("allOrganization") boolean allOrganization) {
+    @GetMapping(value = "/employment/staff/{staffId}")
+    public ResponseEntity<Map<String, Object>> getEmploymentsOfStaff(@PathVariable Long unitId, @RequestParam(value = "type",required = false) String type, @PathVariable Long staffId, @RequestParam("allOrganization") boolean allOrganization) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getEmploymentsOfStaff(unitId, staffId, allOrganization));
     }
 
@@ -132,34 +132,34 @@ public class EmploymentController {
     }
 
     @ApiOperation(value = "get employments based on expertise and staff list")
-    @RequestMapping(value = "/expertise/{expertiseId}/employments", method = RequestMethod.POST)
+    @PostMapping(value = "/expertise/{expertiseId}/employments")
     public ResponseEntity<Map<String, Object>> getStaffsEmployment(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getStaffsEmployment(unitId, expertiseId, staffList));
     }
 
     @ApiOperation(value = "get employmentsId based on expertise and staff list")
-    @RequestMapping(value = "/expertise/{expertiseId}/staff_and_employments", method = RequestMethod.POST)
+    @PostMapping(value = "/expertise/{expertiseId}/staff_and_employments")
     public ResponseEntity<Map<String, Object>> getStaffIdAndEmploymentId(@PathVariable Long unitId, @PathVariable Long expertiseId, @RequestBody List<Long> staffList) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentService.getStaffIdAndEmploymentId(unitId, expertiseId, staffList));
     }
 
     @ApiOperation(value = "get all wta version for a staff")
-    @RequestMapping(value = "/staff/{staffId}/wta", method = RequestMethod.GET)
+    @GetMapping(value = "/staff/{staffId}/wta")
     public ResponseEntity<Map<String, Object>> getAllWTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getAllWTAOfStaff(unitId,staffId));
     }
 
     @ApiOperation(value = "get all cta version for a staff")
-    @RequestMapping(value = "/staff/{staffId}/cta", method = RequestMethod.GET)
+    @GetMapping(value = "/staff/{staffId}/cta")
     public ResponseEntity<Map<String, Object>> getAllCTAOfStaff(@PathVariable Long unitId, @PathVariable Long staffId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentCTAWTAService.getAllCTAOfStaff(unitId, staffId));
     }
 
     //Do not remove, required for local testing.
    @ApiOperation(value = "update senioritylevel")
-    @RequestMapping(value = "/seniority_level_update", method = RequestMethod.POST)
+    @PostMapping(value = "/seniority_level_update")
     public ResponseEntity<Map<String, Object>> updateSeniorityLevel() {
-        employmentJobService.updateSeniorityLevelOnJobTrigger(new BigInteger("4"),999L);
+        employmentJobService.updateSeniorityLevelOnJobTrigger(BigInteger.valueOf(4),999L);
         return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
     }
 
@@ -182,7 +182,7 @@ public class EmploymentController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentFunctionService.getEmploymentLinesWithHourlyCost(unitId, staffId,employmentId));
     }
 
-    @RequestMapping(value = "/employment/default_data", method = RequestMethod.GET)
+    @GetMapping(value = "/employment/default_data")
     @ApiOperation("Get All default data for unit employment  by organization ")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> getEmploymentDefaultData(@PathVariable Long unitId,  @RequestParam("staffId") Long staffId) {
