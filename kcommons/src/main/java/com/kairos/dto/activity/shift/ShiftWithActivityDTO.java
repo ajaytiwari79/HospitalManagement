@@ -97,6 +97,16 @@ public class ShiftWithActivityDTO extends ShiftDTO{
     }
 
     @JsonIgnore
+    public ShiftActivityDTO getFirstActivity(){
+        return this.getActivities().get(0);
+    }
+
+    @JsonIgnore
+    public ShiftActivityDTO getLastActivity(){
+        return this.getActivities().get(this.getActivities().size()-1);
+    }
+
+    @JsonIgnore
     public DateTimeInterval getDateTimeInterval() {
         return new DateTimeInterval(startDate.getTime(), endDate.getTime());
     }

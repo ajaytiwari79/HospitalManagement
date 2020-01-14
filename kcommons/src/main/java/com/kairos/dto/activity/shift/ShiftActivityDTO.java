@@ -9,6 +9,8 @@ import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,13 +28,15 @@ import static com.kairos.commons.utils.ObjectUtils.isNull;
  */
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
 
     private Set<ShiftStatus> status;
     private String message;
     private boolean success;
     //This field is only for validation
-    @JsonIgnore
+    //@JsonIgnore
     private ActivityDTO activity;
     private BigInteger activityId;
     private Date startDate;
