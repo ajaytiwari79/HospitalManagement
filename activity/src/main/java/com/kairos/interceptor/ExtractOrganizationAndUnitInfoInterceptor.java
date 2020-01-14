@@ -36,7 +36,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             throw new InvalidRequestException("Url or Parameter is not correct");
         }        String orgIdString=pathVariables.get("organizationId");
         try {
-        UserContext.setUserDetails(getCurrentUser());
+        //UserContext.setUserDetails(getCurrentUser());
     } catch (Exception e) {
 LOGGER.error("exception {}",e);
     }
