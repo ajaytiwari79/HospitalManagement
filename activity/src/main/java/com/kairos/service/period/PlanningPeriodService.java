@@ -847,10 +847,6 @@ public class PlanningPeriodService extends MongoBaseService {
         return new DateTimeInterval(planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
     }
 
-    public PlanningPeriodDTO getPlanningPeriodByUnitId(Long unitId) {
-        return planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
-    }
-
     public List<PlanningPeriodDTO> findAllPeriodsOfUnit(Long unitId) {
         return planningPeriodMongoRepository.findAllPeriodsOfUnit(unitId);
     }

@@ -105,6 +105,7 @@ public class PlanningPeriodController {
     @PostMapping(value="/migrate_planning_period")
     //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     public ResponseEntity<Map<String, Object>> migratePlanningPeriod(@PathVariable Long unitId,  @RequestBody @Valid PlanningPeriodDTO planningPeriodDTO) {
+
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.migratePlanningPeriods(unitId, planningPeriodDTO));
     }
 
@@ -113,12 +114,6 @@ public class PlanningPeriodController {
     public ResponseEntity<Map<String, Object>> createJobForPlanningPeriod() {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createJobOfPlanningPeriod());
 
-    }
-
-    @ApiOperation("Get planning period range by unit id")
-    @GetMapping("/get_planning_period_range")
-    public ResponseEntity<Map<String, Object>> getPlanningPeriodByUnitId(@PathVariable Long unitId) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.getPlanningPeriodByUnitId(unitId));
     }
 
 }
