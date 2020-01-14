@@ -712,20 +712,15 @@ public class AccessGroupService {
 
     /***** Access group - COUNTRY LEVEL - ENDS HERE ******************/
 
-    public AccessGroupDTO copyUnitAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
+    public AccessGroupDTO copyUnitAccessGroup(Long organizationId, AccessGroupDTO accessGroupDTO) {
         validateDayTypes(accessGroupDTO.isAllowedDayTypes(), accessGroupDTO.getDayTypeIds());
         if (accessGroupDTO.getEndDate() != null && accessGroupDTO.getEndDate().isBefore(accessGroupDTO.getStartDate())) {
             exceptionService.actionNotPermittedException(START_DATE_LESS_FROM_END_DATE);
         }
-        Organization organization = organizationService.fetchParentOrganization(organizationId);
-        if (Optional.ofNullable(organization).isPresent()) {
-            exceptionService.actionNotPermittedException(MESSAGE_ACCESSGROUP_COPIED);
-
-        }
+        Organization organization = organizationGraphRepository.findById(organizationId).orElseThrow(() -> new ActionNotPermittedException(exceptionService.convertMessage(MESSAGE_ACCESSGROUP_COPIED)));
         Boolean isAccessGroupExistWithSameName = accessGroupRepository.isOrganizationAccessGroupExistWithName(organizationId, accessGroupDTO.getName().trim());
         if (isAccessGroupExistWithSameName) {
             exceptionService.duplicateDataException(MESSAGE_DUPLICATE, ACCESS_GROUP, accessGroupDTO.getName().trim());
-
         }
         AccessGroupQueryResult currentAccessGroup = accessGroupRepository.findByAccessGroupId(organizationId, accessGroupDTO.getId());
         if (currentAccessGroup == null) {
@@ -735,6 +730,7 @@ public class AccessGroupService {
         AccessGroup accessGroup = new AccessGroup(accessGroupDTO.getName().trim(), accessGroupDTO.getDescription(), accessGroupDTO.getRole(), currentAccessGroup.getDayTypes(), currentAccessGroup.getStartDate(), currentAccessGroup.getEndDate());
         accessGroupRepository.save(accessGroup);
         organization.getAccessGroups().add(accessGroup);
+        organization.getUnits().forEach(unit->unit.getAccessGroups().add(accessGroup));
         organizationGraphRepository.save(organization);
         accessPageRepository.copyAccessGroupPageRelationShips(accessGroupDTO.getId(), accessGroup.getId());
         accessGroupDTO.setId(accessGroup.getId());

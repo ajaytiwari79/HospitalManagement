@@ -371,6 +371,8 @@ public class UserMessagesConstants {
     public static final String MESSAGE_EMPLOYMENT_STAFF_NOTFOUND = "message.employment.staff.notfound";
     public static final String MESSAGE_STARTDATE_NOTLESSTHAN_CURRENTDATE = "message.startdate.notlessthan.currentdate";
     public static final String MESSAGE_STARTDATE_NOTLESSTHAN_ENDDATE = "message.startdate.notlessthan.enddate";
+    public static final String MESSAGE_STARTDATE_NOTLESSTHAN_PLANNING_PERIOD_STARTDATE = "message.startdate.notlessthan.planningperiod.startdate";
+    public static final String MESSAGE_ENDDATE_NOTGREATERTHAN_PLANNING_PERIOD_ENDDATE = "message.endate.notgreaterthan.planningperiod.enddate";
     public static final String MESSAGE_REGION_ENDDATE = "message.region.enddate";
     public static final String MESSAGE_LASTDATE_NOTLESSTHAN_STARTDATE = "message.lastdate.notlessthan.startdate";
     public static final String MESSAGE_SENIORITYLEVEL_ID_NOTFOUND = "message.seniorityLevel.id.notfound";

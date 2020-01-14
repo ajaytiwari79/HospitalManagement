@@ -1,6 +1,5 @@
 package com.kairos.config.interceptor;
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
@@ -19,6 +18,7 @@ import java.util.Optional;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.service.auth.UserService.getCurrentUser;
+
 
 /**
  * Created by anil on 10/8/17.
@@ -41,8 +41,13 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         } catch (Exception e) {
             LOGGER.error("exception {}",e);
         }
-        String unitIdString=isNull(pathVariables) ? null : pathVariables.get("unitId");
-        String orgIdString=isNull(pathVariables) ? null : pathVariables.get("organizationId");
+        try {
+            UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
+        } catch (Exception e) {
+            LOGGER.error("exception {}",e);
+        }
+        String orgIdString=pathVariables.get("organizationId");
+        String unitIdString=pathVariables.get("unitId");
         LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
 
