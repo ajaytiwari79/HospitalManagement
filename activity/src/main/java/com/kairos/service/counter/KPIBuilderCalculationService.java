@@ -544,50 +544,48 @@ public class KPIBuilderCalculationService implements CounterService {
     private List<ClusteredBarChartKpiDataUnit> getClusteredBarChartDetails(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
         for (YAxisConfig yAxisConfig : kpiCalculationRelatedInfo.getYAxisConfigs()) {
-
-
-            kpiCalculationRelatedInfo.setCurrentCalculationType(null);
-            switch (yAxisConfig) {
-                case ACTIVITY:
-                    subClusteredBarValue.addAll(getActivitySubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
-                    break;
-                case TIME_TYPE:
-                    subClusteredBarValue.addAll(getTimeTypeSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
-                    break;
-                case PLANNED_TIME:
-                    subClusteredBarValue.addAll(getPlannedTimeSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig));
-                    break;
-                case DELTA_TIMEBANK:
-                case PAYOUT:
-                case UNAVAILABILITY:
-                case TOTAL_PLANNED_HOURS:
-                case STAFFING_LEVEL_CAPACITY:
-                    CalculationType currentCalculationType = copyPropertiesByMapper(yAxisConfig, CalculationType.class);
-                    kpiCalculationRelatedInfo.setCurrentCalculationType(currentCalculationType);
-                    Double value = getTotalByCalculationBased(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, value));
-                    break;
-                case PLANNING_QUALITY_LEVEL:
-                    subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId, dateTimeInterval, kpiCalculationRelatedInfo));
-                    break;
-                case PROTECTED_DAYS_OFF:
-                case CARE_DAYS:
-                case SENIORDAYS:
-                case TOTAL_ABSENCE_DAYS:
-                case CHILD_CARE_DAYS:
-                    Double count = (double) getLeaveCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo, yAxisConfig);
-                    subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value, count));
-                    break;
-                case ABSENCE_REQUEST:
-                    List<TodoDTO> todoDTOList = kpiCalculationRelatedInfo.getTodosByStaffIdAndInterval(staffId, dateTimeInterval);
-                    List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = absencePlanningKPIService.getActivityStatusCount(todoDTOList, kpiCalculationRelatedInfo.xAxisConfigs.get(0));
-                    subClusteredBarValue.addAll(clusteredBarChartKpiDataUnits);
-                    break;
-                case ACTUAL_TIMEBANK:
-                case BREAK_INTERRUPT:
-                default:
-                    break;
-            }
+                kpiCalculationRelatedInfo.setCurrentCalculationType(null);
+                switch (yAxisConfig){
+                    case ACTIVITY:
+                        subClusteredBarValue.addAll(getActivitySubClusteredValue(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
+                        break;
+                    case TIME_TYPE:
+                        subClusteredBarValue.addAll(getTimeTypeSubClusteredValue(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
+                        break;
+                    case PLANNED_TIME:
+                        subClusteredBarValue.addAll(getPlannedTimeSubClusteredValue(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig));
+                        break;
+                    case DELTA_TIMEBANK:
+                    case PAYOUT:
+                    case UNAVAILABILITY:
+                    case TOTAL_PLANNED_HOURS:
+                    case STAFFING_LEVEL_CAPACITY:
+                        CalculationType currentCalculationType = copyPropertiesByMapper(yAxisConfig, CalculationType.class);
+                        kpiCalculationRelatedInfo.setCurrentCalculationType(currentCalculationType);
+                        Double value = getTotalByCalculationBased(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
+                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,value));
+                        break;
+                    case PLANNING_QUALITY_LEVEL:
+                        subClusteredBarValue.addAll(geTodoSubClusteredValue(staffId,dateTimeInterval, kpiCalculationRelatedInfo));
+                        break;
+                    case PROTECTED_DAYS_OFF:
+                    case CARE_DAYS:
+                    case SENIORDAYS:
+                    case TOTAL_ABSENCE_DAYS:
+                    case CHILD_CARE_DAYS:
+                        Double count= (double) getLeaveCount(staffId,dateTimeInterval,kpiCalculationRelatedInfo,yAxisConfig);
+                        subClusteredBarValue.add(new ClusteredBarChartKpiDataUnit(yAxisConfig.value,count));
+                        break;
+                    case ABSENCE_REQUEST:
+                        List<TodoDTO> todoDTOList=kpiCalculationRelatedInfo.getTodosByStaffIdAndInterval(staffId,dateTimeInterval);
+                        List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits =absencePlanningKPIService.getActivityStatusCount(todoDTOList,kpiCalculationRelatedInfo.xAxisConfigs.get(0));
+                        subClusteredBarValue.addAll(clusteredBarChartKpiDataUnits);
+                        break;
+                    case ACTUAL_TIMEBANK:
+                    case BREAK_INTERRUPT:
+                    default:
+                        break;
+                }
         }
         return subClusteredBarValue;
     }
@@ -716,8 +714,6 @@ public class KPIBuilderCalculationService implements CounterService {
         }
         return subClusteredBarValue;
     }
-
-
 
     private List<ClusteredBarChartKpiDataUnit> getPlannedTimeSubClusteredValue(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo,YAxisConfig yAxisConfig){
         List<ClusteredBarChartKpiDataUnit> subClusteredBarValue = new ArrayList<>();
@@ -872,8 +868,6 @@ public class KPIBuilderCalculationService implements CounterService {
         Map<BigInteger, ActivityWrapper> activityWrapperMap;
         PlanningPeriod planningPeriod;
 
-
-
         public KPICalculationRelatedInfo(Map<FilterType, List> filterBasedCriteria, Long unitId, ApplicableKPI applicableKPI, KPI kpi) {
             this.filterBasedCriteria = filterBasedCriteria;
             this.unitId = unitId;
@@ -900,11 +894,9 @@ public class KPIBuilderCalculationService implements CounterService {
             getDailyTimeBankEntryByEmploymentId();
         }
 
-
         public void getActivityTodoList(){
             todoDTOS=todoService.getAllTodoByEntityIds(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             activityIdAndTodoListMap=todoDTOS.stream().collect(Collectors.groupingBy(TodoDTO::getSubEntityId,Collectors.toList()));
-
         }
 
         public CalculationType getCalculationType() {
@@ -998,7 +990,12 @@ public class KPIBuilderCalculationService implements CounterService {
             List<Integer> dayOfWeeksNo = new ArrayList<>();
             daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
             daysOfWeeks.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
-            shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),false);
+            if(CollectionUtils.containsAny(newArrayList(PRESENCE_UNDER_STAFFING.toString(),PRESENCE_OVER_STAFFING.toString(),ABSENCE_UNDER_STAFFING.toString(),ABSENCE_OVER_STAFFING.toString()), filterBasedCriteria.get(FilterType.CALCULATION_TYPE))){
+                List<Shift> shiftData =  shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), isCollectionNotEmpty(unitIds) ? unitIds : newArrayList(organizationId));
+                shifts = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftData, ShiftWithActivityDTO.class);
+            }else {
+                shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),false);
+            }
             StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
             shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             currentShiftActivityCriteria = getDefaultShiftActivityCriteria();

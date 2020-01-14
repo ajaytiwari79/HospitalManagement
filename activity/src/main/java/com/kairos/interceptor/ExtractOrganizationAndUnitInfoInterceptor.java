@@ -1,4 +1,5 @@
 package com.kairos.interceptor;
+
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
@@ -14,7 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.rest_client.UserIntegrationService.getCurrentUser;
 
 /**
@@ -32,13 +32,15 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        if(pathVariables==null){
+            throw new InvalidRequestException("Url or Parameter is not correct");
+        }        String orgIdString=pathVariables.get("organizationId");
         try {
         UserContext.setUserDetails(getCurrentUser());
     } catch (Exception e) {
 LOGGER.error("exception {}",e);
     }
-        String unitIdString=isNull(pathVariables) ? null : pathVariables.get("unitId");
-        String orgIdString=isNull(pathVariables) ? null : pathVariables.get("organizationId");
+        String unitIdString=pathVariables.get("unitId");
         LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationId ,Unit Id " +orgIdString+" ,"+unitIdString+" ]");
 
