@@ -3,6 +3,7 @@ package com.kairos.service.country;
 import com.google.api.services.calendar.model.Event;
 import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADefaultDataInfoDTO;
@@ -553,22 +554,8 @@ public class CountryService {
     public WTADefaultDataInfoDTO getWtaTemplateDefaultDataInfo(Long countryId) {
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
-        List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p -> new PresenceTypeDTO(p.getName(), p.getId())).collect(Collectors.toList());
-        dayTypes.forEach(dayType -> {
-            DayTypeDTO dayTypeDTO = new DayTypeDTO();
-            try {
-                PropertyUtils.copyProperties(dayTypeDTO, dayType);
-                dayTypeDTOS.add(dayTypeDTO);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        });
-        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS1, getDefaultTimeSlot(), countryId);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypes,DayTypeDTO.class);
+        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, getDefaultTimeSlot(), countryId);
     }
 
     public List<TimeSlotDTO> getDefaultTimeSlot() {
