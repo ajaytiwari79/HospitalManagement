@@ -42,7 +42,6 @@ import com.kairos.service.google_calender.CountryCalenderService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.wrapper.OrganizationLevelAndUnionWrapper;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;

@@ -748,20 +748,10 @@ public class OrganizationService {
         Long countryId = UserContext.getUserDetails().getCountryId();
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(unitId);
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organizationBaseEntity);
-        List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p -> new PresenceTypeDTO(p.getName(), p.getId())).collect(Collectors.toList());
-        dayTypes.forEach(dayType -> {
-            DayTypeDTO dayTypeDTO = new DayTypeDTO();
-            try {
-                PropertyUtils.copyProperties(dayTypeDTO, dayType);
-                dayTypeDTOS.add(dayTypeDTO);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        });
-        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS1, timeSlotDTOS, countryId);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypes,DayTypeDTO.class);
+        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, timeSlotDTOS, countryId);
     }
 
     public RuleTemplateDefaultData getDefaultDataForRuleTemplateByUnit(Long unitId) {
