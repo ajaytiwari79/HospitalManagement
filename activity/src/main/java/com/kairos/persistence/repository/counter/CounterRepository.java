@@ -43,10 +43,7 @@ import org.springframework.util.Assert;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -205,7 +202,7 @@ public class CounterRepository{
 
 
     //KPI  CRUD
-    public List<ApplicableKPI> getApplicableKPI(List<BigInteger> kpiIds, ConfLevel level, Long refId) {
+    public List<ApplicableKPI> getApplicableKPI(Collection<BigInteger> kpiIds, ConfLevel level, Long refId) {
         String refQueryField = getRefQueryField(level);
         Criteria criteria = Criteria.where(DELETED).is(false).and(refQueryField).is(refId).and(LEVEL).is(level);
         if (isCollectionNotEmpty(kpiIds)) {
