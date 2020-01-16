@@ -566,6 +566,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.durationMinutes' : 1,\n" +
                 "        'activities.scheduledMinutes':1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.status':1,\n" +
                 "        'activities.timeBankCtaBonusMinutes':1,\n" +
                 "        'activities.scheduledMinutesOfTimebank':1,\n" +
                 "        'activities.scheduledMinutesOfPayout':1,\n" +
