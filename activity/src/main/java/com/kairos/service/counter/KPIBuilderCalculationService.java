@@ -182,7 +182,8 @@ public class KPIBuilderCalculationService implements CounterService {
             for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
                 for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
                     List<DailyTimeBankEntry> dailyTimeBankEntries = (List)kpiCalculationRelatedInfo.employmentIdListAndDailyTimeBankEntryMap.getOrDefault(employmentWithCtaDetailsDTO.getId(),new ArrayList<>());
-                    actualTimeBank += timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(),employmentWithCtaDetailsDTO.getStartDate());
+                    LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate().isAfter(kpiCalculationRelatedInfo.getPlanningPeriodInterval().getStartLocalDate())?employmentWithCtaDetailsDTO.getStartDate():kpiCalculationRelatedInfo.getPlanningPeriodInterval().getStartLocalDate();
+                    actualTimeBank += timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(),employmentStartDate);
                 }
             }
         }

@@ -29,7 +29,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
     public boolean preHandle(
             HttpServletRequest request,
             HttpServletResponse response,
-            Object handler) throws Exception {
+            Object handler) {
 
         if(request.getRequestURL().toString().contains("/scheduler_execute_job")) return true;
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
