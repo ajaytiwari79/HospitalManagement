@@ -102,13 +102,11 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         results.forEach(result->{
             staffKpiFilterQueryResults.add(ObjectMapperUtils.copyPropertiesByMapper(result,StaffKpiFilterQueryResult.class));
         });
-
         return staffKpiFilterQueryResults;
-//
     }
 
-    public List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
-                                         Map<FilterType, Set<String>> filters, String searchText, String imagePath,Long loggedInStaffId) {
+    public <T> List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
+                                         Map<FilterType, Set<T>> filters, String searchText, String imagePath,Long loggedInStaffId) {
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put("unitId", unitId);
         queryParameters.put("parentOrganizationId", parentOrganizationIds);
@@ -135,6 +133,18 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         if (Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
             queryParameters.put("teamIds",
                     convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()) {
+            queryParameters.put("mainTeamIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.MAIN_TEAM)));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()) {
+            queryParameters.put("skillLevels",
+                    filters.get(FilterType.SKILL_LEVEL));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.ACCESS_GROUPS)).isPresent()) {
+            queryParameters.put("accessGroupIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.ACCESS_GROUPS)));
         }
         if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent()) {
             queryParameters.put("tagIds",
@@ -189,13 +199,11 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
     }
 
-    public List<Long> convertListOfStringIntoLong(Set<String> listOfString) {
-        return listOfString.stream().map(Long::parseLong).collect(Collectors.toList());
+    public <T> List<Long> convertListOfStringIntoLong(Set<T> listOfString) {
+        return listOfString.stream().map(list->Long.valueOf(list.toString())).collect(Collectors.toList());
     }
 
-
-
-    private String getSelfRosteringQuery(Map<FilterType, Set<String>> filters, String searchText,Long loggedInStaffId) {
+    private <T> String getSelfRosteringQuery(Map<FilterType, Set<T>> filters, String searchText,Long loggedInStaffId) {
         String query = "";
         query = " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId} " +getMatchQueryForStaff(loggedInStaffId)+
                 " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
@@ -203,13 +211,13 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             query += " MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
         }
         if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
-            query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
+            query += " Match (staff)<-[:" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
         }
         query +=" WITH user, staff, employment,organization ";
         return query;
     }
 
-    private String getGroupQuery(Map<FilterType, Set<String>> filters, String searchText) {
+    private <T> String getGroupQuery(Map<FilterType, Set<T>> filters, String searchText) {
         String query = "";
         query = " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
                 " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
@@ -217,18 +225,40 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             query +=" MATCH (staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false})-[:HAS_EMPLOYMENT_LINES]->(employmentLine:EmploymentLine)-[:APPLICABLE_FUNCTION]->(function:Function)\n" +
                     " where id(function) IN {functionIds}";
         }
-        if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()) {
-            query += " MATCH (staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
+        if(Optional.ofNullable(filters.get(FilterType.ACCESS_GROUPS)).isPresent()) {
+            query +=" MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroups:AccessGroup)\n" +
+                    " where id(accessGroups) IN {accessGroupIds}";
         }
-        if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
-            query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
+        if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent() || Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()) {
+            query += " MATCH (staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE ";
+            boolean isSkill = false;
+            if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()){
+                query += "id(skill) IN {skillIds} ";
+                isSkill = true;
+            }
+            if(Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()){
+                query += isSkill ? " AND " : " ";
+                query += "staffSkillRel.skillLevel IN {skillLevels}";
+            }
+        }
+        if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent() || Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()) {
+            query += " Match (staff)<-[mainTeamRel:" + TEAM_HAS_MEMBER + "]-(team:Team) where ";
+            boolean isTeam = false;
+            if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()){
+                query += "id(team) IN {teamIds} ";
+                isTeam = true;
+            }
+            if(Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()){
+                query += isTeam ? " OR " : " ";
+                query += "(id(team) IN {mainTeamIds} AND mainTeamRel.teamType='MAIN')";
+            }
         }
         query +=" WITH user, staff, employment,organization ";
 
         return query;
     }
 
-    public String getMatchQueryForNameGenderStatusOfStaffByFilters(Map<FilterType, Set<String>> filters, String searchText) {
+    public <T> String getMatchQueryForNameGenderStatusOfStaffByFilters(Map<FilterType, Set<T>> filters, String searchText) {
         String matchQueryForStaff = "";
         int countOfSubString = 0;
         if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent()) {
@@ -251,7 +281,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return loggedInStaffId==null?" ":"AND id(staff)={loggedInStaffId}";
     }
 
-    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, Set<String>> filters) {
+    public <T> String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, Set<T>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
             matchRelationshipQueryForStaff += "MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)  " +

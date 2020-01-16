@@ -40,6 +40,10 @@ public class StaffFilterDTO {
     private Map<Long,List<WTAResponseDTO>> employmentIdAndWtaResponseMap;
     private boolean includeWorkTimeAgreement;
 
+    public StaffFilterDTO(String moduleId, List<FilterSelectionDTO> filtersData){
+        this.moduleId = moduleId;
+        this.filtersData = filtersData;
+    }
     public void setFiltersData(List<FilterSelectionDTO> filtersData) {
         this.filtersData = isNullOrElse(filtersData,new ArrayList<>());
     }

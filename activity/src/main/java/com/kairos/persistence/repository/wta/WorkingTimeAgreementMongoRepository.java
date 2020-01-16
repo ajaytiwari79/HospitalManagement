@@ -1,6 +1,8 @@
 package com.kairos.persistence.repository.wta;
 
 
+import com.kairos.dto.activity.wta.basic_details.WTADTO;
+import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -26,6 +28,9 @@ public interface WorkingTimeAgreementMongoRepository extends MongoBaseRepository
 
     @Query(value = "{name:?1,deleted:false,disabled:false,'organization._id':{$in:?0}}")
     List<WorkingTimeAgreement> findWTAByUnitIdsAndName(List<Long> organizationIds, String name);
+
+    @Query(value = "{deleted:false,disabled:false,'organization._id':?0}")
+    List<WTAResponseDTO> findWTAByUnitId(Long organizationIds);
 
     @Query(value = "{'organization._id':?0, name:?1, deleted:false}", exists = true)
     boolean isWTAExistByOrganizationIdAndName(long organizationId, String wtaName);

@@ -6,6 +6,7 @@ import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.TableConfiguration;
+import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
 import com.kairos.dto.activity.night_worker.NightWorkerGeneralResponseDTO;
@@ -204,6 +205,10 @@ public class ActivityIntegrationService {
 
     public PlanningPeriodDTO getPlanningPeriodIntervalByUnitId(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/get_planning_period_range", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<PlanningPeriodDTO>>(){});
+    }
+
+    public StaffFilterDataDTO getStaffFilterDataByUnitId(Long unitId) {
+        return genericRestClient.publishRequest(null, unitId, true, IntegrationOperation.GET, "/get_staff_filter_data", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffFilterDataDTO>>(){});
     }
 }
 
