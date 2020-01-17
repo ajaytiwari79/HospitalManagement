@@ -517,8 +517,8 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType){
-        return getActivityWrappersByCriteria(Criteria.where("balanceSettingsActivityTab.timeType").is(secondLevelTimeType).and(DELETED).is(false));
+    public List<ActivityWrapper> getAllActivityWrapperBySecondLevelTimeType(String secondLevelTimeType,Long unitId){
+        return getActivityWrappersByCriteria(Criteria.where("balanceSettingsActivityTab.timeType").is(secondLevelTimeType).and(UNIT_ID).is(unitId).and(DELETED).is(false));
     }
 
     public List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds) {

@@ -409,4 +409,5 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PROTECTEDDAYSOFF_ACTIVITY_NOT_FOUND="message.protected.day.off.activity.not.found";
     public static final String MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES= "message.activity.usedon.approve.absences";
     public static final String MESSAGE_NON_WORKING_SICKNESS_ACTIVITY_NOT_FOUND= "message.activity.nonworking.sickness.activity.not.found";
+    public static final String EMPLOYMENT_NOT_VALID_TO_MARK_SICK = "employment.not.valid.to.mark.sick";
 }

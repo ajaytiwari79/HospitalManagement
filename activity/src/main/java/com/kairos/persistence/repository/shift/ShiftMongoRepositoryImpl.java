@@ -77,6 +77,14 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         return mongoTemplate.find(query, Shift.class);
     }
 
+    @Override
+    public List<Shift> findAllSicknessShiftByEmploymentIdAndActivityIds(Long employmentId,Collection<BigInteger> activityIds,Date startDate) {
+        Criteria criteria = where(DELETED).is(false).and("draft").is(false).and(ACTIVITIES_ACTIVITY_ID).in(activityIds).and(START_DATE).gte(startDate).and(EMPLOYMENT_ID).is(employmentId);
+        Query query = new Query(criteria);
+        query.with(Sort.by(Sort.Direction.ASC,"startDate"));
+        return mongoTemplate.find(query, Shift.class);
+    }
+
     public List<ShiftDTO> findAllShiftsBetweenDuration(Long employmentId, Long staffId, Date startDate, Date endDate, Long unitId) {
         Criteria criteria = where(UNIT_ID).is(unitId).and(EMPLOYMENT_ID).is(employmentId).and(DELETED).is(false).and(DISABLED).is(false).and(STAFF_ID).is(staffId)
                 .and(START_DATE).gte(startDate).lte(endDate);

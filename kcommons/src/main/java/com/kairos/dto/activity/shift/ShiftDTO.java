@@ -176,27 +176,26 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
 
     @JsonIgnore
     public void mergeShiftActivity(){
-        List<ShiftActivityDTO> updatedShftActivityDTO = new ArrayList<>();
-        Map<BigInteger,List<ShiftActivityDTO>> shiftActivityDTOMap = activities.stream().collect(Collectors.groupingBy(shiftActivityDTO -> shiftActivityDTO.getActivityId()));
-        for (Map.Entry<BigInteger, List<ShiftActivityDTO>> activityIdAndShiftActivityDTOSEntry : shiftActivityDTOMap.entrySet()) {
-            Collections.sort(activityIdAndShiftActivityDTOSEntry.getValue());
-            if(activityIdAndShiftActivityDTOSEntry.getValue().size()>1){
-                for (int i = 1; i < activityIdAndShiftActivityDTOSEntry.getValue().size()-1; i++) {
-                    ShiftActivityDTO prevShiftActivityDTO = activityIdAndShiftActivityDTOSEntry.getValue().get(i-1);
-                    ShiftActivityDTO shiftActivityDTO = activityIdAndShiftActivityDTOSEntry.getValue().get(i);
-                    if(prevShiftActivityDTO.getEndDate().equals(shiftActivityDTO.getStartDate())){
-                        shiftActivityDTO.setStartDate(prevShiftActivityDTO.getStartDate());
-                        i++;
-                    }else {
-                        updatedShftActivityDTO.add(prevShiftActivityDTO);
-                        i++;
-                    }
+        if(isCollectionNotEmpty(activities)) {
+            Collections.sort(activities);
+            ShiftActivityDTO activityDTO = activities.get(0);
+            BigInteger id = activityDTO.getActivityId();
+            List<ShiftActivityDTO> mergedShiftActivityDTOS = new ArrayList<>();
+            for (ShiftActivityDTO shiftActivityDTO : activities) {
+                if (activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
+                    activityDTO.setEndDate(shiftActivityDTO.getEndDate());
+                } else if (activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && !activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
+                    mergedShiftActivityDTOS.add(activityDTO);
+                    activityDTO = shiftActivityDTO;
+                } else if (activityDTO.getEndDate().before(shiftActivityDTO.getStartDate())) {
+                    mergedShiftActivityDTOS.add(activityDTO);
+                    activityDTO = shiftActivityDTO;
                 }
-            }else {
-                updatedShftActivityDTO.addAll(activityIdAndShiftActivityDTOSEntry.getValue());
             }
+            //to add last one
+            mergedShiftActivityDTOS.add(activityDTO);
+            activities = mergedShiftActivityDTOS;
         }
-        activities =  updatedShftActivityDTO;
     }
 
     //todo don't remove this method it is for frontend

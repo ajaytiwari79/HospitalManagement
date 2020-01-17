@@ -93,4 +93,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{unitId:?0, 'timeCalculationActivityTab.methodForCalculatingTime':{$in:?1 }, 'rulesActivityTab.approvalAllowedPhaseIds':?2, deleted:false}")
     List<Activity> findAllAbsenceActivities(Long unitId, Set<String> methodForCalculatingTimes, BigInteger phaseId);
+
+    @Query(value = "{'deleted' : false,'unitId' :?0,'rulesActivityTab.sicknessSettingValid':true}",fields ="{'_id':1}")
+    List<Activity> findAllSicknessActivity(Long unitId);
 }

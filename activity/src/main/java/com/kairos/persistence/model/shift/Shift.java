@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.shift;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
@@ -265,6 +266,20 @@ public class Shift extends MongoBaseEntity {
 
     public Set<ShiftStatus> getShiftStatuses() {
         return getActivities().stream().flatMap(shiftActivity -> shiftActivity.getStatus().stream()).collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public boolean isActivityMatch(BigInteger activityId,boolean includeDraftShift){
+        boolean activityMatch;
+        if(!includeDraftShift && this.draft){
+            activityMatch = false;
+        }else {
+            activityMatch = this.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId));
+            if (!activityMatch && includeDraftShift) {
+                activityMatch = isNotNull(this.getDraftShift()) ? this.getDraftShift().getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(activityId)) : false;
+            }
+        }
+        return activityMatch;
     }
 
     @Override

@@ -27,12 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_EMPTY_STAFF_OR_UNIT_SETTING;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_NOTFOUND;
 
@@ -67,15 +68,15 @@ public class SickService {
         return userSickDataWrapper;
     }
 
-    public Map<String, Long> markUserAsFine(Long staffId, Long unitId,Date startDate) {
+    public Map<String, Long> markUserAsFine(Long employmentId, Long unitId, LocalDate startDate) {
         Map<String, Long> response = new HashMap<>();
-        if (unitId == null || staffId == null) {
+        if (isNull(unitId) || isNull(employmentId)) {
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_UNIT_SETTING);
         }
-        shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate);
-        sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.
+        shiftSickService.disableSicknessShiftsOfStaff(employmentId, unitId,startDate);
+        sickSettingsRepository.markUserAsFine(employmentId, unitId);  //set end date of user sick table.
         response.put("unitId", unitId);
-        response.put("staffId", staffId);
+        response.put("employmentId", employmentId);
         return response;
     }
 
