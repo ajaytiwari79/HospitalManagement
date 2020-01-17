@@ -769,6 +769,7 @@ public class ActivityService {
     }
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId) {
+        LOGGER.info("fetching details of activity and unit");
         SelfRosteringMetaData publicHolidayDayTypeWrapper = userIntegrationService.getPublicHolidaysDayTypeAndReasonCodeByUnitId(unitId);
         if (!Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
             exceptionService.internalServerError(MESSAGE_SELFROSTERING_METADATA_NULL);
