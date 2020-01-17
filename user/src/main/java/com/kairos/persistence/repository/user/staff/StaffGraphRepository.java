@@ -305,7 +305,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (organization:Organization)-[:" + HAS_POSITIONS + "]->(:Position)-[:" + BELONGS_TO + "]->(staff:Staff) WHERE id(organization)={1}" +
             "MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) WHERE user.cprNumber={0} RETURN count(staff)>0")
-    Boolean isStaffExistsByCPRNumber(String cprNumber, Long parentOrganizationId);
+    boolean isStaffExistsByCPRNumber(String cprNumber, Long parentOrganizationId);
 
     // TODO CRITICAL ISSUE we are fetching all staff across all organisation i think it should be refactored
     @Query("MATCH (staff:Staff)-[:" + STAFF_HAS_EXPERTISE + "]->(expertise:Expertise) WHERE id(expertise) IN {1} RETURN staff")

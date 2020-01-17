@@ -259,9 +259,6 @@ public class StaffCreationService {
         User user = null;
         Staff staff;
         Organization organization = organizationService.fetchParentOrganization(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-        }
         if(StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())) {
             validateRequireFieldOfStaff(payload);
             if (payload.getCprNumber().length() != 10) {

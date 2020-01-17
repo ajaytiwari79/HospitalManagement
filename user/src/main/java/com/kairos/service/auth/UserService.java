@@ -67,6 +67,7 @@ import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -505,25 +506,26 @@ public class UserService {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (!organizationId.equals(currentUser.getLastSelectedOrganizationId())) {
             OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);
-            Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
             currentUser.setLastSelectedOrganizationCategory(organizationCategory);
-            currentUser.setCountryId(countryId);
         }
         if(!currentUser.getUnitWiseAccessRole().containsKey(organizationId.toString())){
             Staff staff=staffGraphRepository.getStaffByUserId(currentUser.getId(),organizationService.fetchParentOrganization(organizationId).getId());
             Long staffId=staff==null?staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),organizationService.fetchParentOrganization(organizationId).getId()):staff.getId();
-            boolean onlyStaff=unitPermissionGraphRepository.isOnlyStaff(organizationId,staffId,-1L);
+            boolean onlyStaff=unitPermissionGraphRepository.isOnlyStaff(organizationId,staffId);
             currentUser.getUnitWiseAccessRole().put(organizationId.toString(),staff==null||!onlyStaff?MANAGEMENT.name():AccessGroupRole.STAFF.name());
         }
-
+        if(isNull(currentUser.getCountryId())){
+            Long countryId=countryService.getCountryIdByUnitId(organizationId);
+            currentUser.setCountryId(countryId);
+        }
         userGraphRepository.save(currentUser);
     }
 
 
     public boolean updateDateOfBirthOfUserByCPRNumber() {
         List<User> users = userGraphRepository.findAll();
-        users.stream().forEach(user -> {
+        users.forEach(user -> {
             user.setDateOfBirth(Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
         });
@@ -593,7 +595,7 @@ public class UserService {
 
     public boolean updateUserName(UserDetailsDTO userDetailsDTO) {
         User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
-        if (ObjectUtils.isNull(user)) {
+        if (isNull(user)) {
             LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
             exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, userDetailsDTO.getEmail());
         } else {

@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
+
 public class ResponseHandler {
 
 	public static ResponseEntity<Map<String, Object>> generateResponse(String message, HttpStatus status){
