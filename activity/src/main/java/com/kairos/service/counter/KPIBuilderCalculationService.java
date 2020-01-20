@@ -1018,9 +1018,7 @@ public class KPIBuilderCalculationService implements CounterService {
                         }
                     }
                 }
-                if(isCollectionNotEmpty(teamIds)) {
-                    filterBasedCriteria.put(FilterType.TEAM, teamIds);
-                }
+                filterBasedCriteria.put(FilterType.TEAM, teamIds);
             }
         }
 
