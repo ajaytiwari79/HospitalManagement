@@ -45,7 +45,6 @@ public class EmploymentLine extends UserBaseEntity {
         this.avgDailyWorkingHours = employmentLineBuilder.avgDailyWorkingHours;
         this.workingDaysInWeek = employmentLineBuilder.workingDaysInWeek;
         this.hourlyCost = employmentLineBuilder.hourlyCost;
-
     }
 
     public void setSeniorityLevel(SeniorityLevel seniorityLevel) {

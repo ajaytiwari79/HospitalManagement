@@ -1,5 +1,6 @@
 package com.kairos.service.activity;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
@@ -41,6 +42,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.activity.tabs.*;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -249,10 +251,10 @@ public class ActivityService {
         List<OrganizationActivityDTO> unitActivities = activityMongoRepository.findAllActivityOfUnitsByParentActivity(parentActivityIds, unitIds);
         Map<Long, Map<Long, BigInteger>> mappedParentUnitActivities = new HashMap<>();
         unitActivities.forEach(activityDTO -> {
-            Map<Long, BigInteger> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
+            Map<Long, BigInteger> unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId());
             if (!Optional.ofNullable(unitParentActivities).isPresent()) {
-                mappedParentUnitActivities.put(activityDTO.getUnitId().longValue(), new HashMap<Long, BigInteger>());
-                unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId().longValue());
+                mappedParentUnitActivities.put(activityDTO.getUnitId(), new HashMap<>());
+                unitParentActivities = mappedParentUnitActivities.get(activityDTO.getUnitId());
             }
             unitParentActivities.put(activityDTO.getParentId().longValue(), activityDTO.getId());
         });
@@ -260,10 +262,7 @@ public class ActivityService {
     }
 
     public boolean deleteActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         long activityCount = shiftService.countByActivityId(activityId);
         if (activityCount > 0) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE);
@@ -289,10 +288,9 @@ public class ActivityService {
         if (activityCategory == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_CATEGORY_NOTEXIST);
         }
-        Activity activity = activityMongoRepository.findOne(generalDTO.getActivityId());
+        Activity activity = findActivityById(generalDTO.getActivityId());
         generalDTO.setBackgroundColor(activity.getGeneralActivityTab().getBackgroundColor());
-        GeneralActivityTab generalTab = new GeneralActivityTab();
-        ObjectMapperUtils.copyProperties(generalDTO, generalTab);
+        GeneralActivityTab generalTab = ObjectMapperUtils.copyPropertiesByMapper(generalDTO,GeneralActivityTab.class);
         if (Optional.ofNullable(activity.getGeneralActivityTab().getModifiedIconName()).isPresent()) {
             generalTab.setModifiedIconName(activity.getGeneralActivityTab().getModifiedIconName());
         }
@@ -328,10 +326,7 @@ public class ActivityService {
 
     public ActivityTabsWrapper getGeneralTabOfActivity(Long countryId, BigInteger activityId) {
         List<ActivityCategory> activityCategories = checkCountryAndFindActivityCategory(countryId);
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMECARE_ID, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         GeneralActivityTab generalTab = activity.getGeneralActivityTab();
         generalTab.setTags(null);
         GeneralActivityTabWithTagDTO generalActivityTabWithTagDTO = ObjectMapperUtils.copyPropertiesByMapper(generalTab, GeneralActivityTabWithTagDTO.class);
@@ -428,12 +423,8 @@ public class ActivityService {
     }
 
     public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity) {
-        TimeCalculationActivityTab timeCalculationActivityTab = new TimeCalculationActivityTab();
-        ObjectMapperUtils.copyProperties(timeCalculationActivityDTO, timeCalculationActivityTab);
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_TIMECARE_ID, timeCalculationActivityDTO.getActivityId());
-        }
+        TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO,TimeCalculationActivityTab.class);
+        Activity activity = findActivityById(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
         timeCalculationActivityDTO = verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
         if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
             activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
@@ -458,10 +449,7 @@ public class ActivityService {
     }
 
     public Set<BigInteger> assignChildActivitiesInActivity(BigInteger activityId, Set<BigInteger> childActivitiesIds) {
-        Activity activity = activityMongoRepository.findById(activityId).orElse(null);
-        if (isNull(activity)) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         List<ActivityDTO> activityMatched = activityMongoRepository.findChildActivityActivityIds(childActivitiesIds);
         if (activityMatched.size() != childActivitiesIds.size()) {
             exceptionService.illegalArgumentException(MESSAGE_MISMATCHED_IDS);
@@ -506,26 +494,22 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper updateIndividualPointsTab(IndividualPointsActivityTabDTO individualPointsDTO) {
-        IndividualPointsActivityTab individualPointsActivityTab = new IndividualPointsActivityTab();
-        ObjectMapperUtils.copyProperties(individualPointsDTO, individualPointsActivityTab);
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(individualPointsDTO.getActivityId())));
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, individualPointsDTO.getActivityId());
-        }
+        IndividualPointsActivityTab individualPointsActivityTab = ObjectMapperUtils.copyPropertiesByMapper(individualPointsDTO,IndividualPointsActivityTab.class);
+        Activity activity = findActivityById(new BigInteger(String.valueOf(individualPointsDTO.getActivityId())));
         activity.setIndividualPointsActivityTab(individualPointsActivityTab);
         activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(individualPointsActivityTab);
     }
 
     public IndividualPointsActivityTab getIndividualPointsTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
+        Activity activity = findActivityById(activityId);
         return activity.getIndividualPointsActivityTab();
     }
 
     public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
         validateActivityTimeRules( rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
-        Activity activity = activityMongoRepository.findOne(rulesActivityDTO.getActivityId());
+        Activity activity = findActivityById(rulesActivityDTO.getActivityId());
         if(rulesActivityDTO.isEligibleForStaffingLevel() && !activity.getRulesActivityTab().isEligibleForStaffingLevel()){
             Activity parentActivity = activityMongoRepository.findByChildActivityId(rulesActivityDTO.getActivityId());
             if(isNotNull(parentActivity) && !parentActivity.getRulesActivityTab().isEligibleForStaffingLevel()){
@@ -568,10 +552,7 @@ public class ActivityService {
         }
     }
     public ActivityTabsWrapper getPhaseSettingTabOfActivity(BigInteger activityId, Long countryId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         DayTypeEmploymentTypeWrapper dayTypeEmploymentTypeWrapper = userIntegrationService.getDayTypesAndEmploymentTypes(countryId);
         List<DayType> dayTypes = dayTypeEmploymentTypeWrapper.getDayTypes();
         List<EmploymentTypeDTO> employmentTypeDTOS = dayTypeEmploymentTypeWrapper.getEmploymentTypes();
@@ -581,10 +562,7 @@ public class ActivityService {
     }
 
     public PhaseSettingsActivityTab updatePhaseSettingTab(PhaseSettingsActivityTab phaseSettingsActivityTab) {
-        Activity activity = activityMongoRepository.findOne(phaseSettingsActivityTab.getActivityId());
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, phaseSettingsActivityTab.getActivityId());
-        }
+        Activity activity = findActivityById(phaseSettingsActivityTab.getActivityId());
         activity.setPhaseSettingsActivityTab(phaseSettingsActivityTab);
         activityMongoRepository.save(activity);
         return phaseSettingsActivityTab;
@@ -611,44 +589,34 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper getNotesTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
+        Activity activity = findActivityById(activityId);
         return new ActivityTabsWrapper(activity.getNotesActivityTab());
     }
 
 
     public List<CutOffInterval> getCutOffInterValOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
+        Activity activity = findActivityById(activityId);
         return ActivityUtil.getCutoffInterval(activity.getRulesActivityTab().getCutOffStartFrom(),activity.getRulesActivityTab().getCutOffIntervalUnit(), activity.getRulesActivityTab().getCutOffdayValue());
     }
 
 
     public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO) {
-        CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab();
         validateReminderSettings(communicationActivityDTO);
-        ObjectMapperUtils.copyProperties(communicationActivityDTO, communicationActivityTab);
-        Activity activity = activityMongoRepository.findOne(communicationActivityDTO.getActivityId());
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, communicationActivityDTO.getActivityId());
-        }
+        CommunicationActivityTab communicationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(communicationActivityDTO,CommunicationActivityTab.class);
+        Activity activity = findActivityById(communicationActivityDTO.getActivityId());
         activity.setCommunicationActivityTab(communicationActivityTab);
         activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(communicationActivityTab);
     }
 
     public ActivityTabsWrapper getCommunicationTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         return new ActivityTabsWrapper(activity.getCommunicationActivityTab());
     }
     // BONUS
 
     public ActivityTabsWrapper updateBonusTabOfActivity(BonusActivityDTO bonusActivityDTO) {
-        Activity activity = activityMongoRepository.findOne(bonusActivityDTO.getActivityId());
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, bonusActivityDTO.getActivityId());
-        }
+        Activity activity = findActivityById(bonusActivityDTO.getActivityId());
         BonusActivityTab bonusActivityTab = new BonusActivityTab(bonusActivityDTO.getBonusHoursType(), bonusActivityDTO.isOverRuleCtaWta());
         activity.setBonusActivityTab(bonusActivityTab);
         activityMongoRepository.save(activity);
@@ -656,18 +624,12 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper getBonusTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         return new ActivityTabsWrapper(activity.getBonusActivityTab());
     }
 
     public ActivityTabsWrapper updateSkillTabOfActivity(SkillActivityDTO skillActivityDTO) {
-        Activity activity = activityMongoRepository.findOne(skillActivityDTO.getActivityId());
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, skillActivityDTO.getActivityId());
-        }
+        Activity activity = findActivityById(skillActivityDTO.getActivityId());
         SkillActivityTab skillActivityTab = new SkillActivityTab(skillActivityDTO.getActivitySkills());
         activity.setSkillActivityTab(skillActivityTab);
         activityMongoRepository.save(activity);
@@ -675,15 +637,12 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper getSkillTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
+        Activity activity = findActivityById(activityId);
         return new ActivityTabsWrapper(activity.getSkillActivityTab());
     }
 
     public void updateOrgMappingDetailOfActivity(OrganizationMappingDTO organizationMappingDTO, BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         boolean isSuccess = userIntegrationService.verifyOrganizationExpertizeAndRegions(organizationMappingDTO);
         if (!isSuccess) {
             exceptionService.dataNotFoundException(MESSAGE_PARAMETERS_INCORRECT);
@@ -701,10 +660,7 @@ public class ActivityService {
     }
 
     public OrganizationMappingDTO getOrgMappingDetailOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         OrganizationMappingDTO organizationMappingDTO = new OrganizationMappingDTO();
         organizationMappingDTO.setOrganizationSubTypes(activity.getOrganizationSubTypes());
         organizationMappingDTO.setExpertises(activity.getExpertises());
@@ -738,17 +694,14 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper updateOptaPlannerSettingsTabOfActivity(BigInteger activityId, OptaPlannerSettingActivityTab optaPlannerSettingActivityTab) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         activity.setOptaPlannerSettingActivityTab(optaPlannerSettingActivityTab);
         activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(optaPlannerSettingActivityTab);
     }
 
     public ActivityTabsWrapper getOptaPlannerSettingsTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
+        Activity activity = findActivityById(activityId);
         return new ActivityTabsWrapper(activity.getOptaPlannerSettingActivityTab());
     }
 
@@ -758,10 +711,7 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper updateCtaAndWtaSettingsTabOfActivity(CTAAndWTASettingsActivityTabDTO ctaAndWtaSettingsActivityTabDTO) {
-        Activity activity = activityMongoRepository.findOne(new BigInteger(String.valueOf(ctaAndWtaSettingsActivityTabDTO.getActivityId())));
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, ctaAndWtaSettingsActivityTabDTO.getActivityId());
-        }
+        Activity activity =findActivityById(new BigInteger(String.valueOf(ctaAndWtaSettingsActivityTabDTO.getActivityId())));
         CTAAndWTASettingsActivityTab ctaAndWtaSettingsActivityTab = new CTAAndWTASettingsActivityTab(ctaAndWtaSettingsActivityTabDTO.isEligibleForCostCalculation());
         activity.setCtaAndWtaSettingsActivityTab(ctaAndWtaSettingsActivityTab);
         activityMongoRepository.save(activity);
@@ -769,6 +719,7 @@ public class ActivityService {
     }
 
     public PhaseActivityDTO getActivityAndPhaseByUnitId(long unitId) {
+        LOGGER.info("fetching details of activity and unit");
         SelfRosteringMetaData publicHolidayDayTypeWrapper = userIntegrationService.getPublicHolidaysDayTypeAndReasonCodeByUnitId(unitId);
         if (!Optional.ofNullable(publicHolidayDayTypeWrapper).isPresent()) {
             exceptionService.internalServerError(MESSAGE_SELFROSTERING_METADATA_NULL);
@@ -826,10 +777,7 @@ public class ActivityService {
     }
 
     public GeneralActivityTab addIconInActivity(BigInteger activityId, MultipartFile file) throws IOException {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(EXCEPTION_DATANOTFOUND, ACTIVITY, activityId);
-        }
+        Activity activity =findActivityById(activityId);
         byte[] bytes = file.getBytes();
         String modifiedFileName = System.currentTimeMillis() + file.getOriginalFilename().substring(file.getOriginalFilename().length() - 4);
         Path path = Paths.get(ACTIVITY_TYPE_IMAGE_PATH + modifiedFileName);
@@ -841,10 +789,7 @@ public class ActivityService {
     }
 
     public boolean deleteCountryActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundException(MESSAGE_ACTIVITY_ID, activityId);
-        }
+        Activity activity =findActivityById(activityId);
         if (activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException(EXCEPTION_ALREADYINUSE, ACTIVITY);
         }
@@ -922,10 +867,7 @@ public class ActivityService {
     }
 
     public NotesActivityTab addDocumentInNotesTab(BigInteger activityId, MultipartFile file) throws IOException {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID, activityId);
-        }
+        Activity activity =findActivityById(activityId);
         byte[] bytes = file.getBytes();
         String modifiedFileName = System.currentTimeMillis() + file.getOriginalFilename().substring(file.getOriginalFilename().length() - 4);
         Path path = Paths.get(ACTIVITY_TYPE_IMAGE_PATH + modifiedFileName);
@@ -937,10 +879,7 @@ public class ActivityService {
     }
 
     public Boolean publishActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID, activityId);
-        }
+        Activity activity =findActivityById(activityId);
         if (activity.getState().equals(ActivityStateEnum.PUBLISHED) || activity.getState().equals(ActivityStateEnum.LIVE)) {
             exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_PUBLISHED, activityId);
         }
@@ -982,15 +921,13 @@ public class ActivityService {
     }
 
     public ActivityTabsWrapper getLocationsTabOfActivity(BigInteger activityId) {
-        Activity activity = activityMongoRepository.findOne(activityId);
+        Activity activity = findActivityById(activityId);
         return new ActivityTabsWrapper(activity.getLocationActivityTab());
     }
 
     public ActivityTabsWrapper updateLocationsTabOfActivity(LocationActivityTabDTO locationActivityTabDTO) {
-        Activity activity = activityMongoRepository.findOne(locationActivityTabDTO.getActivityId());
-        if (!Optional.ofNullable(activity).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, locationActivityTabDTO.getActivityId());
-        }
+
+        Activity activity =findActivityById(locationActivityTabDTO.getActivityId());
         LocationActivityTab locationActivityTab = new LocationActivityTab(locationActivityTabDTO.getGlideTimeForCheckIn(), locationActivityTabDTO.getGlideTimeForCheckOut());
         activity.setLocationActivityTab(locationActivityTab);
         activityMongoRepository.save(activity);
@@ -1009,7 +946,7 @@ public class ActivityService {
         if(!existingTimeTypeColor.equals(newTimeTypeColor)){
             new Thread(() -> {
                 Set<BigInteger> activityIds = updateColorInActivity(newTimeTypeColor, timeTypeId);
-                updateColorInShift(newTimeTypeColor, timeTypeId,activityIds);
+                updateColorInShift(newTimeTypeColor,activityIds);
             }).start();
 
         }
@@ -1021,10 +958,10 @@ public class ActivityService {
             activities.forEach(activity -> activity.getGeneralActivityTab().setBackgroundColor(newTimeTypeColor));
             activityMongoRepository.saveEntities(activities);
         }
-        return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+        return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
     }
 
-    private void updateColorInShift(String newTimeTypeColor,BigInteger timeTypeId,Set<BigInteger> activityIds) {
+    private void updateColorInShift(String newTimeTypeColor,Set<BigInteger> activityIds) {
         List<Shift> shifts = shiftMongoRepository.findShiftByShiftActivityIdAndBetweenDate(activityIds,null,null,null);
         shifts.forEach(shift -> shift.getActivities().forEach(shiftActivity -> {
             updateBackgroundColorInShiftActivity(newTimeTypeColor, activityIds, shiftActivity);
@@ -1111,10 +1048,7 @@ public class ActivityService {
     }
 
     public boolean removeAttachementsFromActivity(BigInteger activityId, boolean removeNotes) {
-        Activity activity = activityMongoRepository.findOne(activityId);
-        if (isNull(activity)) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID, activityId);
-        }
+        Activity activity = findActivityById(activityId);
         if (removeNotes) {
             activity.getNotesActivityTab().setOriginalDocumentName(null);
             activity.getNotesActivityTab().setModifiedDocumentName(null);
@@ -1151,6 +1085,10 @@ public class ActivityService {
     public Set<BigInteger> getAbsenceActivityIds(Long unitId, Date date) {
         Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(unitId, date, null);
         List<Activity> activities = activityMongoRepository.findAllAbsenceActivities(unitId,newHashSet(CommonConstants.FULL_DAY_CALCULATION, CommonConstants.FULL_WEEK), phase.getId());
-        return activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+        return activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
+    }
+
+    public Activity findActivityById(BigInteger activityId){
+        return activityMongoRepository.findById(activityId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
     }
 }
