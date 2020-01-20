@@ -24,6 +24,7 @@ import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
+import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
@@ -34,6 +35,7 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.team.TeamType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -68,7 +70,6 @@ import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.Interval;
@@ -990,9 +991,10 @@ public class KPIBuilderCalculationService implements CounterService {
             List<Integer> dayOfWeeksNo = new ArrayList<>();
             daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
             daysOfWeeks.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
-            if(CollectionUtils.containsAny(newArrayList(PRESENCE_UNDER_STAFFING.toString(),PRESENCE_OVER_STAFFING.toString(),ABSENCE_UNDER_STAFFING.toString(),ABSENCE_OVER_STAFFING.toString()), filterBasedCriteria.get(FilterType.CALCULATION_TYPE))){
+            if(filterBasedCriteria.containsKey(FilterType.CALCULATION_TYPE) && CollectionUtils.containsAny(newArrayList(PRESENCE_UNDER_STAFFING.toString(),PRESENCE_OVER_STAFFING.toString(),ABSENCE_UNDER_STAFFING.toString(),ABSENCE_OVER_STAFFING.toString()), filterBasedCriteria.get(FilterType.CALCULATION_TYPE))){
                 List<Shift> shiftData =  shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), isCollectionNotEmpty(unitIds) ? unitIds : newArrayList(organizationId));
                 shifts = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftData, ShiftWithActivityDTO.class);
+                updateTeamIdsByStaffAndTeamType(filterBasedCriteria, staffKpiFilterDTOS);
             }else {
                 shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),false);
             }
@@ -1000,6 +1002,26 @@ public class KPIBuilderCalculationService implements CounterService {
             shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             currentShiftActivityCriteria = getDefaultShiftActivityCriteria();
             selectedDatesAndStaffDTOSMap = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate());
+        }
+
+        private void updateTeamIdsByStaffAndTeamType(Map<FilterType, List> filterBasedCriteria, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
+            if(filterBasedCriteria.containsKey(STAFF_IDS)) {
+                List<TeamType> teamTypes = newArrayList(TeamType.MAIN,TeamType.SECONDARY);
+                if(filterBasedCriteria.containsKey(EMPLOYMENT_SUB_TYPE) && filterBasedCriteria.get(EMPLOYMENT_SUB_TYPE).size() == 1 && teamTypes.contains(TeamType.valueOf(filterBasedCriteria.get(EMPLOYMENT_SUB_TYPE).get(0).toString()))){
+                    teamTypes = newArrayList(TeamType.valueOf(filterBasedCriteria.get(EMPLOYMENT_SUB_TYPE).get(0).toString()));
+                }
+                List<Long> teamIds = new ArrayList<>();
+                for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
+                    for (TeamDTO team : staffKpiFilterDTO.getTeams()) {
+                        if (teamTypes.contains(team.getTeamType())) {
+                            teamIds.add(team.getId());
+                        }
+                    }
+                }
+                if(isCollectionNotEmpty(teamIds)) {
+                    filterBasedCriteria.put(FilterType.TEAM, teamIds);
+                }
+            }
         }
 
         public void getTodoDetails() {
