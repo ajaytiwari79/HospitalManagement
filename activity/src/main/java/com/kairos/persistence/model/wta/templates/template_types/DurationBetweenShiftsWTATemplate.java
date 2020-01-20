@@ -78,7 +78,7 @@ public class DurationBetweenShiftsWTATemplate extends WTABaseRuleTemplate {
         TimeTypeEnum timeTypeEnum = getTimeTypeEnum(shiftActivityDTO);
         switch (timeTypeEnum){
             case ABSENCE:
-                return getDurationByAbsenceOrPresenceType(ruleTemplateSpecificInfo.getShifts(),shiftActivityDTO,checkBefore,newHashSet(TimeTypeEnum.ABSENCE));
+                return getDurationByAbsenceOrPresenceType(ruleTemplateSpecificInfo.getShifts(),shiftActivityDTO,checkBefore,newHashSet(TimeTypeEnum.PRESENCE));
             case PRESENCE:
                 return getDurationByAbsenceOrPresenceType(ruleTemplateSpecificInfo.getShifts(),shiftActivityDTO,checkBefore,newHashSet(TimeTypeEnum.PRESENCE,TimeTypeEnum.ABSENCE));
                 default:
