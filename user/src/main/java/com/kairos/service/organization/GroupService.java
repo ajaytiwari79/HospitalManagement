@@ -1,5 +1,6 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
@@ -75,10 +76,7 @@ public class GroupService {
         if (isNotNull(groupDTO.getName()) && groupGraphRepository.existsByName(unitId,groupId, groupDTO.getName())){
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }
-        Group group = groupGraphRepository.findGroupByIdAndDeletedFalse(groupId);
-        if(isNull(group)){
-            exceptionService.dataNotFoundByIdException(MESSAGE_GROUP_NOT_FOUND,groupId);
-        }
+        Group group = groupGraphRepository.findById(groupId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_GROUP_NOT_FOUND,groupId)));
         if(isNotNull(groupDTO.getName())){
             group.setName(groupDTO.getName());
             group.setDescription(groupDTO.getDescription());
@@ -151,13 +149,6 @@ public class GroupService {
             }
         }
         return filteredStaff;
-    }
-
-    private List<Map> getMapsOfStaff(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS) {
-        //Map<FilterType, Set<T>> mapOfFilters = filterSelectionDTOS.stream().collect(Collectors.toMap(FilterSelectionDTO::getName,FilterSelectionDTO::getValue));
-        //Organization organization=organizationService.fetchParentOrganization(unitId);
-        return staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value,filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false).getStaffList();
-        //return staffGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null);
     }
 
     public Set<Long> getAllStaffIdsByGroupIds(Long unitId, List<Long> groupIds){

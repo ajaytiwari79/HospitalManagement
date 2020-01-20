@@ -19,11 +19,11 @@ import static com.kairos.enums.FilterType.REAL_TIME_STATUS;
 /**
  * Created By G.P.Ranjan on 23/9/19
  **/
-public class RealTimeStatusFilter implements ShiftFilter {
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+public class RealTimeStatusFilter <G> implements ShiftFilter {
+    private Map<FilterType, Set<G>> filterCriteriaMap;
     private Set<BigInteger> selectedSickTimeTypeIds;
 
-    public RealTimeStatusFilter(Map<FilterType, Set<String>> filterCriteriaMap, Set<BigInteger> selectedSickTimeTypeIds) {
+    public RealTimeStatusFilter(Map<FilterType, Set<G>> filterCriteriaMap, Set<BigInteger> selectedSickTimeTypeIds) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.selectedSickTimeTypeIds = selectedSickTimeTypeIds;
     }
