@@ -147,8 +147,8 @@ public class KPISetService {
         Map<BigInteger, Phase> unitPhaseMap = unitPhaseList.stream().collect(Collectors.toMap(Phase::getParentCountryPhaseId, Function.identity()));
         List<KPISet> unitKPISets = new ArrayList<>();
         kpiSets.forEach(kpiSet -> {
-            if (isCollectionNotEmpty(kpiSet.getKpiIds())) {
-                unitKPISets.add(new KPISet(null, kpiSet.getName(), unitPhaseMap.get(kpiSet.getPhaseId()).getId(), unitId, ConfLevel.UNIT, kpiSet.getTimeType(), kpiSet.getKpiIds()));
+            if(isCollectionNotEmpty(kpiSet.getKpiIds())) {
+                unitKPISets.add(new KPISet(null,kpiSet.getName(),unitPhaseMap.containsKey(kpiSet.getPhaseId())?unitPhaseMap.get(kpiSet.getPhaseId()).getId():null,unitId,ConfLevel.UNIT,kpiSet.getTimeType(),kpiSet.getKpiIds()));
             }
         });
         if (isCollectionNotEmpty(unitKPISets)) {
@@ -186,11 +186,11 @@ public class KPISetService {
         return kpiSetResponseDTOList;
     }
 
-    private List<ApplicableKPI> getApplicableKPIS(AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, KPISetDTO kpiSet) {
+    private List<ApplicableKPI> getApplicableKPIS(AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, KPISetDTO kpiSet,Long unitId) {
         List<ApplicableKPI> applicableKPIS;
         List<BigInteger> kpiIds = kpiSet.getKpiIds().stream().collect(Collectors.toList());
         if (accessGroupPermissionCounterDTO.isCountryAdmin()) {
-            applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.COUNTRY, accessGroupPermissionCounterDTO.getCountryId());
+            applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.UNIT, unitId);
         } else {
             applicableKPIS = counterRepository.getApplicableKPI(kpiIds, ConfLevel.STAFF, accessGroupPermissionCounterDTO.getStaffId());
         }
@@ -198,7 +198,7 @@ public class KPISetService {
     }
 
     private List<KPIResponseDTO> getKPISetCalculation(Long unitId, LocalDate startDate, LocalDate endDate, AccessGroupPermissionCounterDTO accessGroupPermissionCounterDTO, KPISetDTO kpiSet, Map<BigInteger, KPIResponseDTO> kpiResponseDTOMap) {
-        List<ApplicableKPI> applicableKPIS = getApplicableKPIS(accessGroupPermissionCounterDTO, kpiSet);
+        List<ApplicableKPI> applicableKPIS = getApplicableKPIS(accessGroupPermissionCounterDTO, kpiSet,unitId);
         KPIResponseDTO kpiResponseDTO=null;
         for (ApplicableKPI applicableKPI : applicableKPIS) {
             try {
@@ -216,7 +216,7 @@ public class KPISetService {
                         }
                     }
                     if (isNotNull(filterCriteriaDTO)) {
-                        kpiResponseDTO = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId());
+                        kpiResponseDTO = counterDataService.generateKPISetCalculationData(filterCriteriaDTO, unitId, accessGroupPermissionCounterDTO.getStaffId(),startDate);
                     }
                     if (isNotNull(kpiResponseDTO)) {
                         kpiResponseDTOMap.put(kpiResponseDTO.getKpiId(), kpiResponseDTO);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.annotations.KPermissionField;
 import com.kairos.annotations.KPermissionModel;
 import com.kairos.annotations.KPermissionSubModel;
+import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -20,6 +21,7 @@ import lombok.Setter;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.*;
@@ -50,7 +52,10 @@ public class Staff extends UserBaseEntity {
     @KPermissionSubModel
     @Relationship(type = BELONGS_TO)
     private User user;
-
+    @KPermissionField
+    protected Gender gender;
+    @KPermissionField
+    private LocalDate dateOfBirth;
     private EngineerType engineerType;
 
     @Relationship(type = HAS_FAVOURITE_FILTERS)
@@ -119,6 +124,7 @@ public class Staff extends UserBaseEntity {
     private String user_id; //specially required for chat server only
 
     @Relationship(type = BELONGS_TO_TAGS)
+    @KPermissionField
     private List<Tag> tags;
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {
@@ -150,5 +156,9 @@ public class Staff extends UserBaseEntity {
         List<StaffFavouriteFilter> staffFavouriteFilterList = Optional.ofNullable(this.staffFavouriteFilterList).orElse(new ArrayList<>());
         staffFavouriteFilterList.add(staffFavouriteFilter);
         this.staffFavouriteFilterList = staffFavouriteFilterList;
+    }
+
+    public List<StaffChildDetail> getStaffChildDetails() {
+        return staffChildDetails=Optional.ofNullable(staffChildDetails).orElse(new ArrayList<>());
     }
 }

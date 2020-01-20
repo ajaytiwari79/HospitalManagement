@@ -90,8 +90,8 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
     void removeStaffFromAllTeams(long staffId);
 
     @Query("MATCH (organization:Unit)-[:"+HAS_TEAMS+"]->(team:Team{isEnabled:true,deleted:false})-[staffTeamRel:"+TEAM_HAS_MEMBER+"]->(staff:Staff) WHERE id(staff)={0} AND id(organization)={1} RETURN \n" +
-            "id(team) as teamId,team.name as name,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType")
-    List<StaffTeamDTO> getTeamDetailsOfStaff(Long staffId,Long unitId);
+            "id(team) as id,team.name as name,staffTeamRel.teamType as teamType,staffTeamRel.leaderType as leaderType")
+    List<TeamDTO> getTeamDetailsOfStaff(Long staffId,Long unitId);
 
     @Query("MATCH (team:Team) WHERE id(team)={0} with team\n" +
             "MATCH (team)<-[:"+HAS_TEAMS+"]-(organization:Unit) with organization,team\n" +

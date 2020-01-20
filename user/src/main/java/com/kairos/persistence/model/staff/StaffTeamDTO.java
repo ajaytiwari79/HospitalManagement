@@ -4,6 +4,8 @@ package com.kairos.persistence.model.staff;
  *
  */
 
+import com.kairos.enums.team.LeaderType;
+import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +20,7 @@ public class StaffTeamDTO {
     private Long staffId;
     private Long teamId;
     private String name;
-    private StaffTeamRelationship.TeamType teamType;
-    private StaffTeamRelationship.LeaderType leaderType;
+    private TeamType teamType;
+    private LeaderType leaderType;
 
 }

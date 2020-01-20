@@ -23,6 +23,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.client_exception.ClientException;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.model.task.TaskAddress;
 import com.kairos.persistence.model.task.TaskStatus;
@@ -422,7 +423,7 @@ public class TaskService extends MongoBaseService {
             exceptionService.internalError(ERROR_TIMECARE_WORKPLACEID_PERSONID_PERSON_EXTERNAL_POSITION_ID);
         }
         OrganizationStaffWrapper organizationStaffWrapper = userIntegrationService.getOrganizationAndStaffByExternalId(String.valueOf(workPlaceId.get()), personExternalId.get(), personExternalEmploymentId.get());
-        StaffDTO staffDTO = organizationStaffWrapper.getStaff();
+        StaffPersonalDetail staffDTO = organizationStaffWrapper.getStaff();
         OrganizationDTO organizationDTO = organizationStaffWrapper.getOrganization();
 
         if (organizationDTO == null) {
@@ -938,7 +939,7 @@ public class TaskService extends MongoBaseService {
     public Task assignGivenTaskToUser(BigInteger taskId) {
         Task pickTask = taskMongoRepository.findOne(taskId);
         Long userId = UserContext.getUserDetails().getId();
-        StaffDTO staffDTO = userIntegrationService.getStaffByUser(userId);
+        StaffPersonalDetail staffDTO = userIntegrationService.getStaffByUser(userId);
         List<Long> assignedStaffIds = pickTask.getAssignedStaffIds();
         if (!assignedStaffIds.contains(staffDTO.getId())) assignedStaffIds.add(staffDTO.getId());
         pickTask.setAssignedStaffIds(assignedStaffIds);

@@ -12,6 +12,6 @@ public class ApplicationConstants {
     public static final String PERMISSION_DATA = "permissionData";
     public static final String PERMISSIONS = "permissions";
     public static final String PERMISSIONS_SCHEMA= "permissionSchema";
-    private ApplicationConstants() {
-    }
+    public static final String ACTION_NAME= "actionName";
+    public static final String ACTION_PERMISSIONS = "actionPermissions";
 }

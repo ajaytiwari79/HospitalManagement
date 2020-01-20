@@ -7,6 +7,7 @@ import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ public interface StaffActivitySettingRepository extends MongoBaseRepository<Staf
 
     Set<StaffActivitySetting> findByStaffIdInAndActivityIdInAndDeletedFalse(Set<Long> staffIds, Set<BigInteger> activityIds);
 
-    List<StaffActivitySetting> findByStaffIdAndActivityIdInAndDeletedFalse(Long staffId,List<BigInteger> activityId);
+    List<StaffActivitySetting> findByStaffIdAndActivityIdInAndDeletedFalse(Long staffId, Collection<BigInteger> activityId);
 
     StaffActivitySettingDTO findByActivityIdAndStaffIdAndUnitIdAndDeletedFalse(BigInteger activityId,Long staffId, Long unitId);
 

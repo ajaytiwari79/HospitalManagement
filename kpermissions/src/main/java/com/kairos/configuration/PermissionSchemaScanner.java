@@ -39,6 +39,7 @@ public class PermissionSchemaScanner {
                         modelMetaData.put(MODEL_CLASS, permissionClass.toString());
                         modelMetaData.put(FIELDS, fields);
                         modelMetaData.put(SUB_MODEL, subModelData);
+                        modelMetaData.put(ACTION_PERMISSIONS,getActionPermissionSchema());
                         modelData.add(modelMetaData);
                     });
             LOGGER.info("model== {}",modelData);
@@ -47,6 +48,20 @@ public class PermissionSchemaScanner {
             LOGGER.error("ERROR in identifying permission models====== {}",ex.getMessage());
         }
         return modelData;
+    }
+
+    private Set<Map<String,String>> getActionPermissionSchema(){
+        Set<Map<String,String>> actionPermissionsMap = new HashSet<>();
+        actionPermissionsMap.add(new HashMap<String, String>(){{
+            put(ACTION_NAME,"Add");
+        }});
+        actionPermissionsMap.add(new HashMap<String, String>(){{
+            put(ACTION_NAME,"Update");
+        }});
+        actionPermissionsMap.add(new HashMap<String, String>(){{
+            put(ACTION_NAME,"Delete");
+        }});
+        return actionPermissionsMap;
     }
 
     private void getRelationShipTypeModelData(Class permissionClass, Set<Map<String, String>> fields, Reflections reflections) {

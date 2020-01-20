@@ -55,7 +55,7 @@ public class ConsecutiveWorkWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues) && MAXIMUM.equals(minMaxSetting) || ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())) {
+        if(!isDisabled() && isValidForPhase(infoWrapper.getPhaseId(),this.phaseTemplateValues) && (MINIMUM.equals(minMaxSetting) && ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())) || (MAXIMUM.equals(minMaxSetting) && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType()))) {
             if (CollectionUtils.containsAny(timeTypeIds,infoWrapper.getShift().getActivitiesTimeTypeIds())) {
                 TimeInterval timeInterval = getTimeSlotByPartOfDay(partOfDays, infoWrapper.getTimeSlotWrapperMap(), infoWrapper.getShift());
                 if (timeInterval != null) {

@@ -13,6 +13,7 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.isEquals;
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
@@ -71,8 +72,8 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
 
     public ShiftActivity( String activityName,Date startDate, Date endDate,BigInteger activityId,String timeType) {
         this.activityId = activityId;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = roundDateByMinutes(startDate,15);;
+        this.endDate = roundDateByMinutes(endDate,15);
         this.activityName = activityName;
         this.timeType = timeType;
     }
@@ -84,8 +85,8 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
 
     public ShiftActivity(BigInteger activityId, Date startDate,Date endDate) {
         this.activityId = activityId;
-        this.startDate=startDate;
-        this.endDate=endDate;
+        this.startDate=roundDateByMinutes(startDate,15);
+        this.endDate=roundDateByMinutes(endDate,15);
     }
 
     public void setPayoutPerShiftCTADistributions(List<PayOutPerShiftCTADistribution> payoutPerShiftCTADistributions) {
@@ -107,6 +108,14 @@ public class ShiftActivity implements Comparable<ShiftActivity>{
     @Override
     public int compareTo(ShiftActivity shiftActivity) {
         return this.startDate.compareTo(shiftActivity.startDate);
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public boolean isShiftActivityChanged(ShiftActivity shiftActivity){

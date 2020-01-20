@@ -87,7 +87,6 @@ public class CounterServiceMapping {
         this.counters.put(CounterType.ACTIVITY_KPI, KPIBuilderCalculationService);
     }
 
-
     public CounterService getService(CounterType counterType){
         return (CounterService) this.counters.get(counterType);
     }

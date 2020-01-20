@@ -239,7 +239,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (org) WHERE id(org)={2} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:"+HAS_CUSTOMIZED_PERMISSION+"]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( DISTINCT {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule,sequence:accessPage.sequence}) as permissions\n" +
-            "RETURN id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
+            "RETURN id(org) as unitId,'Organization' IN labels(org) as parentOrganization, permissions as permission")
     List<UserPermissionQueryResult> fetchStaffPermissionsWithDayTypes(Long userId, Set<Long> dayTypeIds,Long organizationId);
 
 
@@ -256,7 +256,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
             "MATCH (org) WHERE id(org)={1} \n"+
             "OPTIONAL MATCH (unitPermission)-[customRel:HAS_CUSTOMIZED_PERMISSION]->(accessPage) WHERE customRel.accessGroupId=id(accessGroup)\n" +
             "WITH org,collect( DISTINCT {name:accessPage.name,id:id(accessPage),moduleId:accessPage.moduleId,read:CASE WHEN customRel IS NULL THEN r.read ELSE customRel.read END,write:CASE WHEN customRel IS NULL THEN r.write ELSE customRel.write END,module:accessPage.isModule,sequence:accessPage.sequence}) as permissions\n" +
-            "RETURN id(org) as unitId,org.isParentOrganization as parentOrganization, permissions as permission")
+            "RETURN id(org) as unitId,'Organization' IN labels(org) as parentOrganization, permissions as permission")
     List<UserPermissionQueryResult> fetchStaffPermissions(Long userId,Long organizationId);
 
 
@@ -298,7 +298,7 @@ public interface AccessPageRepository extends Neo4jBaseRepository<AccessPage, Lo
 
     @Query("MATCH (u:User) WHERE id(u)={0} \n" +
             "MATCH (org:Organization{isEnable:true})-[:"+ HAS_POSITIONS +"]-(position:Position)-[:"+BELONGS_TO+"]-(s:Staff)-[:"+BELONGS_TO+"]-(u) \n" +
-            "OPTIONAL MATCH (org)-[:"+HAS_SUB_ORGANIZATION+"*]->(subOrg:Organization{isEnable:true}) WITH position,org+[subOrg] as coll\n" +
+            "OPTIONAL MATCH (org)-[:"+HAS_UNIT+"]->(subOrg:Unit{isEnable:true}) WITH position,org+[subOrg] as coll\n" +
             "unwind coll as orgList WITH  DISTINCT orgList,position \n" +
             "OPTIONAL MATCH  (o:Organization{isEnable:true,isParentOrganization:true,organizationLevel:'CITY'})-[r:"+HAS_SUB_ORGANIZATION+"*1..]->(orgList) \n" +
             "WITH o,position, [o]+orgList as units  unwind units as org  WITH DISTINCT org,o,position\n" +

@@ -1,5 +1,7 @@
 package com.kairos.commons.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -9,6 +11,8 @@ import org.springframework.context.annotation.PropertySource;
  */
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 @Configuration
+@Getter
+@Setter
 public class EnvConfigCommon {
 
     @Value("${gateway.userservice.url}")
@@ -42,72 +46,7 @@ public class EnvConfigCommon {
     @Value("${spring.profiles.active}")
     private  String currentProfile;
 
+    @Value("${spring.application.name}")
+    private String applicationName;
 
-    public String getUserServiceUrl() {
-        return userServiceUrl;
-    }
-
-    public void setUserServiceUrl(String userServiceUrl) {
-        this.userServiceUrl = userServiceUrl;
-    }
-
-    public String getUserLoginApiAuthToken() {
-        return userLoginApiAuthToken;
-    }
-
-    public void setUserLoginApiAuthToken(String userLoginApiAuthToken) {
-        this.userLoginApiAuthToken = userLoginApiAuthToken;
-    }
-
-    public String getUserServiceUrlAuth() {
-        return userServiceUrlAuth;
-    }
-
-    public void setUserServiceUrlAuth(String userServiceUrlAuth) {
-        this.userServiceUrlAuth = userServiceUrlAuth;
-    }
-
-    public String getUserServiceAuthUsername() {
-        return userServiceAuthUsername;
-    }
-
-    public void setUserServiceAuthUsername(String userServiceAuthUsername) {
-        this.userServiceAuthUsername = userServiceAuthUsername;
-    }
-
-    public String getUserServiceAuthPassword() {
-        return userServiceAuthPassword;
-    }
-
-    public void setUserServiceAuthPassword(String userServiceAuthPassword) {
-        this.userServiceAuthPassword = userServiceAuthPassword;
-    }
-
-    public String getServerHost() {
-        return serverHost;
-    }
-
-    public String getImagesPath() {
-        return imagesPath;
-    }
-
-    public String getKpermissionDataPublish() {
-        return kpermissionDataPublish;
-    }
-
-    public void setKpermissionDataPublish(String kpermissionDataPublish) {
-        this.kpermissionDataPublish = kpermissionDataPublish;
-    }
-
-    public String getModelPackagePath() {
-        return modelPackagePath;
-    }
-
-    public void setModelPackagePath(String modelPackagePath) {
-        this.modelPackagePath = modelPackagePath;
-    }
-
-    public String getCurrentProfile() {
-        return currentProfile;
-    }
 }

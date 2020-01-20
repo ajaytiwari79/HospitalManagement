@@ -77,7 +77,7 @@ public class ApiExternalStaffService {
             address.setLongitude(Float.valueOf("55.3958"));
             address.setHouseNumber("8");
             address.setFloorNumber(2);
-            address.setZipCodeId(102L);
+            address.getZipCode().setId(102L);
             staffAddressService.saveAddress(staff, Arrays.asList(address));
             return staff;
         }

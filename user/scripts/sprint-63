@@ -1,6 +1,6 @@
 
 MATCH(s:Staff)-[r:STAFF_HAS_SKILLS]-(sk:Skill)
-DETACH delete r
+DETACH delete r;
 
 MATCH(e:Expertise)-[rel:HAS_EXPERTISE_LINES]-(exl:ExpertiseLine)
 MATCH(exl)-[levelRel:IN_ORGANIZATION_LEVEL]-(l:Level)
@@ -17,10 +17,10 @@ MATCH(e:Expertise)<-[r:APPLICABLE_FOR_EXPERTISE]-(fp:FunctionalPayment)
 MATCH(e)-[:HAS_EXPERTISE_LINES]-(exl:ExpertiseLine) with e,collect(exl) as exl,r,fp
 WITH e,exl[0] as exl,r,fp
 CREATE UNIQUE(exl)<-[:APPLICABLE_FOR_EXPERTISE]-(fp)
-DETACH DELETE r
+DETACH DELETE r;
 
 MATCH(e:ExpertiseLine) where not exists(e.deleted)
-Set e.deleted=false
+Set e.deleted=false;
 
 
 MATCH(n:KPermissionModel) detach delete n;
@@ -42,5 +42,5 @@ Match (ag:AccessGroup) WHERE ag.name="SUPER_ADMIN"
 MATCH(m:Municipality) where m.name starts with 'Ballerup'
 MATCH(pga:PayGroupArea) where pga.name starts with 'Area 0`'
 CREATE UNIQUE (pga)-[r:HAS_MUNICIPALITY]->(m)
-SET r.startDateMillis=1536756095237
+SET r.startDateMillis=1536756095237;
 

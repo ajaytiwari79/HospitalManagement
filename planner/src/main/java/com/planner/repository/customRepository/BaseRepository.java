@@ -72,9 +72,9 @@ public class BaseRepository {
             entity.setId(UUIDs.random().toString());
         }
         if (entity.getCreatedDate() == null) {
-            entity.setCreatedDate(new Date());
+            entity.setCreatedDate(getDate());
         } else {
-            entity.setUpdatedDate(new Date());
+            entity.setUpdatedDate(getDate());
         }*/
         return null;//cassandraTemplate.insert(entity);
     }
@@ -91,9 +91,9 @@ public class BaseRepository {
                     entity.setId(UUIDs.random().toString());
                 }
                 if (entity.getCreatedDate() == null) {
-                    entity.setCreatedDate(new Date());
+                    entity.setCreatedDate(getDate());
                 } else {
-                    entity.setUpdatedDate(new Date());
+                    entity.setUpdatedDate(getDate());
                 }
                 saveEntity(entity);
             }

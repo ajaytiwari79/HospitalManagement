@@ -16,8 +16,10 @@ public class UnitWiseStaffPermissionsDTO {
     private AccessGroupRole role;
     private HashMap<String, Object> hubPermissions;
     private HashMap<Long, Object> organizationPermissions;
+    public List<ModelDTO> modelPermissions;
+    public Long staffId;
+
     public Boolean isHub() {
         return hub;
     }
-    public List<ModelDTO> modelPermissions;
 }
