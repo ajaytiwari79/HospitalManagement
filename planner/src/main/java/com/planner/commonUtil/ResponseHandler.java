@@ -8,10 +8,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
+
 public class ResponseHandler {
 
 	public static ResponseEntity<Map<String, Object>> generateResponse(String message, HttpStatus status){
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 			map.put("message", message);
 			map.put("status",status.toString());
 			map.put("time_Stamp", getDate());
@@ -19,12 +21,12 @@ public class ResponseHandler {
 		}
 
 	public static <T> ResponseEntity<ResponseDTO<T>> generateResponseDTO(HttpStatus status, boolean isSuccess, T responsObj){
-		ResponseDTO<T> responseDTO = new ResponseDTO<T>(status.value(), isSuccess, responsObj);
+		ResponseDTO<T> responseDTO = new ResponseDTO<>(status.value(), isSuccess, responsObj);
 		return new ResponseEntity<>(responseDTO, status);
 	}
 
 	public static ResponseEntity<Map<String, Object>> generateResponseWithData(String message, HttpStatus status,Object object){
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("message", message);
 		map.put("status",status.toString());
 		map.put("time_Stamp", getDate());

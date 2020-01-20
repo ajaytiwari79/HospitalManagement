@@ -2,6 +2,8 @@ package com.kairos.dto.activity.activity.activity_tabs;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.enums.TimeTypeEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import java.math.BigInteger;
 
@@ -9,6 +11,8 @@ import java.math.BigInteger;
  * Created by pawanmandhan on 22/8/17.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
+@AllArgsConstructor
 public class BalanceSettingActivityTabDTO {
 
 

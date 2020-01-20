@@ -7,6 +7,8 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.enums.shift.ShiftStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +30,8 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class ActivityDTO  {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")

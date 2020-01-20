@@ -2,9 +2,10 @@ package com.kairos.persistence.model.task;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import org.hibernate.validator.constraints.NotEmpty;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 

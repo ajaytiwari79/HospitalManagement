@@ -7,7 +7,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
-import com.kairos.dto.activity.period.PlanningPeriodDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.country.experties.FunctionsDTO;
@@ -169,7 +168,7 @@ public class EmploymentService {
     private InitialTimeBankLogService initialTimeBankLogService;
 
 
-    public PositionWrapper createEmployment(EmploymentDTO employmentDTO, boolean saveAsDraft) throws Exception {
+    public PositionWrapper createEmployment(Long id, EmploymentDTO employmentDTO, Boolean createFromTimeCare, boolean saveAsDraft) throws Exception {
         Unit unit = unitGraphRepository.findOne(employmentDTO.getUnitId());
         Organization parentUnit = organizationService.fetchParentOrganization(unit.getId());
 
@@ -225,9 +224,9 @@ public class EmploymentService {
         }
         Map<Long, BigDecimal> functionAmountMap = functionDTOS.stream().collect(Collectors.toMap(FunctionsDTO::getId, FunctionsDTO::getAmount));
         List<EmploymentLineFunctionRelationShip> functionsEmploymentLines = new ArrayList<>(functions.size());
-        functions.forEach(currentFunction ->
-            functionsEmploymentLines.add(new EmploymentLineFunctionRelationShip(employmentLine, currentFunction.getFunction(), functionAmountMap.get(currentFunction.getFunction().getId())))
-        );
+        functions.forEach(currentFunction -> {
+            functionsEmploymentLines.add(new EmploymentLineFunctionRelationShip(employmentLine, currentFunction.getFunction(), functionAmountMap.get(currentFunction.getFunction().getId())));
+        });
         employmentLineFunctionRelationRepository.saveAll(functionsEmploymentLines);
     }
 
@@ -406,11 +405,11 @@ public class EmploymentService {
     }
 
 
-    public PositionWrapper updateEmployment(long employmentId, EmploymentDTO employmentDTO, Long unitId, boolean saveAsDraft) throws Exception {
+    public PositionWrapper updateEmployment(long employmentId, EmploymentDTO employmentDTO, Long unitId, Boolean saveAsDraft) throws Exception {
 
         Unit unit = unitGraphRepository.findOne(unitId);
         List<ClientMinimumDTO> clientMinimumDTO = clientGraphRepository.getCitizenListForThisContactPerson(employmentDTO.getStaffId());
-        if (isCollectionNotEmpty(clientMinimumDTO)) {
+        if (clientMinimumDTO.size() > 0) {
             return new PositionWrapper(clientMinimumDTO);
         }
         Employment oldEmployment = employmentGraphRepository.findOne(employmentId, 2);
@@ -548,16 +547,17 @@ public class EmploymentService {
     }
 
     private void setEndDateToEmployment(Employment employment, EmploymentDTO employmentDTO) {
-        PlanningPeriodDTO planningPeriod = activityIntegrationService.getPlanningPeriodIntervalByUnitId(employment.getUnit().getId());
-        if(isNotNull(employmentDTO.getEndDate()) && planningPeriod.getEndDate().isAfter(employmentDTO.getEndDate())){
-            exceptionService.actionNotPermittedException(MESSAGE_ENDDATE_NOTGREATERTHAN_PLANNING_PERIOD_ENDDATE);
-        }
-        if (isNull(employmentDTO.getEndDate())) {
+        if (employmentDTO.getEndDate() == null) {
             employment.setEndDate(null);
-        } else if (isNotNull(employmentDTO.getEndDate()) && isNull(employment.getEndDate()) || employment.getEndDate().isBefore(employmentDTO.getEndDate())) {
+        } else if (employmentDTO.getEndDate() != null && employment.getEndDate() == null) {
+            employment.setEndDate(employmentDTO.getEndDate());
+            setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
+        } else if (employmentDTO.getEndDate() != null && employment.getEndDate() != null && employment.getEndDate().isBefore(employmentDTO.getEndDate())) {
             employment.setEndDate(employmentDTO.getEndDate());
             setEndDateToCTAWTA(employment.getUnit().getId(), employment.getId(), employmentDTO.getEndDate());
         }
+
+
     }
 
     private void setEndDateToCTAWTA(Long unitId, Long employmentId, LocalDate endDate) {
@@ -586,6 +586,8 @@ public class EmploymentService {
         }
         employment.setDeleted(true);
         employmentGraphRepository.save(employment);
+
+        Unit unit = unitGraphRepository.findOne(unitId, 0);
         Long staffId = employmentGraphRepository.getStaffIdFromEmployment(positionId);
         Organization organization = organizationService.fetchParentOrganization(unitId);
         Position position = positionService.updatePositionEndDate(organization, staffId);
@@ -624,10 +626,7 @@ public class EmploymentService {
         CompletableFuture<Boolean> done = setDefaultData(employmentDTO, employment);
         CompletableFuture.allOf(done).join();
         // UEP can be created for past dates from time care
-        PlanningPeriodDTO planningPeriod = activityIntegrationService.getPlanningPeriodIntervalByUnitId(employment.getUnit().getId());
-        if(planningPeriod.getStartDate().isBefore(employmentDTO.getStartDate())){
-            exceptionService.actionNotPermittedException(MESSAGE_STARTDATE_NOTLESSTHAN_PLANNING_PERIOD_STARTDATE);
-        }
+
         employment.setStartDate(employmentDTO.getStartDate());
         if (Optional.ofNullable(employmentDTO.getEndDate()).isPresent()) {
             if (employmentDTO.getStartDate().isAfter(employmentDTO.getEndDate())) {
@@ -639,9 +638,6 @@ public class EmploymentService {
             Optional<ReasonCode> reasonCode = reasonCodeGraphRepository.findById(employmentDTO.getReasonCodeId(), 0);
             if (!Optional.ofNullable(reasonCode).isPresent()) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_REASONCODE_ID_NOTFOUND, employmentDTO.getReasonCodeId());
-            }
-            if(planningPeriod.getEndDate().isAfter(employmentDTO.getEndDate())){
-                exceptionService.actionNotPermittedException(MESSAGE_ENDDATE_NOTGREATERTHAN_PLANNING_PERIOD_ENDDATE);
             }
             employment.setReasonCode(reasonCode.get());
             employment.setEndDate(employmentDTO.getEndDate());
@@ -917,7 +913,7 @@ public class EmploymentService {
                 exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_EXTERNALID_NOTEXIST, timeCareEmploymentDTO.getPersonID());
             }
             EmploymentDTO unitEmploymentPosition = convertTimeCareEmploymentDTOIntoUnitEmploymentDTO(timeCareEmploymentDTO, expertise.getId(), staff.getId(), employmentType.getId(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0).getId(), ctawtaAndAccumulatedTimebankWrapper.getCta().get(0).getId(), unit.getId());
-            createEmployment(unitEmploymentPosition,true);
+            createEmployment(unit.getId(), unitEmploymentPosition, true, true);
         }
         return true;
     }

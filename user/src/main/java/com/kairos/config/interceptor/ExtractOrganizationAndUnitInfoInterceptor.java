@@ -37,12 +37,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         try {
-            UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
-        } catch (Exception e) {
-            LOGGER.error("exception {}",e);
-        }
-        try {
-            UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
+           // UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
         } catch (Exception e) {
             LOGGER.error("exception {}",e);
         }
