@@ -179,14 +179,14 @@ public class KPIBuilderCalculationService implements CounterService {
                 for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
                     for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
                         EmploymentLinesDTO employmentLinesDTO = getSortedEmploymentLine(employmentWithCtaDetailsDTO);
-                        if (isNotNull(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(EMPLOYMENT_SUB_TYPE))) {
+                        if (isNotNull(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(EMPLOYMENT_SUB_TYPE)) && isNotNull(employmentLinesDTO.getEmploymentSubType())) {
                             if (kpiCalculationRelatedInfo.getFilterBasedCriteria().get(EMPLOYMENT_SUB_TYPE).get(0).equals(employmentLinesDTO.getEmploymentSubType().name())) {
                                 ActualTimeBank actualTimeBank1 = new ActualTimeBank(kpiCalculationRelatedInfo, actualTimeBank, actualTimeBankPerDay, employmentWithCtaDetailsDTO).invoke();
                                 actualTimeBank = actualTimeBank1.getActualTimeBank();
                                 actualTimeBankPerDay = actualTimeBank1.getActualTimeBankPerDay();
 
                             }
-                        } else {
+                        } if(isNull(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(EMPLOYMENT_SUB_TYPE))){
                             ActualTimeBank actualTimeBank1 = new ActualTimeBank(kpiCalculationRelatedInfo, actualTimeBank, actualTimeBankPerDay, employmentWithCtaDetailsDTO).invoke();
                             actualTimeBank = actualTimeBank1.getActualTimeBank();
                             actualTimeBankPerDay = actualTimeBank1.getActualTimeBankPerDay();
