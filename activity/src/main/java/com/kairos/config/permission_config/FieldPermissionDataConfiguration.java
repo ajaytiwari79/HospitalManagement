@@ -20,17 +20,17 @@ import javax.inject.Inject;
  * 1. getSession()
  * 2. getConfiguration()
  */
-@Configuration
+/*@Configuration
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 @ComponentScan("com.kairos.persistence")
 //@EnableTransactionManagement
-@EnableNeo4jAuditing
+@EnableNeo4jAuditing*/
 public class FieldPermissionDataConfiguration {
 
     private final Logger logger = LoggerFactory.getLogger(FieldPermissionDataConfiguration.class);
 
 
-    @Inject
+   /* @Inject
     private Environment environment;
 
     @Bean//(name = "getSessionFactory")
@@ -38,10 +38,10 @@ public class FieldPermissionDataConfiguration {
         return new SessionFactory(configuration(), "com.kairos.persistence.model");
     }
 
-   /* @Bean//(name = "PermissionNeo4jTransactionManager")
+   *//* @Bean//(name = "PermissionNeo4jTransactionManager")
     public Neo4jTransactionManager transactionManager(){
         return new Neo4jTransactionManager(permissionSessionFactory());
-    }*/
+    }*//*
 
     @Bean(name = "PermissionConfiguration")
     public org.neo4j.ogm.config.Configuration configuration() {
@@ -51,6 +51,6 @@ public class FieldPermissionDataConfiguration {
                .credentials("neo4j", "oodles")
                 .verifyConnection(true)
                 .build();
-    }
+    }*/
 
 }

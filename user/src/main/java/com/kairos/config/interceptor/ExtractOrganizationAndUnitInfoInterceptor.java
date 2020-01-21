@@ -1,5 +1,6 @@
 package com.kairos.config.interceptor;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
@@ -37,7 +38,9 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         try {
-           // UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
+            if(isNotNull(UserContext.getUserDetails())) {
+                UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
+            }
         } catch (Exception e) {
             LOGGER.error("exception {}",e);
         }
