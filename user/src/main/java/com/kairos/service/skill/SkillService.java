@@ -6,7 +6,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.skill.SkillDTO;
 import com.kairos.dto.user.organization.OrganizationSkillDTO;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.SkillLevel;
 import com.kairos.persistence.model.auth.StaffSkillLevelRelationship;
@@ -17,7 +16,8 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffQueryResult;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.time_care.TimeCareSkill;
 import com.kairos.persistence.model.user.expertise.response.SkillLevelQueryResult;
 import com.kairos.persistence.model.user.expertise.response.SkillQueryResult;
@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.getCurrentLocalDate;
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.enums.SkillLevel.BASIC;
@@ -316,7 +317,7 @@ public class SkillService {
 
 
         List<Map<String, Object>> skills = null;
-        List<StaffPersonalDetailDTO> staffList;
+        List<StaffPersonalDetailQueryResult> staffList;
         staffList = staffRetrievalService.getStaffWithBasicInfo(id, false);
         List<Long> staffIds = new ArrayList<>(staffList.size());
         staffList.stream().forEach(staffPersonalDetailDTO -> staffIds.add(staffPersonalDetailDTO.getId()));
@@ -334,13 +335,13 @@ public class SkillService {
         return map;
     }
 
-    public Map<String, List<StaffDTO>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedFromDate,  LocalDate selectedToDate) {
-        Map<String, List<StaffDTO>> staffSkillsMap = new HashMap<>();
+    public Map<String, List<StaffPersonalDetail>> getStaffSkillAndLevelByStaffIds(List<Long> staffIds, LocalDate selectedFromDate,  LocalDate selectedToDate) {
+        Map<String, List<StaffPersonalDetail>> staffSkillsMap = new HashMap<>();
         while (!selectedFromDate.isAfter(selectedToDate)){
             List<StaffQueryResult> staffQueryResults = skillGraphRepository.getStaffSkillAndLevelByStaffIds(staffIds, selectedFromDate.toString());
-            List<StaffDTO> staffDTOS = new ArrayList<>();
+            List<StaffPersonalDetail> staffDTOS = new ArrayList<>();
             if(isCollectionNotEmpty(staffQueryResults)) {
-                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffDTO(staffQueryResult.getStaff().getId(), staffQueryResult.getSkillInfo())));
+                staffQueryResults.forEach(staffQueryResult -> staffDTOS.add(new StaffPersonalDetail(isNotNull(staffQueryResult.getStaff()) ? staffQueryResult.getStaff().getId() : staffQueryResult.getId(), staffQueryResult.getSkills())));
             }
             staffSkillsMap.put(selectedFromDate.toString(), staffDTOS);
             selectedFromDate = selectedFromDate.plusDays(1);

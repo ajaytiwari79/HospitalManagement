@@ -7,7 +7,6 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.DefaultKPISettingDTO;
 import com.kairos.dto.user.staff.staff.StaffCreationDTO;
-import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.access_permission.AccessGroup;
@@ -25,6 +24,7 @@ import com.kairos.persistence.model.staff.permission.AccessPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermission;
 import com.kairos.persistence.model.staff.permission.UnitPermissionAccessPermissionRelationship;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.position.Position;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -255,7 +255,7 @@ public class StaffCreationService {
         return admin;
     }
 
-    public StaffDTO createStaff(Long unitId, StaffCreationDTO payload) {
+    public StaffPersonalDetail createStaff(Long unitId, StaffCreationDTO payload) {
         User user = null;
         Staff staff;
         Organization organization = organizationService.fetchParentOrganization(unitId);
@@ -308,7 +308,10 @@ public class StaffCreationService {
             defaultKPISettingDTO.setParentUnitId(organization.getId());
             activityIntegrationService.createDefaultKPISettingForStaff(defaultKPISettingDTO, unitId);
         }
-        return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
+        StaffPersonalDetail staffPersonalDetail = ObjectMapperUtils.copyPropertiesByMapper(staff,StaffPersonalDetail.class);
+        staffPersonalDetail.setGender(user.getGender());
+        staffPersonalDetail.setAge(user.getAge());
+        return staffPersonalDetail;
     }
 
     public void validateRequireFieldOfStaff(StaffCreationDTO staffCreationDTO){
@@ -337,6 +340,8 @@ public class StaffCreationService {
         Position position = new Position();
         position.setStaff(staff);
         staff.setUser(user);
+        staff.setGender(user.getGender());
+        staff.setDateOfBirth(user.getDateOfBirth());
         position.setName(UNIT_MANAGER_EMPLOYMENT_DESCRIPTION);
         position.setStaff(staff);
         position.setStartDateMillis(DateUtils.getCurrentDateMillis());

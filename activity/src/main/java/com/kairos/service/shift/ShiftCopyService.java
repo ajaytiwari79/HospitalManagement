@@ -230,11 +230,9 @@ public class ShiftCopyService extends MongoBaseService {
                 exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
             }
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmployment,dataWrapper.getDayTypes());
-            Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(copiedShift.getUnitId(),startDate,endDate);
-            if(!TIME_AND_ATTENDANCE.equals(phase.getName()) || isCollectionNotEmpty(sourceShift.getBreakActivities())){
                 List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,copiedShift, activityMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),dataWrapper.getTimeSlotWrappers(),sourceShift);
                 copiedShift.setBreakActivities(breakActivities);
-            }
+
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffEmployment, planningPeriod, activityConfigurations);
             copiedShift.setShiftType(sourceShift.getShiftType());

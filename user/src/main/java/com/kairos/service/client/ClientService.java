@@ -39,7 +39,7 @@ import com.kairos.persistence.model.query_wrapper.CountryHolidayCalendarQueryRes
 import com.kairos.persistence.model.staff.StaffClientData;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.staff.personal_details.StaffAdditionalInfoQueryResult;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.language.Language;
 import com.kairos.persistence.model.user.language.LanguageLevel;
 import com.kairos.persistence.model.user.region.Municipality;
@@ -660,10 +660,10 @@ public class ClientService {
 
     public boolean assignMultipleStaffToClient(long unitId, ClientStaffRelation.StaffType staffType) {
         long startTime = System.currentTimeMillis();
-        List<StaffPersonalDetailDTO> staffQueryData = staffRetrievalService.getStaffWithBasicInfo(unitId);
+        List<StaffPersonalDetailQueryResult> staffQueryData = staffRetrievalService.getStaffWithBasicInfo(unitId);
         List<Long> staffIds = new ArrayList<>();
-        for (StaffPersonalDetailDTO staffPersonalDetailDTO : staffQueryData) {
-            staffIds.add(staffPersonalDetailDTO.getId());
+        for (StaffPersonalDetailQueryResult staffPersonalDetailQueryResult : staffQueryData) {
+            staffIds.add(staffPersonalDetailQueryResult.getId());
         }
         clientGraphRepository.assignMultipleStaffToClient(unitId, staffIds, staffType, DateUtils.getCurrentDate().getTime(), DateUtils.getCurrentDate().getTime());
         long endTime = System.currentTimeMillis();
@@ -881,18 +881,18 @@ public class ClientService {
         if (addressDTO.isVerifiedByGoogleMap()) {
             clientTemporaryAddress.setLongitude(addressDTO.getLongitude());
             clientTemporaryAddress.setLatitude(addressDTO.getLatitude());
-            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
+            zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
         } else {
             clientTemporaryAddress.setVerifiedByVisitour(false);
             clientTemporaryAddress.setCountry("Denmark");
             clientTemporaryAddress.setLongitude(clientTemporaryAddress.getLongitude());
             clientTemporaryAddress.setLatitude(clientTemporaryAddress.getLatitude());
-            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
         }
         if (zipCode == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ZIPCODE_NOTFOUND);
         }
-        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
+        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
         if (municipality == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
         }
@@ -1033,12 +1033,12 @@ public class ClientService {
     public ContactPersonTabDataDTO getDetailsForContactPersonTab(Long unitId, Long clientId) {
         List<OrganizationServiceQueryResult> organizationServices = organizationServiceRepository.getOrganizationServiceByOrgId(unitId);
         // TODO Fetch list of staff according to employment type ( According to dynamic value of employmnet type )
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId);
+        List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = staffGraphRepository.getAllMainEmploymentStaffDetailByUnitId(unitId);
         List<ClientMinimumDTO> clientMinimumDTOs = getPeopleInHousehold(clientId);
         List<Long> houseHoldIds = clientGraphRepository.getPeopleInHouseholdIdList(clientId);
         houseHoldIds.add(clientId);
         List<ClientContactPersonStructuredData> clientContactPersonQueryResults = refactorContactPersonList(clientId, clientGraphRepository.getClientContactPersonDataList(clientId));
-        return new ContactPersonTabDataDTO(organizationServices,staffPersonalDetailDTOS,clientMinimumDTOs,clientContactPersonQueryResults);
+        return new ContactPersonTabDataDTO(organizationServices, staffPersonalDetailQueryResults,clientMinimumDTOs,clientContactPersonQueryResults);
     }
 
     public ClientContactPersonStructuredData saveContactPerson(Long clientId, ContactPersonDTO contactPersonDTO) {

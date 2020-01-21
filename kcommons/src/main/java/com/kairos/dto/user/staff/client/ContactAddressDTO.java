@@ -1,5 +1,7 @@
 package com.kairos.dto.user.staff.client;
 
+import com.kairos.dto.user.organization.MunicipalityDTO;
+import com.kairos.dto.user.organization.ZipCodeDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,6 +40,8 @@ public class ContactAddressDTO {
     private Boolean verifiedByVisitour;
     private Integer zipCodeValue;
     private String municipalityName;
+    private ZipCodeDTO zipCode;
+    private MunicipalityDTO municipality;
 
     public ContactAddressDTO(String houseNumber, Integer floorNumber, String street, String city, String regionName, String country, Float latitude, Float longitude,
                              String province, String streetUrl, Boolean addressProtected, Boolean verifiedByVisitour) {
@@ -55,6 +59,13 @@ public class ContactAddressDTO {
         this.verifiedByVisitour = verifiedByVisitour;
     }
 
+    public void setZipCodeId(Long zipCodeId) {
+        this.zipCodeId = zipCodeId;
+    }
+
+    public void setMunicipalityId(Long municipalityId) {
+        this.municipalityId = municipalityId;
+    }
 
     public void setMunicipalityName(String municipalityName) {
         this.municipalityName = StringUtils.trim(municipalityName);

@@ -32,6 +32,7 @@ import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.kpi.CalculationType;
@@ -39,6 +40,7 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
+import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
@@ -283,7 +285,13 @@ public class CounterDataService extends MongoBaseService {
                         getTeamUnitData(criteriaList, unitIds.get(0));
                     }
                     break;
-                    default:break;
+                case EMPLOYMENT_SUB_TYPE:
+                    getEmploymentSubTypeData(criteriaList);
+                    break;
+                case TEAM_TYPE:
+                    getTeamTypeData(criteriaList);
+                    break;
+                default:break;
             }
         }
 
@@ -378,6 +386,22 @@ public class CounterDataService extends MongoBaseService {
         }
         criteriaList.add(new FilterCriteria(CALCULATION_UNIT.value, CALCULATION_UNIT, (List) kpiFilterDefaultDataDTOS));
     }
+    private void getEmploymentSubTypeData(List<FilterCriteria> criteriaList){
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        for (EmploymentSubType employmentSubType : EmploymentSubType.values()) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(employmentSubType.toString(), employmentSubType.value));
+        }
+        criteriaList.add(new FilterCriteria(EMPLOYMENT_SUB_TYPE.value, EMPLOYMENT_SUB_TYPE, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getTeamTypeData(List<FilterCriteria> criteriaList){
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        for (TeamType teamType : TeamType.values()) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(teamType.toString(), teamType.value));
+        }
+        criteriaList.add(new FilterCriteria(TEAM_TYPE.value, TEAM_TYPE, (List) kpiFilterDefaultDataDTOS));
+    }
+
 
     private void getReasonCodeData(List<FilterCriteria> criteriaList, DefaultKpiDataDTO defaultKpiDataDTO) {
         List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();

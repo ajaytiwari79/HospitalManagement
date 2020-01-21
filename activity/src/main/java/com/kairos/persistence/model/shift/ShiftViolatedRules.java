@@ -43,7 +43,7 @@ public class ShiftViolatedRules extends MongoBaseEntity {
     }
 
     public Set<ShiftEscalationReason> getEscalationReasons() {
-        return Optional.ofNullable(escalationReasons).orElse(new HashSet<>());
+        return escalationReasons=Optional.ofNullable(escalationReasons).orElse(new HashSet<>());
     }
 
     public void setEscalationReasons(Set<ShiftEscalationReason> escalationReasons) {

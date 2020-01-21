@@ -59,8 +59,6 @@ public class FunctionService {
         Function isAlreadyExists = functionGraphRepository.findByNameIgnoreCase(countryId, functionDTO.getName(),functionDTO.getCode());
         if (Optional.ofNullable(isAlreadyExists).isPresent()) {
             exceptionService.duplicateDataException(MESSAGE_FUNCTION_NAME_OR_CODE_ALREADYEXIST, functionDTO.getName(),functionDTO.getCode());
-
-
         }
         List<Level> levels = new ArrayList<>();
         if (!functionDTO.getOrganizationLevelIds().isEmpty()) {

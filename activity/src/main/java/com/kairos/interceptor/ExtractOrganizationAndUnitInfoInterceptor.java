@@ -1,4 +1,5 @@
 package com.kairos.interceptor;
+
 import com.kairos.custom_exception.InvalidRequestException;
 import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             throw new InvalidRequestException("Url or Parameter is not correct");
         }        String orgIdString=pathVariables.get("organizationId");
         try {
-        UserContext.setUserDetails(getCurrentUser());
+        //UserContext.setUserDetails(getCurrentUser());
     } catch (Exception e) {
 LOGGER.error("exception {}",e);
     }
@@ -50,6 +51,7 @@ LOGGER.error("exception {}",e);
         if(unitIdString!=null){
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.setUnitId(unitId);
+            UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
         }
 
         ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

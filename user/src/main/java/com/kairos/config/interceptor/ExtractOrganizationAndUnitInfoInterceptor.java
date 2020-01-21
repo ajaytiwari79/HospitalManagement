@@ -1,6 +1,5 @@
 package com.kairos.config.interceptor;
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
@@ -17,7 +16,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.service.auth.UserService.getCurrentUser;
+
 
 /**
  * Created by anil on 10/8/17.
@@ -35,11 +36,8 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            if(pathVariables==null){
-            throw new InvalidRequestException("Url or Parameter is not correct");
-        }
         try {
-            UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
+           // UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
         } catch (Exception e) {
             LOGGER.error("exception {}",e);
         }
@@ -57,6 +55,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
             UserContext.setUnitId(unitId);
+            UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
         }
 
         ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

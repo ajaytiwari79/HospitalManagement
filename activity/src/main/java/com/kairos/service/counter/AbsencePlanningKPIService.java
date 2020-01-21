@@ -159,17 +159,18 @@ public class AbsencePlanningKPIService implements CounterService {
                     break;
             }
         }
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toString(), AppConstants.REQUESTED_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,requested)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.PENDING.toString(), AppConstants.PENDING_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,pending)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toString(), AppConstants.APPROVE_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,approve)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toString(), AppConstants.DISAPPROVE_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,disapprove)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.REQUESTED, AppConstants.REQUESTED_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,requested)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.PENDING, AppConstants.PENDING_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,pending)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.APPROVE, AppConstants.APPROVE_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,approve)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.DISAPPROVE, AppConstants.DISAPPROVE_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,disapprove)));
+
         return clusteredBarChartKpiDataUnits;
     }
 
     public double getValueOfTodo(List<TodoDTO> todoDTOS,XAxisConfig xAxisConfig,int todoCount){
         double value =0;
         if(isCollectionNotEmpty(todoDTOS)) {
-            value =  PERCENTAGE.equals(xAxisConfig) ? (todoCount * 100) / todoDTOS.size() : todoCount;
+            value =  PERCENTAGE.equals(xAxisConfig) ? getValueWithDecimalFormat((double)(todoCount * 100) / todoDTOS.size()) : todoCount;
         }
         return value;
     }

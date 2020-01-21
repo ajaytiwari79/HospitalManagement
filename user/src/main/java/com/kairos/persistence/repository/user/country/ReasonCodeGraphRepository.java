@@ -26,7 +26,7 @@ public interface ReasonCodeGraphRepository extends Neo4jBaseRepository<ReasonCod
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND id(reasonCode) <> {1} AND (reasonCode.name=~{2} OR reasonCode.code={4}) AND reasonCode.reasonCodeType={3}" +
             "with count(reasonCode) as reasonCodeCount return CASE when reasonCodeCount>0 THEN  true ELSE false END as response ")
-    boolean findByNameExcludingCurrent(Long countryId, Long reasonCodeId, String name, ReasonCodeType reasonCodeType,String code);
+    boolean findByNameExcludingCurrent(Long countryId, Long reasonCodeId, String name, ReasonCodeType reasonCodeType, String code);
 
     @Query("MATCH (country:Country)-[:" + BELONGS_TO + "]-(reasonCode:ReasonCode{deleted:false}) where id(country)={0} AND id(reasonCode)= {1} return reasonCode")
     ReasonCode findByCountryAndReasonCode(long countryId, long reasonCodeId);

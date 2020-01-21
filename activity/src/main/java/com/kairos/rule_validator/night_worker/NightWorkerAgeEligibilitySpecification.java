@@ -1,6 +1,6 @@
 package com.kairos.rule_validator.night_worker;
 
-import com.kairos.dto.user.staff.StaffDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.rule_validator.activity.AbstractActivitySpecification;
 
 import java.time.LocalDate;
@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpecification<StaffDTO> {
+public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpecification<StaffPersonalDetail> {
 
     private Integer eligibleMinAge;
     private Integer eligibleMaxAge;
@@ -20,7 +20,7 @@ public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpec
     }
 
     @Override
-    public boolean isSatisfied(StaffDTO staffDTO) {
+    public boolean isSatisfied(StaffPersonalDetail staffDTO) {
         if(Optional.ofNullable(staffDTO.getDateOfBirth()).isPresent()){
             int age = Period.between(staffDTO.getDateOfBirth(), LocalDate.now()).getYears();
             return (age >= eligibleMinAge &&  age <= eligibleMaxAge);
@@ -30,12 +30,12 @@ public class NightWorkerAgeEligibilitySpecification extends AbstractActivitySpec
     }
 
     @Override
-    public void validateRules(StaffDTO staffDTO) {
+    public void validateRules(StaffPersonalDetail staffDTO) {
         //This is override method
     }
 
     @Override
-    public List<String> isSatisfiedString(StaffDTO staffDTO) {
+    public List<String> isSatisfiedString(StaffPersonalDetail staffDTO) {
         return Collections.emptyList();
     }
 

@@ -155,7 +155,12 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
     }
 
-    //todo don't remove this method it is for frontend
+    public List<ShiftActivityDTO> getBreakActivities() {
+        this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
+        return breakActivities;
+    }
+
+
     public boolean isMultipleActivity() {
         Set<BigInteger> multipleActivityCount = new HashSet<>();
         for (ShiftActivityDTO activity : this.getActivities()) {
@@ -189,10 +194,6 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
     }
 
-    public List<ShiftActivityDTO> getBreakActivities() {
-        this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
-        return breakActivities;
-    }
 
     public void setStartDate(Date startDate) {
         this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
