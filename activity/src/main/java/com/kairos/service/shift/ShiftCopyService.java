@@ -176,7 +176,7 @@ public class ShiftCopyService extends MongoBaseService {
                 Date endDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getEndDate()));
                 if ((shiftCreationStartDate.equals(staffEmployment.getStartDate()) || shiftCreationStartDate.isAfter(staffEmployment.getStartDate())) &&
                         (staffEmployment.getEndDate() == null || shiftCreationStartDate.equals(staffEmployment.getEndDate()) || shiftCreationStartDate.isBefore(staffEmployment.getEndDate()))) {
-                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap);
+                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap,shiftCreationStartDate);
                     shiftWithActivityDTO.setEndDate(endDate);
                     shiftWithActivityDTO.setStartDate(startDate);
                     shiftWithActivityDTO.setStaffId(staffEmployment.getStaff().getId());
@@ -191,7 +191,7 @@ public class ShiftCopyService extends MongoBaseService {
                 shiftResponse = addShift(validationMessages, sourceShift, staffEmployment, startDate, endDate, newShifts, activityMap, dataWrapper, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {
                     successfullyCopiedShifts.add(shiftResponse);
-                    newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter), activityMap));
+                    newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter), activityMap,shiftCreationStartDate));
                 } else {
                     errorInCopyingShifts.add(shiftResponse);
                 }
