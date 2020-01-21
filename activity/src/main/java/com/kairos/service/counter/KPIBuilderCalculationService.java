@@ -650,7 +650,7 @@ public class KPIBuilderCalculationService implements CounterService {
         long count = 0;
         if (isNotNull(approvalTime)) {
             for (TodoDTO todoDTO : todoDTOS) {
-                if(todoDTO.getStatus().equals(TodoStatus.APPROVE)||todoDTO.getStatus().equals(TodoStatus.DISAPPROVE))
+                if(TodoStatus.APPROVE.equals(todoDTO.getStatus())||TodoStatus.DISAPPROVE.equals(todoDTO.getStatus()))
                     localDate = getApproveOrDisApproveDateFromTODO(localDate, todoDTO);
                     if (isNotNull(localDate)) {
                         LocalDate endDate = add(asLocalDate(todoDTO.getRequestedOn()), approvalTime, kpiCalculationRelatedInfo);
@@ -675,16 +675,17 @@ public class KPIBuilderCalculationService implements CounterService {
         }
         LocalDate requestedDate = date;
         LocalDate result = date;
+        List<DayOfWeek> addDay = new ArrayList<>();
         if(isCollectionNotEmpty(dayOfWeeks)) {
-            while (requestedDate.isBefore(date.plusDays(workdays))) {
-                if (!dayOfWeeks.contains(result.getDayOfWeek())) {
-                    requestedDate = requestedDate.plusDays(1);
+            while(requestedDate.isBefore(date.plusDays(workdays))){
+                if(dayOfWeeks.contains(requestedDate.getDayOfWeek())){
+                    addDay.add(requestedDate.getDayOfWeek());
                 }
-                result = result.plusDays(1);
-
+                requestedDate=requestedDate.plusDays(1);
             }
+
         }
-        return result;
+        return result.plusDays(addDay.size());
     }
 
 
