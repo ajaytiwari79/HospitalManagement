@@ -1006,10 +1006,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
         private void updateTeamIdsByStaffAndTeamType(Map<FilterType, List> filterBasedCriteria, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
             if(filterBasedCriteria.containsKey(STAFF_IDS)) {
-                List<TeamType> teamTypes = newArrayList(TeamType.MAIN,TeamType.SECONDARY);
-                if(filterBasedCriteria.containsKey(EMPLOYMENT_SUB_TYPE) && filterBasedCriteria.get(EMPLOYMENT_SUB_TYPE).size() == 1 && teamTypes.contains(TeamType.valueOf(filterBasedCriteria.get(EMPLOYMENT_SUB_TYPE).get(0).toString()))){
-                    teamTypes = newArrayList(TeamType.valueOf(filterBasedCriteria.get(EMPLOYMENT_SUB_TYPE).get(0).toString()));
-                }
+                List<TeamType> teamTypes = getTeamTypeSelected(filterBasedCriteria);
                 List<Long> teamIds = new ArrayList<>();
                 for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
                     for (TeamDTO team : staffKpiFilterDTO.getTeams()) {
@@ -1020,6 +1017,18 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
                 filterBasedCriteria.put(FilterType.TEAM, teamIds);
             }
+        }
+
+        private List<TeamType> getTeamTypeSelected(Map<FilterType, List> filterBasedCriteria) {
+            List<TeamType> teamTypes = new ArrayList<>();
+            if(filterBasedCriteria.containsKey(TEAM_TYPE)){
+                for (Object teamType : filterBasedCriteria.get(TEAM_TYPE)) {
+                    teamTypes.add(TeamType.getByValue(teamType.toString()));
+                }
+            }else{
+                teamTypes.addAll(EnumSet.allOf(TeamType.class));
+            }
+            return teamTypes;
         }
 
         public void getTodoDetails() {
