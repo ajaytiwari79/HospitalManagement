@@ -135,22 +135,7 @@ public class EmploymentCTAWTAService {
         WTAResponseDTO wtaResponseDTO = workingTimeAgreementRestClient.updateWTAOfEmployment(updateDTO, employment.isPublished());
         return employmentService.getBasicDetails(employment, wtaResponseDTO, employment.getEmploymentLines().get(0));
     }
-    public StaffEmploymentDetails getEmploymentDetails(Long employmentId, Long unitId) {
-        EmploymentQueryResult employment = employmentGraphRepository.getEmploymentById(employmentId);
-        StaffEmploymentDetails employmentDetails = null;
-        if (Optional.ofNullable(employment).isPresent()) {
-            Long countryId = countryService.getCountryIdByUnitId(unitId);
-            OrganizationBaseEntity organizationBaseEntity=organizationBaseRepository.findOne(unitId);
-            employmentDetails = convertEmploymentObject(employment);
-            employmentDetails.setExpertise(ObjectMapperUtils.copyPropertiesByMapper(employment.getExpertise(), com.kairos.dto.activity.shift.Expertise.class));
-            employmentDetails.setCountryId(countryId);
 
-            employmentDetails.setCountryId(countryId);
-            employmentDetails.setUnitTimeZone(organizationBaseEntity.getTimeZone());
-        }
-        return employmentDetails;
-
-    }
     public CTATableSettingWrapper getAllCTAOfStaff(Long unitId, Long staffId) {
         User user = userGraphRepository.getUserByStaffId(staffId);
         List<EmploymentQueryResult> employmentQueryResults = employmentGraphRepository.getAllEmploymentsBasicDetailsAndWTAByUser(user.getId());

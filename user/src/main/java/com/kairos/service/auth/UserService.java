@@ -36,6 +36,7 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.persistence.repository.user.staff.UnitPermissionGraphRepository;
 import com.kairos.service.SmsService;
 import com.kairos.service.access_permisson.AccessGroupService;
+import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.country.DayTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -66,6 +67,7 @@ import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -119,6 +121,18 @@ public class UserService {
     private OrganizationService organizationService;
     @Inject private UnitService unitService;
     @Inject private PermissionService permissionService;
+    private static UserGraphRepository userRepository;
+
+    private static AccessPageService accessPageService;
+
+    @Inject
+    public void setUserRepository(UserGraphRepository userRepository) {
+        UserService.userRepository = userRepository;
+    }
+    @Inject
+    public void setAccessPageService(AccessPageService accessPageService) {
+        UserService.accessPageService = accessPageService;
+    }
 
     /**
      * Calls UserGraphRepository,
@@ -492,25 +506,26 @@ public class UserService {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (!organizationId.equals(currentUser.getLastSelectedOrganizationId())) {
             OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);
-            Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
             currentUser.setLastSelectedOrganizationCategory(organizationCategory);
-            currentUser.setCountryId(countryId);
         }
         if(!currentUser.getUnitWiseAccessRole().containsKey(organizationId.toString())){
             Staff staff=staffGraphRepository.getStaffByUserId(currentUser.getId(),organizationService.fetchParentOrganization(organizationId).getId());
             Long staffId=staff==null?staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),organizationService.fetchParentOrganization(organizationId).getId()):staff.getId();
-            boolean onlyStaff=unitPermissionGraphRepository.isOnlyStaff(organizationId,staffId,-1L);
+            boolean onlyStaff=unitPermissionGraphRepository.isOnlyStaff(organizationId,staffId);
             currentUser.getUnitWiseAccessRole().put(organizationId.toString(),staff==null||!onlyStaff?MANAGEMENT.name():AccessGroupRole.STAFF.name());
         }
-
+        if(isNull(currentUser.getCountryId())){
+            Long countryId=countryService.getCountryIdByUnitId(organizationId);
+            currentUser.setCountryId(countryId);
+        }
         userGraphRepository.save(currentUser);
     }
 
 
     public boolean updateDateOfBirthOfUserByCPRNumber() {
         List<User> users = userGraphRepository.findAll();
-        users.stream().forEach(user -> {
+        users.forEach(user -> {
             user.setDateOfBirth(Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
         });
@@ -580,7 +595,7 @@ public class UserService {
 
     public boolean updateUserName(UserDetailsDTO userDetailsDTO) {
         User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
-        if (ObjectUtils.isNull(user)) {
+        if (isNull(user)) {
             LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
             exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, userDetailsDTO.getEmail());
         } else {
@@ -626,5 +641,11 @@ public class UserService {
         user.setChatStatus(chatStatus);
         userGraphRepository.save(user);
         return true;
+    }
+
+    public static User getCurrentUser(){
+        User user = userRepository.findOne(UserContext.getUserDetails().getId());
+        user.setHubMember(accessPageService.isHubMember(user.getId()));
+        return user;
     }
 }

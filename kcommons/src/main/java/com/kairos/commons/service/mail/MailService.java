@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.CommonConstants.*;
 
 
@@ -163,16 +164,15 @@ public class MailService {
 
     //Todo Please don't use this method for sending any Custom exception
     public void sendMailToBackendOnException(Exception ex){
-       //TODO commented below as we using free account for of send grid which limits 100 emails per day
-         //if(envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE) || envConfigCommon.getCurrentProfile().equals(QA_PROFILE)){
+         if(envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE)){
             StringBuffer body = new StringBuffer(ex.getMessage());
             for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
                 //if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
                     body.append(stackTraceElement.toString()).append(" ").append(System.getProperty("line.separator")).append(" ");
                 //}
             }
-            sendMailWithSendGrid(null,null,body.toString(),"Exception in Activity | "+envConfigCommon.getCurrentProfile(),KAIROS_BACKEND_MAIL_IDS);
-        //}
+            sendMailWithSendGrid(null,null,body.toString(),"Exception in "+envConfigCommon.getApplicationName()+" | "+envConfigCommon.getCurrentProfile(),KAIROS_BACKEND_MAIL_IDS);
+        }
     }
 
 }

@@ -44,6 +44,7 @@ import com.kairos.dto.user.staff.staff.StaffResultDTO;
 import com.kairos.dto.user.staff.staff.UnitStaffResponseDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.rest_client.MicroService;
@@ -52,6 +53,7 @@ import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.user_context.User;
 import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.apache.commons.collections.CollectionUtils;
@@ -77,12 +79,17 @@ import static com.kairos.constants.ApiConstants.*;
 @Service
 @Transactional
 public class UserIntegrationService {
+
+    private static GenericRestClient genericRestClient;
     @Inject
-    GenericRestClient genericRestClient;
-    @Inject
-    ExceptionService exceptionService;
+    private ExceptionService exceptionService;
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
+
+    @Inject
+    public void setGenericRestClient(GenericRestClient genericRestClient) {
+        this.genericRestClient = genericRestClient;
+    }
 
     public Long getEmploymentId(Long unitId, Long staffId, Long expertiseId) {
         Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
@@ -890,6 +897,10 @@ public class UserIntegrationService {
 
     public Set<Long> getAllStaffIdsByGroupIds(Long unitId, List<Long> groupIds) {
         return genericRestClient.publishRequest(groupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
+    }
+
+    public static CurrentUserDetails getCurrentUser(){
+        return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, "/get_current_user", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CurrentUserDetails>>() {});
     }
 }
 

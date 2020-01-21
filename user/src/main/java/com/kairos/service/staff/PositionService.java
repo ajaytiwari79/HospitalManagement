@@ -9,6 +9,7 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPermissionCounterDTO;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
@@ -74,6 +75,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.AppConstants.STAFF;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 
 
 /**
@@ -180,23 +182,13 @@ public class PositionService {
     }
 
 
-    public Map<String, Object> createUnitPermission(long unitId, long staffId, long accessGroupId, boolean created) {
+    public Map<String, Object> createUnitPermission(Long unitId, Long staffId, Long accessGroupId, boolean created) {
         AccessGroup accessGroup = accessGroupRepository.findOne(accessGroupId);
-
         if (accessGroup.getEndDate() != null && accessGroup.getEndDate().isBefore(DateUtils.getCurrentLocalDate()) && created) {
             exceptionService.actionNotPermittedException(ERROR_ACCESS_EXPIRED, accessGroup.getName());
         }
-        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId);
-        if (unit == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_NOTFOUND, unitId);
-
-        }
-
+        OrganizationBaseEntity unit = organizationBaseRepository.findById(unitId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_UNIT_NOTFOUND, unitId)));
         Organization parentUnit = organizationService.fetchParentOrganization(unitId);
-        if (!Optional.ofNullable(parentUnit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
-
-        }
         Staff staff = staffGraphRepository.findOne(staffId);
         if (!Optional.ofNullable(staff).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
@@ -211,7 +203,7 @@ public class PositionService {
 
         boolean flsSyncStatus = false;
         Map<String, Object> response = new HashMap<>();
-        UnitPermission unitPermission = null;
+        UnitPermission unitPermission;
         StaffAccessGroupQueryResult staffAccessGroupQueryResult;
         if (created) {
             unitPermission = unitPermissionGraphRepository.checkUnitPermissionOfStaff(parentUnit.getId(), unitId, staffId, accessGroupId);
@@ -252,15 +244,19 @@ public class PositionService {
         genericRestClient.publishRequest(accessGroupPermissionCounterDTO, unitId, true, IntegrationOperation.CREATE, "/counter/dist/staff/access_group/{accessGroupId}/update_kpi", param, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Object>>() {
         }, accessGroupId);
 
-        if(unitPermissionGraphRepository.isOnlyStaff(unitId,staffId,accessGroupId)){
-            User user=userGraphRepository.findOne(UserContext.getUserDetails().getId(),0);
-            user.getUnitWiseAccessRole().put(String.valueOf(unitId),STAFF);
-            userGraphRepository.save(user);
-        }
+        setUnitWiseAccessRole(unitId, staffId);
 
         response.put("organizationId", unitId);
         response.put("synInFls", flsSyncStatus);
         return response;
+    }
+
+    public void setUnitWiseAccessRole(Long unitId, Long staffId) {
+        boolean onlyStaff=unitPermissionGraphRepository.isOnlyStaff(unitId,staffId);
+        User user=userGraphRepository.findOne(UserContext.getUserDetails().getId(),0);
+        user.getUnitWiseAccessRole().put(unitId.toString(),!onlyStaff?MANAGEMENT.name(): AccessGroupRole.STAFF.name());
+        userGraphRepository.save(user);
+
     }
 
 
@@ -581,10 +577,6 @@ public class PositionService {
 
         Organization parentUnit = organizationService.fetchParentOrganization(organization.getId());
         ReasonCode reasonCode = null;
-        if (!Optional.ofNullable(parentUnit).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_PARENTORGANIZATION_NOTFOUND, organization.getId());
-        }
-
         Position position = positionGraphRepository.findPosition(parentUnit.getId(), staffId);
         //TODO Commented temporary due to kafka down on QA server
 //         userToSchedulerQueueService.pushToJobQueueOnEmploymentEnd(employmentEndDate, position.getEndDateMillis(), parentOrganization.getId(), position.getId(),

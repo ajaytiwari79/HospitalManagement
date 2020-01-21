@@ -259,9 +259,6 @@ public class StaffCreationService {
         User user = null;
         Staff staff;
         Organization organization = organizationService.fetchParentOrganization(unitId);
-        if (!Optional.ofNullable(organization).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_ORGANIZATION_ID_NOTFOUND, unitId);
-        }
         if(StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())) {
             validateRequireFieldOfStaff(payload);
             if (payload.getCprNumber().length() != 10) {
@@ -307,7 +304,9 @@ public class StaffCreationService {
         positionService.createPosition(organization, staff, payload.getAccessGroupId(), DateUtils.getCurrentDateMillis());
         if(StaffStatusEnum.ACTIVE.equals(payload.getCurrentStatus())) {
             staffService.addStaffInChatServer(staff);
-            activityIntegrationService.createDefaultKPISettingForStaff(new DefaultKPISettingDTO(Arrays.asList(staff.getId())), unitId);
+            DefaultKPISettingDTO defaultKPISettingDTO = new DefaultKPISettingDTO(Arrays.asList(staff.getId()));
+            defaultKPISettingDTO.setParentUnitId(organization.getId());
+            activityIntegrationService.createDefaultKPISettingForStaff(defaultKPISettingDTO, unitId);
         }
         return new StaffDTO(staff.getId(), staff.getFirstName(), staff.getLastName(), user.getGender(), user.getAge());
     }

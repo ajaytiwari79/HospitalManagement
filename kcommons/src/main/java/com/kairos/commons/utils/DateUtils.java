@@ -949,6 +949,8 @@ public  class DateUtils {
         return date1.equals(date2) || date1.isAfter(date2);
     }
 
-
+    public static boolean isEqualOrAfter(LocalDate date1,LocalDate date2){
+        return date1.equals(date2) || date1.isAfter(date2);
+    }
 
 }

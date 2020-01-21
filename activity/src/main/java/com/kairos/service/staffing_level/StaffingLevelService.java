@@ -228,7 +228,7 @@ public class StaffingLevelService  {
         Date startDate = asDate(localDate);
         Date endDate = getEndOfDay(startDate);
 
-        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse( startDate, endDate,unitId);
+        List<Shift> shifts = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse( startDate, endDate, newArrayList(unitId));
         List<ShiftDTO>  shiftDTOS = shiftService.updateDraftShiftToShift(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shifts, ShiftDTO.class),userAccessRoleDTO);
         StaffingLevel staffingLevel=staffingLevelMongoRepository.findByUnitIdAndCurrentDateAndDeletedFalse(UserContext.getUnitId(),startDate);
         if (isNull(staffingLevel)) {
