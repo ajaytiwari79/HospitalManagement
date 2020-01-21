@@ -166,7 +166,7 @@ public class MailService {
     public void sendMailToBackendOnException(Exception ex){
        //TODO commented below as we using free account for of send grid which limits 100 emails per day
          if(envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE)){
-            StringBuffer body = new StringBuffer(isNotNull(ex.getCause()) ? ex.getCause().getMessage() : "");
+            StringBuffer body = new StringBuffer(ex.getMessage());
             for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
                 //if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
                     body.append(stackTraceElement.toString()).append(" ").append(System.getProperty("line.separator")).append(" ");
