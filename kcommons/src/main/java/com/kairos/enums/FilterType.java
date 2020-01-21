@@ -13,7 +13,7 @@ public enum FilterType {
     SKILLS("Skills"),REAL_TIME_STATUS("Real Time Status"),TAGS("Tags"),GROUPS("Groups"),NIGHT_WORKERS("Night Workers"),
     ACTIVITY_STATUS("Activity Status"),PHASE("Phase"),DAYS_OF_WEEK("Days Of Week"),DAY_TYPE("Day Type"),TIME_SLOT("Time Slot"),FIBONACCI("Fibonacci"),UNIT_NAME("Unit Name"),ACTIVITY_TIMECALCULATION_TYPE("Activity Timecalculation Type"),TEAM("Team"),
     ABSENCE_ACTIVITY("Absence Activity"),FUNCTIONS("Functions"),VALIDATED_BY("Validated By"),CALCULATION_TYPE("Calculation type"),CALCULATION_BASED_ON("Calculation Based On"),CALCULATION_UNIT("Calculation Unit"),PLANNED_BY("Planned By"),REASON_CODE("Reason Code"),
-    AGE("Age"),ORGANIZATION_EXPERIENCE("Organisation Experience"),ESCALATION_CAUSED_BY("Escalation Caused By");
+    AGE("Age"),ORGANIZATION_EXPERIENCE("Organisation Experience"),ESCALATION_CAUSED_BY("Escalation Caused By"),EMPLOYMENT_SUB_TYPE("Employment Sub Type"),TEAM_TYPE("Team Type");
 
 
     public String value;

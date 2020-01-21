@@ -237,6 +237,8 @@ public class TimeBankService{
             }
             List<Shift> shifts = shiftMongoRepository.findAllOverlappedShiftsAndEmploymentId(newArrayList(staffAdditionalInfoDTO.getEmployment().getId()), startDate, endDate);
             for (Shift shift : shifts) {
+                shift.setScheduledMinutesOfPayout(0);
+                shift.setScheduledMinutesOfTimebank(0);
                 renewDailyTimeBank(staffAdditionalInfoDTO,shift,false);
             }
         }
@@ -648,7 +650,7 @@ public class TimeBankService{
         LocalDate periodEndDate = planningPeriodInterval.getEndLocalDate();
         Date endDate = asDate(periodEndDate);
         List<DailyTimeBankEntry> dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, endDate);
-        LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate();
+        LocalDate employmentStartDate = employmentWithCtaDetailsDTO.getStartDate().isAfter(planningPeriodInterval.getStartLocalDate())?employmentWithCtaDetailsDTO.getStartDate():planningPeriodInterval.getStartLocalDate();
         Date startDate  = asDate(employmentStartDate);
         object = (T)timeBankCalculationService.calculateActualTimebank(planningPeriodInterval,dailyTimeBankEntries,employmentWithCtaDetailsDTO,periodEndDate,employmentStartDate);
         if(isNull(includeActualTimebank)) {

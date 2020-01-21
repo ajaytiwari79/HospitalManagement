@@ -109,4 +109,11 @@ public interface OrganizationGraphRepository extends Neo4jBaseRepository<Organiz
             "RETURN org")
     List<Organization> getOrganizationsBySubOrgTypeIds(List<Long> organizationSubTypeIds);
 
+    @Query("MATCH(o:Organization)-[:HAS_SUB_ORGANIZATION]-(union:Organization{union:true}) WHERE id(o)={0}\n" +
+            "return union\n" +
+            "Union \n" +
+            "MATCH(c:Country)-[:BELONGS_TO]-(union:Organization{union:true}) WHERE id(c)={1}\n" +
+            "RETURN union")
+    List<Organization> getAllUnionsByOrganizationOrCountryId(Long organizationId,Long countryId);
+
 }

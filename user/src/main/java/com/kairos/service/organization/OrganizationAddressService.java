@@ -114,11 +114,11 @@ public class OrganizationAddressService {
 
         ZipCode zipCode;
         if (addressDTO.isVerifiedByGoogleMap()) {
-            if (addressDTO.getZipCodeValue() == 0) {
+            if (addressDTO.getZipCode().getZipCode() == 0) {
                 logger.debug("No ZipCode value received");
                 return null;
             }
-            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
             contactAddress.setLatitude(addressDTO.getLatitude());
             contactAddress.setLongitude(addressDTO.getLongitude());
         } else {
@@ -138,7 +138,7 @@ public class OrganizationAddressService {
                 contactAddress.setStartDate(addressDTO.getStartDate());
                 contactAddress.setEndDate(addressDTO.getEndDate());
                 contactAddress.setVerifiedByVisitour(true);
-                zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
+                zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
             } else {
                 return null;
             }
@@ -150,7 +150,7 @@ public class OrganizationAddressService {
             return null;
         }
 
-        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
+        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
         if (municipality == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
@@ -216,7 +216,7 @@ public class OrganizationAddressService {
         ZipCode zipCode;
 
         if (addressDTO.isVerifiedByGoogleMap()) {
-            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCodeValue());
+            zipCode = zipCodeGraphRepository.findByZipCode(addressDTO.getZipCode().getZipCode());
             billingAddress.setLongitude(addressDTO.getLongitude());
             billingAddress.setLatitude(addressDTO.getLatitude());
         } else {
@@ -232,7 +232,7 @@ public class OrganizationAddressService {
                 billingAddress.setStartDate(addressDTO.getStartDate());
                 billingAddress.setEndDate(addressDTO.getEndDate());
                 billingAddress.setVerifiedByVisitour(true);
-                zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCodeId());
+                zipCode = zipCodeGraphRepository.findOne(addressDTO.getZipCode().getId());
             } else {
                 return null;
             }
@@ -243,7 +243,7 @@ public class OrganizationAddressService {
             return null;
         }
 
-        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipalityId());
+        Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId());
         if (municipality == null) {
             exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 

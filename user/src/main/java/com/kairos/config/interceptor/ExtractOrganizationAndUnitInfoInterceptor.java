@@ -17,7 +17,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.service.auth.UserService.getCurrentUser;
+
 
 /**
  * Created by anil on 10/8/17.
@@ -29,15 +31,12 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
     public boolean preHandle(
             HttpServletRequest request,
             HttpServletResponse response,
-            Object handler) throws Exception {
+            Object handler) {
 
         if(request.getRequestURL().toString().contains("/scheduler_execute_job")) return true;
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-            if(pathVariables==null){
-            throw new InvalidRequestException("Url or Parameter is not correct");
-        }
         try {
             if(isNotNull(UserContext.getUserDetails())) {
                 UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
@@ -59,6 +58,7 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
             UserContext.setUnitId(unitId);
+            UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
         }
 
         ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

@@ -2,7 +2,7 @@ package com.kairos.persistence.repository.user.auth;
 
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.query_wrapper.OrganizationWrapper;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
@@ -74,7 +74,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "RETURN  id(org) AS organizationId ,id(user) AS id, user.email AS email,user.firstName AS firstName," +
             "user.userName AS userName,ag.name AS accessGroupName,id(parentAG) AS parentAccessGroupId,id(ag) AS " +
             "accessGroupId,user.lastName AS lastName ,user.cprNumber AS cprNumber,user.creationDate AS creationDate ORDER BY user.creationDate DESC LIMIT 1" )
-    StaffPersonalDetailDTO getUnitManagerOfOrganization(Long unitId);
+    StaffPersonalDetailQueryResult getUnitManagerOfOrganization(Long unitId);
 
     @Query("MATCH (org:Organization) WHERE id(org)  = {1}" +
             " MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH org,unitPermission,position\n" +
@@ -89,7 +89,7 @@ public interface UserGraphRepository extends Neo4jBaseRepository<User,Long> {
             "MATCH (position)-[:"+BELONGS_TO+"]-(staff:Staff)-[:"+BELONGS_TO+"]-(user:User) \n" +
             "RETURN  id(child) AS organizationId ,user.email AS email,id(user) AS id,ag.name AS accessGroupName,id(ag) AS accessGroupId, user.firstName AS firstName,user.lastName AS lastName, user.userName AS userName, user.cprNumber AS cprNumber,staff AS staff,user.creationDate AS creationDate " )
 
-    List<StaffPersonalDetailDTO> getUnitManagerOfOrganization(List<Long> unitId,Long parentOrganizationId);
+    List<StaffPersonalDetailQueryResult> getUnitManagerOfOrganization(List<Long> unitId, Long parentOrganizationId);
 
     @Query("MATCH (org) WHERE id(org)={0} " +
             "OPTIONAL MATCH (position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(org) WITH position"+

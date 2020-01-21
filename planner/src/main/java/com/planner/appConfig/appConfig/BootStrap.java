@@ -17,7 +17,7 @@ public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        log.info("dasdasdasd"+iAppConfig.getKairosBaseUrl());
+        log.info(iAppConfig.getKairosBaseUrl());
 
     }
 }

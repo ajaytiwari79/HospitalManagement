@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.annotations.KPermissionField;
 import com.kairos.annotations.KPermissionModel;
 import com.kairos.annotations.KPermissionSubModel;
+import com.kairos.enums.Gender;
 import com.kairos.enums.StaffStatusEnum;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactAddress;
@@ -51,7 +52,10 @@ public class Staff extends UserBaseEntity {
     @KPermissionSubModel
     @Relationship(type = BELONGS_TO)
     private User user;
-
+    @KPermissionField
+    protected Gender gender;
+    @KPermissionField
+    private LocalDate dateOfBirth;
     private EngineerType engineerType;
 
     @Relationship(type = HAS_FAVOURITE_FILTERS)
@@ -115,13 +119,12 @@ public class Staff extends UserBaseEntity {
     private Integer capacity;
     private Long kmdExternalId;
     private String careOfName;
-    @KPermissionField
-    private LocalDate dateOfBirth;
 
     private String access_token; // specially required for chat server only
     private String user_id; //specially required for chat server only
 
     @Relationship(type = BELONGS_TO_TAGS)
+    @KPermissionField
     private List<Tag> tags;
 
     public Staff(String email, String userName, String firstName, String lastName, String familyName, StaffStatusEnum currentStatus, Long inactiveFrom, String cprNumber) {

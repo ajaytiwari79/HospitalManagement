@@ -60,6 +60,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public static final String PLANNING_PERIOD_ID = "planningPeriodId";
     public static final String ACTIVITY = "activity";
     public static final String TIME_TYPE = "timeType";
+    public static final String DRAFT ="draft";
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -471,9 +472,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
 
     @Override
-    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate, Boolean isDraft) {
         Criteria criteria = where(STAFF_ID).in(staffIds).and(UNIT_ID).in(unitIds).and(DELETED).is(false).and(DISABLED).is(false)
-                .and(START_DATE).gte(startDate).lte(endDate);
+                .and(START_DATE).gte(startDate).lte(endDate).and(DRAFT).is(false);
         List<AggregationOperation> aggregationOperation = new ArrayList<>();
         aggregationOperation.add(new MatchOperation(criteria));
         aggregationOperation.add(unwind(ACTIVITIES));

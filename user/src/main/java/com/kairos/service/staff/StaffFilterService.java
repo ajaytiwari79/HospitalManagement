@@ -137,9 +137,6 @@ public class StaffFilterService {
             }
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
-        if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTEXIST);
-        }
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
 
         return new FiltersAndFavouriteFiltersDTO(

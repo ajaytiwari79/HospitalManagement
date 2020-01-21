@@ -90,19 +90,19 @@ public class AddressVerificationService {
 
 
     public Map<String, Object> verifyAddressClientException(AddressDTO contactAddress, long unitId) {
-        logger.info("Finding zipcode with value:" + contactAddress.getZipCodeValue());
+        logger.info("Finding zipcode with value:" + contactAddress.getZipCode().getZipCode());
         Map<String, String> flsCredentials = integrationService.getFLS_Credentials(unitId);
-        ZipCode zipCode = zipCodeGraphRepository.findByZipCode(contactAddress.getZipCodeValue());
+        ZipCode zipCode = zipCodeGraphRepository.findByZipCode(contactAddress.getZipCode().getZipCode());
         String municipalityName;
-        if(contactAddress.getMunicipalityId() != null){
-            Municipality municipality = municipalityGraphRepository.findOne(contactAddress.getMunicipalityId());
+        if(contactAddress.getMunicipality().getId() != null){
+            Municipality municipality = municipalityGraphRepository.findOne(contactAddress.getMunicipality().getId());
             if(municipality == null){
                 exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
             }
             municipalityName = municipality.getName();
         } else {
-            municipalityName = contactAddress.getMunicipalityName();
+            municipalityName = contactAddress.getMunicipality().getName();
         }
 
         if (zipCode == null) {
@@ -111,7 +111,7 @@ public class AddressVerificationService {
         }
         logger.info("Verifying with Information \n house: " +
                 contactAddress.getHouseNumber() + "\n City:" +
-                contactAddress.getMunicipalityName() +
+                contactAddress.getMunicipality().getName() +
                 "\n ZipCode: " + zipCode.getName() +
                 "\n Street: " + contactAddress.getStreet());
 

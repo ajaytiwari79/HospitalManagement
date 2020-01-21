@@ -143,6 +143,9 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN exl LIMIT 1")
     ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
 
+    @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} RETURN e")
+    List<Expertise> getExpertiesOfCountry(Long countryId);
+
     @Query("MATCH(expertise:Expertise)-[r:"+HAS_SENIOR_DAYS+"]-(careDays:CareDays) WHERE id(expertise) = {0} DETACH DELETE r RETURN COUNT(r)>0")
     boolean removeSeniorDays(Long expertiseId);
 

@@ -34,6 +34,8 @@ public class ActivityConstraints {
         this.activityRequiredTag = activityRequiredTag;
     }
 
+
+
     public ActivityDayType getActivityDayType() {
         return activityDayType;
     }

@@ -1,7 +1,7 @@
 package com.kairos.persistence.model.organization;
 
 import com.kairos.dto.user.organization.CompanyType;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class OrganizationBasicResponse {
     private List<Long> subTypeId;
     // Used in case of child
     Map<String, Object> contactAddress;
-    private StaffPersonalDetailDTO unitManager;
+    private StaffPersonalDetailQueryResult unitManager;
     private Long unitTypeId;
     private boolean workcentre;
     private Long hubId;
@@ -172,11 +172,11 @@ public class OrganizationBasicResponse {
         this.contactAddress = contactAddress;
     }
 
-    public StaffPersonalDetailDTO getUnitManager() {
+    public StaffPersonalDetailQueryResult getUnitManager() {
         return unitManager;
     }
 
-    public void setUnitManager(StaffPersonalDetailDTO unitManager) {
+    public void setUnitManager(StaffPersonalDetailQueryResult unitManager) {
         this.unitManager = unitManager;
     }
 

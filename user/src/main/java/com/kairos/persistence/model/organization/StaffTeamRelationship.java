@@ -3,6 +3,8 @@ package com.kairos.persistence.model.organization;
 import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.annotations.KPermissionRelationshipFrom;
 import com.kairos.annotations.KPermissionRelationshipTo;
+import com.kairos.enums.team.LeaderType;
+import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.organization.team.Team;
 import com.kairos.persistence.model.staff.personal_details.Staff;
@@ -99,15 +101,6 @@ public class StaffTeamRelationship extends UserBaseEntity {
         this.teamType = teamType;
     }
 
-    //Enum to set the leader type in team
-    public enum LeaderType{
-        MAIN_LEAD,ACTING_LEAD
-    }
-
-    //Enum to set the team type in team
-    public  enum TeamType{
-        MAIN,SECONDARY
-    }
 }
 
 
