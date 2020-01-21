@@ -40,6 +40,7 @@ import com.kairos.enums.kpi.KPIRepresentation;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
+import com.kairos.enums.team.TeamType;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.counter.*;
@@ -287,7 +288,10 @@ public class CounterDataService extends MongoBaseService {
                 case EMPLOYMENT_SUB_TYPE:
                     getEmploymentSubTypeData(criteriaList);
                     break;
-                    default:break;
+                case TEAM_TYPE:
+                    getTeamTypeData(criteriaList);
+                    break;
+                default:break;
             }
         }
 
@@ -388,6 +392,14 @@ public class CounterDataService extends MongoBaseService {
             kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(employmentSubType.toString(), employmentSubType.value));
         }
         criteriaList.add(new FilterCriteria(EMPLOYMENT_SUB_TYPE.value, EMPLOYMENT_SUB_TYPE, (List) kpiFilterDefaultDataDTOS));
+    }
+
+    private void getTeamTypeData(List<FilterCriteria> criteriaList){
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        for (TeamType teamType : TeamType.values()) {
+            kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(teamType.toString(), teamType.value));
+        }
+        criteriaList.add(new FilterCriteria(TEAM_TYPE.value, TEAM_TYPE, (List) kpiFilterDefaultDataDTOS));
     }
 
 
