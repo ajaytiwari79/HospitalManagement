@@ -620,7 +620,11 @@ public class OrganizationService {
 
     public Organization fetchParentOrganization(Long unitId) {
         Long parentOrgId = organizationBaseRepository.findParentOrgId(unitId);
-        return organizationGraphRepository.findOne(parentOrgId);
+        Organization parent=  organizationGraphRepository.findOne(parentOrgId);
+        if (!Optional.ofNullable(parent).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
+        }
+        return parent;
     }
 
     public OrganizationMappingDTO getEmploymentTypeWithExpertise(Long unitId) {
@@ -858,9 +862,6 @@ public class OrganizationService {
 
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
         Long countryId = UserContext.getUserDetails().getCountryId();
-        if (countryId == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
         return new SelfRosteringMetaData(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
