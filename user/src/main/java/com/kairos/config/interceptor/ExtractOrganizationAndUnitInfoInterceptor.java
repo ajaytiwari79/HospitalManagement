@@ -39,7 +39,9 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             throw new InvalidRequestException("Url or Parameter is not correct");
         }
         try {
-            UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
+            if(isNotNull(UserContext.getUserDetails())) {
+                UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
+            }
         } catch (Exception e) {
             LOGGER.error("exception {}",e);
         }

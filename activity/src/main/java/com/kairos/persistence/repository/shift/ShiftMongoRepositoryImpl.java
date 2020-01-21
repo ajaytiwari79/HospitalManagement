@@ -14,6 +14,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -714,6 +715,27 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperations.add(project(shiftProjection));
         }
         return aggregationOperations;
+    }
+
+    @Override
+    public List<ActivityWithCompositeDTO> findMostlyUsedActivityByStaffId(Long staffId){
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(DELETED).is(false).and(DISABLED).is(false).and("staffId").is(staffId)),
+               /* new CustomAggregationOperation(Document.parse("{\n" +
+                        "      $group :\n" +
+                        "        {\n" +
+                        "          _id : \"$activities.activityId\",\n" +
+                        "          count: { $sum: 1 }\n" +
+                        "        }\n" +
+                        "     }")),*/
+               unwind("activities"),
+               group("activities.activityId").count().as("mostlyUsedCount"),
+                lookup("activities", "_id", "_id", ACTIVITY)
+                ,project("_id","mostlyUsedCount").and("activity.activityPriorityId").arrayElementAt(0).as("activityPriorityId").and("activity.balanceSettingsActivityTab.timeType").arrayElementAt(0).as("secondLevelTimtype"),
+                lookup("activityPriority", "activityPriorityId", "_id", "activityPriority"),
+                project("_id","mostlyUsedCount","secondLevelTimtype").and("activityPriority.sequence").arrayElementAt(0).as("activityPriority")
+        );
+        return mongoTemplate.aggregate(aggregation, Shift.class, ActivityWithCompositeDTO.class).getMappedResults();
     }
 
 }

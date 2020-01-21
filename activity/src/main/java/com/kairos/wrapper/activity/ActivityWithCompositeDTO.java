@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.activity.activity.CompositeActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.dto.activity.activity.activity_tabs.TimeCalculationActivityDTO;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.persistence.model.activity.tabs.SkillActivityTab;
@@ -61,5 +62,8 @@ public class ActivityWithCompositeDTO {
     private Set<BigInteger> availableChildActivityIds =new HashSet<>();
     private BigInteger parentActivityId;
     private String activityPriorityName;
+    private int activityPriority;
+    private TimeTypeEnum secondLevelTimtype;
+    private int mostlyUsedCount;
 
 }

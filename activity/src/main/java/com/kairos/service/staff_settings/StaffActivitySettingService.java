@@ -9,6 +9,7 @@ import com.kairos.dto.user.staff.staff_settings.StaffAndActivitySettingWrapper;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staff_settings.StaffActivitySetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
+import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.staff_settings.StaffActivitySettingRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rule_validator.Specification;
@@ -40,6 +41,7 @@ public class StaffActivitySettingService extends MongoBaseService {
     @Inject private LocaleService localeService;
     @Inject private ActivityService activityService;
     @Inject private OrganizationActivityService organizationActivityService;
+    @Inject private ShiftMongoRepository shiftMongoRepository;
 
     public StaffActivitySettingDTO createStaffActivitySetting(Long unitId,StaffActivitySettingDTO staffActivitySettingDTO){
         activityService.validateActivityTimeRules(staffActivitySettingDTO.getShortestTime(),staffActivitySettingDTO.getLongestTime());
@@ -105,26 +107,41 @@ public class StaffActivitySettingService extends MongoBaseService {
 
     public List<ActivityWithCompositeDTO> getStaffSpecificActivitySettings(Long unitId,Long staffId,boolean includeTeamActivity){
         List<ActivityWithCompositeDTO> staffPersonalizedActivities= staffActivitySettingRepository.findAllByUnitIdAndStaffIdAndDeletedFalse(unitId,staffId);
+        Map<BigInteger,ActivityWithCompositeDTO> mostlyUsedActivityData = shiftMongoRepository.findMostlyUsedActivityByStaffId(staffId).stream().collect(Collectors.toMap(k->k.getId(),v->v));
         if(includeTeamActivity) {
             List<ActivityWithCompositeDTO> activityList = organizationActivityService.getTeamActivitiesOfStaff(unitId, staffId, staffPersonalizedActivities);
             Map<BigInteger, ActivityWithCompositeDTO> activityMap = activityList.stream().collect(Collectors.toMap(ActivityWithCompositeDTO::getId, Function.identity()));
             staffPersonalizedActivities.forEach(activity -> {
                 if (activityMap.containsKey(activity.getActivityId())) {
-                    activityMap.get(activity.getActivityId()).getRulesActivityTab().setEarliestStartTime(activity.getEarliestStartTime());
-                    activityMap.get(activity.getActivityId()).getRulesActivityTab().setLatestStartTime(activity.getLatestStartTime());
-                    activityMap.get(activity.getActivityId()).getRulesActivityTab().setShortestTime(activity.getShortestTime());
-                    activityMap.get(activity.getActivityId()).getRulesActivityTab().setLongestTime(activity.getLongestTime());
+                    ActivityWithCompositeDTO teamActivity = activityMap.get(activity.getActivityId());
+                    teamActivity.getRulesActivityTab().setEarliestStartTime(activity.getEarliestStartTime());
+                    teamActivity.getRulesActivityTab().setLatestStartTime(activity.getLatestStartTime());
+                    teamActivity.getRulesActivityTab().setShortestTime(activity.getShortestTime());
+                    teamActivity.getRulesActivityTab().setLongestTime(activity.getLongestTime());
+                    updateActivityPriorityAndMostlyUsedCountAndTimeType(mostlyUsedActivityData, teamActivity);
                 }
             });
             return activityList;
         }
         else {
+            for (ActivityWithCompositeDTO staffPersonalizedActivity : staffPersonalizedActivities) {
+                updateActivityPriorityAndMostlyUsedCountAndTimeType(mostlyUsedActivityData, staffPersonalizedActivity);
+            }
             return staffPersonalizedActivities;
         }
     }
 
+    private void updateActivityPriorityAndMostlyUsedCountAndTimeType(Map<BigInteger, ActivityWithCompositeDTO> mostlyUsedActivityData, ActivityWithCompositeDTO staffPersonalizedActivity) {
+        if(mostlyUsedActivityData.containsKey(staffPersonalizedActivity.getActivityId())){
+            ActivityWithCompositeDTO compositeDTO = mostlyUsedActivityData.get(staffPersonalizedActivity.getActivityId());
+            staffPersonalizedActivity.setMostlyUsedCount(compositeDTO.getMostlyUsedCount());
+            staffPersonalizedActivity.setActivityPriority(compositeDTO.getActivityPriority());
+            staffPersonalizedActivity.setSecondLevelTimtype(compositeDTO.getSecondLevelTimtype());
+        }
+    }
 
-   public StaffActivitySettingDTO getStaffActivitySettingsById(Long unitId,BigInteger staffActivitySettingId){
+
+    public StaffActivitySettingDTO getStaffActivitySettingsById(Long unitId,BigInteger staffActivitySettingId){
         return staffActivitySettingRepository.findByIdAndUnitIdAndDeletedFalse(staffActivitySettingId,unitId);
     }
 
