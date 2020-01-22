@@ -31,6 +31,8 @@ public class StaffingLevelInterval {
         this.skillLevels = skillLevels;
         this.activityTypeLevels = activityTypeLevels;
     }
-
+    public Interval getInterval(){
+        return new Interval(start,end);
+    }
 
 }

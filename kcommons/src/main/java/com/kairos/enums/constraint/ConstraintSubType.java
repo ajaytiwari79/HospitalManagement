@@ -4,13 +4,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ConstraintSubType {
     //For Activity
+    ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH("Activity Longest Duration Relative To Shift Length"),
     ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH("Activity Shortest Duration Relative To Shift Length"),
     MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF("Maximum Allocation Per Shift For This Activity PerStaff"),
     ACTIVITY_VALID_DAYTYPE("Activity Valid Daytype"),
     ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS("Activity Must Continuous Number Of Hours"),
     MINIMIZE_SHIFT_ON_WEEKENDS("Minimize Number of Shift On Weekend"),
     PREFER_PERMANENT_EMPLOYEE("Prefer Permanent Employee"),
-
+    MINIMUM_LENGTH_OF_ACTIVITY("Minimum Length of Activity"),
     ACTIVITY_REQUIRED_TAG("Activity Required Tag"),
 
     //For Shifts

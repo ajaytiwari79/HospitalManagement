@@ -3,6 +3,9 @@ package com.kairos.shiftplanning.domain.staff;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
@@ -12,6 +15,9 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @PlanningEntity
 @XStreamAlias("IndirectActivity")
 public class IndirectActivity {
@@ -32,9 +38,6 @@ public class IndirectActivity {
         this.employees = employees;
         this.type = type;
         this.locked=locked;
-    }
-
-    public IndirectActivity() {
     }
 
     public LocalDate getPlannedStartDate() {
