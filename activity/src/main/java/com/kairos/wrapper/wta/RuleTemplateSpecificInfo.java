@@ -43,7 +43,7 @@ public class RuleTemplateSpecificInfo {
     private Map<Long, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
     private long totalTimeBank;
-    private ViolatedRulesDTO violatedRules;
+    private ViolatedRulesDTO violatedRules=new ViolatedRulesDTO();
     private int staffAge;
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;
     private List<CareDaysDTO> childCareDays;

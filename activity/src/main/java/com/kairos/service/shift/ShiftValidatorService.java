@@ -91,6 +91,7 @@ import static com.kairos.enums.TimeTypes.NON_WORKING_TYPE;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
 import static com.kairos.enums.shift.ShiftOperationType.CREATE;
 import static com.kairos.enums.wta.WTATemplateType.*;
+import static com.kairos.service.shift.ShiftService.staffingLevelForOld;
 import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
@@ -204,6 +205,7 @@ public class ShiftValidatorService {
         if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
         }
+        boolean valid = shift.getActivities().stream().anyMatch(activity -> !activity.getStatus().contains(ShiftStatus.PUBLISH)) && UserContext.getUserDetails().isManagement();
         Shift mainShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
         shift.setPhaseId(phase.getId());
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, CREATE);
@@ -530,6 +532,7 @@ public class ShiftValidatorService {
         Specification<ShiftWithActivityDTO> activityExpertiseSpecification = new ExpertiseSpecification(staffEmploymentDetails.getExpertise(), ruleTemplateSpecificInfo, allActivities);
         Specification<ShiftWithActivityDTO> staffEmploymentSpecification = new StaffEmploymentSpecification(phase, staffAdditionalInfoDTO);
         Specification<ShiftWithActivityDTO> activityDayTypeSpecification = new DayTypeSpecification(validDays, ruleTemplateSpecificInfo.getShift().getStartDate());
+        Specification<ShiftWithActivityDTO> phaseWiseSpecification= new ActivityPhaseSettingSpecification();
         Specification<ShiftWithActivityDTO> activitySpecification = activityExpertiseSpecification.and(wtaRulesSpecification).and(staffEmploymentSpecification).and(activityDayTypeSpecification);
         activitySpecification.validateRules(shiftWithActivityDTO);
         return filterVoilatedRules(ruleTemplateSpecificInfo.getViolatedRules());
@@ -681,10 +684,12 @@ public class ShiftValidatorService {
                 int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
                 if (checkOverStaffing && totalCount >= 0) {
                     ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING))));
+                    ShiftService.staffingLevelForNew=OVERSTAFFING;
                     break;
                 }
                 if (!checkOverStaffing && totalCount <= 0) {
                     ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING))));
+                    staffingLevelForOld=UNDERSTAFFING;
                     break;
                 }
                 if (isNotNull(parentActivity)) {
@@ -701,6 +706,7 @@ public class ShiftValidatorService {
                 }
             } else {
                 ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName()))));
+                break;
             }
         }
 
