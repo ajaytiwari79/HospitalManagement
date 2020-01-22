@@ -1031,14 +1031,6 @@ public class ShiftService extends MongoBaseService {
                     //Intentionally left blank
                 }
             }
-        }else {
-            List<ShiftActivity>[] shiftActivities = oldStateShift.getShiftActivitiesForValidatingStaffingLevel(shift);
-            for (ShiftActivity shiftActivity : shiftActivities[0]) {
-                shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, true, shiftActivity,ruleTemplateSpecificInfo);
-            }
-            for (ShiftActivity shiftActivity : shiftActivities[1]) {
-                shiftValidatorService.validateStaffingLevel(phase, shift, activityWrapperMap, false, shiftActivity,ruleTemplateSpecificInfo);
-            }
         }
     }
 

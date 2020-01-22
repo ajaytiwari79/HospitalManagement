@@ -205,15 +205,17 @@ public class ShiftValidatorService {
         if (staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaff() && !staffAdditionalInfoDTO.getUserAccessRoleDTO().getStaffId().equals(shift.getStaffId())) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_PERMISSION);
         }
-        boolean valid = shift.getActivities().stream().anyMatch(activity -> !activity.getStatus().contains(ShiftStatus.PUBLISH)) && UserContext.getUserDetails().isManagement();
         Shift mainShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
         shift.setPhaseId(phase.getId());
         RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shift, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, CREATE);
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
-        List<ShiftActivity>[] shiftActivities = mainShift.getShiftActivitiesForValidatingStaffingLevel(null);
+        List<ShiftActivity>[] shiftActivities = mainShift.getShiftActivitiesForValidatingStaffingLevel(oldShift);
         for (ShiftActivity shiftActivity : shiftActivities[0]) {
             validateStaffingLevel(phase, mainShift, activityWrapperMap, true, shiftActivity, ruleTemplateSpecificInfo);
+        }
+        for (ShiftActivity shiftActivity : shiftActivities[1]) {
+            validateStaffingLevel(phase, mainShift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo);
         }
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
         updateScheduledAndDurationMinutesInShift(shift, staffAdditionalInfoDTO, activityWrapperMap);
