@@ -11,10 +11,7 @@ import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.night_worker.ExpertiseNightWorkerSetting;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -34,6 +31,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @Setter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class RuleTemplateSpecificInfo {
 
     private List<ShiftWithActivityDTO> shifts = new ArrayList<>();
@@ -45,7 +43,7 @@ public class RuleTemplateSpecificInfo {
     private Map<Long, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
     private long totalTimeBank;
-    private ViolatedRulesDTO violatedRules;
+    private ViolatedRulesDTO violatedRules=new ViolatedRulesDTO();
     private int staffAge;
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;
     private List<CareDaysDTO> childCareDays;

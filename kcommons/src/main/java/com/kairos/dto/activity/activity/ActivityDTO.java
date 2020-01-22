@@ -60,10 +60,6 @@ public class ActivityDTO  {
     private Boolean activityCanBeCopied=false;
     private ActivityPriorityDTO activityPriority;
     private List<ShiftStatus> activityStatus;
-
-
-    //    private List<Tag> tags;
-//    private List<BigInteger> tags = new ArrayList<>();
     private List<BigInteger> tags = new ArrayList<>();
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;

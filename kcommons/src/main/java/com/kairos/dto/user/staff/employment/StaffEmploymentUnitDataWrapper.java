@@ -13,6 +13,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ public class StaffEmploymentUnitDataWrapper {
     private String cprNumber;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private List<ReasonCodeDTO> reasonCodes;
+    private Map<String, String> unitWiseAccessRole=new HashMap<>();
 
 
     public StaffEmploymentUnitDataWrapper(List<StaffEmploymentDetails> staffEmploymentDetails) {
