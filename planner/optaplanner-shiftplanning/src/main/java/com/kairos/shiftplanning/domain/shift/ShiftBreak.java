@@ -2,6 +2,8 @@ package com.kairos.shiftplanning.domain.shift;
 
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
@@ -9,6 +11,8 @@ import org.joda.time.Interval;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
+@Getter
+@Setter
 @PlanningEntity
 @XStreamAlias("ShiftBreak")
 public class ShiftBreak {
@@ -16,34 +20,7 @@ public class ShiftBreak {
     @PlanningVariable(valueRangeProviderRefs = "possibleStartDateTimes",nullable = true)
     private DateTime startTime;
     private int order;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public ShiftImp getShift() {
-        return shift;
-    }
-
-    public void setShift(ShiftImp shift) {
-        this.shift = shift;
-    }
-
-
     private ShiftImp shift;
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
     private int duration;
     public ShiftBreak(){}
     public ShiftBreak(String id, int order, int duration, ShiftImp shift) {
@@ -63,13 +40,6 @@ public class ShiftBreak {
     }
     public Integer getMinutes(){
         return getInterval()==null?0:getInterval().toDuration().toStandardMinutes().getMinutes();
-    }
-    public DateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(DateTime startTime) {
-        this.startTime = startTime;
     }
 
     @Override
@@ -97,13 +67,6 @@ public class ShiftBreak {
         return startTime !=null?("SB:{"+ startTime.toString("HH:mm")+"-"+getEndTime().toString("HH:mm")+"}"):"Not Planned:"+duration;
     }
 
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
     public boolean isPlannedInInterval(){
         Interval validStartInterval=ShiftPlanningUtility.getPossibleBreakStartInterval(this,this.getShift());
         //return validStartInterval.contains(startTime) || validStartInterval.getEnd().equals(startTime);

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
@@ -15,7 +18,9 @@ import java.util.List;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE15
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MinimumDailyRestingTimeWTATemplateTemplate implements ConstraintHandler {
@@ -32,46 +37,6 @@ public class MinimumDailyRestingTimeWTATemplateTemplate implements ConstraintHan
         this.dailyRestingTime = dailyRestingTime;
         this.weight = weight;
         this.level = level;
-    }
-
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-    public long getDailyRestingTime() {
-        return dailyRestingTime;
-    }
-
-    public void setDailyRestingTime(long dailyRestingTime) {
-        this.dailyRestingTime = dailyRestingTime;
-    }
-
-    public MinimumDailyRestingTimeWTATemplateTemplate(long dailyRestingTime) {
-        this.dailyRestingTime = dailyRestingTime;
-    }
-
-    public MinimumDailyRestingTimeWTATemplateTemplate() {
-
     }
 
     public int checkConstraints(List<Shift> shifts){

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.staffing_level.TimeInterval;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -12,7 +15,9 @@ import java.util.List;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE9
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MaximumNumberOfNightsWTATemplate implements ConstraintHandler,NightWorkTemplate {
@@ -38,90 +43,6 @@ public class MaximumNumberOfNightsWTATemplate implements ConstraintHandler,Night
         nightTimeInterval =new TimeInterval(nightStarts,nightEnds);
     }
 
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-
-    public long getNightEnds() {
-        return nightEnds;
-    }
-
-    public void setNightEnds(long nightEnds) {
-        this.nightEnds = nightEnds;
-    }
-
-    public long getNightStarts() {
-        return nightStarts;
-    }
-
-    public void setNightStarts(long nightStarts) {
-        this.nightStarts = nightStarts;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
-
-    public long getNightsWorked() {
-        return nightsWorked;
-    }
-
-    public void setNightsWorked(int nightsWorked) {
-        this.nightsWorked = nightsWorked;
-    }
-
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(long intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
-
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
-
-
-    public MaximumNumberOfNightsWTATemplate() {
-    }
     public int checkConstraints(List<Shift> shifts){
         if(shifts.size()<0) return 0;
         int count = (int)shifts.get(0).getEmployee().getPrevShiftsInfo().getMaximumNumberOfNightsInfo();
