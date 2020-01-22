@@ -9,6 +9,14 @@ import com.kairos.dto.activity.open_shift.DurationField;
 import java.util.Optional;
 
 public class PQLSettings {
+    public static final String GREEN_COLOR_CODE = "#4caf502e";
+    public static final String COLOR_NAME = "Green";
+    public static final String YELLOW_COLOR_CODE = "#ffeb3b33";
+    public static final String COLOR_NAME1 = "Yellow";
+    public static final String COLOR_NAME_1 = COLOR_NAME1;
+    public static final String RED_COLOR_CODE = "#ff3b3b33";
+    public static final String RED = "Red";
+    public static final String COLOR_NAME2 = RED;
     private DurationField approvalTimeInAdvance; // TODO need to rename
     private Float approvalPercentageWithoutMovement;
     private ApprovalCriteria approvalWithMovement;
@@ -45,7 +53,10 @@ public class PQLSettings {
     }
 
     public ApprovalCriteria getAppreciable() {
-        return appreciable=Optional.ofNullable(appreciable).orElse(new ApprovalCriteria());
+        appreciable=Optional.ofNullable(appreciable).orElse(new ApprovalCriteria(GREEN_COLOR_CODE, COLOR_NAME));
+        appreciable.setColorName(COLOR_NAME);
+        appreciable.setColor(GREEN_COLOR_CODE);
+        return appreciable;
     }
 
     public void setAppreciable(ApprovalCriteria appreciable) {
@@ -53,7 +64,10 @@ public class PQLSettings {
     }
 
     public ApprovalCriteria getAcceptable() {
-        return acceptable=Optional.ofNullable(acceptable).orElse(new ApprovalCriteria());
+        acceptable=Optional.ofNullable(acceptable).orElse(new ApprovalCriteria(YELLOW_COLOR_CODE , COLOR_NAME_1));
+        acceptable.setColorName(COLOR_NAME1);
+        acceptable.setColor(YELLOW_COLOR_CODE);
+        return acceptable;
     }
 
     public void setAcceptable(ApprovalCriteria acceptable) {
@@ -61,7 +75,10 @@ public class PQLSettings {
     }
 
     public ApprovalCriteria getCritical() {
-        return critical=Optional.ofNullable(critical).orElse(new ApprovalCriteria());
+        critical=Optional.ofNullable(critical).orElse(new ApprovalCriteria( RED_COLOR_CODE, COLOR_NAME2));
+        critical.setColorName(COLOR_NAME2);
+        critical.setColor(RED_COLOR_CODE);
+        return critical;
     }
 
     public void setCritical(ApprovalCriteria critical) {

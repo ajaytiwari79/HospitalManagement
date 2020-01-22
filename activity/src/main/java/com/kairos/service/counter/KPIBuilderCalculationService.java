@@ -636,10 +636,11 @@ public class KPIBuilderCalculationService implements CounterService {
     private List<ClusteredBarChartKpiDataUnit> getPQlOfTodo(Activity activity, List<TodoDTO> todoDTOS,KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
         PQLSettings pqlSettings = activity.getRulesActivityTab().getPqlSettings();
+        List<ApprovalCriteria> approvalCriterias = newArrayList(pqlSettings.getAppreciable(),pqlSettings.getAcceptable(),pqlSettings.getCritical());
         if (isNotNull(pqlSettings)) {
-            getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAppreciable(), "#4caf502e", "Green",kpiCalculationRelatedInfo);
-            getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAcceptable(), "#ffeb3b33", "Yellow",kpiCalculationRelatedInfo);
-            getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getCritical(), "#ff3b3b33", "Red",kpiCalculationRelatedInfo);
+            for (ApprovalCriteria approvalCriteria : approvalCriterias) {
+                getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, approvalCriteria, approvalCriteria.getColor(), approvalCriteria.getColorName(),kpiCalculationRelatedInfo);
+            }
         }
         return clusteredBarChartKpiDataUnits;
     }
