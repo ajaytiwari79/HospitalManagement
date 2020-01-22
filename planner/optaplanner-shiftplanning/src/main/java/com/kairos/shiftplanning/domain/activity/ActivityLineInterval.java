@@ -5,6 +5,8 @@ import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLineInterval;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.joda.time.DateTime;
@@ -19,6 +21,8 @@ import java.util.Objects;
 /*
  * Do not implement equals or hashcode
  */
+@Getter
+@Setter
 @PlanningEntity
 public class ActivityLineInterval implements StaffingLineInterval, Comparable<ActivityLineInterval> {
 
@@ -51,31 +55,6 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         this.staffNo = staffNo;
     }
 
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    public DateTime getStart() {
-        return start;
-    }
-
-    public void setStart(DateTime start) {
-        this.start = start;
-    }
-
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public void setRequired(boolean required) {
-        this.required = required;
-    }
-
     public Interval getInterval() {
         return start == null ? null : new Interval(start, start.plusMinutes(duration));
     }
@@ -88,14 +67,6 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     public boolean overlaps(StaffingLineInterval staffingLineInterval) {
         return Objects.equals(this.getInterval(), staffingLineInterval.getInterval()) &&
                 this.getClass().isInstance(staffingLineInterval) || this.getActivity().getSkills().contains(((SkillLineInterval) staffingLineInterval).getSkill());
-    }
-
-    public ShiftImp getShift() {
-        return shift;
-    }
-
-    public void setShift(ShiftImp shift) {
-        this.shift = shift;
     }
 
     @Override
@@ -111,44 +82,8 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
         return this.getInterval().equals(interval);
     }
 
-    public ActivityLineInterval getPrevious() {
-        return previous;
-    }
-
-    public void setPrevious(ActivityLineInterval previous) {
-        this.previous = previous;
-    }
-
-    public ActivityLineInterval getNext() {
-        return next;
-    }
-
-    public void setNext(ActivityLineInterval next) {
-        this.next = next;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
     public DateTime getEnd() {
         return start == null ? null : start.plusMinutes(duration);
-    }
-
-    public int getStaffNo() {
-        return staffNo;
-    }
-
-    public void setStaffNo(int staffNo) {
-        this.staffNo = staffNo;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public boolean overlapsActivity(ActivityLineInterval ali) {

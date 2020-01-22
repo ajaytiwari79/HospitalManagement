@@ -164,14 +164,18 @@ public class MailService {
 
     //Todo Please don't use this method for sending any Custom exception
     public void sendMailToBackendOnException(Exception ex){
-         if(envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE)){
-            StringBuffer body = new StringBuffer(ex.getMessage());
-            for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
-                //if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
+        try {
+            if (envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE)) {
+                StringBuffer body = new StringBuffer(ex.getMessage());
+                for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
+                    //if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
                     body.append(stackTraceElement.toString()).append(" ").append(System.getProperty("line.separator")).append(" ");
-                //}
+                    //}
+                }
+                sendMailWithSendGrid(null, null, body.toString(), "Exception in " + envConfigCommon.getApplicationName() + " | " + envConfigCommon.getCurrentProfile(), KAIROS_BACKEND_MAIL_IDS);
             }
-            sendMailWithSendGrid(null,null,body.toString(),"Exception in "+envConfigCommon.getApplicationName()+" | "+envConfigCommon.getCurrentProfile(),KAIROS_BACKEND_MAIL_IDS);
+        }catch (Exception e){
+            LOGGER.error("exception {}",e);
         }
     }
 
