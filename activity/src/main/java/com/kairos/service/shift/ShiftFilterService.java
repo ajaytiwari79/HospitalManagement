@@ -70,10 +70,10 @@ public class ShiftFilterService {
         ShiftFilter escalationFilter = getEscalationFilter(shiftWithActivityDTOS.stream().map(shift->shift.getId()).collect(Collectors.toList()), filterTypeMap);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter)
                                     .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter);
-        shiftWithActivityDTOS = shiftFilter.meetCriteria(shiftWithActivityDTOS);
-        List<Long> staffIds = shiftWithActivityDTOS.stream().map(s->s.getStaffId()).collect(Collectors.toList());
+        return shiftFilter.meetCriteria(shiftWithActivityDTOS);
+        /*List<Long> staffIds = shiftWithActivityDTOS.stream().map(s->s.getStaffId()).collect(Collectors.toList());
         ShiftFilter nightWorkerFilter = getNightWorkerFilter(staffIds, filterTypeMap);
-        return nightWorkerFilter.meetCriteria(shiftWithActivityDTOS);
+        return nightWorkerFilter.meetCriteria(shiftWithActivityDTOS);*/
     }
 
     private ShiftFilter getEscalationFilter(List<BigInteger> shiftIds, Map<FilterType, Set<String>> filterTypeMap){
