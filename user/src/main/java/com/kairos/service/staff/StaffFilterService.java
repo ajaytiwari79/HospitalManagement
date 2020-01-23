@@ -69,6 +69,8 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.FilterType.PAY_GRADE_LEVEL;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 /**
@@ -468,8 +470,9 @@ public class StaffFilterService {
     }
 
     private <T> List<Map> filterStaffList(List<Map> staffListMap, Map<FilterType, Set<T>> filterData) {
+        Set<FilterType> appliedFilters = newHashSet(AGE, ORGANIZATION_EXPERIENCE, BIRTHDAY, SENIORITY, EMPLOYED_SINCE, PAY_GRADE_LEVEL);
         for (Map.Entry<FilterType, Set<T>> filterTypeSetEntry : filterData.entrySet()) {
-            if(isNotNull(filterTypeSetEntry.getKey())) {
+            if(isNotNull(filterTypeSetEntry.getKey()) && appliedFilters.contains(filterTypeSetEntry.getKey())) {
                 staffListMap = getFilteredStaffs(staffListMap, filterTypeSetEntry.getKey(), filterData);
             }
         }

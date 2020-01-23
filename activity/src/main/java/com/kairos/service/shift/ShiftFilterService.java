@@ -76,9 +76,6 @@ public class ShiftFilterService {
                                     .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter)
                                     .and(timeBankBalanceFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
-        /*List<Long> staffIds = shiftWithActivityDTOS.stream().map(s->s.getStaffId()).collect(Collectors.toList());
-        ShiftFilter nightWorkerFilter = getNightWorkerFilter(staffIds, filterTypeMap);
-        return nightWorkerFilter.meetCriteria(shiftWithActivityDTOS);*/
     }
 
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
@@ -175,11 +172,6 @@ public class ShiftFilterService {
             }
         }
         return new PlannedByFilter(staffUserIds,filterTypeMap);
-    }
-
-    private <G> ShiftFilter getNightWorkerFilter(List<Long> staffIds, Map<FilterType, Set<G>> filterTypeMap){
-        Map<Long, Boolean> nightWorkerMap = nightWorkerService.getStaffIdAndNightWorkerMap(staffIds);
-        return new NightWorkerFilter(nightWorkerMap, filterTypeMap);
     }
 
 }
