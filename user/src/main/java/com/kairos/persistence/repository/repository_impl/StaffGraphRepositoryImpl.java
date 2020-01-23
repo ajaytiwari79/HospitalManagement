@@ -319,7 +319,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
 
         matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, CASE WHEN tag IS NULL THEN [] ELSE collect(distinct {id:id(tag),name:tag.name,color:tag.color,shortName:tag.shortName,ultraShortName:tag.ultraShortName}) END AS tags, " +
-                "CASE WHEN expertise IS NULL THEN [] ELSE collect(distinct {id:id(expertise),name:expertise.name,expertiseStartDate:toString(date(datetime({epochmillis:expRel.expertiseStartDate})))})  END as expertiseList " +
+                "CASE WHEN expertise IS NULL THEN [] ELSE collect(distinct {id:id(expertise),name:expertise.name,expertiseStartDateInMillis:expRel.expertiseStartDate})  END as expertiseList " +
                 " with staff, employments,user, employmentList,expertiseList,tags  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
                 " with engineerType,employments, staff, user, employmentList, expertiseList,tags";
         return matchRelationshipQueryForStaff;
