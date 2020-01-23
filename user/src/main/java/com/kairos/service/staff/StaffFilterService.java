@@ -217,10 +217,10 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(SkillLevel.getListOfSkillLevelForFilters(), objectMapper);
             case ACCESS_GROUPS:
                 return unitService.getAllAccessGroupByUnitIdForFilter(unitId);
-            case WTA_RULES:
+            /*case WTA_RULES:
                 return getWTARules(staffFilterDataDTO.getWtadtos());
             case CTA_RULES:
-                return getCTARules(staffFilterDataDTO.getCtadtos());
+                return getCTARules(staffFilterDataDTO.getCtadtos());*/
             default:
                 break;
         }
