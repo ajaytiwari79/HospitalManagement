@@ -660,7 +660,10 @@ public class UserService {
     }
 
     public Map<String,String> getUnitWiseLastSelectedAccessRole(){
-        return userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+        Map<String,String> unitWiseAccessRole= userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+        Map<String,String> unitWiseAccessRoleMap=new HashMap<>(unitWiseAccessRole.size());
+        unitWiseAccessRole.forEach((k,v)-> unitWiseAccessRoleMap.put(k,v.toUpperCase()));
+        return unitWiseAccessRoleMap;
     }
 
     public boolean updateChatStatus(ChatStatus chatStatus){
