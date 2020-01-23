@@ -15,11 +15,11 @@ import static com.kairos.enums.FilterType.NIGHT_WORKERS;
 /**
  * Created By G.P.Ranjan on 10/12/19
  **/
-public class NightWorkerFilter implements ShiftFilter {
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+public class NightWorkerFilter <G> implements ShiftFilter {
+    private Map<FilterType, Set<G>> filterCriteriaMap;
     private Map<Long, Boolean> nightWorkerMap;
 
-    public NightWorkerFilter(Map<Long, Boolean> nightWorkerMap, Map<FilterType, Set<String>> filterCriteriaMap) {
+    public NightWorkerFilter(Map<Long, Boolean> nightWorkerMap, Map<FilterType, Set<G>> filterCriteriaMap) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.nightWorkerMap = nightWorkerMap;
     }

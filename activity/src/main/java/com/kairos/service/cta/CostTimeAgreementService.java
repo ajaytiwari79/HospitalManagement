@@ -627,5 +627,9 @@ public class CostTimeAgreementService {
         return ruleTemplates;
     }
 
+    public List<CTAResponseDTO> getAllCTAByUnitId(long unitId){
+        return costTimeAgreementRepository.findCTAByUnitId(unitId);
+    }
+
 }
 

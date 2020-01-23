@@ -13,11 +13,11 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.ABSENCE_ACTIVITY;
 import static com.kairos.enums.FilterType.TEAM;
 
-public class ActivityFilter implements ShiftFilter {
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+public class ActivityFilter <G> implements ShiftFilter {
+    private Map<FilterType, Set<G>> filterCriteriaMap;
     private List<BigInteger> selectedActivityIds;
 
-    public ActivityFilter(Map<FilterType, Set<String>> filterCriteriaMap, List<BigInteger> selectedActivityIds) {
+    public ActivityFilter(Map<FilterType, Set<G>> filterCriteriaMap, List<BigInteger> selectedActivityIds) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.selectedActivityIds = selectedActivityIds;
     }
