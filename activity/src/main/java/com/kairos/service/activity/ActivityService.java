@@ -1,8 +1,10 @@
 package com.kairos.service.activity;
 
+import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityTranslation;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
@@ -997,6 +999,25 @@ public class ActivityService {
         activity.setLocationActivityTab(locationActivityTab);
         activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(locationActivityTab);
+    }
+
+    public Map<String,ActivityTranslation> updateTranslationData(BigInteger activityId, Map<String, ActivityTranslation> activityTranslationDTO){
+        LOGGER.debug("activity Id received is "+activityId);
+        Activity activity = activityMongoRepository.findActivityByIdAndEnabled(activityId);
+        if(activity!=null) {
+            final Map<String, ActivityTranslation> activityLanguageDetailsMap = activity.getTranslations();
+            LOGGER.debug("actitivity preset language details "+activityLanguageDetailsMap);
+            activityTranslationDTO.forEach((s, translation) -> {
+                LOGGER.debug("saving language details "+translation.toString());
+                activityLanguageDetailsMap.put(s, translation);
+            });
+            activity.setTranslations(activityLanguageDetailsMap);
+            activityMongoRepository.save(activity);
+            return activity.getTranslations();
+        }else {
+            throw new DataNotFoundException("Could not find activity by that id");
+        }
+
     }
 
     public ActivityWithTimeTypeDTO getActivitiesWithTimeTypes(long countryId) {

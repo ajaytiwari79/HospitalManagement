@@ -283,6 +283,7 @@ public class OrganizationActivityService extends MongoBaseService {
         generalActivityTabWithTagDTO.setContent(activity.getNotesActivityTab().getContent());
         generalActivityTabWithTagDTO.setOriginalDocumentName(activity.getNotesActivityTab().getOriginalDocumentName());
         generalActivityTabWithTagDTO.setModifiedDocumentName(activity.getNotesActivityTab().getModifiedDocumentName());
+        generalActivityTabWithTagDTO.setTranslations(activity.getTranslations());
         ActivityTabsWrapper activityTabsWrapper = new ActivityTabsWrapper(generalActivityTabWithTagDTO, activityId, activityCategories);
         activityTabsWrapper.setTimeTypes(timeTypeService.getAllTimeType(balanceSettingsActivityTab.getTimeTypeId(), presenceType.getCountryId()));
         activityTabsWrapper.setPresenceTypeWithTimeType(presenceType);

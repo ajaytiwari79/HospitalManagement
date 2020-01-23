@@ -1,6 +1,7 @@
 package com.kairos.controller.activity;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityTranslation;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.persistence.model.activity.tabs.OptaPlannerSettingActivityTab;
@@ -370,6 +371,13 @@ public class ActivityController {
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> updateLocationsTabOfActivity(@RequestBody LocationActivityTabDTO locationActivityTabDTO) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateLocationsTabOfActivity(locationActivityTabDTO));
+    }
+
+    @ApiOperation("Update language wise details of activity ")
+    @PutMapping(value = "/activity/{activityId}/language_settings")
+        //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    ResponseEntity<Map<String, Object>> updateTranslationsOfActivity(@PathVariable BigInteger activityId,@RequestBody Map<String, ActivityTranslation> translationMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, activityService.updateTranslationData(activityId,translationMap));
     }
 
 

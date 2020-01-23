@@ -1,12 +1,17 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
+import com.kairos.dto.activity.activity.ActivityTranslation;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.TimeTypeEnum;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This DTO is made just to customize the default view at frontend
@@ -15,6 +20,8 @@ import java.util.List;
  * List<BigInteger> tags  but required List<Tag> tags
  * @Note:- please update the comment list whenever any more changes done
  */
+@Getter
+@Setter
 public class GeneralActivityTabWithTagDTO {
 
     private String name;
@@ -41,196 +48,5 @@ public class GeneralActivityTabWithTagDTO {
     private String content;
     private String originalDocumentName;
     private String modifiedDocumentName;
-
-    public Integer getAddTimeTo() {
-        return addTimeTo;
-    }
-
-    public void setAddTimeTo(Integer addTimeTo) {
-        this.addTimeTo = addTimeTo;
-    }
-
-    public BigInteger getTimeTypeId() {
-        return timeTypeId;
-    }
-
-    public void setTimeTypeId(BigInteger timeTypeId) {
-        this.timeTypeId = timeTypeId;
-    }
-
-    public boolean isOnCallTimePresent() {
-        return onCallTimePresent;
-    }
-
-    public void setOnCallTimePresent(boolean onCallTimePresent) {
-        this.onCallTimePresent = onCallTimePresent;
-    }
-
-    public Boolean getNegativeDayBalancePresent() {
-        return negativeDayBalancePresent;
-    }
-
-    public void setNegativeDayBalancePresent(Boolean negativeDayBalancePresent) {
-        this.negativeDayBalancePresent = negativeDayBalancePresent;
-    }
-
-    public TimeTypeEnum getTimeType() {
-        return timeType;
-    }
-
-    public void setTimeType(TimeTypeEnum timeType) {
-        this.timeType = timeType;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getOriginalDocumentName() {
-        return originalDocumentName;
-    }
-
-    public void setOriginalDocumentName(String originalDocumentName) {
-        this.originalDocumentName = originalDocumentName;
-    }
-
-    public String getModifiedDocumentName() {
-        return modifiedDocumentName;
-    }
-
-    public void setModifiedDocumentName(String modifiedDocumentName) {
-        this.modifiedDocumentName = modifiedDocumentName;
-    }
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public BigInteger getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(BigInteger categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public Boolean getColorPresent() {
-        return colorPresent;
-    }
-
-    public void setColorPresent(Boolean colorPresent) {
-        this.colorPresent = colorPresent;
-    }
-
-    public String getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public void setBackgroundColor(String backgroundColor) {
-        this.backgroundColor = backgroundColor;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
-    public boolean isEligibleForUse() {
-        return eligibleForUse;
-    }
-
-    public void setEligibleForUse(boolean eligibleForUse) {
-        this.eligibleForUse = eligibleForUse;
-    }
-
-    public String getUltraShortName() {
-        return ultraShortName;
-    }
-
-    public void setUltraShortName(String ultraShortName) {
-        this.ultraShortName = ultraShortName;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getOriginalIconName() {
-        return originalIconName;
-    }
-
-    public void setOriginalIconName(String originalIconName) {
-        this.originalIconName = originalIconName;
-    }
-
-    public String getModifiedIconName() {
-        return modifiedIconName;
-    }
-
-    public void setModifiedIconName(String modifiedIconName) {
-        this.modifiedIconName = modifiedIconName;
-    }
-
-    public List<TagDTO> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<TagDTO> tags) {
-        this.tags = tags;
-    }
-
-    public String getPrintoutSymbol() {
-        return printoutSymbol;
-    }
-
-    public void setPrintoutSymbol(String printoutSymbol) {
-        this.printoutSymbol = printoutSymbol;
-    }
-
+    private Map<String,ActivityTranslation> translations;
 }
