@@ -19,11 +19,11 @@ import static com.kairos.enums.FilterType.TIME_SLOT;
 /**
  * Created By G.P.Ranjan on 3/7/19
  **/
-public class TimeSlotFilter implements ShiftFilter {
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+public class TimeSlotFilter <G> implements ShiftFilter {
+    private Map<FilterType, Set<G>> filterCriteriaMap;
     private List<TimeSlotDTO> timeSlotDTOS;
 
-    public TimeSlotFilter(Map<FilterType, Set<String>> filterCriteriaMap,List<TimeSlotDTO> timeSlotDTOS) {
+    public TimeSlotFilter(Map<FilterType, Set<G>> filterCriteriaMap,List<TimeSlotDTO> timeSlotDTOS) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.timeSlotDTOS = timeSlotDTOS;
     }

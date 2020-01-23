@@ -15,6 +15,7 @@ import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.night_worker.NightWorkerService;
+import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.counter.KPIUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,8 @@ public class ShiftFilterService {
     private NightWorkerService nightWorkerService;
     @Inject
     private ShiftValidatorService shiftValidatorService;
+    @Inject
+    private TimeBankService timeBankService;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
@@ -52,46 +55,58 @@ public class ShiftFilterService {
             staffFilterDTO = new StaffFilterDTO();
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
-
         List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
-        Map<FilterType, Set<String>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
+        Map<FilterType, Set<T>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         ShiftFilter timeTypeFilter = getTimeTypeFilter(filterTypeMap);
         ShiftFilter activityTimecalculationTypeFilter = new ActivityTimeCalculationTypeFilter(filterTypeMap);
         ShiftFilter activityStatusFilter = new ActivityStatusFilter(filterTypeMap);
         ShiftFilter timeSlotFilter = new TimeSlotFilter(filterTypeMap,timeSlotDTOS);
         ShiftFilter activityFilter = getActivityFilter(unitId, filterTypeMap);
         ShiftFilter plannedTimeTypeFilter=new PlannedTimeTypeFilter(filterTypeMap);
-        ShiftFilter TimeAndAttendanceFilter = getValidatedFilter(shiftWithActivityDTOS, shiftStateIds, filterTypeMap);
+        ShiftFilter timeAndAttendanceFilter = getValidatedFilter(shiftWithActivityDTOS, shiftStateIds, filterTypeMap);
         ShiftFilter functionsFilter = getFunctionFilter(unitId, filterTypeMap);
         ShiftFilter realTimeStatusFilter = getSickTimeTypeFilter(unitId, filterTypeMap);
         ShiftFilter plannedByFilter = getPlannedByFilter(unitId,filterTypeMap);
         ShiftFilter phaseFilter = new PhaseFilter(filterTypeMap);
         ShiftFilter groupFilter = getGroupFilter(unitId, filterTypeMap);
         ShiftFilter escalationFilter = getEscalationFilter(shiftWithActivityDTOS.stream().map(shift->shift.getId()).collect(Collectors.toList()), filterTypeMap);
-        ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(TimeAndAttendanceFilter)
-                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter);
+        Set<Long> employmentIds = shiftWithActivityDTOS.stream().map(s->s.getEmploymentId()).collect(Collectors.toSet());
+        ShiftFilter timeBankBalanceFilter = getTimeBankBalanceFilter(unitId, filterTypeMap, employmentIds);
+        ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(timeAndAttendanceFilter)
+                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter)
+                                    .and(timeBankBalanceFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
         /*List<Long> staffIds = shiftWithActivityDTOS.stream().map(s->s.getStaffId()).collect(Collectors.toList());
         ShiftFilter nightWorkerFilter = getNightWorkerFilter(staffIds, filterTypeMap);
         return nightWorkerFilter.meetCriteria(shiftWithActivityDTOS);*/
     }
 
-    private ShiftFilter getEscalationFilter(List<BigInteger> shiftIds, Map<FilterType, Set<String>> filterTypeMap){
+    private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
+        //Update loop in a single call
+        Map<Long,Long> employmentIdAndActualTimeBankData = new HashMap<>();
+        for (Long employmentId : employmentIds) {
+            Long timeBank = timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true);
+            employmentIdAndActualTimeBankData.put(employmentId, timeBank);
+        }
+        return new TimeBankBalanceFilter(filterTypeMap, employmentIdAndActualTimeBankData);
+    }
+
+    private <G> ShiftFilter getEscalationFilter(List<BigInteger> shiftIds, Map<FilterType, Set<G>> filterTypeMap){
         List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shiftIds,false);
         Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
         return new EscalationFilter(shiftViolatedRulesMap, filterTypeMap);
     }
 
-    private ShiftFilter getGroupFilter(Long unitId, Map<FilterType, Set<String>> filterTypeMap) {
+    private <G> ShiftFilter getGroupFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap) {
         Set<Long> groupMembers = new HashSet<>();
         if(filterTypeMap.containsKey(GROUPS) && isCollectionNotEmpty(filterTypeMap.get(GROUPS))) {
-            List<Long> groupIds = filterTypeMap.get(GROUPS).stream().map(s -> new Long(s)).collect(Collectors.toList());
+            List<Long> groupIds = filterTypeMap.get(GROUPS).stream().map(s -> new Long(s.toString())).collect(Collectors.toList());
             groupMembers = userIntegrationService.getAllStaffIdsByGroupIds(unitId, groupIds);
         }
         return new GroupFilter(groupMembers,filterTypeMap);
     }
 
-    private ShiftFilter getSickTimeTypeFilter(Long unitId, Map<FilterType, Set<String>> filterTypeMap) {
+    private <G> ShiftFilter getSickTimeTypeFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap) {
         Set<BigInteger> sickTimeTypes = new HashSet<>();
         if(filterTypeMap.containsKey(REAL_TIME_STATUS) && isCollectionNotEmpty(filterTypeMap.get(REAL_TIME_STATUS))) {
             sickTimeTypes = userIntegrationService.getSickSettingsOfUnit(unitId);
@@ -99,28 +114,28 @@ public class ShiftFilterService {
         return new RealTimeStatusFilter(filterTypeMap, sickTimeTypes);
     }
 
-    private ShiftFilter getFunctionFilter(Long unitId, Map<FilterType, Set<String>> filterTypeMap) {
+    private <G> ShiftFilter getFunctionFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap) {
         Set<LocalDate> functionDates = new HashSet<>();
         if(filterTypeMap.containsKey(FilterType.FUNCTIONS) && isCollectionNotEmpty(filterTypeMap.get(FUNCTIONS))) {
-            List<Long> functionIds = filterTypeMap.get(FUNCTIONS).stream().map(s -> new Long(s)).collect(Collectors.toList());
+            List<Long> functionIds = filterTypeMap.get(FUNCTIONS).stream().map(s -> new Long(s.toString())).collect(Collectors.toList());
             functionDates = userIntegrationService.getAllDateByFunctionIds(unitId, functionIds);
         }
         return new FunctionsFilter(filterTypeMap, functionDates);
     }
 
-    private <T extends ShiftDTO> ShiftFilter getValidatedFilter(List<T> shiftWithActivityDTOS, List<BigInteger> shiftStateIds, Map<FilterType, Set<String>> filterTypeMap) {
+    private <T extends ShiftDTO, G> ShiftFilter getValidatedFilter(List<T> shiftWithActivityDTOS, List<BigInteger> shiftStateIds, Map<FilterType, Set<G>> filterTypeMap) {
         if(filterTypeMap.containsKey(FilterType.VALIDATED_BY) && isCollectionNotEmpty(filterTypeMap.get(VALIDATED_BY))) {
             Set<BigInteger> shiftIds = shiftWithActivityDTOS.stream().map(shiftDTO -> shiftDTO.getId()).collect(Collectors.toSet());
-            List<ShiftState> shiftStates = shiftStateService.findAllByShiftIdsByAccessgroupRole(shiftIds, filterTypeMap.get(FilterType.VALIDATED_BY));
+            List<ShiftState> shiftStates = shiftStateService.findAllByShiftIdsByAccessgroupRole(shiftIds, filterTypeMap.get(FilterType.VALIDATED_BY).stream().map(v->v.toString()).collect(Collectors.toSet()));
             shiftStateIds=shiftStates.stream().map(shiftState -> shiftState.getShiftId()).collect(Collectors.toList());
         }
         return new TimeAndAttendanceFilter(filterTypeMap,shiftStateIds);
     }
 
-    private ShiftFilter getActivityFilter(Long unitId, Map<FilterType, Set<String>> filterTypeMap) {
+    private <G> ShiftFilter getActivityFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap) {
         List<BigInteger> selectedActivityIds = new ArrayList<>();
         if(filterTypeMap.containsKey(ABSENCE_ACTIVITY) && isCollectionNotEmpty(filterTypeMap.get(ABSENCE_ACTIVITY))) {
-            selectedActivityIds.addAll(filterTypeMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s)).collect(Collectors.toList()));
+            selectedActivityIds.addAll(filterTypeMap.get(ABSENCE_ACTIVITY).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toList()));
         }
         if(filterTypeMap.containsKey(TEAM) && isCollectionNotEmpty(filterTypeMap.get(TEAM))){
             Set<String> teamIds = KPIUtils.getStringByList(filterTypeMap.get(TEAM));
@@ -130,7 +145,7 @@ public class ShiftFilterService {
         return new ActivityFilter(filterTypeMap, selectedActivityIds);
     }
 
-    private ShiftFilter getTimeTypeFilter(Map<FilterType, Set<String>> filterTypeMap) {
+    private <G> ShiftFilter getTimeTypeFilter(Map<FilterType, Set<G>> filterTypeMap) {
         Set<BigInteger> timeTypeIds = new HashSet<>();
         if(filterTypeMap.containsKey(TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(TIME_TYPE))) {
             Set<BigInteger> ids = new HashSet<>(getBigInteger(filterTypeMap.get(TIME_TYPE)));
@@ -148,11 +163,11 @@ public class ShiftFilterService {
         return ids;
     }
 
-    private ShiftFilter getPlannedByFilter(Long unitId,Map<FilterType, Set<String>> filterTypeMap) {
+    private <G> ShiftFilter getPlannedByFilter(Long unitId,Map<FilterType, Set<G>> filterTypeMap) {
         Set<Long> staffUserIds = new HashSet<>();
         if(filterTypeMap.containsKey(PLANNED_BY) && isCollectionNotEmpty(filterTypeMap.get(PLANNED_BY))){
             List<StaffPersonalDetail> staffDTOS = userIntegrationService.getStaffByUnitId(unitId);
-            Set<AccessGroupRole> accessGroups = filterTypeMap.get(PLANNED_BY).stream().map(s -> AccessGroupRole.valueOf(s)).collect(Collectors.toSet());
+            Set<AccessGroupRole> accessGroups = filterTypeMap.get(PLANNED_BY).stream().map(s -> AccessGroupRole.valueOf(s.toString())).collect(Collectors.toSet());
             for (StaffPersonalDetail staffDTO : staffDTOS) {
                 if(isNotNull(staffDTO.getRoles()) && CollectionUtils.containsAny(staffDTO.getRoles(),accessGroups)){
                     staffUserIds.add(staffDTO.getStaffUserId());
@@ -162,7 +177,7 @@ public class ShiftFilterService {
         return new PlannedByFilter(staffUserIds,filterTypeMap);
     }
 
-    private ShiftFilter getNightWorkerFilter(List<Long> staffIds, Map<FilterType, Set<String>> filterTypeMap){
+    private <G> ShiftFilter getNightWorkerFilter(List<Long> staffIds, Map<FilterType, Set<G>> filterTypeMap){
         Map<Long, Boolean> nightWorkerMap = nightWorkerService.getStaffIdAndNightWorkerMap(staffIds);
         return new NightWorkerFilter(nightWorkerMap, filterTypeMap);
     }
