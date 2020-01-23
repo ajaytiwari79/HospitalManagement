@@ -15,8 +15,7 @@ public enum FilterType {
     ABSENCE_ACTIVITY("Absence Activity"),FUNCTIONS("Functions"),VALIDATED_BY("Validated By"),CALCULATION_TYPE("Calculation type"),CALCULATION_BASED_ON("Calculation Based On"),CALCULATION_UNIT("Calculation Unit"),PLANNED_BY("Planned By"),REASON_CODE("Reason Code"),
     AGE("Age"),ORGANIZATION_EXPERIENCE("Organisation Experience"),ESCALATION_CAUSED_BY("Escalation Caused By"),EMPLOYMENT_SUB_TYPE("Employment Sub Type"),
     MAIN_TEAM("Main Team"),SKILL_LEVEL("Skill Level"),ACCESS_GROUPS("Access Groups"),BIRTHDAY("Birthday"),SENIORITY("Seniority"),PAY_GRADE_LEVEL("Pay Grade Level"),
-    TIME_BANK_BALANCE("Time Bank balance"),EMPLOYED_SINCE("Employed Since"),
-    WTA_RULES("WTA Rules"),CTA_RULES("CTA Rules");
+    TIME_BANK_BALANCE("Time Bank balance"),EMPLOYED_SINCE("Employed Since"),TEAM_TYPE("Team Type");
 
 
     public String value;

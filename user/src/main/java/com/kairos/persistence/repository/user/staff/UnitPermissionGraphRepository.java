@@ -71,9 +71,9 @@ public interface UnitPermissionGraphRepository extends Neo4jBaseRepository<UnitP
     void createPermission(Long accessGroupId,Long unitPermissionId);
 
     @Query("MATCH (staff:Staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+APPLICABLE_IN_UNIT+"]->(unit)\n" +
-            "MATCH (unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WHERE id(unit)={0} AND id(staff)={1} AND id(accessGroup)<>{2} AND accessGroup.role='MANAGEMENT'  " +
+            "MATCH (unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroup:AccessGroup) WHERE id(unit)={0} AND id(staff)={1}  AND accessGroup.role='MANAGEMENT'  " +
             "RETURN COUNT(accessGroup)=0 ")
-    boolean isOnlyStaff(Long unitId,Long staffId,Long accessGroupId);
+    boolean isOnlyStaff(Long unitId,Long staffId);
 
 
 

@@ -149,9 +149,6 @@ public class StaffFilterService {
             }
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
-        if (!Optional.ofNullable(countryId).isPresent()) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTEXIST);
-        }
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
         StaffFilterDataDTO staffFilterDataDTO = activityIntegrationService.getStaffFilterDataByUnitId(unitId);
         return new FiltersAndFavouriteFiltersDTO(
@@ -432,12 +429,7 @@ public class StaffFilterService {
         List<Map> staffListMap=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
                 getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null);
-        if(loggedInStaffId!=null && staffListMap.stream().noneMatch(k->k.containsKey(loggedInStaffId)) && ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)){
-            List<Map> loggedInStaffDetails=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
-                    new HashMap<>(), null,
-                    envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId);
-            staffListMap.addAll(loggedInStaffDetails);
-        }
+
         staffListMap = filterStaffList(staffListMap, getMapOfFiltersToBeAppliedWithValue( staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()));
         staffEmploymentTypeWrapper.setStaffList(staffListMap);
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
@@ -463,6 +455,12 @@ public class StaffFilterService {
                     }
                 }
             }
+        }
+        if(loggedInStaffId!=null && staffList.stream().noneMatch(k->k.containsKey(loggedInStaffId)) && ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)){
+            List<Map> loggedInStaffDetails=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
+                    new HashMap<>(), null,
+                    envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),loggedInStaffId);
+            staffList.addAll(loggedInStaffDetails);
         }
         staffEmploymentTypeWrapper.setStaffList(staffList);
         return staffEmploymentTypeWrapper;

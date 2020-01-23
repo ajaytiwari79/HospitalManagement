@@ -736,7 +736,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
                     break;
                 case PROTECTED_DAYS_OFF:
                     ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
-                    activityIds.addAll(newHashSet(protectedDaysOffWTATemplate.getActivityId()));
+                    CollectionUtils.addIgnoreNull(activityIds,protectedDaysOffWTATemplate.getActivityId());
                     break;
                 default:
                     break;
