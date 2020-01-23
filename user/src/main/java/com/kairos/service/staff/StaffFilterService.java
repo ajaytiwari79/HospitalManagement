@@ -434,7 +434,7 @@ public class StaffFilterService {
         staffEmploymentTypeWrapper.setStaffList(staffListMap);
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
         List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId , moduleId , showAllStaffs);
-        staffs = staffs.stream().filter(distinctByKey(a -> a.get("id"))).collect(Collectors.toList());
+        staffs = staffs.stream().filter(distinctByKey(a -> a.get(ID))).collect(Collectors.toList());
         staffEmploymentTypeWrapper.setStaffList(staffs);
         Map<Long,List<Long>> mapOfStaffAndEmploymentIds = getMapOfStaffAndEmploymentIds(staffs);
         staffFilterDTO.setMapOfStaffAndEmploymentIds(mapOfStaffAndEmploymentIds);
@@ -442,15 +442,15 @@ public class StaffFilterService {
         staffFilterDTO = activityIntegrationService.getNightWorkerDetails(staffFilterDTO, unitId, startDate, endDate);
         List<Map> staffList = new ArrayList<>();
         for (Map staffAndModifiable : staffs) {
-            if(staffFilterDTO.getNightWorkerDetails().containsKey(staffAndModifiable.get("id"))) {
+            if(staffFilterDTO.getNightWorkerDetails().containsKey(staffAndModifiable.get(ID))) {
                 Map<String, Object> staff = ObjectMapperUtils.copyPropertiesByMapper(staffAndModifiable, HashedMap.class);
-                staff.put("nightWorker", staffFilterDTO.getNightWorkerDetails().get(((Integer) ((Map) staff).get("id")).longValue()));
+                staff.put(NIGHT_WORKER, staffFilterDTO.getNightWorkerDetails().get(((Integer) ((Map) staff).get(ID)).longValue()));
                 staffList.add(staff);
                 if(staffFilterDTO.isIncludeWorkTimeAgreement()){
-                    for (Map employment : ((Collection<Map>) staff.get("employments"))) {
-                        if (isNotNull(employment.get("id"))) {
-                            Long employmentId = ((Integer) employment.get("id")).longValue();
-                            employment.put("workTimeAgreements", staffFilterDTO.getEmploymentIdAndWtaResponseMap().getOrDefault(employmentId, newArrayList()));
+                    for (Map employment : ((Collection<Map>) staff.get(EMPLOYMENTS))) {
+                        if (isNotNull(employment.get(ID))) {
+                            Long employmentId = ((Integer) employment.get(ID)).longValue();
+                            employment.put(WORK_TIME_AGREEMENTS, staffFilterDTO.getEmploymentIdAndWtaResponseMap().getOrDefault(employmentId, newArrayList()));
                         }
                     }
                 }
@@ -467,42 +467,45 @@ public class StaffFilterService {
     }
 
     private <T> List<Map> filterStaffList(List<Map> staffListMap, Map<FilterType, Set<T>> filterData) {
-        if (Optional.ofNullable(filterData.get(FilterType.AGE)).isPresent()) {
-            Map ageRangeMap = (Map) filterData.get(FilterType.AGE).iterator().next();
-            final AgeRangeDTO ageRange = new AgeRangeDTO(Integer.parseInt(ageRangeMap.get("from").toString()), isNotNull(ageRangeMap.get("to")) ? Integer.parseInt(ageRangeMap.get("to").toString()) : null, DurationType.valueOf(ageRangeMap.get("durationType").toString()));
-            staffListMap = staffListMap.stream().filter(map -> isNotNull(map.get("dateOfBirth")) && validate(asLocalDate(map.get("dateOfBirth").toString()), getCurrentLocalDate(), ageRange)).collect(Collectors.toList());
+        for (Map.Entry<FilterType, Set<T>> filterTypeSetEntry : filterData.entrySet()) {
+            if(isNotNull(filterTypeSetEntry.getKey())) {
+                staffListMap = getFilteredStaffs(staffListMap, filterTypeSetEntry.getKey(), filterData);
+            }
         }
-        if (Optional.ofNullable(filterData.get(FilterType.ORGANIZATION_EXPERIENCE)).isPresent()) {
-            Map joiningRangeMap = (Map) filterData.get(FilterType.ORGANIZATION_EXPERIENCE).iterator().next();
-            final AgeRangeDTO joiningRange = new AgeRangeDTO(Integer.parseInt(joiningRangeMap.get("from").toString()), isNotNull(joiningRangeMap.get("to")) ? Integer.parseInt(joiningRangeMap.get("to").toString()) : null, DurationType.valueOf(joiningRangeMap.get("durationType").toString()));
-            staffListMap = staffListMap.stream().filter(map -> isNotNull(map.get("joiningDate")) && validate(asLocalDate(map.get("joiningDate").toString()), getCurrentLocalDate(), joiningRange)).collect(Collectors.toList());
-        }
-        if(Optional.ofNullable(filterData.get(FilterType.BIRTHDAY)).isPresent()){
-            Map birthdayMap = (Map) filterData.get(FilterType.BIRTHDAY).iterator().next();
-            final AgeRangeDTO birthdayRange = new AgeRangeDTO(Integer.parseInt(birthdayMap.get("from").toString()), Integer.parseInt(birthdayMap.get("to").toString()), DurationType.valueOf(birthdayMap.get("durationType").toString()));
-            staffListMap = staffListMap.stream().filter(map -> isNotNull(map.get("dateOfBirth")) && validate(getCurrentLocalDate(), asLocalDate(getCurrentLocalDate().toString().substring(0,4) + map.get("dateOfBirth").toString().substring(4)), birthdayRange)).collect(Collectors.toList());
-        }
-        if (Optional.ofNullable(filterData.get(FilterType.SENIORITY)).isPresent()) {
-            Map expertiseRangeMap = (Map) filterData.get(FilterType.SENIORITY).iterator().next();
-            final AgeRangeDTO expertiseRange = new AgeRangeDTO(Integer.parseInt(expertiseRangeMap.get("from").toString()), isNotNull(expertiseRangeMap.get("to")) ? Integer.parseInt(expertiseRangeMap.get("to").toString()) : null, DurationType.valueOf(expertiseRangeMap.get("durationType").toString()));
-            staffListMap = staffListMap.stream().filter(map -> validateSeniority((List<Map>) map.get("expertiseList"), expertiseRange)).collect(Collectors.toList());
-        }
-        if (Optional.ofNullable(filterData.get(FilterType.EMPLOYED_SINCE)).isPresent()) {
-            Map employmentMap = (Map) filterData.get(FilterType.EMPLOYED_SINCE).iterator().next();
-            final AgeRangeDTO employmentRange = new AgeRangeDTO(Integer.parseInt(employmentMap.get("from").toString()), isNotNull(employmentMap.get("to")) ? Integer.parseInt(employmentMap.get("to").toString()) : null, DurationType.valueOf(employmentMap.get("durationType").toString()));
-            staffListMap = staffListMap.stream().filter(map -> validateEmployment((List<Map>) map.get("employments"), employmentRange)).collect(Collectors.toList());
-        }
-        if (Optional.ofNullable(filterData.get(FilterType.PAY_GRADE_LEVEL)).isPresent()) {
-            Map payGradeMap = (Map) filterData.get(FilterType.PAY_GRADE_LEVEL).iterator().next();
-            final AgeRangeDTO payGradeRange = new AgeRangeDTO(Integer.parseInt(payGradeMap.get("from").toString()), isNotNull(payGradeMap.get("to")) ? Integer.parseInt(payGradeMap.get("to").toString()) : null, DurationType.DAYS);
-            staffListMap = staffListMap.stream().filter(map -> validatePayGrade((List<Map>) map.get("employments"), payGradeRange)).collect(Collectors.toList());
+        return staffListMap;
+    }
+
+    private <T> List<Map> getFilteredStaffs(List<Map> staffListMap, FilterType filterType, Map<FilterType, Set<T>> filterData){
+        Map ageRangeMap = (Map) filterData.get(filterType).iterator().next();
+        final AgeRangeDTO ageRange = new AgeRangeDTO(Integer.parseInt(ageRangeMap.get(FROM.toLowerCase()).toString()), isNotNull(ageRangeMap.get(TO.toLowerCase())) ? Integer.parseInt(ageRangeMap.get(TO.toLowerCase()).toString()) : null, isNull(ageRangeMap.get(DURATION_TYPE)) ? DurationType.DAYS : DurationType.valueOf(ageRangeMap.get(DURATION_TYPE).toString()));
+        switch (filterType){
+            case AGE:
+                staffListMap =  staffListMap.stream().filter(map -> isNotNull(map.get(DATE_OF_BIRTH)) && validate(asLocalDate(map.get(DATE_OF_BIRTH).toString()), getCurrentLocalDate(), ageRange)).collect(Collectors.toList());
+                break;
+            case ORGANIZATION_EXPERIENCE:
+                staffListMap =   staffListMap.stream().filter(map -> isNotNull(map.get(JOINING_BIRTH)) && validate(asLocalDate(map.get(JOINING_BIRTH).toString()), getCurrentLocalDate(), ageRange)).collect(Collectors.toList());
+                break;
+            case BIRTHDAY:
+                staffListMap =   staffListMap.stream().filter(map -> isNotNull(map.get(DATE_OF_BIRTH)) && validate(getCurrentLocalDate(), asLocalDate(getCurrentLocalDate().toString().substring(0,4) + map.get(DATE_OF_BIRTH).toString().substring(4)), ageRange)).collect(Collectors.toList());
+                break;
+            case SENIORITY:
+                staffListMap =   staffListMap.stream().filter(map -> validateSeniority((List<Map>) map.get(EXPERTISE_LIST), ageRange)).collect(Collectors.toList());
+                break;
+            case EMPLOYED_SINCE:
+                staffListMap =   staffListMap.stream().filter(map -> validateEmployment((List<Map>) map.get(EMPLOYMENTS), ageRange)).collect(Collectors.toList());
+                break;
+            case PAY_GRADE_LEVEL:
+                staffListMap =   staffListMap.stream().filter(map -> validatePayGrade((List<Map>) map.get(EMPLOYMENTS), ageRange)).collect(Collectors.toList());
+                break;
+            default:
+                break;
         }
         return staffListMap;
     }
 
     private boolean validateEmployment(List<Map> employments, AgeRangeDTO employmentRange) {
         for (Map employment : employments) {
-            if(validate(asLocalDate(employment.get("startDate").toString()), getCurrentLocalDate(), employmentRange)){
+            if(validate(asLocalDate(employment.get(START_DATE).toString()), getCurrentLocalDate(), employmentRange)){
                 return true;
             }
         }
@@ -513,9 +516,9 @@ public class StaffFilterService {
         long from = getDataInDays(payGradeRange.getFrom(), payGradeRange.getDurationType());
         long to = isNotNull(payGradeRange.getTo()) ? getDataInDays(payGradeRange.getTo(), payGradeRange.getDurationType()) : MAX_LONG_VALUE;
         for (Map employment : employments) {
-            for (Map employmentLines : (List<Map>) employment.get("employmentLines")) {
-                for (Map payGrades : (List<Map>) employmentLines.get("payGrades")) {
-                    long payGradeLevel = Long.valueOf(payGrades.get("payGradeLevel").toString());
+            for (Map employmentLines : (List<Map>) employment.get(EMPLOYMENT_LINES)) {
+                for (Map payGrades : (List<Map>) employmentLines.get(PAY_GRADES)) {
+                    long payGradeLevel = Long.valueOf(payGrades.get(PAY_GRADE_LEVEL).toString());
                     if(from <= payGradeLevel && to >= payGradeLevel){
                         return true;
                     }
@@ -527,8 +530,11 @@ public class StaffFilterService {
 
     private boolean validateSeniority(List<Map> expertiseList, AgeRangeDTO expertiseRange) {
         for (Map map : expertiseList) {
-            if(validate(asLocalDate(map.get("expertiseStartDate").toString()), getCurrentLocalDate(), expertiseRange)){
-                return true;
+            if(map.containsKey(EXPERTISE_START_DATE_IN_MILLIS) && isNotNull(map.get(EXPERTISE_START_DATE_IN_MILLIS))) {
+                Date expertiseStartDate = new Date(Long.getLong(map.get(EXPERTISE_START_DATE_IN_MILLIS).toString()));
+                if (validate(asLocalDate(expertiseStartDate), getCurrentLocalDate(), expertiseRange)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -555,7 +561,7 @@ public class StaffFilterService {
     private Map<Long,List<Long>> getMapOfStaffAndEmploymentIds(List<Map> staffs){
         Map<Long,List<Long>> mapOfStaffAndEmploymentIds = new HashMap<>();
         for (Map staff : staffs) {
-                mapOfStaffAndEmploymentIds.put((Long) staff.get("id"),((Collection<Map>)staff.get("employments")).stream().map(employment -> (Long)employment.get("id")).collect(Collectors.toList()));
+                mapOfStaffAndEmploymentIds.put((Long) staff.get(ID),((Collection<Map>)staff.get(EMPLOYMENTS)).stream().map(employment -> (Long)employment.get(ID)).collect(Collectors.toList()));
         }
         return mapOfStaffAndEmploymentIds;
     }
@@ -573,7 +579,7 @@ public class StaffFilterService {
             if (accessGroupQueryResult != null) {
                 STAFF_CURRENT_ROLE = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
               if ((!showAllStaffs || !ModuleId.SELF_ROSTERING_MODULE_ID.value.equals(moduleId)) && AccessGroupRole.STAFF.name().equals(STAFF_CURRENT_ROLE)) {
-                    Map staff = staffList.stream().filter(s -> s.get("id").equals(accessGroupQueryResult.getStaffId())).findFirst().orElse(new HashMap());
+                    Map staff = staffList.stream().filter(s -> s.get(ID).equals(accessGroupQueryResult.getStaffId())).findFirst().orElse(new HashMap());
                     if (isNotEmpty(staff)) {
                         staffListByRole.add(staff);
                     }
