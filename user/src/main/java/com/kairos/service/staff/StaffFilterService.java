@@ -69,6 +69,8 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.constants.UserMessagesConstants.*;
+import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.FilterType.PAY_GRADE_LEVEL;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 /**
@@ -415,7 +417,7 @@ public class StaffFilterService {
         return mapOfFilters;
     }
 
-    public StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId,LocalDate startDate,LocalDate endDate , boolean showAllStaffs) {
+    public <T> StaffEmploymentTypeWrapper getAllStaffByUnitId(Long unitId, StaffFilterDTO staffFilterDTO, String moduleId,LocalDate startDate,LocalDate endDate , boolean showAllStaffs) {
         boolean unit=unitGraphRepository.existsById(unitId);
         Organization organization=organizationService.fetchParentOrganization(unitId);
         if (!Optional.ofNullable(staffFilterDTO.getModuleId()).isPresent() &&
@@ -426,11 +428,12 @@ public class StaffFilterService {
         StaffEmploymentTypeWrapper staffEmploymentTypeWrapper = new StaffEmploymentTypeWrapper();
         staffEmploymentTypeWrapper.setEmploymentTypes(employmentTypeGraphRepository.getAllEmploymentTypeByOrganization(organization.getId(), false));
         List<Long> allOrgIds=unit?Arrays.asList(organization.getId()):organizationGraphRepository.findAllOrganizationIdsInHierarchy(organization.getId());
+        Map<FilterType, Set<T>> filterTypeSetMap = getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData());
         List<Map> staffListMap=staffGraphRepository.getStaffWithFilters(unitId, allOrgIds, moduleId,
-                getMapOfFiltersToBeAppliedWithValue(staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()), staffFilterDTO.getSearchText(),
+                filterTypeSetMap, staffFilterDTO.getSearchText(),
                 envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null);
 
-        staffListMap = filterStaffList(staffListMap, getMapOfFiltersToBeAppliedWithValue( staffFilterDTO.getModuleId(), staffFilterDTO.getFiltersData()));
+        staffListMap = filterStaffList(staffListMap, filterTypeSetMap);
         staffEmploymentTypeWrapper.setStaffList(staffListMap);
         staffEmploymentTypeWrapper.setLoggedInStaffId(loggedInStaffId);
         List<Map> staffs = filterStaffByRoles(staffEmploymentTypeWrapper.getStaffList(), unitId , moduleId , showAllStaffs);
@@ -467,8 +470,9 @@ public class StaffFilterService {
     }
 
     private <T> List<Map> filterStaffList(List<Map> staffListMap, Map<FilterType, Set<T>> filterData) {
+        Set<FilterType> appliedFilters = newHashSet(AGE, ORGANIZATION_EXPERIENCE, BIRTHDAY, SENIORITY, EMPLOYED_SINCE, PAY_GRADE_LEVEL);
         for (Map.Entry<FilterType, Set<T>> filterTypeSetEntry : filterData.entrySet()) {
-            if(isNotNull(filterTypeSetEntry.getKey())) {
+            if(isNotNull(filterTypeSetEntry.getKey()) && appliedFilters.contains(filterTypeSetEntry.getKey())) {
                 staffListMap = getFilteredStaffs(staffListMap, filterTypeSetEntry.getKey(), filterData);
             }
         }

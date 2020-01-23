@@ -70,15 +70,12 @@ public class ShiftFilterService {
         ShiftFilter phaseFilter = new PhaseFilter(filterTypeMap);
         ShiftFilter groupFilter = getGroupFilter(unitId, filterTypeMap);
         ShiftFilter escalationFilter = getEscalationFilter(shiftWithActivityDTOS.stream().map(shift->shift.getId()).collect(Collectors.toList()), filterTypeMap);
-        ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(timeAndAttendanceFilter)
-                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter);
-        shiftWithActivityDTOS = shiftFilter.meetCriteria(shiftWithActivityDTOS);
-        List<Long> staffIds = shiftWithActivityDTOS.stream().map(s->s.getStaffId()).collect(Collectors.toList());
-        ShiftFilter nightWorkerFilter = getNightWorkerFilter(staffIds, filterTypeMap);
-        shiftWithActivityDTOS = nightWorkerFilter.meetCriteria(shiftWithActivityDTOS);
         Set<Long> employmentIds = shiftWithActivityDTOS.stream().map(s->s.getEmploymentId()).collect(Collectors.toSet());
         ShiftFilter timeBankBalanceFilter = getTimeBankBalanceFilter(unitId, filterTypeMap, employmentIds);
-        return timeBankBalanceFilter.meetCriteria(shiftWithActivityDTOS);
+        ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(timeAndAttendanceFilter)
+                                    .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter)
+                                    .and(timeBankBalanceFilter);
+        return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
 
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
@@ -175,11 +172,6 @@ public class ShiftFilterService {
             }
         }
         return new PlannedByFilter(staffUserIds,filterTypeMap);
-    }
-
-    private <G> ShiftFilter getNightWorkerFilter(List<Long> staffIds, Map<FilterType, Set<G>> filterTypeMap){
-        Map<Long, Boolean> nightWorkerMap = nightWorkerService.getStaffIdAndNightWorkerMap(staffIds);
-        return new NightWorkerFilter(nightWorkerMap, filterTypeMap);
     }
 
 }
