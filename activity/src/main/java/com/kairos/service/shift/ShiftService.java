@@ -275,7 +275,7 @@ public class ShiftService extends MongoBaseService {
             Shift draftShift = ObjectMapperUtils.copyPropertiesByMapper(shift, Shift.class);
             draftShift.setShiftType(updateShiftType(activityWrapperMap, draftShift));
             draftShift.setDraft(true);
-            shift.setDraftShift(draftShift);
+            shift.setDraftShift(draftShift.getDraftShift());
             shift.setDraft(true);
         }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
