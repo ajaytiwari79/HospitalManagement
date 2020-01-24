@@ -68,6 +68,7 @@ import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
+import com.kairos.utils.CPRUtil;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
@@ -82,6 +83,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.time.Period;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -320,6 +322,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case ESCALATED_SHIFTS:
             case ESCALATION_RESOLVED_SHIFTS:
                 return getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+            case STAFF_AGE:
+                return getStaffAgeData(staffId, kpiCalculationRelatedInfo);
             case PRESENCE_OVER_STAFFING:
             case PRESENCE_UNDER_STAFFING:
             case ABSENCE_OVER_STAFFING:
@@ -330,6 +334,17 @@ public class KPIBuilderCalculationService implements CounterService {
                 break;
         }
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
+    }
+
+    private double getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
+        LocalDate dateOfBirth = CPRUtil.getDateOfBirthFromCPR(staff.getCprNumber());
+        int age = 0;
+        if(isNotNull(dateOfBirth)) {
+            Period diff = Period.between(dateOfBirth, asLocalDate(kpiCalculationRelatedInfo.startDate));
+            age = diff.getYears();
+        }
+        return age;
     }
 
 
