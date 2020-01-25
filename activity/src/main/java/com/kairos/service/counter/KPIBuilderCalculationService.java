@@ -204,9 +204,10 @@ public class KPIBuilderCalculationService implements CounterService {
 
     public Integer getNumberOfWorkingDays(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
         List<ExpertiseLineDTO> expertiseLineDTOS = employmentWithCtaDetailsDTO.getExpertiseQueryResult().getExpertiseLines();
+        EmploymentLinesDTO employmentLinesDTO =getSortedEmploymentLine(employmentWithCtaDetailsDTO);
         Collections.sort(expertiseLineDTOS);
         Collections.reverse(expertiseLineDTOS);
-        return expertiseLineDTOS.get(0).getNumberOfWorkingDaysInWeek();
+        return employmentLinesDTO.getTotalWeeklyHours()/expertiseLineDTOS.get(0).getNumberOfWorkingDaysInWeek();
     }
 
     public EmploymentLinesDTO getSortedEmploymentLine(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
