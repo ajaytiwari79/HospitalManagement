@@ -112,8 +112,10 @@ public class UserIntegrationService {
     }
 
     public StaffEmploymentUnitDataWrapper getStaffsEmployment(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, EMPLOYMENTS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentUnitDataWrapper>>() {
+        StaffEmploymentUnitDataWrapper staffEmploymentUnitDataWrapper= genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, EMPLOYMENTS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentUnitDataWrapper>>() {
         }, expertiseId);
+        UserContext.getUserDetails().setUnitWiseAccessRole(staffEmploymentUnitDataWrapper.getUnitWiseAccessRole());
+        return staffEmploymentUnitDataWrapper;
     }
 
     public List<String> getEmailsOfStaffByStaffIds(Long unitId, List<Long> staffIds) {

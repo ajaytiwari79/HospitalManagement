@@ -1076,5 +1076,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
         return wtaRepository.getAllWTAByEmploymentIds(employmentIds);
     }
 
-
+    public List<WTAResponseDTO> getAllWTAByUnitId(long unitId){
+        return wtaRepository.findWTAByUnitId(unitId);
+    }
 }

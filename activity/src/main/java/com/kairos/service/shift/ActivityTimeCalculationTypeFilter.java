@@ -14,11 +14,11 @@ import static com.kairos.enums.FilterType.ACTIVITY_TIMECALCULATION_TYPE;
  * Created at 30/6/19
  **/
 
-public class ActivityTimeCalculationTypeFilter implements ShiftFilter {
+public class ActivityTimeCalculationTypeFilter <G> implements ShiftFilter {
 
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+    private Map<FilterType, Set<G>> filterCriteriaMap;
 
-    public ActivityTimeCalculationTypeFilter(Map<FilterType, Set<String>> filterCriteriaMap) {
+    public ActivityTimeCalculationTypeFilter(Map<FilterType, Set<G>> filterCriteriaMap) {
         this.filterCriteriaMap = filterCriteriaMap;
     }
 

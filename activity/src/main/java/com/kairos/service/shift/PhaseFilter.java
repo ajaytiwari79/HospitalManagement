@@ -11,14 +11,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.enums.FilterType.ACTIVITY_STATUS;
 import static com.kairos.enums.FilterType.PHASE;
 
-public class PhaseFilter implements ShiftFilter {
+public class PhaseFilter <G> implements ShiftFilter {
 
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+    private Map<FilterType, Set<G>> filterCriteriaMap;
 
-    public PhaseFilter(Map<FilterType, Set<String>> filterCriteriaMap) {
+    public PhaseFilter(Map<FilterType, Set<G>> filterCriteriaMap) {
         this.filterCriteriaMap = filterCriteriaMap;
     }
 
@@ -27,7 +26,7 @@ public class PhaseFilter implements ShiftFilter {
         boolean validFilter = filterCriteriaMap.containsKey(PHASE) && isCollectionNotEmpty(filterCriteriaMap.get(PHASE));
         List<T> filteredShifts = validFilter ? new ArrayList<>() : shiftDTOS;
         if(validFilter){
-            Set<BigInteger> phaseIds = filterCriteriaMap.get(PHASE).stream().map(s -> new BigInteger(s)).collect(Collectors.toSet());
+            Set<BigInteger> phaseIds = filterCriteriaMap.get(PHASE).stream().map(s -> new BigInteger(s.toString())).collect(Collectors.toSet());
             for (ShiftDTO shiftDTO : shiftDTOS) {
                 if(phaseIds.contains(shiftDTO.getPhaseId())){
                     filteredShifts.add((T)shiftDTO);

@@ -17,11 +17,11 @@ import static com.kairos.enums.FilterType.GROUPS;
 /**
  * Created By G.P.Ranjan on 17/12/19
  **/
-public class EscalationFilter implements ShiftFilter  {
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+public class EscalationFilter <G> implements ShiftFilter  {
+    private Map<FilterType, Set<G>> filterCriteriaMap;
     Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap;
 
-    public EscalationFilter(Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap, Map<FilterType, Set<String>> filterCriteriaMap) {
+    public EscalationFilter(Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap, Map<FilterType, Set<G>> filterCriteriaMap) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.shiftViolatedRulesMap = shiftViolatedRulesMap;
     }

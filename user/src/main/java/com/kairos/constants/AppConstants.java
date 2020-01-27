@@ -230,6 +230,17 @@ public class AppConstants {
     public static final double DAYS_IN_ONE_YEAR = 365.242199;
     public static final double DAYS_IN_ONE_MONTH = 30.4368499;
     public static final long MAX_LONG_VALUE = 9999999999999999L;
-
-
+    public static final String DATE_OF_BIRTH = "dateOfBirth";
+    public static final String JOINING_BIRTH = "joiningDate";
+    public static final String EXPERTISE_LIST = "expertiseList";
+    public static final String EXPERTISE_START_DATE_IN_MILLIS = "expertiseStartDateInMillis";
+    public static final String EMPLOYMENTS = "employments";
+    public static final String START_DATE = "startDate";
+    public static final String EMPLOYMENT_LINES = "employmentLines";
+    public static final String PAY_GRADES = "payGrades";
+    public static final String PAY_GRADE_LEVEL = "payGradeLevel";
+    public static final String DURATION_TYPE = "durationType";
+    public static final String ID = "id";
+    public static final String NIGHT_WORKER = "nightWorker";
+    public static final String WORK_TIME_AGREEMENTS = "workTimeAgreements";
 }
