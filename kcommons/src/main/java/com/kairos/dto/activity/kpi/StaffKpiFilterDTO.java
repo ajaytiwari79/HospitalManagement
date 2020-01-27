@@ -2,6 +2,7 @@ package com.kairos.dto.activity.kpi;
 
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +23,7 @@ public class StaffKpiFilterDTO {
     private List<EmploymentWithCtaDetailsDTO> employment;
     private List<DayTypeDTO> dayTypeDTOS;
     private List<TeamDTO> teams;
-
+    private List<StaffChildDetailDTO> staffChildDetails;
 
     public String getFullName(){
         return this.firstName+" "+this.getLastName();
