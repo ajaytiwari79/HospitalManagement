@@ -171,7 +171,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 total = getActivityAndTimeTypeTotalByCalulationType(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
                 break;
         }
-        return total;
+        return getValueWithDecimalFormat(total);
     }
 
     public double getActualTimeBank(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
