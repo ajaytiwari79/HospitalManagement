@@ -87,6 +87,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -1005,20 +1006,25 @@ public class ActivityService {
         LOGGER.debug("activity Id received is "+activityId);
         Activity activity = activityMongoRepository.findActivityByIdAndEnabled(activityId);
         if(activity!=null) {
-            final Map<String, ActivityTranslation> activityLanguageDetailsMap = activity.getTranslations();
-            LOGGER.debug("actitivity preset language details "+activityLanguageDetailsMap);
-            activityTranslationDTO.forEach((s, translation) -> {
-                LOGGER.debug("saving language details "+translation.toString());
-                activityLanguageDetailsMap.put(s, translation);
-            });
-            activity.setTranslations(activityLanguageDetailsMap);
-            activityMongoRepository.save(activity);
-            return activity.getTranslations();
+            return updateActivityTranslations(activity,activityTranslationDTO);
         }else {
             throw new DataNotFoundException("Could not find activity by that id");
         }
 
     }
+
+    public Map<String,ActivityTranslation> updateActivityTranslations(@NotNull Activity activity,Map<String, ActivityTranslation> activityTranslationDTO){
+        final Map<String, ActivityTranslation> activityLanguageDetailsMap = activity.getTranslations();
+        LOGGER.debug("actitivity preset language details "+activityLanguageDetailsMap);
+        activityTranslationDTO.forEach((s, translation) -> {
+            LOGGER.debug("saving language details "+translation.toString());
+            activityLanguageDetailsMap.put(s, translation);
+        });
+        activity.setTranslations(activityLanguageDetailsMap);
+        activityMongoRepository.save(activity);
+        return activity.getTranslations();
+    }
+
 
     public ActivityWithTimeTypeDTO getActivitiesWithTimeTypes(long countryId) {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);

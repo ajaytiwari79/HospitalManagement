@@ -1,8 +1,10 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.ActivityTranslation;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
@@ -252,6 +254,16 @@ public class OrganizationActivityService extends MongoBaseService {
         response.put("activityCategories", activityCategories);
         return response;
     }
+
+    public Map<String, ActivityTranslation> updateUnitActivityTranslationDetails(BigInteger activityId,Long unitId, Map<String, ActivityTranslation> activityTranslationMap){
+        Activity activity = activityMongoRepository.findByIdAndUnitIdAndDeleted(activityId,unitId,false);
+        if(activity!=null) {
+            return activityService.updateActivityTranslations(activity,activityTranslationMap);
+        }else {
+            throw new DataNotFoundException("Could not find activity by that id");
+        }
+    }
+
 
     public ActivityTabsWrapper getGeneralTabOfActivity(BigInteger activityId, Long unitId) {
         Activity activity = activityMongoRepository.findOne(activityId);
