@@ -21,6 +21,7 @@ import java.util.*;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * @author pradeep
@@ -131,6 +132,10 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         this.activityId = activityId;
         this.activityName = activityName;
         this.status = status;
+    }
+
+    public List<ShiftActivityDTO> getChildActivities() {
+        return isNullOrElse(this.childActivities,new ArrayList<>());
     }
 
     @JsonIgnore
