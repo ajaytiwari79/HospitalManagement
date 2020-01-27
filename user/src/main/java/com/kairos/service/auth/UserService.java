@@ -67,8 +67,7 @@ import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -674,8 +673,11 @@ public class UserService {
     }
 
     public static User getCurrentUser(){
-        User user = userRepository.findOne(UserContext.getUserDetails().getId());
-        user.setHubMember(accessPageService.isHubMember(user.getId()));
+        User user = null;
+        if(isNotNull(UserContext.getUserDetails())) {
+            user = userRepository.findOne(UserContext.getUserDetails().getId());
+            user.setHubMember(accessPageService.isHubMember(user.getId()));
+        }
         return user;
     }
 }

@@ -11,6 +11,8 @@ import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.joda.time.DateTime;
 import org.kie.api.runtime.rule.RuleContext;
@@ -24,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 
+@Getter
+@Setter
 @XStreamAlias("Employee")
 public class Employee {
     private static final Logger LOGGER = LoggerFactory.getLogger(Employee.class);
@@ -59,139 +63,9 @@ public class Employee {
         this.employmentTypeId = employmentTypeId;
     }
 
-    public Map<java.time.LocalDate, CTAResponseDTO> getLocalDateCTAResponseDTOMap() {
-        return localDateCTAResponseDTOMap;
-    }
-
-    public void setLocalDateCTAResponseDTOMap(Map<java.time.LocalDate, CTAResponseDTO> localDateCTAResponseDTOMap) {
-        this.localDateCTAResponseDTOMap = localDateCTAResponseDTOMap;
-    }
-
-    public Map<java.time.LocalDate, WorkingTimeAgreement> getLocalDateWTAMap() {
-        return localDateWTAMap;
-    }
-
-    public void setLocalDateWTAMap(Map<java.time.LocalDate, WorkingTimeAgreement> localDateWTAMap) {
-        this.localDateWTAMap = localDateWTAMap;
-    }
-
-    public int getTotalWeeklyMinutes() {
-        return totalWeeklyMinutes;
-    }
-
-    public void setTotalWeeklyMinutes(int totalWeeklyMinutes) {
-        this.totalWeeklyMinutes = totalWeeklyMinutes;
-    }
-
-    public int getWorkingDaysInWeek() {
-        return workingDaysInWeek;
-    }
-
-    public void setWorkingDaysInWeek(int workingDaysInWeek) {
-        this.workingDaysInWeek = workingDaysInWeek;
-    }
-
-    public PaidOutFrequencyEnum getPaidOutFrequencyEnum() {
-        return paidOutFrequencyEnum;
-    }
-
-    public void setPaidOutFrequencyEnum(PaidOutFrequencyEnum paidOutFrequencyEnum) {
-        this.paidOutFrequencyEnum = paidOutFrequencyEnum;
-    }
-
-    public CollectiveTimeAgreement getCollectiveTimeAgreement() {
-        return collectiveTimeAgreement;
-    }
-
-    public void setCollectiveTimeAgreement(CollectiveTimeAgreement collectiveTimeAgreement) {
-        this.collectiveTimeAgreement = collectiveTimeAgreement;
-    }
-
-    public DateTime getPrevShiftEnd() {
-        return prevShiftEnd;
-    }
-
-    public void setPrevShiftEnd(DateTime prevShiftEnd) {
-        this.prevShiftEnd = prevShiftEnd;
-    }
-
-    public DateTime getPrevShiftStart() {
-        return prevShiftStart;
-    }
-
-    public void setPrevShiftStart(DateTime prevShiftStart) {
-        this.prevShiftStart = prevShiftStart;
-    }
-
-    public PrevShiftsInfo getPrevShiftsInfo() {
-        return prevShiftsInfo;
-    }
-
-    public void setPrevShiftsInfo(PrevShiftsInfo prevShiftsInfo) {
-        this.prevShiftsInfo = prevShiftsInfo;
-    }
-
-    public WorkingTimeConstraints getWorkingTimeConstraints() {
-        return workingTimeConstraints;
-    }
-
-    public void setWorkingTimeConstraints(WorkingTimeConstraints workingTimeConstraints) {
-        this.workingTimeConstraints = workingTimeConstraints;
-    }
-
-    public BigDecimal getBaseCost() {
-        return baseCost;
-    }
-
-    public void setBaseCost(BigDecimal baseCost) {
-        this.baseCost = baseCost;
-    }
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
-
-
-    public Set<Skill> getSkillSet() {
-        return skillSet;
-    }
-
-    public void setSkillSet(Set<Skill> skillSet) {
-        this.skillSet = skillSet;
-    }
-
-
-
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-    public Long getExpertiseId() {
-        return expertiseId;
-    }
-
-    public void setExpertiseId(Long expertiseId) {
-        this.expertiseId = expertiseId;
-    }
 
     public String toString() {
-        return "E:" + id;//+"-"+getAvailabilityList();//+skillSet+"-
+        return "E:" + id;
     }
     public Employee() {
     }
@@ -214,22 +88,12 @@ public class Employee {
 
         return new EqualsBuilder()
                 .append(id, employee.id)
-                /*.append(avialableMinutes, employee.avialableMinutes)
-                .append(location, employee.location)
-                .append(name, employee.name)
-                .append(skillSet, employee.skillSet)
-                .append(affinityMap, employee.affinityMap)
-                .append(unavailabilityRequests, employee.unavailabilityRequests)*/
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
-        /*return new HashCodeBuilder(17, 37)
-                .append(id)
-                .toHashCode();*/
         int hashcode=id.hashCode();
-        //LOGGER.info("Employee hashcode:"+id+":"+hashcode);
         return hashcode;
     }
     public int checkConstraints(List<Shift> shifts, int index){

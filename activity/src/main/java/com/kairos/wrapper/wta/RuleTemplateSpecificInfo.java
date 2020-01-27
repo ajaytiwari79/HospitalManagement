@@ -33,7 +33,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RuleTemplateSpecificInfo {
-
+    @Builder.Default
     private List<ShiftWithActivityDTO> shifts = new ArrayList<>();
     private ShiftWithActivityDTO shift;
     private Map<String,TimeSlotWrapper> timeSlotWrapperMap;
