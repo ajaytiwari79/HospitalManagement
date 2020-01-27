@@ -1,6 +1,7 @@
 package com.kairos.service.activity;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
+import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
