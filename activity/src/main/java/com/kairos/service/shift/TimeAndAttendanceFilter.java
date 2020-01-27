@@ -12,14 +12,14 @@ import java.util.Set;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.VALIDATED_BY;
 
-public class TimeAndAttendanceFilter implements ShiftFilter {
+public class TimeAndAttendanceFilter <G> implements ShiftFilter {
 
 
 
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+    private Map<FilterType, Set<G>> filterCriteriaMap;
     private List<BigInteger> shiftStateIds;
 
-    public TimeAndAttendanceFilter(Map<FilterType, Set<String>> filterCriteriaMap,List<BigInteger> shiftStateIds) {
+    public TimeAndAttendanceFilter(Map<FilterType, Set<G>> filterCriteriaMap,List<BigInteger> shiftStateIds) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.shiftStateIds=shiftStateIds;
 

@@ -1,5 +1,6 @@
 package com.kairos.persistence.model.user.employment;
 
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;
@@ -45,7 +46,6 @@ public class EmploymentLine extends UserBaseEntity {
         this.avgDailyWorkingHours = employmentLineBuilder.avgDailyWorkingHours;
         this.workingDaysInWeek = employmentLineBuilder.workingDaysInWeek;
         this.hourlyCost = employmentLineBuilder.hourlyCost;
-
     }
 
     public void setSeniorityLevel(SeniorityLevel seniorityLevel) {

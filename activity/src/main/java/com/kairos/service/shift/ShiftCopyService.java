@@ -112,7 +112,6 @@ public class ShiftCopyService extends MongoBaseService {
         List<Long> employmentIds = staffDataList.stream().map(StaffEmploymentDetails::getId).collect(Collectors.toList());
         findAndAddCTAInEmployments(staffDataList, copyShiftDTO, dataWrapper, employmentIds);
         Map<Long, List<WTAQueryResultDTO>> wtaMapByEmploymentId = findAllWTAGroupByEmploymentId(employmentIds, copyShiftDTO);
-        List<Long> expertiseIds = staffDataList.stream().map(staffEmploymentDetails -> staffEmploymentDetails.getExpertise().getId()).collect(Collectors.toList());
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllByUnitIdAndDeletedFalse(unitId); // might we add more optimization later
         if (activityConfigurations.isEmpty()) {
             exceptionService.dataNotFoundException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
@@ -176,7 +175,7 @@ public class ShiftCopyService extends MongoBaseService {
                 Date endDate = DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(sourceShift.getEndDate()));
                 if ((shiftCreationStartDate.equals(staffEmployment.getStartDate()) || shiftCreationStartDate.isAfter(staffEmployment.getStartDate())) &&
                         (staffEmployment.getEndDate() == null || shiftCreationStartDate.equals(staffEmployment.getEndDate()) || shiftCreationStartDate.isBefore(staffEmployment.getEndDate()))) {
-                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap);
+                    ShiftWithActivityDTO shiftWithActivityDTO = shiftService.convertIntoShiftWithActivity(sourceShift, activityMap,shiftCreationStartDate);
                     shiftWithActivityDTO.setEndDate(endDate);
                     shiftWithActivityDTO.setStartDate(startDate);
                     shiftWithActivityDTO.setStaffId(staffEmployment.getStaff().getId());
@@ -191,7 +190,7 @@ public class ShiftCopyService extends MongoBaseService {
                 shiftResponse = addShift(validationMessages, sourceShift, staffEmployment, startDate, endDate, newShifts, activityMap, dataWrapper, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {
                     successfullyCopiedShifts.add(shiftResponse);
-                    newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter), activityMap));
+                    newCreatedShiftWithActivityDTOs.add(shiftService.convertIntoShiftWithActivity(newShifts.get(counter), activityMap,shiftCreationStartDate));
                 } else {
                     errorInCopyingShifts.add(shiftResponse);
                 }

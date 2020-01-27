@@ -35,6 +35,7 @@ import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.team.TeamType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
@@ -67,6 +68,7 @@ import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
+import com.kairos.utils.CPRUtil;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
@@ -81,6 +83,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import java.time.Period;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -168,7 +171,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 total = getActivityAndTimeTypeTotalByCalulationType(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
                 break;
         }
-        return total;
+        return getValueWithDecimalFormat(total);
     }
 
     public double getActualTimeBank(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -204,9 +207,10 @@ public class KPIBuilderCalculationService implements CounterService {
 
     public Integer getNumberOfWorkingDays(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
         List<ExpertiseLineDTO> expertiseLineDTOS = employmentWithCtaDetailsDTO.getExpertiseQueryResult().getExpertiseLines();
+        EmploymentLinesDTO employmentLinesDTO =getSortedEmploymentLine(employmentWithCtaDetailsDTO);
         Collections.sort(expertiseLineDTOS);
         Collections.reverse(expertiseLineDTOS);
-        return expertiseLineDTOS.get(0).getNumberOfWorkingDaysInWeek();
+        return employmentLinesDTO.getTotalWeeklyHours()/expertiseLineDTOS.get(0).getNumberOfWorkingDaysInWeek();
     }
 
     public EmploymentLinesDTO getSortedEmploymentLine(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
@@ -319,6 +323,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case ESCALATED_SHIFTS:
             case ESCALATION_RESOLVED_SHIFTS:
                 return getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+            case STAFF_AGE:
+                return getStaffAgeData(staffId, kpiCalculationRelatedInfo);
             case PRESENCE_OVER_STAFFING:
             case PRESENCE_UNDER_STAFFING:
             case ABSENCE_OVER_STAFFING:
@@ -329,6 +335,17 @@ public class KPIBuilderCalculationService implements CounterService {
                 break;
         }
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
+    }
+
+    private double getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
+        LocalDate dateOfBirth = CPRUtil.getDateOfBirthFromCPR(staff.getCprNumber());
+        int age = 0;
+        if(isNotNull(dateOfBirth)) {
+            Period diff = Period.between(dateOfBirth, asLocalDate(kpiCalculationRelatedInfo.startDate));
+            age = diff.getYears();
+        }
+        return age;
     }
 
 
@@ -623,7 +640,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 Activity activity = kpiCalculationRelatedInfo.getActivityMap().get(activityId);
                 List<TodoDTO> todoDTOS = new CopyOnWriteArrayList(kpiCalculationRelatedInfo.getTodosByInterval(dateTimeInterval, kpiCalculationRelatedInfo.activityIdAndTodoListMap.get(activityId)));
                 ClusteredBarChartKpiDataUnit clusteredBarChartKpiDataUnit = new ClusteredBarChartKpiDataUnit(activity.getName(), activity.getGeneralActivityTab().getBackgroundColor(), todoDTOS.size());
-                subClusteredBarValue.addAll(getPQlOfTodo(activity, todoDTOS));
+                subClusteredBarValue.addAll(getPQlOfTodo(activity, todoDTOS,kpiCalculationRelatedInfo));
                 clusteredBarChartKpiDataUnit.setSubValues(subClusteredBarValue);
                 activitySubClusteredBarValue.add(clusteredBarChartKpiDataUnit);
                 subClusteredBarValue = newArrayList();
@@ -633,53 +650,64 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
 
-    private List<ClusteredBarChartKpiDataUnit> getPQlOfTodo(Activity activity, List<TodoDTO> todoDTOS) {
+    private List<ClusteredBarChartKpiDataUnit> getPQlOfTodo(Activity activity, List<TodoDTO> todoDTOS,KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits = new ArrayList<>();
         PQLSettings pqlSettings = activity.getRulesActivityTab().getPqlSettings();
+        List<ApprovalCriteria> approvalCriterias = newArrayList(pqlSettings.getAppreciable(),pqlSettings.getAcceptable(),pqlSettings.getCritical());
         if (isNotNull(pqlSettings)) {
-            getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAppreciable(), "#4caf502e", "Green");
-            getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getAcceptable(), "#ffeb3b33", "Yellow");
-            getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, pqlSettings.getCritical(), "#ff3b3b33", "Red");
+            for (ApprovalCriteria approvalCriteria : approvalCriterias) {
+                getDataByPQLSetting(todoDTOS, clusteredBarChartKpiDataUnits, approvalCriteria, approvalCriteria.getColor(), approvalCriteria.getColorName(),kpiCalculationRelatedInfo);
+            }
         }
         return clusteredBarChartKpiDataUnits;
     }
 
-    private void getDataByPQLSetting(List<TodoDTO> todoDTOS, List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits, ApprovalCriteria approvalCriteria, String color, String range) {
+    private void getDataByPQLSetting(List<TodoDTO> todoDTOS, List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits, ApprovalCriteria approvalCriteria, String color, String range, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         Short approvalTime = approvalCriteria.getApprovalTime();
         LocalDate localDate = null;
         long count = 0;
         if (isNotNull(approvalTime)) {
             for (TodoDTO todoDTO : todoDTOS) {
-                localDate = getApproveOrDisApproveDateFromTODO(localDate, todoDTO);
-                if (isNotNull(localDate)) {
-                    LocalDate endDate = add(asLocalDate(todoDTO.getRequestedOn()), approvalTime);
-                    Boolean isApproveExist = new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), endDate).containsAndEqualsEndDate(asDate(localDate));
-                    if (isApproveExist) {
-                        count++;
-                        todoDTOS.remove(todoDTO);
+                if(TodoStatus.APPROVE.equals(todoDTO.getStatus())||TodoStatus.DISAPPROVE.equals(todoDTO.getStatus()))
+                    localDate = getApproveOrDisApproveDateFromTODO(localDate, todoDTO);
+                    if (isNotNull(localDate)) {
+                        LocalDate endDate = add(asLocalDate(todoDTO.getRequestedOn()), approvalTime, kpiCalculationRelatedInfo);
+                        Boolean isApproveExist = new DateTimeInterval(asLocalDate(todoDTO.getRequestedOn()), endDate).containsAndEqualsEndDate(asDate(localDate));
+                        if (isApproveExist) {
+                            count++;
+                            todoDTOS.remove(todoDTO);
+                        }
                     }
-                }
             }
         }
         clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(range, color, count));
     }
 
-    public LocalDate add(LocalDate date, int workdays) {
+    public LocalDate add(LocalDate date, int workdays,KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        Set<DayOfWeek> dayOfWeeks = kpiCalculationRelatedInfo.getDaysOfWeeks();
         if (workdays < 1) {
             return date;
         }
-
-        LocalDate result = date;
-        int addedDays = 0;
-        while (addedDays < workdays) {
-            result = result.plusDays(1);
-            if (!(result.getDayOfWeek() == DayOfWeek.SATURDAY ||
-                    result.getDayOfWeek() == DayOfWeek.SUNDAY)) {
-                ++addedDays;
-            }
+        if(isNull(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(DAYS_OF_WEEK))){
+            return date.plusDays(workdays);
         }
-        return result;
+        LocalDate requestedDate = date;
+        LocalDate result = date;
+        List<DayOfWeek> addDay = new ArrayList<>();
+        if(isCollectionNotEmpty(dayOfWeeks)) {
+            while(requestedDate.isBefore(date.plusDays(workdays))){
+                if(dayOfWeeks.contains(requestedDate.getDayOfWeek())){
+                    addDay.add(requestedDate.getDayOfWeek());
+                }
+                requestedDate=requestedDate.plusDays(1);
+            }
+
+        }
+        return result.plusDays(addDay.size());
     }
+
+
+
 
     private LocalDate getApproveOrDisApproveDateFromTODO(LocalDate localDate, TodoDTO todoDTO) {
         switch (todoDTO.getStatus()) {
