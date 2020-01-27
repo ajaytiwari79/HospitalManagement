@@ -1,13 +1,12 @@
 package com.kairos.service.activity;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
@@ -942,12 +941,10 @@ public class ActivityService {
     public Map<String, TranslationInfo> updateTranslationData(BigInteger activityId, Map<String, TranslationInfo> activityTranslationDTO){
         LOGGER.debug("activity Id received is {}",activityId);
         Activity activity = activityMongoRepository.findActivityByIdAndEnabled(activityId);
-        if(activity!=null) {
-            return updateActivityTranslations(activity,activityTranslationDTO);
-        }else {
-            throw new DataNotFoundException("Could not find activity by that id");
+        if(isNull(activity)) {
+            exceptionService.dataNotFoundException(MESSAGE_DATA_NOTFOUND);
         }
-
+        return updateActivityTranslations(activity,activityTranslationDTO);
     }
 
     public Map<String, TranslationInfo> updateActivityTranslations(@NotNull Activity activity, Map<String, TranslationInfo> activityTranslationDTO){
