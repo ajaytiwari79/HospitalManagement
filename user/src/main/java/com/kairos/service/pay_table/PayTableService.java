@@ -442,7 +442,7 @@ public class PayTableService {
         Set<Long> payGroupAreaIds = payGradeDTO.getPayGroupAreas().stream().map(PayGroupAreaDTO::getPayGroupAreaId).collect(Collectors.toSet());
         List<PayGroupArea> payGroupAreas = payGroupAreaGraphRepository.findAllByIds(payGroupAreaIds);
         List<PayGroupAreaDTO> payGroupAreaDTOS = payGradeGraphRepository.getPayGradeDataByIdAndPayGroupArea(payGradeId, new ArrayList<>(payGroupAreaIds));
-        Map<Long, BigDecimal> payGradePublishedAmountMap = payGroupAreaDTOS.stream().collect(Collectors.toMap(PayGroupAreaDTO::getPayGroupAreaId, PayGroupAreaDTO::getPublishedAmount));
+        Map<Long, BigDecimal> payGradePublishedAmountMap = getMapOfPayGroupAreaAmount(payGroupAreaDTOS);
         for (PayGrade currentPayGrade : payTable.getPayGrades()) {
             PayGrade newPayGrade = new PayGrade(currentPayGrade.getPayGradeLevel(), false);
             List<PayGradePayGroupAreaRelationShip> payGradePayGroupAreaRelationShips = new ArrayList<>();
@@ -575,5 +575,13 @@ public class PayTableService {
         if (payTableGraphRepository.existsByDate(payTableId, publishedDate.toString())) {
             exceptionService.actionNotPermittedException(PUBLISHED_PAY_TABLE_EXISTS, publishedDate);
         }
+    }
+
+    private Map<Long, BigDecimal>  getMapOfPayGroupAreaAmount(List<PayGroupAreaDTO> payGroupAreaDTOS){
+        Map<Long, BigDecimal> payGradePublishedAmountMap=new HashMap<>();
+        for (PayGroupAreaDTO payGroupAreaDTO : payGroupAreaDTOS){
+            payGradePublishedAmountMap.put(payGroupAreaDTO.getPayGroupAreaId(),payGroupAreaDTO.getPublishedAmount());
+        }
+        return payGradePublishedAmountMap;
     }
 }
