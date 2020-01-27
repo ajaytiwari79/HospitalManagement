@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.custom_exception.UserExceptionHandler;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepositoryImpl;
 import com.kairos.utils.user_context.SchedulerUserContextInterceptor;
 import com.kairos.dto.user_context.UserContextInterceptor;
@@ -70,6 +71,7 @@ public class UserServiceApplication implements WebMvcConfigurer {
 
 
 	public static void main(String[] args) {
+		Thread.setDefaultUncaughtExceptionHandler(new UserExceptionHandler());
 		SpringApplication.run(UserServiceApplication.class, args);
 	}
 

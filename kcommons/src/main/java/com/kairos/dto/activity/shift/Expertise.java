@@ -7,7 +7,10 @@ import com.kairos.enums.shift.BreakPaymentSetting;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * Created by vipul on 6/2/18.
@@ -27,5 +30,9 @@ public class Expertise {
         //Not in use
     }
 
+
+    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
+        return isNullOrElse(protectedDaysOffSettings,new ArrayList<>());
+    }
 
 }
