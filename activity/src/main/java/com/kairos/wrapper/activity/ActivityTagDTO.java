@@ -2,7 +2,7 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.activity.ActivityTranslation;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.CompositeShiftActivityDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.ActivityStateEnum;
@@ -55,7 +55,7 @@ public class ActivityTagDTO {
     // for filter FullDay and Full week activity
     private String methodForCalculatingTime;
 
-    private Map<String, ActivityTranslation> translations ;
+    private Map<String, TranslationInfo> translations ;
 
     public ActivityTagDTO() {
         //default constructor

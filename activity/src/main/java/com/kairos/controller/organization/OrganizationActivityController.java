@@ -1,7 +1,7 @@
 package com.kairos.controller.organization;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
-import com.kairos.dto.activity.activity.ActivityTranslation;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
@@ -87,7 +87,7 @@ public class OrganizationActivityController {
 
     @ApiOperation("Update Translations of Activity in a unit ")
     @PutMapping(value = "/activity/{activityId}/unit_language_settings")
-    ResponseEntity<Map<String, Object>> updateLanguageSettings(@NotEmpty  @PathVariable Long unitId, @NotEmpty @PathVariable BigInteger activityId, @NotNull @RequestBody Map<String, ActivityTranslation> translationMap) {
+    ResponseEntity<Map<String, Object>> updateLanguageSettings(@NotEmpty  @PathVariable Long unitId, @NotEmpty @PathVariable BigInteger activityId, @NotNull @RequestBody Map<String, TranslationInfo> translationMap) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateUnitActivityTranslationDetails(activityId,unitId,translationMap));
     }
 

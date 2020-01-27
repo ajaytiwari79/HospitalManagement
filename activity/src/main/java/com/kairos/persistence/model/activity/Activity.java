@@ -3,7 +3,7 @@ package com.kairos.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.activity.ActivityTranslation;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -71,7 +71,7 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     //time care id
     private String externalId;
-    private Map<String, ActivityTranslation> translations = new HashMap<>();
+    private Map<String, TranslationInfo> translations = new HashMap<>();
 
     public Activity(String name, String description, List<BigInteger> tags) {
         this.name = name;

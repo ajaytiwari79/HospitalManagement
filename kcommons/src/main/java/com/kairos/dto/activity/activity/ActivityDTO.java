@@ -60,7 +60,7 @@ public class ActivityDTO  {
     private BigInteger activityPriorityId;
     private int activitySequence;
     private BigInteger countryParentId;
-    private Map<String,ActivityTranslation> translations = new HashMap<>();
+    private Map<String, TranslationInfo> translations = new HashMap<>();
 
 
     public ActivityDTO() {

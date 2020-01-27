@@ -1,6 +1,6 @@
 package com.kairos.dto.activity.activity.activity_tabs;
 
-import com.kairos.dto.activity.activity.ActivityTranslation;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.TimeTypeEnum;
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,5 +47,5 @@ public class GeneralActivityTabWithTagDTO {
     private String content;
     private String originalDocumentName;
     private String modifiedDocumentName;
-    private Map<String,ActivityTranslation> translations;
+    private Map<String, TranslationInfo> translations;
 }

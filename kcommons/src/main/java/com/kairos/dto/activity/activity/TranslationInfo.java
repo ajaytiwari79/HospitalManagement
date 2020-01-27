@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityTranslation{
+public class TranslationInfo {
     private String name;
     private String description;
 
