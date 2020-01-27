@@ -173,8 +173,8 @@ public class KPIBuilderCalculationService implements CounterService {
 
     public double getActualTimeBank(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.staffKpiFilterDTOS;
-        Long actualTimeBank = 0l;
-        Long actualTimeBankPerDay = 0l;
+        Double actualTimeBank = 0d;
+        Double actualTimeBankPerDay = 0d;
             if (isCollectionNotEmpty(staffKpiFilterDTOS)) {
                 for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
                     for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
@@ -198,16 +198,16 @@ public class KPIBuilderCalculationService implements CounterService {
         if (HOURS.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
             return getHoursByMinutes(actualTimeBank);
         }
-        return actualTimeBankPerDay;
+        return getValueWithDecimalFormat(actualTimeBankPerDay);
     }
 
 
-    public Integer getNumberOfWorkingDays(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
+    public Double getNumberOfWorkingDays(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
         List<ExpertiseLineDTO> expertiseLineDTOS = employmentWithCtaDetailsDTO.getExpertiseQueryResult().getExpertiseLines();
         EmploymentLinesDTO employmentLinesDTO =getSortedEmploymentLine(employmentWithCtaDetailsDTO);
         Collections.sort(expertiseLineDTOS);
         Collections.reverse(expertiseLineDTOS);
-        return employmentLinesDTO.getTotalWeeklyHours()/expertiseLineDTOS.get(0).getNumberOfWorkingDaysInWeek();
+        return getValueWithDecimalFormat(Double.valueOf(employmentLinesDTO.getTotalWeeklyHours())/Double.valueOf(expertiseLineDTOS.get(0).getNumberOfWorkingDaysInWeek()));
     }
 
     public EmploymentLinesDTO getSortedEmploymentLine(EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
@@ -1179,33 +1179,33 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private class ActualTimeBank {
         private KPICalculationRelatedInfo kpiCalculationRelatedInfo;
-        private Long actualTimeBank;
-        private Long actualTimeBankPerDay;
+        private Double actualTimeBank;
+        private Double actualTimeBankPerDay;
         private EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO;
 
-        public ActualTimeBank(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Long actualTimeBank, Long actualTimeBankPerDay, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
+        public ActualTimeBank(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Double actualTimeBank, Double actualTimeBankPerDay, EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO) {
             this.kpiCalculationRelatedInfo = kpiCalculationRelatedInfo;
             this.actualTimeBank = actualTimeBank;
             this.actualTimeBankPerDay = actualTimeBankPerDay;
             this.employmentWithCtaDetailsDTO = employmentWithCtaDetailsDTO;
         }
 
-        public Long getActualTimeBank() {
+        public Double getActualTimeBank() {
             return actualTimeBank;
         }
 
-        public Long getActualTimeBankPerDay() {
+        public Double getActualTimeBankPerDay() {
             return actualTimeBankPerDay;
         }
 
         public ActualTimeBank invoke() {
-            Integer numberOfDaysInWeekOfAStaff = getNumberOfWorkingDays(employmentWithCtaDetailsDTO);
+            Double numberOfDaysInWeekOfAStaff = getNumberOfWorkingDays(employmentWithCtaDetailsDTO);
             if(numberOfDaysInWeekOfAStaff==0){
                return this;
             }else {
                 List<DailyTimeBankEntry> dailyTimeBankEntries = (List) kpiCalculationRelatedInfo.employmentIdListAndDailyTimeBankEntryMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
                 if (AVERAGE_PER_DAY.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
-                    actualTimeBank = timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(), employmentWithCtaDetailsDTO.getStartDate());
+                    actualTimeBank = Double.valueOf(timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(), employmentWithCtaDetailsDTO.getStartDate()));
                     actualTimeBankPerDay += getHourByMinutes(actualTimeBank) / numberOfDaysInWeekOfAStaff;
                 } else {
                     actualTimeBank += timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(), employmentWithCtaDetailsDTO.getStartDate());
