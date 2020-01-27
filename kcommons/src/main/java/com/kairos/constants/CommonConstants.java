@@ -36,4 +36,13 @@ public class CommonConstants {
     public static final String DELETED = "deleted";
     public static final String DISABLED = "disabled";
     public static final String UNIT_ID = "unitId";
+    public static final long DEFAULT_ID = -1l;
+
+    public static final String GREEN_COLOR_CODE = "#4caf502e";
+    public static final String COLOR_NAME = "Green";
+    public static final String YELLOW_COLOR_CODE = "#ffeb3b33";
+    public static final String COLOR_NAME1 = "Yellow";
+    public static final String RED_COLOR_CODE = "#ff3b3b33";
+    public static final String RED = "Red";
+
 }

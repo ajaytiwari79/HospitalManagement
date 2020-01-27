@@ -46,10 +46,6 @@ public class Unit extends OrganizationBaseEntity {
     @Relationship(type = HAS_SETTING)
     private OrganizationSetting organizationSetting;
 
-
-    @Relationship(type = UNIT_HAS_ACCESS_GROUPS)
-    private List<AccessGroup> accessGroups = new ArrayList<>();
-
     @Relationship(type = UNIT_HAS_RESOURCE)
     private List<Resource> resourceList;
 

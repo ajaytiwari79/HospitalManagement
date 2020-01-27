@@ -6,6 +6,7 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.enums.DurationType;
+import com.kairos.enums.shift.ShiftOperationType;
 import com.kairos.enums.wta.MinMaxSetting;
 import com.kairos.enums.wta.PartOfDay;
 import com.kairos.enums.wta.WTATemplateType;
@@ -20,6 +21,8 @@ import java.math.BigInteger;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.enums.wta.MinMaxSetting.MAXIMUM;
+import static com.kairos.enums.wta.MinMaxSetting.MINIMUM;
 import static com.kairos.service.shift.ShiftValidatorService.filterShiftsByPlannedTypeAndTimeTypeIds;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -56,7 +59,7 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
 
     @Override
     public void validateRules(RuleTemplateSpecificInfo infoWrapper) {
-        if(!isDisabled() && isValidShift(infoWrapper.getPhaseId(),infoWrapper.getShift(),this.phaseTemplateValues,timeTypeIds,plannedTimeIds)){
+        if(!isDisabled() && isValidShift(infoWrapper.getPhaseId(),infoWrapper.getShift(),this.phaseTemplateValues,timeTypeIds,plannedTimeIds) && (MINIMUM.equals(minMaxSetting) && ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType())) || (MAXIMUM.equals(minMaxSetting) && !ShiftOperationType.DELETE.equals(infoWrapper.getShiftOperationType()))){
             TimeInterval[] timeIntervals = getTimeSlotsByPartOfDay(partOfDays,infoWrapper.getTimeSlotWrapperMap(),infoWrapper.getShift());
             if(timeIntervals.length>0) {
                 DateTimeInterval[] dateTimeIntervals = getIntervalsByRuleTemplate(infoWrapper.getShift(), intervalUnit, intervalLength);
@@ -78,9 +81,6 @@ public class NumberOfPartOfDayShiftsWTATemplate extends WTABaseRuleTemplate {
             }
         }
     }
-
-
-
 
     @Override
     public boolean isCalculatedValueChanged(WTABaseRuleTemplate wtaBaseRuleTemplate) {

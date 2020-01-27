@@ -156,16 +156,20 @@ public class OrganizationActivityService extends MongoBaseService {
                 exceptionService.dataNotFoundException(isActivityAlreadyExist.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
             }
             List<PhaseDTO> phaseDTOList = phaseService.getPhasesByUnit(unitId);
+            Collections.reverse(phaseDTOList);
+
             Set<Long> parentAccessGroupIds = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().stream().flatMap(a -> a.getActivityShiftStatusSettings().stream().flatMap(b -> b.getAccessGroupIds().stream())).collect(Collectors.toSet());
             Map<Long, Long> accessGroupIdsMap = userIntegrationService.getAccessGroupForUnit(unitId, parentAccessGroupIds);
+            List<PhaseTemplateValue> phaseTemplateValues1 = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues();
             List<PhaseTemplateValue> phaseTemplateValues = new ArrayList<>();
             for (int i = 0; i < phaseDTOList.size(); i++) {
                 List<ActivityShiftStatusSettings> existingActivityShiftStatusSettings = activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getActivityShiftStatusSettings();
                 List<ActivityShiftStatusSettings> activityShiftStatusSettings = new ArrayList<>();
                 Set<Long> agIds = new HashSet<>();
-                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
-                        activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
-                        activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
+                PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phaseDTOList.get(i).getId(), phaseDTOList.get(i).getName(), phaseDTOList.get(i).getDescription(), phaseTemplateValues1.get(i).getEligibleEmploymentTypes(),
+                        phaseTemplateValues1.get(i).isEligibleForManagement(), phaseTemplateValues1.get(i).isStaffCanDelete(), phaseTemplateValues1.get(i).isManagementCanDelete(),
+                        phaseTemplateValues1.get(i).isStaffCanSell(), phaseTemplateValues1.get(i).isManagementCanSell(), phaseTemplateValues1.get(i).getAllowedSettings());
+                phaseTemplateValue.setSequence(phaseDTOList.get(i).getSequence());
                 for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
                     List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
                     accessGroupIds.forEach(a -> {
@@ -516,6 +520,7 @@ public class OrganizationActivityService extends MongoBaseService {
                     PhaseTemplateValue phaseTemplateValue = new PhaseTemplateValue(phases.get(i).getId(), phases.get(i).getName(), phases.get(i).getDescription(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getEligibleEmploymentTypes(),
                             activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isEligibleForManagement(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanDelete(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanDelete(),
                             activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isStaffCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).isManagementCanSell(), activity.getPhaseSettingsActivityTab().getPhaseTemplateValues().get(i).getAllowedSettings());
+                    phaseTemplateValue.setSequence(phases.get(i).getSequence());
                     for (int j = 0; j < existingActivityShiftStatusSettings.size(); j++) {
                         List<Long> accessGroupIds = new ArrayList<>(existingActivityShiftStatusSettings.get(j).getAccessGroupIds());
                         accessGroupIds.forEach(a -> {

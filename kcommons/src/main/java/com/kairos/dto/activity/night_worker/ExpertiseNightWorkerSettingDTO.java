@@ -14,17 +14,17 @@ import java.math.BigInteger;
 public class ExpertiseNightWorkerSettingDTO {
     private BigInteger id;
     private TimeSlot timeSlot;
-    private Integer minMinutesToCheckNightShift;
+    private int minMinutesToCheckNightShift;
     private DurationType intervalUnitToCheckNightWorker;
-    private Integer intervalValueToCheckNightWorker;
-    private Integer minShiftsValueToCheckNightWorker;
+    private int intervalValueToCheckNightWorker;
+    private int minShiftsValueToCheckNightWorker;
     private XAxisConfig minShiftsUnitToCheckNightWorker;
     private Long countryId;
     private Long expertiseId;
 
 
-    public ExpertiseNightWorkerSettingDTO(TimeSlot timeSlot, Integer minMinutesToCheckNightShift, DurationType intervalUnitToCheckNightWorker, Integer intervalValueToCheckNightWorker,
-                                          Integer minShiftsValueToCheckNightWorker, XAxisConfig minShiftsUnitToCheckNightWorker, Long countryId, Long expertiseId){
+    public ExpertiseNightWorkerSettingDTO(TimeSlot timeSlot, int minMinutesToCheckNightShift, DurationType intervalUnitToCheckNightWorker, int intervalValueToCheckNightWorker,
+                                          int minShiftsValueToCheckNightWorker, XAxisConfig minShiftsUnitToCheckNightWorker, Long countryId, Long expertiseId){
         this.timeSlot = timeSlot;
         this.minMinutesToCheckNightShift = minMinutesToCheckNightShift;
         this.intervalUnitToCheckNightWorker = intervalUnitToCheckNightWorker;

@@ -4,7 +4,7 @@ import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationContactAddress;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.service.exception.ExceptionService;
 
 import java.util.List;
@@ -46,9 +46,9 @@ public class OrganizationDetailsValidator {
         }
     }
 
-    public static void validateUserDetails(List<StaffPersonalDetailDTO> staffPersonalDetailDTOS, ExceptionService exceptionService) {
-        if(ObjectUtils.isCollectionNotEmpty(staffPersonalDetailDTOS)) {
-            staffPersonalDetailDTOS.forEach(staffPersonalDetailDTO -> {
+    public static void validateUserDetails(List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults, ExceptionService exceptionService) {
+        if(ObjectUtils.isCollectionNotEmpty(staffPersonalDetailQueryResults)) {
+            staffPersonalDetailQueryResults.forEach(staffPersonalDetailDTO -> {
                 if (!Optional.ofNullable(staffPersonalDetailDTO.getCprNumber()).isPresent() || staffPersonalDetailDTO.getCprNumber().length() != 10) {
                     exceptionService.invalidRequestException(ERROR_CPRNUMBER_NOTNULL, staffPersonalDetailDTO.getOrganizationId());
                 }

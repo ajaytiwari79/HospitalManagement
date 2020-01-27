@@ -58,18 +58,18 @@ public class ContactAddress extends UserBaseEntity{
 
     private boolean privateAddress;
 
-    private boolean isVerifiedByVisitour;
+    private boolean verifiedByVisitour;
 
     public boolean isVerifiedByVisitour() {
-        return isVerifiedByVisitour;
+        return verifiedByVisitour;
     }
 
     public boolean isAddressProtected() {
-        return isAddressProtected;
+        return addressProtected;
     }
 
     @KPermissionField
-    private boolean isAddressProtected;
+    private boolean addressProtected;
 
     @KPermissionField
     private String streetUrl;
@@ -298,11 +298,11 @@ public class ContactAddress extends UserBaseEntity{
     }
 
     public void setVerifiedByVisitour(boolean verifiedByVisitour) {
-        isVerifiedByVisitour = verifiedByVisitour;
+        this.verifiedByVisitour = verifiedByVisitour;
     }
 
     public void setAddressProtected(boolean addressProtected) {
-        isAddressProtected = addressProtected;
+        this.addressProtected = addressProtected;
     }
 
     public String getStreetUrl() {
@@ -383,8 +383,8 @@ public class ContactAddress extends UserBaseEntity{
         this.longitude = longitude;
         this.province = province;
         this.streetUrl = streetUrl;
-        this.isAddressProtected = addressProtected;
-        this.isVerifiedByVisitour = verifiedByVisitour;
+        this.addressProtected = addressProtected;
+        this.verifiedByVisitour = verifiedByVisitour;
     }
 
 

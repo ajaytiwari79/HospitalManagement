@@ -177,8 +177,8 @@ public class ExternalClientService {
         addressDTO1.setStreet(street);
         addressDTO1.setHouseNumber(hnr);
         addressDTO1.setCity(addressDTO.getPostalDistrict());
-        addressDTO1.setMunicipalityName(addressDTO.getPostalDistrict());
-        addressDTO1.setZipCodeId(addressDTO.getPostalCode());
+        addressDTO1.getMunicipality().setName(addressDTO.getPostalDistrict());
+        addressDTO1.getZipCode().setId(addressDTO.getPostalCode());
         Map<String, Object> tomtomResponse = addressVerificationService.verifyAddress(addressDTO1, unitId);
         logger.info("tomtomResponse-----------> "+tomtomResponse);
         if (tomtomResponse != null) {
@@ -211,7 +211,7 @@ public class ExternalClientService {
 
         }
 
-        ZipCode zipCode = zipCodeGraphRepository.findOne(addressDTO1.getZipCodeId());
+        ZipCode zipCode = zipCodeGraphRepository.findOne(addressDTO1.getZipCode().getId());
         if (zipCode == null)
             zipCode = zipCodeGraphRepository.findByZipCode(Integer.valueOf(addressDTO.getPostalCode().toString()));
         logger.info("zipCode-----------> " + zipCode);

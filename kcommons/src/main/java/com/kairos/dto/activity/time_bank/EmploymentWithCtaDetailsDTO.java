@@ -2,7 +2,8 @@ package com.kairos.dto.activity.time_bank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.activity.shift.Expertise;
+import com.kairos.dto.user.country.experties.ExpertiseDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import lombok.Getter;
@@ -40,6 +41,8 @@ public class EmploymentWithCtaDetailsDTO {
     private Long employmentTypeId;
     private Long expertiseId;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
+    private ExpertiseDTO expertiseQueryResult;
+
 
 
     public EmploymentWithCtaDetailsDTO(Long id) {

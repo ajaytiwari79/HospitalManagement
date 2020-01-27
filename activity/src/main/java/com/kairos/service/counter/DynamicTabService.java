@@ -6,8 +6,8 @@ import com.kairos.dto.activity.counter.distribution.access_group.AccessGroupPerm
 import com.kairos.dto.activity.counter.distribution.category.KPIDashboardUpdationDTO;
 import com.kairos.dto.activity.counter.distribution.dashboard.KPIDashboardDTO;
 import com.kairos.dto.activity.counter.enums.ConfLevel;
-import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.persistence.model.counter.KPIDashboard;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.repository.counter.CounterRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
@@ -72,9 +72,9 @@ public class DynamicTabService extends MongoBaseService {
             kpiDashboards.stream().forEach(kpiDashboard -> kpiDashboard.setModuleId(createModuleId(kpiDashboard.getId(), kpiDashboard.getParentModuleId())));
             save(kpiDashboards);
         }
-        List<StaffDTO> staffDTOS = userIntegrationService.getStaffListByUnit();
+        List<StaffPersonalDetail> staffDTOS = userIntegrationService.getStaffListByUnit();
         if (ConfLevel.UNIT.equals(level)) {
-            createTabsForStaff(unitId, kpiDashboards, staffDTOS.stream().map(StaffDTO::getId).collect(Collectors.toList()));
+            createTabsForStaff(unitId, kpiDashboards, staffDTOS.stream().map(StaffPersonalDetail::getId).collect(Collectors.toList()));
         }
         return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(kpiDashboards, KPIDashboardDTO.class);
     }

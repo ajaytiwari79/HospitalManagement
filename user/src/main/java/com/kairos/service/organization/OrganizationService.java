@@ -17,12 +17,12 @@ import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
-import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotsDeductionDTO;
 import com.kairos.dto.user.organization.*;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.OrganizationCategory;
@@ -39,7 +39,7 @@ import com.kairos.persistence.model.organization.services.OrganizationServicesAn
 import com.kairos.persistence.model.query_wrapper.OrganizationCreationData;
 import com.kairos.persistence.model.staff.personal_details.OrganizationStaffWrapper;
 import com.kairos.persistence.model.staff.personal_details.Staff;
-import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailDTO;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.counter.OrgTypeQueryResult;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.response.OrderAndActivityDTO;
@@ -74,8 +74,6 @@ import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import com.kairos.utils.external_plateform_shift.GetWorkShiftsFromWorkPlaceByIdResult;
-import com.kairos.dto.user_context.UserContext;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +83,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
@@ -348,7 +345,7 @@ public class OrganizationService {
         List<OrganizationBasicResponse> organizationQueryResult = unitGraphRepository.getOrganizationGdprAndWorkCenter(organizationId);
         List<Long> unitIds = organizationQueryResult.stream().map(organizationBasicResponse -> organizationBasicResponse.getId()).collect(Collectors.toList());
         List<Map<String, Object>> organizationContactAddress = unitGraphRepository.getContactAddressOfParentOrganization(unitIds);
-        List<StaffPersonalDetailDTO> staffPersonalDetailDTOS = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
+        List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
         for (OrganizationBasicResponse organizationData : organizationQueryResult) {
             for (Map<String, Object> address : organizationContactAddress) {
                 if (address.get("organizationId").equals(organizationData.getId())) {
@@ -356,7 +353,7 @@ public class OrganizationService {
                     break;
                 }
             }
-            Optional<StaffPersonalDetailDTO> currentStaff = staffPersonalDetailDTOS.stream().filter(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId().equals(organizationData.getId())).findFirst();
+            Optional<StaffPersonalDetailQueryResult> currentStaff = staffPersonalDetailQueryResults.stream().filter(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId().equals(organizationData.getId())).findFirst();
             organizationData.setUnitManager(currentStaff.isPresent() ? currentStaff.get() : null);
         }
         return organizationQueryResult;
@@ -623,7 +620,11 @@ public class OrganizationService {
 
     public Organization fetchParentOrganization(Long unitId) {
         Long parentOrgId = organizationBaseRepository.findParentOrgId(unitId);
-        return organizationGraphRepository.findOne(parentOrgId);
+        Organization parent=  organizationGraphRepository.findOne(parentOrgId);
+        if (!Optional.ofNullable(parent).isPresent()) {
+            exceptionService.dataNotFoundByIdException(MESSAGE_UNIT_ID_NOTFOUND, unitId);
+        }
+        return parent;
     }
 
     public OrganizationMappingDTO getEmploymentTypeWithExpertise(Long unitId) {
@@ -729,7 +730,7 @@ public class OrganizationService {
         } else {
             LOGGER.info("Organization Services or Level is not present for Unit id {}", unitId);
         }
-        List<StaffPersonalDetailDTO> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
+        List<StaffPersonalDetailQueryResult> staffList = staffGraphRepository.getAllStaffWithMobileNumber(unitId);
         List<PresenceTypeDTO> plannedTypes = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<FunctionDTO> functions = functionGraphRepository.findFunctionsIdAndNameByCountry(countryId);
         List<ReasonCodeResponseDTO> reasonCodes = reasonCodeGraphRepository.findReasonCodesByUnitIdAndReasonCodeType(unitId, ReasonCodeType.ORDER);
@@ -749,20 +750,10 @@ public class OrganizationService {
         Long countryId = UserContext.getUserDetails().getCountryId();
         List<PresenceTypeDTO> presenceTypeDTOS = plannedTimeTypeRestClient.getAllPlannedTimeTypes(countryId);
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);
-        List<DayTypeDTO> dayTypeDTOS = new ArrayList<>();
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(unitId);
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getShiftPlanningTimeSlotByUnit(organizationBaseEntity);
-        List<PresenceTypeDTO> presenceTypeDTOS1 = presenceTypeDTOS.stream().map(p -> new PresenceTypeDTO(p.getName(), p.getId())).collect(Collectors.toList());
-        dayTypes.forEach(dayType -> {
-            DayTypeDTO dayTypeDTO = new DayTypeDTO();
-            try {
-                PropertyUtils.copyProperties(dayTypeDTO, dayType);
-                dayTypeDTOS.add(dayTypeDTO);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        });
-        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS1, timeSlotDTOS, countryId);
+        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypes,DayTypeDTO.class);
+        return new WTADefaultDataInfoDTO(dayTypeDTOS, presenceTypeDTOS, timeSlotDTOS, countryId);
     }
 
     public RuleTemplateDefaultData getDefaultDataForRuleTemplateByUnit(Long unitId) {
@@ -871,9 +862,6 @@ public class OrganizationService {
 
     public SelfRosteringMetaData getPublicHolidaysReasonCodeAndDayTypeUnitId(long unitId) {
         Long countryId = UserContext.getUserDetails().getCountryId();
-        if (countryId == null) {
-            exceptionService.dataNotFoundByIdException(MESSAGE_COUNTRY_ID_NOTFOUND, countryId);
-        }
         UserAccessRoleDTO userAccessRoleDTO = accessGroupService.findUserAccessRole(unitId);
         List<ReasonCodeDTO> reasonCodes = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodeGraphRepository.findReasonCodeByUnitId(unitId), ReasonCodeDTO.class);
         return new SelfRosteringMetaData(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeService.getAllDayTypeByCountryId(countryId), com.kairos.dto.user.country.day_type.DayType.class), new ReasonCodeWrapper(reasonCodes, userAccessRoleDTO), FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId)));
@@ -917,6 +905,10 @@ public class OrganizationService {
             }
         }
         return organizationCategory;
+    }
+
+    public List<Organization> getAllUnionsByOrganizationOrCountryId(Long organizationId,Long countryId){
+        return organizationGraphRepository.getAllUnionsByOrganizationOrCountryId(organizationId,countryId);
     }
 
 }

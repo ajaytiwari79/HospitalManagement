@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
@@ -999,6 +1000,8 @@ public class EmploymentService {
         List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
         staffAdditionalInfoDTOS.forEach(currentData -> convertStaffEmploymentObject(employmentDetailsMap.get(currentData.getId()), currentData, expertisePlannedTimes));
         StaffEmploymentUnitDataWrapper staffEmploymentUnitDataWrapper = new StaffEmploymentUnitDataWrapper(staffAdditionalInfoDTOS);
+        User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        staffEmploymentUnitDataWrapper.setUnitWiseAccessRole(user.getUnitWiseAccessRole());
         staffRetrievalService.setRequiredDataForShiftCreationInWrapper(staffEmploymentUnitDataWrapper, unit, countryId, expertiseId);
         return staffEmploymentUnitDataWrapper;
     }
@@ -1043,11 +1046,11 @@ public class EmploymentService {
     }
 
     public List<EmploymentQueryResult> getMainEmploymentOfStaffs() {
-        return employmentGraphRepository.getMainEmploymentOfStaffs(EmploymentSubType.MAIN);
+        List<EmploymentQueryResult> employments =  employmentGraphRepository.getMainEmploymentOfStaffs(EmploymentSubType.MAIN);
+        return setHourlyCostInEmployments(employments);
     }
 
-    public List<EmploymentQueryResult> findEmploymentByUnitId(Long unitId) {
-        List<EmploymentQueryResult> employments = employmentGraphRepository.findEmploymentByUnitId(unitId);
+    private List<EmploymentQueryResult> setHourlyCostInEmployments(List<EmploymentQueryResult> employments) {
         List<EmploymentLinesQueryResult> hourlyCostPerLine = employmentGraphRepository.findFunctionalHourlyCost(employments.stream().map(employmentQueryResult -> employmentQueryResult.getId()).collect(Collectors.toList()));
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
         employments = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(employments, EmploymentQueryResult.class);
@@ -1058,6 +1061,11 @@ public class EmploymentService {
             }
         }
         return employments;
+    }
+
+    public List<EmploymentQueryResult> findEmploymentByUnitId(Long unitId) {
+        List<EmploymentQueryResult> employments = employmentGraphRepository.findEmploymentByUnitId(unitId);
+        return setHourlyCostInEmployments(employments);
     }
 
     public void setEndDateInEmploymentOfExpertise(ExpertiseDTO expertiseDTO) {

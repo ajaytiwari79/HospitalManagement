@@ -5,10 +5,7 @@ import org.neo4j.ogm.session.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.EnvironmentAware;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.data.neo4j.annotation.EnableNeo4jAuditing;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
@@ -25,7 +22,6 @@ import static com.kairos.constants.Neo4jConstant.*;
  * 2. getConfiguration()
  */
 @Configuration
-
 @PropertySource({"classpath:application-${spring.profiles.active}.properties"})
 @ComponentScan("com.kairos.persistence")
 @EnableTransactionManagement
@@ -39,6 +35,7 @@ public class Neo4jConfig  implements EnvironmentAware {
     private Environment environment;
 
     @Bean
+    @Primary
     public SessionFactory sessionFactory() {
         return new SessionFactory(configuration(), "com.kairos.persistence.model");
     }

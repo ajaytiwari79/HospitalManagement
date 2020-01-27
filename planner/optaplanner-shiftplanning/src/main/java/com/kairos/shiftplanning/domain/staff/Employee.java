@@ -1,6 +1,9 @@
 package com.kairos.shiftplanning.domain.staff;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
+import com.kairos.dto.activity.shift.EmploymentType;
+import com.kairos.enums.Employment;
+import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.domain.cta.CollectiveTimeAgreement;
 import com.kairos.shiftplanning.domain.shift.Shift;

@@ -10,7 +10,7 @@ public class ShiftImpPlanningSolutionServiceUnitTest {
     @Test
     public void getDataFromKairos() throws Exception {
        // ShiftRequestPhasePlanningSolutionService solutionService = new ShiftRequestPhasePlanningSolutionService();
-       // solutionService.getDataFromKairos(145l,new Date(),new Date());
+       // solutionService.getDataFromKairos(145l,getDate(),getDate());
         logger.info("complete");
     }
 

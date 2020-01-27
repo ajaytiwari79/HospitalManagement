@@ -8,6 +8,8 @@ import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
+import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
+import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,6 +55,9 @@ public class EmploymentQueryResult {
     private long totalShifts;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private Long expertiseId;
+    private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+    private ExpertiseQueryResult expertiseQueryResult;
+
 
 
     /**
