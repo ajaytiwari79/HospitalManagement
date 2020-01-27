@@ -1,5 +1,6 @@
 package com.kairos.interceptor;
 import com.kairos.custom_exception.InvalidRequestException;
+import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,17 +32,16 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
-        if(pathVariables==null){
-            throw new InvalidRequestException("Url or Parameter is not correct");
-        }        String orgIdString=pathVariables.get("organizationId");
         try {
-            if(isNotNull(UserContext.getUserDetails())) {
-                UserContext.setUserDetails(getCurrentUser());
+            CurrentUserDetails userDetails = getCurrentUser();
+            if(isNotNull(UserContext.getUserDetails()) && isNotNull(userDetails)) {
+                UserContext.setUserDetails(userDetails);
             }
     } catch (Exception e) {
 LOGGER.error("exception {}",e);
     }
-        String unitIdString=pathVariables.get("unitId");
+        String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
+        String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
         LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationId ,Unit Id " +orgIdString+" ,"+unitIdString+" ]");
 
@@ -52,7 +52,9 @@ LOGGER.error("exception {}",e);
         if(unitIdString!=null){
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.setUnitId(unitId);
-            UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
+            if(isNotNull(UserContext.getUserDetails())) {
+                UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
+            }
         }
 
         ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
