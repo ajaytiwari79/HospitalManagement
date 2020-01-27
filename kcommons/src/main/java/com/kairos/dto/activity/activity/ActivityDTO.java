@@ -41,8 +41,10 @@ public class ActivityDTO  {
     private Long countryId;
     private BigInteger categoryId;
     private String categoryName;
+    @Builder.Default
     private Long unitId = -1L;
     private List<Long> employmentTypes;
+    @Builder.Default
     private boolean isParentActivity = true;
     private GeneralActivityTabDTO generalActivityTab;
     private TimeTypeDTO timeType;
@@ -57,6 +59,7 @@ public class ActivityDTO  {
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private List<Long> skills;
     private SkillActivityDTO skillActivityTab;
+    @Builder.Default
     private Boolean activityCanBeCopied=false;
     private ActivityPriorityDTO activityPriority;
     private List<ShiftStatus> activityStatus;
@@ -64,6 +67,7 @@ public class ActivityDTO  {
 
     //    private List<Tag> tags;
 //    private List<BigInteger> tags = new ArrayList<>();
+    @Builder.Default
     private List<BigInteger> tags = new ArrayList<>();
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;

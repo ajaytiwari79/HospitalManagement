@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
@@ -23,7 +24,8 @@ import static com.kairos.constants.ApiConstants.SCHEDULER_EXECUTE_JOB;
  * @author pradeep
  * @date - 23/12/18
  */
-@RestController(API_V1+ SCHEDULER_EXECUTE_JOB)
+@RestController()
+@RequestMapping(API_V1+ SCHEDULER_EXECUTE_JOB)
 public class SchedulerJobController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerJobController.class);
