@@ -23,6 +23,7 @@ public class FilterSelectionDTO<T> {
     private List<FilterSelection> filtersData;
     private FilterType name;
     private Set<T> value;
+    private int sequence;
 
 
     private String moduleId;

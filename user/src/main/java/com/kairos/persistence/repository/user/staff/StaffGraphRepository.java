@@ -289,7 +289,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (staff:Staff)-[:" + HAS_FAVOURITE_FILTERS + "]->(staffFavouriteFilters:StaffFavouriteFilter{deleted:false}) WHERE id(staff)={0} WITH staffFavouriteFilters \n" +
             "MATCH (staffFavouriteFilters)-[:HAS_FILTER_GROUP]->(filterGroup:FilterGroup)-[:APPLICABLE_FOR]-(accessPage:AccessPage) WHERE accessPage.moduleId={1} \n" +
-            "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterSelection) WITH staffFavouriteFilters, COLLECT({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value}) AS filterDetails\n" +
+            "MATCH (staffFavouriteFilters)-[:FILTER_DETAIL]-(filterDetail:FilterSelection) WITH staffFavouriteFilters, COLLECT({id:id(filterDetail), name:filterDetail.name, value:filterDetail.value,sequence:filterDetail.sequence}) AS filterDetails\n" +
             "RETURN id(staffFavouriteFilters) AS id, staffFavouriteFilters.name AS name, filterDetails AS filtersData")
     List<FavoriteFilterQueryResult> getStaffFavouriteFiltersByStaffAndView(Long staffId, String moduleId);
 
