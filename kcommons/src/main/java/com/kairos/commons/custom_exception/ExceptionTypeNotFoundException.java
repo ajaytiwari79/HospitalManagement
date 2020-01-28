@@ -5,7 +5,7 @@ package com.kairos.commons.custom_exception;
  */
 
 public class ExceptionTypeNotFoundException extends RuntimeException{
-
+    @Deprecated//Please use ExceptionService
     public ExceptionTypeNotFoundException(String message) {
         super(message);
     }
