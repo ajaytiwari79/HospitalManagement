@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.activity;
 
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLineInterval;
@@ -31,6 +32,9 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     private Activity activity;
     @PlanningVariable(valueRangeProviderRefs = "shifts", nullable = true)
     private ShiftImp shift;
+
+
+
 
     public ActivityLineInterval() {
     }

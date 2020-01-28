@@ -11,6 +11,7 @@ import com.kairos.dto.planner.shift_planning.ShiftPlanningProblemSubmitDTO;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;
 import com.kairos.enums.constraint.ConstraintLevel;
 import com.kairos.enums.constraint.ConstraintType;
+import com.kairos.enums.planning_problem.PlanningProblemType;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
@@ -19,11 +20,17 @@ import com.kairos.shiftplanning.domain.staffing_level.StaffingLevelMatrix;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import com.kairos.shiftplanning.executioner.ShiftPlanningSolver;
 import com.kairos.shiftplanning.solution.ShiftRequestPhasePlanningSolution;
+import com.planner.domain.planning_problem.PlanningProblem;
 import com.planner.domain.query_results.staff.StaffQueryResult;
 import com.planner.domain.shift_planning.Shift;
+import com.planner.repository.planning_problem.PlanningProblemRepository;
+import com.planner.service.config.PathProvider;
+import com.planner.service.planning_problem.PlanningProblemService;
+import com.planner.util.wta.FileIOUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -61,12 +68,16 @@ public class ShiftPlanningInitializationService {
     private StaffingLevelService staffingLevelService;
     @Inject
     private WTAService wtaService;
-
+    @Inject
+    private PathProvider pathProvider;
+    @Inject
+    private PlanningProblemService planningProblemService;
 
     /**
      * ShiftRequestPhasePlanningSolution(Opta-planner planning Solution)
      */
     public ShiftRequestPhasePlanningSolution initializeShiftPlanning(ShiftPlanningProblemSubmitDTO shiftPlanningProblemSubmitDTO) {
+
         Long unitId = shiftPlanningProblemSubmitDTO.getUnitId();
         Date fromPlanningDate;
         Date toPlanningDate;
@@ -76,14 +87,20 @@ public class ShiftPlanningInitializationService {
             com.kairos.dto.planner.planninginfo.PlanningProblemDTO planningPeriodDTO = activityMongoService.getPlanningPeriod(planningPeriodId,unitId);
             fromPlanningDate = DateUtils.asDate(planningPeriodDTO.getStartDate());
             toPlanningDate = DateUtils.asDate(planningPeriodDTO.getEndDate());
+
         } else {
             fromPlanningDate = DateUtils.asDate(shiftPlanningProblemSubmitDTO.getStartDate());
             toPlanningDate = DateUtils.asDate(shiftPlanningProblemSubmitDTO.getEndDate());
         }
 
+
         List<StaffQueryResult> staffWithSkillsAndEmploymentIds = userNeo4jService.getStaffWithSkillsAndEmploymentIds(unitId, staffIds);
-        List<Long> employmentIds = staffWithSkillsAndEmploymentIds.stream().map(s -> s.getEmploymentId()).collect(Collectors.toList());
-       //
+        //List<Long> employmentIds = staffWithSkillsAndEmploymentIds.stream().map(s -> s.getEmploymentIds()).collect(Collectors.toList());
+        List<Long> employmentIds = new LinkedList<>();
+        for(StaffQueryResult staffQueryResult:staffWithSkillsAndEmploymentIds){
+            employmentIds.addAll(staffQueryResult.getEmploymentIds());
+        }
+
         List<Employee> employeeList = getAllEmployee(fromPlanningDate, toPlanningDate, staffWithSkillsAndEmploymentIds, employmentIds);
        //
         List<ShiftPlanningStaffingLevelDTO> shiftPlanningStaffingLevelDTOList = staffingLevelService.getShiftPlanningStaffingLevelDTOByUnitId(unitId, fromPlanningDate, toPlanningDate);
@@ -128,8 +145,9 @@ public class ShiftPlanningInitializationService {
         shiftRequestPhasePlanningSolution.setStaffingLevelMatrix(new StaffingLevelMatrix(staffingLevelMatrix,activitiesRank));
         shiftRequestPhasePlanningSolution.setWeekDates(weekDates);
         shiftRequestPhasePlanningSolution.setSkillLineIntervals(new ArrayList<>());//Temporary
+        BigInteger problemId = planningProblemService.addProblemFileAndGetPlanningProblemID(shiftPlanningProblemSubmitDTO,fromPlanningDate,toPlanningDate,shiftRequestPhasePlanningSolution);
         ShiftRequestPhasePlanningSolution planningSolution=new ShiftPlanningSolver(getSolverConfigDTO()).solveProblem(shiftRequestPhasePlanningSolution);
-
+        planningProblemService.addSolutionFile(planningSolution,problemId);
         return planningSolution;
     }
 
@@ -162,15 +180,17 @@ public class ShiftPlanningInitializationService {
 
             //Initialize Employee
             for (StaffQueryResult staffQueryResult : staffWithSkillsAndEmploymentIds) {
-                if (staffQueryResult.getEmploymentId() != null && employmentIdWithLocalDateCTAMap.containsKey(staffQueryResult.getEmploymentId())) {
-                    Employee employee = new Employee();
-                    employee.setId(staffQueryResult.getStaffId().toString());
-                    employee.setName(staffQueryResult.getStaffName());
-                    employee.setEmploymentId(staffQueryResult.getEmploymentId());
-                    employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByEmploymentId(employmentIdWithLocalDateCTAMap, staffQueryResult.getEmploymentId()));
-                    employee.setSkillSet(skillService.setSkillsOfEmployee(staffQueryResult.getStaffSkills()));
-                    employee.setLocalDateWTAMap(wtaService.getLocalDateWTAMapByEmploymentId(dateWTAMap, staffQueryResult.getEmploymentId()));//TODO
-                    employeeList.add(employee);
+                for(Long employmentId : staffQueryResult.getEmploymentIds()) {
+                    if (employmentId != null && employmentIdWithLocalDateCTAMap.containsKey(employmentId)) {
+                        Employee employee = new Employee();
+                        employee.setId(staffQueryResult.getStaffId().toString());
+                        employee.setName(staffQueryResult.getStaffName());
+                        employee.setEmploymentId(employmentId);
+                        employee.setLocalDateCTAResponseDTOMap(ctaService.getLocalDateCTAMapByEmploymentId(employmentIdWithLocalDateCTAMap, employmentId));
+                        employee.setSkillSet(skillService.setSkillsOfEmployee(staffQueryResult.getStaffSkills()));
+                        employee.setLocalDateWTAMap(wtaService.getLocalDateWTAMapByEmploymentId(dateWTAMap, employmentId));//TODO
+                        employeeList.add(employee);
+                    }
                 }
             }
         }

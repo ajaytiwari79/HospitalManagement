@@ -39,8 +39,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.DateUtils.asZoneDateTime;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 
 @Service
@@ -253,7 +252,7 @@ public class TimeAndAttendanceService extends MongoBaseService {
         //List<TimeAndAttendance> timeAndAttendances = timeAndAttendanceRepository.findAllbyUnitIdAndDate(unitId,startDate);
         ZonedDateTime startZonedDateTime = asZoneDateTime(startDate).truncatedTo(ChronoUnit.DAYS);
         ZonedDateTime endZonedDateTime = startZonedDateTime.plusDays(1);
-        List<Shift> shifts = isNull(staffId) ? shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(asDate(startZonedDateTime), asDate(endZonedDateTime), unitId) :
+        List<Shift> shifts = isNull(staffId) ? shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(asDate(startZonedDateTime), asDate(endZonedDateTime), newArrayList(unitId)) :
                 shiftMongoRepository.findShiftBetweenDurationByStaffId(staffId, asDate(startZonedDateTime), asDate(endZonedDateTime));
              /*Map<BigInteger, Shift> staffIdAndShifts = shifts.stream().collect(Collectors.toMap(k -> k.getId(), v -> v));
              timeAndAttendances.forEach(timeAndAttendance -> {

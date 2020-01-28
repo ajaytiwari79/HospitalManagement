@@ -6,7 +6,6 @@ import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.dto.user.staff.StaffDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
@@ -15,6 +14,7 @@ import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
@@ -125,7 +125,7 @@ public class ShiftReminderService{
         }
         Activity activity = activityMongoRepository.findOne(shiftActivity.get().getActivityId());
 
-        StaffDTO staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
+        StaffPersonalDetail staffDTO = userIntegrationService.getStaff(shift.getUnitId(), shift.getStaffId());
         LocalDateTime lastTriggerDateTime = DateUtils.getLocalDateTimeFromMillis(jobDetails.getOneTimeTriggerDateMillis());
         LocalDateTime nextTriggerDateTime = calculateTriggerTime(activity, shiftActivity.get().getStartDate(), lastTriggerDateTime);
 
@@ -138,7 +138,7 @@ public class ShiftReminderService{
         if(StringUtils.isNotBlank(staffDTO.getProfilePic())) {
                templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
         }
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getEmail());
+        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getContactDetail().getPrivateEmail());
 
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {

@@ -243,10 +243,17 @@ public class AppConstants {
     public static final String DISAPPROVE_COLOR_CODE="#f7665e";
     public static final String PENDING_COLOR_CODE="#f5f591";
 
+    public static final String REQUESTED ="Requested";
+    public static final String APPROVE="Approve";
+    public static final String DISAPPROVE="Disapprove";
+    public static final String PENDING="Pending";
+
 
     public static final String LEVEL = "level";
     public static final String SKILL_ID = "skillId";
 
     public static final String PLANNING_PERIOD_NAME="PP_";
+    public static final int NOT_VALID_VALUE = -1;
+
 
 }

@@ -187,11 +187,11 @@ public class Shift extends MongoBaseEntity {
         List<ShiftActivity> shiftActivitiesForOverStaffing = new ArrayList<>();
         if (shift == null) {
             for (int i = 0; i < this.getActivities().size(); i++) {
-                shiftActivitiesForOverStaffing.add(new ShiftActivity(this.getActivities().get(i).getActivityId(),this.getActivities().get(i).getStartDate(),this.getActivities().get(i).getEndDate()));
+                shiftActivitiesForOverStaffing.add(new ShiftActivity(this.getActivities().get(i).getActivityId(),this.getActivities().get(i).getStartDate(),this.getActivities().get(i).getEndDate(),this.getActivities().get(i).getActivityName()));
             }
         } else if (this == shift) {
             for (int i = 0; i < this.getActivities().size(); i++) {
-                shiftActivitiesForUnderStaffing.add(new ShiftActivity(this.getActivities().get(i).getActivityId(),this.getActivities().get(i).getStartDate(),this.getActivities().get(i).getEndDate()));
+                shiftActivitiesForUnderStaffing.add(new ShiftActivity(this.getActivities().get(i).getActivityId(),this.getActivities().get(i).getStartDate(),this.getActivities().get(i).getEndDate(),this.getActivities().get(i).getActivityName()));
             }
         } else {
             List<ShiftActivityLineInterval> shiftActivityLines=getShiftActivityLineIntervals(shift);
@@ -222,7 +222,7 @@ public class Shift extends MongoBaseEntity {
         List<ShiftActivity> shiftActivitiesForCheckingStaffingLevel = new ArrayList<>();
         for (ShiftActivityLineInterval activityLineInterval:currentActivityLines){
             if(shiftActivityLines.stream().noneMatch(k->k.getStartDate().equals(activityLineInterval.getStartDate()) && k.getActivityId().equals(activityLineInterval.getActivityId()))){
-                shiftActivitiesForCheckingStaffingLevel.add(new ShiftActivity(activityLineInterval.getActivityId(),activityLineInterval.getStartDate(),activityLineInterval.getEndDate()));
+                shiftActivitiesForCheckingStaffingLevel.add(new ShiftActivity(activityLineInterval.getActivityId(),activityLineInterval.getStartDate(),activityLineInterval.getEndDate(),activityLineInterval.getActivityName()));
             }
         }
         if(isCollectionNotEmpty(shiftActivitiesForCheckingStaffingLevel))
@@ -247,6 +247,14 @@ public class Shift extends MongoBaseEntity {
             }
         }
         return shiftActivitiesList;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
 

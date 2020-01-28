@@ -12,10 +12,10 @@ import lombok.Setter;
 public class ExpertiseNightWorkerSetting extends MongoBaseEntity {
 
     private TimeSlot timeSlot;
-    private Integer minMinutesToCheckNightShift;
+    private int minMinutesToCheckNightShift;
     private DurationType intervalUnitToCheckNightWorker;
-    private Integer intervalValueToCheckNightWorker;
-    private Integer minShiftsValueToCheckNightWorker;
+    private int intervalValueToCheckNightWorker;
+    private int minShiftsValueToCheckNightWorker;
     private XAxisConfig minShiftsUnitToCheckNightWorker;
     private Long countryId;
     private Long unitId;

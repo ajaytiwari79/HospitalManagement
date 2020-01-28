@@ -37,7 +37,26 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     @Query("MATCH(unit:Unit{deleted:false,union:true}) WHERE  unit.name=~{0} RETURN count(unit)>0")
     boolean existsByName(String name);
 
-    @Query("MATCH (organization:Organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
+    @Query("MATCH (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
+            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill{isEnabled:true}) WITH distinct skill,organization\n" +
+            "OPTIONAL MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH DISTINCT skill,r, organization\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=true WITH  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[ORGANIZATION_HAS_TAG]-(organization) WITH  skill,r,organization,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            "MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH\n" +
+            " {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
+            " RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
+            " UNION\n" +
+            " MATCH (unit)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) WHERE id(unit)={1} WITH subType,unit\n" +
+            " MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL+"{deleted:false}]->(skill:Skill{isEnabled:true}) WITH distinct skill,unit\n" +
+            " MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,unit,r\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags WITH  skill,unit,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
+            "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[ORGANIZATION_HAS_TAG]-(unit) WITH  skill,r,unit,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
+            " MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:skill.name,visitourId:r.visitourId, customName:r.customName, description:skill.description,isEdited:true, tags:ctags+otags})} as selectedSkills\n" +
+            " RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
+    List<Map<String, Object>> getSkillsForParentOrganization(long organizationId, long unitId);
+
+
+    @Query("MATCH (organization)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
             "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{deleted:false}]->(skill:Skill{isEnabled:true}) WITH distinct skill,organization\n" +
             "MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH DISTINCT skill,r, organization\n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=true WITH  skill,r,organization,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
@@ -46,26 +65,26 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             " {id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:skill.name,description:skill.description,visitourId:r.visitourId,isEdited:true, tags:ctags+otags})} as availableSkills\n" +
             " RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             " UNION\n" +
-            " MATCH (unit:Unit)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) WHERE id(unit)={1} WITH subType,unit\n" +
+            " MATCH (unit)-[:"+SUB_TYPE_OF+"]->(subType:OrganizationType) WHERE id(unit)={1} WITH subType,unit\n" +
             " MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL+"{deleted:false}]->(skill:Skill{isEnabled:true}) WITH distinct skill,unit\n" +
             " MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,unit,r\n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[COUNTRY_HAS_TAG]-(c:Country) WHERE tag.countryTag=unit.showCountryTags WITH  skill,unit,r,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as ctags\n" +
             "OPTIONAL MATCH (skill:Skill)-[:" + HAS_TAG + "]-(tag:Tag{deleted:false})<-[ORGANIZATION_HAS_TAG]-(unit) WITH  skill,r,unit,ctags,CASE WHEN tag IS NULL THEN [] ELSE COLLECT({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as otags\n" +
             " MATCH (skill)-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH {id:id(skillCategory),name:skillCategory.name,description:skillCategory.description,children:COLLECT({id:id(skill),name:skill.name,visitourId:r.visitourId, customName:r.customName, description:skill.description,isEdited:true, tags:ctags+otags})} as selectedSkills\n" +
             " RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
-    List<Map<String, Object>> getSkillsOfChildOrganizationWithActualName(long organizationId, long unitId);
+    List<Map<String, Object>> getSkillsOfChildUnit(long organizationId, long unitId);
 
     @Query("MATCH (organization:Unit) WHERE id(organization)={0} \n" +
             "MATCH (organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) \n" +
-            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH DISTINCT skill,organization\n" +
+            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true,deleted:false}]->(skill:Skill) WITH DISTINCT skill,organization\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH distinct skill,skillCategory,organization\n" +
             "OPTIONAL MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) WITH\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:r.customName,description:skill.description,visitourId:r.visitourId,isEdited:true})} as availableSkills\n" +
             "RETURN {availableSkills:COLLECT(availableSkills)} as data\n" +
             "UNION\n" +
             "MATCH (organization:Organization)-[:" + SUB_TYPE_OF + "]->(subType:OrganizationType) WHERE id(organization)={0} WITH subType,organization\n" +
-            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true}]->(skill:Skill) WITH distinct skill,organization\n" +
-            "MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,r\n" +
+            "MATCH (subType)-[:" + ORG_TYPE_HAS_SKILL + "{isEnabled:true,deleted:false}]->(skill:Skill) WITH distinct skill,organization\n" +
+            "OPTIONAL MATCH (organization)-[r:" + ORGANISATION_HAS_SKILL + "{isEnabled:true}]->(skill) WITH skill,r\n" +
             "MATCH (skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory:SkillCategory{isEnabled:true}) WITH\n" +
             "{id:id(skillCategory),name:skillCategory.name,children:COLLECT({id:id(skill),name:r.customName,description:skill.description,visitourId:r.visitourId, customName:r.customName, isEdited:true})} as selectedSkills\n" +
             "RETURN {selectedSkills:COLLECT(selectedSkills)} as data")
@@ -222,8 +241,8 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
     Unit getParentOrganizationOfCityLevel(long unitId);
 
 
-    @Query("MATCH (o:Unit)-[rel:" + ORGANISATION_HAS_SKILL + "]->(s:Skill) WHERE id(o)={0}  AND  id(s)={1} \n" +
-            "OPTIONAL MATCH (o)-[:" + HAS_SUB_ORGANIZATION + "]->(sub:Unit)-[subRel:" + ORGANISATION_HAS_SKILL + "]->(s) SET rel.isEnabled=false, " +
+    @Query("MATCH (o)-[rel:" + ORGANISATION_HAS_SKILL + "]->(s:Skill) WHERE id(o)={0}  AND  id(s)={1} \n" +
+            "OPTIONAL MATCH (o)-[:" + HAS_UNIT + "]->(sub:Unit)-[subRel:" + ORGANISATION_HAS_SKILL + "]->(s) SET rel.isEnabled=false, " +
             "rel.lastModificationDate={2},subRel.isEnabled=false,subRel.lastModificationDate={2} ")
     void removeSkillFromOrganization(long unitId, long skillId, long lastModificationDate);
 
@@ -296,10 +315,10 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             " RETURN {selectedServices:COLLECT(selectedServices)} as data")
     List<Map<String, Object>> getServicesForUnit(Long unitId);
 
-    @Query("MATCH (unit:Unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:skill.name}]->(skill)")
+    @Query("MATCH (unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} create (unit)-[r:" + ORGANISATION_HAS_SKILL + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:skill.name}]->(skill)")
     void addSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
 
-    @Query("MATCH (unit:Unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) set r.creationDate={2},r.lastModificationDate={3},r.isEnabled=true")
+    @Query("MATCH (unit),(skill:Skill) WHERE id (unit)={0} AND id(skill) IN {1} MATCH (unit)-[r:" + ORGANISATION_HAS_SKILL + "]->(skill) set r.creationDate={2},r.lastModificationDate={3},r.isEnabled=true")
     void updateSkillInOrganization(long unitId, List<Long> skillId, long creationDate, long lastModificationDate);
 
     @Query("MATCH (unit:Unit),(organizationService:OrganizationService) WHERE id(unit)={0} AND id(organizationService) IN {1} create unique (unit)-[r:" + PROVIDE_SERVICE + "{creationDate:{2},lastModificationDate:{3},isEnabled:true, customName:organizationService.name}]->(organizationService)")

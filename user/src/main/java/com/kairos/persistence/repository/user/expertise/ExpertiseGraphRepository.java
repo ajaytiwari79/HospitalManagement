@@ -42,27 +42,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
     @Query("MATCH (expertise:Expertise{deleted:false,published:true}) RETURN expertise")
     List<Expertise> findAll();
 
-    @Query("MATCH (expertise:Expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill:Skill) WHERE id(expertise)={0} AND id(skill)={1} RETURN count(r) as countOfRel")
-    int expertiseHasAlreadySkill(long expertiseId, long skillId);
-
-    @Query("MATCH (expertise:Expertise),(skill:Skill) WHERE id (expertise)={0} AND id(skill)={1} create (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "{creationDate:{2},lastModificationDate:{3},isEnabled:true}]->(skill) RETURN skill")
-    void addSkillInExpertise(long expertiseId, long skillId, long creationDate, long lastModificationDate);
-
-    @Query("MATCH (expertise:Expertise),(skill:Skill) WHERE id (expertise)={0} AND id(skill) = {1} MATCH (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill) set r.lastModificationDate={2},r.isEnabled=true RETURN skill")
-    void updateExpertiseSkill(long expertiseId, long skillId, long lastModificationDate);
-
-    @Query("MATCH (expertise:Expertise),(skill:Skill) WHERE id(expertise)={0} AND id(skill) IN {1} MATCH (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill) set r.isEnabled=false,r.lastModificationDate={2} RETURN r")
-    void deleteExpertiseSkill(long expertiseId, List<Long> skillId, long lastModificationDate);
-
-    @Query("MATCH (expertise:Expertise) WHERE id(expertise)={0} with expertise\n" +
-            "MATCH (skillCategory:SkillCategory{isEnabled:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country)={1} with skillCategory,expertise,country\n" +
-            "MATCH (skill:Skill{isEnabled:true})-[:" + HAS_CATEGORY + "]->(skillCategory) with skill,skillCategory,expertise,country\n" +
-            "OPTIONAL MATCH (skill)-[:" + HAS_TAG + "]-(tag:Tag)<-[" + COUNTRY_HAS_TAG + "]-(country)  with skill,skillCategory,expertise, CASE WHEN tag IS NULL THEN [] ELSE collect({id:id(tag),name:tag.name,countryTag:tag.countryTag}) END as tags\n" +
-            "optional MATCH (expertise)-[r:" + EXPERTISE_HAS_SKILLS + "]->(skill) with collect({id:id(skill),name:skill.name,isSelected:case when r.isEnabled then true else false end, tags:tags}) as skill,skillCategory\n" +
-            "RETURN collect({id:id(skillCategory),name:skillCategory.name,children:skill}) as skills")
-    ExpertiseSkillQueryResult getExpertiseSkills(long expertiseId, long countryId);
-
-
 
     @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} AND id(e) = {1} RETURN e")
     Expertise getExpertiesOfCountry(Long countryId, Long expertiseId);
@@ -103,11 +82,6 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "expertise.endDate as endDate ,expertise.description as description ,expertise.published as published,expertise.breakPaymentSetting as breakPaymentSetting ORDER BY expertise.name")
     ExpertiseQueryResult getExpertiseById(Long expertiseId);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,history:false})-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level) WHERE id(level)={0} AND expertise.name={1}  AND id(expertise)<> {2}" +
-            "with count(expertise) as expertiseCount " +
-            "RETURN case when expertiseCount>0 THEN  true ELSE false END as response")
-    Boolean checkExpertiseNameUniqueInOrganizationLevel(Long organizationLevelId, String expertiseName, Long currentExpertise);
-
     @Query("MATCH(expertise:Expertise{deleted:false}) where expertise.name=~{0} with count(expertise) as expertiseCount " +
             "RETURN case when expertiseCount>0 THEN  true ELSE false END as response")
     boolean findExpertiseByUniqueName(String expertiseName);
@@ -138,17 +112,19 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
 
     @Query("MATCH (country:Country)<-[:" + BELONGS_TO + "]-(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine) WHERE id(country) = {0} AND (DATE(exl.startDate)<=DATE() AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE()))  " +
             "MATCH(expertise)-[:" + BELONGS_TO_SECTOR + "]-(sector:Sector)\n" +
+            "OPTIONAL MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(organizationLevel:Level) \n" +
+            "OPTIONAL MATCH(expertise)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization) \n" +
             "OPTIONAL MATCH(expertise)-[:" + HAS_SENIOR_DAYS + "]->(seniorDays:CareDays) \n " +
             "OPTIONAL MATCH(expertise)-[:" + HAS_CHILD_CARE_DAYS + "]->(childCareDays:CareDays) \n" +
-            "WITH DISTINCT expertise,exl,seniorDays,childCareDays,sector " +
+            "WITH DISTINCT expertise,exl,seniorDays,childCareDays,sector,organizationLevel,union  " +
             "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1}\n" +
             "MATCH(exl)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
-            "with expertise,exl,seniorityLevel,sector, " +
+            "with expertise,exl,seniorityLevel,sector,organizationLevel,union, " +
             "CASE WHEN seniorDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE WHEN childCareDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays ORDER BY  seniorityLevel.from \n" +
             "RETURN DISTINCT expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate ," +
             "expertise.endDate as endDate ,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek," +
-             " seniorDays,childCareDays,sector order by expertise.name")
+             " seniorDays,childCareDays,sector,organizationLevel,union order by expertise.name")
     List<ExpertiseQueryResult> findExpertiseByOrganizationServicesForUnit(Long countryId, Set<Long> organizationServicesIds);
 
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  WHERE id(expertise)={0}" +
@@ -165,18 +141,16 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "RETURN protectedSetting")
     List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(Long expertiseId);
 
-    @Query("MATCH(expertise:Expertise{deleted:false,published:true}) WHERE id(expertise) IN {0}" +
-            "MATCH(expertise)-[:"+HAS_PROTECTED_DAYS_OFF_SETTINGS+"]->(protectedSetting:ProtectedDaysOffSetting)\n" +
-            "RETURN protectedSetting")
-    List<ProtectedDaysOffSetting> findProtectedDaysOffSettingByExpertiseId(List<Long> expertiseId);
-
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) WHERE id(expertise) = {0} AND (DATE(exl.startDate)<=DATE({1}) AND (exl.endDate IS NULL OR DATE(exl.endDate)>=DATE({1})))" +
             "RETURN exl LIMIT 1")
     ExpertiseLine getCurrentlyActiveExpertiseLineByDate(Long expertiseId, String startDate);
 
-    @Query("MATCH(exl:ExpertiseLine)-[rel:"+FOR_SENIORITY_LEVEL+"]-(sl:SeniorityLevel)-[pgRel: " + HAS_BASE_PAY_GRADE + "]->(payGrade:PayGrade) WHERE id(exl)={0} DETACH DELETE rel,pgRel")
-    void removeSeniorityLevel(Long expertiseLineId);
+    @Query("MATCH (e:Expertise{deleted:false,published:true})-[:" + BELONGS_TO + "]->(country:Country) WHERE id(country) = {0} RETURN e")
+    List<Expertise> getExpertiesOfCountry(Long countryId);
 
+    @Query("MATCH(expertise:Expertise)-[r:"+HAS_SENIOR_DAYS+"]-(careDays:CareDays) WHERE id(expertise) = {0} DETACH DELETE r RETURN COUNT(r)>0")
+    boolean removeSeniorDays(Long expertiseId);
 
-
+    @Query("MATCH(expertise:Expertise)-[r:"+HAS_CHILD_CARE_DAYS+"]-(careDays:CareDays) WHERE id(expertise) = {0} DETACH DELETE r RETURN COUNT(r)>0")
+    boolean removeChildCareDays(Long expertiseId);
  }

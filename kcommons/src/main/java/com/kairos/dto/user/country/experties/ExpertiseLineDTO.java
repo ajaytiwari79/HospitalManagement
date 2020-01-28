@@ -13,7 +13,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class ExpertiseLineDTO {
+public class  ExpertiseLineDTO implements Comparable<ExpertiseLineDTO> {
     private Long id;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -22,9 +22,18 @@ public class ExpertiseLineDTO {
     private UnionIDNameDTO union;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
+
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private Boolean editable;
     private BreakPaymentSetting breakPaymentSetting;
     private SectorDTO sector;
+
+    @Override
+    public int compareTo(ExpertiseLineDTO expertiseLineDTO) {
+        if (getStartDate() == null || expertiseLineDTO.getStartDate() == null) {
+            return 0;
+        }
+        return getStartDate().compareTo(expertiseLineDTO.getStartDate());
+    }
 
 }

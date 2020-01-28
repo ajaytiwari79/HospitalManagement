@@ -12,7 +12,6 @@ import com.kairos.dto.user.staff.ColumnResource;
 import com.kairos.dto.user.staff.ImportShiftDTO;
 import com.kairos.dto.user.staff.RelativeContacts;
 import com.kairos.dto.user.staff.client.CitizenSupplier;
-import com.kairos.dto.user.staff.staff.StaffDTO;
 import com.kairos.dto.user.visitation.RepetitionType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.Client;
@@ -21,6 +20,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBuilder;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
 import com.kairos.persistence.repository.organization.OrganizationServiceRepository;
@@ -504,7 +504,7 @@ public class CitizenService {
             staffExternalId = staffExternalId.substring(staffExternalId.indexOf("PROFESSIONAL:")+13);
             logger.info("Staff External Id----> "+staffExternalId);
             ResponseEntity<String> staffResponseEntity = loginTemplate.exchange(String.format(AppConstants.KMD_NEXUS_STAFFS_DETAILS, staffExternalId), HttpMethod.GET, headersElements, String.class);
-            StaffDTO staffDTO = jsonStringToObject(staffResponseEntity.getBody(), StaffDTO.class);
+            StaffPersonalDetail staffDTO = jsonStringToObject(staffResponseEntity.getBody(), StaffPersonalDetail.class);
             Staff staff = createStaffFromKMD(unitId, staffDTO);
             taskServiceRestClient.createTaskFromKMD(staff.getId(),shift,unitId);
             //anil m2 move this method in task micro service
@@ -515,7 +515,7 @@ public class CitizenService {
         //logger.info("result---------> "+columnResource.getShifts().size());
     }
 
-    public Staff createStaffFromKMD(long unitId, StaffDTO payload) {
+    public Staff createStaffFromKMD(long unitId, StaffPersonalDetail payload) {
         Staff staff = staffGraphRepository.findByKmdExternalId(payload.getId());
         if(staff == null) staff = new Staff();
         Organization organization = organizationGraphRepository.findOne(unitId);
@@ -525,7 +525,7 @@ public class CitizenService {
         staff.setFirstName(payload.getFirstName());
         staff.setLastName(payload.getLastName());
         staff.setCurrentStatus(payload.getCurrentStatus());
-        staff.setEmail(payload.getPrimaryEmailAddress());
+        staff.setEmail(payload.getContactDetail().getPrivateEmail());
         staff.setKmdExternalId(payload.getId());
 
 

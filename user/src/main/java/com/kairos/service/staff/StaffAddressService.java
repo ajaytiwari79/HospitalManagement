@@ -1,6 +1,7 @@
 package com.kairos.service.staff;
 
 import com.kairos.dto.user.organization.AddressDTO;
+import com.kairos.dto.user.organization.ZipCodeDTO;
 import com.kairos.dto.user.staff.client.ContactAddressDTO;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
@@ -69,9 +70,9 @@ public class StaffAddressService {
      void saveAddress(Staff staff, List<AddressDTO> addressDTOs) {
         List<ContactAddress> contactAddresses = contactAddressGraphRepository.findAllById(addressDTOs.stream().map(AddressDTO::getId).collect(Collectors.toList()));
         Map<Long, ContactAddress> contactAddressMap = contactAddresses.stream().collect(Collectors.toMap(ContactAddress::getId, Function.identity()));
-        List<ZipCode> zipCodes = zipCodeGraphRepository.findAllByZipCode(addressDTOs.stream().map(AddressDTO::getZipCodeValue).collect(Collectors.toList()));
+        List<ZipCode> zipCodes = zipCodeGraphRepository.findAllByZipCode(addressDTOs.stream().map(addressDTO -> addressDTO.getZipCode().getZipCode()).collect(Collectors.toList()));
         Map<Integer, ZipCode> zipCodeMap = zipCodes.stream().collect(Collectors.toMap(ZipCode::getZipCode, Function.identity()));
-        List<Municipality> municipalities = municipalityGraphRepository.findAllById(addressDTOs.stream().map(AddressDTO::getMunicipalityId).collect(Collectors.toList()));
+        List<Municipality> municipalities = municipalityGraphRepository.findAllById(addressDTOs.stream().map(addressDTO->addressDTO.getMunicipality().getId()).collect(Collectors.toList()));
         Map<Long, Municipality> municipalityMap = municipalities.stream().collect(Collectors.toMap(Municipality::getId, Function.identity()));
         for (AddressDTO addressDTO : addressDTOs) {
             ContactAddress contactAddress = contactAddressMap.getOrDefault(addressDTO.getId(), new ContactAddress());
@@ -80,16 +81,16 @@ public class StaffAddressService {
                 LOGGER.info("Google Map verified address received ");
 
                 //ZipCode
-                if (addressDTO.getZipCodeValue() == 0) {
+                if (addressDTO.getZipCode().getZipCode() == 0) {
                     LOGGER.info("No ZipCode value received");
                     continue;
                 }
-                ZipCode zipCode = zipCodeMap.get(addressDTO.getZipCodeValue());
+                ZipCode zipCode = zipCodeMap.get(addressDTO.getZipCode().getZipCode());
                 if (zipCode == null) {
                     LOGGER.info("ZipCode Not Found returning null");
                     continue;
                 }
-                Municipality municipality = municipalityMap.get(addressDTO.getMunicipalityId());
+                Municipality municipality = municipalityMap.get(addressDTO.getMunicipality().getId());
                 if (municipality == null) {
                     exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);
 
@@ -141,30 +142,14 @@ public class StaffAddressService {
     }
 
 
-    public Map<String, Object> getAddress(long unitId, long staffId) {
+    public Map<String, Object> getAddress(long staffId) {
         Long countryId = UserContext.getUserDetails().getCountryId();
         Staff staff = staffGraphRepository.findOne(staffId, 2);
         if (staff == null) {
             return null;
         }
-
         ContactAddress staffAddress = staff.getContactAddress();
-
-        OrganizationBaseEntity unit = organizationBaseRepository.findOne(unitId);
-        if (unit == null) {
-            return null;
-        }
-        ContactAddress address = unit.getContactAddress();
-        double distance = 0;
-        if (address != null && staffAddress != null) {
-            distance = DistanceCalculator.distance(address.getLatitude(), address.getLongitude(), staffAddress.getLatitude(), staffAddress.getLongitude(), "K");
-        }
-
         Map<String, Object> response = new HashMap<>();
-        response.put("primaryAddress", getContactAddress(staff.getContactAddress()));
-        response.put("secondaryAddress", getContactAddress(staff.getSecondaryContactAddress()));
-        response.put("distanceFromWork", distance);
-
         if (countryId != null) {
             ZipCode zipCode = (staffAddress == null) ? null : staffAddress.getZipCode();
             response.put("municipalities", (zipCode == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(zipCode.getId())));
@@ -173,7 +158,7 @@ public class StaffAddressService {
         return response;
     }
 
-    private ContactAddressDTO getContactAddress(ContactAddress contactAddress) {
+   /* private ContactAddressDTO getContactAddress(ContactAddress contactAddress) {
         ContactAddressDTO contactAddressDTO;
         if (Optional.ofNullable(contactAddress).isPresent()) {
             contactAddressDTO = new ContactAddressDTO(contactAddress.getHouseNumber(), contactAddress.getFloorNumber(), contactAddress.getStreet(), contactAddress.getCity(),
@@ -185,7 +170,7 @@ public class StaffAddressService {
             contactAddressDTO = new ContactAddressDTO();
         }
         return contactAddressDTO;
-    }
+    }*/
 
     public ContactAddress getStaffContactAddressByOrganizationAddress(Organization organization) {
         if (isNull(organization.getContactAddress())) {

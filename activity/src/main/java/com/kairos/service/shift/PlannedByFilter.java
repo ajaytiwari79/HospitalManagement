@@ -12,12 +12,12 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.enums.FilterType.PLANNED_BY;
 
-public class PlannedByFilter implements ShiftFilter{
+public class PlannedByFilter <G> implements ShiftFilter{
 
     private Set<Long> plannedByUserIds;
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+    private Map<FilterType, Set<G>> filterCriteriaMap;
 
-    public PlannedByFilter(Set<Long> plannedByUserIds, Map<FilterType, Set<String>> filterCriteriaMap) {
+    public PlannedByFilter(Set<Long> plannedByUserIds, Map<FilterType, Set<G>> filterCriteriaMap) {
         this.plannedByUserIds = plannedByUserIds;
         this.filterCriteriaMap = filterCriteriaMap;
     }

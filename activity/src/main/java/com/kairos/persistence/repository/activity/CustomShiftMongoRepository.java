@@ -61,7 +61,7 @@ public interface CustomShiftMongoRepository {
     List<Shift> findShiftsByKpiFilters(List<Long> staffIds, List<Long> unitIds, List<String> shiftActivityStatus, Set<BigInteger> timeTypeIds, Date startDate, Date endDate);
 
 
-    List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate,Boolean isDraft);
 
     void updateRemarkInShiftActivity(BigInteger shiftActivityId, String remark);
 
@@ -69,7 +69,7 @@ public interface CustomShiftMongoRepository {
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentAndActivityIds(Long employmentId, Date startDate, Date endDate, Set<BigInteger> activityIds);
 
-    List<ShiftWithActivityDTO> findOverlappedShiftsByEmploymentId(BigInteger shiftId, Long employmentId, Date startDate, Date endDate);
+    List<ShiftWithActivityDTO> findOverlappedShiftsByEmploymentId(BigInteger shiftId, Long staffId, Date startDate, Date endDate);
 
     List<Shift> findAllUnPublishShiftByPlanningPeriodAndUnitId(BigInteger planningPeriodId,Long unitId,List<Long> staffIds ,List<ShiftStatus> shiftStatus);
 
@@ -88,5 +88,6 @@ public interface CustomShiftMongoRepository {
     List<Shift> findShiftByShiftActivityIdAndBetweenDate(Collection<BigInteger> shiftActivityIds,LocalDate startDate,LocalDate endDate,Long staffId);
 
     List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIdNotEqualShiftIds(Long employmentId, Date startDate, Date endDate,List<BigInteger> shiftIds);
+    List<ShiftWithActivityDTO> findAllShiftsBetweenDurationByEmploymentIds(Collection<Long> employmentIds, Date startDate, Date endDate,Boolean draftShift);
 
 }

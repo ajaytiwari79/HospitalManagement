@@ -2,12 +2,14 @@ package com.kairos.service.organization;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.*;
+import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.OrganizationBasicResponse;
 import com.kairos.persistence.model.organization.Unit;
+import com.kairos.persistence.model.user.filter.FilterSelectionQueryResult;
 import com.kairos.persistence.model.user.open_shift.OrganizationTypeAndSubType;
 import com.kairos.persistence.repository.organization.OrganizationBaseRepository;
 import com.kairos.persistence.repository.organization.OrganizationGraphRepository;
@@ -167,6 +169,15 @@ public class UnitService {
 
     public boolean isUnit(Long organisationId){
         return organizationBaseRepository.findOne(organisationId) instanceof Unit;
+    }
+
+    public List<FilterSelectionQueryResult> getAllAccessGroupByUnitIdForFilter(Long unitId){
+        List<FilterSelectionQueryResult> accessGroupFilters = new ArrayList<>();
+        Unit unit = unitGraphRepository.findOne(unitId);
+        if(isNotNull(unit)){
+            unit.getAccessGroups().forEach(accessGroup -> accessGroupFilters.add(new FilterSelectionQueryResult(accessGroup.getId().toString(), accessGroup.getName())));
+        }
+        return accessGroupFilters;
     }
 
 }

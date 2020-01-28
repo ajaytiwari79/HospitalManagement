@@ -4,12 +4,15 @@ import com.kairos.enums.constraint.ConstraintLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.mockito.internal.exceptions.stacktrace.ConditionalStackTraceFilter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class PlanningSetting {
+    Logger log= LoggerFactory.getLogger(PlanningSetting .class);
     private ConstraintLevel constraintLevel;
     private int constraintWeight;
 

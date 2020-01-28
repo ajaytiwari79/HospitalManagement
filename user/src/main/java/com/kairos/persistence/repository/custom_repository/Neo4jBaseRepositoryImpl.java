@@ -1,6 +1,6 @@
 package com.kairos.persistence.repository.custom_repository;
 
-import com.kairos.commons.audit_logging.AuditLogging;
+import com.kairos.annotations.KPermissionRelatedModel;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.session.Session;
@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.service.kpermissions.PermissionService.checkAndUpdateRelationShipPermission;
 
 @Transactional(readOnly = true)
 public class Neo4jBaseRepositoryImpl<T extends UserBaseEntity, ID extends Serializable>
@@ -81,13 +82,19 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 				}
 			}
 		}
-		session.save(entity);
+		if(entity.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
+			entity = checkAndUpdateRelationShipPermission(entity);
+		}
+		if(isNotNull(entity)) {
+			session.save(entity);
+		}
 		if(validClass) {
 			//Todo pradeep auditlogging is off due to Infinite recursion issue
 			//AuditLogging.doAudit(oldEntity, entity);
 		}
 		return entity;
 	}
+
 
 	@Transactional
 	@Override
@@ -122,6 +129,25 @@ extends SimpleNeo4jRepository<T, ID> implements Neo4jBaseRepository<T, ID> {
 			save(entity,depth);
 		}
 		return ses;
+	}
+
+	@Override
+	@Transactional
+	public void deleteAll(Iterable<? extends T> entities){
+		for (T entity : entities) {
+			delete(entity);
+		}
+	}
+
+	@Override
+	@Transactional
+	public void delete(T entity){
+		if(entity.getClass().isAnnotationPresent(KPermissionRelatedModel.class)){
+			entity = checkAndUpdateRelationShipPermission(entity);
+		}
+		if(isNotNull(entity)){
+			session.delete(entity);
+		}
 	}
 
 

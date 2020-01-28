@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.kairos.dto.user.organization.CompanyUnitType;
 import com.kairos.enums.OrganizationLevel;
 import com.kairos.enums.time_slot.TimeSlotMode;
+import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.common.UserBaseEntity;
@@ -67,6 +68,9 @@ public class OrganizationBaseEntity extends UserBaseEntity {
     protected List<OrganizationType> organizationSubTypes;
     @Relationship(type = HAS_ACCOUNT_TYPE)
     protected AccountType accountType;
+
+    @Relationship(type = ORGANIZATION_HAS_ACCESS_GROUPS)
+    private List<AccessGroup> accessGroups = new ArrayList<>();
 
 
     protected String desiredUrl;

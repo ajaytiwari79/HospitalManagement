@@ -1,0 +1,7 @@
+//Add Filter Group At SELF ROSTERING
+MATCH (n:FilterGroup) where id(n)=355 set n.filterTypes=["PLANNED_TIME_TYPE", "EMPLOYMENT_TYPE", "GENDER", "STAFF_STATUS", "EXPERTISE", "TIME_TYPE", "TAGS", "GROUPS", "NIGHT_WORKERS", "ESCALATION_CAUSED_BY", "ACTIVITY_TIMECALCULATION_TYPE", "ACTIVITY_STATUS", "REAL_TIME_STATUS", "TIME_SLOT", "TEAM", "ABSENCE_ACTIVITY", "VALIDATED_BY", "SKILLS", "FUNCTIONS"] return n;
+
+//set default joining date of all exist user
+MATCH (u:User)
+set
+u.joiningDate=SUBSTRING(u.creationDate,0,10)

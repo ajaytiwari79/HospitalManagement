@@ -9,6 +9,7 @@ import com.kairos.dto.planner.planninginfo.PlanningProblemDTO;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityConstraint.*;
 import com.kairos.shiftplanning.domain.activity.Activity;
+import com.kairos.shiftplanning.domain.tag.Tag;
 import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeAgreement;
 import com.planner.domain.shift_planning.Shift;
@@ -19,6 +20,8 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
+
+import static com.kairos.enums.MasterDataTypeEnum.STAFF;
 
 /**
  * This service is used to interact with or have logic to collect data
@@ -151,10 +154,15 @@ public class ActivityMongoService {
         //ContinousActivityPerShift continousActivityPerShift = new ContinousActivityPerShift(3,ScoreLevel.SOFT,-4);
         MaxDiffrentActivity maxDiffrentActivity = new MaxDiffrentActivity(3,ScoreLevel.MEDIUM,-1);//4
         MinimumLengthofActivity minimumLengthofActivity = new MinimumLengthofActivity(60,ScoreLevel.MEDIUM,-1);//5
-        ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity,null);
+        ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(requiredTagId(),ScoreLevel.HARD,1);
+        ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity,null,activityRequiredTag);
         return activityConstraints;
     }
 
+    public Tag requiredTagId(){
+        Tag tag = new Tag(new BigInteger("1"),"StaffTag", STAFF, false, 958);;
+        return tag;
+    }
     //
 
     public PlanningProblemDTO getPlanningPeriod(BigInteger planningPeriodId,Long unitId){

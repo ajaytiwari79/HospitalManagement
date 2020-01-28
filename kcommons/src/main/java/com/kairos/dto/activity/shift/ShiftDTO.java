@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
 import lombok.Getter;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 
@@ -32,7 +34,7 @@ import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
-public class ShiftDTO {
+public class ShiftDTO implements Comparable<ShiftDTO>{
 
     protected BigInteger id;
     protected Date startDate;
@@ -101,15 +103,15 @@ public class ShiftDTO {
     }
 
     public ShiftDTO(Date startDate, Date endDate, List<ShiftActivityDTO> activities) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
+        this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
         this.activities = activities;
     }
 
     public ShiftDTO(BigInteger id, Date startDate, Date endDate, Long unitId, Long staffId) {
        this.id = id;
-       this.startDate = startDate;
-       this.endDate = endDate;
+       this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
+       this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);
        this.unitId = unitId;
        this.staffId = staffId;
    }
@@ -121,6 +123,7 @@ public class ShiftDTO {
         this.employmentId = employmentId;
     }
 
+    //Todo this constructor is only for absenceType of Activity
     public ShiftDTO(List<ShiftActivityDTO> activities, Long unitId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, @Range(min = 0) @NotNull(message = "error.ShiftDTO.employmentId.notnull") Long employmentId, Date startDate, Date endDate) {
         this.activities = activities;
         this.unitId = unitId;
@@ -151,6 +154,12 @@ public class ShiftDTO {
     public void setBreakActivities(List<ShiftActivityDTO> breakActivities) {
         this.breakActivities = isNullOrElse(breakActivities,new ArrayList<>());
     }
+
+    public List<ShiftActivityDTO> getBreakActivities() {
+        this.breakActivities = isNullOrElse(this.breakActivities,new ArrayList<>());
+        return breakActivities;
+    }
+
 
     public boolean isMultipleActivity() {
         Set<BigInteger> multipleActivityCount = new HashSet<>();
@@ -185,6 +194,20 @@ public class ShiftDTO {
         return escalationFreeShiftIds=Optional.ofNullable(escalationFreeShiftIds).orElse(new HashSet<>());
     }
 
+
+    public void setStartDate(Date startDate) {
+        this.startDate = isNull(startDate) ? null : roundDateByMinutes(startDate,15);
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = isNull(endDate) ? null : roundDateByMinutes(endDate,15);;
+    }
+
+    public void setStartDateAndEndDate(Date startDate,Date endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
     @Override
     public String toString() {
         return "ShiftDTO{" +
@@ -199,5 +222,10 @@ public class ShiftDTO {
                 ", unitId=" + unitId +
                 ", staffId=" + staffId +
                 '}';
+    }
+
+    @Override
+    public int compareTo(ShiftDTO shiftDTO) {
+        return this.startDate.compareTo(shiftDTO.startDate);
     }
 }

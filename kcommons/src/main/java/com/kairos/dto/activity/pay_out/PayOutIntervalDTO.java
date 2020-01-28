@@ -27,6 +27,7 @@ public class PayOutIntervalDTO {
     private PayOutCTADistributionDTO payOutDistribution;
     private DayOfWeek dayOfWeek;
     private long protectedDaysOffMinutes;
+    private int sequence;
 
 
 

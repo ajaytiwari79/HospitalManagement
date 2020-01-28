@@ -21,6 +21,7 @@ public class UnitConstraint extends MongoBaseEntity {
     private Long unitId;
     private PlanningSetting planningSetting;
     private ConstraintSubType constraintSubType;
+    private Boolean  mandatory;
 
 
 }

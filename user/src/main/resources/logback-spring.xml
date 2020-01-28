@@ -5,7 +5,44 @@
     <logger name="org.springframework.kafka" level="OFF"/>
     <logger name="org.apache.kafka" level="OFF"/>
 
-    <springProfile name="default">
+    <!--<springProfile name="default">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <appender name="ROLLING-FILE"
+                  class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+            <file>${LOG_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            </rollingPolicy>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ROLLING-FILE"/>
+        </root>
+    </springProfile>-->
+
+    <!--<springProfile name="local">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <appender name="ROLLING-FILE"
+                  class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+            <file>${LOG_FILE}</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            </rollingPolicy>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ROLLING-FILE"/>
+        </root>
+    </springProfile>-->
+
+
+    <springProfile name="local,development,test,production,qa">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -23,44 +60,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="local,qa">
-        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-        <appender name="ROLLING-FILE"
-                  class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <encoder>
-                <pattern>${FILE_LOG_PATTERN}</pattern>
-            </encoder>
-            <file>${LOG_FILE}</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
-            </rollingPolicy>
-        </appender>
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="ROLLING-FILE"/>
-        </root>
-    </springProfile>
-
-
-    <springProfile name="development,test">
-        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
-        <appender name="ROLLING-FILE"
-                  class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <encoder>
-                <pattern>${FILE_LOG_PATTERN}</pattern>
-            </encoder>
-            <file>${LOG_FILE}</file>
-            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
-            </rollingPolicy>
-        </appender>
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="ROLLING-FILE"/>
-        </root>
-    </springProfile>
-
-    <springProfile name="production">
+   <!-- <springProfile name="production">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -80,7 +80,7 @@
         <root level="INFO">
             <appender-ref ref="ROLLING-FILE"/>
         </root>
-    </springProfile>
+    </springProfile>-->
 
 </configuration>
 
