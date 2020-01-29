@@ -81,9 +81,12 @@ public class ShiftFilterService {
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
         //Update loop in a single call
         Map<Long,Long> employmentIdAndActualTimeBankData = new HashMap<>();
-        for (Long employmentId : employmentIds) {
-            Long timeBank = timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true);
-            employmentIdAndActualTimeBankData.put(employmentId, timeBank);
+        boolean validFilter = filterTypeMap.containsKey(TIME_BANK_BALANCE) && isCollectionNotEmpty(filterTypeMap.get(TIME_BANK_BALANCE));
+        if(validFilter){
+            for (Long employmentId : employmentIds) {
+                Long timeBank = timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true);
+                employmentIdAndActualTimeBankData.put(employmentId, timeBank);
+            }
         }
         return new TimeBankBalanceFilter(filterTypeMap, employmentIdAndActualTimeBankData);
     }
