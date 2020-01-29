@@ -18,6 +18,8 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+
 
 /**
  * Created by vipul on 29/1/18.
@@ -98,5 +100,14 @@ public class StaffEmploymentDetails {
 
     public StaffEmploymentDetails(EmploymentType employmentType) {
         this.employmentType = employmentType;
+    }
+
+
+    public Expertise getExpertise() {
+        return isNullOrElse(expertise,new Expertise());
+    }
+
+    public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
+        return isNullOrElse(protectedDaysOffSettings,new ArrayList<>());
     }
 }
