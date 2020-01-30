@@ -53,7 +53,6 @@ public class Shift extends MongoBaseEntity {
     private int durationMinutes;
     @NotEmpty(message = "message.shift.activity.empty")
     private List<ShiftActivity> activities;
-    //time care id
     private String externalId;
     @NotNull(message = "error.ShiftDTO.employmentId.notnull")
     private Long employmentId;
