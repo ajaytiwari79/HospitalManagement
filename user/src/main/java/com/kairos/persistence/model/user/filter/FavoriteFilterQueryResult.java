@@ -17,4 +17,5 @@ public class FavoriteFilterQueryResult {
     private Long id;
     private List<FavoriteFilterDetailQueryResult> filtersData;
     private String name;
+    private int sequence;
 }
