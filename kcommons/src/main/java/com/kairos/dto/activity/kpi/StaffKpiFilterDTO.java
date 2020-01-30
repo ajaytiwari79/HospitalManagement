@@ -7,7 +7,11 @@ import com.kairos.dto.user.team.TeamDTO;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;
 
 @Getter
 @Setter
@@ -29,5 +33,8 @@ public class StaffKpiFilterDTO {
         return this.firstName+" "+this.getLastName();
     }
 
+    public int getStaffAge(LocalDate localDate) {
+        return isNull(this.cprNumber) ? 0 : getAgeByCPRNumberAndStartDate(this.cprNumber,localDate);
+    }
 
 }

@@ -344,15 +344,9 @@ public class KPIBuilderCalculationService implements CounterService {
         return isCollectionNotEmpty(staff.getStaffChildDetails()) ? staff.getStaffChildDetails().size() : 0;
     }
 
-    private double getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    private long getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
-        LocalDate dateOfBirth = CPRUtil.getDateOfBirthFromCPR(staff.getCprNumber());
-        int age = 0;
-        if(isNotNull(dateOfBirth)) {
-            Period diff = Period.between(dateOfBirth, asLocalDate(kpiCalculationRelatedInfo.startDate));
-            age = diff.getYears();
-        }
-        return age;
+        return staff.getStaffAge(asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
     }
 
 
