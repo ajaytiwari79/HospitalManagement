@@ -6,6 +6,7 @@ import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.ActivityWithTimeTypeDTO;
 import com.kairos.dto.activity.activity.OrganizationActivityDTO;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
@@ -87,6 +88,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -935,6 +937,28 @@ public class ActivityService {
         activityMongoRepository.save(activity);
         return new ActivityTabsWrapper(locationActivityTab);
     }
+
+    public Map<String, TranslationInfo> updateTranslationData(BigInteger activityId, Map<String, TranslationInfo> activityTranslationDTO){
+        LOGGER.debug("activity Id received is {}",activityId);
+        Activity activity = activityMongoRepository.findActivityByIdAndEnabled(activityId);
+        if(isNull(activity)) {
+            exceptionService.dataNotFoundException(MESSAGE_DATA_NOTFOUND);
+        }
+        return updateActivityTranslations(activity,activityTranslationDTO);
+    }
+
+    public Map<String, TranslationInfo> updateActivityTranslations(@NotNull Activity activity, Map<String, TranslationInfo> activityTranslationDTO){
+        final Map<String, TranslationInfo> activityLanguageDetailsMap = activity.getTranslations();
+        LOGGER.debug("activity preset language details {}",activityLanguageDetailsMap);
+        activityTranslationDTO.forEach((s, translation) -> {
+            LOGGER.debug("saving language details {} ",translation.toString());
+            activityLanguageDetailsMap.put(s, translation);
+        });
+        activity.setTranslations(activityLanguageDetailsMap);
+        activityMongoRepository.save(activity);
+        return activity.getTranslations();
+    }
+
 
     public ActivityWithTimeTypeDTO getActivitiesWithTimeTypes(long countryId) {
         List<ActivityDTO> activityDTOS = activityMongoRepository.findAllActivitiesWithTimeTypes(countryId);
