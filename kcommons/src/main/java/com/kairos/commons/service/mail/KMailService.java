@@ -1,7 +1,6 @@
 package com.kairos.commons.service.mail;
 
 
-import com.amazonaws.services.simpleemail.model.Content;
 import com.kairos.commons.config.EnvConfigCommon;
 import org.apache.commons.lang3.StringUtils;
 import org.thymeleaf.TemplateEngine;

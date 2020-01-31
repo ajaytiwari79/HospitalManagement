@@ -4,21 +4,12 @@ package com.kairos.commons.service.mail;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
-import com.kairos.commons.config.EnvConfigCommon;
-import org.apache.commons.lang3.StringUtils;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import javax.validation.constraints.Null;
-import java.util.Locale;
-import java.util.Map;
-
-import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
-import static com.kairos.constants.CommonConstants.*;
 
 public class AmazonSesEmailService implements EmailService {
 
-    private final String fromAddress = "no-reply@kairosplanning.com";
+    private final String fromAddress = "noreply@dev.kairosplanning.com";
     private AmazonSimpleEmailService client ;
 
     public AmazonSesEmailService(final String region){

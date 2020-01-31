@@ -39,11 +39,10 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    KMailService kMailService(){
-        EmailServicesConfiguration emailServicesConfiguration = applicationContext.getBean(EmailServicesConfiguration.class);
-        EnvConfigCommon envConfigCommon = applicationContext.getBean(EnvConfigCommon.class);
-        TemplateEngine templateEngine = applicationContext.getBean(TemplateEngine.class);
+    KMailService kMailService(EmailServicesConfiguration emailServicesConfiguration,EnvConfigCommon envConfigCommon,TemplateEngine templateEngine){
+//        EmailServicesConfiguration emailServicesConfiguration = applicationContext.getBean(EmailServicesConfiguration.class);
+//        EnvConfigCommon envConfigCommon = applicationContext.getBean(EnvConfigCommon.class);
+//        TemplateEngine templateEngine = applicationContext.getBean(TemplateEngine.class);
         return new KMailService(emailServicesConfiguration.getCurrentEmailService(),envConfigCommon,templateEngine);
     }
-
 }
