@@ -2,7 +2,7 @@ package com.kairos.controller.exception_handler;
 
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.custom_exception.UnitNotFoundException;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -50,7 +50,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @Autowired
     private LocaleService localeService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
 
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
