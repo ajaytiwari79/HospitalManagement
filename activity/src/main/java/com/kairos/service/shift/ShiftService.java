@@ -449,6 +449,7 @@ public class ShiftService extends MongoBaseService {
                 if (isNotNull(todoType)) {
                     Todo todo = todoRepository.findByEntityIdAndType(shift.getId(), TodoType.REQUEST_ABSENCE);
                     todo.setStatus(TodoStatus.APPROVE);
+                    todo.setApprovedOn(getDate());
                     todoRepository.save(todo);
                 }
                 todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, isNotNull(shiftDTO.getId()),staffAdditionalInfoDTO);
