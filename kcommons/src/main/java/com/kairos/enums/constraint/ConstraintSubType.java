@@ -13,6 +13,7 @@ public enum ConstraintSubType {
     PREFER_PERMANENT_EMPLOYEE("Prefer Permanent Employee"),
     MINIMUM_LENGTH_OF_ACTIVITY("Minimum Length of Activity"),
     ACTIVITY_REQUIRED_TAG("Activity Required Tag"),
+    PRESENCE_AND_ABSENCE_SAME_TIME("Presence and Absence at same time"),
 
     //For Shifts
 

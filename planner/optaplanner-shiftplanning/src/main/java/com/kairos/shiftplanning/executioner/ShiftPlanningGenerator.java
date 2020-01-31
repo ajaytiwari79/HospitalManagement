@@ -1,6 +1,7 @@
 package com.kairos.shiftplanning.executioner;
 
 import com.kairos.enums.Day;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
 import com.kairos.shiftplanning.constraints.Constraint;
@@ -796,8 +797,8 @@ public class ShiftPlanningGenerator {
     }
     public TimeType[] createTimeTypes(){
         TimeType[] timeTypes= new TimeType[4];
-        timeTypes[0]= new TimeType(UUID.randomUUID().toString(),"presence" );
-        timeTypes[1]= new TimeType(UUID.randomUUID().toString(),"absence");
+        timeTypes[0]= new TimeType(UUID.randomUUID().toString(),"presence", TimeTypeEnum.PRESENCE );
+        timeTypes[1]= new TimeType(UUID.randomUUID().toString(),"absence",TimeTypeEnum.ABSENCE);
         return timeTypes;
     }
     private List<Activity> getActivities(){
