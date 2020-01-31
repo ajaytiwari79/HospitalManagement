@@ -327,6 +327,8 @@ public class KPIBuilderCalculationService implements CounterService {
                 return getStaffAgeData(staffId, kpiCalculationRelatedInfo);
             case SUM_OF_CHILDREN:
                 return getChildrenCount(staffId, kpiCalculationRelatedInfo);
+            case WORKED_ON_PUBLIC_HOLIDAY:
+                return getWorkedOnPublicHolidayCount(staffId, kpiCalculationRelatedInfo);
             case PRESENCE_OVER_STAFFING:
             case PRESENCE_UNDER_STAFFING:
             case ABSENCE_OVER_STAFFING:
@@ -337,6 +339,10 @@ public class KPIBuilderCalculationService implements CounterService {
                 break;
         }
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
+    }
+
+    private long getWorkedOnPublicHolidayCount(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        return 0;
     }
 
     private long getChildrenCount(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -870,7 +876,6 @@ public class KPIBuilderCalculationService implements CounterService {
         private Date endDate;
         private Set<DayOfWeek> daysOfWeeks;
         private Map<Long, Collection<DailyTimeBankEntry>> employmentIdAndDailyTimebankEntryMap;
-        private Map<Long, Collection<DailyTimeBankEntry>> employmentIdListAndDailyTimeBankEntryMap;
         private Map<Long, Collection<DailyTimeBankEntry>> staffIdAndDailyTimebankEntryMap;
         private Collection<DailyTimeBankEntry> dailyTimeBankEntries;
         private List<Long> employmentTypeIds;
@@ -1013,9 +1018,10 @@ public class KPIBuilderCalculationService implements CounterService {
             List<Long> unitIds = (List<Long>) filterCriteria[2];
             employmentTypeIds = (List<Long>) filterCriteria[3];
             Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
-            List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(organizationId);
-            dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
             staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
+            dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
+            List<TimeSlotDTO> timeSlotDTOS = (List<TimeSlotDTO>) kpiData[3];
+            selectedDatesAndStaffDTOSMap = (Map<String, List<StaffPersonalDetail>>) kpiData[4];
             staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
             List<Integer> dayOfWeeksNo = new ArrayList<>();
             daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
@@ -1030,7 +1036,7 @@ public class KPIBuilderCalculationService implements CounterService {
             StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
             shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             currentShiftActivityCriteria = getDefaultShiftActivityCriteria();
-            selectedDatesAndStaffDTOSMap = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate());
+            //selectedDatesAndStaffDTOSMap = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate());
         }
 
         private void updateTeamIdsByStaffAndTeamType(Map<FilterType, List> filterBasedCriteria, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
@@ -1170,7 +1176,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
         private void getDailyTimeBankEntryByEmploymentId() {
             dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdsAndBeforDate(new ArrayList<>(employmentIds), planningPeriodInterval.getEndDate());
-            employmentIdListAndDailyTimeBankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toCollection(ArrayList::new)));
+            employmentIdAndDailyTimebankEntryMap = dailyTimeBankEntries.stream().collect(Collectors.groupingBy(DailyTimeBankEntry::getEmploymentId, Collectors.toCollection(ArrayList::new)));
         }
 
         public Collection<DailyTimeBankEntry> getDailyTimeBankEntrysByEmploymentIdAndInterval(Long employmentId, DateTimeInterval dateTimeInterval) {
@@ -1231,7 +1237,7 @@ public class KPIBuilderCalculationService implements CounterService {
             if(numberOfDaysInWeekOfAStaff==0){
                return this;
             }else {
-                List<DailyTimeBankEntry> dailyTimeBankEntries = (List) kpiCalculationRelatedInfo.employmentIdListAndDailyTimeBankEntryMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
+                List<DailyTimeBankEntry> dailyTimeBankEntries = (List) kpiCalculationRelatedInfo.employmentIdAndDailyTimebankEntryMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
                 if (AVERAGE_PER_DAY.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0))) {
                     actualTimeBank = timeBankCalculationService.calculateActualTimebank(kpiCalculationRelatedInfo.planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, kpiCalculationRelatedInfo.getPlanningPeriodInterval().getEndLocalDate(), employmentWithCtaDetailsDTO.getStartDate());
                     actualTimeBankPerDay += Math.round(getHourByMinutes(actualTimeBank) / numberOfDaysInWeekOfAStaff);

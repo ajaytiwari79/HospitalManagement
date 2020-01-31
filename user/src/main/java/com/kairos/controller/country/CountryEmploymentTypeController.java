@@ -1,5 +1,6 @@
 package com.kairos.controller.country;
 
+import com.kairos.dto.activity.kpi.KpiDataWrapper;
 import com.kairos.dto.activity.kpi.StaffEmploymentTypeDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
@@ -130,4 +131,10 @@ public class CountryEmploymentTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiFilterDefaultData(unitId));
     }
 
+    @PostMapping(value =COUNTRY_URL+"/kpi_all_default_data")
+    @ApiOperation("get all default data")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getKpiAllDefaultData(@RequestBody KpiDataWrapper kpiDataWrapper) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiAllDefaultData(kpiDataWrapper));
+    }
 }
