@@ -331,7 +331,7 @@ public class KPIBuilderCalculationService implements CounterService {
             case PRESENCE_UNDER_STAFFING:
             case ABSENCE_OVER_STAFFING:
             case ABSENCE_UNDER_STAFFING:
-                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(dateTimeInterval, kpiCalculationRelatedInfo);
+                return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
             default:
                 break;
