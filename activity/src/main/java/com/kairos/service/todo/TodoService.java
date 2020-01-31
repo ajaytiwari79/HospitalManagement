@@ -255,7 +255,6 @@ public class TodoService {
             for (ShiftActivity shiftActivity : shiftActivities) {
                 if (todo.getSubEntityId().equals(shiftActivity.getActivityId())) {
                     todo.setRemark(shiftActivity.getRemarks());
-
                 }
             }
         }
