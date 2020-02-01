@@ -45,6 +45,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -224,6 +225,11 @@ public class ShiftStatusService {
             if(isNotNull(todo)) {
                 todo.setStatus(todoStatus);
                 todo.setComment(comment);
+                if(TodoStatus.APPROVE.equals(todo.getStatus())){
+                    todo.setApprovedOn(getDate());
+                }else{
+                    todo.setDisApproveOn(getDate());
+                }
                 todoRepository.save(todo);
             }
         }
