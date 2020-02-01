@@ -43,7 +43,12 @@ dependencies {
     // compile group: 'org.springframework.data', name: 'spring-data-neo4j', version: '5.0.2.RELEASE'//As there are DTOs with neo4j annotations which needs to be fixed TODO
     //compile 'org.neo4j:neo4j:3.3.4'
     compile group: 'ch.qos.logback', name: 'logback-core', version: versionlogback
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback    
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: versionlogback
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.714'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.714'
+    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.714'
+
 }
 sonarqube {
     properties {

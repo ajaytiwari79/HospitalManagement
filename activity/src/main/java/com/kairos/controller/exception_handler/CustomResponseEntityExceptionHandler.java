@@ -2,7 +2,7 @@ package com.kairos.controller.exception_handler;
 
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.core.annotation.Order;
@@ -57,7 +57,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @Inject
     private LocaleService localeService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
 
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
@@ -390,7 +390,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         errorMessage.setData(ex.getMessage());
         errorMessage.setPath(httprequest.getRequestURL().toString());
-        mailService.sendMailToBackendOnException(ex);
+        sendGridMailService.sendMailToBackendOnException(ex);
         logger.error("exception {}", ex.getCause());
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
