@@ -26,11 +26,7 @@ public class KMailService {
 
     public void sendMail(final String from,final String to,final String subject,final String textBody,final String htmlBody,final Map<String,Object> templateParam,String templatePath){
         String htmlContent = getContent(templatePath,templateParam);
-        if(templateParam==null){
-            emailService.sendMail(from,to,subject,textBody,htmlBody);
-        }else {
-            emailService.sendMail(from, to, subject, textBody, htmlContent);
-        }
+        emailService.sendMail(from, to, subject, htmlContent, textBody);
     }
 
 
