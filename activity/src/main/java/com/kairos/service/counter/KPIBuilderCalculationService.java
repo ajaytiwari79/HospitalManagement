@@ -18,6 +18,7 @@ import com.kairos.dto.activity.shift.*;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
+import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
@@ -385,21 +386,12 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private int getLeaveCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
         int count = 0;
-        List<WTAQueryResultDTO> wtaQueryResultDTOS;
-        List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS;
-        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalancesDTOS;
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = isNotNull(staffId) ? Arrays.asList(kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().getOrDefault(staffId, new StaffKpiFilterDTO())) : kpiCalculationRelatedInfo.staffKpiFilterDTOS;
         if (isCollectionNotEmpty(staffKpiFilterDTOS)) {
             for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
-                shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(isNotNull(staffId) ? staffId : staffKpiFilterDTO.getId(), dateTimeInterval,true);
                 for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                    wtaQueryResultDTOS = kpiCalculationRelatedInfo.employmentIdAndWtaMap.getOrDefault(employmentWithCtaDetailsDTO.getId(), new ArrayList<>());
-                    wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> kpiCalculationRelatedInfo.getWtaTemplateTypes(yAxisConfig).contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
-                    StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffKpiFilterDTO.getCprNumber(), employmentWithCtaDetailsDTO.getSeniorAndChildCareDays());
-                    staffAdditionalInfoDTO.setEmployment(ObjectMapperUtils.copyPropertiesByMapper(employmentWithCtaDetailsDTO,StaffEmploymentDetails.class));
-                    workTimeAgreementRuleTemplateBalancesDTOS = workTimeAgreementBalancesCalculationService.getWorkTimeAgreementRuleTemplateBalancesDtos(kpiCalculationRelatedInfo.unitId, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate(), staffAdditionalInfoDTO, wtaBaseRuleTemplates, kpiCalculationRelatedInfo.activityWrapperMap, kpiCalculationRelatedInfo.planningPeriod, shiftWithActivityDTOS, new HashMap<>());
-                    count += workTimeAgreementRuleTemplateBalancesDTOS.stream().flatMap(workTimeAgreementRuleTemplateBalancesDTO -> workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().stream()).mapToInt(intervalBalance -> (int) intervalBalance.getAvailable()).sum();
+                    WorkTimeAgreementBalance workTimeAgreementBalance = workTimeAgreementBalancesCalculationService.getWorktimeAgreementBalance(kpiCalculationRelatedInfo.unitId,employmentWithCtaDetailsDTO.getId(), dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate(),kpiCalculationRelatedInfo.getWtaTemplateTypes(yAxisConfig));
+                    count += workTimeAgreementBalance.getWorkTimeAgreementRuleTemplateBalances().stream().flatMap(workTimeAgreementRuleTemplateBalancesDTO -> workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().stream()).mapToInt(intervalBalance -> (int) intervalBalance.getAvailable()).sum();
                 }
             }
         }
