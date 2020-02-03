@@ -7,7 +7,6 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.activity.staffing_level.StaffingLevelActivity;
 import com.kairos.dto.activity.staffing_level.StaffingLevelInterval;
 import com.kairos.dto.user.skill.SkillLevelDTO;
-import com.kairos.enums.FilterType;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staffing_level.StaffingLevel;
@@ -77,7 +76,7 @@ public class StaffingLevelCalculationKPIService {
         if (isPresenceStaffingLevelData) {
             staffingLevelData = getStaffingLevelCalculationData(staffingLevel.getPresenceStaffingLevelInterval(), PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), teamActivityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
         }else{
-            staffingLevelData = getStaffingLevelCalculationData(staffingLevel.getAbsenceStaffingLevelInterval(), ABSENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), teamActivityIds, 1);
+            staffingLevelData = getStaffingLevelCalculationData(staffingLevel.getAbsenceStaffingLevelInterval(), ABSENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), null, 1);
         }
         return staffingLevelData;
     }
