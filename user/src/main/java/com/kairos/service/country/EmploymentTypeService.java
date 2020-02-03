@@ -303,7 +303,6 @@ public class EmploymentTypeService {
                         BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);
                         employmentLine.setHourlyCost(hourlyCost);
                     }
-
                 }
             }
         }
@@ -321,7 +320,6 @@ public class EmploymentTypeService {
         List<DayTypeDTO> dayTypeDTOS = dayTypes.stream().map(dayType ->
                 new DayTypeDTO(dayType.getId(), dayType.getName(), dayType.getValidDays(), ObjectMapperUtils.copyPropertiesOfCollectionByMapper(publicHolidayMap.get(dayType.getId()), CountryHolidayCalenderDTO.class), dayType.isHolidayType(), dayType.isAllowTimeSettings(),dayType.getColorCode())
         ).collect(Collectors.toList());
-
 //        List<DayTypeDTO> dayTypeDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeGraphRepository.findByCountryId(countryId), DayTypeDTO.class);
         List<Long> unitIds = ObjectUtils.isCollectionNotEmpty(staffEmploymentTypeDTO.getUnitIds()) ? staffEmploymentTypeDTO.getUnitIds() : Arrays.asList(staffEmploymentTypeDTO.getOrganizationId());
         List<TimeSlotDTO> timeSlotSetDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(timeSlotGraphRepository.getShiftPlanningTimeSlotsByUnitIds(unitIds, TimeSlotType.SHIFT_PLANNING), TimeSlotDTO.class);
@@ -340,7 +338,4 @@ public class EmploymentTypeService {
         List<ReasonCodeDTO> reasonCodeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(reasonCodeService.getReasonCodesByUnitIds(isCollectionNotEmpty(unitIds)?unitIds:Arrays.asList(unitId), ReasonCodeType.FORCEPLAN),ReasonCodeDTO.class);
         return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS,organizationCommonDTO,employmentTypeKpiDTOS,reasonCodeDTOS);
     }
-
-
-
 }

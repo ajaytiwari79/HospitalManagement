@@ -49,6 +49,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -325,6 +326,8 @@ public class KPIBuilderCalculationService implements CounterService {
                 return getEscalatedShiftsOrResolvedShifts(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case STAFF_AGE:
                 return getStaffAgeData(staffId, kpiCalculationRelatedInfo);
+            case SUM_OF_CHILDREN:
+                return getChildrenCount(staffId, kpiCalculationRelatedInfo);
             case PRESENCE_OVER_STAFFING:
             case PRESENCE_UNDER_STAFFING:
             case ABSENCE_OVER_STAFFING:
@@ -337,15 +340,14 @@ public class KPIBuilderCalculationService implements CounterService {
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
     }
 
-    private double getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    private long getChildrenCount(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
-        LocalDate dateOfBirth = CPRUtil.getDateOfBirthFromCPR(staff.getCprNumber());
-        int age = 0;
-        if(isNotNull(dateOfBirth)) {
-            Period diff = Period.between(dateOfBirth, asLocalDate(kpiCalculationRelatedInfo.startDate));
-            age = diff.getYears();
-        }
-        return age;
+        return isCollectionNotEmpty(staff.getStaffChildDetails()) ? staff.getStaffChildDetails().size() : 0;
+    }
+
+    private long getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
+        return staff.getStaffAge(asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
     }
 
 

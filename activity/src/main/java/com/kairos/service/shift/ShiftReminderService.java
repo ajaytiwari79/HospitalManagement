@@ -1,6 +1,6 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
@@ -47,7 +47,7 @@ public class ShiftReminderService{
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -138,7 +138,7 @@ public class ShiftReminderService{
         if(StringUtils.isNotBlank(staffDTO.getProfilePic())) {
                templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
         }
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getContactDetail().getPrivateEmail());
+        sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getContactDetail().getPrivateEmail());
 
 
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {
