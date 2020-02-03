@@ -49,6 +49,13 @@ dependencies {
     // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-ses
     compile group: 'com.amazonaws', name: 'aws-java-sdk-ses', version: '1.11.714'
 
+    // https://mvnrepository.com/artifact/com.mindscapehq/core
+    compile group: 'com.mindscapehq', name: 'core', version: '3.0.0'
+    // https://mvnrepository.com/artifact/com.mindscapehq/raygun4java
+    compile group: 'com.mindscapehq', name: 'raygun4java', version: '3.0.0', ext: 'pom'
+// https://mvnrepository.com/artifact/com.mindscapehq/webprovider
+    compile group: 'com.mindscapehq', name: 'webprovider', version: '3.0.0'
+
 }
 sonarqube {
     properties {
