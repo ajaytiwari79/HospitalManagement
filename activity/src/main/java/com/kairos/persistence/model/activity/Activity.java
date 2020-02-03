@@ -3,7 +3,6 @@ package com.kairos.persistence.model.activity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.PhaseSettingsActivityTab;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.persistence.model.activity.tabs.*;
@@ -18,7 +17,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by pawanmandhan on 17/8/17.
@@ -71,7 +73,6 @@ public class Activity extends MongoBaseEntity implements Serializable {
 
     //time care id
     private String externalId;
-    private Map<String, TranslationInfo> translations = new HashMap<>();
 
     public Activity(String name, String description, List<BigInteger> tags) {
         this.name = name;
