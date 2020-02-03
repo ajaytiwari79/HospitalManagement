@@ -11,6 +11,7 @@ import com.kairos.dto.activity.counter.data.KPIAxisData;
 import com.kairos.dto.activity.counter.data.KPIRepresentationData;
 import com.kairos.dto.activity.counter.enums.RepresentationUnit;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
+import com.kairos.dto.activity.kpi.DefaultKpiDataDTO;
 import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
@@ -20,6 +21,7 @@ import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
+import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
@@ -68,7 +70,6 @@ import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.service.todo.TodoService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
-import com.kairos.utils.CPRUtil;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
@@ -83,7 +84,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import java.time.Period;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
@@ -328,7 +328,7 @@ public class KPIBuilderCalculationService implements CounterService {
             case SUM_OF_CHILDREN:
                 return getChildrenCount(staffId, kpiCalculationRelatedInfo);
             case WORKED_ON_PUBLIC_HOLIDAY:
-                return getWorkedOnPublicHolidayCount(staffId, kpiCalculationRelatedInfo);
+                return getWorkedOnPublicHolidayCount(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case PRESENCE_OVER_STAFFING:
             case PRESENCE_UNDER_STAFFING:
             case ABSENCE_OVER_STAFFING:
@@ -341,8 +341,18 @@ public class KPIBuilderCalculationService implements CounterService {
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
     }
 
-    private long getWorkedOnPublicHolidayCount(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        return 0;
+    private long getWorkedOnPublicHolidayCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        int WorkedOnPublicHolidayCount = 0;
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval);
+        if(isCollectionNotEmpty(kpiCalculationRelatedInfo.getHolidayCalenders()) && isCollectionNotEmpty(shiftWithActivityDTOS)) {
+            List<ShiftWithActivityDTO> shiftsInHoliday = shiftWithActivityDTOS.stream().filter(shift -> shiftInHoliday(shift, kpiCalculationRelatedInfo.getHolidayCalenders())).collect(Collectors.toList());
+            WorkedOnPublicHolidayCount = shiftsInHoliday.size();
+        }
+        return WorkedOnPublicHolidayCount;
+    }
+
+    private boolean shiftInHoliday(ShiftWithActivityDTO shift, List<CountryHolidayCalenderDTO> holidayCalenders) {
+        return false;
     }
 
     private long getChildrenCount(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -895,6 +905,7 @@ public class KPIBuilderCalculationService implements CounterService {
         private Set<BigInteger> activityIds;
         private Boolean isDraft;
         private Map<String, List<StaffPersonalDetail>> selectedDatesAndStaffDTOSMap;
+        private List<CountryHolidayCalenderDTO> holidayCalenders;
         List<WTAQueryResultDTO> wtaQueryResultDTOS;
         List<WTABaseRuleTemplate> wtaBaseRuleTemplates;
         Map<Long, List<WTAQueryResultDTO>> employmentIdAndWtaMap;
@@ -1017,11 +1028,12 @@ public class KPIBuilderCalculationService implements CounterService {
             List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
             List<Long> unitIds = (List<Long>) filterCriteria[2];
             employmentTypeIds = (List<Long>) filterCriteria[3];
-            Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
-            staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
-            dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
-            List<TimeSlotDTO> timeSlotDTOS = (List<TimeSlotDTO>) kpiData[3];
-            selectedDatesAndStaffDTOSMap = (Map<String, List<StaffPersonalDetail>>) kpiData[4];
+            DefaultKpiDataDTO defaultKpiDataDTO = counterHelperService.getKPIAllData(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+            staffKpiFilterDTOS = defaultKpiDataDTO.getStaffKpiFilterDTOs();
+            dateTimeIntervals = defaultKpiDataDTO.getDateTimeIntervals();
+            List<TimeSlotDTO> timeSlotDTOS = defaultKpiDataDTO.getTimeSlotDTOS();
+            selectedDatesAndStaffDTOSMap = defaultKpiDataDTO.getSelectedDatesAndStaffDTOSMap();
+            holidayCalenders = defaultKpiDataDTO.getHolidayCalenders();
             staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
             List<Integer> dayOfWeeksNo = new ArrayList<>();
             daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];

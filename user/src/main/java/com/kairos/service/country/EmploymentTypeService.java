@@ -7,6 +7,7 @@ import com.kairos.dto.activity.kpi.*;
 import com.kairos.dto.activity.open_shift.PriorityGroupDefaultData;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
+import com.kairos.dto.user.country.basic_details.CountryHolidayCalender;
 import com.kairos.dto.user.country.day_type.DayTypeEmploymentTypeWrapper;
 import com.kairos.dto.user.country.experties.ExpertiseResponseDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -14,6 +15,7 @@ import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.organization.OrganizationEmploymentTypeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
@@ -26,6 +28,7 @@ import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.staff.StaffKpiFilterQueryResult;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentLinesQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import com.kairos.persistence.model.user.expertise.response.ExpertiseDTO;
@@ -42,7 +45,9 @@ import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.expertise.ExpertiseService;
 import com.kairos.service.organization.OrganizationService;
+import com.kairos.service.organization.TimeSlotService;
 import com.kairos.service.region.RegionService;
+import com.kairos.service.skill.SkillService;
 import com.kairos.service.staff.StaffRetrievalService;
 import com.kairos.utils.FormatUtil;
 import org.slf4j.Logger;
@@ -52,9 +57,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.AppConstants.*;
@@ -102,6 +109,11 @@ public class EmploymentTypeService {
     @Inject private StaffRetrievalService  staffRetrievalService;
     @Inject
     private ExpertiseService expertiseService;
+    @Inject
+    private TimeSlotService timeSlotService;
+    @Inject
+    private SkillService skillService;
+    @Inject CountryHolidayCalenderService countryHolidayCalenderService;
 
 
     public EmploymentType addEmploymentType(Long countryId, EmploymentTypeDTO employmentTypeDTO) {
@@ -336,8 +348,14 @@ public class EmploymentTypeService {
         return new DefaultKpiDataDTO(countryId,staffKpiFilterDTOS, dayTypeDTOS, timeSlotSetDTOS,organizationCommonDTO,employmentTypeKpiDTOS,reasonCodeDTOS);
     }
 
-    public DefaultKpiDataDTO getKpiAllDefaultData(KpiDataWrapper kpiDataWrapper) {
-
-        return null;
+    public DefaultKpiDataDTO getKpiAllDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = getStaffByKpiFilter(staffEmploymentTypeDTO);
+        List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getUnitTimeSlot(staffEmploymentTypeDTO.getOrganizationId());
+        List<Long> staffIds = staffKpiFilterDTOS.stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
+        LocalDate startDate = asLocalDate(staffEmploymentTypeDTO.getStartDate());
+        LocalDate endDate = asLocalDate(staffEmploymentTypeDTO.getEndDate());
+        Map<String, List<StaffPersonalDetail>> skills = skillService.getStaffSkillAndLevelByStaffIds(staffIds, startDate, endDate);
+        List<CountryHolidayCalenderDTO> holidayCalenders = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(countryHolidayCalenderService.getCountryHolidayCalenders(UserContext.getUserDetails().getCountryId(), startDate, endDate), CountryHolidayCalenderDTO.class);
+        return new DefaultKpiDataDTO(staffKpiFilterDTOS, timeSlotDTOS, skills, holidayCalenders);
     }
 }

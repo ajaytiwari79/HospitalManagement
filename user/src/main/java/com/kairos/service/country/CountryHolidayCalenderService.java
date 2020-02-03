@@ -2,6 +2,7 @@ package com.kairos.service.country;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,5 +145,8 @@ public class CountryHolidayCalenderService {
         return null;
     }
 
+    public List<CountryHolidayCalender> getCountryHolidayCalenders(Long countryId, LocalDate startDate, LocalDate endDate){
+        return countryHolidayCalenderGraphRepository.findAllByCountryIdAndHolidayDateBetween(countryId, startDate.toString(), endDate.toString());
+    }
 
 }
