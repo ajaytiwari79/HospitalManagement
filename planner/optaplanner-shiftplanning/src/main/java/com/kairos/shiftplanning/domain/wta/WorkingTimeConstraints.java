@@ -1,13 +1,18 @@
 package com.kairos.shiftplanning.domain.wta;
 
 import com.kairos.shiftplanning.domain.shift.Shift;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.kie.api.runtime.rule.RuleContext;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class WorkingTimeConstraints {
     private static Logger log= LoggerFactory.getLogger(WorkingTimeConstraints.class);
 
@@ -133,163 +138,4 @@ public class WorkingTimeConstraints {
         }
     }
 
-    public CareDayCheckWTATemplate getCareDayCheck() {
-        return careDayCheck;
-    }
-
-    public void setCareDayCheck(CareDayCheckWTATemplate careDayCheck) {
-        this.careDayCheck = careDayCheck;
-    }
-
-    public MaximumAverageScheduledTimeWTATemplate getMaximumAverageScheduledTime() {
-        return maximumAverageScheduledTime;
-    }
-
-    public void setMaximumAverageScheduledTime(MaximumAverageScheduledTimeWTATemplate maximumAverageScheduledTime) {
-        this.maximumAverageScheduledTime = maximumAverageScheduledTime;
-    }
-
-    public MaximumConsecutiveWorkingDaysWTATemplate getMaximumConsecutiveWorkingDays() {
-        return maximumConsecutiveWorkingDays;
-    }
-
-    public void setMaximumConsecutiveWorkingDays(MaximumConsecutiveWorkingDaysWTATemplate maximumConsecutiveWorkingDays) {
-        this.maximumConsecutiveWorkingDays = maximumConsecutiveWorkingDays;
-    }
-
-    public MaximumConsecutiveWorkingNightsWTATemplate getMaximumConsecutiveWorkingNights() {
-        return maximumConsecutiveWorkingNights;
-    }
-
-    public void setMaximumConsecutiveWorkingNights(MaximumConsecutiveWorkingNightsWTATemplate maximumConsecutiveWorkingNights) {
-        this.maximumConsecutiveWorkingNights = maximumConsecutiveWorkingNights;
-    }
-
-    public MaximumDaysOffInPeriodWTATemplate getMaximumDaysOffInPeriod() {
-        return maximumDaysOffInPeriod;
-    }
-
-    public void setMaximumDaysOffInPeriod(MaximumDaysOffInPeriodWTATemplate maximumDaysOffInPeriod) {
-        this.maximumDaysOffInPeriod = maximumDaysOffInPeriod;
-    }
-
-    public MaximumNightShiftLengthWTATemplate getMaximumNightShiftLength() {
-        return maximumNightShiftLength;
-    }
-
-    public void setMaximumNightShiftLength(MaximumNightShiftLengthWTATemplate maximumNightShiftLength) {
-        this.maximumNightShiftLength = maximumNightShiftLength;
-    }
-
-    public MaximumNumberOfNightsWTATemplate getMaximumNumberOfNights() {
-        return maximumNumberOfNights;
-    }
-
-    public void setMaximumNumberOfNights(MaximumNumberOfNightsWTATemplate maximumNumberOfNights) {
-        this.maximumNumberOfNights = maximumNumberOfNights;
-    }
-
-    public MaximumSeniorDaysInYearWTATemplate getMaximumSeniorDaysInYear() {
-        return maximumSeniorDaysInYear;
-    }
-
-    public void setMaximumSeniorDaysInYear(MaximumSeniorDaysInYearWTATemplate maximumSeniorDaysInYear) {
-        this.maximumSeniorDaysInYear = maximumSeniorDaysInYear;
-    }
-
-    public MaximumShiftLengthWTATemplate getMaximumShiftLength() {
-        return maximumShiftLength;
-    }
-
-    public void setMaximumShiftLength(MaximumShiftLengthWTATemplate maximumShiftLength) {
-        this.maximumShiftLength = maximumShiftLength;
-    }
-
-    public MaximumShiftsInIntervalWTATemplate getMaximumShiftsInInterval() {
-        return maximumShiftsInInterval;
-    }
-
-    public void setMaximumShiftsInInterval(MaximumShiftsInIntervalWTATemplate maximumShiftsInInterval) {
-        this.maximumShiftsInInterval = maximumShiftsInInterval;
-    }
-
-    public MaximumVetoPerPeriodWTATemplate getMaximumVetoPerPeriod() {
-        return maximumVetoPerPeriod;
-    }
-
-    public void setMaximumVetoPerPeriod(MaximumVetoPerPeriodWTATemplate maximumVetoPerPeriod) {
-        this.maximumVetoPerPeriod = maximumVetoPerPeriod;
-    }
-
-    public MinimumConsecutiveNightsWTATemplate getMinimumConsecutiveNights() {
-        return minimumConsecutiveNights;
-    }
-
-    public void setMinimumConsecutiveNights(MinimumConsecutiveNightsWTATemplate minimumConsecutiveNights) {
-        this.minimumConsecutiveNights = minimumConsecutiveNights;
-    }
-
-    public MinimumDailyRestingTimeWTATemplateTemplate getMinimumDailyRestingTime() {
-        return minimumDailyRestingTime;
-    }
-
-    public void setMinimumDailyRestingTime(MinimumDailyRestingTimeWTATemplateTemplate minimumDailyRestingTime) {
-        this.minimumDailyRestingTime = minimumDailyRestingTime;
-    }
-
-    public MinimumDurationBetweenShiftWTATemplate getMinimumDurationBetweenShift() {
-        return minimumDurationBetweenShift;
-    }
-
-    public void setMinimumDurationBetweenShift(MinimumDurationBetweenShiftWTATemplate minimumDurationBetweenShift) {
-        this.minimumDurationBetweenShift = minimumDurationBetweenShift;
-    }
-
-    public MinimumRestConsecutiveNightsWTATemplate getMinimumRestConsecutiveNights() {
-        return minimumRestConsecutiveNights;
-    }
-
-    public void setMinimumRestConsecutiveNights(MinimumRestConsecutiveNightsWTATemplate minimumRestConsecutiveNights) {
-        this.minimumRestConsecutiveNights = minimumRestConsecutiveNights;
-    }
-
-    public MinimumRestInConsecutiveDaysWTATemplate getMinimumRestInConsecutiveDays() {
-        return minimumRestInConsecutiveDays;
-    }
-
-    public void setMinimumRestInConsecutiveDays(MinimumRestInConsecutiveDaysWTATemplate minimumRestInConsecutiveDays) {
-        this.minimumRestInConsecutiveDays = minimumRestInConsecutiveDays;
-    }
-
-    public MinimumShiftLengthWTATemplate getMinimumShiftLength() {
-        return minimumShiftLength;
-    }
-
-    public void setMinimumShiftLength(MinimumShiftLengthWTATemplate minimumShiftLength) {
-        this.minimumShiftLength = minimumShiftLength;
-    }
-
-    public MinimumWeeklyRestPeriodWTATemplate getMinimumWeeklyRestPeriod() {
-        return minimumWeeklyRestPeriod;
-    }
-
-    public void setMinimumWeeklyRestPeriod(MinimumWeeklyRestPeriodWTATemplate minimumWeeklyRestPeriod) {
-        this.minimumWeeklyRestPeriod = minimumWeeklyRestPeriod;
-    }
-
-    public NumberOfWeekendShiftInPeriodWTATemplate getNumberOfWeekendShiftInPeriod() {
-        return numberOfWeekendShiftInPeriod;
-    }
-
-    public void setNumberOfWeekendShiftInPeriod(NumberOfWeekendShiftInPeriodWTATemplate numberOfWeekendShiftInPeriod) {
-        this.numberOfWeekendShiftInPeriod = numberOfWeekendShiftInPeriod;
-    }
-
-    public ShortestAndAverageDailyRestWTATemplate getShortestAndAverageDailyRest() {
-        return shortestAndAverageDailyRest;
-    }
-
-    public void setShortestAndAverageDailyRest(ShortestAndAverageDailyRestWTATemplate shortestAndAverageDailyRest) {
-        this.shortestAndAverageDailyRest = shortestAndAverageDailyRest;
-    }
 }

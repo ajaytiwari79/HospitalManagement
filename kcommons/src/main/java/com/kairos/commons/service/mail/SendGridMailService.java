@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -48,6 +49,26 @@ public class SendGridMailService implements EmailService{
     @Inject
     private TemplateEngine templateEngine;
     @Inject private EnvConfigCommon envConfigCommon;
+
+
+    public boolean sendPlainMail(String receiver,String body, String subject) {
+        try {
+            LOGGER.info("Sending email to::" + receiver);
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+            helper.setFrom("info@nordicplanning.dk");
+            helper.setTo(receiver);
+            helper.setSubject(subject);
+            helper.setBcc("vipul.pandey@oodlestechnologies.com");
+            helper.setText(body);
+            javaMailSender.send(mimeMessage);
+            LOGGER.info("Email sent");
+        } catch (Exception e){
+            LOGGER.info("exception occured {}",e);
+            return false;
+        }
+        return false;
+    }
 
     /***
      *
@@ -164,14 +185,18 @@ public class SendGridMailService implements EmailService{
 
     //Todo Please don't use this method for sending any Custom exception
     public void sendMailToBackendOnException(Exception ex){
-         if(envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE)){
-            StringBuffer body = new StringBuffer(ex.getMessage());
-            for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
-                //if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
+        try {
+            if (envConfigCommon.getCurrentProfile().equals(PRODUCTION_PROFILE)) {
+                StringBuffer body = new StringBuffer(ex.getMessage());
+                for (StackTraceElement stackTraceElement : ex.getStackTrace()) {
+                    //if(stackTraceElement.getClassName().contains(PACKAGE_NAME)) {
                     body.append(stackTraceElement.toString()).append(" ").append(System.getProperty("line.separator")).append(" ");
-                //}
+                    //}
+                }
+                sendMailWithSendGrid(null, null, body.toString(), "Exception in " + envConfigCommon.getApplicationName() + " | " + envConfigCommon.getCurrentProfile(), KAIROS_BACKEND_MAIL_IDS);
             }
-            sendMailWithSendGrid(null,null,body.toString(),"Exception in "+envConfigCommon.getApplicationName()+" | "+envConfigCommon.getCurrentProfile(),KAIROS_BACKEND_MAIL_IDS);
+        }catch (Exception e){
+            LOGGER.error("exception {}",e);
         }
     }
 

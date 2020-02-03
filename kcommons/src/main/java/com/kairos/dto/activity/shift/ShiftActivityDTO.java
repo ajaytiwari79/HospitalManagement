@@ -21,6 +21,7 @@ import java.util.*;
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * @author pradeep
@@ -62,6 +63,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private Long allowedBreakDurationInMinute;
 
     private int timeBankCtaBonusMinutes;
+    @Builder.Default
     private List<TimeBankDistributionDTO> timeBankCTADistributions = new ArrayList<>();
     private List<PayOutPerShiftCTADistributionDTO> payoutPerShiftCTADistributions;
     private Map<String, Object> location;// location where this activity needs to perform
@@ -80,6 +82,7 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private BigInteger plannedTimeId;
     private int plannedMinutesOfPayout;
     private int payoutCtaBonusMinutes;
+    @Builder.Default
     private List<ShiftActivityDTO> childActivities = new ArrayList<>();
     private boolean breakNotHeld;
     private Long employmentId;
@@ -129,6 +132,10 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
         this.activityId = activityId;
         this.activityName = activityName;
         this.status = status;
+    }
+
+    public List<ShiftActivityDTO> getChildActivities() {
+        return isNullOrElse(this.childActivities,new ArrayList<>());
     }
 
     @JsonIgnore

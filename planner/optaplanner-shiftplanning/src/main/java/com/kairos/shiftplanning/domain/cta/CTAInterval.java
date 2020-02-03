@@ -2,45 +2,22 @@ package com.kairos.shiftplanning.domain.cta;
 
 import com.kairos.shiftplanning.domain.staffing_level.TimeInterval;
 import com.kairos.shiftplanning.utils.StaticFields;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.Interval;
 
 import java.math.BigDecimal;
-
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class CTAInterval {
 
     private TimeInterval timeInterval;
     private CompensationType compensationType;
     private BigDecimal compensationValue;
-
-    public CTAInterval(TimeInterval timeInterval, CompensationType compensationType, BigDecimal compensationValue) {
-        this.timeInterval = timeInterval;
-        this.compensationType = compensationType;
-        this.compensationValue = compensationValue;
-    }
-
-    public TimeInterval getTimeInterval() {
-        return timeInterval;
-    }
-
-    public void setTimeInterval(TimeInterval timeInterval) {
-        this.timeInterval = timeInterval;
-    }
-
-    public CompensationType getCompensationType() {
-        return compensationType;
-    }
-
-    public void setCompensationType(CompensationType compensationType) {
-        this.compensationType = compensationType;
-    }
-
-    public BigDecimal getCompensationValue() {
-        return compensationValue;
-    }
-
-    public void setCompensationValue(BigDecimal compensationValue) {
-        this.compensationValue = compensationValue;
-    }
 
 
     public BigDecimal getCostForThisIntervalByGranularity(int granularity,Interval interval,BigDecimal baseCost){

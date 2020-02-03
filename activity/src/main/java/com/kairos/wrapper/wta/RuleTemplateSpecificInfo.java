@@ -33,7 +33,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RuleTemplateSpecificInfo {
-
+    @Builder.Default
     private List<ShiftWithActivityDTO> shifts = new ArrayList<>();
     private ShiftWithActivityDTO shift;
     private Map<String,TimeSlotWrapper> timeSlotWrapperMap;
@@ -43,6 +43,7 @@ public class RuleTemplateSpecificInfo {
     private Map<Long, DayTypeDTO> dayTypeMap;
     private UserAccessRoleDTO user;
     private long totalTimeBank;
+    @Builder.Default
     private ViolatedRulesDTO violatedRules=new ViolatedRulesDTO();
     private int staffAge;
     private Map<BigInteger,ActivityWrapper> activityWrapperMap;
