@@ -2,7 +2,10 @@ package com.kairos.utils.event;
 
 import com.kairos.persistence.model.shift.Shift;
 
+import java.time.LocalDate;
 import java.util.Date;
+
+import static com.kairos.commons.utils.DateUtils.asDate;
 
 public class ShiftNotificationEvent {
    private Long unitId;
@@ -54,8 +57,13 @@ public class ShiftNotificationEvent {
     public ShiftNotificationEvent() {
     }
 
+    public ShiftNotificationEvent(Long unitId, LocalDate currentDate) {
+        this.unitId = unitId;
+        this.currentDate = asDate(currentDate);
+    }
+
     public ShiftNotificationEvent(Long unitId, Date currentDate, Shift shift,
-      boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence) {
+                                  boolean shiftUpdated, Shift previousStateShift, boolean isShiftForPresence) {
         this.unitId = unitId;
         this.currentDate = currentDate;
         this.shift = shift;

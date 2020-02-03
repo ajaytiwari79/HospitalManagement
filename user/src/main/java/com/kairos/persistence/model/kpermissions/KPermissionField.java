@@ -27,9 +27,6 @@ public class KPermissionField extends UserBaseEntity {
     @NotBlank(message = ERROR_NAME_NOTNULL)
     private String fieldName;
 
-    @Relationship(type = HAS_PERMISSION)
-    private List<AccessGroup> accessGroups = new ArrayList<>();
-
     private Set<OrganizationCategory> organizationCategories;
 
 

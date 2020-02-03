@@ -1,5 +1,6 @@
 package com.kairos.config.interceptor;
 
+import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
@@ -37,12 +38,15 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         try {
-           // UserContext.setUserDetails(ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class));
+            CurrentUserDetails currentUserDetails = ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class);
+            if(isNotNull(UserContext.getUserDetails()) && isNotNull(currentUserDetails)) {
+                UserContext.setUserDetails(currentUserDetails);
+            }
         } catch (Exception e) {
             LOGGER.error("exception {}",e);
         }
-        String orgIdString=pathVariables.get("organizationId");
-        String unitIdString=pathVariables.get("unitId");
+        String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
+        String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
         LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
                 + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
 
