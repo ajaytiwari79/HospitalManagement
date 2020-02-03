@@ -9,8 +9,9 @@ import org.springframework.context.annotation.PropertySource;
 import javax.inject.Inject;
 
 //TODO create profile based email configuration properties file
-@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
+
 @Configuration
+@PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 public class EmailServicesConfiguration {
 
     @Value("${aws.mail.server.region}")
