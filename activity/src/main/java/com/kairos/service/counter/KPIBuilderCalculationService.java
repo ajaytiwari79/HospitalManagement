@@ -1027,9 +1027,9 @@ public class KPIBuilderCalculationService implements CounterService {
         }
 
         private void updateAuditLogs() {
-            if(CollectionUtils.containsAny(newHashSet(CARE_BUBBLE),calculationTypes)){
+            /*if(CollectionUtils.containsAny(newHashSet(CARE_BUBBLE),calculationTypes)){
 
-            }
+            }*/
         }
 
         private void updateShiftsDetails(Map<FilterType, List> filterBasedCriteria, Long organizationId, List<Long> unitIds, List<TimeSlotDTO> timeSlotDTOS, List<Integer> dayOfWeeksNo) {
