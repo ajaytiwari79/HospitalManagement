@@ -50,6 +50,7 @@ public class SendGridMailService implements EmailService{
     private TemplateEngine templateEngine;
     @Inject private EnvConfigCommon envConfigCommon;
 
+
     public boolean sendPlainMail(String receiver,String body, String subject) {
         try {
             LOGGER.info("Sending email to::" + receiver);
