@@ -1,6 +1,6 @@
 package com.kairos.service.priority_group;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.counter.configuration.CounterDTO;
@@ -43,7 +43,7 @@ public class PriorityGroupService extends MongoBaseService {
     @Inject
     private PriorityGroupRulesDataGetterService priorityGroupRulesDataGetterService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private ApplicationContext applicationContext;
     private static final Logger logger = LoggerFactory.getLogger(PriorityGroupService.class);
@@ -230,7 +230,7 @@ public class PriorityGroupService extends MongoBaseService {
             int fibonacciCounter = 0;//Using it to put fibonacci order in email for testing.
             for(StaffEmploymentQueryResult staffEmploymentQueryResult :entry.getValue()) {
 
-                mailService.sendMailWithSendGrid(null,null, String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++,
+                sendGridMailService.sendMailWithSendGrid(null,null, String.format(AppConstants.OPENSHIFT_EMAIL_BODY,fibonacciCounter++,
                         staffEmploymentQueryResult.getAccumulatedTimeBank(), staffEmploymentQueryResult.getDeltaWeeklytimeBank(),
                         staffEmploymentQueryResult.getPlannedHoursWeek()),AppConstants.OPENSHIFT_SUBJECT, staffEmploymentQueryResult.getStaffEmail());
                 openShiftNotification = new OpenShiftNotification(entry.getKey(), staffEmploymentQueryResult.getStaffId());

@@ -51,6 +51,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
+import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -353,7 +354,10 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private boolean shiftInHoliday(ShiftWithActivityDTO shift, List<CountryHolidayCalenderDTO> holidayCalenders) {
         for (CountryHolidayCalenderDTO holidayCalender : holidayCalenders) {
-            if(holidayCalender.getHolidayDate().isEqual(asLocalDate(shift.getStartDate()))){
+            if(holidayCalender.getHolidayDate().isEqual(asLocalDate(shift.getStartDate())) &&
+                    (isNull(holidayCalender.getStartTime()) ||
+                    (!holidayCalender.getStartTime().isAfter(asLocalTime(shift.getStartDate())) &&  !holidayCalender.getEndTime().isBefore(asLocalTime(shift.getStartDate()))))
+            ){
                 return true;
             }
         }
