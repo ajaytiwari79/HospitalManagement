@@ -1,6 +1,6 @@
 package com.kairos.controller.scheduler;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.utils.response.ResponseHandler;
@@ -30,7 +30,7 @@ public class SchedulerJobController {
 
     @Inject
     private JobQueueExecutor schedulerToActivityQueueService;
-    @Inject private MailService mailService;
+    @Inject private SendGridMailService sendGridMailService;
 
     @ApiOperation("scheduler job execution")
     @PostMapping
@@ -40,7 +40,7 @@ public class SchedulerJobController {
         }
         catch(Exception e) {
             LOGGER.error(e.getMessage(),e);
-            mailService.sendMailToBackendOnException(e);
+            sendGridMailService.sendMailToBackendOnException(e);
 
         }
         return ResponseHandler.generateResponse(HttpStatus.OK,true,true);
