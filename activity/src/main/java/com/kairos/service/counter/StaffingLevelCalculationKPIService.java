@@ -37,7 +37,10 @@ public class StaffingLevelCalculationKPIService {
     private KPIBuilderCalculationService kpiBuilderCalculationService;
 
     public double getStaffingLevelCalculationData(Long staffId, DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        Set<BigInteger> activityIds = new HashSet<>();
+        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShifts().stream().filter(shift -> dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
+        KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
+        KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
+        Set<BigInteger> activityIds;
         if(isNotNull(staffId)) {
             StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
             if(isCollectionEmpty(staff.getTeams())){
@@ -50,15 +53,14 @@ public class StaffingLevelCalculationKPIService {
             if(isCollectionEmpty(activityIds)){
                 return 0;
             }
+        }else {
+            activityIds = shiftActivityCriteria.getTeamActivityIds();
         }
-        List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShifts().stream().filter(shift -> dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
-        KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
-        KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
         List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate());
         long staffingLevelData = 0;
         boolean isPresenceStaffingLevelData = PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) || PRESENCE_OVER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType());
         for (StaffingLevel staffingLevel : staffingLevels) {
-            staffingLevelData += getStaffingLevelData(kpiCalculationRelatedInfo, isCollectionEmpty(activityIds) ? shiftActivityCriteria.getTeamActivityIds() : activityIds, filterShiftActivity, isPresenceStaffingLevelData, staffingLevel);
+            staffingLevelData += getStaffingLevelData(kpiCalculationRelatedInfo, activityIds, filterShiftActivity, isPresenceStaffingLevelData, staffingLevel);
         }
         return isPresenceStaffingLevelData ? getValueWithDecimalFormat(getHoursByMinutes(staffingLevelData)) : staffingLevelData;
     }
@@ -107,7 +109,7 @@ public class StaffingLevelCalculationKPIService {
 
     private long getOverStaffingLevelData(StaffingLevelInterval staffingLevelInterval, Set<BigInteger> teamActivityIds, int multiplyBy) {
         long overStaffingLevelData = 0;
-        if(multiplyBy != 1 && isCollectionNotEmpty(teamActivityIds)){
+        if(isCollectionNotEmpty(teamActivityIds)){
             for (StaffingLevelActivity staffingLevelActivity : staffingLevelInterval.getStaffingLevelActivities()) {
                 if(teamActivityIds.contains(staffingLevelActivity.getActivityId()) && staffingLevelActivity.getMaxNoOfStaff() < staffingLevelActivity.getAvailableNoOfStaff()){
                     overStaffingLevelData += (staffingLevelActivity.getAvailableNoOfStaff() - staffingLevelActivity.getMaxNoOfStaff()) * multiplyBy;

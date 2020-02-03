@@ -3,6 +3,7 @@ package com.kairos.service.counter;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.activity.activity_tabs.ApprovalCriteria;
 import com.kairos.dto.activity.activity.activity_tabs.PQLSettings;
 import com.kairos.dto.activity.counter.chart.ClusteredBarChartKpiDataUnit;
@@ -57,6 +58,7 @@ import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.activity.PlannedTimeTypeService;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.service.exception.ExceptionService;
@@ -71,6 +73,7 @@ import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.counter.KPIUtils;
+import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -157,6 +160,8 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Inject
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
+    @Inject
+    private ActivityService activityService;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -502,9 +507,9 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
 
-    public Map<Long, Integer> getStaffAndWithTotalHour(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
+    public Map<Long, Double> getStaffAndWithTotalHour(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
         Map<Object, Double> totalHoursMap = getTotalHoursMap(filterBasedCriteria, organizationId, kpi, applicableKPI);
-        return totalHoursMap.entrySet().stream().collect(Collectors.toMap(k -> (Long) k.getKey(), v -> v.getValue().intValue()));
+        return totalHoursMap.entrySet().stream().collect(Collectors.toMap(k -> (Long) k.getKey(), v -> v.getValue()));
     }
 
     private Map<Object, Double> getTotalHoursMap(Map<FilterType, List> filterBasedCriteria, Long organizationId, KPI kpi, ApplicableKPI applicableKPI) {
@@ -515,7 +520,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Override
     public TreeSet<FibonacciKPICalculation> getFibonacciCalculatedCounter(Map<FilterType, List> filterBasedCriteria, Long organizationId, Direction sortingOrder, List<StaffKpiFilterDTO> staffKpiFilterDTOS, KPI kpi, ApplicableKPI applicableKPI) {
-        Map<Long, Integer> staffAndTotalHoursMap = getStaffAndWithTotalHour(filterBasedCriteria, organizationId, kpi, applicableKPI);
+        Map<Long, Integer> staffAndTotalHoursMap = getStaffAndWithTotalHour(filterBasedCriteria, organizationId, kpi, applicableKPI).entrySet().stream().collect(Collectors.toMap(k -> k.getKey(), v -> v.getValue().intValue()));;
         return getFibonacciCalculation(staffAndTotalHoursMap, sortingOrder);
     }
 
@@ -800,8 +805,7 @@ public class KPIBuilderCalculationService implements CounterService {
                     .sorted(comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
             kpiResponseDTO.setKpiValue(sortedStaffKpiCostDataMap);
         } else {
-            Map<Long, Integer> totalHoursMap = getStaffAndWithTotalHour(filterBasedCriteria, organizationId, kpi, applicableKPI);
-            Map<Long, Double> staffKpiDataMap = totalHoursMap.entrySet().stream().collect(Collectors.toMap(k -> (Long) k.getKey(), v -> v.getValue().doubleValue()));
+            Map<Long, Double> staffKpiDataMap = getStaffAndWithTotalHour(filterBasedCriteria, organizationId, kpi, applicableKPI);
             kpiResponseDTO.setStaffKPIValue(staffKpiDataMap);
         }
         kpiResponseDTO.setKpiName(kpi.getTitle());
@@ -1021,44 +1025,17 @@ public class KPIBuilderCalculationService implements CounterService {
             List<Integer> dayOfWeeksNo = new ArrayList<>();
             daysOfWeeks = (Set<DayOfWeek>) filterCriteria[4];
             daysOfWeeks.forEach(dayOfWeek -> dayOfWeeksNo.add((dayOfWeek.getValue() < 7) ? dayOfWeek.getValue() + 1 : 1));
-            if(filterBasedCriteria.containsKey(FilterType.CALCULATION_TYPE) && CollectionUtils.containsAny(newArrayList(PRESENCE_UNDER_STAFFING.toString(),PRESENCE_OVER_STAFFING.toString(),ABSENCE_UNDER_STAFFING.toString(),ABSENCE_OVER_STAFFING.toString()), filterBasedCriteria.get(FilterType.CALCULATION_TYPE))){
+            List<String> validKPIS = newArrayList(PRESENCE_UNDER_STAFFING.toString(), PRESENCE_OVER_STAFFING.toString(), ABSENCE_UNDER_STAFFING.toString(), ABSENCE_OVER_STAFFING.toString());
+            if(filterBasedCriteria.containsKey(FilterType.CALCULATION_TYPE) && CollectionUtils.containsAny(validKPIS, filterBasedCriteria.get(FilterType.CALCULATION_TYPE))){
                 List<Shift> shiftData =  shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), isCollectionNotEmpty(unitIds) ? unitIds : newArrayList(organizationId));
                 shifts = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftData, ShiftWithActivityDTO.class);
-                updateTeamIdsByStaffAndTeamType(filterBasedCriteria, staffKpiFilterDTOS);
             }else {
                 shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, isCollectionNotEmpty(unitIds) ? unitIds : Arrays.asList(organizationId), new ArrayList<>(), dayOfWeeksNo, dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),false);
+                StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
+                shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             }
-            StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, timeSlotDTOS, organizationId);
-            shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
             currentShiftActivityCriteria = getDefaultShiftActivityCriteria();
             selectedDatesAndStaffDTOSMap = userIntegrationService.getSkillIdAndLevelByStaffIds(UserContext.getUserDetails().getCountryId(), staffIds, dateTimeIntervals.get(0).getStartLocalDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate());
-        }
-
-        private void updateTeamIdsByStaffAndTeamType(Map<FilterType, List> filterBasedCriteria, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
-            if(filterBasedCriteria.containsKey(STAFF_IDS)) {
-                List<TeamType> teamTypes = getTeamTypeSelected(filterBasedCriteria);
-                List<Long> teamIds = new ArrayList<>();
-                for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
-                    for (TeamDTO team : staffKpiFilterDTO.getTeams()) {
-                        if (teamTypes.contains(team.getTeamType())) {
-                            teamIds.add(team.getId());
-                        }
-                    }
-                }
-                filterBasedCriteria.put(FilterType.TEAM, teamIds);
-            }
-        }
-
-        private List<TeamType> getTeamTypeSelected(Map<FilterType, List> filterBasedCriteria) {
-            List<TeamType> teamTypes = new ArrayList<>();
-            if(filterBasedCriteria.containsKey(TEAM_TYPE)){
-                for (Object teamType : filterBasedCriteria.get(TEAM_TYPE)) {
-                    teamTypes.add(TeamType.getByValue(teamType.toString()));
-                }
-            }else{
-                teamTypes.addAll(EnumSet.allOf(TeamType.class));
-            }
-            return teamTypes;
         }
 
         public void getTodoDetails() {
@@ -1100,6 +1077,12 @@ public class KPIBuilderCalculationService implements CounterService {
                 Set<String> teamIds = getStringByList(new HashSet<>(filterBasedCriteria.get(TEAM)));
                 ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUserDetails().getLastSelectedOrganizationId(), teamIds));
                 teamActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
+            }else {
+                List<String> validKPIS = newArrayList(PRESENCE_UNDER_STAFFING.toString(), PRESENCE_OVER_STAFFING.toString(), ABSENCE_UNDER_STAFFING.toString(), ABSENCE_OVER_STAFFING.toString());
+                if(filterBasedCriteria.containsKey(FilterType.CALCULATION_TYPE) && CollectionUtils.containsAny(validKPIS, filterBasedCriteria.get(FilterType.CALCULATION_TYPE))){
+                    List<ActivityDTO> activityDTOS = activityService.getActivitiesByUnitId(UserContext.getUserDetails().getLastSelectedOrganizationId());
+                    teamActivityIds.addAll(activityDTOS.stream().map(activity-> activity.getId()).collect(Collectors.toSet()));
+                }
             }
             Set<Long> reasonCodeIds = filterBasedCriteria.containsKey(REASON_CODE) ? KPIUtils.getLongValueSet(filterBasedCriteria.get(REASON_CODE)) : new HashSet<>();
             Set<ShiftStatus> shiftStatuses = filterBasedCriteria.containsKey(ACTIVITY_STATUS) ? (Set<ShiftStatus>) filterBasedCriteria.get(ACTIVITY_STATUS).stream().map(o -> ShiftStatus.valueOf(o.toString())).collect(Collectors.toSet()) : new HashSet<>();
