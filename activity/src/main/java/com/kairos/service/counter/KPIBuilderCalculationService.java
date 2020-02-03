@@ -157,6 +157,8 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Inject
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
+    @Inject
+    private SkillKPIService skillKPIService;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -334,6 +336,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case ABSENCE_UNDER_STAFFING:
                 return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(dateTimeInterval, kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
+            case STAFF_SKILLS_COUNT:
+                return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId,asLocalDate(kpiCalculationRelatedInfo.getStartDate()),asLocalDate(kpiCalculationRelatedInfo.getEndDate()),kpiCalculationRelatedInfo);
             default:
                 break;
         }

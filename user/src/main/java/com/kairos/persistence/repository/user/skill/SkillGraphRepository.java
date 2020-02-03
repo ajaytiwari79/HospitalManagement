@@ -89,7 +89,7 @@ public interface SkillGraphRepository extends Neo4jBaseRepository<Skill,Long>{
 
     @Query("MATCH (staff:Staff),(skill:Skill) WHERE id(staff) IN {0} \n" +
             "MATCH (staff)-[skillRel:" + STAFF_HAS_SKILLS + "]->(skill) WHERE DATE(skillRel.startDate) <=DATE({1}) AND (skillRel.endDate IS NULL OR DATE(skillRel.endDate) >= DATE({1}) )  \n" +
-            "WITH staff, collect({skillLevel:skillRel.skillLevel,skillId:id(skill)}) AS skills \n" +
+            "WITH staff, collect(distinct {skillLevel:skillRel.skillLevel,skillId:id(skill),startDate:skillRel.startDate,endDate:skillRel.endDate}) AS skills \n" +
             "RETURN id(staff) as id,skills")
     List<StaffQueryResult> getStaffSkillAndLevelByStaffIds(List<Long> staffIds,String selectedDate);
 
