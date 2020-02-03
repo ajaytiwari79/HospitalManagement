@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
@@ -16,7 +19,9 @@ import java.util.List;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE4
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MinimumRestInConsecutiveDaysWTATemplate implements ConstraintHandler {
@@ -34,54 +39,6 @@ public class MinimumRestInConsecutiveDaysWTATemplate implements ConstraintHandle
         this.daysWorked=daysWorked;
     }
 
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-    public long getMinimumRest() {
-        return minimumRest;
-    }
-
-    public void setMinimumRest(int minimumRest) {
-        this.minimumRest = minimumRest;
-    }
-
-    public long getDaysWorked() {
-        return daysWorked;
-    }
-
-    public void setDaysWorked(int daysWorked) {
-        this.daysWorked = daysWorked;
-    }
-
-
-    public MinimumRestInConsecutiveDaysWTATemplate(int minimumRest, int daysWorked) {
-        this.minimumRest = minimumRest;
-        this.daysWorked = daysWorked;
-    }
-
-    public MinimumRestInConsecutiveDaysWTATemplate() {
-    }
     //TODO test case and fix this.
     public int checkConstraints(List<Shift> shifts){
         if(shifts.size()<2) return 0;

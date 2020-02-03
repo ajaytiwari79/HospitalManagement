@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.LocalDate;
 
 import java.util.Collections;
@@ -14,7 +17,9 @@ import java.util.List;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE3
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MaximumConsecutiveWorkingDaysWTATemplate implements ConstraintHandler {
@@ -32,62 +37,6 @@ public class MaximumConsecutiveWorkingDaysWTATemplate implements ConstraintHandl
         this.level = level;
     }
 
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
-
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
-
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
-
-    public long getDaysLimit() {
-        return daysLimit;
-    }
-
-    public void setDaysLimit(int daysLimit) {
-        this.daysLimit = daysLimit;
-    }
-
-    public MaximumConsecutiveWorkingDaysWTATemplate(List<String> balanceType, boolean checkAgainstTimeRules, int daysLimit) {
-        this.balanceType = balanceType;
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-        this.daysLimit = daysLimit;
-    }
-
-    public MaximumConsecutiveWorkingDaysWTATemplate() {
-    }
     //TODO Test case
     public int getConsecutiveDays(List<LocalDate> localDates) {
         if(localDates.size()<2) return 0;

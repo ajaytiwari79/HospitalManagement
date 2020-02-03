@@ -6,6 +6,9 @@ import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.staffing_level.TimeInterval;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.LocalDate;
 
 import java.util.List;
@@ -15,7 +18,9 @@ import java.util.List;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE6
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MinimumConsecutiveNightsWTATemplate implements ConstraintHandler, NightWorkTemplate {
@@ -33,9 +38,6 @@ public class MinimumConsecutiveNightsWTATemplate implements ConstraintHandler, N
         return nightTimeInterval;
     }
 
-    public void setNightTimeInterval(TimeInterval nightTimeInterval) {
-        this.nightTimeInterval = nightTimeInterval;
-    }
 
     private TimeInterval nightTimeInterval;
 
@@ -46,58 +48,6 @@ public class MinimumConsecutiveNightsWTATemplate implements ConstraintHandler, N
         this.nightStarts = nightStarts;
         this.nightEnds = nightEnds;
         nightTimeInterval =new TimeInterval(nightStarts,nightEnds);
-    }
-
-    public long getNightStarts() {
-        return nightStarts;
-    }
-
-    public void setNightStarts(long nightStarts) {
-        this.nightStarts = nightStarts;
-    }
-
-    public long getNightEnds() {
-        return nightEnds;
-    }
-
-    public void setNightEnds(long nightEnds) {
-        this.nightEnds = nightEnds;
-    }
-
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-    public long getDaysLimit() {
-        return daysLimit;
-    }
-
-    public void setDaysLimit(int daysLimit) {
-        this.daysLimit = daysLimit;
-    }
-
-
-    public MinimumConsecutiveNightsWTATemplate() {
     }
 
     public int checkConstraints(List<Shift> shifts){

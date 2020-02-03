@@ -2,6 +2,7 @@ package com.kairos.shiftplanning.domain.shift;
 
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
 import com.kairos.shiftplanning.domain.unit.Unit;
@@ -11,6 +12,8 @@ import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.*;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
@@ -22,32 +25,26 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+
+@Getter
+@Setter
 @PlanningEntity
 @XStreamAlias("ShiftImp")
 public class ShiftImp implements Shift{
     private static Logger log= LoggerFactory.getLogger(ShiftImp.class);
     private UUID id;
     private Employee employee;
-    //@CustomShadowVariable(variableListenerClass = ShiftIntervalListener.class,
-      //      sources = @PlanningVariableReference(variableName = "shift",entityClass = ActivityLineInterval.class))
     @CustomShadowVariable(variableListenerClass = ShiftStartTimeListener.class,
           sources = @PlanningVariableReference(variableName = "activityLineIntervals"))
     @XStreamConverter(JodaLocalTimeConverter.class)
     private LocalTime startTime;
     @XStreamConverter(JodaLocalTimeConverter.class)
-    //@CustomShadowVariable(variableListenerClass = ShiftIntervalListener.class,
-     //       sources = @PlanningVariableReference(variableName = "shift",entityClass = ActivityLineInterval.class))
     private LocalTime endTime;
-   // @CustomShadowVariable(variableListenerClass = ShiftBreakListener.class, sources = {
-     //       @PlanningVariableReference(variableName = "startTime")/*,@PlanningVariableReference(variableName = "endTime")*/ })
-   //@InverseRelationShadowVariable(sourceVariableName =  "breakShift")
     //These breaks are not useful while planner as those are realy planner entities
     private List<ShiftBreak> breaks= new ArrayList<>();
     private java.time.LocalDate startDate;
     private java.time.LocalDate endDate;
 
-    //@CustomShadowVariable(variableListenerClass = ShiftIntervalListener.class, sources = {
-    //        @PlanningVariableReference(variableName = "startTime"),@PlanningVariableReference(variableName = "endTime") })
     @InverseRelationShadowVariable(sourceVariableName =  "shift")
     private List<ActivityLineInterval> activityLineIntervals = new ArrayList<>();
     @XStreamConverter(JodaLocalDateConverter.class)
@@ -55,6 +52,8 @@ public class ShiftImp implements Shift{
 
     private boolean isLocked;
     private boolean isCreatedByStaff;
+    private List<ShiftActivity> shiftActivities;
+
     public ShiftImp(Employee employee, LocalDate date) {
         this.employee = employee;
         this.date = date;
@@ -65,102 +64,10 @@ public class ShiftImp implements Shift{
         return startOfWeek;
     }
 
-    public boolean isCreatedByStaff() {
-        return isCreatedByStaff;
-    }
-
-    public void setCreatedByStaff(boolean createdByStaff) {
-        isCreatedByStaff = createdByStaff;
-    }
-
-    /*public List<ShiftBreak> getBreaks() {
-        return breaks;
-    }
-
-    public void setBreaks(List<ShiftBreak> breaks) {
-        this.breaks = breaks;
-    }*/
-
-    //List<ShiftBreak> breaks = new ArrayList<>();
-
-
-
-
-    public boolean isLocked() {
-        return isLocked;
-    }
-
-    public void setLocked(boolean locked) {
-        isLocked = locked;
-    }
-
-
-    /*public Integer getBreakMinutes() {
-        return breaks.stream().mapToInt(brk -> brk.getMinutes()).sum();
-    }*/
-
-    /*public Integer getWorkMinutes() {
-        return getMinutes() == 0 ? 0 : getMinutes() - getBreakMinutes();
-    }*/
-
-
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    /*public void addBreak(ShiftBreak brk) {
-        this.breaks.add(brk);
-    }*/
-    /*
-    This considers only shift's total hours.
-     */
-
-    /*public boolean checkActivityContraints(ActivityLineInterval activityLineInterval,ShiftImp shift,List<ActivityLineInterval> activityLineIntervals,int index){
-        return activityLineInterval.checkConstraints(activityLineInterval,shift,activityLineIntervals,index);
-    }*/
-
-   /* public void breakActivityContraints(ActivityLineInterval activityLineInterval,HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext,int index){
-        activityLineInterval.getActivity().breakActivityContraints(scoreHolder,kContext,index);
-    }*/
-
-    /*public int checkConstraints(List<Shift> shifts, int index){
-        return this.getEmployee().getWorkingTimeConstraints().checkConstraint(shifts, index);
-
-    }
-
-    public int checkConstraints( int index){
-        return this.getEmployee().getWorkingTimeConstraints().checkConstraint(this, index);
-    }
-
-    public void breakLevelConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext,int index,int contraintPenality){
-        this.getEmployee().getWorkingTimeConstraints().breakLevelConstraints(scoreHolder,kContext,index,contraintPenality);
-    }
-    */
-
     public int getBreaksDuration(List<ShiftBreak> breaks){
         return breaks.stream().mapToInt(b->b.getMinutes()).sum();
     }
 
-    public List<ShiftBreak> getBreaks() {
-        return breaks;
-    }
-
-    public void setBreaks(List<ShiftBreak> breaks) {
-        this.breaks = breaks;
-    }
     public boolean containsActivity(IndirectActivity indirectActivity){
         return availableThisInterval(indirectActivity.getInterval());
     }
@@ -168,22 +75,6 @@ public class ShiftImp implements Shift{
         return interval!=null && this.getInterval()!=null && this.getInterval().overlaps(interval);
     }
 
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
     @Override
     public DateTime getStart() {
         return startTime!=null?date.toDateTime(startTime):null;
@@ -198,48 +89,6 @@ public class ShiftImp implements Shift{
         return Shift.super.getMinutes();
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-    public LocalDate getDate() {
-        return  date;
-    }
-
-    public List<ActivityLineInterval> getActivityLineIntervals() {
-        return activityLineIntervals;
-    }
-   /* public List<ActivityLineInterval> getActivityLineIntervalsList() {
-        return new ArrayList<>(activityLineIntervals);
-    }*/
-
-    public java.time.LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(java.time.LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public java.time.LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(java.time.LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public void setActivityLineIntervals(List<ActivityLineInterval> activityLineIntervals) {
-        this.activityLineIntervals = activityLineIntervals;
-    }
-
-    /*public int getShiftCostInInt(){
-        return Math.round(getShiftCost());
-    }
-
-    public float getShiftCost(){
-        return getEmployee().getCollectiveTimeAgreement().getTotalCostOfShift(this).floatValue();
-    }*/
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -247,18 +96,6 @@ public class ShiftImp implements Shift{
         if (o == null || getClass() != o.getClass()) return false;
 
         ShiftImp that = (ShiftImp) o;
-
-        /*return new EqualsBuilder()
-                .append(isLocked, that.isLocked)
-                .append(isCreatedByStaff, that.isCreatedByStaff)
-                .append(id, that.id)
-                .append(employee, that.employee)
-                .append(startTime, that.startTime)
-                .append(endTime, that.endTime)
-                .append(breaks, that.breaks)
-                .append(activityLineIntervals, that.activityLineIntervals)
-                .append(date, that.date)
-                .isEquals();*/
         return id.equals(that.getId());
     }
 
@@ -267,20 +104,7 @@ public class ShiftImp implements Shift{
 
     @Override
     public int hashCode() {
-        /*int hashcode=new HashCodeBuilder(17, 37)
-                .append(id)
-                .append(employee)
-                .append(startTime)
-                .append(endTime)
-                .append(breaks)
-                .append(activityLineIntervals)
-                .append(date)
-
-                .append(isLocked)
-                .append(isCreatedByStaff)
-                .toHashCode();*/
         int hashcode=id.hashCode();
-        //log.info("Shift hashcode:"+date.toString("MM/dd")+":"+hashcode);
         return hashcode;
     }
 
@@ -315,15 +139,10 @@ public class ShiftImp implements Shift{
 
     }
     public int missingIntervals(List<ActivityLineInterval> assignedActivityLineIntervals){
-        //System.out.println(assignedActivityLineIntervals.size());
         if(startTime==null) return  0;
         Collections.sort(assignedActivityLineIntervals);
         int intervalMins=15;
         Map<Integer,Integer> intervalEntry= new HashMap<>();
-        //if(assignedActivityLineIntervals.size()==0){
-            //Well, the reason it(empty assignedActivityLineIntervals) happens even when startTime is not null is because when removed a shift from activityLineinterval,
-            //it does not update the listener which wreaks havoc.
-        //}
         for (ActivityLineInterval activityLineInterval:assignedActivityLineIntervals) {
             DateTime start = activityLineInterval.getStart();
             int a=(start.getHourOfDay()*(60/intervalMins)) + (start.getMinuteOfHour()/intervalMins);
