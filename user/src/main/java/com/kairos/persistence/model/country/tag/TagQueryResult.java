@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,4 +26,6 @@ public class TagQueryResult {
     private String color;
     private String shortName;
     private String ultraShortName;
+    private Date startDate;
+    private Date endDate;
 }

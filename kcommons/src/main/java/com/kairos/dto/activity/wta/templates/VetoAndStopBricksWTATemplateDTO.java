@@ -28,7 +28,9 @@ public class VetoAndStopBricksWTATemplateDTO extends WTABaseRuleTemplateDTO {
     private int numberOfWeeks;
     @NotNull(message = "message.ruleTemplate.weeks.notNull")
     private LocalDate validationStartDate;
+    @NotNull(message = "message.mismatched-ids")
     private BigInteger vetoActivityId;
+    @NotNull(message = "message.mismatched-ids")
     private BigInteger stopBrickActivityId;
     @Positive(message = "message.ruleTemplate.blocking.point")
     private float totalBlockingPoints; // It's for a duration from @validationStartDate  till the @numberOfWeeks

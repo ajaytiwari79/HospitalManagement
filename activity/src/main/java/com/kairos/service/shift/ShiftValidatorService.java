@@ -961,7 +961,7 @@ public class ShiftValidatorService {
 
     private boolean getEsclationResolved(Shift shift, Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap, Shift overLappedShift) {
         boolean isResolved = true;
-        if (shift.getId().equals(overLappedShift.getId())) {
+        if (shift.getId().equals(overLappedShift.getId()) && shiftViolatedRulesMap.containsKey(overLappedShift.getId())) {
             if (shift.getBreakActivities().stream().anyMatch(ShiftActivity::isBreakNotHeld)) {
                 shiftViolatedRulesMap.get(overLappedShift.getId()).setEscalationResolved(false);
                 isResolved = false;

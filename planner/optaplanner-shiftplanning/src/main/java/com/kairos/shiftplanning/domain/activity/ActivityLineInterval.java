@@ -16,6 +16,7 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 /*
@@ -36,6 +37,7 @@ public class ActivityLineInterval implements StaffingLineInterval, Comparable<Ac
     private Activity activity;
     @PlanningVariable(valueRangeProviderRefs = "shifts", nullable = true)
     private ShiftImp shift;
+    private BigInteger actualShiftId;
 
 
 

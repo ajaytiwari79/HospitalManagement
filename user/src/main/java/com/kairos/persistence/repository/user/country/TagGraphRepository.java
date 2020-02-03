@@ -112,6 +112,11 @@ public interface TagGraphRepository extends Neo4jBaseRepository<Tag, Long> {
             "return tag\n")
     List<Tag> getOrganizationTagsById(Long orgId, List<Long> tagIds, String masterDataType, boolean deleted);
 
+    @Query("Match (org:OrganizationBaseEntity)-[r:" + ORGANIZATION_HAS_TAG + "]->(tag:Tag{countryTag:false,deleted:false})\n" +
+            "WHERE id(org)={0} AND tag.masterDataType ={1}\n" +
+            "return tag\n")
+    List<Tag> getOrganizationTags(Long orgId, String masterDataType);
+
 
 }
 

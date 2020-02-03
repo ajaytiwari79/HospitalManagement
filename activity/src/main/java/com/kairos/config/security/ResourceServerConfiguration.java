@@ -40,15 +40,9 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/webjars/**", "/resources/**", "/swagger-resources/**/**", "/swagger-ui.html", "/v2/api-docs").permitAll()
-                .antMatchers(API_V1 + "/time_care/**").permitAll()
-                .antMatchers(API_UNIT_URL + COUNTRY_URL + "/time_care/**").permitAll()
+                .antMatchers("/webjars/**", "/static/**","/api/v1/ws/**", "/swagger-resources/**/**", "/swagger-ui.html", "/v2/api-docs").permitAll()
                 .antMatchers(API_CREATE_KMD_TASK_DEMAND).permitAll()
                 .antMatchers(API_UNIT_URL + "/api/v1/ws/**").permitAll()
-                .antMatchers("/planner/vrp_completed/**").permitAll()
-                .antMatchers(API_UNIT_URL + "/getShiftPlanningInfo").permitAll()
-                .antMatchers(API_UNIT_URL + "/sub-shifts").permitAll()
-                //.antMatchers(API_V1+ SCHEDULER_EXECUTE_JOB).permitAll()
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/**").authenticated()
                 .and().addFilterBefore(getAuthenticationFilter(), AbstractPreAuthenticatedProcessingFilter.class);

@@ -61,8 +61,10 @@ public class AuditLogging {
                         updateMap(arg0, oldValue, newValue, arg0.getPropertyName(), diffResult, parentNodeClass);
                     }
                 }
-
             });
+            if(newEntity.getClass().getSimpleName().equals("Shift")){
+                diffResult.put("staffId", newEntity.getClass().getMethod("getStaffId").invoke(newEntity));
+            }
             diffResult.put("loggingType", getLoggingType(ObjectMapperUtils.copyPropertiesByMapper(oldEntity, HashMap.class), ObjectMapperUtils.copyPropertiesByMapper(newEntity, HashMap.class)));
             result = diffResult;
             mongoTemplate.save(result, newEntity.getClass().getSimpleName());
@@ -124,7 +126,6 @@ public class AuditLogging {
     }
 
     static boolean isParentValid(DiffNode arg0) {
-        LOGGER.debug("property {}", arg0.getPropertyName());
         return isNotNull(arg0.getParentNode()) && arg0.getParentNode().getValueType().getPackage().getName().contains(PACKAGE_NAME);
     }
 

@@ -64,6 +64,7 @@ public class ActivityDTO  {
     private BigInteger activityPriorityId;
     private int activitySequence;
     private BigInteger countryParentId;
+    @Builder.Default
     private Map<String, TranslationInfo> translations = new HashMap<>();
 
 

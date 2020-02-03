@@ -440,6 +440,7 @@ public class TimeBankService{
     }
 
     private void updateBonusHoursOfTimeBankInShift(List<ShiftWithActivityDTO> shiftWithActivityDTOS, List<Shift> shifts) {
+        shifts.removeIf(shift -> shift.isDeleted());
         if(CollectionUtils.isNotEmpty(shifts)) {
             Map<String, ShiftActivityDTO> shiftActivityDTOMap = shiftWithActivityDTOS.stream().flatMap(shift1 -> shift1.getActivities().stream()).collect(Collectors.toMap(k -> k.getActivityId()+"_"+k.getStartDate(), v -> v));
             for (ShiftWithActivityDTO shiftWithActivityDTO : shiftWithActivityDTOS) {

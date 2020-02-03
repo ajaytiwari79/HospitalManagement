@@ -60,7 +60,7 @@ public class PlannedTimePercentageService implements CounterService {
         List<Long> unitIds = (List<Long>) filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>) filterCriteria[3];
         List<BigInteger> plannedTimeIds=(List<BigInteger>) filterCriteria[6];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];

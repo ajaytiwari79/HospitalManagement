@@ -30,6 +30,12 @@ public class AuditLoggingRepository {
         return mongoTemplate.find(query ,Map.class,"Shift");
     }
 
+    public List<Map> getAuditLogOfStaffs(List<Long> staffIds,LocalDate startDate,LocalDate endDate) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("staffId").in(staffIds).and ("activities.startDate").gte(startDate).and("activities.endDate").lte(endDate));
+        return mongoTemplate.find(query ,Map.class,"Shift");
+    }
+
 
 }
 
