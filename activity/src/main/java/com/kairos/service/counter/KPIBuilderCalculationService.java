@@ -352,6 +352,11 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
     private boolean shiftInHoliday(ShiftWithActivityDTO shift, List<CountryHolidayCalenderDTO> holidayCalenders) {
+        for (CountryHolidayCalenderDTO holidayCalender : holidayCalenders) {
+            if(holidayCalender.getHolidayDate().isEqual(asLocalDate(shift.getStartDate()))){
+                return true;
+            }
+        }
         return false;
     }
 
