@@ -117,7 +117,7 @@ public class StaffingLevelController {
 
 
     @MessageMapping("/staffing_level/graph/{unitId}")
-    @SendTo(ApiConstants.API_V1+"/ws/dynamic-push/staffing-level/graph/{unitId}")
+    @SendTo(ApiConstants.API_V1+"/ws/dynamic-push/staffing_level/graph/{unitId}")
     public StaffingLevel dynamicStaffingLevelGraphSyncResponse(@DestinationVariable Long unitId, Message message){
 
         return  staffingLevelService.getPresenceStaffingLevel(unitId,message.getCurrentDate());

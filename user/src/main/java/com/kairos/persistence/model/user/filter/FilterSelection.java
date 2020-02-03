@@ -28,4 +28,9 @@ public class FilterSelection extends UserBaseEntity {
     }
 
     private int sequence;
+
+    public FilterSelection(FilterType name, List<String> value) {
+        this.name = name;
+        this.value = value;
+    }
 }

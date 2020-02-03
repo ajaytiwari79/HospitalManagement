@@ -4,9 +4,13 @@ package com.kairos.shiftplanning.domain.skill;
 
 import com.kairos.shiftplanning.enums.SkillType;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+@Getter
+@Setter
 @XStreamAlias("Skill")
 public class Skill {
 
@@ -24,38 +28,11 @@ public class Skill {
 	public Skill() {
 	}
 
-	public int getWeight() {
-		return weight;
-	}
-
-	public void setWeight(int weight) {
-		this.weight = weight;
-	}
-
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
 	@Override
 	public String toString() {
 		return "Skill [name=" + name + "]";
 	}
 
-	public SkillType getSkillType() {
-		return skillType;
-	}
-
-	public void setSkillType(SkillType skillType) {
-		this.skillType = skillType;
-	}
 
 	@Override
 	public boolean equals(Object o) {

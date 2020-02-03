@@ -6,6 +6,9 @@ import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.staffing_level.TimeInterval;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.LocalDate;
 
 import java.util.List;
@@ -18,7 +21,9 @@ import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class MaximumConsecutiveWorkingNightsWTATemplate implements ConstraintHandler,NightWorkTemplate{
 
 
@@ -43,82 +48,11 @@ public class MaximumConsecutiveWorkingNightsWTATemplate implements ConstraintHan
         nightTimeInterval =new TimeInterval(nightStarts,nightEnds);
     }
 
-    public long getNightStarts() {
-        return nightStarts;
-    }
-
-    public void setNightStarts(long nightStarts) {
-        this.nightStarts = nightStarts;
-    }
-
-    public Long getNightEnds() {
-        return nightEnds;
-    }
-
-    public void setNightEnds(Long nightEnds) {
-        this.nightEnds = nightEnds;
-    }
-
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
-
-    public boolean isCheckAgainstTimeRules() {
-        return checkAgainstTimeRules;
-    }
-
-    public void setCheckAgainstTimeRules(boolean checkAgainstTimeRules) {
-        this.checkAgainstTimeRules = checkAgainstTimeRules;
-    }
-
-    public long getNightsWorked() {
-        return nightsWorked;
-    }
-
-    public void setNightsWorked(long nightsWorked) {
-        this.nightsWorked = nightsWorked;
-    }
-
     @Override
     public TimeInterval getNightTimeInterval() {
         return nightTimeInterval;
     }
 
-    public void setNightTimeInterval(TimeInterval nightTimeInterval) {
-        this.nightTimeInterval = nightTimeInterval;
-    }
-
-    public MaximumConsecutiveWorkingNightsWTATemplate() {
-    }
 
     private int getConsecutiveNightShifts(Set<LocalDate> localDates, Shift shift){
         int count = 0;

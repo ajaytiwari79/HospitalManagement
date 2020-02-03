@@ -1,33 +1,21 @@
 package com.kairos.shiftplanning.domain.staffing_level;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.Interval;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TimeInterval {
 
     //In minutes
     private long startFrom;
     private long endTo;
 
-    public TimeInterval(long startFrom, long endTo) {
-        this.startFrom = startFrom;
-        this.endTo = endTo;
-    }
-
-    public long getStartFrom() {
-        return startFrom;
-    }
-
-    public void setStartFrom(long startFrom) {
-        this.startFrom = startFrom;
-    }
-
-    public long getEndTo() {
-        return endTo;
-    }
-
-    public void setEndTo(long endTo) {
-        this.endTo = endTo;
-    }
 
     public boolean overlaps(TimeInterval timeInterval){
         long otherEnd = timeInterval.getEndTo();

@@ -119,12 +119,12 @@ public interface ExpertiseGraphRepository extends Neo4jBaseRepository<Expertise,
             "WITH DISTINCT expertise,exl,seniorDays,childCareDays,sector,organizationLevel,union  " +
             "MATCH(exl)-[:" + SUPPORTS_SERVICES + "]-(orgService:OrganizationService) WHERE id(orgService) IN {1}\n" +
             "MATCH(exl)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel) " +
-            "with expertise,exl,seniorityLevel,sector,organizationLevel,union, " +
+            "with expertise,exl,seniorityLevel,sector,organizationLevel,union , " +
             "CASE WHEN seniorDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(seniorDays),from:seniorDays.from,to:seniorDays.to,leavesAllowed:seniorDays.leavesAllowed}) END as seniorDays, " +
             "CASE WHEN childCareDays IS NULL THEN [] ELSE COLLECT(DISTINCT {id:id(childCareDays),from:childCareDays.from,to:childCareDays.to,leavesAllowed:childCareDays.leavesAllowed}) END as childCareDays ORDER BY  seniorityLevel.from \n" +
             "RETURN DISTINCT expertise.name as name ,id(expertise) as id,expertise.creationDate as creationDate, expertise.startDate as startDate ," +
             "expertise.endDate as endDate ,exl.fullTimeWeeklyMinutes as fullTimeWeeklyMinutes,exl.numberOfWorkingDaysInWeek as numberOfWorkingDaysInWeek," +
-             " seniorDays,childCareDays,sector,organizationLevel,union order by expertise.name")
+             " seniorDays,childCareDays,sector,organizationLevel,union  order by expertise.name")
     List<ExpertiseQueryResult> findExpertiseByOrganizationServicesForUnit(Long countryId, Set<Long> organizationServicesIds);
 
     @Query("MATCH(expertise:Expertise{deleted:false,published:true})-[:"+HAS_EXPERTISE_LINES+"]->(exl:ExpertiseLine)-[:" + SUPPORTED_BY_UNION + "]-(union:Organization)-[:"+HAS_LOCATION+"]-(location:Location{deleted:false})  WHERE id(expertise)={0}" +

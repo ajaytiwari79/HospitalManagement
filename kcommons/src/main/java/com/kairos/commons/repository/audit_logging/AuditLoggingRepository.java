@@ -24,12 +24,13 @@ public class AuditLoggingRepository {
     public List<Map> getAuditLoggingByType(String auditLogType){
         return mongoTemplate.findAll(Map.class,auditLogType);
     }
-    public List<Map> getAuditLogOfStaff(Long staffId,LocalDate startDate,LocalDate endDate) {
-
+    public List<Map> getAuditLogOfStaff(List<Long> staffIds,LocalDate startDate,LocalDate endDate) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("staffId").is(staffId).and ("startDate").gte(startDate).and("endDate").lte(endDate));
+        query.addCriteria(Criteria.where("staffId").in(staffIds).and ("startDate").gte(startDate).and("endDate").lte(endDate));
         return mongoTemplate.find(query ,Map.class,"Shift");
     }
+
+
 }
 
 

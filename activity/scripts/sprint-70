@@ -30,7 +30,7 @@ var valid = false;
 doc.dups.forEach( function(dupId){
 if(valid){
 print("dups id"+ dupId);
-// db.kPIDashboard.remove({"_id":dupId});
+ db.kPIDashboard.remove({"_id":dupId});
 }else{
 valid = true;
 }
