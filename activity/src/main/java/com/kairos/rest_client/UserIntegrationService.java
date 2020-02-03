@@ -82,7 +82,7 @@ import static com.kairos.constants.ApiConstants.*;
 public class UserIntegrationService {
 
     private static GenericRestClient genericRestClient;
-    @Injectgit gu
+    @Inject
     private ExceptionService exceptionService;
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
