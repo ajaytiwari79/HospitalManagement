@@ -267,8 +267,10 @@ public class ShiftService extends MongoBaseService {
             shift = updateShiftAfterPublish(shift, shiftAction);
         }
         if (isValidForDraftShiftFunctionality(staffAdditionalInfoDTO, updateShift, phase, shiftAction, planningPeriod)) {
+            shift.setDraftShift(isNull(shift.getDraftShift()) ? shift : shift.getDraftShift());
             shift.getDraftShift().setShiftType(updateShiftType(activityWrapperMap, shift.getDraftShift()));
             shift.getDraftShift().setDraft(true);
+            shift.getDraftShift().setDraftShift(null);
             shift.setDraft(isNull(shift.getId()));
         }
         shift.setStaffUserId(staffAdditionalInfoDTO.getStaffUserId());
