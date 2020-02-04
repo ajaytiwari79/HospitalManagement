@@ -162,7 +162,11 @@ public class KPIBuilderCalculationService implements CounterService {
     @Inject
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
     @Inject
+
+    private SkillKPIService skillKPIService;
+
     private ActivityService activityService;
+
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -267,7 +271,7 @@ public class KPIBuilderCalculationService implements CounterService {
     public ShiftActivityCriteria getShiftActivityCriteria(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         if (kpiCalculationRelatedInfo.getKpi().isMultiDimensional()) {
             return kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria();
-        }
+        }985
         ShiftActivityCriteria currentShiftActivityCriteria = kpiCalculationRelatedInfo.getCurrentShiftActivityCriteria();
         Set<BigInteger> timeTypeIds = kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(TIME_TYPE) ? kpiCalculationRelatedInfo.getTimeTypeMap().keySet() : new HashSet<>();
         Set<BigInteger> plannedTimeIds = kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(PLANNED_TIME_TYPE) ? KPIUtils.getBigIntegerSet(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(PLANNED_TIME_TYPE)) : new HashSet<>();
@@ -342,6 +346,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case ABSENCE_UNDER_STAFFING:
                 return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
+            case STAFF_SKILLS_COUNT:
+                return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId,asLocalDate(kpiCalculationRelatedInfo.getStartDate()),asLocalDate(kpiCalculationRelatedInfo.getEndDate()),kpiCalculationRelatedInfo);
             default:
                 break;
         }
