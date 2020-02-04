@@ -46,11 +46,5 @@ public class ProtectedDaysOffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, protectedDaysOffService.createAutoProtectedDaysOffOfAllUnits(countryId));
     }
 
-    @ApiOperation(value = "Register job for protected days off")
-    @PostMapping(value = "/register_job_for_protected_days_off")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> registerJobForNightWorker() {
-        activitySchedulerJobService.registerJobForProtectedDaysOff();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
-    }
+
 }

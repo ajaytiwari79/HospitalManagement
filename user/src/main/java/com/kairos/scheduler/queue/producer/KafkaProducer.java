@@ -45,7 +45,7 @@ public class KafkaProducer {
     }
 
     public void pushToSchedulerLogsQueue(KairosSchedulerLogsDTO logs) {
-        schedulerServiceRestClient.publishRequest(logs,null,false,IntegrationOperation.CREATE,JOB_DETAILS,null,new ParameterizedTypeReference<RestTemplateResponseEnvelope<Boolean>>() {});
+
         //Todo Yatharth uncomment this code when it kafka is ready
         //kafkaTemplateLogsQueue.send(USER_TO_SCHEDULER_LOGS_QUEUE_TOPIC,logs);
     }

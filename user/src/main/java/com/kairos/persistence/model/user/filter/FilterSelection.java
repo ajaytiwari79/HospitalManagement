@@ -27,4 +27,5 @@ public class FilterSelection extends UserBaseEntity {
         this.name = name;
         this.value = value;
     }
+
 }

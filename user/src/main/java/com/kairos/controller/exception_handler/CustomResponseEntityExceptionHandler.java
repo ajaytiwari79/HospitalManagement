@@ -51,6 +51,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @Autowired
     private LocaleService localeService;
     @Inject
+    private SendGridMailService sendGridMailService;
     private SendGridMailService mailService;
     @Inject
     private RaygunClient raygunClient;
