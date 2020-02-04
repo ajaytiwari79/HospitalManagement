@@ -29,6 +29,10 @@
     <springProfile name="development,test,local,production,qa">
         <logger name="org.springframework.kafka" level="OFF"/>
         <logger name="org.apache.kafka" level="OFF"/>
+        <logger name="org.springframework.data.repository.config.RepositoryConfigurationExtensionSupport" level="OFF"/>
+        <logger name="org.springframework.data.neo4j.mapping.Neo4jPersistentProperty" level="OFF"/>
+        <logger name="org.springframework.data.neo4j.mapping.Neo4jMappingContext" level="OFF"/>
+        <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="OFF"/>
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
         <appender name="ROLLING-FILE"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">

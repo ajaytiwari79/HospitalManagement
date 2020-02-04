@@ -22,4 +22,15 @@ public class FilterSelection extends UserBaseEntity {
     private FilterType name;
     private List<String> value;
 
+    public FilterSelection(FilterType name, List<String> value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    private int sequence;
+
+    public FilterSelection(FilterType name, List<String> value) {
+        this.name = name;
+        this.value = value;
+    }
 }

@@ -492,31 +492,6 @@ public class ExpertiseService {
 
     }
 
-    private Organization getUnion(Long unionId, String unionName, Country country) {
-        Organization union;
-        if (Optional.ofNullable(unionId).isPresent()) {
-            union = organizationGraphRepository.findByIdAndUnionTrueAndIsEnableTrue(unionId);
-            if (!Optional.ofNullable(union).isPresent()) {
-                exceptionService.dataNotFoundByIdException(MESSAGE_DATANOTFOUND, UNION, unionId);
-            }
-        } else {
-            union = new Organization(unionName, true, country);
-        }
-        return union;
-    }
-
-    private Sector getSector(SectorDTO sectorDTO, Country country) {
-        Sector sector = null;
-        if (Optional.ofNullable(sectorDTO).isPresent()) {
-            if (Optional.ofNullable(sectorDTO.getId()).isPresent()) {
-                sector = new Sector(sectorDTO.getId(), sectorDTO.getName());
-            } else {
-                sector = new Sector(sectorDTO.getName());
-                sector.setCountry(country);
-            }
-        }
-        return sector;
-    }
 
     public Map<String, Object> getPlannedTimeAndEmploymentTypeForUnit(Long unitId) {
         Unit unit = unitGraphRepository.findOne(unitId);

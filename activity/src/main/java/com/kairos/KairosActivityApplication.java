@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.kairos.commons.config.mongo.EnableAuditLogging;
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.custom_exception.ActivityExceptionHandler;
 import com.kairos.dto.user_context.UserContextInterceptor;
 import com.kairos.interceptor.ExtractOrganizationAndUnitInfoInterceptor;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepositoryImpl;
@@ -59,6 +60,7 @@ public class KairosActivityApplication implements WebMvcConfigurer {
 	}
 
 	public static void main(String[] args) {
+		Thread.setDefaultUncaughtExceptionHandler(new ActivityExceptionHandler());
 		SpringApplication.run(KairosActivityApplication.class, args);
 	}
 

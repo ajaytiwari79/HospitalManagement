@@ -1,11 +1,13 @@
 package com.kairos.service.organization;
 
+import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.experties.AgeRangeDTO;
+import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.ModuleId;
@@ -20,6 +22,7 @@ import com.kairos.persistence.repository.organization.GroupGraphRepository;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.service.staff.StaffFilterService;
 import org.apache.poi.ss.formula.functions.T;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +57,8 @@ public class GroupService {
     private EnvConfig envConfig;
     @Inject
     private OrganizationService organizationService;
-    @Inject private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private StaffFilterService staffFilterService;
 
     public GroupDTO createGroup(Long unitId, GroupDTO groupDTO) {
         Unit unit = unitGraphRepository.findOne(unitId);
@@ -72,10 +76,7 @@ public class GroupService {
         if (isNotNull(groupDTO.getName()) && groupGraphRepository.existsByName(unitId,groupId, groupDTO.getName())){
             exceptionService.duplicateDataException(MESSAGE_GROUP_ALREADY_EXISTS_IN_UNIT, groupDTO.getName(), unitId);
         }
-        Group group = groupGraphRepository.findGroupByIdAndDeletedFalse(groupId);
-        if(isNull(group)){
-            exceptionService.dataNotFoundByIdException(MESSAGE_GROUP_NOT_FOUND,groupId);
-        }
+        Group group = groupGraphRepository.findById(groupId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_GROUP_NOT_FOUND,groupId)));
         if(isNotNull(groupDTO.getName())){
             group.setName(groupDTO.getName());
             group.setDescription(groupDTO.getDescription());
@@ -84,8 +85,9 @@ public class GroupService {
             groupGraphRepository.deleteAllFiltersByGroupId(groupId);
             List<FilterSelection> filterSelections = new ArrayList<>();
             groupDTO.getFiltersData().forEach(k->{
-                FilterSelection filterSelection=new FilterSelection(k.getName(),Arrays.asList(ObjectMapperUtils.objectToJsonString(k.getValue().iterator().next())));
-                filterSelections.add(filterSelection);
+                List<String> values = new ArrayList<>();
+                k.getValue().forEach(val->values.add(ObjectMapperUtils.objectToJsonString(val)));
+                filterSelections.add(new FilterSelection(k.getName(),values,0));
             });
             group.setFiltersData(filterSelections);
             group.setExcludedStaffIds(groupDTO.getExcludedStaffs());
@@ -113,7 +115,9 @@ public class GroupService {
         GroupDTO groupDTO = new GroupDTO(group.getId(), group.getName(), group.getDescription(), group.getExcludedStaffIds(), group.getRoomId());
         List<FilterSelectionDTO> filterSelectionDTOS = new ArrayList<>();
         for(FilterSelection filterSelection : group.getFiltersData()){
-            filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), newHashSet(ObjectMapperUtils.jsonStringToObject(filterSelection.getValue().get(0),Object.class))));
+            Set<Object> values = new HashSet<>();
+            filterSelection.getValue().forEach(val-> values.add(ObjectMapperUtils.jsonStringToObject(val,Object.class)));
+            filterSelectionDTOS.add(new FilterSelectionDTO(filterSelection.getName(), values));
         }
         groupDTO.setFiltersData(filterSelectionDTOS);
         return groupDTO;
@@ -131,7 +135,7 @@ public class GroupService {
 
     public List<Map> getStaffListByGroupFilter(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS){
         List<Map> filteredStaff = new ArrayList<>();
-        for(Map staff : getMapsOfStaff(unitId, filterSelectionDTOS)){
+        for(Map staff : staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value,filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false).getStaffList()){
             if(StaffStatusEnum.ACTIVE.toString().equals(staff.get("currentStatus"))) {
                 Map<String, Object> fStaff = new HashMap<>();
                 fStaff.put("id", staff.get("id"));
@@ -147,53 +151,6 @@ public class GroupService {
         return filteredStaff;
     }
 
-    private List<Map> getMapsOfStaff(Long unitId, List<FilterSelectionDTO> filterSelectionDTOS) {
-        Map<FilterType, Set<String>> mapOfFilters = new HashMap<>();
-        Map ageRange = null;
-        Map experienceRange = null;
-        for(FilterSelectionDTO filterSelection : filterSelectionDTOS){
-            if(FilterType.AGE.equals(filterSelection.getName())){
-                ageRange = (Map) filterSelection.getValue().iterator().next();
-            }else if(FilterType.ORGANIZATION_EXPERIENCE.equals(filterSelection.getName())){
-                experienceRange = (Map) filterSelection.getValue().iterator().next();
-            }else {
-                mapOfFilters.put(filterSelection.getName(), filterSelection.getValue());
-            }
-        }
-        Organization organization=organizationService.fetchParentOrganization(unitId);
-        List<Map> staffs = staffGraphRepository.getStaffWithFilters(unitId, Arrays.asList(organization.getId()), ModuleId.Group_TAB_ID.value,mapOfFilters, "",envConfig.getServerHost() + AppConstants.FORWARD_SLASH + envConfig.getImagesPath(),null);
-        if(isNotNull(ageRange)) {
-            final AgeRangeDTO age = new AgeRangeDTO(Integer.parseInt(ageRange.get("from").toString()), isNotNull(ageRange.get("to")) ? Integer.parseInt(ageRange.get("to").toString()) : null, DurationType.valueOf(ageRange.get("durationType").toString()));
-            staffs = staffs.stream().filter(map -> validate(map.get("dateOfBirth"), age)).collect(Collectors.toList());
-        }
-        if(isNotNull(experienceRange)){
-            final AgeRangeDTO joining = new AgeRangeDTO(Integer.parseInt(experienceRange.get("from").toString()), isNotNull(experienceRange.get("to")) ? Integer.parseInt(experienceRange.get("to").toString()) : null,DurationType.valueOf(experienceRange.get("durationType").toString()));
-            staffs = staffs.stream().filter(map -> validate(map.get("joiningDate"), joining)).collect(Collectors.toList());
-        }
-        return staffs;
-    }
-
-    private boolean validate(Object date, AgeRangeDTO dateRange){
-        if(isNotNull(date)) {
-            long inDays = ChronoUnit.DAYS.between(asLocalDate(date.toString()), getCurrentLocalDate());
-            long from = getDataInDays(dateRange.getFrom(), dateRange.getDurationType());
-            long to = isNotNull(dateRange.getTo()) ? getDataInDays(dateRange.getTo(), dateRange.getDurationType()) : MAX_LONG_VALUE;
-            return from <= inDays && to >= inDays;
-        }
-        return false;
-    }
-
-    private long getDataInDays(long value, DurationType durationType){
-        switch (durationType){
-            case YEAR :
-                return Math.round(value *  DAYS_IN_ONE_YEAR);
-            case MONTHS:
-                return Math.round(value *  DAYS_IN_ONE_MONTH);
-            default:
-                return value;
-        }
-    }
-
     public Set<Long> getAllStaffIdsByGroupIds(Long unitId, List<Long> groupIds){
         Set<Long> staffIds = new HashSet<>();
         Set<Long> excludedStaffs = new HashSet<>();
@@ -201,7 +158,8 @@ public class GroupService {
         List<GroupDTO> groupDTOS = new ArrayList<>();
         for(Group group : groups){
             GroupDTO groupDTO = getGroupDTOFromGroup(group);
-            List<Map> staffs = getMapsOfStaff(unitId, groupDTO.getFiltersData());
+            List<FilterSelectionDTO> filterSelectionDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(group.getFiltersData(), FilterSelectionDTO.class);
+            List<Map> staffs = staffFilterService.getAllStaffByUnitId(unitId, new StaffFilterDTO(ModuleId.Group_TAB_ID.value, filterSelectionDTOS),  ModuleId.Group_TAB_ID.value, null, null,false).getStaffList();
             staffIds.addAll(staffs.stream().map(map-> Long.valueOf(map.get("id").toString())).collect(Collectors.toSet()));
             excludedStaffs.addAll(groupDTO.getExcludedStaffs());
             groupDTOS.add(groupDTO);

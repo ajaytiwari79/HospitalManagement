@@ -48,13 +48,11 @@ import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.MasterDataTypeEnum;
 import com.kairos.enums.rest_client.MicroService;
 import com.kairos.enums.rest_client.RestClientUrlType;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.client_exception.ClientExceptionDTO;
 import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.user_context.User;
 import com.kairos.wrapper.task_demand.TaskDemandRequestWrapper;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
 import org.apache.commons.collections.CollectionUtils;
@@ -112,8 +110,10 @@ public class UserIntegrationService {
     }
 
     public StaffEmploymentUnitDataWrapper getStaffsEmployment(Long unitId, List<Long> staffIds, Long expertiseId) {
-        return genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, EMPLOYMENTS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentUnitDataWrapper>>() {
+        StaffEmploymentUnitDataWrapper staffEmploymentUnitDataWrapper= genericRestClient.publishRequest(staffIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, EMPLOYMENTS_BY_EXPERTISE_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<StaffEmploymentUnitDataWrapper>>() {
         }, expertiseId);
+        UserContext.getUserDetails().setUnitWiseAccessRole(staffEmploymentUnitDataWrapper.getUnitWiseAccessRole());
+        return staffEmploymentUnitDataWrapper;
     }
 
     public List<String> getEmailsOfStaffByStaffIds(Long unitId, List<Long> staffIds) {
@@ -771,8 +771,13 @@ public class UserIntegrationService {
         });
     }
 
-    public DefaultKpiDataDTO getKpiDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+    public DefaultKpiDataDTO getKpiAllDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         return genericRestClient.publishRequest(staffEmploymentTypeDTO, null, RestClientUrlType.COUNTRY, HttpMethod.POST, KPI_DEFAULT_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultKpiDataDTO>>() {
+        });
+    }
+
+    public DefaultKpiDataDTO getKpiAllDefaultData(Long countryId, StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        return genericRestClient.publishRequest(staffEmploymentTypeDTO, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, KPI_ALL_DEFAULT_DATA, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<DefaultKpiDataDTO>>() {
         });
     }
 

@@ -422,13 +422,14 @@ public class NightWorkerService {
         Set<Long> staffIds = staffFilterDTO.getMapOfStaffAndEmploymentIds().keySet();
         Map<Long, Boolean> staffIdNightWorkerMap = getStaffIdAndNightWorkerMap(staffIds);
         Map<FilterType, Set<String>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
+        if(filterTypeMap.containsKey(NIGHT_WORKERS) && filterTypeMap.get(NIGHT_WORKERS).size() == 1){
+            staffIds = filterTypeMap.get(NIGHT_WORKERS).contains(StaffWorkingType.NOT_NIGHT_WORKER.toString()) ? staffIdNightWorkerMap.keySet().stream().filter(k->!staffIdNightWorkerMap.get(k)).collect(Collectors.toSet()) : staffIdNightWorkerMap.keySet().stream().filter(k->staffIdNightWorkerMap.get(k)).collect(Collectors.toSet());
+            staffIds.forEach(staffId->staffFilterDTO.getMapOfStaffAndEmploymentIds().remove(staffId));
+        }
         if (staffFilterDTO.isValidFilterForShift()) {
             List<ShiftDTO> shiftDTOS = shiftMongoRepository.findAllByStaffIdsAndDeleteFalse(isCollectionEmpty(staffFilterDTO.getStaffIds()) ? staffIds : staffFilterDTO.getStaffIds(), startDate, endDate);
             shiftDTOS = shiftFilterService.getShiftsByFilters(shiftDTOS, staffFilterDTO);
             staffIds = shiftDTOS.stream().map(shiftDTO -> shiftDTO.getStaffId()).collect(Collectors.toSet());
-            if(filterTypeMap.containsKey(NIGHT_WORKERS) && filterTypeMap.get(NIGHT_WORKERS).contains(StaffWorkingType.NOT_NIGHT_WORKER.toString())){
-                staffIds.addAll(staffIdNightWorkerMap.keySet().stream().filter(k->!staffIdNightWorkerMap.get(k)).collect(Collectors.toSet()));
-            }
             staffIds.forEach(staffId->staffFilterDTO.getMapOfStaffAndEmploymentIds().remove(staffId));
         }
         final Set<Long> filteredStaffIds = staffIds;
