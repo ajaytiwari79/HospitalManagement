@@ -87,7 +87,7 @@ public class GroupService {
             groupDTO.getFiltersData().forEach(k->{
                 List<String> values = new ArrayList<>();
                 k.getValue().forEach(val->values.add(ObjectMapperUtils.objectToJsonString(val)));
-                filterSelections.add(new FilterSelection(k.getName(),values,0));
+                filterSelections.add(new FilterSelection(k.getName(),values));
             });
             group.setFiltersData(filterSelections);
             group.setExcludedStaffIds(groupDTO.getExcludedStaffs());
