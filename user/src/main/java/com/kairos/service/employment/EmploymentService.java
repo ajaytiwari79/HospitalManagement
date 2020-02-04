@@ -215,7 +215,9 @@ public class EmploymentService {
         employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0));
         employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0));
         setHourlyCost(employmentQueryResult);
-        return new PositionWrapper(employmentQueryResult, new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd()));
+        EmploymentAndPositionDTO employmentAndPositionDTO = getEmploymentsOfStaff(employmentDTO.getUnitId(), employmentDTO.getStaffId(), false);
+        List<EmploymentQueryResult> employmentQueryResults = employmentAndPositionDTO.getEmployments().stream().filter(e -> e.getId()==employmentQueryResult.getId()).collect(Collectors.toList());
+        return new PositionWrapper(employmentQueryResults.get(0), new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd()));
     }
 
     private void linkFunctions(List<FunctionWithAmountQueryResult> functions, EmploymentLine employmentLine, boolean update, Set<FunctionsDTO> functionDTOS) {
