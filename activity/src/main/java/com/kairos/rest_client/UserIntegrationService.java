@@ -869,6 +869,10 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_and_level_by_staff_ids", newArrayList(appliedFromDate, appliedToDate), new ParameterizedTypeReference<RestTemplateResponseEnvelope<Map<String, List<StaffPersonalDetail>>>>() {});
     }
 
+    public List<StaffPersonalDetail> getAllSkillIdAndLevelByStaffIds(Long countryId, List<Long> staffIds) {
+        return genericRestClient.publishRequest(staffIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_Skill_ALL_and_level_by_staff_ids", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope< List<StaffPersonalDetail>>>() {});
+    }
+
     public List<EmploymentWithCtaDetailsDTO> getAllEmploymentByUnitId(Long unitId) {
         return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, GET_ALL_EMPLOYMENT_BY_UNIT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<EmploymentWithCtaDetailsDTO>>>() {
         });
