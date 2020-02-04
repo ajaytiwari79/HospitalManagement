@@ -204,12 +204,12 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     )
     List<EmploymentLinesQueryResult> findAllEmploymentLines(List<Long> employmentIds);
 
-    @Query(" MATCH (employmentLine:EmploymentLine) where id(employmentLine) IN {0} " +
+    @Query(" MATCH (employmentLine:EmploymentLine) where id(employmentLine) = {0} " +
             " MATCH (employmentLine)-[functionalRel:" + APPLICABLE_FUNCTION + "]-(function:Function) "+
             "RETURN distinct function as function,functionalRel.amount as amount")
     List<FunctionWithAmountQueryResult> findAllAppliedFunctionOnEmploymentLines(Long employmentLineId);
 
-    @Query(" MATCH (employmentLine:EmploymentLine) where id(employmentLine) IN {0} " +
+    @Query(" MATCH (employmentLine:EmploymentLine) where id(employmentLine) = {0} " +
             "MATCH (employmentLine)-[functionalRel:" + APPLICABLE_FUNCTION + "]-(function:Function) "+
             "detach delete functionalRel")
     void removeAllAppliedFunctionOnEmploymentLines(Long employmentLineId);
