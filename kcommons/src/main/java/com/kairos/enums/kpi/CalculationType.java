@@ -3,7 +3,7 @@ package com.kairos.enums.kpi;
 public enum CalculationType {
     SCHEDULED_HOURS("Scheduled Hours"), PLANNED_HOURS_TIMEBANK("Planned Hours of Timebank"),DURATION_HOURS("Duration"),TOTAL_MINUTES("Total Minutes"),COLLECTIVE_TIME_BONUS_TIMEBANK("Collective time bonus of timebank"),
 
-    PRESENCE_UNDER_STAFFING("Presence Under Staffing"),PRESENCE_OVER_STAFFING("Presence Over Staffing"),ABSENCE_UNDER_STAFFING("Absence Under Staffing"),ABSENCE_OVER_STAFFING("Absence Over Staffing"),STAFF_AGE("Staff Age"),
+    PRESENCE_UNDER_STAFFING("Presence Under Staffing"),PRESENCE_OVER_STAFFING("Presence Over Staffing"),ABSENCE_UNDER_STAFFING("Absence Under Staffing"),ABSENCE_OVER_STAFFING("Absence Over Staffing"),STAFF_AGE("Staff Age"),SUM_OF_CHILDREN("Sum Of Children"),WORKED_ON_PUBLIC_HOLIDAY("Worked On Public Holiday"),
 
     PAYOUT("Planned Hours of Payout"),COLLECTIVE_TIME_BONUS_PAYOUT("Collective time bonus of payout"),TOTAL_COLLECTIVE_BONUS("Total Collective Bonus"),TOTAL_PLANNED_HOURS("Total Planned Hours"),
     DELTA_TIMEBANK("Delta Timebank"),UNAVAILABILITY("Unavailability"),STAFFING_LEVEL_CAPACITY("Staffing Level capacity"), TOTAL_ABSENCE_DAYS("Total absence days left") , SENIORDAYS("Senior days left"),

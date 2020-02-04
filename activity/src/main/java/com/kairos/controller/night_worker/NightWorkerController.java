@@ -83,13 +83,4 @@ public class NightWorkerController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true,nightWorkerService.getFilteredStaffNightWorkerDetails(staffFilterDTO,startDate,endDate));
     }
 
-
-
-    @ApiOperation(value = "Register job for night worker")
-    @PostMapping(value = "/register_job_for_night_worker")
-    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> registerJobForNightWorker() {
-        nightWorkerService.registerJobForNightWorker();
-        return ResponseHandler.generateResponse(HttpStatus.OK, true,null);
-    }
 }

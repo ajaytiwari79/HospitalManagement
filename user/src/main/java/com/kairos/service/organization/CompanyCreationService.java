@@ -54,6 +54,7 @@ import com.kairos.service.country.ReasonCodeService;
 import com.kairos.service.country.tag.TagService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.scheduler.UserSchedulerJobService;
 import com.kairos.service.staff.StaffCreationService;
 import com.kairos.service.staff.StaffService;
 import com.kairos.service.tree_structure.TreeStructureService;
@@ -152,6 +153,7 @@ public class CompanyCreationService {
     private EmploymentTypeGraphRepository employmentTypeGraphRepository;
     @Inject
     private TagService tagService;
+    @Inject private UserSchedulerJobService userSchedulerJobService;
 
     public OrganizationBasicDTO createCompany(OrganizationBasicDTO orgDetails, long countryId) {
         Country country = countryGraphRepository.findOne(countryId);
@@ -587,15 +589,7 @@ public class CompanyCreationService {
         organization.setBoardingCompleted(true);
         organization.setTags(tagService.getCountryTagByOrgSubTypes(countryId, organization.getOrganizationSubTypes().stream().map(orgSubtype->orgSubtype.getId()).collect(Collectors.toList())));
         organizationBaseRepository.save(organization);
-        try {
-            List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
-            SchedulerPanelDTO schedulerPanelDTO = new SchedulerPanelDTO(days, LocalTime.of(23, 59), JobType.FUNCTIONAL, JobSubType.ATTENDANCE_SETTING, String.valueOf(organization.getTimeZone()));
-            // create job for auto clock out and create realtime/draft shiftstate
-            schedulerRestClient.publishRequest(Arrays.asList(schedulerPanelDTO), organization.getId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-            });
-        } catch (Exception e) {
-            LOGGER.info("schedular is not running , unable to create job");
-        }
+        userSchedulerJobService.createJobForAddPlanningPeriod(organization);
         addStaffsInChatServer(staffPersonalDetailQueryResults.stream().map(StaffPersonalDetailQueryResult::getStaff).collect(Collectors.toList()));
         Map<Long, Long> countryAndOrgAccessGroupIdsMap = accessGroupService.findAllAccessGroupWithParentOfOrganization(parent.getId());
         List<TimeSlot> timeSlots = timeSlotGraphRepository.findBySystemGeneratedTimeSlotsIsTrue();

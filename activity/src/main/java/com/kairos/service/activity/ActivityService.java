@@ -1117,4 +1117,8 @@ public class ActivityService {
     public Activity findActivityById(BigInteger activityId){
         return activityMongoRepository.findById(activityId).orElseThrow(()->new DataNotFoundByIdException(exceptionService.convertMessage(MESSAGE_ACTIVITY_ID, activityId)));
     }
+
+    public List<ActivityDTO> getActivitiesByUnitId(Long unitId){
+        return activityMongoRepository.getActivitiesByUnitId(unitId);
+    }
 }

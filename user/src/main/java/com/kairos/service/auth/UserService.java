@@ -1,6 +1,7 @@
 package com.kairos.service.auth;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.KMailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -102,7 +103,7 @@ public class UserService {
     @Inject
     private DayTypeService dayTypeService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private TokenService tokenService;
     @Inject
@@ -123,6 +124,9 @@ public class UserService {
     private static UserGraphRepository userRepository;
 
     private static AccessPageService accessPageService;
+
+    @Inject
+    private KMailService kMailService;
 
     @Inject
     public void setUserRepository(UserGraphRepository userRepository) {
@@ -592,7 +596,8 @@ public class UserService {
             templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName())));
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
             templateParam.put("hyperLinkName", RESET_PASSCODE);
-            mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+//            sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+            kMailService.sendMail(null,currentUser.getEmail(),AppConstants.MAIL_SUBJECT,templateParam.get("description").toString(),templateParam.get("description").toString(),templateParam,DEFAULT_EMAIL_TEMPLATE);
             return true;
         }
 

@@ -1,6 +1,6 @@
 package com.kairos.controller.absencePlanning;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.dto.activity.task.TaskDTO;
 import com.kairos.service.absencePlanning.AbsencePlanningService;
 import com.kairos.utils.response.ResponseHandler;
@@ -32,7 +32,7 @@ public class AbsencePlanningController {
 
 
     @Inject
-    MailService mailService;
+    SendGridMailService sendGridMailService;
 
     private static final Logger logger = LoggerFactory.getLogger(AbsencePlanningController.class);
 
