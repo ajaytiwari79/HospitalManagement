@@ -188,7 +188,6 @@ public class EmploymentService {
             validateEmploymentWithExpertise(oldEmployments, employmentDTO);
         }
 
-
         EmploymentType employmentType = unitGraphRepository.getEmploymentTypeByOrganizationAndEmploymentId(parentUnit.getId(), employmentDTO.getEmploymentTypeId(), false);
         if (!Optional.ofNullable(employmentType).isPresent()) {
             exceptionService.dataNotFoundByIdException(MESSAGE_POSITION_EMPLOYMENTTYPE_NOTEXIST, employmentDTO.getEmploymentTypeId());
@@ -202,7 +201,7 @@ public class EmploymentService {
         }
         employmentGraphRepository.save(employment);
         initialTimeBankLogService.saveInitialTimeBankLog(employment.getId(), employment.getAccumulatedTimebankMinutes());
-        CTAWTAAndAccumulatedTimebankWrapper ctawtaAndAccumulatedTimebankWrapper = assignCTAAndWTAToEmployment(employment, employmentDTO);
+        assignCTAAndWTAToEmployment(employment, employmentDTO);
         Long reasonCodeId = updateEmploymentEndDate(parentUnit, employmentDTO, position);
         List<EmploymentLineEmploymentTypeRelationShip> employmentLineEmploymentTypeRelationShips = new ArrayList<>();
         employment.getEmploymentLines().forEach(line -> {
@@ -211,13 +210,10 @@ public class EmploymentService {
         employmentAndEmploymentTypeRelationShipGraphRepository.saveAll(employmentLineEmploymentTypeRelationShips);
         linkFunctions(functions, employment.getEmploymentLines().get(0), false, employmentDTO.getFunctions());
 
-        EmploymentQueryResult employmentQueryResult = getBasicDetails(employmentType, employmentDTO, employment, employmentLineEmploymentTypeRelationShips.get(0), parentUnit.getId(), parentUnit.getName(), ctawtaAndAccumulatedTimebankWrapper.getWta().get(0), employment.getEmploymentLines().get(0));
-        employmentQueryResult.getEmploymentLines().get(0).setCostTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getCta().get(0));
-        employmentQueryResult.getEmploymentLines().get(0).setWorkingTimeAgreement(ctawtaAndAccumulatedTimebankWrapper.getWta().get(0));
-        setHourlyCost(employmentQueryResult);
         EmploymentAndPositionDTO employmentAndPositionDTO = getEmploymentsOfStaff(employmentDTO.getUnitId(), employmentDTO.getStaffId(), false);
-        List<EmploymentQueryResult> employmentQueryResults = employmentAndPositionDTO.getEmployments().stream().filter(e -> e.getId()==employmentQueryResult.getId()).collect(Collectors.toList());
-        return new PositionWrapper(employmentQueryResults.get(0), new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd()));
+        EmploymentQueryResult employmentQueryResult = employmentAndPositionDTO.getEmployments().stream().filter(e -> employment.getId().equals(e.getId())).findAny().orElse(new EmploymentQueryResult());
+        setHourlyCost(employmentQueryResult);
+        return new PositionWrapper(employmentQueryResult, new PositionQueryResult(position.getId(), position.getStartDateMillis(), position.getEndDateMillis(), reasonCodeId, position.getAccessGroupIdOnPositionEnd()));
     }
 
     private void linkFunctions(List<FunctionWithAmountQueryResult> functions, EmploymentLine employmentLine, boolean update, Set<FunctionsDTO> functionDTOS) {
