@@ -43,7 +43,7 @@ public class CostCalculationKPIService {
       Map<Long, DayTypeDTO> dayTypeDTOMap = staffKpiFilterDTO.getDayTypeDTOS().stream().collect(Collectors.toMap(DayTypeDTO::getId, v->v));
       BigDecimal totalCost=new BigDecimal(0);
       int totalCtaBonus=0;
-      List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval);
+      List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId,dateTimeInterval,true);
       KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
       KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,true).invoke();
       List<ShiftActivityDTO> shiftActivityDTOS = filterShiftActivity.getShiftActivityDTOS();

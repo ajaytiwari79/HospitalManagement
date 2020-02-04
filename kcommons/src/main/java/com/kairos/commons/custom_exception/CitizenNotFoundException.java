@@ -5,7 +5,7 @@ package com.kairos.commons.custom_exception;
  */
 
 public class CitizenNotFoundException extends RuntimeException{
-
+    @Deprecated//Please use ExceptionService
     public CitizenNotFoundException(String message) {
         super(message);
     }

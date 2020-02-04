@@ -52,6 +52,7 @@ import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
 import com.kairos.service.organization.OrganizationService;
 import com.kairos.service.redis.RedisService;
+import com.kairos.service.scheduler.UserSchedulerJobService;
 import com.kairos.service.tree_structure.TreeStructureService;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -131,6 +132,7 @@ public class PositionService {
     private GenericRestClient genericRestClient;
     @Inject
     private RedisService redisService;
+    @Inject private UserSchedulerJobService userSchedulerJobService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PositionService.class);
 
@@ -622,10 +624,10 @@ public class PositionService {
             result = Result.ERROR;
         }
         stopped = LocalDateTime.now();
-        schedulerLogsDTO = new KairosSchedulerLogsDTO(result, log, schedulerPanelId, unitId, DateUtils.getMillisFromLocalDateTime(started), DateUtils.getMillisFromLocalDateTime(stopped), JobSubType.EMPLOYMENT_END);
-
-        kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
+        userSchedulerJobService.createJobForPositionEnd(schedulerPanelId, unitId, started, stopped, log, result);
     }
+
+
 
 
     public boolean eligibleForMainEmployment(EmploymentDTO employmentDTO, long employmentId) {

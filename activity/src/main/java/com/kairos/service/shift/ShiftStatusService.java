@@ -300,11 +300,13 @@ public class ShiftStatusService {
 
             }
         }else {
-            boolean removed = shift.getActivities().remove(shiftActivity);
+            /*boolean removed = shift.getActivities().get(0).setStatus(newHashSet(DISAPPROVE));
             if(removed) {
-                shift.setDeleted(true);
-            }
-            removeShiftAcivityFromChildActivities(shift,shiftActivity,removed);
+
+            }*/
+            shift.getActivities().get(0).setStatus(newHashSet(DISAPPROVE));
+            shift.setDeleted(true);
+            //removeShiftAcivityFromChildActivities(shift,shiftActivity,removed);
         }
     }
 

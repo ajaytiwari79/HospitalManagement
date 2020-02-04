@@ -90,8 +90,7 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.parseDate;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 
 @Transactional
@@ -885,9 +884,8 @@ public class OrganizationService {
 
     public ShiftFilterDefaultData getFilterDataBySelfRosteringFilter(SelfRosteringFilterDTO selfRosteringFilterDTO) {
         List<TimeSlotDTO> timeSlotDTOS = timeSlotService.getUnitTimeSlot(selfRosteringFilterDTO.getUnitId());
-        List<BigInteger> teamActivityIds=teamGraphRepository.getTeamActivityIdsByTeamIds(selfRosteringFilterDTO.getTeamIds().stream().map(value->new Long(value)).collect(Collectors.toList()));
+        List<BigInteger> teamActivityIds = teamGraphRepository.getTeamActivityIdsByTeamIds(selfRosteringFilterDTO.getTeamIds().stream().map(value -> new Long(value)).collect(Collectors.toList()));
         return new ShiftFilterDefaultData(timeSlotDTOS,teamActivityIds);
-
     }
 
     public List<Long> getAllUnitIdsByCountryId(Long countryId) {
