@@ -227,7 +227,7 @@ public class ShiftStatusService {
                 todo.setComment(comment);
                 if(TodoStatus.APPROVE.equals(todo.getStatus())){
                     todo.setApprovedOn(getDate());
-                }else{
+                }else if(TodoStatus.DISAPPROVE.equals(todo.getStatus())){
                     todo.setDisApproveOn(getDate());
                 }
                 todoRepository.save(todo);
