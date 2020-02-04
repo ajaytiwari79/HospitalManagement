@@ -33,7 +33,6 @@ public class SchedulerJobController {
 
     @Inject
     private JobQueueExecutor schedulerToActivityQueueService;
-    @Inject private MailService mailService;
     @Inject private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject private SendGridMailService sendGridMailService;
 
