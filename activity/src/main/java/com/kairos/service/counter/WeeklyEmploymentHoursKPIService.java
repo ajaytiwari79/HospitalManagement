@@ -17,6 +17,7 @@ import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
 public class WeeklyEmploymentHoursKPIService {
 
     public Double getWeeklyHoursOfEmployment(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo, LocalDate startDate, LocalDate endDate) {
+        DateTimeInterval dateTimeInterval = new DateTimeInterval(startDate,endDate);
         Double weeklyHours = 0.0d;
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();
         for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
@@ -30,12 +31,10 @@ public class WeeklyEmploymentHoursKPIService {
                             }
                         }
                         if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEndDate())) {
-                            if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEndDate())) {
-                                if (employmentStartDateAndEndDateInterval.containsAndEqualsEndDate(DateUtils.asDate(startDate))) {
+                                if (employmentStartDateAndEndDateInterval.containsAndEqualsEndDate(DateUtils.asDate(startDate))||dateTimeInterval.contains(employmentStartDateAndEndDateInterval.getStartDate())||dateTimeInterval.contains(employmentStartDateAndEndDateInterval.getEndDate())) {
                                     weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
                                 }
                             }
-                        }
                     }
 
                 }
@@ -43,8 +42,6 @@ public class WeeklyEmploymentHoursKPIService {
             }
 
         }
-
             return weeklyHours;
-
     }
 }
