@@ -142,7 +142,6 @@ public class KPIBuilderCalculationService implements CounterService {
     private UnavailabilityCalculationKPIService unavailabilityCalculationKPIService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-
     @Inject
     private TodoService todoService;
     @Inject
@@ -155,16 +154,13 @@ public class KPIBuilderCalculationService implements CounterService {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private TimeBankService timeBankService;
-
     @Inject
     private AbsencePlanningKPIService absencePlanningKPIService;
-
     @Inject
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
     @Inject
-
     private SkillKPIService skillKPIService;
-
+    @Inject
     private ActivityService activityService;
 
 
