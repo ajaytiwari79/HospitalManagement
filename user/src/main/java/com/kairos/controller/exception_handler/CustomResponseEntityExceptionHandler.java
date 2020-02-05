@@ -53,6 +53,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     private SendGridMailService sendGridMailService;
     private SendGridMailService mailService;
 
+
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
             try {
