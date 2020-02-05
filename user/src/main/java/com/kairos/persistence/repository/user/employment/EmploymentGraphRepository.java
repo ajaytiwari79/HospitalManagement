@@ -215,23 +215,27 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     void removeAllAppliedFunctionOnEmploymentLines(Long employmentLineId);
 
 
-    @Query(" MATCH (employment:Employment{deleted:false}) where id(employment) IN  {0} \n" +
-            "MATCH(employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine) \n" +
-            "MATCH(employmentLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:"+HAS_BASE_PAY_GRADE+"]-(payGrade:PayGrade) \n" +
-            "MATCH(employment)-[:"+HAS_EXPERTISE_IN+"]->(expertise:Expertise{published:true})-[:"+HAS_EXPERTISE_LINES+"]-(exl:ExpertiseLine) \n" +
-            "OPTIONAL MATCH(employment)-[:"+IN_UNIT+"]-(org:Unit)-[:"+CONTACT_ADDRESS+"]->(contactAddress:ContactAddress)-[:"+MUNICIPALITY+"]->(municipality:Municipality)-[:"+HAS_MUNICIPALITY+"]-(pga:PayGroupArea)<-[pgaRel:"+HAS_PAY_GROUP_AREA+"]-(payGrade) \n" +
-            "WITH  employment,employmentLine,payGrade,exl,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as hourlyCost \n" +
-            "OPTIONAL MATCH (employmentLine)-[:"+APPLICABLE_FUNCTION+"]-(function:Function) \n" +
+    @Query("MATCH (employment:Employment{deleted:false}) where id(employment) IN  {0} \n" +
+            "MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine) \n" +
+            "MATCH(employmentLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(pg:PayGrade)\n" +
+            "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{published:true})-[:" + HAS_EXPERTISE_LINES + "]-(exl:ExpertiseLine) \n" +
+            "OPTIONAL MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)-[:" + IN_ORGANIZATION_LEVEL + "]-(pt:PayTable)-[:" + HAS_PAY_GRADE + "]-(payGrade:PayGrade) " +
+            "where ((employmentLine.endDate IS NULL OR Date(pt.startDateMillis) <= Date(employmentLine.endDate)) AND \n" +
+            "(pt.endDateMillis IS NULL OR Date(pt.endDateMillis) >= Date(employmentLine.startDate)))  AND payGrade.payGradeLevel=pg.payGradeLevel\n" +
+            "OPTIONAL MATCH(employment)-[:" + IN_UNIT + "]-(org:Unit)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality)-[:" + HAS_MUNICIPALITY + "]-(pga:PayGroupArea)<-[pgaRel:" + HAS_PAY_GROUP_AREA + "]-(payGrade) \n" +
+            "WITH  employment,employmentLine,payGrade,exl,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as hourlyCost\n" +
+            "OPTIONAL MATCH (employmentLine)-[:" + APPLICABLE_FUNCTION + "]-(function:Function) \n" +
             "WITH  employment,employmentLine,exl,seniorityLevel,hourlyCost,function\n" +
-            "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:"+APPLICABLE_FOR_EXPERTISE+"]->(exl) where date(functionalPayment.startDate) <= date(employmentLine.startDate) AND (functionalPayment.endDate IS NULL OR date(employmentLine.startDate)<= date(functionalPayment.endDate))\n" +
+            "OPTIONAL MATCH(functionalPayment:FunctionalPayment)-[:" + APPLICABLE_FOR_EXPERTISE + "]->(exl) " +
+            "where date(functionalPayment.startDate) <= date(employmentLine.startDate) AND (functionalPayment.endDate IS NULL OR date(employmentLine.startDate)<= date(functionalPayment.endDate))\n" +
             "WITH  employment,employmentLine,functionalPayment,seniorityLevel,function,hourlyCost\n" +
-            "OPTIONAL MATCH(functionalPayment)-[:"+FUNCTIONAL_PAYMENT_MATRIX+"]->(fpm:FunctionalPaymentMatrix) \n" +
+            "OPTIONAL MATCH(functionalPayment)-[:" + FUNCTIONAL_PAYMENT_MATRIX + "]->(fpm:FunctionalPaymentMatrix) \n" +
             "WITH  employment,employmentLine,fpm,seniorityLevel,function,functionalPayment,hourlyCost\n" +
-            "OPTIONAL MATCH(fpm)-[:"+SENIORITY_LEVEL_FUNCTIONS+"]->(slf:SeniorityLevelFunction)-[:"+FOR_SENIORITY_LEVEL+"]->(seniorityLevel) \n" +
+            "OPTIONAL MATCH(fpm)-[:" + SENIORITY_LEVEL_FUNCTIONS + "]->(slf:SeniorityLevelFunction)-[:" + FOR_SENIORITY_LEVEL + "]->(seniorityLevel) \n" +
             "WITH  employment,employmentLine,fpm,slf,function,functionalPayment,hourlyCost\n" +
-            "OPTIONAL MATCH(slf)-[rel:"+HAS_FUNCTIONAL_AMOUNT+"]-(function) \n" +
+            "OPTIONAL MATCH(slf)-[rel:" + HAS_FUNCTIONAL_AMOUNT + "]-(function) \n" +
             "WITH functionalPayment,employmentLine,hourlyCost, sum(toInteger(rel.amount)) as totalCostOfFunctions WITH employmentLine,CASE WHEN functionalPayment.paymentUnit='MONTHLY' THEN totalCostOfFunctions*12+hourlyCost ELSE totalCostOfFunctions+hourlyCost END as hourlyCost,functionalPayment\n" +
-            "RETURN id(employmentLine) as id, toString(hourlyCost) as hourlyCost ")
+            "RETURN DISTINCT id(employmentLine) as id, toString(hourlyCost) as hourlyCost")
     List<EmploymentLinesQueryResult> findFunctionalHourlyCost(List<Long> employmentIds);
 
     @Query("MATCH (employment:Employment{deleted:false})-[:IN_UNIT]-(unit:Unit) where id(unit)={0} \n" +
