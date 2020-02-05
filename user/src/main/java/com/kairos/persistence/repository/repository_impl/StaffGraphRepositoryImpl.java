@@ -1,4 +1,4 @@
-package com.kairos.persistence.repository.repository_impl;
+ package com.kairos.persistence.repository.repository_impl;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.open_shift.priority_group.StaffIncludeFilterDTO;
@@ -87,27 +87,29 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             queryParameters.put("staffIds",staffIds);
         }
         stringBuilder.append(" MATCH (employment)-[:"+ HAS_EMPLOYMENT_LINES +"]-(employmentLine:EmploymentLine)"+
-                "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)"+
-                "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType)  " +
-                "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60), hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,\n" +
-                "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,expertise "+
-                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,unitId:employment.unitId,accumulatedTimebankMinutes:employment.accumulatedTimebankMinutes,accumulatedTimebankDate:employment.accumulatedTimebankDate, employmentLines:employmentLines ,expertiseId:id(expertise)} as employment,staff,org,user,expertise\n" +
-                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,user.cprNumber AS cprNumber,id(org) as unitId,org.name as unitName,collect(employment) as employment");
+                "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise)-[r:" + HAS_EXPERTISE_LINES + "]-(expertiseLine:ExpertiseLine)"+
+                "MATCH (employmentLine)-[:"+HAS_EMPLOYMENT_TYPE+"]-(empType) " +
+                "MATCH (staff)-[staffTeamRel:" + TEAM_HAS_MEMBER + "]-(team:Team) " +
+                "OPTIONAL MATCH(staff)-[:" + HAS_CHILDREN + "]->(staffChildDetail:StaffChildDetail)" +
+                " WITH  collect({id:id(expertiseLine),numberOfWorkingDaysInWeek:expertiseLine.numberOfWorkingDaysInWeek,fullTimeWeeklyMinutes:expertiseLine.fullTimeWeeklyMinutes,startDate:expertiseLine.startDate,endDate:expertiseLine.endDate}) as explinew,employmentLine,empType,employment,staff,expertise,org,user,COLLECT( distinct {id:id(team),name:team.name,teamType:staffTeamRel.teamType,activityIds:team.activityIds}) as teams," +
+                "CASE WHEN staffChildDetail IS NULL THEN [] ELSE COLLECT(distinct {id:id(staffChildDetail),name:staffChildDetail.name,cprNumber:staffChildDetail.cprNumber}) END as staffChildDetails " +
+                "WITH  COLLECT({totalWeeklyMinutes:(employmentLine.totalWeeklyMinutes % 60),startDate:employmentLine.startDate,totalWeeklyHours:(employmentLine.totalWeeklyMinutes / 60),employmentStatus:employmentLine.employmentStatus, hourlyCost:employmentLine.hourlyCost,id:id(employmentLine), workingDaysInWeek:employmentLine.workingDaysInWeek,employmentSubType:employment.employmentSubType,\n" +
+                "avgDailyWorkingHours:employmentLine.avgDailyWorkingHours,fullTimeWeeklyMinutes:employmentLine.fullTimeWeeklyMinutes,totalWeeklyMinutes:employmentLine.totalWeeklyMinutes,employmentTypeId:id(empType)}) as employmentLines,employment,staff,org,user,{id:id(expertise),expertiseLines:explinew} as expertiseQueryResult,teams,staffChildDetails\n" +
+                "WITH {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,unitId:employment.unitId,accumulatedTimebankMinutes:employment.accumulatedTimebankMinutes,accumulatedTimebankDate:employment.accumulatedTimebankDate, employmentLines:employmentLines ,expertise:expertiseQueryResult} as employment,staff,org,user,teams,staffChildDetails\n" +
+                "RETURN id(staff) as id,staff.firstName as firstName ,staff.lastName as lastName,user.cprNumber AS cprNumber,id(org) as unitId,org.name as unitName,collect(employment) as employment,teams,staffChildDetails");
         queryParameters.put("endDate", endDate);
         queryParameters.put("startDate", startDate);
 
         Result results=session.query( stringBuilder.toString(), queryParameters);
         List<StaffKpiFilterQueryResult> staffKpiFilterQueryResults= new ArrayList<>();
-        results.forEach(result->{
-            staffKpiFilterQueryResults.add(ObjectMapperUtils.copyPropertiesByMapper(result,StaffKpiFilterQueryResult.class));
-        });
-
+        results.forEach(result->
+            staffKpiFilterQueryResults.add(ObjectMapperUtils.copyPropertiesByMapper(result,StaffKpiFilterQueryResult.class))
+        );
         return staffKpiFilterQueryResults;
-//
     }
 
-    public List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
-                                         Map<FilterType, Set<String>> filters, String searchText, String imagePath,Long loggedInStaffId) {
+    public <T> List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
+                                         Map<FilterType, Set<T>> filters, String searchText, String imagePath,Long loggedInStaffId) {
         Map<String, Object> queryParameters = new HashMap<>();
         queryParameters.put("unitId", unitId);
         queryParameters.put("parentOrganizationId", parentOrganizationIds);
@@ -134,6 +136,18 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         if (Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
             queryParameters.put("teamIds",
                     convertListOfStringIntoLong(filters.get(FilterType.TEAM)));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()) {
+            queryParameters.put("mainTeamIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.MAIN_TEAM)));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()) {
+            queryParameters.put("skillLevels",
+                    filters.get(FilterType.SKILL_LEVEL));
+        }
+        if (Optional.ofNullable(filters.get(FilterType.ACCESS_GROUPS)).isPresent()) {
+            queryParameters.put("accessGroupIds",
+                    convertListOfStringIntoLong(filters.get(FilterType.ACCESS_GROUPS)));
         }
         if (Optional.ofNullable(filters.get(FilterType.TAGS)).isPresent()) {
             queryParameters.put("tagIds",
@@ -188,13 +202,11 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return StreamSupport.stream(Spliterators.spliteratorUnknownSize(session.query(Map.class, query, queryParameters).iterator(), Spliterator.ORDERED), false).collect(Collectors.<Map>toList());
     }
 
-    public List<Long> convertListOfStringIntoLong(Set<String> listOfString) {
-        return listOfString.stream().map(Long::parseLong).collect(Collectors.toList());
+    public <T> List<Long> convertListOfStringIntoLong(Set<T> listOfString) {
+        return listOfString.stream().map(list->Long.valueOf(list.toString())).collect(Collectors.toList());
     }
 
-
-
-    private String getSelfRosteringQuery(Map<FilterType, Set<String>> filters, String searchText,Long loggedInStaffId) {
+    private <T> String getSelfRosteringQuery(Map<FilterType, Set<T>> filters, String searchText,Long loggedInStaffId) {
         String query = "";
         query = " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false,published:true})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId} " +getMatchQueryForStaff(loggedInStaffId)+
                 " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
@@ -202,13 +214,13 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             query += " MATCH (staff:Staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
         }
         if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
-            query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
+            query += " Match (staff)<-[:" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
         }
         query +=" WITH user, staff, employment,organization ";
         return query;
     }
 
-    private String getGroupQuery(Map<FilterType, Set<String>> filters, String searchText) {
+    private <T> String getGroupQuery(Map<FilterType, Set<T>> filters, String searchText) {
         String query = "";
         query = " MATCH (staff:Staff)-[:" + BELONGS_TO_STAFF + "]-(employment:Employment{deleted:false})-[:" + IN_UNIT + "]-(organization:Unit) where id(organization)={unitId}" +
                 " MATCH (staff)-[:" + BELONGS_TO + "]->(user:User) " + getMatchQueryForNameGenderStatusOfStaffByFilters(filters, searchText) + " WITH user, staff, employment,organization ";
@@ -216,18 +228,40 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             query +=" MATCH (staff)-[:BELONGS_TO_STAFF]->(employment:Employment{deleted:false})-[:HAS_EMPLOYMENT_LINES]->(employmentLine:EmploymentLine)-[:APPLICABLE_FUNCTION]->(function:Function)\n" +
                     " where id(function) IN {functionIds}";
         }
-        if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()) {
-            query += " MATCH (staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE id(skill) IN {skillIds} ";
+        if(Optional.ofNullable(filters.get(FilterType.ACCESS_GROUPS)).isPresent()) {
+            query +=" MATCH (staff)<-[:"+BELONGS_TO+"]-(position:Position)-[:"+HAS_UNIT_PERMISSIONS+"]->(unitPermission:UnitPermission)-[:"+HAS_ACCESS_GROUP+"]->(accessGroups:AccessGroup)\n" +
+                    " where id(accessGroups) IN {accessGroupIds}";
         }
-        if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()) {
-            query += " Match (staff)<-[" + TEAM_HAS_MEMBER + "]-(team:Team) where id(team)  IN {teamIds} ";
+        if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent() || Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()) {
+            query += " MATCH (staff)-[staffSkillRel:" + STAFF_HAS_SKILLS + "{isEnabled:true}]->(skill) WHERE ";
+            boolean isSkill = false;
+            if(Optional.ofNullable(filters.get(FilterType.SKILLS)).isPresent()){
+                query += "id(skill) IN {skillIds} ";
+                isSkill = true;
+            }
+            if(Optional.ofNullable(filters.get(FilterType.SKILL_LEVEL)).isPresent()){
+                query += isSkill ? " AND " : " ";
+                query += "staffSkillRel.skillLevel IN {skillLevels}";
+            }
+        }
+        if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent() || Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()) {
+            query += " Match (staff)<-[mainTeamRel:" + TEAM_HAS_MEMBER + "]-(team:Team) where ";
+            boolean isTeam = false;
+            if(Optional.ofNullable(filters.get(FilterType.TEAM)).isPresent()){
+                query += "id(team) IN {teamIds} ";
+                isTeam = true;
+            }
+            if(Optional.ofNullable(filters.get(FilterType.MAIN_TEAM)).isPresent()){
+                query += isTeam ? " OR " : " ";
+                query += "(id(team) IN {mainTeamIds} AND mainTeamRel.teamType='MAIN')";
+            }
         }
         query +=" WITH user, staff, employment,organization ";
 
         return query;
     }
 
-    public String getMatchQueryForNameGenderStatusOfStaffByFilters(Map<FilterType, Set<String>> filters, String searchText) {
+    public <T> String getMatchQueryForNameGenderStatusOfStaffByFilters(Map<FilterType, Set<T>> filters, String searchText) {
         String matchQueryForStaff = "";
         int countOfSubString = 0;
         if (Optional.ofNullable(filters.get(FilterType.STAFF_STATUS)).isPresent()) {
@@ -239,8 +273,7 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
             countOfSubString += 1;
         }
         if (StringUtils.isNotBlank(searchText)) {
-            String s="";
-            matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) +
+           matchQueryForStaff += appendWhereOrAndPreFixOnQueryString(countOfSubString) +
                     " (  LOWER(staff.firstName+staff.lastName) CONTAINS LOWER({searchText}) OR user.cprNumber STARTS WITH {searchText} )";
         }
         return matchQueryForStaff;
@@ -250,25 +283,25 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         return loggedInStaffId==null?" ":"AND id(staff)={loggedInStaffId}";
     }
 
-    public String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, Set<String>> filters) {
+    public <T> String getMatchQueryForRelationshipOfStaffByFilters(Map<FilterType, Set<T>> filters) {
         String matchRelationshipQueryForStaff = "";
         if (Optional.ofNullable(filters.get(FilterType.EMPLOYMENT_TYPE)).isPresent()) {
-            matchRelationshipQueryForStaff += "MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)  " +
+            matchRelationshipQueryForStaff += "MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:"+HAS_BASE_PAY_GRADE+"]->(payGrade:PayGrade)  " +
                     "MATCH (employmentLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType) " +
                     "WHERE id(employmentType) IN {employmentTypeIds}  " +
-                    "OPTIONAL MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]-(exp:Expertise) WITH staff,organization,employment,user,exp,employmentType,employmentLine \n" +
+                    "OPTIONAL MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]-(exp:Expertise) WITH staff,organization,employment,user,exp,employmentType,employmentLine,payGrade \n" +
                     "OPTIONAL MATCH(employmentLine)-[:" + APPLICABLE_FUNCTION + "]-(function:Function) " +
-                    "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name,icon:function.icon,code:function.code}) END as functions,employmentLine,exp,employmentType\n" +
-                    "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions}) as employmentLines,exp,employmentType\n" +
+                    "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name,icon:function.icon,code:function.code}) END as functions,employmentLine,exp,employmentType,CASE WHEN payGrade IS NULL THEN [] ELSE COLLECT(distinct {id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) END as payGrades\n" +
+                    "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions,payGrades:payGrades}) as employmentLines,exp,employmentType\n" +
                     "with staff,user,CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList, \n" +
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         } else {
-            matchRelationshipQueryForStaff += "OPTIONAL MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)  " +
+            matchRelationshipQueryForStaff += "OPTIONAL MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine)-[:"+HAS_SENIORITY_LEVEL+"]->(seniorityLevel:SeniorityLevel)-[:"+HAS_BASE_PAY_GRADE+"]->(payGrade:PayGrade)  " +
                     "OPTIONAL MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]-(exp:Expertise)\n" +
                     "OPTIONAL MATCH (employmentLine)-[empRelation:" + HAS_EMPLOYMENT_TYPE + "]-(employmentType:EmploymentType)  " +
                     "OPTIONAL MATCH(employmentLine)-[:" + APPLICABLE_FUNCTION + "]-(function:Function) " +
-                    "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name,icon:function.icon,code:function.code}) END as functions,employmentLine,exp,employmentType\n" +
-                    "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions}) as employmentLines,exp,employmentType\n" +
+                    "WITH staff,organization,employment,user, CASE WHEN function IS NULL THEN [] ELSE COLLECT(distinct {id:id(function),name:function.name,icon:function.icon,code:function.code}) END as functions,employmentLine,exp,employmentType,CASE WHEN payGrade IS NULL THEN [] ELSE COLLECT(distinct {id:id(payGrade),payGradeLevel:payGrade.payGradeLevel}) END as payGrades\n" +
+                    "WITH staff,organization,employment,user, COLLECT(distinct {id:id(employmentLine),startDate:employmentLine.startDate,endDate:employmentLine.endDate,functions:functions,payGrades:payGrades}) as employmentLines,exp,employmentType\n" +
                     "with staff,user,CASE WHEN employmentType IS NULL THEN [] ELSE collect({id:id(employmentType),name:employmentType.name}) END as employmentList, \n" +
                     "COLLECT(distinct {id:id(employment),startDate:employment.startDate,endDate:employment.endDate,expertise:{id:id(exp),name:exp.name},employmentLines:employmentLines,employmentType:{id:id(employmentType),name:employmentType.name}}) as employments ";
         }
@@ -281,14 +314,14 @@ public class StaffGraphRepositoryImpl implements CustomStaffGraphRepository {
         }
 
         if (Optional.ofNullable(filters.get(FilterType.EXPERTISE)).isPresent()) {
-            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise) " +
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  MATCH (staff)-[expRel:" + STAFF_HAS_EXPERTISE + "]-(expertise:Expertise) " +
                     "WHERE id(expertise) IN {expertiseIds} ";
         } else {
-            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  OPTIONAL MATCH (staff)-[" + HAS_EXPERTISE_IN + "]-(expertise:Expertise)  ";
+            matchRelationshipQueryForStaff += " with staff,employments,user,employmentList,tag  OPTIONAL MATCH (staff)-[expRel:" + STAFF_HAS_EXPERTISE + "]-(expertise:Expertise)  ";
         }
 
         matchRelationshipQueryForStaff += " with staff,employments, user, employmentList, CASE WHEN tag IS NULL THEN [] ELSE collect(distinct {id:id(tag),name:tag.name,color:tag.color,shortName:tag.shortName,ultraShortName:tag.ultraShortName}) END AS tags, " +
-                "CASE WHEN expertise IS NULL THEN [] ELSE collect({id:id(expertise),name:expertise.name})  END as expertiseList " +
+                "CASE WHEN expertise IS NULL THEN [] ELSE collect(distinct {id:id(expertise),name:expertise.name,expertiseStartDateInMillis:expRel.expertiseStartDate})  END as expertiseList " +
                 " with staff, employments,user, employmentList,expertiseList,tags  OPTIONAL Match (staff)-[:" + ENGINEER_TYPE + "]->(engineerType:EngineerType) " +
                 " with engineerType,employments, staff, user, employmentList, expertiseList,tags";
         return matchRelationshipQueryForStaff;

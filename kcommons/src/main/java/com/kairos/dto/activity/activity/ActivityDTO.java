@@ -2,23 +2,17 @@ package com.kairos.dto.activity.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.enums.shift.ShiftStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
@@ -41,8 +35,10 @@ public class ActivityDTO  {
     private Long countryId;
     private BigInteger categoryId;
     private String categoryName;
+    @Builder.Default
     private Long unitId = -1L;
     private List<Long> employmentTypes;
+    @Builder.Default
     private boolean isParentActivity = true;
     private GeneralActivityTabDTO generalActivityTab;
     private TimeTypeDTO timeType;
@@ -57,20 +53,18 @@ public class ActivityDTO  {
     private PhaseSettingsActivityTab phaseSettingsActivityTab;
     private List<Long> skills;
     private SkillActivityDTO skillActivityTab;
+    @Builder.Default
     private Boolean activityCanBeCopied=false;
     private ActivityPriorityDTO activityPriority;
     private List<ShiftStatus> activityStatus;
-
-
-    //    private List<Tag> tags;
-//    private List<BigInteger> tags = new ArrayList<>();
+    @Builder.Default
     private List<BigInteger> tags = new ArrayList<>();
     private boolean allowChildActivities;
     private Set<BigInteger> childActivityIds;
     private BigInteger activityPriorityId;
     private int activitySequence;
     private BigInteger countryParentId;
-
+    private Map<String, TranslationInfo> translations = new HashMap<>();
 
 
     public ActivityDTO() {

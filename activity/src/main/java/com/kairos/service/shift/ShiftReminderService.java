@@ -1,13 +1,12 @@
 package com.kairos.service.shift;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.DurationType;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.activity.Activity;
@@ -17,15 +16,14 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.rest_client.UserRestClientForScheduler;
 import com.kairos.scheduler_listener.ActivityToSchedulerQueueService;
+import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -47,7 +45,7 @@ public class ShiftReminderService{
     @Inject
     private ActivityMongoRepository activityMongoRepository;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
@@ -58,6 +56,7 @@ public class ShiftReminderService{
     private UserRestClientForScheduler userRestClientForScheduler;
     @Inject
     private ActivityToSchedulerQueueService activityToSchedulerQueueService;
+    @Inject private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject private EnvConfig envConfig;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ShiftReminderService.class);
@@ -66,30 +65,10 @@ public class ShiftReminderService{
         // TODO Find better approach
         List<BigInteger> jobIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
         deleteReminderTrigger(jobIds, shift.getUnitId());
-        setReminderTrigger(activityWrapperMap, shift);
+        activitySchedulerJobService.updateJobForShiftReminder(activityWrapperMap, shift);
     }
 
-    public void setReminderTrigger(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
-        List<SchedulerPanelDTO> scheduledJobs = new ArrayList<>(shift.getActivities().size());
-        shift.getActivities().forEach(currentShift -> {
-            if (activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().isAllowCommunicationReminder()
-                    && !activityWrapperMap.get(currentShift.getActivityId()).getActivity().getCommunicationActivityTab().getActivityReminderSettings().isEmpty()) {
-                LocalDateTime firstReminderDateTime = calculateTriggerTime(activityWrapperMap.get(currentShift.getActivityId()).getActivity(), shift.getStartDate(), DateUtils.getCurrentLocalDateTime());
-                if (firstReminderDateTime != null) {
-                    scheduledJobs.add(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, currentShift.getId(), firstReminderDateTime, true, currentShift.getActivityId().toString()));
-                } else {
-                    LOGGER.info("Unable to get notify time for shift {}", shift.getId());
-                }
-            }
-        });
-        if (!scheduledJobs.isEmpty()) {
-            // TODO FUTURE REMOVE VIPUL MIGHT WE DONT NEED
-            List<SchedulerPanelDTO> schedulerPanelRestDTOS = schedulerServiceRestClient.publishRequest
-                    (scheduledJobs, shift.getUnitId(), true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-                    });
-            //save(shift);
-        }
-    }
+
 
     public void deleteReminderTrigger(List<BigInteger> jobIds, Long unitId) {
         // TODO VIPUL please verify when needed
@@ -99,7 +78,7 @@ public class ShiftReminderService{
 
     }
 
-    private LocalDateTime calculateTriggerTime(Activity activity, Date shiftStartDate, LocalDateTime currentLocalDateTime) {
+    public LocalDateTime calculateTriggerTime(Activity activity, Date shiftStartDate, LocalDateTime currentLocalDateTime) {
         LocalDateTime shiftStartDateTime = DateUtils.asLocalDateTime(shiftStartDate);
         long daysRemaining = currentLocalDateTime.until(shiftStartDateTime, ChronoUnit.DAYS);
         long minutesRemaining = currentLocalDateTime.until(shiftStartDateTime, ChronoUnit.MINUTES);
@@ -138,9 +117,7 @@ public class ShiftReminderService{
         if(StringUtils.isNotBlank(staffDTO.getProfilePic())) {
                templateParam.put("receiverImage",envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath()+staffDTO.getProfilePic());
         }
-        mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getContactDetail().getPrivateEmail());
-
-
+        sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE,templateParam, null, SHIFT_NOTIFICATION,staffDTO.getContactDetail().getPrivateEmail());
         if (nextTriggerDateTime != null && nextTriggerDateTime.isBefore(DateUtils.asLocalDateTime(shiftActivity.get().getStartDate()))) {
             LOGGER.info("next email on {} to staff {}", nextTriggerDateTime, staffDTO.getFirstName());
             List<SchedulerPanelDTO> schedulerPanelRestDTOS = userIntegrationService.registerNextTrigger(shift.getUnitId(), Arrays.asList(new SchedulerPanelDTO(shift.getUnitId(), JobType.FUNCTIONAL, JobSubType.SHIFT_REMINDER, shiftActivity.get().getId(), nextTriggerDateTime, true, jobDetails.getFilterId())));

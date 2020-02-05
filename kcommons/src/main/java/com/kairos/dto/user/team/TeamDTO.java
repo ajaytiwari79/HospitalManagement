@@ -6,6 +6,10 @@ import com.kairos.enums.team.TeamType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
+
 @Getter
 @Setter
 public class TeamDTO {
@@ -13,4 +17,5 @@ public class TeamDTO {
     private String name;
     private TeamType teamType;
     private LeaderType leaderType;
+    private Set<BigInteger> activityIds;
 }

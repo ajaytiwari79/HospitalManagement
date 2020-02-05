@@ -113,7 +113,6 @@ public class ShiftCopyService extends MongoBaseService {
         List<Long> employmentIds = staffDataList.stream().map(StaffEmploymentDetails::getId).collect(Collectors.toList());
         findAndAddCTAInEmployments(staffDataList, copyShiftDTO, dataWrapper, employmentIds);
         Map<Long, List<WTAQueryResultDTO>> wtaMapByEmploymentId = findAllWTAGroupByEmploymentId(employmentIds, copyShiftDTO);
-        List<Long> expertiseIds = staffDataList.stream().map(staffEmploymentDetails -> staffEmploymentDetails.getExpertise().getId()).collect(Collectors.toList());
         List<ActivityConfiguration> activityConfigurations = activityConfigurationRepository.findAllByUnitIdAndDeletedFalse(unitId); // might we add more optimization later
         if (activityConfigurations.isEmpty()) {
             exceptionService.dataNotFoundException(ERROR_ACTIVITYCONFIGURATION_NOTFOUND);
@@ -178,6 +177,11 @@ public class ShiftCopyService extends MongoBaseService {
                 if ((shiftCreationStartDate.equals(staffEmployment.getStartDate()) || shiftCreationStartDate.isAfter(staffEmployment.getStartDate())) &&
                         (staffEmployment.getEndDate() == null || shiftCreationStartDate.equals(staffEmployment.getEndDate()) || shiftCreationStartDate.isBefore(staffEmployment.getEndDate()))) {
                     ShiftDTO shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift,ShiftDTO.class);
+                    shiftDTO.getActivities().forEach(act->{
+                        act.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(act.getStartDate())));
+                        act.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(act.getEndDate())));
+                    });
+
                     ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(shiftDTO, activityMap);
                     shiftWithActivityDTO.setEndDate(endDate);
                     shiftWithActivityDTO.setStartDate(startDate);
@@ -193,7 +197,7 @@ public class ShiftCopyService extends MongoBaseService {
                 shiftResponse = addShift(validationMessages, sourceShift, staffEmployment, startDate, endDate, newShifts, activityMap, dataWrapper, activityConfigurations, planningPeriod);
                 if (shiftResponse.isSuccess()) {
                     successfullyCopiedShifts.add(shiftResponse);
-                    newCreatedShiftWithActivityDTOs.add(convertIntoShiftWithActivity(newShifts.get(counter), activityMap));
+                    newCreatedShiftWithActivityDTOs.add(convertIntoShiftWithActivity(newShifts.get(counter), activityMap,shiftCreationStartDate));
                 } else {
                     errorInCopyingShifts.add(shiftResponse);
                 }
@@ -215,9 +219,11 @@ public class ShiftCopyService extends MongoBaseService {
         return statusMap;
     }
 
-    private ShiftWithActivityDTO convertIntoShiftWithActivity(Shift sourceShift, Map<BigInteger, ActivityWrapper> activityMap) {
+    public ShiftWithActivityDTO convertIntoShiftWithActivity(Shift sourceShift, Map<BigInteger, ActivityWrapper> activityMap,LocalDate shiftCreationStartDate) {
         ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(sourceShift, ShiftWithActivityDTO.class);
         shiftWithActivityDTO.getActivities().forEach(s -> {
+            s.setStartDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(s.getStartDate())));
+            s.setEndDate(DateUtils.getDateByLocalDateAndLocalTime(shiftCreationStartDate, DateUtils.asLocalTime(s.getEndDate())));
             ActivityDTO activityDTO = ObjectMapperUtils.copyPropertiesByMapper(activityMap.get(s.getActivityId()).getActivity(), ActivityDTO.class);
             s.setActivity(activityDTO);
         });
@@ -241,11 +247,9 @@ public class ShiftCopyService extends MongoBaseService {
                 exceptionService.actionNotPermittedException(MESSAGE_WTA_NOTFOUND);
             }
             StaffAdditionalInfoDTO staffAdditionalInfoDTO = new StaffAdditionalInfoDTO(staffEmployment,dataWrapper.getDayTypes());
-            Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(copiedShift.getUnitId(),startDate,endDate);
-            if(!TIME_AND_ATTENDANCE.equals(phase.getName()) || isCollectionNotEmpty(sourceShift.getBreakActivities())){
                 List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,copiedShift, activityMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),dataWrapper.getTimeSlotWrappers(),sourceShift);
                 copiedShift.setBreakActivities(breakActivities);
-            }
+
             copiedShift.setActivities(shiftActivities);
             setScheduleMinuteAndHours(copiedShift, activityMap, dataWrapper, staffEmployment, planningPeriod, activityConfigurations);
             copiedShift.setShiftType(sourceShift.getShiftType());

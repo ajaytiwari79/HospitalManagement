@@ -115,6 +115,7 @@ public class ShiftSickService extends MongoBaseService {
         if(!MAIN.equals(staffAdditionalInfoDTO)){
             exceptionService.dataNotFoundException(EMPLOYMENT_NOT_VALID_TO_MARK_SICK);
         }
+        Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),shiftDTO.getStartDate(),shiftDTO.getEndDate());
         Date startDate = asDate(shiftDTO.getShiftDate(), LocalTime.MIDNIGHT);
         Date endDate = asDate(shiftDTO.getShiftDate().plusDays(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? 7 * shiftNeedsToAddForDays : 1 * shiftNeedsToAddForDays), LocalTime.MIDNIGHT);
         List<Shift> shifts = shiftMongoRepository.findAllShiftsByEmploymentIdBetweenDate(shiftDTO.getEmploymentId(),startDate,endDate);
@@ -199,7 +200,7 @@ public class ShiftSickService extends MongoBaseService {
         Set<BigInteger> activityIds = sicknessActivity.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
         List<Shift> shifts = shiftMongoRepository.findAllSicknessShiftByEmploymentIdAndActivityIds(employmentId,activityIds,asDate(localDate));
         if(isCollectionEmpty(shifts)){
-            exceptionService.dataNotFoundException();
+            exceptionService.dataNotFoundException("Data not found");
         }
         BigInteger activityId = shifts.get(0).getActivities().get(0).getActivityId();
         Optional<Activity> activityOptional = sicknessActivity.stream().filter(activity -> activity.getId().equals(activityId)).findFirst();

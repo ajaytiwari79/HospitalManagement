@@ -2,54 +2,37 @@ package com.kairos.dto.activity.shift;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
 import com.kairos.enums.shift.BreakPaymentSetting;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * Created by vipul on 6/2/18.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class Expertise {
     private Long id;
     private String name;
     private BreakPaymentSetting breakPaymentSetting;
     private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
+    private List<ExpertiseLineDTO> expertiseLines;
 
     public Expertise() {
         //Not in use
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BreakPaymentSetting getBreakPaymentSetting() {
-        return breakPaymentSetting;
-    }
-
-    public void setBreakPaymentSetting(BreakPaymentSetting breakPaymentSetting) {
-        this.breakPaymentSetting = breakPaymentSetting;
-    }
 
     public List<ProtectedDaysOffSetting> getProtectedDaysOffSettings() {
-        return protectedDaysOffSettings;
+        return isNullOrElse(protectedDaysOffSettings,new ArrayList<>());
     }
 
-    public void setProtectedDaysOffSettings(List<ProtectedDaysOffSetting> protectedDaysOffSettings) {
-        this.protectedDaysOffSettings = protectedDaysOffSettings;
-    }
 }

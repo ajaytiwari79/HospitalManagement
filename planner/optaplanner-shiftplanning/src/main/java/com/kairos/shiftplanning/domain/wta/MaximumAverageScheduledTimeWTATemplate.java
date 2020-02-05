@@ -8,6 +8,9 @@ import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.utils.JodaIntervalConverter;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
@@ -17,6 +20,9 @@ import java.util.List;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE11
  */
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MaximumAverageScheduledTimeWTATemplate implements ConstraintHandler {
@@ -36,94 +42,6 @@ public class MaximumAverageScheduledTimeWTATemplate implements ConstraintHandler
     @XStreamConverter(JodaIntervalConverter.class)
     private Interval interval;
 
-    public Interval getInterval() {
-        return interval;
-    }
-
-    public void setInterval(Interval interval) {
-        this.interval = interval;
-    }
-
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-
-
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
-
-
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(int intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
-
-
-    public boolean isBalanceAdjustment() {
-        return balanceAdjustment;
-    }
-
-    public void setBalanceAdjustment(boolean balanceAdjustment) {
-        this.balanceAdjustment = balanceAdjustment;
-    }
-
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
-
-    public boolean isUseShiftTimes() {
-        return useShiftTimes;
-    }
-
-    public void setUseShiftTimes(boolean useShiftTimes) {
-        this.useShiftTimes = useShiftTimes;
-    }
-    public MaximumAverageScheduledTimeWTATemplate() {
-    }
-    public MaximumAverageScheduledTimeWTATemplate(List<String> balanceType, int intervalLength, IntervalUnit intervalUnit, long validationStartDateMillis, boolean balanceAdjustment, boolean useShiftTimes, long maximumAvgTime) {
-        this.balanceType = balanceType;
-        this.intervalLength = intervalLength;
-        this.intervalUnit = intervalUnit;
-        this.validationStartDateMillis = validationStartDateMillis;
-        this.balanceAdjustment = balanceAdjustment;
-        this.useShiftTimes = useShiftTimes;
-        this.maximumAvgTime = maximumAvgTime;
-    }
-
     public MaximumAverageScheduledTimeWTATemplate(long maximumAvgTime, int intervalLength, int weight, ScoreLevel level, LocalDate weekStart){
         this.weight = weight;
         this.maximumAvgTime = maximumAvgTime;
@@ -135,22 +53,6 @@ public class MaximumAverageScheduledTimeWTATemplate implements ConstraintHandler
 
     private Interval initializeInterval(LocalDate weekStart) {
         return ShiftPlanningUtility.createInterval(weekStart,intervalLength,intervalUnit);
-    }
-
-    public IntervalUnit getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(IntervalUnit intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-    public long getMaximumAvgTime() {
-        return maximumAvgTime;
-    }
-
-    public void setMaximumAvgTime(long maximumAvgTime) {
-        this.maximumAvgTime = maximumAvgTime;
     }
 
 

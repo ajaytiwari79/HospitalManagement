@@ -1,6 +1,7 @@
 package com.kairos.service.auth;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.KMailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -15,9 +16,13 @@ import com.kairos.dto.user.auth.UserDetailsDTO;
 import com.kairos.dto.user.staff.staff.UnitWiseStaffPermissionsDTO;
 import com.kairos.dto.user.user.password.FirstTimePasswordUpdateDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.user.ChatStatus;
-import com.kairos.persistence.model.access_permission.*;
+import com.kairos.persistence.model.access_permission.AccessGroup;
+import com.kairos.persistence.model.access_permission.AccessPage;
+import com.kairos.persistence.model.access_permission.AccessPageQueryResult;
+import com.kairos.persistence.model.access_permission.UserPermissionQueryResult;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.client.ContactDetail;
 import com.kairos.persistence.model.country.default_data.DayType;
@@ -43,7 +48,6 @@ import com.kairos.service.organization.UnitService;
 import com.kairos.service.redis.RedisService;
 import com.kairos.utils.CPRUtil;
 import com.kairos.utils.OtpGenerator;
-import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,13 +68,11 @@ import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-
 
 /**
  * Calls UserGraphRepository to perform CRUD operation on  User
@@ -101,7 +103,7 @@ public class UserService {
     @Inject
     private DayTypeService dayTypeService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private TokenService tokenService;
     @Inject
@@ -122,6 +124,9 @@ public class UserService {
     private static UserGraphRepository userRepository;
 
     private static AccessPageService accessPageService;
+
+    @Inject
+    private KMailService kMailService;
 
     @Inject
     public void setUserRepository(UserGraphRepository userRepository) {
@@ -531,25 +536,26 @@ public class UserService {
         User currentUser = userGraphRepository.findOne(UserContext.getUserDetails().getId());
         if (!organizationId.equals(currentUser.getLastSelectedOrganizationId())) {
             OrganizationCategory organizationCategory = organizationService.getOrganisationCategory(organizationId);
-            Long countryId=countryService.getCountryIdByUnitId(organizationId);
             currentUser.setLastSelectedOrganizationId(organizationId);
-          //  currentUser.setLastSelectedOrganizationCategory(organizationCategory);
-            currentUser.setCountryId(countryId);
+            currentUser.setLastSelectedOrganizationCategory(organizationCategory);
         }
         if(!currentUser.getUnitWiseAccessRole().containsKey(organizationId.toString())){
             Staff staff=staffGraphRepository.getStaffByUserId(currentUser.getId(),organizationService.fetchParentOrganization(organizationId).getId());
             Long staffId=staff==null?staffGraphRepository.findHubStaffIdByUserId(UserContext.getUserDetails().getId(),organizationService.fetchParentOrganization(organizationId).getId()):staff.getId();
-            boolean onlyStaff=unitPermissionGraphRepository.isOnlyStaff(organizationId,staffId,-1L);
+            boolean onlyStaff=unitPermissionGraphRepository.isOnlyStaff(organizationId,staffId);
             currentUser.getUnitWiseAccessRole().put(organizationId.toString(),staff==null||!onlyStaff?MANAGEMENT.name():AccessGroupRole.STAFF.name());
         }
-
+        if(isNull(currentUser.getCountryId())){
+            Long countryId=countryService.getCountryIdByUnitId(organizationId);
+            currentUser.setCountryId(countryId);
+        }
         userGraphRepository.save(currentUser);
     }
 
 
     public boolean updateDateOfBirthOfUserByCPRNumber() {
         List<User> users = userGraphRepository.findAll();
-        users.stream().forEach(user -> {
+        users.forEach(user -> {
             user.setDateOfBirth(Optional.ofNullable(user.getCprNumber()).isPresent() ?
                     CPRUtil.fetchDateOfBirthFromCPR(user.getCprNumber()) : null);
         });
@@ -590,7 +596,8 @@ public class UserService {
             templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token);
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
             templateParam.put("hyperLinkName", RESET_PASSCODE);
-            mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+//            sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+            kMailService.sendMail(null,currentUser.getEmail(),AppConstants.MAIL_SUBJECT,templateParam.get("description").toString(),templateParam.get("description").toString(),templateParam,DEFAULT_EMAIL_TEMPLATE);
             return true;
         }
 
@@ -619,7 +626,7 @@ public class UserService {
 
     public boolean updateUserName(UserDetailsDTO userDetailsDTO) {
         User user = userGraphRepository.findByEmail("(?i)" + userDetailsDTO.getEmail());
-        if (ObjectUtils.isNull(user)) {
+        if (isNull(user)) {
             LOGGER.error("User not found belongs to this email " + userDetailsDTO.getEmail());
             exceptionService.dataNotFoundByIdException(MESSAGE_USER_EMAIL_NOTFOUND, userDetailsDTO.getEmail());
         } else {
@@ -657,7 +664,10 @@ public class UserService {
     }
 
     public Map<String,String> getUnitWiseLastSelectedAccessRole(){
-        return userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+        Map<String,String> unitWiseAccessRole= userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+        Map<String,String> unitWiseAccessRoleMap=new HashMap<>(unitWiseAccessRole.size());
+        unitWiseAccessRole.forEach((k,v)-> unitWiseAccessRoleMap.put(k,v.toUpperCase()));
+        return unitWiseAccessRoleMap;
     }
 
     public boolean updateChatStatus(ChatStatus chatStatus){
@@ -668,8 +678,11 @@ public class UserService {
     }
 
     public static User getCurrentUser(){
-        User user = userRepository.findOne(UserContext.getUserDetails().getId());
-        user.setHubMember(accessPageService.isHubMember(user.getId()));
+        User user = null;
+        if(isNotNull(UserContext.getUserDetails())) {
+            user = userRepository.findOne(UserContext.getUserDetails().getId());
+            user.setHubMember(accessPageService.isHubMember(user.getId()));
+        }
         return user;
     }
 }

@@ -1,6 +1,6 @@
 package com.kairos.service.activity_stream;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.dto.activity.response.RequestComponent;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -30,7 +30,7 @@ public class NotificationService {
     private UserIntegrationService userIntegrationService;
 
     @Inject
-    MailService mailService;
+    SendGridMailService sendGridMailService;
 
     public List<Notification> fetchUnreadNotifications(Long unitId, String module){
         UserContext.setUnitId(unitId);

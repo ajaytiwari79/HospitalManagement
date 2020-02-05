@@ -14,6 +14,7 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.CustomShiftMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.wrapper.ShiftResponseDTO;
+import com.kairos.wrapper.activity.ActivityWithCompositeDTO;
 import org.apache.commons.collections.CollectionUtils;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
     public static final String PLANNING_PERIOD_ID = "planningPeriodId";
     public static final String ACTIVITY = "activity";
     public static final String TIME_TYPE = "timeType";
+    public static final String DRAFT ="draft";
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -478,9 +480,9 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
 
 
     @Override
-    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate) {
+    public List<ShiftWithActivityDTO> findShiftsByShiftAndActvityKpiFilters(List<Long> staffIds, List<Long> unitIds, List<BigInteger> activitiesIds, List<Integer> dayOfWeeks, Date startDate, Date endDate, Boolean isDraft) {
         Criteria criteria = where(STAFF_ID).in(staffIds).and(UNIT_ID).in(unitIds).and(DELETED).is(false).and(DISABLED).is(false)
-                .and(START_DATE).gte(startDate).lte(endDate);
+                .and(START_DATE).gte(startDate).lte(endDate).and(DRAFT).is(false);
         List<AggregationOperation> aggregationOperation = new ArrayList<>();
         aggregationOperation.add(new MatchOperation(criteria));
         aggregationOperation.add(unwind(ACTIVITIES));
@@ -574,6 +576,7 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
                 "        'activities.durationMinutes' : 1,\n" +
                 "        'activities.scheduledMinutes':1,\n" +
                 "        'activities.activityName':1,\n" +
+                "        'activities.status':1,\n" +
                 "        'activities.timeBankCtaBonusMinutes':1,\n" +
                 "        'activities.scheduledMinutesOfTimebank':1,\n" +
                 "        'activities.scheduledMinutesOfPayout':1,\n" +
@@ -721,6 +724,27 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
             aggregationOperations.add(project(shiftProjection));
         }
         return aggregationOperations;
+    }
+
+    @Override
+    public List<ActivityWithCompositeDTO> findMostlyUsedActivityByStaffId(Long staffId){
+        Aggregation aggregation = Aggregation.newAggregation(
+                match(Criteria.where(DELETED).is(false).and(DISABLED).is(false).and("staffId").is(staffId)),
+               /* new CustomAggregationOperation(Document.parse("{\n" +
+                        "      $group :\n" +
+                        "        {\n" +
+                        "          _id : \"$activities.activityId\",\n" +
+                        "          count: { $sum: 1 }\n" +
+                        "        }\n" +
+                        "     }")),*/
+               unwind("activities"),
+               group("activities.activityId").count().as("mostlyUsedCount"),
+                lookup("activities", "_id", "_id", ACTIVITY)
+                ,project("_id","mostlyUsedCount").and("activity.activityPriorityId").arrayElementAt(0).as("activityPriorityId").and("activity.balanceSettingsActivityTab.timeType").arrayElementAt(0).as("secondLevelTimtype"),
+                lookup("activityPriority", "activityPriorityId", "_id", "activityPriority"),
+                project("_id","mostlyUsedCount","secondLevelTimtype").and("activityPriority.sequence").arrayElementAt(0).as("activityPriority")
+        );
+        return mongoTemplate.aggregate(aggregation, Shift.class, ActivityWithCompositeDTO.class).getMappedResults();
     }
 
 }

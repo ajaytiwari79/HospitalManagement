@@ -12,8 +12,8 @@ import java.util.Set;
 
 public interface CustomStaffGraphRepository {
 
-     List<StaffEmploymentQueryResult> getStaffByPriorityGroupStaffIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId);
+    List<StaffEmploymentQueryResult> getStaffByPriorityGroupStaffIncludeFilter(StaffIncludeFilterDTO staffIncludeFilterDTO, Long unitId);
     List<StaffKpiFilterQueryResult> getStaffsByFilter(Long organizationId, List<Long> unitId, List<Long> employmentType, String startDate, String endDate, List<Long> staffIds,boolean parentOrganization);
-    List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
-                                  Map<FilterType, Set<String>> filters, String searchText, String imagePath,Long loggedInStaffId);
+    <T> List<Map> getStaffWithFilters(Long unitId, List<Long> parentOrganizationIds, String moduleId,
+                                  Map<FilterType, Set<T>> filters, String searchText, String imagePath,Long loggedInStaffId);
 }

@@ -24,6 +24,7 @@ import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 /**
  * Created by oodles on 28/11/17.
@@ -83,6 +84,13 @@ public class StaffAdditionalInfoDTO {
         this.reasonCodes = reasonCodes;
     }
 
+    public List<StaffChildDetailDTO> getStaffChildDetails() {
+        return isNullOrElse(staffChildDetails,new ArrayList<>());
+    }
+
+    public SeniorAndChildCareDaysDTO getSeniorAndChildCareDays() {
+        return isNullOrElse(seniorAndChildCareDays,new SeniorAndChildCareDaysDTO());
+    }
 
     public Set<AccessGroupRole> getRoles() {
             Set<AccessGroupRole> roles = new HashSet<>();

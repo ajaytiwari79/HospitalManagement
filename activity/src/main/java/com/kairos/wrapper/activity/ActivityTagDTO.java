@@ -2,6 +2,7 @@ package com.kairos.wrapper.activity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.CompositeShiftActivityDTO;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.enums.ActivityStateEnum;
@@ -11,19 +12,20 @@ import com.kairos.persistence.model.activity.tabs.BalanceSettingsActivityTab;
 import com.kairos.persistence.model.activity.tabs.GeneralActivityTab;
 import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by prerna on 16/12/17.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 public class ActivityTagDTO {
     private BigInteger id;
     private String name;
@@ -53,6 +55,8 @@ public class ActivityTagDTO {
     private Set<BigInteger> childActivityIds=new HashSet<>();
     // for filter FullDay and Full week activity
     private String methodForCalculatingTime;
+
+    private Map<String, TranslationInfo> translations ;
 
     public ActivityTagDTO() {
         //default constructor

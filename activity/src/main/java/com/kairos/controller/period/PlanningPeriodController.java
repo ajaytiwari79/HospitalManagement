@@ -109,11 +109,6 @@ public class PlanningPeriodController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.migratePlanningPeriods(unitId, planningPeriodDTO));
     }
 
-    @ApiOperation(value = "create job of Planning Period ")
-    @PutMapping(value="/planning_period_job")
-    public ResponseEntity<Map<String, Object>> createJobForPlanningPeriod() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, planningPeriodService.createJobOfPlanningPeriod());
 
-    }
 
 }

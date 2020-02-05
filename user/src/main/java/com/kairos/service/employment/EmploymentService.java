@@ -13,6 +13,7 @@ import com.kairos.dto.user.country.experties.FunctionsDTO;
 import com.kairos.dto.user.staff.employment.EmploymentDTO;
 import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.persistence.model.auth.User;
@@ -999,6 +1000,8 @@ public class EmploymentService {
         List<ExpertisePlannedTimeQueryResult> expertisePlannedTimes = expertiseEmploymentTypeRelationshipGraphRepository.findPlannedTimeByExpertise(expertiseId);
         staffAdditionalInfoDTOS.forEach(currentData -> convertStaffEmploymentObject(employmentDetailsMap.get(currentData.getId()), currentData, expertisePlannedTimes));
         StaffEmploymentUnitDataWrapper staffEmploymentUnitDataWrapper = new StaffEmploymentUnitDataWrapper(staffAdditionalInfoDTOS);
+        User user=userGraphRepository.findOne(UserContext.getUserDetails().getId());
+        staffEmploymentUnitDataWrapper.setUnitWiseAccessRole(user.getUnitWiseAccessRole());
         staffRetrievalService.setRequiredDataForShiftCreationInWrapper(staffEmploymentUnitDataWrapper, unit, countryId, expertiseId);
         return staffEmploymentUnitDataWrapper;
     }
@@ -1093,12 +1096,20 @@ public class EmploymentService {
         List<Employment> employmentList = new ArrayList<>();
         for (Employment employment : employments) {
             List<EmploymentLine> employmentLines = new CopyOnWriteArrayList<>(employment.getEmploymentLines());
-            for (EmploymentLine employmentLine : employmentLines) {
+            employmentLines.sort(Comparator.comparing(EmploymentLine::getStartDate));
+            ListIterator iterator=employmentLines.listIterator();
+            while (iterator.hasNext()){
+                EmploymentLine employmentLine=(EmploymentLine) iterator.next();
                 DateTimeInterval employmentLineInterval = new DateTimeInterval(employmentLine.getStartDate(), employmentLine.getEndDate());
                 if (expertiseLineInterval.overlaps(employmentLineInterval)) {
                     if (employmentLine.getStartDate().isBefore(expertiseLine.getStartDate())) {
                         employmentLine.setEndDate(expertiseLine.getStartDate().minusDays(1));
-                        EmploymentLine employmentLineToBeCreated = getEmploymentLine(expertiseLine, employment, expertiseLine.getStartDate(), employmentLine.getEndDate(), employmentLine, expertiseId);
+                        LocalDate endDate=expertiseLine.getEndDate();
+                        if(isNull(endDate) && iterator.hasNext()){
+                            endDate= ((EmploymentLine) iterator.next()).getStartDate().minusDays(1);
+                            iterator.previous();
+                        }
+                        EmploymentLine employmentLineToBeCreated = getEmploymentLine(expertiseLine, employment, expertiseLine.getStartDate(), endDate, employmentLine, expertiseId);
                         employment.getEmploymentLines().add(employmentLineToBeCreated);
                         linkExistingRelations(employmentLineToBeCreated, employmentLine);
                     } else {
@@ -1149,17 +1160,25 @@ public class EmploymentService {
         List<Employment> employmentList = new ArrayList<>();
         for (Employment employment : employments) {
             List<EmploymentLine> employmentLines = new CopyOnWriteArrayList<>(employment.getEmploymentLines());
-            for (EmploymentLine employmentLine : employmentLines) {
+            employmentLines.sort(Comparator.comparing(EmploymentLine::getStartDate));
+            ListIterator iterator=employmentLines.listIterator();
+            while (iterator.hasNext()){
+                EmploymentLine employmentLine=(EmploymentLine) iterator.next();
                 DateTimeInterval employmentLineInterval = new DateTimeInterval(employmentLine.getStartDate(), employmentLine.getEndDate());
                 if (expertiseLineInterval.overlaps(employmentLineInterval)) {
                     if (employmentLine.getStartDate().isBefore(payTable.getStartDateMillis())) {
                         employmentLine.setEndDate(payTable.getStartDateMillis().minusDays(1));
-                        EmploymentLine employmentLineToBeCreated = getEmploymentLine(null, employment, payTable.getStartDateMillis(), payTable.getEndDateMillis(), employmentLine, null);
+                        LocalDate endDate=payTable.getEndDateMillis();
+                        if(payTable.getEndDateMillis()==null && iterator.hasNext()){
+                            endDate= ((EmploymentLine) iterator.next()).getStartDate().minusDays(1);
+                            iterator.previous();
+                        }
+                        EmploymentLine employmentLineToBeCreated = getEmploymentLine(null, employment, payTable.getStartDateMillis(), endDate, employmentLine, null);
                         employment.getEmploymentLines().add(employmentLineToBeCreated);
                         linkExistingRelations(employmentLineToBeCreated, employmentLine);
                     } else {
                         employmentLine.setFullTimeWeeklyMinutes(employmentLine.getFullTimeWeeklyMinutes());
-                        employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), null, employment.getExpertise().getId()));
+                        //employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), null, employment.getExpertise().getId()));
                         employmentLine.setWorkingDaysInWeek(employmentLine.getWorkingDaysInWeek());
                     }
                 }
@@ -1168,6 +1187,7 @@ public class EmploymentService {
         }
         employmentGraphRepository.saveAll(employmentList);
     }
+
 }
 
 

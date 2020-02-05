@@ -6,7 +6,7 @@ package com.planner.common.custum_exceptions;
  */
 public class DataNotFoundByIdException extends RuntimeException {
     private String message;
-
+    @Deprecated//Please use ExceptionService
     public DataNotFoundByIdException(String message) {
         super(message);
         this.message = message;

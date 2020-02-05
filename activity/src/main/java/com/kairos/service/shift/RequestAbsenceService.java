@@ -145,9 +145,9 @@ public class RequestAbsenceService {
             shiftOptional.get().setRequestAbsence(null);
             //todo.setDeleted(true);
             shiftMongoRepository.save(shiftOptional.get());
-            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString().replace("ED","")) , todo.getComment());
         }else if(PENDING.equals(todo.getStatus())){
-            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString()) , todo.getComment());
+            shiftStatusService.sendMailToStaffWhenStatusChange(shiftOptional.get(), activityWrapper.getActivity().getName(), ShiftStatus.valueOf(todo.getStatus().toString().replace("ED","")) , todo.getComment());
         }
         return response;
     }

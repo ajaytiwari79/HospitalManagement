@@ -2,10 +2,16 @@ package com.kairos.shiftplanning.domain.tag;
 
 import com.kairos.enums.MasterDataTypeEnum;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.math.BigInteger;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @XStreamAlias("Tag")
 public class Tag {
     BigInteger tagId;
@@ -29,53 +35,5 @@ public class Tag {
         }else {
             this.organizationId = countryOrOrdId;
         }
-    }
-
-    public BigInteger getTagId() {
-        return tagId;
-    }
-
-    public void setTagId(BigInteger tagId) {
-        this.tagId = tagId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public MasterDataTypeEnum getMasterDataType() {
-        return masterDataType;
-    }
-
-    public void setMasterDataType(MasterDataTypeEnum masterDataType) {
-        this.masterDataType = masterDataType;
-    }
-
-    public boolean isCountryTag() {
-        return countryTag;
-    }
-
-    public void setCountryTag(boolean countryTag) {
-        this.countryTag = countryTag;
-    }
-
-    public long getCountryId() {
-        return countryId;
-    }
-
-    public void setCountryId(long countryId) {
-        this.countryId = countryId;
-    }
-
-    public long getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(long organizationId) {
-        this.organizationId = organizationId;
     }
 }

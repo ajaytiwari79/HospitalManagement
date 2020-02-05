@@ -38,6 +38,7 @@ public class IntegrationJobsExecutorService {
     private EnvConfig envConfig;
     @Inject
     private UnitGraphRepository unitGraphRepository;
+    @Inject private UserSchedulerJobService userSchedulerJobService;
     private static Logger logger = LoggerFactory.getLogger(IntegrationJobsExecutorService.class);
 
     @Inject
@@ -92,11 +93,7 @@ public class IntegrationJobsExecutorService {
                         try(GZIPInputStream zi = new GZIPInputStream(new ByteArrayInputStream(bytes))) {
                             unzipped = IOUtils.toString(zi);
                         }
-                        KairosSchedulerLogsDTO logs = new KairosSchedulerLogsDTO(Result.SUCCESS,unzipped,job.getId(),job.getUnitId(),DateUtils.getMillisFromLocalDateTime(started),DateUtils.getMillisFromLocalDateTime(stopped),job.getJobSubType());
-                        if(transstatus.getResult().getNr_errors() > 0) {
-                            logs.setResult(Result.ERROR);
-                        }
-                        kafkaProducer.pushToSchedulerLogsQueue(logs);
+                        userSchedulerJobService.updateJobForTimecareShift(job, started, stopped, transstatus, unzipped);
 
                     } catch (JAXBException exception) {
                         logger.info("trans status---exception > " + exception);

@@ -16,10 +16,10 @@ import static com.kairos.enums.FilterType.FUNCTIONS;
 /**
  * Created By G.P.Ranjan on 19/9/19
  **/
-public class FunctionsFilter implements ShiftFilter {
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+public class FunctionsFilter <G> implements ShiftFilter {
+    private Map<FilterType, Set<G>> filterCriteriaMap;
     private Set<LocalDate> functionDates;
-    public FunctionsFilter(Map<FilterType, Set<String>> filterCriteriaMap, Set<LocalDate> functionDates) {
+    public FunctionsFilter(Map<FilterType, Set<G>> filterCriteriaMap, Set<LocalDate> functionDates) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.functionDates = functionDates;
     }

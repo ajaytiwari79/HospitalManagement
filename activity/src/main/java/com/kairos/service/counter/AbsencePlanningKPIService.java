@@ -21,7 +21,6 @@ import com.kairos.enums.DurationType;
 import com.kairos.enums.FilterType;
 import com.kairos.enums.kpi.Direction;
 import com.kairos.enums.kpi.KPIRepresentation;
-import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.counter.ApplicableKPI;
 import com.kairos.persistence.model.counter.FibonacciKPICalculation;
 import com.kairos.persistence.model.counter.KPI;
@@ -73,7 +72,7 @@ public class AbsencePlanningKPIService implements CounterService {
 
         List<DateTimeInterval> dateTimeIntervals = getDateTimeIntervals(applicableKPI.getInterval(), isNull(applicableKPI) ? 0 : applicableKPI.getValue(), applicableKPI.getFrequencyType(), filterDates, null);
         StaffEmploymentTypeDTO staffEmploymentTypeDTO = new StaffEmploymentTypeDTO(staffIds, unitIds, employmentTypeIds, organizationId, dateTimeIntervals.get(0).getStartLocalDate().toString(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndLocalDate().toString());
-        DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiDefaultData(staffEmploymentTypeDTO);
+        DefaultKpiDataDTO defaultKpiDataDTO = userIntegrationService.getKpiAllDefaultData(staffEmploymentTypeDTO);
         staffIds = defaultKpiDataDTO.getStaffKpiFilterDTOs().stream().map(StaffKpiFilterDTO::getId).collect(Collectors.toList());
         List<TodoDTO> todoDTOS = todoRepository.findAllByKpiFilter(unitIds.get(0), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(), staffIds, todoStatus);
         Map<Object, List<ClusteredBarChartKpiDataUnit>> objectDoubleMap = calculateDataByKpiRepresentation(staffIds, dateTimeIntervals, applicableKPI, todoDTOS, defaultKpiDataDTO.getTimeSlotDTOS());
@@ -159,10 +158,10 @@ public class AbsencePlanningKPIService implements CounterService {
                     break;
             }
         }
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.REQUESTED.toString(), AppConstants.REQUESTED_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,requested)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.VIEWED.toString(), AppConstants.PENDING_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,pending)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.APPROVE.toString(), AppConstants.APPROVE_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,approve)));
-        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(TodoStatus.DISAPPROVE.toString(), AppConstants.DISAPPROVE_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,disapprove)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.REQUESTED, AppConstants.REQUESTED_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,requested)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.PENDING, AppConstants.PENDING_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,pending)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.APPROVE, AppConstants.APPROVE_COLOR_CODE, getValueOfTodo(todoDTOS,xAxisConfig,approve)));
+        clusteredBarChartKpiDataUnits.add(new ClusteredBarChartKpiDataUnit(AppConstants.DISAPPROVE, AppConstants.DISAPPROVE_COLOR_CODE,getValueOfTodo(todoDTOS,xAxisConfig,disapprove)));
 
         return clusteredBarChartKpiDataUnits;
     }

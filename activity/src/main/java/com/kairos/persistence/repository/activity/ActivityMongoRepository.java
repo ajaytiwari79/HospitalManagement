@@ -22,6 +22,8 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
     @Query("{'deleted' : false,'_id':?0}")
     Activity findActivityByIdAndEnabled(BigInteger id);
 
+    Activity findByIdAndUnitIdAndDeleted(BigInteger id,Long unitId,boolean deleted);
+
     Activity findByParentIdAndDeletedFalseAndUnitId(BigInteger parentId, Long unitId);
 
     @Query(value = "{'deleted' : false, 'countryId' :?0 }", fields = "{'name':1,'description':1,'parentId':1,'_id':1,'unitId':1,'timeCalculationActivityTab.methodForCalculatingTime':1,'rulesActivityTab':1,'balanceSettingsActivityTab':1}")
@@ -96,4 +98,7 @@ public interface ActivityMongoRepository extends MongoBaseRepository<Activity, B
 
     @Query(value = "{'deleted' : false,'unitId' :?0,'rulesActivityTab.sicknessSettingValid':true}",fields ="{'_id':1}")
     List<Activity> findAllSicknessActivity(Long unitId);
+
+    @Query(value = "{unitId:?0, deleted:false}")
+    List<ActivityDTO> getActivitiesByUnitId(Long unitId);
 }

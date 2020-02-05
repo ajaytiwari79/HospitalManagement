@@ -130,4 +130,10 @@ public class CountryEmploymentTypeController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiFilterDefaultData(unitId));
     }
 
+    @PostMapping(value =COUNTRY_URL+"/kpi_all_default_data")
+    @ApiOperation("get all default data")
+    //@PreAuthorize("@customPermissionEvaluator.isAuthorized()")
+    public ResponseEntity<Map<String, Object>> getKpiAllDefaultData(@RequestBody StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, employmentTypeService.getKpiAllDefaultData(staffEmploymentTypeDTO));
+    }
 }

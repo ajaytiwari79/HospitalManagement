@@ -1,11 +1,17 @@
 package com.kairos.shiftplanning.domain.staffing_level;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @XStreamAlias("StaffingLevelInterval")
 @Deprecated
 public class StaffingLevelInterval {
@@ -23,57 +29,6 @@ public class StaffingLevelInterval {
         this.minimumStaffRequired = minimumStaffRequired;
         this.maximumStaffRequired = maximumStaffRequired;
         this.skillLevels = skillLevels;
-        this.activityTypeLevels = activityTypeLevels;
-    }
-
-    public StaffingLevelInterval(){
-    }
-
-    public DateTime getStart() {
-        return start;
-    }
-
-    public void setStart(DateTime start) {
-        this.start = start;
-    }
-
-    public DateTime getEnd() {
-        return end;
-    }
-
-    public void setEnd(DateTime end) {
-        this.end = end;
-    }
-
-    public int getMinimumStaffRequired() {
-        return minimumStaffRequired;
-    }
-
-    public void setMinimumStaffRequired(int minimumStaffRequired) {
-        this.minimumStaffRequired = minimumStaffRequired;
-    }
-
-    public int getMaximumStaffRequired() {
-        return maximumStaffRequired;
-    }
-
-    public void setMaximumStaffRequired(int maximumStaffRequired) {
-        this.maximumStaffRequired = maximumStaffRequired;
-    }
-
-    public List<StaffingLevelSkill> getSkillLevels() {
-        return skillLevels;
-    }
-
-    public void setSkillLevels(List<StaffingLevelSkill> skillLevels) {
-        this.skillLevels = skillLevels;
-    }
-
-    public List<StaffingLevelActivityType> getActivityTypeLevels() {
-        return activityTypeLevels;
-    }
-
-    public void setActivityTypeLevels(List<StaffingLevelActivityType> activityTypeLevels) {
         this.activityTypeLevels = activityTypeLevels;
     }
     public Interval getInterval(){

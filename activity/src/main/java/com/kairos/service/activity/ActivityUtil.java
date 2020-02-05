@@ -11,6 +11,8 @@ import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.glide_time.ActivityGlideTimeDetails;
 import com.kairos.dto.activity.glide_time.GlideTimeSettingsDTO;
 import com.kairos.dto.activity.phase.PhaseDTO;
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.organization.skill.Skill;
 import com.kairos.enums.ActivityStateEnum;
 import com.kairos.enums.LocationEnum;
@@ -233,6 +235,17 @@ public class ActivityUtil {
         BalanceSettingsActivityTab balanceSettingsActivityTab = new BalanceSettingsActivityTab(false, false);
 
         activity.setBalanceSettingsActivityTab(balanceSettingsActivityTab);
+    }
+
+    public static Set<BigInteger> getAllActivities(ShiftWithActivityDTO shift) {
+        Set<BigInteger> allActivities=new HashSet<>();
+        for (ShiftActivityDTO shiftActivityDTO:shift.getActivities()) {
+            allActivities.add(shiftActivityDTO.getActivityId());
+            for (ShiftActivityDTO child:shiftActivityDTO.getChildActivities()) {
+                allActivities.add(child.getActivityId());
+            }
+        }
+        return allActivities;
     }
 
 

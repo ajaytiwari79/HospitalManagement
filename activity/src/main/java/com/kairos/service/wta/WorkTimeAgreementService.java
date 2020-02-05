@@ -736,7 +736,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
                     break;
                 case PROTECTED_DAYS_OFF:
                     ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate = ObjectMapperUtils.copyPropertiesByMapper(ruleTemplate, ProtectedDaysOffWTATemplate.class);
-                    activityIds.addAll(newHashSet(protectedDaysOffWTATemplate.getActivityId()));
+                    CollectionUtils.addIgnoreNull(activityIds,protectedDaysOffWTATemplate.getActivityId());
                     break;
                 default:
                     break;
@@ -836,7 +836,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
     }
 
     public WorkTimeAgreementBalance getWorktimeAgreementBalance(Long unitId, Long employmentId, LocalDate startDate, LocalDate endDate) {
-        return workTimeAgreementBalancesCalculationService.getWorktimeAgreementBalance(unitId, employmentId, startDate, endDate);
+        return workTimeAgreementBalancesCalculationService.getWorktimeAgreementBalance(unitId, employmentId, startDate, endDate,new HashSet<>());
     }
 
     public IntervalBalance getProtectedDaysOffCount(Long unitId, LocalDate localDate, Long staffId, BigInteger activityId) {
@@ -1076,5 +1076,7 @@ public class WorkTimeAgreementService extends MongoBaseService {
         return wtaRepository.getAllWTAByEmploymentIds(employmentIds);
     }
 
-
+    public List<WTAResponseDTO> getAllWTAByUnitId(long unitId){
+        return wtaRepository.findWTAByUnitId(unitId);
+    }
 }

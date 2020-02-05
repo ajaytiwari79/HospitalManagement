@@ -1,6 +1,6 @@
 package com.kairos.service.tpa;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.persistence.model.task.TaskReport;
 import com.kairos.persistence.repository.task_type.TaskReportMongoRepository;
 import com.kairos.service.MongoBaseService;
@@ -31,7 +31,7 @@ public class TaskReportService extends MongoBaseService {
     private StaffGraphRepository staffGraphRepository;*/
 
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
 
 
 
@@ -138,7 +138,7 @@ public class TaskReportService extends MongoBaseService {
     }
 */
     public boolean mailStaffTaskReport(File file,String[] receivers,String message,String subject){
-        return mailService.sendMailWithAttachment(receivers,message,subject,file);
+        return sendGridMailService.sendMailWithAttachment(receivers,message,subject,file);
     }
 
 

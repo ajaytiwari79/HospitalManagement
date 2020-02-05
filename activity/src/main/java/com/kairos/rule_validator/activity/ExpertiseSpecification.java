@@ -7,11 +7,13 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_EXPERTISE_MATCH;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 
@@ -23,11 +25,12 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
     private Set<Long> expertiseIds = new HashSet<>();
     private Expertise expertise;
     private RuleTemplateSpecificInfo ruleTemplateSpecificInfo;
+    private Set<BigInteger> teamActivityIds;
 
-
-    public ExpertiseSpecification(Expertise expertise, RuleTemplateSpecificInfo ruleTemplateSpecificInfo) {
+    public ExpertiseSpecification(Expertise expertise, RuleTemplateSpecificInfo ruleTemplateSpecificInfo, Set<BigInteger> teamActivityIds) {
         this.expertise = expertise;
         this.ruleTemplateSpecificInfo = ruleTemplateSpecificInfo;
+        this.teamActivityIds=teamActivityIds;
 
     }
 
@@ -49,15 +52,33 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
         for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
             for (ShiftActivityDTO childActivity : shiftActivityDTO.getChildActivities()) {
                 validateExpertise(errorMessages, childActivity);
+                validateStaffActivity(errorMessages,childActivity);
             }
             validateExpertise(errorMessages,shiftActivityDTO);
+            validateStaffActivity(errorMessages,shiftActivityDTO);
         }
     }
+
+    private void validateStaffActivity(List<String> errorMessages,ShiftActivityDTO activity) {
+        ActivityRuleViolation activityRuleViolation;
+        if (!teamActivityIds.contains(activity.getActivityId())) {
+            errorMessages.add(convertMessage(MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN, activity.getActivity().getName()));
+            activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getActivity().getId())).findAny().orElse(null);
+            if (activityRuleViolation == null) {
+                activityRuleViolation = new ActivityRuleViolation(activity.getActivity().getId(), activity.getActivity().getName(), 0, errorMessages);
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
+            } else {
+                activityRuleViolation.getErrorMessages().addAll(errorMessages);
+            }
+        }
+    }
+
+
 
     private void validateExpertise(List<String> errorMessages, ShiftActivityDTO childActivity) {
         ActivityRuleViolation activityRuleViolation = null;
         if (isNotNull(childActivity.getActivity().getExpertises()) && !childActivity.getActivity().getExpertises().contains(expertise.getId())) {
-            errorMessages.add(convertMessage(MESSAGE_ACTIVITY_EXPERTISE_MATCH, childActivity.getActivity().getName(), expertise.getName()));
+            errorMessages.add(convertMessage(MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN, childActivity.getActivity().getName(), expertise.getName()));
             activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(childActivity.getActivity().getId())).findAny().orElse(null);
             if (activityRuleViolation == null) {
                 activityRuleViolation = new ActivityRuleViolation(childActivity.getActivity().getId(), childActivity.getActivity().getName(), 0, errorMessages);
