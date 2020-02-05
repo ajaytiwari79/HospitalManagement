@@ -458,4 +458,9 @@ public class SkillService {
         return list;
 
     }
+
+    public List<StaffQueryResult> getStaffAllSkillAndLevelByStaffIds(List<Long> staffIds) {
+        List<StaffQueryResult> staffQueryResults = skillGraphRepository.getAllStaffSkillAndLevelByStaffIds(staffIds);
+        return staffQueryResults;
+    }
 }

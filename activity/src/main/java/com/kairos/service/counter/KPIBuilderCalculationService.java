@@ -142,7 +142,6 @@ public class KPIBuilderCalculationService implements CounterService {
     private UnavailabilityCalculationKPIService unavailabilityCalculationKPIService;
     @Inject
     private ActivityMongoRepository activityMongoRepository;
-
     @Inject
     private TodoService todoService;
     @Inject
@@ -155,14 +154,15 @@ public class KPIBuilderCalculationService implements CounterService {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private TimeBankService timeBankService;
-
     @Inject
     private AbsencePlanningKPIService absencePlanningKPIService;
-
     @Inject
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
     @Inject
+    private SkillKPIService skillKPIService;
+    @Inject
     private ActivityService activityService;
+
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -342,6 +342,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case ABSENCE_UNDER_STAFFING:
                 return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
+            case STAFF_SKILLS_COUNT:
+                return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId,asLocalDate(kpiCalculationRelatedInfo.getStartDate()),asLocalDate(kpiCalculationRelatedInfo.getEndDate()),kpiCalculationRelatedInfo);
             default:
                 break;
         }
