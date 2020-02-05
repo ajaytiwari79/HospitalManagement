@@ -8,7 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @QueryResult
 @Getter
@@ -27,4 +30,7 @@ public class StaffKpiFilterQueryResult {
     private List<TeamDTO> teams;
     private List<StaffChildDetailDTO> staffChildDetails;
 
+    public List<EmploymentQueryResult> getEmployment() {
+        return isNullOrElse(employment,new ArrayList<>());
+    }
 }

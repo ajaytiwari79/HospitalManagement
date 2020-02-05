@@ -291,13 +291,13 @@ public class EmploymentTypeService {
         List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult=staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization);
         List<EmploymentLinesQueryResult> hourlyCostPerLine=employmentGraphRepository.findFunctionalHourlyCost(staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(employmentQueryResult -> employmentQueryResult.getId())).collect(Collectors.toList()));
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
-        List<Long> expertiseIds=staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(employmentQueryResult -> employmentQueryResult.getExpertiseId())).collect(Collectors.toList());
+        List<Long> expertiseIds=staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(employmentQueryResult -> employmentQueryResult.getExpertise().getId())).collect(Collectors.toList());
         Map<Long, SeniorAndChildCareDaysDTO> expertiseIdsAndSeniorAndChildCareDaysMap=expertiseService.getSeniorAndChildCareDaysMapByExpertiseIds(expertiseIds);
         for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
             kpiFilterQueryResult.setDayTypeDTOS(dayTypeDTOS);
             for (EmploymentQueryResult employmentQueryResult : kpiFilterQueryResult.getEmployment()) {
                 employmentQueryResult.setUnitId(staffEmploymentTypeDTO.getOrganizationId());
-                employmentQueryResult.setSeniorAndChildCareDays(expertiseIdsAndSeniorAndChildCareDaysMap.get(employmentQueryResult.getExpertiseId()));
+                employmentQueryResult.setSeniorAndChildCareDays(expertiseIdsAndSeniorAndChildCareDaysMap.get(employmentQueryResult.getExpertise().getId()));
                 for (EmploymentLinesQueryResult employmentLine : employmentQueryResult.getEmploymentLines()) {
                     if(hourlyCostMap.containsKey(employmentLine.getId())) {
                         BigDecimal hourlyCost = employmentLine.getStartDate().isLeapYear() ? hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING) : hourlyCostMap.get(employmentLine.getId()).divide(new BigDecimal(NON_LEAP_YEAR).multiply(PER_DAY_HOUR_OF_FULL_TIME_EMPLOYEE), 2, BigDecimal.ROUND_CEILING);

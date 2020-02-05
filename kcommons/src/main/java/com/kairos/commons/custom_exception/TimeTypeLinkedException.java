@@ -8,7 +8,7 @@ package com.kairos.commons.custom_exception;
 * */
 public class TimeTypeLinkedException extends RuntimeException {
 
-
+    @Deprecated//Please use ExceptionService
     public TimeTypeLinkedException(String message){
         super(message);
     }

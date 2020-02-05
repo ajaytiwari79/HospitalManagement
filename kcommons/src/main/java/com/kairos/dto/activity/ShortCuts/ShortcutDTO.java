@@ -25,6 +25,7 @@ public class ShortcutDTO {
     private TodoFilter todoFilter;
     private GraphFilterDTO graphFilter;
     private List<ShortcutsDetailsDTO> shortcutsDetails;
+    private BigInteger phaseId;
 
     public void setName(String name) {
         this.name = name.trim();

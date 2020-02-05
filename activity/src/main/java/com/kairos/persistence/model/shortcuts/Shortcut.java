@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Getter
@@ -25,6 +26,7 @@ public class Shortcut extends MongoBaseEntity {
     private TodoFilter todoFilter;
     private GraphFilterDTO graphFilter;
     private List<ShortcutsDetails> shortcutsDetails;
+    private BigInteger phaseId;
 
 
 }
