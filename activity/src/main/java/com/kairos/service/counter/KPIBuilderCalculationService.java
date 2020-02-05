@@ -163,6 +163,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private StaffingLevelCalculationKPIService staffingLevelCalculationKPIService;
     @Inject
     private ActivityService activityService;
+    @Inject
+    private WeeklyEmploymentHoursKPIService weeklyEmploymentHoursKPIService;
 
 
     public Double getTotalByCalculationBased(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo, YAxisConfig yAxisConfig) {
@@ -341,6 +343,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case ABSENCE_OVER_STAFFING:
             case ABSENCE_UNDER_STAFFING:
                 return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+            case TOTAL_WEEKLY_HOURS:
+                return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId,kpiCalculationRelatedInfo,asLocalDate(kpiCalculationRelatedInfo.getStartDate()),asLocalDate(kpiCalculationRelatedInfo.getEndDate()));
             case ABSENCE_REQUEST:
             default:
                 break;
