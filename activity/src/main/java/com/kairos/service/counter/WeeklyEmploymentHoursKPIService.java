@@ -23,18 +23,16 @@ public class WeeklyEmploymentHoursKPIService {
         for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
             if (staffKpiFilterDTO.getId().equals(staffId)) {
                 for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                    DateTimeInterval employmentStartDateAndEndDateInterval = new DateTimeInterval(employmentWithCtaDetailsDTO.getStartDate(), employmentWithCtaDetailsDTO.getEndDate());
-                    if(ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours())) {
-                        if (ObjectUtils.isNull(employmentWithCtaDetailsDTO.getEndDate())) {
-                            if (employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && ObjectUtils.isNull(employmentWithCtaDetailsDTO.getEndDate())) {
+                    if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours())) {
+                        if (employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && ObjectUtils.isNull(employmentWithCtaDetailsDTO.getEndDate())) {
+                            weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
+                        }
+
+                        if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEndDate())) {
+                            if ((employmentWithCtaDetailsDTO.getStartDate().isBefore(startDate) && employmentWithCtaDetailsDTO.getEndDate().isAfter(startDate)) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getStartDate())) || dateTimeInterval.containsAndEqualsEndDate(DateUtils.asDate(employmentWithCtaDetailsDTO.getEndDate()))) {
                                 weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
                             }
                         }
-                        if (ObjectUtils.isNotNull(employmentWithCtaDetailsDTO.getEndDate())) {
-                                if (employmentStartDateAndEndDateInterval.containsAndEqualsEndDate(DateUtils.asDate(startDate))||dateTimeInterval.contains(employmentStartDateAndEndDateInterval.getStartDate())||dateTimeInterval.contains(employmentStartDateAndEndDateInterval.getEndDate())) {
-                                    weeklyHours += Double.valueOf(employmentWithCtaDetailsDTO.getEmploymentLines().get(0).getTotalWeeklyHours());
-                                }
-                            }
                     }
 
                 }
@@ -42,6 +40,8 @@ public class WeeklyEmploymentHoursKPIService {
             }
 
         }
+
+
             return weeklyHours;
     }
 }
