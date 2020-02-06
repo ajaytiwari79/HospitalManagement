@@ -55,7 +55,7 @@ public class RulesActivityTab{
     private PQLSettings pqlSettings=new PQLSettings();
     private ReasonCodeRequiredState reasonCodeRequiredState;
     private List<BigInteger> staffTagIds;
-    private SicknessSetting sicknessSetting;
+    private SicknessSetting sicknessSetting=new SicknessSetting();
     private boolean sicknessSettingValid;
 
 }

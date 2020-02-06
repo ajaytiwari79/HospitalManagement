@@ -289,13 +289,6 @@ public class SkillService {
         userSkillLevelRelationshipGraphRepository.saveAll(staffSkillLevelRelationships);
     }
 
-
-    public void updateStaffSkillLevel(long staffId, long skillId, SkillLevel skillLevel, long startDate, long endDate, boolean status, long unitId) {
-        Staff staff = staffGraphRepository.findOne(staffId);
-        userSkillLevelRelationshipGraphRepository.updateStaffSkill(staffId, skillId, skillLevel, startDate, endDate, status);
-    }
-
-
     public boolean assignSkillToStaff(long id, long staffId, long skillId, boolean isSelected) {
 
         Staff staff = staffGraphRepository.findOne(staffId);

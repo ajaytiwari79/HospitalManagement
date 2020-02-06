@@ -112,7 +112,7 @@ public class ShiftSickService extends MongoBaseService {
         if(isCollectionEmpty(nonWorkingSicknessActivityWrappers)){
             exceptionService.dataNotFoundException(MESSAGE_NON_WORKING_SICKNESS_ACTIVITY_NOT_FOUND);
         }
-        if(!MAIN.equals(staffAdditionalInfoDTO)){
+        if(!MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType())){
             exceptionService.dataNotFoundException(EMPLOYMENT_NOT_VALID_TO_MARK_SICK);
         }
         Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),shiftDTO.getStartDate(),shiftDTO.getEndDate());
@@ -123,9 +123,8 @@ public class ShiftSickService extends MongoBaseService {
         Map<BigInteger,ActivityWrapper> activityWrapperMap = shiftService.getActivityWrapperMap(shifts,shiftDTO);
         List<ShiftDTO> shiftDTOS = new ArrayList<>();
         List<ShiftWithViolatedInfoDTO> shiftWithViolatedInfoDTOS = new ArrayList<>();
-        if(shiftNeedsToAddForDays!=0){
             int i=0;
-            while (shiftNeedsToAddForDays != 0 && i<shiftNeedsToAddForDays) {
+            while ( i<shiftNeedsToAddForDays) {
                 ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftDTO.class);
                 shiftDTO1 = updateShiftWithSetting(nonWorkingSicknessActivityWrappers.get(0),activityWrapperMap,shiftDTO1.getShiftDate().plusDays(i),shiftDTO1,shiftMap);
                 shiftDTO1.setShiftDate(shiftDTO1.getShiftDate().plusDays(i));
@@ -134,7 +133,6 @@ public class ShiftSickService extends MongoBaseService {
                 shiftDTOS.add(shiftDTO1);
                 i++;
             }
-        }
         return null;//shiftService.createShifts(shiftDTO.getUnitId(),shiftDTOS,ShiftActionType.SAVE);
 
     }
@@ -148,7 +146,7 @@ public class ShiftSickService extends MongoBaseService {
             shiftActivityDTOS.addAll(getShiftActivityDTOByIntervals(dateTimeInterval,nonWorkingSicknessActivityWrapper,shift.getInterval()));
         }
         shiftDTO.mergeShiftActivity();
-        shiftDTO.setActivities(shiftActivityDTOS);
+        //shiftDTO.setActivities(shiftActivityDTOS);
         shiftDTO.setStartDate(dateTimeInterval.getStartDate());
         shiftDTO.setEndDate(dateTimeInterval.getEndDate());
         return shiftDTO;
@@ -162,7 +160,7 @@ public class ShiftSickService extends MongoBaseService {
         if(isLayerSettingEnabled) {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 ActivityWrapper activityWrapper = activityWrapperMap.get(shiftActivity.getActivityId());
-                ShiftActivityDTO updatedShiftActivity = null;
+                ShiftActivityDTO updatedShiftActivity;
                 if(newHashSet(TimeTypeEnum.ABSENCE,TimeTypeEnum.PRESENCE).contains(activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType())){
                     shiftActivityDTOS.add(new ShiftActivityDTO(sickActivityWrapper.getActivity().getName(),shiftActivity.getStartDate(),shiftActivity.getEndDate(),sickActivityWrapper.getActivity().getId(),null));
                 }else {

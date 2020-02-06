@@ -179,15 +179,11 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         if(isCollectionNotEmpty(activities)) {
             Collections.sort(activities);
             ShiftActivityDTO activityDTO = activities.get(0);
-            BigInteger id = activityDTO.getActivityId();
             List<ShiftActivityDTO> mergedShiftActivityDTOS = new ArrayList<>();
             for (ShiftActivityDTO shiftActivityDTO : activities) {
                 if (activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
                     activityDTO.setEndDate(shiftActivityDTO.getEndDate());
-                } else if (activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && !activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
-                    mergedShiftActivityDTOS.add(activityDTO);
-                    activityDTO = shiftActivityDTO;
-                } else if (activityDTO.getEndDate().before(shiftActivityDTO.getStartDate())) {
+                } else if ((activityDTO.getEndDate().before(shiftActivityDTO.getStartDate())) || activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && !activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
                     mergedShiftActivityDTOS.add(activityDTO);
                     activityDTO = shiftActivityDTO;
                 }
