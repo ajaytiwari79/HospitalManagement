@@ -204,6 +204,7 @@ public class StaffRetrievalService {
         staffPersonalDetail.setExpertiseIds(getExpertiseIds(staffExpertiseQueryResults));
         staffPersonalDetail.setCprNumber(staff.getUser().getCprNumber());
         staffPersonalDetail.setDateOfBirth(CPRUtil.getDateOfBirthFromCPR(staff.getUser().getCprNumber()));
+        staffPersonalDetail.setGender(CPRUtil.getGenderFromCPRNumber(staff.getUser().getCprNumber()));
         return staffPersonalDetail;
     }
 
