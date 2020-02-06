@@ -67,6 +67,7 @@ import com.kairos.service.integration.PlannerSyncService;
 import com.kairos.service.organization.OrganizationActivityService;
 import com.kairos.service.period.PlanningPeriodService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftTemplateService;
 import com.kairos.service.staffing_level.StaffingLevelService;
@@ -160,6 +161,8 @@ public class ActivityService {
     private ActivityConfigurationService activityConfigurationService;
     @Inject
     private StaffingLevelService staffingLevelService;
+    @Inject
+    private ActivitySchedulerJobService activitySchedulerJobService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityService.class);
 
@@ -604,11 +607,13 @@ public class ActivityService {
 
 
     public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO) {
-        validateReminderSettings(communicationActivityDTO);
+        validateReminderSettings(communicationActivityDTO.getActivityReminderSettings());
+        validateReminderSettings(communicationActivityDTO.getActivityCutoffReminderSettings());
         CommunicationActivityTab communicationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(communicationActivityDTO,CommunicationActivityTab.class);
         Activity activity = findActivityById(communicationActivityDTO.getActivityId());
         activity.setCommunicationActivityTab(communicationActivityTab);
         activityMongoRepository.save(activity);
+        activitySchedulerJobService.registerJobForActivityCutoff(activity);
         return new ActivityTabsWrapper(communicationActivityTab);
     }
 
@@ -1015,10 +1020,10 @@ public class ActivityService {
         return activityMongoRepository.findAllActivityByUnitId(unitId, false);
     }
 
-    private boolean validateReminderSettings(CommunicationActivityDTO communicationActivityDTO) {
+    private boolean validateReminderSettings(List<ActivityReminderSettings> activityReminderSettings) {
         int counter = 0;
-        if (!communicationActivityDTO.getActivityReminderSettings().isEmpty()) {
-            for (ActivityReminderSettings currentSettings : communicationActivityDTO.getActivityReminderSettings()) {
+        if (isCollectionNotEmpty(activityReminderSettings)) {
+            for (ActivityReminderSettings currentSettings : activityReminderSettings) {
                 if (currentSettings.getSendReminder().getDurationType() == DurationType.MINUTES &&
                         (currentSettings.getRepeatReminder().getDurationType() == DurationType.DAYS)) {
                     exceptionService.actionNotPermittedException(REPEAT_VALUE_CANT_BE, currentSettings.getRepeatReminder().getDurationType());
@@ -1031,7 +1036,7 @@ public class ActivityService {
                             currentSettings.getSendReminder().getTimeValue(), currentSettings.getSendReminder().getDurationType());
                 }
                 if (counter > 0) {
-                    ActivityReminderSettings previousSettings = communicationActivityDTO.getActivityReminderSettings().get(counter - 1);
+                    ActivityReminderSettings previousSettings = activityReminderSettings.get(counter - 1);
                     if (previousSettings.isRepeatAllowed()) {
                         validateWithPreviousFrequency(currentSettings, previousSettings.getRepeatReminder());
                     } else {

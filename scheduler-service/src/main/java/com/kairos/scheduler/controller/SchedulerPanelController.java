@@ -3,6 +3,7 @@ package com.kairos.scheduler.controller;
 import com.kairos.dto.response.ResponseDTO;
 import com.kairos.dto.scheduler.scheduler_panel.LocalDateTimeScheduledPanelIdDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
+import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.scheduler.service.UserIntegrationService;
 import com.kairos.scheduler.service.scheduler_panel.SchedulerPanelService;
 import com.kairos.scheduler.utils.ResponseHandler;
@@ -135,6 +136,11 @@ public class SchedulerPanelController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.createSchedulerPanel(null, schedulerPanelDTOs));
     }
 
+    @DeleteMapping(API_UNIT_SCHEDULER_URL+"/entity/{entityId}/delete_job")
+    @ApiOperation("delete job by entity id and subType")
+    public ResponseEntity<Map<String, Object>> deleteSchedulerPanelByEntityIdAndJobSubType(@PathVariable Long unitId, @PathVariable BigInteger entityId, @RequestParam JobSubType jobSubType) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, schedulerPanelService.deleteJobBySubTypeAndEntityId(unitId, entityId, jobSubType));
+    }
 
     /**
      * this end point will be called from

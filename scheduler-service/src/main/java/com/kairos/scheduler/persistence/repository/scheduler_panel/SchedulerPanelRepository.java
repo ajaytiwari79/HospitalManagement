@@ -24,4 +24,6 @@ public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerP
 
     SchedulerPanel findByIdAndDeletedFalse(BigInteger schedulerPanelId);
 
+    void deleteAllJobByEntityIdAndJobSubtypeAndUnitId(Long unitId, BigInteger entityId, JobSubType jobSubType);
+
 }
