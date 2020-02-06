@@ -611,7 +611,7 @@ public class CounterDataService extends MongoBaseService {
         } else {
             getStaffKPiFilterAndApplicableKpi(filters, staffId, kpiIdAndApplicableKPIMap, kpis, staffKpiFilterCritera,startDate);
         }
-        List<Future<KPIResponseDTO>> kpiResults = getKPIResults(filters, organizationId, kpiIdAndApplicableKPIMap, kpiMap, filterBasedCriteria, staffKpiFilterCritera);
+        List<Future<KPIResponseDTO>> kpiResults = getKPIResults(filters, organizationId, kpiIdAndApplicableKPIMap, kpiMap, filterBasedCriteria, staffKpiFilterCritera,startDate);
         KPIResponseDTO kpiResponseDTO = new KPISetResponseDTO();
         for (Future<KPIResponseDTO> data : kpiResults) {
             try {
@@ -628,11 +628,13 @@ public class CounterDataService extends MongoBaseService {
         return kpiResponseDTO;
     }
 
-    private  List<Future<KPIResponseDTO>> getKPIResults(FilterCriteriaDTO filters, Long organizationId, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKPIMap, Map<BigInteger, KPI> kpiMap,  Map<FilterType, List> filterBasedCriteria, Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera) {
+    private  List<Future<KPIResponseDTO>> getKPIResults(FilterCriteriaDTO filters, Long organizationId, Map<BigInteger, ApplicableKPI> kpiIdAndApplicableKPIMap, Map<BigInteger, KPI> kpiMap,  Map<FilterType, List> filterBasedCriteria, Map<BigInteger, Map<FilterType, List>> staffKpiFilterCritera,LocalDate startDate) {
         List<Future<KPIResponseDTO>> kpiResults = new ArrayList<>();
         for (BigInteger kpiId : filters.getKpiIds()) {
             if(!counterRepository.getKPIByid(kpiId).isMultiDimensional() && isNotNull(kpiIdAndApplicableKPIMap.get(kpiId))) {
-                kpiIdAndApplicableKPIMap.get(kpiId).setKpiRepresentation(DurationType.HOURS.equals(filters.getFrequencyType())? KPIRepresentation.REPRESENT_PER_INTERVAL:KPIRepresentation.REPRESENT_PER_STAFF);
+                ApplicableKPI applicableKPI = kpiIdAndApplicableKPIMap.get(kpiId);
+                applicableKPI.setDateForKPISetCalculation(startDate);
+                applicableKPI.setKpiRepresentation(DurationType.HOURS.equals(filters.getFrequencyType())? KPIRepresentation.REPRESENT_PER_INTERVAL:KPIRepresentation.REPRESENT_PER_STAFF);
                 Callable<KPIResponseDTO> data = () -> counterServiceMapping.getService(kpiMap.get(kpiId).getType()).getCalculatedDataOfKPI(staffKpiFilterCritera.getOrDefault(kpiId, filterBasedCriteria), organizationId, kpiMap.get(kpiId), kpiIdAndApplicableKPIMap.get(kpiId));
                 Future<KPIResponseDTO> responseData = executorService.submit(data);
                 kpiResults.add(responseData);
