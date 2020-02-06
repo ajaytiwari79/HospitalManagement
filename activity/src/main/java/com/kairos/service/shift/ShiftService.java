@@ -10,6 +10,7 @@ import com.kairos.dto.activity.attendance.TimeAndAttendanceDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.open_shift.OpenShiftResponseDTO;
 import com.kairos.dto.activity.shift.*;
+import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_group.UserAccessRoleDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
@@ -316,26 +317,11 @@ public class ShiftService extends MongoBaseService {
     public void validateSicknessShift(ShiftWithActivityDTO shift, StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<Activity> activities) {
         List<String> errorMessages = new ArrayList<>();
         SicknessSetting sicknessSetting = activityWrapper.getActivity().getRulesActivityTab().getSicknessSetting();
-        if (!(sicknessSetting.isCanOnlyUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
-            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND));
-        }
-        if(isCollectionNotEmpty(activityWrapper.getActivity().getRulesActivityTab().getStaffTagIds())){
-            Set<BigInteger> tadIds=staffAdditionalInfoDTO.getTags().stream().map(tagDTO -> tagDTO.getId()).collect(Collectors.toSet());
-            if (!tadIds.contains(activityWrapper.getActivity().getRulesActivityTab().getStaffTagIds())){
-                errorMessages.add(exceptionService.convertMessage(STAFF_NOT_ALLOWED_ON_TAG));
-            }
-
-        }
-        if(sicknessSetting.isValidForChildCare() && isCollectionEmpty(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays())){
-            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_CARE_DAYS_NOT_FOUND));
-        }
-        if(sicknessSetting.isUsedOnFreeDays() && isCollectionNotEmpty(shifts)){
-            errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_FREEDAY));
-        }
+        validateSickSettings(staffAdditionalInfoDTO, activityWrapper, shifts, errorMessages, sicknessSetting);
         if(sicknessSetting.isUsedOnProtecedDaysOff()){
-            Set<BigInteger> activityIds=activities.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+            Set<BigInteger> activityIds=activities.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
             for (Shift oldShift : shifts) {
-                if(!activityIds.contains(oldShift.getActivities().stream().map(shiftActivity -> shiftActivity.getActivityId()))){
+                if(!activityIds.contains(oldShift.getActivities().stream().map(ShiftActivity::getActivityId))){
                     errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_PROTECTEDDAYSOFF));
                 }
             }
@@ -346,6 +332,25 @@ public class ShiftService extends MongoBaseService {
                     errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_APPROVEABSENCES));
                 }
             }
+        }
+    }
+
+    private void validateSickSettings(StaffAdditionalInfoDTO staffAdditionalInfoDTO, ActivityWrapper activityWrapper, List<Shift> shifts, List<String> errorMessages, SicknessSetting sicknessSetting) {
+        if (!(sicknessSetting.isCanOnlyUsedOnMainEmployment() && EmploymentSubType.MAIN.equals(staffAdditionalInfoDTO.getEmployment().getEmploymentSubType()))) {
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_MAIN_EMPLOYMENT_NOT_FOUND));
+        }
+        if(isCollectionNotEmpty(activityWrapper.getActivity().getRulesActivityTab().getStaffTagIds())){
+            Set<BigInteger> tadIds=staffAdditionalInfoDTO.getTags().stream().map(TagDTO::getId).collect(Collectors.toSet());
+            if (CollectionUtils.containsAny(tadIds,activityWrapper.getActivity().getRulesActivityTab().getStaffTagIds())){
+                errorMessages.add(exceptionService.convertMessage(STAFF_NOT_ALLOWED_ON_TAG));
+            }
+
+        }
+        if(sicknessSetting.isValidForChildCare() && isCollectionEmpty(staffAdditionalInfoDTO.getSeniorAndChildCareDays().getChildCareDays())){
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_STAFF_CARE_DAYS_NOT_FOUND));
+        }
+        if(sicknessSetting.isUsedOnFreeDays() && isCollectionNotEmpty(shifts)){
+            errorMessages.add(exceptionService.convertMessage(MESSAGE_ACTIVITY_USEDON_FREEDAY));
         }
     }
 
