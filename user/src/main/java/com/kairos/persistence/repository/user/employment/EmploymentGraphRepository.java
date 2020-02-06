@@ -220,8 +220,7 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "MATCH(employmentLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(pg:PayGrade)\n" +
             "MATCH(employment)-[:" + HAS_EXPERTISE_IN + "]->(expertise:Expertise{published:true})-[:" + HAS_EXPERTISE_LINES + "]-(exl:ExpertiseLine) \n" +
             "OPTIONAL MATCH(expertise)-[:" + IN_ORGANIZATION_LEVEL + "]-(level:Level)-[:" + IN_ORGANIZATION_LEVEL + "]-(pt:PayTable)-[:" + HAS_PAY_GRADE + "]-(payGrade:PayGrade) " +
-            "where ((employmentLine.endDate IS NULL OR Date(pt.startDateMillis) <= Date(employmentLine.endDate)) AND \n" +
-            "(pt.endDateMillis IS NULL OR Date(pt.endDateMillis) >= Date(employmentLine.startDate)))  AND payGrade.payGradeLevel=pg.payGradeLevel\n" +
+            "where Date(employmentLine.startDate) <= Date(pt.startDateMillis) AND (employmentLine.endDate IS NULL OR Date(employmentLine.endDate) >= Date(pt.startDateMillis))  AND payGrade.payGradeLevel=pg.payGradeLevel\n" +
             "OPTIONAL MATCH(employment)-[:" + IN_UNIT + "]-(org:Unit)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality)-[:" + HAS_MUNICIPALITY + "]-(pga:PayGroupArea)<-[pgaRel:" + HAS_PAY_GROUP_AREA + "]-(payGrade) \n" +
             "WITH  employment,employmentLine,payGrade,exl,seniorityLevel, CASE when pgaRel.payGroupAreaAmount IS NULL THEN toInteger('0') ELSE toInteger(pgaRel.payGroupAreaAmount) END as hourlyCost\n" +
             "OPTIONAL MATCH (employmentLine)-[:" + APPLICABLE_FUNCTION + "]-(function:Function) \n" +
