@@ -255,7 +255,6 @@ public class TodoService {
             for (ShiftActivity shiftActivity : shiftActivities) {
                 if (todo.getSubEntityId().equals(shiftActivity.getActivityId())) {
                     todo.setRemark(shiftActivity.getRemarks());
-
                 }
             }
         }
@@ -266,6 +265,8 @@ public class TodoService {
     public List<TodoDTO> getAllTodoByEntityIds( Date startDate, Date endDate){
         return todoRepository.findAllByEntityIdsAndTodoStatus(startDate,endDate,newArrayList(APPROVE,DISAPPROVE, REQUESTED,PENDING,VIEWED));
     }
+
+
 
 
 }

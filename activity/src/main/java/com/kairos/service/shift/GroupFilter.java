@@ -14,11 +14,11 @@ import static com.kairos.enums.FilterType.*;
 /**
  * Created By G.P.Ranjan on 10/12/19
  **/
-public class GroupFilter implements ShiftFilter {
-    private Map<FilterType, Set<String>> filterCriteriaMap;
+public class GroupFilter <G> implements ShiftFilter {
+    private Map<FilterType, Set<G>> filterCriteriaMap;
     private Set<Long> groupMembers;
 
-    public GroupFilter(Set<Long> groupMembers, Map<FilterType, Set<String>> filterCriteriaMap) {
+    public GroupFilter(Set<Long> groupMembers, Map<FilterType, Set<G>> filterCriteriaMap) {
         this.filterCriteriaMap = filterCriteriaMap;
         this.groupMembers = groupMembers;
     }

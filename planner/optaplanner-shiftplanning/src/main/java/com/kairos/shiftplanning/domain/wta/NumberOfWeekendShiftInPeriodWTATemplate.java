@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
@@ -16,7 +19,9 @@ import java.util.List;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE13
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NumberOfWeekendShiftInPeriodWTATemplate implements ConstraintHandler {
@@ -54,13 +59,4 @@ public class NumberOfWeekendShiftInPeriodWTATemplate implements ConstraintHandle
         return weekendShifts>numberShiftsPerPeriod?weekendShifts-numberShiftsPerPeriod:0;
     }
 
-    @Override
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    @Override
-    public int getWeight() {
-        return weight;
-    }
 }

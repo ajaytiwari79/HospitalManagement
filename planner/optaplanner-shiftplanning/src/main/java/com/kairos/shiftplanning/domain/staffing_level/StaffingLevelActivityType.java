@@ -1,9 +1,14 @@
 package com.kairos.shiftplanning.domain.staffing_level;
 
 import com.kairos.shiftplanning.domain.skill.Skill;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Set;
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class StaffingLevelActivityType {
     private String activityTypeId;
     private Set<Skill> skillSet;
@@ -14,36 +19,5 @@ public class StaffingLevelActivityType {
         this.skillSet = skillSet;
         this.maximumStaffRequired = maximumStaffRequired;
         this.activityTypeId=activityTypeId;
-    }
-    public StaffingLevelActivityType(){}
-    public Set<Skill> getSkillSet() {
-        return skillSet;
-    }
-    public void setSkillSet(Set<Skill> skillSet) {
-        this.skillSet = skillSet;
-    }
-
-    public int getMinimumStaffRequired() {
-        return minimumStaffRequired;
-    }
-
-    public void setMinimumStaffRequired(int minimumStaffRequired) {
-        this.minimumStaffRequired = minimumStaffRequired;
-    }
-
-    public int getMaximumStaffRequired() {
-        return maximumStaffRequired;
-    }
-
-    public void setMaximumStaffRequired(int maximumStaffRequired) {
-        this.maximumStaffRequired = maximumStaffRequired;
-    }
-
-    public String getActivityTypeId() {
-        return activityTypeId;
-    }
-
-    public void setActivityTypeId(String activityTypeId) {
-        this.activityTypeId = activityTypeId;
     }
 }

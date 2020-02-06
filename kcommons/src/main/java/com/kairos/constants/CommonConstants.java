@@ -20,7 +20,7 @@ public class CommonConstants {
     public static final String KAIROS_LOGO = "Kairoslogo.png";
     public static final String RESET_PASSCODE = "Reset password";
 
-    public static final String[] KAIROS_BACKEND_MAIL_IDS = new String[]{"pradeep.singh@oodlestechnologies.com","pavan.kumar@oodlestechnologies.com"};
+    public static final String[] KAIROS_BACKEND_MAIL_IDS = new String[]{"kairos-backend@oodlestechnologies.com"};
     public static final String PRODUCTION_PROFILE = "production";
     public static final String QA_PROFILE = "qa";
     public static final String LOCAL_PROFILE = "local";
@@ -37,4 +37,12 @@ public class CommonConstants {
     public static final String DISABLED = "disabled";
     public static final String UNIT_ID = "unitId";
     public static final long DEFAULT_ID = -1l;
+
+    public static final String GREEN_COLOR_CODE = "#4caf502e";
+    public static final String COLOR_NAME = "Green";
+    public static final String YELLOW_COLOR_CODE = "#ffeb3b33";
+    public static final String COLOR_NAME1 = "Yellow";
+    public static final String RED_COLOR_CODE = "#ff3b3b33";
+    public static final String RED = "Red";
+
 }

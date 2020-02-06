@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.kie.api.runtime.rule.RuleContext;
@@ -16,7 +19,9 @@ import java.util.List;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE18
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShortestAndAverageDailyRestWTATemplate implements ConstraintHandler {
@@ -37,112 +42,10 @@ public class ShortestAndAverageDailyRestWTATemplate implements ConstraintHandler
     private Interval interval;
 
 
-    public Interval getInterval() {
-        return interval;
-    }
-
-    public void setInterval(Interval interval) {
-        this.interval = interval;
-    }
-
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
-
-    public long getIntervalLength() {
-        return intervalLength;
-    }
-
-    public void setIntervalLength(long intervalLength) {
-        this.intervalLength = intervalLength;
-    }
-
-    public String getIntervalUnit() {
-        return intervalUnit;
-    }
-
-    public void setIntervalUnit(String intervalUnit) {
-        this.intervalUnit = intervalUnit;
-    }
-
-    public long getValidationStartDateMillis() {
-        return validationStartDateMillis;
-    }
-
-    public void setValidationStartDateMillis(long validationStartDateMillis) {
-        this.validationStartDateMillis = validationStartDateMillis;
-    }
-
-    public long getContinuousDayRestingTime() {
-        return continuousDayRestingTime;
-    }
-
-    public void setContinuousDayRestingTime(long continuousDayRestingTime) {
-        this.continuousDayRestingTime = continuousDayRestingTime;
-    }
-
-    public long getAverageRest() {
-        return averageRest;
-    }
-
-    public void setAverageRest(long averageRest) {
-        this.averageRest = averageRest;
-    }
-
-    public String getShiftAffiliation() {
-        return shiftAffiliation;
-    }
-
-    public void setShiftAffiliation(String shiftAffiliation) {
-        this.shiftAffiliation = shiftAffiliation;
-    }
-
-
     public ShortestAndAverageDailyRestWTATemplate(long averageRest, int weight, ScoreLevel level) {
         this.averageRest = averageRest;
         this.weight = weight;
         this.level = level;
-    }
-
-    public ShortestAndAverageDailyRestWTATemplate(List<String> balanceType, long intervalLength, String intervalUnit, long validationStartDateMillis, long continuousDayRestingTime, long averageRest, String shiftAffiliation) {
-        this.balanceType = balanceType;
-        this.intervalLength = intervalLength;
-        this.intervalUnit = intervalUnit;
-        this.validationStartDateMillis = validationStartDateMillis;
-        this.continuousDayRestingTime = continuousDayRestingTime;
-        this.averageRest = averageRest;
-        this.shiftAffiliation = shiftAffiliation;
-    }
-
-    public ShortestAndAverageDailyRestWTATemplate() {
     }
 
     public int checkConstraints(List<Shift> shifts){

@@ -1,6 +1,7 @@
 package com.kairos.controller.organization;
 
 import com.kairos.dto.activity.activity.ActivityDTO;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.activity.activity_tabs.*;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.CommunicationActivityDTO;
 import com.kairos.dto.user.organization.OrgTypeAndSubTypeDTO;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Map;
@@ -80,6 +83,12 @@ public class OrganizationActivityController {
         //  @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
     ResponseEntity<Map<String, Object>> getGeneralTab(@PathVariable Long unitId, @PathVariable BigInteger activityId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.getGeneralTabOfActivity(activityId, unitId));
+    }
+
+    @ApiOperation("Update Translations of Activity in a unit ")
+    @PutMapping(value = "/activity/{activityId}/unit_language_settings")
+    ResponseEntity<Map<String, Object>> updateLanguageSettings(@NotEmpty  @PathVariable Long unitId, @NotEmpty @PathVariable BigInteger activityId, @NotNull @RequestBody Map<String, TranslationInfo> translationMap) {
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, organizationActivityService.updateUnitActivityTranslationDetails(activityId,unitId,translationMap));
     }
 
 

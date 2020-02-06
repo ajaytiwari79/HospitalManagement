@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
@@ -33,6 +34,7 @@ public class ApplicableKPI extends MongoBaseEntity {
     private XAxisConfig xAxisConfig;
     private YAxisConfig yAxisConfig;
     private KPIRepresentation kpiRepresentation;
+    private transient LocalDate dateForKPISetCalculation;
 
     private DurationType frequencyType;
     // frequency value

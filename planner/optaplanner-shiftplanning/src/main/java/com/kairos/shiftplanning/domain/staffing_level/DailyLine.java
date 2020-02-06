@@ -1,16 +1,12 @@
 package com.kairos.shiftplanning.domain.staffing_level;
 
 
+import lombok.Getter;
+import lombok.Setter;
 import org.joda.time.LocalDate;
 
+@Getter
+@Setter
 public abstract class DailyLine {
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
     protected LocalDate date;
 }

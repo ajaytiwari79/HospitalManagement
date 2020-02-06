@@ -202,6 +202,8 @@ public class StaffRetrievalService {
         staffPersonalDetail.setLanguageId(staffGraphRepository.getLanguageId(staff.getId()));
         staffPersonalDetail.setUserName(staff.getUser().getUserName());
         staffPersonalDetail.setExpertiseIds(getExpertiseIds(staffExpertiseQueryResults));
+        staffPersonalDetail.setCprNumber(staff.getUser().getCprNumber());
+        staffPersonalDetail.setDateOfBirth(CPRUtil.getDateOfBirthFromCPR(staff.getUser().getCprNumber()));
         return staffPersonalDetail;
     }
 

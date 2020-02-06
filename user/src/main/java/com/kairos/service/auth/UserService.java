@@ -1,6 +1,7 @@
 package com.kairos.service.auth;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.KMailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
@@ -67,8 +68,7 @@ import java.nio.CharBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.AppConstants.OTP_MESSAGE;
 import static com.kairos.constants.CommonConstants.*;
 import static com.kairos.constants.UserMessagesConstants.*;
@@ -103,7 +103,7 @@ public class UserService {
     @Inject
     private DayTypeService dayTypeService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private TokenService tokenService;
     @Inject
@@ -124,6 +124,9 @@ public class UserService {
     private static UserGraphRepository userRepository;
 
     private static AccessPageService accessPageService;
+
+    @Inject
+    private KMailService kMailService;
 
     @Inject
     public void setUserRepository(UserGraphRepository userRepository) {
@@ -593,7 +596,8 @@ public class UserService {
             templateParam.put("description", AppConstants.MAIL_BODY.replace("{0}", StringUtils.capitalize(currentUser.getFirstName()))+config.getForgotPasswordApiLink()+token);
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
             templateParam.put("hyperLinkName", RESET_PASSCODE);
-            mailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+//            sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
+            kMailService.sendMail(null,currentUser.getEmail(),AppConstants.MAIL_SUBJECT,templateParam.get("description").toString(),templateParam.get("description").toString(),templateParam,DEFAULT_EMAIL_TEMPLATE);
             return true;
         }
 
@@ -660,7 +664,10 @@ public class UserService {
     }
 
     public Map<String,String> getUnitWiseLastSelectedAccessRole(){
-        return userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+        Map<String,String> unitWiseAccessRole= userGraphRepository.findOne(UserContext.getUserDetails().getId()).getUnitWiseAccessRole();
+        Map<String,String> unitWiseAccessRoleMap=new HashMap<>(unitWiseAccessRole.size());
+        unitWiseAccessRole.forEach((k,v)-> unitWiseAccessRoleMap.put(k,v.toUpperCase()));
+        return unitWiseAccessRoleMap;
     }
 
     public boolean updateChatStatus(ChatStatus chatStatus){
@@ -671,8 +678,11 @@ public class UserService {
     }
 
     public static User getCurrentUser(){
-        User user = userRepository.findOne(UserContext.getUserDetails().getId());
-        user.setHubMember(accessPageService.isHubMember(user.getId()));
+        User user = null;
+        if(isNotNull(UserContext.getUserDetails())) {
+            user = userRepository.findOne(UserContext.getUserDetails().getId());
+            user.setHubMember(accessPageService.isHubMember(user.getId()));
+        }
         return user;
     }
 }

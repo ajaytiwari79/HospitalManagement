@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
@@ -15,7 +18,9 @@ import java.util.stream.Collectors;
  * Created by Pradeep singh on 5/8/17.
  * TEMPLATE16
  */
-
+@Getter
+@Setter
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MinimumDurationBetweenShiftWTATemplate implements ConstraintHandler {
@@ -31,54 +36,6 @@ public class MinimumDurationBetweenShiftWTATemplate implements ConstraintHandler
         this.minimumDurationBetweenShifts = minimumDurationBetweenShifts;
         this.weight = weight;
         this.level = level;
-    }
-
-    public String getTemplateType() {
-        return templateType;
-    }
-
-    public void setTemplateType(String templateType) {
-        this.templateType = templateType;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-    public ScoreLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(ScoreLevel level) {
-        this.level = level;
-    }
-
-    public List<String> getBalanceType() {
-        return balanceType;
-    }
-
-    public void setBalanceType(List<String> balanceType) {
-        this.balanceType = balanceType;
-    }
-
-    public long getMinimumDurationBetweenShifts() {
-        return minimumDurationBetweenShifts;
-    }
-
-    public void setMinimumDurationBetweenShifts(long minimumDurationBetweenShifts) {
-        this.minimumDurationBetweenShifts = minimumDurationBetweenShifts;
-    }
-
-    public MinimumDurationBetweenShiftWTATemplate(List<String> balanceType, long minimumDurationBetweenShifts) {
-        this.balanceType = balanceType;
-        this.minimumDurationBetweenShifts = minimumDurationBetweenShifts;
-    }
-
-    public MinimumDurationBetweenShiftWTATemplate() {
     }
 
     public boolean checkConsTraints(List<Shift> shifts, Shift shift) {

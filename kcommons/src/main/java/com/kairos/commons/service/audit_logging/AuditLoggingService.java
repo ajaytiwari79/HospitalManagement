@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
+
 /**
  * Created by pradeep
  * Created at 4/6/19
@@ -20,9 +22,9 @@ public class AuditLoggingService {
     public List<Map> getAuditLoggingByType(String auditLogType){
         return auditLoggingRepository.getAuditLoggingByType(auditLogType);
     }
-    public List<Map>getAuditLogOfStaff(Long staffId ,LocalDate startDate,LocalDate endDate)
-    {
-        return auditLoggingRepository.getAuditLogOfStaff(staffId,startDate,endDate);
+
+    public List<Map> getAuditLogOfStaff(List<Long> staffIds ,LocalDate startDate,LocalDate endDate){
+        return auditLoggingRepository.getAuditLogOfStaff(staffIds,startDate,endDate);
     }
 
 
