@@ -22,10 +22,12 @@ import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
 import com.kairos.enums.Day;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.reason_code.ReasonCodeType;
+import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.access_permission.*;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupDayTypesQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
 import com.kairos.persistence.model.access_permission.query_result.DayTypeCountryHolidayCalenderQueryResult;
+import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.CountryAccessGroupRelationship;
 import com.kairos.persistence.model.country.default_data.DayType;
@@ -43,6 +45,7 @@ import com.kairos.persistence.repository.organization.UnitGraphRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessGroupRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPageRepository;
 import com.kairos.persistence.repository.user.access_permission.AccessPermissionGraphRepository;
+import com.kairos.persistence.repository.user.auth.UserGraphRepository;
 import com.kairos.persistence.repository.user.country.CountryAccessGroupRelationshipRepository;
 import com.kairos.persistence.repository.user.country.CountryGraphRepository;
 import com.kairos.persistence.repository.user.country.DayTypeGraphRepository;
@@ -112,6 +115,7 @@ public class AccessGroupService {
     private StaffRetrievalService staffRetrievalService;
     @Inject
     private ReasonCodeGraphRepository reasonCodeGraphRepository;
+    @Inject private UserGraphRepository userGraphRepository;
 
 
     public AccessGroupDTO createAccessGroup(long organizationId, AccessGroupDTO accessGroupDTO) {
@@ -790,29 +794,34 @@ public class AccessGroupService {
 
     public UserAccessRoleDTO findUserAccessRole(Long unitId) {
         Long userId = UserContext.getUserDetails().getId();
-        Organization parent = organizationService.fetchParentOrganization(unitId);
-        Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), userId);
+        Optional<User> userOptional = userGraphRepository.findById(userId);
         UserAccessRoleDTO userAccessRoleDTO = null;
-        if (staffAtHub != null) {
-            userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staffAtHub.getId(),false, true);
-        } else {
-            Long hubIdByOrganizationId = unitGraphRepository.getHubIdByOrganizationId(parent.getId());
-            staffAtHub = staffGraphRepository.getStaffOfHubByHubIdAndUserId(parent.isKairosHub() ? parent.getId() : hubIdByOrganizationId, userId);
+        if(userOptional.isPresent() && UserType.SYSTEM_ACCOUNT.equals(userOptional.get().getUserType())){
+            userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, true, true,newHashSet());
+        }else {
+            Organization parent = organizationService.fetchParentOrganization(unitId);
+            Staff staffAtHub = staffGraphRepository.getStaffByOrganizationHub(parent.getId(), userId);
             if (staffAtHub != null) {
-                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId,staffAtHub.getId(), false, true);
-            } else if (isNull(userAccessRoleDTO)) {
-                AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
-                if (isNull(accessGroupQueryResult)) {
-                    exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
-                }
-                accessGroupQueryResult=ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult,AccessGroupStaffQueryResult.class);
-                String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
-                boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
-                boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
-                Set<Long> accessGroupIds = accessGroupQueryResult.getDayTypesByAccessGroup().stream().map(dayTypesByAccessGroup -> dayTypesByAccessGroup.getAccessGroup().getId()).collect(Collectors.toSet());
-                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management, accessGroupIds);
-                userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
+                userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staffAtHub.getId(), false, true);
+            } else {
+                Long hubIdByOrganizationId = unitGraphRepository.getHubIdByOrganizationId(parent.getId());
+                staffAtHub = staffGraphRepository.getStaffOfHubByHubIdAndUserId(parent.isKairosHub() ? parent.getId() : hubIdByOrganizationId, userId);
+                if (staffAtHub != null) {
+                    userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staffAtHub.getId(), false, true);
+                } else if (isNull(userAccessRoleDTO)) {
+                    AccessGroupStaffQueryResult accessGroupQueryResult = accessGroupRepository.getAccessGroupDayTypesAndUserId(unitId, userId);
+                    if (isNull(accessGroupQueryResult)) {
+                        exceptionService.actionNotPermittedException(MESSAGE_STAFF_INVALID_UNIT);
+                    }
+                    accessGroupQueryResult = ObjectMapperUtils.copyPropertiesByMapper(accessGroupQueryResult, AccessGroupStaffQueryResult.class);
+                    String staffRole = staffRetrievalService.getStaffAccessRole(accessGroupQueryResult);
+                    boolean staff = AccessGroupRole.STAFF.name().equals(staffRole);
+                    boolean management = AccessGroupRole.MANAGEMENT.name().equals(staffRole);
+                    Set<Long> accessGroupIds = accessGroupQueryResult.getDayTypesByAccessGroup().stream().map(dayTypesByAccessGroup -> dayTypesByAccessGroup.getAccessGroup().getId()).collect(Collectors.toSet());
+                    userAccessRoleDTO = new UserAccessRoleDTO(userId, unitId, staff, management, accessGroupIds);
+                    userAccessRoleDTO.setStaffId(accessGroupQueryResult.getStaffId());
 
+                }
             }
         }
         return userAccessRoleDTO;
