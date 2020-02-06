@@ -3,6 +3,7 @@ package com.kairos.dto.user.employment;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
+import com.kairos.dto.user.country.experties.SeniorityLevelDTO;
 import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,6 +35,7 @@ public class EmploymentLinesDTO implements Comparable<EmploymentLinesDTO> {
     private BigDecimal hourlyCost;
     private Long employmentTypeId;
     private EmploymentSubType employmentSubType;
+    private SeniorityLevelDTO seniorityLevel;
 
 
     //This getter is used for Accumulated Timebank calculation
