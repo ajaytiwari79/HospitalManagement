@@ -22,6 +22,7 @@ import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
 import com.kairos.service.shift.ShiftReminderService;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -128,6 +129,8 @@ public class ActivitySchedulerJobService extends MongoBaseService {
     }
 
     public void registerJobForActivityCutoff(Activity activity) {
+        BasicNameValuePair jobSubType = new BasicNameValuePair("jobSubType", JobSubType.ACTIVITY_CUTOFF.toString());
+        schedulerRestClient.publishRequest(null, activity.getUnitId(), true, IntegrationOperation.DELETE, "/scheduler_panel/entity/{entityId}/delete_job", newArrayList(jobSubType), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {}, activity.getId());
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
         calculateTriggerDateTimeList(activity).forEach(reminderDateTime ->
             schedulerPanelDTOS.add(new SchedulerPanelDTO(activity.getUnitId(), JobType.FUNCTIONAL, JobSubType.ACTIVITY_CUTOFF, activity.getId(), reminderDateTime, true, null))
