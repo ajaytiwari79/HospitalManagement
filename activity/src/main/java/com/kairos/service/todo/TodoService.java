@@ -12,6 +12,7 @@ import com.kairos.enums.shift.TodoStatus;
 import com.kairos.enums.todo.TodoSubtype;
 import com.kairos.enums.todo.TodoType;
 import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
@@ -71,22 +72,8 @@ public class TodoService {
         List<Todo> todos = new ArrayList<>();
         if (todoType.equals(TodoType.APPROVAL_REQUIRED)) {
             Set<BigInteger> activityIds = shift.getActivities().stream().filter(shiftActivity -> !containsAny(newHashSet(ShiftStatus.APPROVE,ShiftStatus.PUBLISH),shiftActivity.getStatus())).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet());
-            activityIds.addAll(shift.getActivities().stream().flatMap(shiftActivity -> shiftActivity.getChildActivities().stream()).map(shiftActivity -> shiftActivity.getActivityId()).collect(Collectors.toSet()));
-            List<Activity> activities = activityMongoRepository.findAllActivitiesByIds(activityIds);
-            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
-            Map<BigInteger,Activity> activityMap = activities.stream().filter(activity -> activity.getRulesActivityTab().getApprovalAllowedPhaseIds().contains(phase.getId())).collect(Collectors.toMap(activity->activity.getId(), v->v));
-            if (!shiftUpdate && UserContext.getUserDetails().isManagement()) {
-                shift.getActivities().forEach(shiftActivity -> {
-                    updateStatusIfApprovalRequired(activityMap, shiftActivity,shift,staffAdditionalInfoDTO);
-                    shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(activityMap, childActivity,shift,staffAdditionalInfoDTO));
-                });
-                Activity activity = activityMongoRepository.findOne(shift.getActivities().get(0).getActivityId());
-                TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
-                String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), MMM_DD_YYYY) + "</span>";
-                Todo todo = new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(), activity.getName(), APPROVE, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId(),shift.getActivities().get(0).getRemarks());
-                todo.setApprovedOn(getDate());
-                todoRepository.save(todo);
-                shiftMongoRepository.save(shift); } else {
+            List<Activity> activities;
+            if(!UserContext.getUserDetails().isManagement()) {
                 List<Todo> todoList = todoRepository.findAllByNotApprovedAndEntityId(shift.getId(), TodoType.APPROVAL_REQUIRED, newArrayList(PENDING, VIEWED, REQUESTED));
                 Set<BigInteger> subEntitiyIds = todoList.stream().map(todo -> todo.getSubEntityId()).collect(Collectors.toSet());
                 updateRemark(todoList, shift);
@@ -110,6 +97,23 @@ public class TodoService {
 
     }
 
+    public void updateStatusOfShiftActivityIfApprovalRequired(Map<BigInteger, ActivityWrapper> activityWrapperMap,Shift shift, boolean shiftUpdate, StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+        if (!shiftUpdate && UserContext.getUserDetails().isManagement()) {
+            Phase phase = phaseService.getCurrentPhaseByUnitIdAndDate(shift.getUnitId(), shift.getStartDate(), shift.getEndDate());
+            shift.getActivities().forEach(shiftActivity -> {
+                updateStatusIfApprovalRequired(activityWrapperMap, shiftActivity, shift, staffAdditionalInfoDTO);
+                shiftActivity.getChildActivities().forEach(childActivity -> updateStatusIfApprovalRequired(activityWrapperMap, childActivity, shift, staffAdditionalInfoDTO));
+            });
+            Activity activity = activityMongoRepository.findOne(shift.getActivities().get(0).getActivityId());
+            TodoSubtype todoSubtype = FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_DAY : FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? TodoSubtype.FULL_WEEK : TodoSubtype.ABSENCE_WITH_TIME;
+            String description = "An activity <span class='activity-details'>" + activity.getName() + "</span> has been requested for <span class='activity-details'>" + asLocalDateString(shift.getStartDate(), MMM_DD_YYYY) + "</span>";
+            Todo todo = new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(), activity.getName(), APPROVE, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId(), shift.getActivities().get(0).getRemarks());
+            todo.setApprovedOn(getDate());
+            todoRepository.save(todo);
+            shiftMongoRepository.save(shift);
+        }
+    }
+
     private void createOrUpdateTodoForRequestApproval(Shift shift, List<Todo> todos) {
         if (shift.isDeleted()) {
             todoRepository.deleteByEntityId(shift.getId());
@@ -121,7 +125,7 @@ public class TodoService {
         }
     }
 
-    private void updateStatusIfApprovalRequired(Map<BigInteger,Activity> activityMap, ShiftActivity shiftActivity,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
+    private void updateStatusIfApprovalRequired(Map<BigInteger,ActivityWrapper> activityMap, ShiftActivity shiftActivity,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         if (activityMap.containsKey(shiftActivity.getActivityId())) {
             shiftActivity.getStatus().add(ShiftStatus.APPROVE);
             timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityMap,staffAdditionalInfoDTO);
