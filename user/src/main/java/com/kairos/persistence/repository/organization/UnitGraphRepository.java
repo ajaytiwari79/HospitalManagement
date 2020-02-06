@@ -592,10 +592,6 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY sub.name")
     List<OrganizationBasicResponse> getAllOrganizationOfOrganization(Long orgId);
 
-    @Query("MATCH (unit:Unit) WHERE id(unit)={0} " +
-            "OPTIONAL MATCH (unit)-[rel:" + HAS_GROUPS + "]->(group:Group{deleted:false})" +
-            "OPTIONAL MATCH (group)-[relFilter:HAS_FILTERS]->(filter:FilterSelection)" +
-            "RETURN unit,COLLECT(rel),COLLECT(group),collect(relFilter),collect(filter)")
-    Unit getUnitWithGroupsByUnitId(Long unitId);
+
 }
 
