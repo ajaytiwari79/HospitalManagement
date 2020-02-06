@@ -436,7 +436,8 @@ public class EmploymentService {
         if (EmploymentSubType.MAIN.equals(employmentDTO.getEmploymentSubType()) && positionService.eligibleForMainEmployment(employmentDTO, employmentId)) {
             oldEmployment.setEmploymentSubType(EmploymentSubType.MAIN);
         }
-        if(EmploymentSubType.SECONDARY.equals(employmentDTO.getEmploymentSubType())&& isNull(oldEmployment.getEmploymentSubType())){
+
+        if(EmploymentSubType.SECONDARY.equals(employmentDTO.getEmploymentSubType())&&isNull(oldEmployment.getEmploymentSubType())){
             oldEmployment.setEmploymentSubType(EmploymentSubType.SECONDARY);
         }
 
