@@ -2,6 +2,7 @@ package com.kairos.persistence.repository.custom_repository;
 
 import com.kairos.commons.audit_logging.AuditLogging;
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.MongoBaseEntity;
@@ -165,7 +166,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	private <S> S createEntity(S entity){
 		S oldEntity = null;
 		try {
-			oldEntity = (S)entity.getClass().newInstance();
+			oldEntity = (S) ObjectMapperUtils.copyPropertiesByMapper(entity.getClass().newInstance(),entity.getClass());
 		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}

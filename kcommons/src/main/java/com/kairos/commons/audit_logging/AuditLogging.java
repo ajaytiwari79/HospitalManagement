@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Async;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -41,11 +42,11 @@ public class AuditLogging {
     }
 
     @Async
-    public static void doAudit(Object oldEntity, Object newEntity){
+    public static <S> void doAudit(S oldEntity, S newEntity){
         checkDifferences(oldEntity,newEntity);
     }
 
-    public static Map<String, Object> checkDifferences(Object oldEntity, Object newEntity) {
+    public static <S> Map<String, Object> checkDifferences(S oldEntity, S newEntity) {
         Map<String, Object> result = null;
         try {
             ObjectDifferBuilder builder = ObjectDifferBuilder.startBuilding();
@@ -64,8 +65,11 @@ public class AuditLogging {
             });
             if(newEntity.getClass().getSimpleName().equals("Shift")){
                 diffResult.put("staffId", newEntity.getClass().getMethod("getStaffId").invoke(newEntity));
+                if((boolean)newEntity.getClass().getMethod("isDraft").invoke(newEntity)){
+                    return null;
+                }
             }
-            diffResult.put("loggingType", getLoggingType(ObjectMapperUtils.copyPropertiesByMapper(oldEntity, HashMap.class), ObjectMapperUtils.copyPropertiesByMapper(newEntity, HashMap.class)));
+            diffResult.put("loggingType", getLoggingType(oldEntity, newEntity));
             result = diffResult;
             mongoTemplate.save(result, newEntity.getClass().getSimpleName());
             LOGGER.info("test {}", oldEntity);
@@ -129,13 +133,20 @@ public class AuditLogging {
         return isNotNull(arg0.getParentNode()) && arg0.getParentNode().getValueType().getPackage().getName().contains(PACKAGE_NAME);
     }
 
-    private static LoggingType getLoggingType(Map<String, Object> oldEntity, Map<String, Object> newEntity) {
-        if(!oldEntity.containsKey("id")) {
-            return LoggingType.CREATED;
-        } else if(newEntity.containsKey("deleted") && (Boolean) newEntity.get("deleted")) {
-            return LoggingType.DELETED;
-        } else {
-            return LoggingType.UPDATED;
+    private static <S,T> LoggingType getLoggingType(S oldEntity, S newEntity) {
+        T id = null;
+        boolean deleted = false;
+        try {
+            id = (T)oldEntity.getClass().getMethod("getId").invoke(oldEntity);
+            deleted = (boolean)newEntity.getClass().getMethod("isDeleted").invoke(newEntity);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
         }
+        if(isNull(id)) {
+            return LoggingType.CREATED;
+        } else if(deleted) {
+            return LoggingType.DELETED;
+        }
+        return LoggingType.UPDATED;
     }
 }

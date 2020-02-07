@@ -110,7 +110,6 @@ public class TodoService {
             Todo todo = new Todo(TodoType.APPROVAL_REQUIRED, todoSubtype, shift.getId(), activity.getId(), activity.getName(), APPROVE, asLocalDate(shift.getStartDate()), description, shift.getStaffId(), shift.getEmploymentId(), shift.getUnitId(), shift.getActivities().get(0).getRemarks());
             todo.setApprovedOn(getDate());
             todoRepository.save(todo);
-            shiftMongoRepository.save(shift);
         }
     }
 
