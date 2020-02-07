@@ -103,7 +103,9 @@ import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_INVALIDRE
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.*;
 import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.*;
+import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
 import static com.kairos.enums.kpi.KPIRepresentation.REPRESENT_PER_STAFF;
+import static com.kairos.enums.shift.ShiftType.PRESENCE;
 import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.utils.Fibonacci.FibonacciCalculationUtil.getFibonacciCalculation;
@@ -164,6 +166,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private ActivityService activityService;
     @Inject
     private PayLevelKPIService payLevelKPIService;
+    @Inject
+    private WeeklyEmploymentHoursKPIService weeklyEmploymentHoursKPIService;
 
 
 
@@ -343,25 +347,43 @@ public class KPIBuilderCalculationService implements CounterService {
             case ABSENCE_OVER_STAFFING:
             case ABSENCE_UNDER_STAFFING:
                 return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
-            case ABSENCE_REQUEST:
+            case TOTAL_WEEKLY_HOURS:
+                return getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
             case STAFF_SKILLS_COUNT:
                 return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId,asLocalDate(kpiCalculationRelatedInfo.getStartDate()),asLocalDate(kpiCalculationRelatedInfo.getEndDate()),kpiCalculationRelatedInfo);
             case TOTAL_SUM_OF_PAY_LEVEL:
-                return payLevelKPIService.getTotalSumOfPayLevelOfAllEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+                if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
+                    LocalDate startDate =kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+                    return payLevelKPIService.getTotalSumOfPayLevelOfAllEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,startDate);
+                }else {
+                    return payLevelKPIService.getTotalSumOfPayLevelOfAllEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+                }
+            case ABSENCE_REQUEST:
             default:
                 break;
         }
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
     }
 
+    private double getWeeklyHoursOfEmployment(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
+            LocalDate startDate =kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            LocalDate endDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId,kpiCalculationRelatedInfo,startDate,endDate);
+        }else {
+            return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()));
+        }
+    }
+
     private long getWorkedOnPublicHolidayCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        int WorkedOnPublicHolidayCount = 0;
+        int workedOnPublicHolidayCount = 0;
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval, false);
+        shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shift -> PRESENCE.equals(shift.getShiftType())).collect(Collectors.toList());
         if(isCollectionNotEmpty(kpiCalculationRelatedInfo.getHolidayCalenders()) && isCollectionNotEmpty(shiftWithActivityDTOS)) {
             List<ShiftWithActivityDTO> shiftsInHoliday = shiftWithActivityDTOS.stream().filter(shift -> shiftInHoliday(shift, kpiCalculationRelatedInfo.getHolidayCalenders())).collect(Collectors.toList());
-            WorkedOnPublicHolidayCount = shiftsInHoliday.size();
+            workedOnPublicHolidayCount = shiftsInHoliday.size();
         }
-        return WorkedOnPublicHolidayCount;
+        return workedOnPublicHolidayCount;
     }
 
     private boolean shiftInHoliday(ShiftWithActivityDTO shift, List<CountryHolidayCalenderDTO> holidayCalenders) {
@@ -378,7 +400,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     private long getChildrenCount(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
-        return isCollectionNotEmpty(staff.getStaffChildDetails()) ? staff.getStaffChildDetails().size() : 0;
+        return isNotNull(staff) && isCollectionNotEmpty(staff.getStaffChildDetails()) ? staff.getStaffChildDetails().size() : 0;
     }
 
     private long getStaffAgeData(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -496,7 +518,7 @@ public class KPIBuilderCalculationService implements CounterService {
     private List<CommonKpiDataUnit> getKpiDataUnits(double multiplicationFactor, Map<Object, Double> staffTotalHours, ApplicableKPI applicableKPI, List<StaffKpiFilterDTO> staffKpiFilterDTOS) {
         List<CommonKpiDataUnit> kpiDataUnits = new ArrayList<>();
         for (Map.Entry<Object, Double> entry : staffTotalHours.entrySet()) {
-            if (applicableKPI.getKpiRepresentation().equals(REPRESENT_PER_STAFF)) {
+            if (REPRESENT_PER_STAFF.equals(applicableKPI.getKpiRepresentation()) || INDIVIDUAL_STAFF.equals(applicableKPI.getKpiRepresentation())) {
                 Map<Long, String> staffIdAndNameMap = staffKpiFilterDTOS.stream().collect(Collectors.toMap(StaffKpiFilterDTO::getId, StaffKpiFilterDTO::getFullName));
                 kpiDataUnits.add(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), Arrays.asList(new ClusteredBarChartKpiDataUnit(staffIdAndNameMap.get(entry.getKey()), entry.getValue() * multiplicationFactor))));
             } else {
@@ -557,6 +579,7 @@ public class KPIBuilderCalculationService implements CounterService {
         Map<T, E> staffTotalHours;
         switch (kpiCalculationRelatedInfo.getApplicableKPI().getKpiRepresentation()) {
             case REPRESENT_PER_STAFF:
+            case INDIVIDUAL_STAFF:
                 staffTotalHours = getStaffTotalByRepresentPerStaff(kpiCalculationRelatedInfo);
                 break;
             case REPRESENT_TOTAL_DATA:
