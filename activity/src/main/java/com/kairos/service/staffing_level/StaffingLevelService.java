@@ -936,15 +936,7 @@ public class StaffingLevelService  {
     }
 
     @Async
-    public void removedActivityFromStaffingLevel(BigInteger activityId, boolean isPresence){
-        List<StaffingLevel> staffingLevels = isPresence ? staffingLevelMongoRepository.findPresenceStaffingLevelsByActivityId(activityId) : staffingLevelMongoRepository.findAbsenceStaffingLevelsByActivityId(activityId);
-        for(StaffingLevel staffingLevel : staffingLevels){
-            for(StaffingLevelInterval staffingLevelInterval : isPresence ? staffingLevel.getPresenceStaffingLevelInterval() : staffingLevel.getAbsenceStaffingLevelInterval()){
-                removedActivityFromStaffingLevelInterval(staffingLevelInterval, activityId);
-            }
-        }
-        staffingLevelMongoRepository.saveAll(staffingLevels);
-    }
+    public void removedActivityFromStaffingLevel(BigInteger activityId, boolean isPresence)git
 
     private void removedActivityFromStaffingLevelInterval(StaffingLevelInterval staffingLevelInterval, BigInteger activityId) {
         Set<StaffingLevelActivity> staffingLevelActivities = new HashSet<>();
