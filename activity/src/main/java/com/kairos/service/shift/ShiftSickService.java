@@ -154,8 +154,8 @@ public class ShiftSickService extends MongoBaseService {
             shiftActivityDTOS.addAll(updateShiftOnTheBasisOfLayerSetting(nonWorkingSicknessActivityWrapper,activityWrapperMap, shift,shiftDTO,dateTimeInterval));
             shiftActivityDTOS.addAll(getShiftActivityDTOByIntervals(dateTimeInterval,nonWorkingSicknessActivityWrapper,shift.getInterval()));
         }
+        shiftDTO.setActivities(shiftActivityDTOS);
         shiftDTO.mergeShiftActivity();
-        //shiftDTO.setActivities(shiftActivityDTOS);
         shiftDTO.setStartDate(dateTimeInterval.getStartDate());
         shiftDTO.setEndDate(dateTimeInterval.getEndDate());
         return shiftDTO;
