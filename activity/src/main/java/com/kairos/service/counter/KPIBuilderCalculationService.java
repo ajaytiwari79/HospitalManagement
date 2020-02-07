@@ -162,6 +162,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private SkillKPIService skillKPIService;
     @Inject
     private ActivityService activityService;
+    @Inject
+    private WeeklyEmploymentHoursKPIService weeklyEmploymentHoursKPIService;
 
 
 
@@ -341,6 +343,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case ABSENCE_OVER_STAFFING:
             case ABSENCE_UNDER_STAFFING:
                 return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
+            case TOTAL_WEEKLY_HOURS:
+                return getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
             case STAFF_SKILLS_COUNT:
                 return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId,asLocalDate(kpiCalculationRelatedInfo.getStartDate()),asLocalDate(kpiCalculationRelatedInfo.getEndDate()),kpiCalculationRelatedInfo);
@@ -348,6 +352,16 @@ public class KPIBuilderCalculationService implements CounterService {
                 break;
         }
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
+    }
+
+    private double getWeeklyHoursOfEmployment(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
+            LocalDate startDate =kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            LocalDate endDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId,kpiCalculationRelatedInfo,startDate,endDate);
+        }else {
+            return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()));
+        }
     }
 
     private long getWorkedOnPublicHolidayCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
