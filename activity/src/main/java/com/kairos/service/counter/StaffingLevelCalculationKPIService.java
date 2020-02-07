@@ -78,7 +78,7 @@ public class StaffingLevelCalculationKPIService {
         if (isPresenceStaffingLevelData) {
             staffingLevelData = getStaffingLevelCalculationData(staffingLevel.getPresenceStaffingLevelInterval(), PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), activityIds, staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes());
         }else{
-            staffingLevelData = getStaffingLevelCalculationData(staffingLevel.getAbsenceStaffingLevelInterval(), ABSENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), null, 1);
+            staffingLevelData = getStaffingLevelCalculationData(staffingLevel.getAbsenceStaffingLevelInterval(), ABSENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()), activityIds, 1);
         }
         return staffingLevelData;
     }
