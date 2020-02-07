@@ -162,6 +162,8 @@ public class KPIBuilderCalculationService implements CounterService {
     private SkillKPIService skillKPIService;
     @Inject
     private ActivityService activityService;
+    @Inject
+    private PayLevelKPIService payLevelKPIService;
 
 
 
@@ -344,6 +346,8 @@ public class KPIBuilderCalculationService implements CounterService {
             case ABSENCE_REQUEST:
             case STAFF_SKILLS_COUNT:
                 return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId,asLocalDate(kpiCalculationRelatedInfo.getStartDate()),asLocalDate(kpiCalculationRelatedInfo.getEndDate()),kpiCalculationRelatedInfo);
+            case TOTAL_SUM_OF_PAY_LEVEL:
+                return payLevelKPIService.getTotalSumOfPayLevelOfAllEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
             default:
                 break;
         }
@@ -630,6 +634,7 @@ public class KPIBuilderCalculationService implements CounterService {
                         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits =absencePlanningKPIService.getActivityStatusCount(todoDTOList,kpiCalculationRelatedInfo.xAxisConfigs.get(0));
                         subClusteredBarValue.addAll(clusteredBarChartKpiDataUnits);
                         break;
+                    case TOTAL_SUM_OF_PAY_LEVEL:
                     case ACTUAL_TIMEBANK:
                     case BREAK_INTERRUPT:
                     default:

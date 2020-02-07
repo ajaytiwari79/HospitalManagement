@@ -36,6 +36,7 @@ public class EmploymentLinesDTO implements Comparable<EmploymentLinesDTO> {
     private Long employmentTypeId;
     private EmploymentSubType employmentSubType;
     private SeniorityLevelDTO seniorityLevel;
+    private Long payGradeLevel;
 
 
     //This getter is used for Accumulated Timebank calculation
