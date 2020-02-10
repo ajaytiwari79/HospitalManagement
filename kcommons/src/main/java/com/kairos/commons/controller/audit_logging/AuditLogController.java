@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.Map;
 
+import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.commons.utils.ResponseHandler.generateResponse;
 import static com.kairos.commons.utils.ResponseHandler.invalidResponse;
 import static com.kairos.constants.CommonConstants.API_V1;
@@ -42,7 +43,7 @@ public class AuditLogController {
     public ResponseEntity<Map<String,Object>>getAuditLoggingOfStaff(@PathVariable Long staffId,
                                                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
                                                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
-        return ResponseHandler.generateResponse(HttpStatus.OK,true,context.getBean(AuditLoggingService.class).getAuditLogOfStaff(staffId,startDate,endDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK,true,context.getBean(AuditLoggingService.class).getAuditLogOfStaff(newArrayList(staffId),startDate,endDate));
 
     }
 

@@ -4,6 +4,7 @@ import com.kairos.shiftplanning.domain.activity.*;
 import com.kairos.shiftplanning.domain.shift.*;
 import com.kairos.shiftplanning.domain.staffing_level.*;
 import com.kairos.shiftplanning.domain.skill.*;
+import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import java.util.ArrayList;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
@@ -14,7 +15,7 @@ salience 20
     when
         $ac:Activity()
         $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
-        $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,3))
+        $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF))
     then
-        $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality,  3);
+        $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality,  ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF);
 end

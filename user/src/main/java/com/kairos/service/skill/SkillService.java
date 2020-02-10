@@ -1,7 +1,7 @@
 package com.kairos.service.skill;
 
 import com.kairos.commons.custom_exception.DataNotFoundByIdException;
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user.country.skill.SkillDTO;
@@ -78,7 +78,7 @@ public class SkillService {
     @Inject
     private TeamService teamService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private UserSkillLevelRelationshipGraphRepository userSkillLevelRelationshipGraphRepository;
     @Inject
@@ -244,7 +244,7 @@ public class SkillService {
         skill.setEnabled(false);
         skill.setSkillStatus(Skill.SkillStatus.PENDING);
         skillGraphRepository.save(skill);
-        mailService.sendMailWithSendGrid(null, null, "Request for create new skill", "Skill creation request", ADMIN_EMAIL);
+        sendGridMailService.sendMailWithSendGrid(null, null, "Request for create new skill", "Skill creation request", ADMIN_EMAIL);
         return true;
     }
 
@@ -457,5 +457,10 @@ public class SkillService {
         }
         return list;
 
+    }
+
+    public List<StaffQueryResult> getStaffAllSkillAndLevelByStaffIds(List<Long> staffIds) {
+        List<StaffQueryResult> staffQueryResults = skillGraphRepository.getAllStaffSkillAndLevelByStaffIds(staffIds);
+        return staffQueryResults;
     }
 }

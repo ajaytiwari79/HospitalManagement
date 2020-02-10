@@ -3,6 +3,7 @@ package com.kairos.shiftplanning.rules;
 
 import com.kairos.shiftplanning.domain.activity.*;
 import com.kairos.shiftplanning.domain.shift.*;
+import com.kairos.enums.constraint.ConstraintSubType;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 global HardMediumSoftLongScoreHolder scoreHolder;
 
@@ -11,7 +12,7 @@ salience 20
  when
   $ac:Activity(tags != null)
   $shift:ShiftImp(!activityLineIntervals.isEmpty() && hasIntervalsForActivity($ac))
-  $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,8))
+  $constraintsPenality: Integer(intValue>0) from ($ac.checkActivityConstraints($shift,ConstraintSubType.ACTIVITY_REQUIRED_TAG))
  then
-    $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality, 8);
+    $ac.breakActivityContraints(null,scoreHolder,kcontext,$constraintsPenality, ConstraintSubType.ACTIVITY_REQUIRED_TAG);
 end

@@ -1,7 +1,7 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.service.locale.LocaleService;
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
@@ -45,6 +45,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.getDate;
 import static com.kairos.commons.utils.DateUtils.getEmailDateTimeWithFormat;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
@@ -72,7 +73,7 @@ public class ShiftStatusService {
     @Inject
     private LocaleService localeService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private ShiftService shiftService;
     @Inject
@@ -224,6 +225,11 @@ public class ShiftStatusService {
             if(isNotNull(todo)) {
                 todo.setStatus(todoStatus);
                 todo.setComment(comment);
+                if(TodoStatus.APPROVE.equals(todo.getStatus())){
+                    todo.setApprovedOn(getDate());
+                }else if(TodoStatus.DISAPPROVE.equals(todo.getStatus())){
+                    todo.setDisApproveOn(getDate());
+                }
                 todoRepository.save(todo);
             }
         }
@@ -369,6 +375,6 @@ public class ShiftStatusService {
             templateParam.put("descriptionPart7", bodyPart7);
             templateParam.put("descriptionPart8", bodyPart8);
         }
-        mailService.sendMailWithSendGrid(SHIFT_NOTIFICATION_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getContactDetail().getPrivateEmail());
+        sendGridMailService.sendMailWithSendGrid(SHIFT_NOTIFICATION_EMAIL_TEMPLATE, templateParam, null, MAIL_SUBJECT, staffDTO.getContactDetail().getPrivateEmail());
     }
 }

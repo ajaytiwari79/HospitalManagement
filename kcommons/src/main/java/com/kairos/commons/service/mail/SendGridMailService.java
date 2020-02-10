@@ -3,6 +3,7 @@ package com.kairos.commons.service.mail;
 import com.kairos.commons.config.EnvConfigCommon;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.sendgrid.*;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.constants.CommonConstants.*;
 
 
@@ -39,16 +39,17 @@ import static com.kairos.constants.CommonConstants.*;
 /**
  * Created by oodles on 11/11/16.
  */
-
+//TODO this should implement EmailService interface as there could be multiple email providers
 @Service
-public class MailService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
+public class SendGridMailService implements EmailService{
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendGridMailService.class);
 
     @Inject
     private JavaMailSender javaMailSender;
     @Inject
     private TemplateEngine templateEngine;
     @Inject private EnvConfigCommon envConfigCommon;
+
 
     public boolean sendPlainMail(String receiver,String body, String subject) {
         try {
@@ -199,4 +200,8 @@ public class MailService {
         }
     }
 
+    @Override
+    public void sendMail(String from, String to, String subject, String htmlBody, String textBody) {
+      throw new NotImplementedException("This has not been implemented yet ");
+    }
 }
