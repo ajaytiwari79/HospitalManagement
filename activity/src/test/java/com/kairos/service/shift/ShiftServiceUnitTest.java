@@ -155,8 +155,6 @@ public class ShiftServiceUnitTest {
         activity.setScheduledMinutes(360);
         activity.setScheduledMinutes(360);
         activity.setActivityName("12 Bronze");
-        activity.setPId(0);
-        activity.setBid(0);
         activity.setRemarks("");
         activity.setTimeType("WORKING_TYPE");
         activity.setBackgroundColor("");
@@ -171,8 +169,6 @@ public class ShiftServiceUnitTest {
         activity1.setScheduledMinutes(360);
         activity1.setScheduledMinutes(360);
         activity1.setActivityName("12 Bronze");
-        activity1.setPId(0);
-        activity1.setBid(0);
         activity1.setRemarks("");
         activity1.setTimeType("WORKING_TYPE");
         activity1.setBackgroundColor("");
@@ -185,10 +181,6 @@ public class ShiftServiceUnitTest {
         shiftState.setActivities(Arrays.asList(activity));
         shiftDTO=new ShiftDTO();
         shiftDTO.setId(BigInteger.valueOf(93));
-        shiftDTO.setBid(0l);
-        shiftDTO.setPId(0l);
-        shiftDTO.setAmount(0);
-        shiftDTO.setProbability(0);
         shiftDTO.setUnitId(958l);
         shiftDTO.setStaffId(834l);
         shiftDTO.setEmploymentId(1136l);
