@@ -39,10 +39,6 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     protected BigInteger id;
     protected Date startDate;
     protected Date endDate;
-    protected long bid;
-    protected long pId;
-    protected long amount;
-    protected long probability;
     protected String remarks;
     protected BigInteger parentOpenShiftId;
     protected Long unitId;
@@ -248,10 +244,6 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
                 "id=" + id +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
-                ", bid=" + bid +
-                ", pId=" + pId +
-                ", amount=" + amount +
-                ", probability=" + probability +
                 ", remarks='" + remarks + '\'' +
                 ", unitId=" + unitId +
                 ", staffId=" + staffId +

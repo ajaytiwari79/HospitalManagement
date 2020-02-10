@@ -436,7 +436,7 @@ public class EmploymentService {
         if (EmploymentSubType.MAIN.equals(employmentDTO.getEmploymentSubType()) && positionService.eligibleForMainEmployment(employmentDTO, employmentId)) {
             oldEmployment.setEmploymentSubType(EmploymentSubType.MAIN);
         }
-        if(EmploymentSubType.SECONDARY.equals(employmentDTO.getEmploymentSubType())&& isNull(oldEmployment.getEmploymentSubType())){
+        if((EmploymentSubType.SECONDARY.equals(employmentDTO.getEmploymentSubType())&& isNull(oldEmployment.getEmploymentSubType())||(EmploymentSubType.SECONDARY.equals(employmentDTO.getEmploymentSubType())&&EmploymentSubType.MAIN.equals(oldEmployment.getEmploymentSubType())))){
             oldEmployment.setEmploymentSubType(EmploymentSubType.SECONDARY);
         }
 
@@ -1179,7 +1179,7 @@ public class EmploymentService {
                         linkExistingRelations(employmentLineToBeCreated, employmentLine);
                     } else {
                         employmentLine.setFullTimeWeeklyMinutes(employmentLine.getFullTimeWeeklyMinutes());
-                        //employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), null, employment.getExpertise().getId()));
+                        employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), null, employment.getExpertise().getId()));
                         employmentLine.setWorkingDaysInWeek(employmentLine.getWorkingDaysInWeek());
                     }
                 }
