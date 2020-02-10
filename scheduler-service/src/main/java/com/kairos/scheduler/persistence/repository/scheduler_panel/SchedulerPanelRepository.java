@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerPanel, BigInteger> {
+public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerPanel, BigInteger>, CustomSchedulerPanelRepository {
 
     List<SchedulerPanel> findAllByUnitIdAndDeletedFalse(long unitId);
 

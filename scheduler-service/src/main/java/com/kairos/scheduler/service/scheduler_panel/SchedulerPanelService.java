@@ -540,12 +540,7 @@ public class SchedulerPanelService extends MongoBaseService {
     }*/
 
     public boolean deleteJobBySubTypeAndEntityId(Long unitId, BigInteger entityId, JobSubType jobSubType) {
-        List<SchedulerPanel> schedulerPanels = schedulerPanelRepository.findAllJobByEntityIdAndJobSubtypeAndUnitId(unitId, entityId, jobSubType);
-        for (SchedulerPanel schedulerPanel : schedulerPanels) {
-            schedulerPanel.setDeleted(true);
-            schedulerPanel.setActive(false);
-        }
-        schedulerPanelRepository.saveAll(schedulerPanels);
+        schedulerPanelRepository.deleteJobBySubTypeAndEntityId(unitId, entityId, jobSubType);
         return true;
     }
 
