@@ -24,6 +24,7 @@ public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerP
 
     SchedulerPanel findByIdAndDeletedFalse(BigInteger schedulerPanelId);
 
-    void deleteAllJobByEntityIdAndJobSubtypeAndUnitId(Long unitId, BigInteger entityId, JobSubType jobSubType);
+    @Query("{unitId:?0, entityId:?1, jobSubType:?2, deleted:false}")
+    List<SchedulerPanel> findAllJobByEntityIdAndJobSubtypeAndUnitId(Long unitId, BigInteger entityId, JobSubType jobSubType);
 
 }

@@ -271,7 +271,7 @@ public class ActivityService {
         Activity activity = findActivityById(activityId);
         long activityCount = shiftService.countByActivityId(activityId);
         if (activityCount > 0) {
-            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE);
+            exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE, activity.getName());
         }
         activity.setDeleted(true);
         activityMongoRepository.save(activity);
@@ -431,7 +431,7 @@ public class ActivityService {
     public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity) {
         TimeCalculationActivityTab timeCalculationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(timeCalculationActivityDTO,TimeCalculationActivityTab.class);
         Activity activity = findActivityById(new BigInteger(String.valueOf(timeCalculationActivityDTO.getActivityId())));
-        timeCalculationActivityDTO = verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
+        verifyAndDeleteCompositeActivity(timeCalculationActivityDTO, availableAllowActivity);
         if (!timeCalculationActivityDTO.isAvailableAllowActivity()) {
             activity.setTimeCalculationActivityTab(timeCalculationActivityTab);
             if (!timeCalculationActivityTab.getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
@@ -610,6 +610,9 @@ public class ActivityService {
         validateReminderSettings(communicationActivityDTO.getActivityReminderSettings());
         validateReminderSettings(communicationActivityDTO.getActivityCutoffReminderSettings());
         CommunicationActivityTab communicationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(communicationActivityDTO,CommunicationActivityTab.class);
+        if(!communicationActivityTab.isAllowActivityCutoffReminder()){
+            communicationActivityTab.setActivityCutoffReminderSettings(new ArrayList<>());
+        }
         Activity activity = findActivityById(communicationActivityDTO.getActivityId());
         activity.setCommunicationActivityTab(communicationActivityTab);
         activityMongoRepository.save(activity);
@@ -910,15 +913,15 @@ public class ActivityService {
         if (Optional.ofNullable(activity).isPresent()) {
             exceptionService.dataNotFoundException(activity.getGeneralActivityTab().getEndDate() == null ? MESSAGE_ACTIVITY_ENDDATE_REQUIRED : MESSAGE_ACTIVITY_ACTIVE_ALREADYEXISTS);
         }
-        Optional<Activity> activityFromDatabase = activityMongoRepository.findById(activityId);
-        if (!activityFromDatabase.isPresent() || activityFromDatabase.get().isDeleted() || !countryId.equals(activityFromDatabase.get().getCountryId())) {
+        Activity activityFromDatabase = activityMongoRepository.findOne(activityId);
+        if (isNull(activityFromDatabase) || activityFromDatabase.isDeleted() || !countryId.equals(activityFromDatabase.getCountryId())) {
             exceptionService.dataNotFoundByIdException(MESSAGE_ACTIVITY_ID, activityId);
         }
 
-        Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase.get(), Activity.class);
+        Activity activityCopied = ObjectMapperUtils.copyPropertiesByMapper(activityFromDatabase, Activity.class);
         activityCopied.setId(null);
         activityCopied.setName(activityDTO.getName().trim());
-        activityCopied.setCountryParentId(activityFromDatabase.get().getCountryParentId() == null ? activityFromDatabase.get().getId() : activityFromDatabase.get().getCountryParentId());
+        activityCopied.setCountryParentId(activityFromDatabase.getCountryParentId() == null ? activityFromDatabase.getId() : activityFromDatabase.getCountryParentId());
         activityCopied.getGeneralActivityTab().setName(activityDTO.getName().trim());
         activityCopied.getGeneralActivityTab().setStartDate(activityDTO.getStartDate());
         activityCopied.setState(ActivityStateEnum.DRAFT);
