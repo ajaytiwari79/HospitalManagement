@@ -297,11 +297,12 @@ public class CompanyCreationService {
         return addressDTO;
     }
 
-    public HashMap<String, Object> getAddressOfCompany(Long unitId) {
+    public Map<String, Object> getAddressOfCompany(Long unitId) {
         HashMap<String, Object> orgBasicData = new HashMap<>();
-        Map<String, Object> organizationContactAddress = unitGraphRepository.getContactAddressOfParentOrganization(unitId);
-        orgBasicData.put("address", organizationContactAddress);
-        orgBasicData.put("municipalities", (organizationContactAddress.get("zipCodeId") == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) organizationContactAddress.get("zipCodeId"))));
+        ContactAddress address = contactAddressGraphRepository.getContactAddressOfOrganization(unitId);
+        AddressDTO addressDTO=ObjectMapperUtils.copyPropertiesByMapper(address,AddressDTO.class);
+        orgBasicData.put("address", addressDTO);
+        orgBasicData.put("municipalities", (address.getZipCode() == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(address.getZipCode().getId())));
         return orgBasicData;
     }
 

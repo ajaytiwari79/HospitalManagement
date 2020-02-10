@@ -583,6 +583,7 @@ public class CounterDataService extends MongoBaseService {
         if(isNotNull(data)) {
             tabKPIDTO.setData(data.get(copyKpi.getId()));
         }
+        tabKPIDTO.getKpi().setKpiRepresentation(counterDTO.getKpiRepresentation());
         return tabKPIDTO;
     }
 
