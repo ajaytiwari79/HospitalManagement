@@ -18,11 +18,13 @@ public class CommunicationActivityTab implements Serializable {
     private boolean allowCommunicationReminder;
     private boolean notifyAfterDeleteActivity;
     private List<ActivityReminderSettings> activityReminderSettings;
+    private boolean allowActivityCutoffReminder;
+    private List<ActivityReminderSettings> activityCutoffReminderSettings;
 
-    public CommunicationActivityTab(boolean allowCommunicationReminder, boolean notifyAfterDeleteActivity) {
+    public CommunicationActivityTab(boolean allowCommunicationReminder, boolean allowActivityCutoffReminder, boolean notifyAfterDeleteActivity) {
         this.allowCommunicationReminder = allowCommunicationReminder;
+        this.allowActivityCutoffReminder = allowActivityCutoffReminder;
         this.notifyAfterDeleteActivity = notifyAfterDeleteActivity;
     }
-
 
 }
