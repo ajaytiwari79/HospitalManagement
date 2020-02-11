@@ -313,7 +313,6 @@ public class ShiftValidatorService {
                 validateActivityReasonCode(activityWrapperMap, ruleTemplateSpecificInfo, childActivity);
             }
         }
-
     }
 
     private void validateActivityReasonCode(Map<BigInteger, ActivityWrapper> activityWrapperMap, RuleTemplateSpecificInfo ruleTemplateSpecificInfo, ShiftActivityDTO childActivity) {

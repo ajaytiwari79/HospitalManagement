@@ -1092,6 +1092,9 @@ public class EmploymentService {
     public void triggerEmploymentLine(Long expertiseId, ExpertiseLine expertiseLine) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 2);
         List<Employment> employmentsList = employmentGraphRepository.findAllEmploymentByExpertiseId(expertise.getId());
+        List<Long> employmentLineIds = employmentsList.stream().flatMap(e->e.getEmploymentLines().stream().map(el-> el.getId())).collect(Collectors.toList());
+        List<EmploymentLine> employmentLineList = employmentGraphRepository.getEmploymentLineByIds(employmentLineIds);
+        Map<Long,EmploymentLine> employmentLineMap = employmentLineList.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         List<Employment> employments = new CopyOnWriteArrayList<>(employmentsList);
         DateTimeInterval expertiseLineInterval = new DateTimeInterval(expertiseLine.getStartDate(), expertiseLine.getEndDate());
         List<Employment> employmentList = new ArrayList<>();
@@ -1115,9 +1118,11 @@ public class EmploymentService {
                         linkExistingRelations(employmentLineToBeCreated, employmentLine);
                     } else {
                         employmentLine.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
-                        //employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), expertiseLine, expertiseId));
+                        employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), expertiseLine, expertiseId));
                         employmentLine.setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
                     }
+                }else{
+                    employmentLine.setSeniorityLevel(employmentLineMap.get(employmentLine.getId()).getSeniorityLevel());
                 }
             }
             employmentList.add(employment);

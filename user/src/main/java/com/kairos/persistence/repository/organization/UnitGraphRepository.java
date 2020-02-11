@@ -500,11 +500,11 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "org.companyUnitType as companyUnitType,id(accountType) as accountTypeId, id(hub) as hubId ")
     OrganizationBasicResponse getOrganizationDetailsById(Long organizationId);
 
-    @Query("MATCH (organization:Unit) WHERE id(organization) IN {0} " +
+    @Query("MATCH (organization) WHERE id(organization) IN {0} " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH organization,contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress,organization \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) \n" +
-            "RETURN organization as organization, municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
+            "RETURN organization as organization, municipality as municipality,contactAddress as contactAddress,zipCode as zipCode,id(organization) as organizationId")
     List<OrganizationContactAddress> getContactAddressOfOrganizations(List<Long> unitIds);
 
 
@@ -592,10 +592,6 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "id(accountType) as accountTypeId ,id(zipCode) as zipCodeId ORDER BY sub.name")
     List<OrganizationBasicResponse> getAllOrganizationOfOrganization(Long orgId);
 
-    @Query("MATCH (unit:Unit) WHERE id(unit)={0} " +
-            "OPTIONAL MATCH (unit)-[rel:" + HAS_GROUPS + "]->(group:Group{deleted:false})" +
-            "OPTIONAL MATCH (group)-[relFilter:HAS_FILTERS]->(filter:FilterSelection)" +
-            "RETURN unit,COLLECT(rel),COLLECT(group),collect(relFilter),collect(filter)")
-    Unit getUnitWithGroupsByUnitId(Long unitId);
+
 }
 

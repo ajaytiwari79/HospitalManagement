@@ -30,13 +30,8 @@ public interface UserSkillLevelRelationshipGraphRepository extends Neo4jBaseRepo
             "return {name:case when orgSkillRelation is null or orgSkillRelation.customName is null then skill.name else orgSkillRelation.customName end,skillId:id(skill),startDate:r.startDate,endDate:r.endDate,level:r.skillLevel,skillCategory:skillCategory.name,status:r.isEnabled} as data")
     List<Map<String,Object>> getStaffSkillRelationship(long staffId, List<Long> skillId, long unitId);
 
-    @Query("MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill) DETACH DELETE r")
+    @Query("MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill) WHERE id(skill)={1} AND id(staff)={0} DETACH DELETE r")
     void removeExistingByStaffIdAndSkillId(Long staffId,Long skillId);
-
-    @Query("MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill:Skill) WHERE id(skill) IN {1} AND id(staff)={0} \n " +
-            "WITH skill,{}" +
-            "return id(skill) as id")
-    List<SkillQueryResult> findAllByStaffIdAndSkillIds(Long staffId, List<Long> skillId);
 
     @Query("MATCH (staff)-[r:"+STAFF_HAS_SKILLS+"]->(skill:Skill) WHERE id(skill) = {1} AND id(staff)={0} \n " +
             "return DISTINCT r.skillLevel as skillLevel,r.startDate as startDate,r.endDate AS endDate")
