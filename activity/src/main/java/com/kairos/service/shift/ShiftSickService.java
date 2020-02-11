@@ -1,32 +1,22 @@
 package com.kairos.service.shift;
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.CommonConstants;
-import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.period.PeriodDTO;
 import com.kairos.dto.activity.shift.*;
-import com.kairos.dto.activity.staffing_level.Duration;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.EmploymentSubType;
-import com.kairos.enums.TimeCalaculationType;
 import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.phase.PhaseDefaultName;
+import com.kairos.enums.phase.PhaseType;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
-import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
-import com.kairos.persistence.model.activity.tabs.TimeCalculationActivityTab;
-import com.kairos.persistence.model.activity.tabs.rules_activity_tab.RulesActivityTab;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
-import com.kairos.persistence.model.attendence_setting.SickSettings;
-import com.kairos.persistence.model.period.PlanningPeriod;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.cta.CostTimeAgreementRepository;
@@ -39,8 +29,6 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,23 +36,16 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionEmpty;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.EmploymentSubType.MAIN;
-import static com.kairos.enums.shift.ShiftType.SICK;
 import static com.kairos.enums.sickness.ReplaceSickShift.*;
-import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
-import static java.time.temporal.ChronoUnit.MINUTES;
 
 /**
  * CreatedBy vipulpandey on 31/8/18
@@ -120,7 +101,7 @@ public class ShiftSickService extends MongoBaseService {
         Date endDate = asDate(shiftDTO.getShiftDate().plusDays(CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) ? 7 * shiftNeedsToAddForDays : 1 * shiftNeedsToAddForDays), LocalTime.MIDNIGHT);
         setStartAndEndDate(shiftDTO, startDate);
         Phase phase=phaseService.getCurrentPhaseByUnitIdAndDate(shiftDTO.getUnitId(),startDate,asDate(shiftDTO.getShiftDate().plusDays(1), LocalTime.MIDNIGHT));
-        List<Shift> shifts = shiftMongoRepository.findAllShiftsByEmploymentIdBetweenDate(shiftDTO.getEmploymentId(),startDate,endDate);
+        List<Shift> shifts = shiftMongoRepository.findAllShiftsByStaffIdBetweenDate(shiftDTO.getStaffId(),startDate,endDate);
         Map<LocalDate,List<Shift>> shiftMap = shifts.stream().collect(Collectors.groupingBy(shift->asLocalDate(shift.getStartDate())));
         Map<BigInteger,ActivityWrapper> activityWrapperMap = shiftService.getActivityWrapperMap(shifts,shiftDTO);
         List<ShiftDTO> shiftDTOS = new ArrayList<>();
@@ -128,7 +109,7 @@ public class ShiftSickService extends MongoBaseService {
             int i=0;
             while ( i<shiftNeedsToAddForDays) {
                 ShiftDTO shiftDTO1 = ObjectMapperUtils.copyPropertiesByMapper(shiftDTO,ShiftDTO.class);
-                shiftDTO1 = updateShiftWithSetting(nonWorkingSicknessActivityWrappers.get(0),activityWrapperMap,shiftDTO1.getShiftDate().plusDays(i),shiftDTO1,shiftMap);
+                shiftDTO1 = updateShiftWithSetting(nonWorkingSicknessActivityWrappers.get(0),activityWrapperMap,shiftDTO1.getShiftDate().plusDays(i),shiftDTO1,shiftMap, PhaseDefaultName.REALTIME.equals(phase.getPhaseEnum()));
                 shiftDTO1.setShiftDate(shiftDTO1.getShiftDate().plusDays(i));
                 ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = shiftService.saveShift(staffAdditionalInfoDTO, shiftDTO1, phase, false, ShiftActionType.SAVE);
                 shiftWithViolatedInfoDTOS.add(shiftWithViolatedInfoDTO);
@@ -146,13 +127,12 @@ public class ShiftSickService extends MongoBaseService {
         shiftDTO.getActivities().get(0).setEndDate(asDate(shiftDTO.getShiftDate().plusDays(1), LocalTime.MIDNIGHT));
     }
 
-    private ShiftDTO updateShiftWithSetting(ActivityWrapper nonWorkingSicknessActivityWrapper,Map<BigInteger,ActivityWrapper> activityWrapperMap, LocalDate shiftDate,ShiftDTO shiftDTO,Map<LocalDate,List<Shift>> shiftMap) {
+    private ShiftDTO updateShiftWithSetting(ActivityWrapper nonWorkingSicknessActivityWrapper,Map<BigInteger,ActivityWrapper> activityWrapperMap, LocalDate shiftDate,ShiftDTO shiftDTO,Map<LocalDate,List<Shift>> shiftMap,boolean realTime) {
         List<Shift> shifts = shiftMap.getOrDefault(shiftDate,new ArrayList<>());
         DateTimeInterval dateTimeInterval = new DateTimeInterval(shiftDate,shiftDate.plusDays(1));
         List<ShiftActivityDTO> shiftActivityDTOS = new ArrayList<>();
         for (Shift shift : shifts) {
             shiftActivityDTOS.addAll(updateShiftOnTheBasisOfLayerSetting(nonWorkingSicknessActivityWrapper,activityWrapperMap, shift,shiftDTO,dateTimeInterval));
-            shiftActivityDTOS.addAll(getShiftActivityDTOByIntervals(dateTimeInterval,nonWorkingSicknessActivityWrapper,shift.getInterval()));
         }
         shiftDTO.setActivities(shiftActivityDTOS);
         shiftDTO.mergeShiftActivity();
@@ -178,16 +158,38 @@ public class ShiftSickService extends MongoBaseService {
                 }
             }
             shift.setDisabled(true);
-        }else {
+
+        } else if(shift.getInterval().contains(getCurrentDate())){
+            replaceWithSick(shift,sickActivityWrapper);
+        }
+
+        else {
             shift.setDeleted(true);
         }
+        shiftActivityDTOS.addAll(getShiftActivityDTOByIntervals(dateTimeInterval,nonWorkingSicknessActivityWrapper,shift.getInterval(),isLayerSettingEnabled));
         return shiftActivityDTOS;
     }
 
+    private void replaceWithSick(Shift shift, ActivityWrapper sickActivityWrapper) {
+        List<ShiftActivity> shiftActivities=new ArrayList<>();
+        for (int i = 0; i < shift.getActivities().size(); i++) {
+            if(shift.getActivities().get(i).getInterval().contains(getCurrentDate())){
+                shift.getActivities().get(i).setEndDate(getCurrentDate());
+                shiftActivities.add(shift.getActivities().get(i));
+                ShiftActivity shiftActivity=new ShiftActivity(sickActivityWrapper.getActivity().getName(),shift.getActivities().get(i).getStartDate(),shift.getActivities().get(i).getEndDate(),sickActivityWrapper.getActivity().getId(),null);
+                shiftActivities.add(shiftActivity);
+                break;
+            }
+            else {
+                shiftActivities.add(shift.getActivities().get(i));
+            }
+        }
+        shift.setActivities(shiftActivities);
+    }
 
 
-    private List<ShiftActivityDTO> getShiftActivityDTOByIntervals(DateTimeInterval dateTimeInterval, ActivityWrapper sickActivityWrapper, DateTimeInterval otherInterval) {
-        List<DateTimeInterval> dateTimeIntervals = dateTimeInterval.minusInterval(otherInterval);
+    private List<ShiftActivityDTO> getShiftActivityDTOByIntervals(DateTimeInterval dateTimeInterval, ActivityWrapper sickActivityWrapper, DateTimeInterval otherInterval,boolean isLayerSatingEnabled) {
+        List<DateTimeInterval> dateTimeIntervals =isLayerSatingEnabled ? dateTimeInterval.minusInterval(otherInterval): Collections.singletonList(dateTimeInterval);
         List<ShiftActivityDTO> shiftActivityDTOS = new ArrayList<>();
         for (DateTimeInterval timeInterval : dateTimeIntervals) {
             ShiftActivityDTO updatedShiftActivity = new ShiftActivityDTO(sickActivityWrapper.getActivity().getName(),timeInterval.getStartDate(),timeInterval.getEndDate(),sickActivityWrapper.getActivity().getId(),null);
@@ -204,7 +206,7 @@ public class ShiftSickService extends MongoBaseService {
 
     public void disableSicknessShiftsOfStaff(Long employmentId, Long unitId,LocalDate localDate) {
         List<Activity> sicknessActivity = activityRepository.findAllSicknessActivity(unitId);
-        Set<BigInteger> activityIds = sicknessActivity.stream().map(activity -> activity.getId()).collect(Collectors.toSet());
+        Set<BigInteger> activityIds = sicknessActivity.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
         List<Shift> shifts = shiftMongoRepository.findAllSicknessShiftByEmploymentIdAndActivityIds(employmentId,activityIds,asDate(localDate));
         if(isCollectionEmpty(shifts)){
             exceptionService.dataNotFoundException("Data not found");

@@ -1,14 +1,19 @@
 package com.kairos.service.shift;
 
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
+import com.kairos.persistence.model.activity.Activity;
+import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.todo.Todo;
+import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftViolatedRulesMongoRepository;
 import com.kairos.persistence.repository.todo.TodoRepository;
@@ -25,11 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.enums.shift.ShiftType.SICK;
 import static java.util.stream.Collectors.toMap;
 
 
@@ -55,6 +62,8 @@ public class ShiftDetailsService extends MongoBaseService {
     private ShiftService shiftService;
     @Inject
     private TodoRepository todoRepository;
+    @Inject
+    private ActivityMongoRepository activityMongoRepository;
 
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds , boolean showDraft) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS;
@@ -132,6 +141,34 @@ public class ShiftDetailsService extends MongoBaseService {
         List<NameValuePair> requestParam = new ArrayList<>();
         requestParam.add(new BasicNameValuePair("absenceReasonCodeIds", absenceReasonCodeIds.toString()));
         return userIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
+    }
+
+    public void setLayerInShifts(Map<LocalDate, List<ShiftDTO>> shiftsMap){
+        Set<BigInteger> activityIds=getAllActivityIds(shiftsMap);
+        List<ActivityWrapper> activityWrappers=activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+        Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
+        shiftsMap.forEach((date,shifts)->{
+            ShiftDTO sickShift=shifts.stream().filter(k->k.getShiftType().equals(SICK)).findAny().orElse(null);
+            if(sickShift!=null){
+                Activity activity=activityWrapperMap.get(sickShift.getActivities().get(0).getActivityId()).getActivity();
+                if(!activity.getRulesActivityTab().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()){
+                    shifts.removeAll(shifts.stream().filter(k->k.getActivities().stream().anyMatch(act->act.getStatus().contains(ShiftStatus.PUBLISH) && k.isDisabled())).collect(Collectors.toList()));
+                }
+                if(!activity.getRulesActivityTab().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()){
+                    shifts.removeAll(shifts.stream().filter(k->k.getActivities().stream().anyMatch(act->!act.getStatus().contains(ShiftStatus.PUBLISH) && k.isDisabled())).collect(Collectors.toList()));
+                }
+            }
+        });
+    }
+
+    private Set<BigInteger> getAllActivityIds(Map<LocalDate, List<ShiftDTO>> shiftsMap) {
+        Set<BigInteger> activityIds=new HashSet<>();
+        shiftsMap.forEach((date,shifts)->{
+            shifts.forEach(shiftDTO -> {
+                activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
+            });
+        });
+        return activityIds;
     }
 
 

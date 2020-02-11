@@ -426,6 +426,7 @@ public class ActivityService {
             activityCategoryRepository.save(category);
         }
         activity.getGeneralActivityTab().setCategoryId(category.getId());
+        activityMongoRepository.save(activity);
     }
 
     public TimeCalculationActivityDTO updateTimeCalculationTabOfActivity(TimeCalculationActivityDTO timeCalculationActivityDTO, boolean availableAllowActivity) {
@@ -538,6 +539,7 @@ public class ActivityService {
             removedActivityFromStaffingLevelOfChildActivity(activity.getChildActivityIds());
             staffingLevelService.removedActivityFromStaffingLevel(activity.getId(), TimeTypeEnum.PRESENCE.equals(activity.getBalanceSettingsActivityTab().getTimeType()));
         }
+        rulesActivityTab.setSicknessSetting(ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO.getSicknessSetting(),SicknessSetting.class));
         activity.setRulesActivityTab(rulesActivityTab);
         if (!activity.getTimeCalculationActivityTab().getMethodForCalculatingTime().equals(CommonConstants.FULL_WEEK)) {
             activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
