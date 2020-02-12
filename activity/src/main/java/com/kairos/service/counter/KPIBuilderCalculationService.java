@@ -351,18 +351,22 @@ public class KPIBuilderCalculationService implements CounterService {
                 return getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
             case STAFF_SKILLS_COUNT:
                 return skillKPIService.getCountOfSkillOfStaffIdOnSelectedDate(staffId,asLocalDate(kpiCalculationRelatedInfo.getStartDate()),asLocalDate(kpiCalculationRelatedInfo.getEndDate()),kpiCalculationRelatedInfo);
-            case TOTAL_SUM_OF_PAY_LEVEL:
-                if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
-                    LocalDate startDate =kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
-                    return payLevelKPIService.getTotalSumOfPayLevelOfAllEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,startDate);
-                }else {
-                    return payLevelKPIService.getTotalSumOfPayLevelOfAllEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
-                }
+            case PAY_LEVEL_GRADE:
+                return getPayLevelGradeOfMainEmploymentOfStaff(staffId, kpiCalculationRelatedInfo);
             case ABSENCE_REQUEST:
             default:
                 break;
         }
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
+    }
+
+    private double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        if(isNotNull(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation())){
+            LocalDate startDate =kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
+            return payLevelKPIService.getPayLevelOfMainEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,startDate);
+        }else {
+            return payLevelKPIService.getPayLevelOfMainEmploymentOfStaff(staffId,kpiCalculationRelatedInfo,asLocalDate(kpiCalculationRelatedInfo.getStartDate()));
+        }
     }
 
     private double getWeeklyHoursOfEmployment(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -374,6 +378,7 @@ public class KPIBuilderCalculationService implements CounterService {
             return weeklyEmploymentHoursKPIService.getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo, asLocalDate(kpiCalculationRelatedInfo.getStartDate()), asLocalDate(kpiCalculationRelatedInfo.getEndDate()));
         }
     }
+
 
     private long getWorkedOnPublicHolidayCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         int workedOnPublicHolidayCount = 0;
@@ -657,7 +662,7 @@ public class KPIBuilderCalculationService implements CounterService {
                         List<ClusteredBarChartKpiDataUnit> clusteredBarChartKpiDataUnits =absencePlanningKPIService.getActivityStatusCount(todoDTOList,kpiCalculationRelatedInfo.xAxisConfigs.get(0));
                         subClusteredBarValue.addAll(clusteredBarChartKpiDataUnits);
                         break;
-                    case TOTAL_SUM_OF_PAY_LEVEL:
+                    case PAY_LEVEL_GRADE:
                     case ACTUAL_TIMEBANK:
                     case BREAK_INTERRUPT:
                     default:

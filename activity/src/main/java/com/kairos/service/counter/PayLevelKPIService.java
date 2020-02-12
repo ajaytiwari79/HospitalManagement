@@ -21,7 +21,7 @@ import static com.kairos.commons.utils.DateUtils.startDateIsEqualsOrBeforeEndDat
 @Service
 public class PayLevelKPIService {
 
-    public double getTotalSumOfPayLevelOfAllEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,LocalDate selectedDate){
+    public double getPayLevelOfMainEmploymentOfStaff(Long staffId, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo,LocalDate selectedDate){
         List<StaffKpiFilterDTO> staffKpiFilterDTOS =kpiCalculationRelatedInfo.getStaffKpiFilterDTOS();
         double payLevel=0.0d;
         for(StaffKpiFilterDTO staffKpiFilterDTO :staffKpiFilterDTOS){
