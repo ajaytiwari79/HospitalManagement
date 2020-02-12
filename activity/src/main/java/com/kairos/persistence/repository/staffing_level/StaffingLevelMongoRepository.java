@@ -24,8 +24,8 @@ public interface StaffingLevelMongoRepository extends MongoBaseRepository<Staffi
     List<StaffingLevel> findByUnitIdAndDates(Long unitId, Date startDate, Date endDate);
     @Query("{deleted:false,unitId:?0,currentDate:{$in:?1}}")
     List<StaffingLevel> findByUnitIdAndDates(Long unitId, Set<LocalDate> localDates);
-    @Query("{deleted:false,presenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?0}}}}}")
-    List<StaffingLevel> findPresenceStaffingLevelsByActivityId(BigInteger activityId);
-    @Query("{deleted:false,absenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?0}}}}}")
-    List<StaffingLevel> findAbsenceStaffingLevelsByActivityId(BigInteger activityId);
+    @Query("{deleted:false,currentDate:{$gt:?1},presenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?0}}}}}")
+    List<StaffingLevel> findPresenceStaffingLevelsByActivityId(BigInteger activityId,Date startDate);
+    @Query("{deleted:false,currentDate:{$gt:?1},absenceStaffingLevelInterval:{$elemMatch:{staffingLevelActivities:{$elemMatch:{activityId:?0}}}}}")
+    List<StaffingLevel> findAbsenceStaffingLevelsByActivityId(BigInteger activityId,Date startDate);
 }

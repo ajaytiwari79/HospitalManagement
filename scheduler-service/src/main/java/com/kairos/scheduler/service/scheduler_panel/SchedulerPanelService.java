@@ -539,5 +539,9 @@ public class SchedulerPanelService extends MongoBaseService {
         return controlPanelDTO;
     }*/
 
+    public boolean deleteJobBySubTypeAndEntityId(Long unitId, BigInteger entityId, JobSubType jobSubType) {
+        schedulerPanelRepository.deleteJobBySubTypeAndEntityId(unitId, entityId, jobSubType);
+        return true;
+    }
 
 }

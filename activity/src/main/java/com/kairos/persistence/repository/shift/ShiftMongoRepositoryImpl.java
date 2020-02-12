@@ -6,6 +6,7 @@ import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftCountDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
@@ -240,6 +241,18 @@ public class ShiftMongoRepositoryImpl implements CustomShiftMongoRepository {
         mongoTemplate.updateMulti(query, update, Shift.class);
 
     }
+
+    @Override
+    public void updateValidateDetailsOfShift(BigInteger shiftId, AccessGroupRole accessGroupRole,LocalDate localDate) {
+        Query query = new Query();
+        query.addCriteria(where("_id").is(shiftId));
+        Update update = new Update();
+        update.set("accessGroupRole", accessGroupRole);
+        update.set("validated",localDate);
+        mongoTemplate.updateMulti(query, update, Shift.class);
+
+    }
+
 
     @Override
     public Shift findShiftByShiftActivityId(BigInteger shiftActivityId) {

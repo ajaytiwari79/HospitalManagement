@@ -297,11 +297,12 @@ public class CompanyCreationService {
         return addressDTO;
     }
 
-    public HashMap<String, Object> getAddressOfCompany(Long unitId) {
+    public Map<String, Object> getAddressOfCompany(Long unitId) {
         HashMap<String, Object> orgBasicData = new HashMap<>();
-        Map<String, Object> organizationContactAddress = unitGraphRepository.getContactAddressOfParentOrganization(unitId);
-        orgBasicData.put("address", organizationContactAddress);
-        orgBasicData.put("municipalities", (organizationContactAddress.get("zipCodeId") == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData((long) organizationContactAddress.get("zipCodeId"))));
+        ContactAddress address = contactAddressGraphRepository.getContactAddressOfOrganization(unitId);
+        AddressDTO addressDTO=ObjectMapperUtils.copyPropertiesByMapper(address,AddressDTO.class);
+        orgBasicData.put("address", addressDTO);
+        orgBasicData.put("municipalities", (address==null || address.getZipCode() == null) ? null : FormatUtil.formatNeoResponse(regionGraphRepository.getGeographicTreeData(address.getZipCode().getId())));
         return orgBasicData;
     }
 
@@ -406,14 +407,19 @@ public class CompanyCreationService {
     }
 
     private void setOrganizationTypeAndSubTypeInOrganization(OrganizationBaseEntity organizationBaseEntity, OrganizationBasicDTO organizationBasicDTO) {
-        Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(organizationBasicDTO.getTypeId());
-        organizationBaseEntity.setOrganizationType(organizationType.get());
+        if(organizationBasicDTO.getTypeId()!=null){
+            Optional<OrganizationType> organizationType = organizationTypeGraphRepository.findById(organizationBasicDTO.getTypeId());
+            organizationBaseEntity.setOrganizationType(organizationType.get());
+        }
         if(organizationBasicDTO.getLevelId() != null) {
             Level level = levelGraphRepository.findOne(organizationBasicDTO.getLevelId(), 0);
             organizationBaseEntity.setLevel(level);
         }
-        List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationBasicDTO.getSubTypeId());
-        organizationBaseEntity.setOrganizationSubTypes(organizationSubTypes);
+        if(organizationBasicDTO.getSubTypeId()!=null){
+            List<OrganizationType> organizationSubTypes = organizationTypeGraphRepository.findByIdIn(organizationBasicDTO.getSubTypeId());
+            organizationBaseEntity.setOrganizationSubTypes(organizationSubTypes);
+        }
+
     }
 
     public OrganizationTypeAndSubType getOrganizationTypeAndSubTypeByUnitId(Long unitId) {
@@ -499,7 +505,7 @@ public class CompanyCreationService {
             contactAddress.setCity(zipCode.getName());
             contactAddress.setZipCode(zipCode);
         }
-        if(addressDTO.getMunicipality().getId() != null) {
+        if(addressDTO.getMunicipality() != null) {
             Municipality municipality = municipalityGraphRepository.findOne(addressDTO.getMunicipality().getId(), 0);
             if(municipality == null) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_MUNICIPALITY_NOTFOUND);

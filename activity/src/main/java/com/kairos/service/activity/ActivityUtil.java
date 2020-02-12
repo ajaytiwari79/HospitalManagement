@@ -216,7 +216,7 @@ public class ActivityUtil {
         IndividualPointsActivityTab individualPointsActivityTab = new IndividualPointsActivityTab("addHourValues", 0.0);
         activity.setIndividualPointsActivityTab(individualPointsActivityTab);
 
-        CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab(false, false);
+        CommunicationActivityTab communicationActivityTab = new CommunicationActivityTab(false, false, false);
         activity.setCommunicationActivityTab(communicationActivityTab);
 
         OptaPlannerSettingActivityTab optaPlannerSettingActivityTab = new OptaPlannerSettingActivityTab(AppConstants.MAX_ONE_ACTIVITY_PER_SHIFT, 0, true);

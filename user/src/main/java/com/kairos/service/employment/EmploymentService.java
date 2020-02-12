@@ -436,7 +436,7 @@ public class EmploymentService {
         if (EmploymentSubType.MAIN.equals(employmentDTO.getEmploymentSubType()) && positionService.eligibleForMainEmployment(employmentDTO, employmentId)) {
             oldEmployment.setEmploymentSubType(EmploymentSubType.MAIN);
         }
-        if(EmploymentSubType.SECONDARY.equals(employmentDTO.getEmploymentSubType())&& isNull(oldEmployment.getEmploymentSubType())){
+        if((EmploymentSubType.SECONDARY.equals(employmentDTO.getEmploymentSubType())&& isNull(oldEmployment.getEmploymentSubType())||(EmploymentSubType.SECONDARY.equals(employmentDTO.getEmploymentSubType())&&EmploymentSubType.MAIN.equals(oldEmployment.getEmploymentSubType())))){
             oldEmployment.setEmploymentSubType(EmploymentSubType.SECONDARY);
         }
 
@@ -1092,6 +1092,9 @@ public class EmploymentService {
     public void triggerEmploymentLine(Long expertiseId, ExpertiseLine expertiseLine) {
         Expertise expertise = expertiseGraphRepository.findOne(expertiseId, 2);
         List<Employment> employmentsList = employmentGraphRepository.findAllEmploymentByExpertiseId(expertise.getId());
+        List<Long> employmentLineIds = employmentsList.stream().flatMap(e->e.getEmploymentLines().stream().map(el-> el.getId())).collect(Collectors.toList());
+        List<EmploymentLine> employmentLineList = employmentGraphRepository.getEmploymentLineByIds(employmentLineIds);
+        Map<Long,EmploymentLine> employmentLineMap = employmentLineList.stream().collect(Collectors.toMap(k->k.getId(),v->v));
         List<Employment> employments = new CopyOnWriteArrayList<>(employmentsList);
         DateTimeInterval expertiseLineInterval = new DateTimeInterval(expertiseLine.getStartDate(), expertiseLine.getEndDate());
         List<Employment> employmentList = new ArrayList<>();
@@ -1115,9 +1118,11 @@ public class EmploymentService {
                         linkExistingRelations(employmentLineToBeCreated, employmentLine);
                     } else {
                         employmentLine.setFullTimeWeeklyMinutes(expertiseLine.getFullTimeWeeklyMinutes());
-                        //employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), expertiseLine, expertiseId));
+                        employmentLine.setSeniorityLevel(getSeniorityLevelByStaffAndExpertise(employment.getStaff().getId(), expertiseLine, expertiseId));
                         employmentLine.setWorkingDaysInWeek(expertiseLine.getNumberOfWorkingDaysInWeek());
                     }
+                }else{
+                    employmentLine.setSeniorityLevel(employmentLineMap.get(employmentLine.getId()).getSeniorityLevel());
                 }
             }
             employmentList.add(employment);
@@ -1188,6 +1193,11 @@ public class EmploymentService {
         }
         employmentGraphRepository.saveAll(employmentList);
     }
+
+//    public Long getTotalSumOfAmountOfPayLevel(List<Long> employmentIds,LocalDate selectedDate){
+//        Long totalSumOfPayLevel =employmentGraphRepository.findSum(employmentIds,selectedDate.toString());
+//        return totalSumOfPayLevel;
+//    }
 
 }
 

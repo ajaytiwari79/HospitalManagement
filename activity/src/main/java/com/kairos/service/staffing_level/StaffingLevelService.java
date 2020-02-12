@@ -682,16 +682,25 @@ public class StaffingLevelService  {
         return startDate;
     }
 
-    private StaffingLevel updateAbsenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel) {
+    private StaffingLevel updateAbsenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, BigInteger activityId) {
         if (!staffingLevel.getAbsenceStaffingLevelInterval().isEmpty()) {
             StaffingLevelInterval absenceStaffingLevelInterval = staffingLevel.getAbsenceStaffingLevelInterval().get(0);
             absenceStaffingLevelInterval.setAvailableNoOfStaff(absenceStaffingLevelInterval.getAvailableNoOfStaff() + 1);
+            updateInnerAbsenceStaffingAvailableNoOfStaff(absenceStaffingLevelInterval, activityId);
         } else {
             Duration duration = new Duration(LocalTime.MIN, LocalTime.MAX);
             StaffingLevelInterval absenceStaffingLevelInterval = new StaffingLevelInterval(0, 0, duration, 1);
             staffingLevel.getAbsenceStaffingLevelInterval().add(absenceStaffingLevelInterval);
         }
         return staffingLevel;
+    }
+
+    private void updateInnerAbsenceStaffingAvailableNoOfStaff(StaffingLevelInterval absenceStaffingLevelInterval, BigInteger activityId) {
+        for (StaffingLevelActivity staffingLevelActivity : absenceStaffingLevelInterval.getStaffingLevelActivities()) {
+            if(activityId.equals(staffingLevelActivity.getActivityId())){
+                staffingLevelActivity.setAvailableNoOfStaff(staffingLevelActivity.getAvailableNoOfStaff() + 1);
+            }
+        }
     }
 
     public StaffingLevel updatePresenceStaffingLevelAvailableStaffCount(StaffingLevel staffingLevel, List<Shift> shifts, Map<Long, List<SkillLevelDTO>> staffSkillsMap) {
@@ -707,7 +716,7 @@ public class StaffingLevelService  {
             for (ShiftActivity shiftActivity : shift.getActivities()) {
                 Activity activity = activityMap.get(shiftActivity.getActivityId());
                 if(isNotNull(activity) && (FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()))){
-                    updateAbsenceStaffingLevelAvailableStaffCount(staffingLevel);
+                    updateAbsenceStaffingLevelAvailableStaffCount(staffingLevel, activity.getId());
                 }else {
                     int durationMinutes = staffingLevel.getStaffingLevelSetting().getDefaultDetailLevelMinutes();
                     updateStaffingLevelInterval(shift.getBreakActivities(),durationMinutes,staffingLevel, shiftActivity, childAndParentActivityIdMap, shift.getStaffId(), staffSkillsMap);
@@ -937,7 +946,7 @@ public class StaffingLevelService  {
 
     @Async
     public void removedActivityFromStaffingLevel(BigInteger activityId, boolean isPresence){
-        List<StaffingLevel> staffingLevels = isPresence ? staffingLevelMongoRepository.findPresenceStaffingLevelsByActivityId(activityId) : staffingLevelMongoRepository.findAbsenceStaffingLevelsByActivityId(activityId);
+        List<StaffingLevel> staffingLevels = isPresence ? staffingLevelMongoRepository.findPresenceStaffingLevelsByActivityId(activityId,getCurrentDate()) : staffingLevelMongoRepository.findAbsenceStaffingLevelsByActivityId(activityId,getCurrentDate());
         for(StaffingLevel staffingLevel : staffingLevels){
             for(StaffingLevelInterval staffingLevelInterval : isPresence ? staffingLevel.getPresenceStaffingLevelInterval() : staffingLevel.getAbsenceStaffingLevelInterval()){
                 removedActivityFromStaffingLevelInterval(staffingLevelInterval, activityId);

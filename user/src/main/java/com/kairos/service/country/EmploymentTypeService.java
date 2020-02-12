@@ -301,18 +301,23 @@ public class EmploymentTypeService {
 
     public List<StaffKpiFilterDTO> getStaffByKpiFilter(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         Long countryId=countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
-         List<DayTypeDTO> dayTypeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeGraphRepository.findByCountryId(countryId),DayTypeDTO.class);
+        List<DayTypeDTO> dayTypeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeGraphRepository.findByCountryId(countryId),DayTypeDTO.class);
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult=staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,staffEmploymentTypeDTO.getTagIds());
+        List<EmploymentLinesQueryResult> hourlyCostPerLine=employmentGraphRepository.findFunctionalHourlyCost(staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(EmploymentQueryResult::getId)).collect(Collectors.toList()));
+       // List<EmploymentLinesQueryResult> payTableAmount=employmentGraphRepository.findSum(staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(EmploymentQueryResult::getId)).collect(Collectors.toList()),staffEmploymentTypeDTO.getStartDate());
+//        Map<Long,Long> longIntegerMap=payTableAmount.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getPayTableAmount));
         List<Long> staffIds = staffKpiFilterQueryResult.stream().map(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getId()).collect(Collectors.toList());
         List<StaffKpiFilterQueryResult> staffsWithTag = tagGraphRepository.getStaffsTagsByStaffIds(staffIds);
         Map<Long,List<TagQueryResult>> staffTagsMap = staffsWithTag.stream().collect(Collectors.toMap(k->k.getId(),v->v.getTags()));
-        List<EmploymentLinesQueryResult> hourlyCostPerLine=employmentGraphRepository.findFunctionalHourlyCost(staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(employmentQueryResult -> employmentQueryResult.getId())).collect(Collectors.toList()));
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
         List<Long> expertiseIds=staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(employmentQueryResult -> employmentQueryResult.getExpertise().getId())).collect(Collectors.toList());
         Map<Long, SeniorAndChildCareDaysDTO> expertiseIdsAndSeniorAndChildCareDaysMap=expertiseService.getSeniorAndChildCareDaysMapByExpertiseIds(expertiseIds);
         for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
             kpiFilterQueryResult.setDayTypeDTOS(dayTypeDTOS);
+//            if(ObjectUtils.isNotNull(longIntegerMap.get(kpiFilterQueryResult.getId()))) {
+//                kpiFilterQueryResult.setPayTableAmount(longIntegerMap.get(kpiFilterQueryResult.getId()));
+//            }
             kpiFilterQueryResult.setTags(staffTagsMap.getOrDefault(kpiFilterQueryResult.getId(),new ArrayList<>()));
             for (EmploymentQueryResult employmentQueryResult : kpiFilterQueryResult.getEmployment()) {
                 employmentQueryResult.setUnitId(staffEmploymentTypeDTO.getOrganizationId());
@@ -332,7 +337,7 @@ public class EmploymentTypeService {
     public DefaultKpiDataDTO getKpiDefaultData(StaffEmploymentTypeDTO staffEmploymentTypeDTO) {
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         Long countryId = countryGraphRepository.getCountryIdByUnitId(staffEmploymentTypeDTO.getOrganizationId());
-        List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,new ArrayList<>()), StaffKpiFilterDTO.class);
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,staffEmploymentTypeDTO.getTagIds()), StaffKpiFilterDTO.class);
         List<Map<String, Object>> publicHolidaysResult = FormatUtil.formatNeoResponse(countryGraphRepository.getCountryAllHolidays(countryId));
         Map<Long, List<Map>> publicHolidayMap = publicHolidaysResult.stream().filter(d -> d.get("dayTypeId") != null).collect(Collectors.groupingBy(k -> ((Long) k.get("dayTypeId")), Collectors.toList()));
         List<DayType> dayTypes = dayTypeGraphRepository.findByCountryId(countryId);

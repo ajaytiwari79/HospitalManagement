@@ -201,7 +201,7 @@ public class OrganizationActivityService extends MongoBaseService {
             }
             long activityCount = shiftService.countByActivityId(activityCopied.getId());
             if (activityCount > 0) {
-                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE);
+                exceptionService.actionNotPermittedException(MESSAGE_ACTIVITY_TIMECAREACTIVITYTYPE, activityCopied.getName());
             }
             if (isNotNull(activityCopied)) {
                 activityCopied.setDeleted(true);
