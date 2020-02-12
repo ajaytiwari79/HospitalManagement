@@ -360,7 +360,6 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "RETURN DISTINCT emp,r,exp,slRel,sl,COLLECT(empRel),COLLECT(empLine),staffRel,staff")
     List<Employment> getAllEmploymentByLevel(Long levelId,String startDate,String endDate);
 
-
     @Query("MATCH (employment:Employment{deleted:false})-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) where id(employment) IN  {0} \n" +
             "MATCH(employment)-[:" + HAS_EMPLOYMENT_LINES + "]-(employmentLine:EmploymentLine) WHERE (DATE(employmentLine.startDate)<=Date({1}) AND (employmentLine.endDate IS NULL OR Date({1}) <= Date(employmentLine.endDate))) \n" +
             "MATCH(employmentLine)-[:" + HAS_SENIORITY_LEVEL + "]->(seniorityLevel:SeniorityLevel)-[:" + HAS_BASE_PAY_GRADE + "]-(pg:PayGrade)\n" +
@@ -377,3 +376,4 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
     List<EmploymentLine> getEmploymentLineByIds(List<Long> employmentLineIds);
 
 }
+

@@ -368,6 +368,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         errorMessage.setSuccess(false);
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         mailService.sendMailToBackendOnException(ex);
+
         //raygunClient.send(ex);
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
