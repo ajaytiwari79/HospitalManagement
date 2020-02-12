@@ -298,6 +298,8 @@ public class StaffService {
         //saving addresses of staff
         staffAddressService.saveAddress(staffToUpdate, Arrays.asList(staffPersonalDetail.getContactAddress(), staffPersonalDetail.getSecondaryContactAddress()));
         assignTags(staffId, staffPersonalDetail, staffToUpdate);
+        staffGraphRepository.unlinkStaffChilds(staffId);
+        staffToUpdate.getStaffChildDetails().forEach(staffChildDetail -> staffChildDetail.setId(null));
         Staff staff = staffGraphRepository.save(staffToUpdate);
         staffPersonalDetail.setUserName(staff.getUser().getUserName());
         setStaffChildDetailsInPersonalDetail(staff, staffPersonalDetail);

@@ -354,6 +354,9 @@ public class KPIBuilderCalculationService implements CounterService {
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
     }
 
+
+
+
     private long getWorkedOnPublicHolidayCount(Long staffId, DateTimeInterval dateTimeInterval, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         int WorkedOnPublicHolidayCount = 0;
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShiftsByStaffIdAndInterval(staffId, dateTimeInterval, false);
