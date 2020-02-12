@@ -45,8 +45,6 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     private int scheduledMinutes;
     private int durationMinutes;
     private String activityName;
-    private long bid;
-    private long pId;
     //used in T&A view
     private Long reasonCodeId;
     //used for adding absence type of activities.

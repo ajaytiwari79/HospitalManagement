@@ -29,6 +29,7 @@ public class StaffKpiFilterQueryResult {
     private List<DayTypeDTO> dayTypeDTOS;
     private List<TeamDTO> teams;
     private List<StaffChildDetailDTO> staffChildDetails;
+    private long payTableAmount;
 
     public List<EmploymentQueryResult> getEmployment() {
         return isNullOrElse(employment,new ArrayList<>());

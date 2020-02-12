@@ -35,7 +35,6 @@ public class ApplicableKPI extends MongoBaseEntity {
     private YAxisConfig yAxisConfig;
     private KPIRepresentation kpiRepresentation;
     private transient LocalDate dateForKPISetCalculation;
-
     private DurationType frequencyType;
     // frequency value
     private int value;

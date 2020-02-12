@@ -14,6 +14,7 @@ repositories {
     mavenCentral()
     jcenter()
     maven { url "http://repo.spring.io/release/" }
+    maven { url "https://repo1.maven.org/maven2/"}
 }
 
 dependencies {
@@ -51,8 +52,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.mindscapehq/core
     compile group: 'com.mindscapehq', name: 'core', version: '3.0.0'
-    // https://mvnrepository.com/artifact/com.mindscapehq/raygun4java
-    compile group: 'com.mindscapehq', name: 'raygun4java', version: '3.0.0', ext: 'pom'
+//    // https://mvnrepository.com/artifact/com.mindscapehq/raygun4java
+//    compile group: 'com.mindscapehq', name: 'raygun4java', version: '3.0.0', ext: 'pom'
 // https://mvnrepository.com/artifact/com.mindscapehq/webprovider
     compile group: 'com.mindscapehq', name: 'webprovider', version: '3.0.0'
 

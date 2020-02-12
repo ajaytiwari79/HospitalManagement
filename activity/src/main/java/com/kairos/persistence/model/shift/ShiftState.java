@@ -1,19 +1,21 @@
 package com.kairos.persistence.model.shift;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 
+@Getter
+@Setter
 @Document(collection = "shiftState")
 public class ShiftState extends Shift {
 
     private BigInteger shiftId;
     private BigInteger shiftStatePhaseId;
-    private AccessGroupRole accessGroupRole;
-    private LocalDate validated;
 
     public ShiftState() {
 

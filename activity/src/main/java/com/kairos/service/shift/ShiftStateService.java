@@ -129,6 +129,7 @@ public class ShiftStateService {
             }else {
                 timeAndAttendanceShiftState.setAccessGroupRole(AccessGroupRole.MANAGEMENT);
             }
+            shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidated());
             if(isNotNull(timeAndAttendanceShiftState.getId())) {
                 timeAndAttendanceShiftStateMap.remove(timeAndAttendanceShiftState.getShiftId());
             }
@@ -149,6 +150,7 @@ public class ShiftStateService {
                 newshiftState.getActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                 newshiftState.getBreakActivities().forEach(a -> a.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
                 timeAndAttendanceShiftState.setValidated(getLocalDate());
+                shiftMongoRepository.updateValidateDetailsOfShift(timeAndAttendanceShiftState.getShiftId(),timeAndAttendanceShiftState.getAccessGroupRole(),timeAndAttendanceShiftState.getValidated());
                 timeAndAttendanceShiftStates.add(newshiftState);
             }
         }
