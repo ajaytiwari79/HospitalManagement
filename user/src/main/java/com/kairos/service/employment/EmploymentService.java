@@ -1194,6 +1194,11 @@ public class EmploymentService {
         employmentGraphRepository.saveAll(employmentList);
     }
 
+//    public Long getTotalSumOfAmountOfPayLevel(List<Long> employmentIds,LocalDate selectedDate){
+//        Long totalSumOfPayLevel =employmentGraphRepository.findSum(employmentIds,selectedDate.toString());
+//        return totalSumOfPayLevel;
+//    }
+
 }
 
 

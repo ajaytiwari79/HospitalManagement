@@ -28,6 +28,7 @@ public class StaffKpiFilterDTO {
     private List<DayTypeDTO> dayTypeDTOS;
     private List<TeamDTO> teams;
     private List<StaffChildDetailDTO> staffChildDetails;
+    private long payTableAmount;
 
     public String getFullName(){
         return this.firstName+" "+this.getLastName();
