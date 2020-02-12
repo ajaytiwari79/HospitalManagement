@@ -1,7 +1,9 @@
 package com.kairos.dto.activity.shift;
 
+import com.kairos.commons.utils.DateTimeInterval;
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -21,11 +23,9 @@ public class AuditShiftActivityDTO implements Comparable<AuditShiftActivityDTO>{
     private List<AuditShiftActivityDTO> childActivities;
 
     public boolean isChanged(AuditShiftActivityDTO auditShiftActivityDTO){
-        childActivities = isNullOrElse(childActivities,new ArrayList<>());
+        this.childActivities = isNullOrElse(childActivities,new ArrayList<>());
         auditShiftActivityDTO.setChildActivities(isNullOrElse(auditShiftActivityDTO.getChildActivities(),new ArrayList<>()));
-        boolean isChanged = isNull(startDate) || isNull(endDate) || isNull(activityId);
-        isChanged = isChanged || !(startDate.equals(auditShiftActivityDTO.startDate) || endDate.equals(auditShiftActivityDTO.endDate) || activityId.equals(auditShiftActivityDTO.activityId));
-        isChanged = isChanged || childActivities.size()!=auditShiftActivityDTO.childActivities.size() || this.durationMinutes != auditShiftActivityDTO.durationMinutes;
+        boolean isChanged = !this.startDate.equals(auditShiftActivityDTO.startDate) || !this.endDate.equals(auditShiftActivityDTO.endDate) || this.childActivities.size()!=auditShiftActivityDTO.childActivities.size();
         for (int i = 0; i < childActivities.size(); i++) {
             if (!isChanged) {
                 AuditShiftActivityDTO activityDTO = childActivities.get(i);
@@ -34,6 +34,11 @@ public class AuditShiftActivityDTO implements Comparable<AuditShiftActivityDTO>{
             }
         }
         return isChanged;
+    }
+
+
+    public DateTimeInterval getInterval() {
+        return new DateTimeInterval(startDate,endDate);
     }
 
     @Override

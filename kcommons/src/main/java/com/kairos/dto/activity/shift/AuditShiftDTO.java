@@ -48,14 +48,34 @@ public class AuditShiftDTO {
             this.startDate = activities.get(0).getStartDate();
             this.endDate = activities.get(activities.size()-1).getEndDate();
             changeMinutes = (int)new DateTimeInterval(startDate,endDate).getMinutes();
+        }else if(LoggingType.CREATED.equals(loggingType)){
+            changeMinutes = getMinutesOfActivity(activities);
         }else {
-            int totalMinutes = getMinutesOfActivity(activities);
-            int oldTotalMinutes = getMinutesOfActivity(old_activities);
-            if(totalMinutes==oldTotalMinutes){
-                totalMinutes = activities.stream().collect(Collectors.summingInt(auditShiftActivityDTO -> auditShiftActivityDTO.getDurationMinutes()));
-                oldTotalMinutes = old_activities.stream().collect(Collectors.summingInt(auditShiftActivityDTO -> auditShiftActivityDTO.getDurationMinutes()));
+            for (int i = 0; i < activities.size(); i++) {
+                DateTimeInterval shiftActivityInterval = activities.get(i).getInterval();
+                if(i<old_activities.size()){
+                    DateTimeInterval oldShiftActivityInterval = old_activities.get(i).getInterval();
+                    int totalMinutes = (oldShiftActivityInterval.equals(shiftActivityInterval) && old_activities.get(i).getActivityId().equals(activities.get(i).getActivityId())) ? 0 : getChangedActivity(activities.get(i),old_activities.get(i));
+                    changeMinutes+=abs(totalMinutes);
+                }else {
+                    changeMinutes += shiftActivityInterval.getMinutes();
+                }
             }
-            changeMinutes = abs(totalMinutes-oldTotalMinutes);
+        }
+        return changeMinutes;
+    }
+
+    private int getChangedActivity(AuditShiftActivityDTO auditShiftActivityDTO, AuditShiftActivityDTO oldauditShiftActivityDTO) {
+        int changeMinutes = 0;
+        if(auditShiftActivityDTO.getInterval().overlaps(oldauditShiftActivityDTO.getInterval())){
+            changeMinutes = (int)(auditShiftActivityDTO.getInterval().getMinutes() - oldauditShiftActivityDTO.getInterval().getMinutes());
+        }else {
+            changeMinutes+= abs((int)(auditShiftActivityDTO.getInterval().getMinutes() - oldauditShiftActivityDTO.getInterval().getMinutes()));
+            if(auditShiftActivityDTO.getStartDate().after(oldauditShiftActivityDTO.getEndDate())){
+                changeMinutes+=abs((int)new DateTimeInterval(oldauditShiftActivityDTO.getEndDate(),auditShiftActivityDTO.getStartDate()).getMinutes());
+            }else {
+                changeMinutes+=abs((int)new DateTimeInterval(auditShiftActivityDTO.getEndDate(),oldauditShiftActivityDTO.getStartDate()).getMinutes());
+            }
         }
         return changeMinutes;
     }
@@ -68,6 +88,6 @@ public class AuditShiftDTO {
             this.endDate = activities.get(activities.size() - 1).getEndDate();
             intervalMinutes = (int)new DateTimeInterval(startDate, endDate).getMinutes();
         }
-        return 0;
+        return intervalMinutes;
     }
 }

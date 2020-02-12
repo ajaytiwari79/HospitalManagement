@@ -62,6 +62,6 @@ public class TagDTO {
     public DateTimeInterval getOverlapInterval(Date startDate,Date endDate){
         Date intervalStartDate = isNull(this.startDate) ? startDate : this.startDate.before(startDate) ? startDate : this.startDate;
         Date intervalEndDate = isNull(this.endDate) ? endDate : this.endDate.after(endDate) ? endDate : this.endDate;
-        return new DateTimeInterval(intervalStartDate,endDate);
+        return new DateTimeInterval(intervalStartDate,intervalEndDate);
     }
 }

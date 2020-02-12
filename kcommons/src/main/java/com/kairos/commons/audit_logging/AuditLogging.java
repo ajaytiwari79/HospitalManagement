@@ -65,7 +65,7 @@ public class AuditLogging {
             });
             if(newEntity.getClass().getSimpleName().equals("Shift")){
                 diffResult.put("staffId", newEntity.getClass().getMethod("getStaffId").invoke(newEntity));
-                if((boolean)newEntity.getClass().getMethod("isDraft").invoke(newEntity)){
+                if((Boolean) newEntity.getClass().getMethod("isDraft").invoke(newEntity)){
                     return null;
                 }
             }

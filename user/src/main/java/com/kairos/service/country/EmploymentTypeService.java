@@ -304,12 +304,16 @@ public class EmploymentTypeService {
          List<DayTypeDTO> dayTypeDTOS=ObjectMapperUtils.copyPropertiesOfCollectionByMapper(dayTypeGraphRepository.findByCountryId(countryId),DayTypeDTO.class);
         OrganizationBaseEntity organizationBaseEntity = organizationBaseRepository.findOne(staffEmploymentTypeDTO.getOrganizationId());
         List<StaffKpiFilterQueryResult> staffKpiFilterQueryResult=staffGraphRepository.getStaffsByFilter(staffEmploymentTypeDTO.getOrganizationId(), staffEmploymentTypeDTO.getUnitIds(), staffEmploymentTypeDTO.getEmploymentTypeIds(), staffEmploymentTypeDTO.getStartDate(), staffEmploymentTypeDTO.getEndDate(), staffEmploymentTypeDTO.getStaffIds(), organizationBaseEntity instanceof Organization,staffEmploymentTypeDTO.getTagIds());
+        List<Long> staffIds = staffKpiFilterQueryResult.stream().map(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getId()).collect(Collectors.toList());
+        List<StaffKpiFilterQueryResult> staffsWithTag = tagGraphRepository.getStaffsTagsByStaffIds(staffIds);
+        Map<Long,List<TagQueryResult>> staffTagsMap = staffsWithTag.stream().collect(Collectors.toMap(k->k.getId(),v->v.getTags()));
         List<EmploymentLinesQueryResult> hourlyCostPerLine=employmentGraphRepository.findFunctionalHourlyCost(staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(employmentQueryResult -> employmentQueryResult.getId())).collect(Collectors.toList()));
         Map<Long, BigDecimal> hourlyCostMap = hourlyCostPerLine.stream().collect(Collectors.toMap(EmploymentLinesQueryResult::getId, EmploymentLinesQueryResult::getHourlyCost, (previous, current) -> current));
         List<Long> expertiseIds=staffKpiFilterQueryResult.stream().flatMap(staffKpiFilterQueryResult1 -> staffKpiFilterQueryResult1.getEmployment().stream().map(employmentQueryResult -> employmentQueryResult.getExpertise().getId())).collect(Collectors.toList());
         Map<Long, SeniorAndChildCareDaysDTO> expertiseIdsAndSeniorAndChildCareDaysMap=expertiseService.getSeniorAndChildCareDaysMapByExpertiseIds(expertiseIds);
         for (StaffKpiFilterQueryResult kpiFilterQueryResult : staffKpiFilterQueryResult) {
             kpiFilterQueryResult.setDayTypeDTOS(dayTypeDTOS);
+            kpiFilterQueryResult.setTags(staffTagsMap.getOrDefault(kpiFilterQueryResult.getId(),new ArrayList<>()));
             for (EmploymentQueryResult employmentQueryResult : kpiFilterQueryResult.getEmployment()) {
                 employmentQueryResult.setUnitId(staffEmploymentTypeDTO.getOrganizationId());
                 employmentQueryResult.setSeniorAndChildCareDays(expertiseIdsAndSeniorAndChildCareDaysMap.get(employmentQueryResult.getExpertise().getId()));

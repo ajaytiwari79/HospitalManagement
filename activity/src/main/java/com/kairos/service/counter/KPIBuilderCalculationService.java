@@ -1058,7 +1058,7 @@ public class KPIBuilderCalculationService implements CounterService {
             List<LocalDate> filterDates = (List<LocalDate>) filterCriteria[1];
             List<Long> unitIds = (List<Long>) filterCriteria[2];
             employmentTypeIds = (List<Long>) filterCriteria[3];
-            DefaultKpiDataDTO defaultKpiDataDTO = counterHelperService.getKPIAllData(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+            DefaultKpiDataDTO defaultKpiDataDTO = counterHelperService.getKPIAllData(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId,getLongValue(filterBasedCriteria.getOrDefault(TAGS,new ArrayList())));
             staffKpiFilterDTOS = defaultKpiDataDTO.getStaffKpiFilterDTOs();
             dateTimeIntervals = defaultKpiDataDTO.getDateTimeIntervals();
             List<TimeSlotDTO> timeSlotDTOS = defaultKpiDataDTO.getTimeSlotDTOS();

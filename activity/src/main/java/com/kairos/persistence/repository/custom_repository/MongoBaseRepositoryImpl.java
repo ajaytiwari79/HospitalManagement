@@ -166,7 +166,7 @@ public class MongoBaseRepositoryImpl<T extends MongoBaseEntity, ID extends Seria
 	private <S> S createEntity(S entity){
 		S oldEntity = null;
 		try {
-			oldEntity = (S) ObjectMapperUtils.copyPropertiesByMapper(entity.getClass().newInstance(),entity.getClass());
+			oldEntity = (S) entity.getClass().newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
