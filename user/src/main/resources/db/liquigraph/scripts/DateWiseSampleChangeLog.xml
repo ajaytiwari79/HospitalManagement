@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<changelog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://www.liquigraph.org/schema/1.0/liquigraph.xsd">
+   <changeset id="timestamp2" author="arvind">
+       <query>Match (s:Staff) where id(s)=18135 set s.lastName='Singh2' return s </query>
+   </changeset>
+</changelog>
