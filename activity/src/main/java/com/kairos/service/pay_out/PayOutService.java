@@ -133,7 +133,7 @@ public class PayOutService extends MongoBaseService {
             updatePayoutByShift(staffAdditionalInfoDTO, draftShiftWithActivityDTO, activityWrapperMap, interval);
             updatePayoutDetailInShift(draftShiftWithActivityDTO,shift.getDraftShift());
         }
-        shiftMongoRepository.save(shift);
+        //shiftMongoRepository.save(shift);
     }
 
     private void updatePayoutDetailInShift(ShiftWithActivityDTO shiftWithActivityDTO,Shift shift){

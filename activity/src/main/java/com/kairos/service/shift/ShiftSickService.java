@@ -29,6 +29,7 @@ import com.kairos.persistence.repository.time_bank.TimeBankRepository;
 import com.kairos.persistence.repository.wta.WorkingTimeAgreementMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
+import com.kairos.service.activity.ActivityService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -86,6 +87,7 @@ public class ShiftSickService extends MongoBaseService {
     private TimeBankService timeBankService;
     @Inject
     private ShiftBreakService shiftBreakService;
+    @Inject private ActivityService activityService;
 
 
     public Map<String, Long> createSicknessShiftsOfStaff(Long unitId, BigInteger activityId, Long staffId, Duration duration) {
@@ -173,7 +175,7 @@ public class ShiftSickService extends MongoBaseService {
             Map<Date, Phase> phaseListByDate = phaseService.getPhasesByDates(shifts.get(0).getUnitId(), dateTimes);
             //shiftMongoRepository.saveEntities(shifts);
 
-            Map<BigInteger, ActivityWrapper> activityWrapperMap = shiftService.getActivityWrapperMap(shifts,null);
+            Map<BigInteger, ActivityWrapper> activityWrapperMap = activityService.getActivityWrapperMap(shifts,null);
             for (Shift shift : shifts) {
                 staffAdditionalInfoDTO = userIntegrationService.verifyUnitEmploymentOfStaff(DateUtils.asLocalDate(shift.getActivities().get(0).getStartDate()),shifts.get(0).getStaffId(),  shifts.get(0).getEmploymentId(),Collections.emptySet());
                 WTAQueryResultDTO wtaQueryResultDTO = workingTimeAgreementMongoRepository.getWTAByEmploymentIdAndDate(staffAdditionalInfoDTO.getEmployment().getId(), DateUtils.onlyDate(shift.getActivities().get(0).getStartDate()));

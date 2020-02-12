@@ -28,6 +28,7 @@ import com.kairos.dto.activity.kpi.KPIResponseDTO;
 import com.kairos.dto.activity.kpi.KPISetResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
+import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.dto.user_context.UserContext;
@@ -291,10 +292,18 @@ public class CounterDataService extends MongoBaseService {
                 case TEAM_TYPE:
                     getTeamTypeData(criteriaList);
                     break;
+                case TAGS:getTagsData(defaultKpiDataDTO,criteriaList);
+                break;
                 default:break;
             }
         }
 
+    }
+
+    private void getTagsData(DefaultKpiDataDTO defaultKpiDataDTO,List<FilterCriteria> criteriaList) {
+        List<KPIFilterDefaultDataDTO> kpiFilterDefaultDataDTOS = new ArrayList<>();
+        defaultKpiDataDTO.getTags().forEach(tagDTO -> kpiFilterDefaultDataDTOS.add(new KPIFilterDefaultDataDTO(tagDTO.getId(), tagDTO.getName())));
+        criteriaList.add(new FilterCriteria(TAGS.value, TAGS, (List) kpiFilterDefaultDataDTOS));
     }
 
     private void getPlannedByUnitData(List<FilterCriteria> criteriaList) {
