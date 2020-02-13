@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.CommonConstants.MULTIPLE_ACTIVITY;
@@ -202,6 +203,10 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     public void setStartDateAndEndDate(Date startDate,Date endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public boolean isOverNightShift(){
+        return !asLocalDate(this.startDate).equals(asLocalDate(this.endDate));
     }
 
     @Override

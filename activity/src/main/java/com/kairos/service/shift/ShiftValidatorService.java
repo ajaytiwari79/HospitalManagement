@@ -928,10 +928,9 @@ public class ShiftValidatorService {
         Date startDate = null;
         Date endDate = null;
         List<Shift> shiftList = new ArrayList<>();
-        if(isNull(shiftDTO.getStartDate())||isNull(shiftDTO.getEndDate())){
-            startDate = isNull(shiftDTO.getStartDate()) ? asDateStartOfDay(shiftDTO.getShiftDate()) : shiftDTO.getStartDate();
-            endDate = isNull(shiftDTO.getStartDate()) ? asDateEndOfDay(shiftDTO.getShiftDate()) : shiftDTO.getEndDate();
-        }
+        startDate = isNull(shiftDTO.getStartDate()) ? asDateStartOfDay(shiftDTO.getShiftDate()) : shiftDTO.getStartDate();
+        endDate = isNull(shiftDTO.getEndDate()) ? asDateEndOfDay(shiftDTO.getShiftDate()) : shiftDTO.getEndDate();
+
         shiftList = shiftMongoRepository.getAllOverlappedShiftsAndEmploymentId(shiftDTO.getEmploymentId(),startDate,endDate);
 
 
@@ -943,6 +942,9 @@ public class ShiftValidatorService {
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
+        if(isCollectionEmpty(shiftList)){
+            absenceShiftExists =false;
+        }
         if (absenceShiftExists) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY);
         }
@@ -998,7 +1000,7 @@ public class ShiftValidatorService {
         for (ShiftWithActivityDTO shift : shifts) {
             if (isNotNull(shift) && isNotNull(shift.getActivities().get(0).getActivity()) && shift.getActivities().get(0).getActivity().isFullDayOrFullWeekActivity()) {
                 Date startDate = getStartOfDay(shift.getStartDate());
-                Date endDate = getMidNightOfDay(shift.getEndDate());
+                Date endDate = shift.isOverNightShift() ? shift.getEndDate() : getMidNightOfDay(shift.getEndDate());
                 shift.getActivities().get(0).setStartDate(startDate);
                 shift.getActivities().get(0).setEndDate(endDate);
                 shift.setStartDate(startDate);
