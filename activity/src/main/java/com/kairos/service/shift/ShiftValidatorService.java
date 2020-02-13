@@ -925,19 +925,22 @@ public class ShiftValidatorService {
 
     //This method is being used to check overlapping shift with full day and full week activity
     public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
-        Date startDate;
-        Date endDate;
-        List<Shift> shift = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(asLocalDateTime(DateUtils.getStartOfDay(shiftDTO.getStartDate())),asLocalDateTime(DateUtils.getEndOfDay(shiftDTO.getEndDate())),shiftDTO.getUnitId());
-        Shift lastShiftOfTheDay =shift.get(shift.size()-1);
+        Date startDate = null;
+        Date endDate = null;
+        List<Shift> shiftList = new ArrayList<>();
+        if(isNull(shiftDTO.getStartDate())||isNull(shiftDTO.getEndDate())){
+            startDate = isNull(shiftDTO.getStartDate()) ? asDateStartOfDay(shiftDTO.getShiftDate()) : shiftDTO.getStartDate();
+            endDate = isNull(shiftDTO.getStartDate()) ? asDateEndOfDay(shiftDTO.getShiftDate()) : shiftDTO.getEndDate();
+        }
+        shiftList = shiftMongoRepository.getAllOverlappedShiftsAndEmploymentId(shiftDTO.getEmploymentId(),startDate,endDate);
+
+
         if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
             startDate = DateUtils.getStartOfDay(shiftDTO.getStartDate());
             endDate = DateUtils.getEndOfDay(shiftDTO.getEndDate());
         } else {
             startDate = asDateStartOfDay(shiftDTO.getShiftDate());
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
-            if(lastShiftOfTheDay.getEndDate().after(shiftDTO.getEndDate())){
-                endDate =lastShiftOfTheDay.getEndDate();
-            }
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
         if (absenceShiftExists) {
