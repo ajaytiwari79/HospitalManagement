@@ -927,12 +927,17 @@ public class ShiftValidatorService {
     public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
         Date startDate;
         Date endDate;
+        List<Shift> shift = shiftMongoRepository.findShiftBetweenDurationAndUnitIdAndDeletedFalse(asLocalDateTime(DateUtils.getStartOfDay(shiftDTO.getStartDate())),asLocalDateTime(DateUtils.getEndOfDay(shiftDTO.getEndDate())),shiftDTO.getUnitId());
+        Shift lastShiftOfTheDay =shift.get(shift.size()-1);
         if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
             startDate = DateUtils.getStartOfDay(shiftDTO.getStartDate());
             endDate = DateUtils.getEndOfDay(shiftDTO.getEndDate());
         } else {
             startDate = asDateStartOfDay(shiftDTO.getShiftDate());
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
+            if(lastShiftOfTheDay.getEndDate().after(shiftDTO.getEndDate())){
+                endDate =lastShiftOfTheDay.getEndDate();
+            }
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
         if (absenceShiftExists) {

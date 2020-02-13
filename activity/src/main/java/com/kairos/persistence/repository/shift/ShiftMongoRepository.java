@@ -95,6 +95,9 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,employmentId:?0, 'disabled':false, startDate:{$gte:?1,$lt:?2}}")
     List<Shift> findAllShiftsByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate);
 
+    @Query("{deleted:false, 'disabled':false, startDate:{$gte:?1,$lt:?2}}")
+    List<Shift> findAllShiftsBetweenDate(Date startDate, Date endDate);
+
     @Query("{deleted:false,employmentId:?0, startDate:{$gte:?1}}")
     List<Shift> findAllShiftsByEmploymentIdAfterDate(Long employmentId, Date startDate);
 
