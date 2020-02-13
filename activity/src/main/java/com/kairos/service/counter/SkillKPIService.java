@@ -61,7 +61,7 @@ public class SkillKPIService {
                             }
                         }
                         if (ObjectUtils.isNotNull(skillLevelDTO.getEndDate())) {
-                            if (dateTimeInterval.containsAndEqualsEndDate(asDate(selectedFromDate))) {
+                            if (dateTimeInterval.containsAndEqualsEndDate(asDate(selectedFromDate))||selectedFromDate.equals(skillLevelDTO.getStartDate())) {
                                 count++;
                             }
 
