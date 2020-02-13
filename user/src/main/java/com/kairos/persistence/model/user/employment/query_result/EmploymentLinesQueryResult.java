@@ -4,6 +4,7 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.enums.EmploymentSubType;
+import com.kairos.persistence.model.pay_table.PayGrade;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,6 +43,8 @@ public class EmploymentLinesQueryResult {
     private Long employmentTypeId;
     private EmploymentSubType employmentSubType;
     private List<StaffChildDetailDTO> staffChildDetails;
+    private long payTableAmount;
+    private Long payGradeLevel;
 
     public EmploymentLinesQueryResult(Long id, LocalDate startDate, LocalDate endDate, Integer workingDaysInWeek, Integer totalWeeklyHours, Float avgDailyWorkingHours, Integer fullTimeWeeklyMinutes, Double salary, Integer totalWeeklyMinutes, BigDecimal hourlyCost, Map<String, Object> employmentType, Map<String, Object> seniorityLevel, Long employmentId, long accumulatedTimebankMinutes) {
         this.id = id;

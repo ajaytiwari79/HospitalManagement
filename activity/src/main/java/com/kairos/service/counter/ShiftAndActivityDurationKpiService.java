@@ -59,7 +59,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
         Set<DayOfWeek> daysOfWeeks = (Set<DayOfWeek>)filterCriteria[4];
         List<BigInteger> activitiesIds = KPIUtils.getBigIntegerValue(filterBasedCriteria.getOrDefault(FilterType.ACTIVITY_IDS, new ArrayList<>()));
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
         staffIds = (List<Long>) kpiData[2];
@@ -93,7 +93,7 @@ public class ShiftAndActivityDurationKpiService implements CounterService {
         Object[] filterCriteria = counterHelperService.getDataByFilterCriteria(filterBasedCriteria);
         List<Long> staffIds = (List<Long>)filterCriteria[0];
         List<LocalDate> filterDates = (List<LocalDate>)filterCriteria[1];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI,filterDates,staffIds,newArrayList(),newArrayList(organizationId),organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<ShiftWithActivityDTO> shifts = shiftMongoRepository.findShiftsByShiftAndActvityKpiFilters(staffIds, newArrayList(organizationId), newArrayList(), newArrayList(), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate(),null);
         Map<Long,Integer> staffIdAndDurationMap = getStaffAndShiftDurationMap(shifts);

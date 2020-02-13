@@ -121,7 +121,7 @@ public class TimeBankKpiCalculationService implements CounterService {
         List<Long> unitIds = (List<Long>)filterCriteria[2];
         List<Long> employmentTypeIds = (List<Long>)filterCriteria[3];
         Set<DayOfWeek> daysOfWeeks = (Set<DayOfWeek>)filterCriteria[4];
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI,filterDates,staffIds,employmentTypeIds,unitIds,organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>)kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>)kpiData[0];
         if (CollectionUtils.isEmpty(unitIds)) {
@@ -258,7 +258,7 @@ public class TimeBankKpiCalculationService implements CounterService {
         if (CollectionUtils.isEmpty(unitIds)) {
             unitIds.add(organizationId);
         }
-        Object[] kpiData = counterHelperService.getKPIdata(applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
+        Object[] kpiData = counterHelperService.getKPIdata(new HashMap(),applicableKPI, filterDates, staffIds, employmentTypeIds, unitIds, organizationId);
         List<DateTimeInterval> dateTimeIntervals = (List<DateTimeInterval>) kpiData[1];
         List<StaffKpiFilterDTO> staffKpiFilterDTOS = (List<StaffKpiFilterDTO>) kpiData[0];
         staffIds = (List<Long>) kpiData[2];
