@@ -21,15 +21,12 @@ import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.activity.todo.TodoDTO;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
-import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.experties.ExpertiseLineDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.employment.EmploymentLinesDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
-import com.kairos.dto.user.team.TeamDTO;
-import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.DurationType;
 import com.kairos.enums.EmploymentSubType;
@@ -40,7 +37,6 @@ import com.kairos.enums.kpi.YAxisConfig;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
-import com.kairos.enums.team.TeamType;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -53,7 +49,6 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.time_bank.DailyTimeBankEntry;
-import com.kairos.persistence.model.todo.Todo;
 import com.kairos.persistence.model.wta.WTAQueryResultDTO;
 import com.kairos.persistence.model.wta.templates.WTABaseRuleTemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
@@ -75,7 +70,6 @@ import com.kairos.service.todo.TodoService;
 import com.kairos.service.wta.WorkTimeAgreementBalancesCalculationService;
 import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.counter.KPIUtils;
-import com.kairos.wrapper.shift.ActivityWithUnitIdDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -438,7 +432,7 @@ public class KPIBuilderCalculationService implements CounterService {
         if (isCollectionNotEmpty(staffKpiFilterDTOS)) {
             for (StaffKpiFilterDTO staffKpiFilterDTO : staffKpiFilterDTOS) {
                 for (EmploymentWithCtaDetailsDTO employmentWithCtaDetailsDTO : staffKpiFilterDTO.getEmployment()) {
-                    WorkTimeAgreementBalance workTimeAgreementBalance = workTimeAgreementBalancesCalculationService.getWorktimeAgreementBalance(kpiCalculationRelatedInfo.unitId,employmentWithCtaDetailsDTO.getId(), dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate(),kpiCalculationRelatedInfo.getWtaTemplateTypes(yAxisConfig));
+                    WorkTimeAgreementBalance workTimeAgreementBalance = workTimeAgreementBalancesCalculationService.getWorkTimeAgreementBalance(kpiCalculationRelatedInfo.unitId,employmentWithCtaDetailsDTO.getId(), dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate(),kpiCalculationRelatedInfo.getWtaTemplateTypes(yAxisConfig),null);
                     count += workTimeAgreementBalance.getWorkTimeAgreementRuleTemplateBalances().stream().flatMap(workTimeAgreementRuleTemplateBalancesDTO -> workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().stream()).mapToInt(intervalBalance -> (int) intervalBalance.getAvailable()).sum();
                 }
             }
@@ -982,7 +976,7 @@ public class KPIBuilderCalculationService implements CounterService {
             wtaQueryResultDTOS = workTimeAgreementService.getWTAByEmploymentIdsAndDates(new ArrayList<>(employmentIds), dateTimeIntervals.get(0).getStartDate(), dateTimeIntervals.get(dateTimeIntervals.size() - 1).getEndDate());
             wtaBaseRuleTemplates = wtaQueryResultDTOS.stream().flatMap(wtaQueryResultDTO -> wtaQueryResultDTO.getRuleTemplates().stream()).filter(wtaBaseRuleTemplate -> getWtaTemplateTypes(null).contains(wtaBaseRuleTemplate.getWtaTemplateType())).collect(Collectors.toList());
             employmentIdAndWtaMap = wtaQueryResultDTOS.stream().collect(Collectors.groupingBy(WTAQueryResultDTO::getEmploymentId, Collectors.toList()));
-            wtaActivityIds = workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates);
+            wtaActivityIds = workTimeAgreementBalancesCalculationService.getActivityIdsByRuletemplates(wtaBaseRuleTemplates,null);
             activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(new ArrayList<>(wtaActivityIds));
             activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
             planningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(unitId);

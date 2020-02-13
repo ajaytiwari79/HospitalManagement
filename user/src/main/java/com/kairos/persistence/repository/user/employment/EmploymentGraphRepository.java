@@ -3,6 +3,7 @@ package com.kairos.persistence.repository.user.employment;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionWithAmountQueryResult;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
+import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetailQueryResult;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.EmploymentLine;
 import com.kairos.persistence.model.user.employment.EmploymentLineEmploymentTypeRelationShip;
@@ -52,11 +53,11 @@ public interface EmploymentGraphRepository extends Neo4jBaseRepository<Employmen
             "id(employment) as id,employment.startDate as startDate")
     List<StaffEmploymentDetails> getStaffInfoByUnitIdAndStaffId(Long unitId, Long expertiseId, List<Long> staffId);
 
-    @Query("MATCH (staff:Staff) where id(staff) IN {0} " +
+    @Query("MATCH (staff:Staff)-[:"+HAS_CONTACT_DETAIL+"]->(contactDetail:ContactDetail) where id(staff) IN {0} " +
             "MATCH(staff)-[rel:"+STAFF_HAS_EXPERTISE+"]->(expertise:Expertise) " +
-            "return id(staff) as id,collect(id(expertise)) as expertiseIds")
-    List<StaffPersonalDetail> getStaffDetailByIds(Set<Long> staffId, LocalDate currentDate);
-
+            "OPTIONAL MATCH(staff)-[:"+BELONGS_TO_STAFF+"]->(employment:Employment{employmentSubType:'MAIN'}) " +
+            "RETURN id(staff) as id,staff.firstName as firstName,staff.lastName as lastName,contactDetail.privateEmail as privateEmail,staff.profilePic as profilePic,collect(id(expertise)) as expertiseIds,id(employment) as mainEmploymentId")
+    List<StaffPersonalDetailQueryResult> getStaffDetailByIds(Set<Long> staffId, LocalDate currentDate);
 
     @Query("MATCH (employment:Employment{deleted:false}) where id(employment) IN {0} \n" +
             "MATCH(employment)-[:"+BELONGS_TO_STAFF+"]-(staff:Staff) \n" +

@@ -58,6 +58,7 @@ import com.kairos.service.open_shift.OrderService;
 import com.kairos.service.period.PeriodSettingsService;
 import com.kairos.service.phase.PhaseService;
 import com.kairos.service.priority_group.PriorityGroupService;
+import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.unit_settings.*;
 import com.kairos.service.wta.WorkTimeAgreementService;
@@ -142,6 +143,8 @@ public class OrganizationActivityService extends MongoBaseService {
     private ShiftService shiftService;
     @Inject
     private CounterDistService counterDistService;
+    @Inject
+    private ActivitySchedulerJobService activitySchedulerJobService;
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationActivityService.class);
 
@@ -550,6 +553,7 @@ public class OrganizationActivityService extends MongoBaseService {
             save(activityCopiedList);
             costTimeAgreementService.assignCountryCTAtoOrganisation(orgTypeAndSubTypeDTO.getCountryId(), orgTypeAndSubTypeDTO.getSubTypeId(), unitId);
             workTimeAgreementService.assignWTAToNewOrganization(orgTypeAndSubTypeDTO.getSubTypeId(), unitId, orgTypeAndSubTypeDTO.getCountryId());
+            activitySchedulerJobService.registerJobForActivityCutoff(activityCopiedList);
         }
     }
 

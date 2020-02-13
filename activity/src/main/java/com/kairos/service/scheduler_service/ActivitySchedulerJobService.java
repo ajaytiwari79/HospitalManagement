@@ -3,6 +3,7 @@ package com.kairos.service.scheduler_service;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
+import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobFrequencyType;
@@ -17,6 +18,7 @@ import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.activity.ActivityService;
+import com.kairos.service.shift.ActivityReminderService;
 import com.kairos.service.shift.ShiftReminderService;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -32,20 +34,20 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.DateUtils.substractDurationInLocalDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.service.period.PlanningPeriodService.SCHEDULER_PANEL;
+import static java.util.Comparator.comparing;
 
 @Service
 public class ActivitySchedulerJobService extends MongoBaseService {
 
-    @Inject
-    private SchedulerServiceRestClient schedulerRestClient;
+    @Inject private SchedulerServiceRestClient schedulerRestClient;
     @Inject private ShiftReminderService shiftReminderService;
-    @Inject private ActivityService activityService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivitySchedulerJobService.class);
 
@@ -122,28 +124,29 @@ public class ActivitySchedulerJobService extends MongoBaseService {
     }
 
     @Async
-    public void registerJobForActivityCutoff(Activity activity) {
-        BasicNameValuePair jobSubType = new BasicNameValuePair("jobSubType", JobSubType.ACTIVITY_CUTOFF.toString());
-        schedulerRestClient.publishRequest(null, activity.getUnitId(), true, IntegrationOperation.DELETE, "/scheduler_panel/entity/{entityId}/delete_job", newArrayList(jobSubType), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {}, activity.getId());
-        List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
-        if(activity.getCommunicationActivityTab().isAllowActivityCutoffReminder()) {
-            calculateTriggerDateTimeList(activity).forEach(reminderDateTime ->
-                    schedulerPanelDTOS.add(new SchedulerPanelDTO(activity.getUnitId(), JobType.SYSTEM, JobSubType.ACTIVITY_CUTOFF, activity.getId(), reminderDateTime, true, null))
-            );
-            if (isCollectionNotEmpty(schedulerPanelDTOS)) {
-                schedulerRestClient.publishRequest(schedulerPanelDTOS, activity.getUnitId(), true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-                });
+    public void registerJobForActivityCutoff(List<Activity> activities) {
+        for (Activity activity : activities) {
+            BasicNameValuePair jobSubType = new BasicNameValuePair("jobSubType", JobSubType.ACTIVITY_CUTOFF.toString());
+            schedulerRestClient.publishRequest(null, activity.getUnitId(), true, IntegrationOperation.DELETE, "/scheduler_panel/entity/{entityId}/delete_job", newArrayList(jobSubType), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {}, activity.getId());
+            List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
+            if(activity.getCommunicationActivityTab().isAllowActivityCutoffReminder()) {
+                calculateTriggerDateTimeList(activity).forEach(reminderDateTime ->
+                        schedulerPanelDTOS.add(new SchedulerPanelDTO(activity.getUnitId(), JobType.SYSTEM, JobSubType.ACTIVITY_CUTOFF, activity.getId(), reminderDateTime, true, null))
+                );
+                if (isCollectionNotEmpty(schedulerPanelDTOS)) {
+                    schedulerRestClient.publishRequest(schedulerPanelDTOS, activity.getUnitId(), true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});
+                }
             }
         }
     }
 
-    private List<LocalDateTime> calculateTriggerDateTimeList(Activity activity) {
-        List<LocalDateTime> reminderDateTimes = new ArrayList<>();
+    private Set<LocalDateTime> calculateTriggerDateTimeList(Activity activity) {
+        Set<LocalDateTime> reminderDateTimes = new HashSet<>();
         for (ActivityReminderSettings activityCutoffReminderSetting : activity.getCommunicationActivityTab().getActivityCutoffReminderSettings()) {
             for (CutOffInterval cutOffInterval : activity.getRulesActivityTab().getCutOffIntervals()) {
                 LocalDateTime reminderDateTime = substractDurationInLocalDateTime(asLocalDateTime(asDate(cutOffInterval.getEndDate())), activityCutoffReminderSetting.getSendReminder().getTimeValue(), activityCutoffReminderSetting.getSendReminder().getDurationType());
                 reminderDateTimes.add(reminderDateTime);
-                if(activityCutoffReminderSetting.isRepeatAllowed()){
+                if (activityCutoffReminderSetting.isRepeatAllowed()) {
                     reminderDateTimes.addAll(calculateRepeatTriggerDateTimeList(activityCutoffReminderSetting, cutOffInterval, reminderDateTime));
                 }
             }
@@ -151,10 +154,10 @@ public class ActivitySchedulerJobService extends MongoBaseService {
         return reminderDateTimes;
     }
 
-    private List<LocalDateTime> calculateRepeatTriggerDateTimeList(ActivityReminderSettings activityCutoffReminderSetting, CutOffInterval cutOffInterval, LocalDateTime reminderDateTime) {
-        List<LocalDateTime> repeatTriggerDateTimes = new ArrayList<>();
+    private Set<LocalDateTime> calculateRepeatTriggerDateTimeList(ActivityReminderSettings activityCutoffReminderSetting, CutOffInterval cutOffInterval, LocalDateTime reminderDateTime) {
+        Set<LocalDateTime> repeatTriggerDateTimes = new HashSet<>();
         reminderDateTime = addDurationInLocalDateTime(reminderDateTime, activityCutoffReminderSetting.getRepeatReminder().getTimeValue(), activityCutoffReminderSetting.getRepeatReminder().getDurationType(), 1);
-        while (reminderDateTime.isBefore(cutOffInterval.getEndDate().plusDays(1).atStartOfDay())){
+        while (reminderDateTime.isBefore(cutOffInterval.getEndDate().atStartOfDay())){
             repeatTriggerDateTimes.add(reminderDateTime);
             reminderDateTime = addDurationInLocalDateTime(reminderDateTime, activityCutoffReminderSetting.getRepeatReminder().getTimeValue(), activityCutoffReminderSetting.getRepeatReminder().getDurationType(), 1);
         }
