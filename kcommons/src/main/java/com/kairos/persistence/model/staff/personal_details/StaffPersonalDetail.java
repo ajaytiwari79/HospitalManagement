@@ -84,6 +84,8 @@ public class StaffPersonalDetail {
     private Long staffUserId;
     private Long externalId;
     private Set<AccessGroupRole> roles;
+    private Long mainEmploymentId;
+    private String privateEmail;
 
     public StaffPersonalDetail(Long id, List<SkillLevelDTO> skills) {
         this.id = id;

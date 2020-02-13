@@ -87,12 +87,11 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 break;
             case ACTIVITY_CUTOFF:
                 LOGGER.info("Job to Reminders to be sent to the staff for not planning the absences within the cutoff period. ");
-                activityReminderService.sendReminderViaEmail(job);
+                activityReminderService.sendActivityCutoffReminderViaEmail(job.getUnitId(), job.getEntityId());
                 break;
             default:
                 LOGGER.error("No exceution route found for jobsubtype");
                 break;
-
         }
 
     }

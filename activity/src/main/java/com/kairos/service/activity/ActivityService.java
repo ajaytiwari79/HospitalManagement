@@ -515,7 +515,7 @@ public class ActivityService {
         return activity.getIndividualPointsActivityTab();
     }
 
-    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO) {
+    public ActivityTabsWrapper updateRulesTab(RulesActivityTabDTO rulesActivityDTO,boolean updateFromOrg) {
         validateActivityTimeRules( rulesActivityDTO.getShortestTime(), rulesActivityDTO.getLongestTime());
         RulesActivityTab rulesActivityTab = ObjectMapperUtils.copyPropertiesByMapper(rulesActivityDTO, RulesActivityTab.class);
         Activity activity = findActivityById(rulesActivityDTO.getActivityId());
@@ -545,6 +545,9 @@ public class ActivityService {
             activity.getTimeCalculationActivityTab().setDayTypes(activity.getRulesActivityTab().getDayTypes());
         }
         activityMongoRepository.save(activity);
+        if(updateFromOrg) {
+            activitySchedulerJobService.registerJobForActivityCutoff(newArrayList(activity));
+        }
         return new ActivityTabsWrapper(rulesActivityTab);
     }
 
@@ -609,7 +612,7 @@ public class ActivityService {
     }
 
 
-    public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO) {
+    public ActivityTabsWrapper updateCommunicationTabOfActivity(CommunicationActivityDTO communicationActivityDTO, boolean updateFromOrg) {
         validateReminderSettings(communicationActivityDTO.getActivityReminderSettings());
         validateReminderSettings(communicationActivityDTO.getActivityCutoffReminderSettings());
         CommunicationActivityTab communicationActivityTab = ObjectMapperUtils.copyPropertiesByMapper(communicationActivityDTO,CommunicationActivityTab.class);
@@ -619,7 +622,9 @@ public class ActivityService {
         Activity activity = findActivityById(communicationActivityDTO.getActivityId());
         activity.setCommunicationActivityTab(communicationActivityTab);
         activityMongoRepository.save(activity);
-        activitySchedulerJobService.registerJobForActivityCutoff(activity);
+        if(updateFromOrg) {
+            activitySchedulerJobService.registerJobForActivityCutoff(newArrayList(activity));
+        }
         return new ActivityTabsWrapper(communicationActivityTab);
     }
 

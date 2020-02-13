@@ -170,6 +170,7 @@ public class AppConstants {
     public static final String ABSENCE_ACTIVITY_REMINDER_EMAIL_BODY = "Please plan  activity %s before it expires on %s.\n Count left is %s.";
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
     public static final String SHIFT_NOTIFICATION="Shift Reminder";
+    public static final String ACTIVITY_REMINDER="Activity Reminder";
     public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
     public static final String NORMAL_TIME="Normal Time";
     public static final String EXTRA_TIME="Extra Time";
