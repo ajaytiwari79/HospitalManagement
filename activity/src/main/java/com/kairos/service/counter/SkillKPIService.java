@@ -50,6 +50,7 @@ public class SkillKPIService {
             selectedFromDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
             selectedToDate = kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation();
         }
+
         for(StaffPersonalDetail staffPersonalDetail :staffPersonalDetails){
             if(staffPersonalDetail.getId().equals(staffId)){
                 for(SkillLevelDTO skillLevelDTO :staffPersonalDetail.getSkills()){
@@ -61,7 +62,8 @@ public class SkillKPIService {
                             }
                         }
                         if (ObjectUtils.isNotNull(skillLevelDTO.getEndDate())) {
-                            if (dateTimeInterval.containsAndEqualsEndDate(asDate(selectedFromDate))||selectedFromDate.equals(skillLevelDTO.getStartDate())) {
+                            DateTimeInterval dateTimeIntervals = new DateTimeInterval(selectedFromDate,selectedToDate);
+                            if (dateTimeInterval.containsAndEqualsEndDate(asDate(selectedFromDate))||selectedFromDate.equals(skillLevelDTO.getStartDate())||dateTimeInterval.containsInterval(dateTimeIntervals)) {
                                 count++;
                             }
 
@@ -86,7 +88,7 @@ public class SkillKPIService {
                     for (SkillLevelDTO skillLevelDTO : staffPersonalDetail.getSkills()) {
                         if(isNotNull(skillLevelDTO.getEndDate())) {
                             dateTimeInterval = new DateTimeInterval(skillLevelDTO.getStartDate(), skillLevelDTO.getEndDate());
-                            if (dateTimeIntervalForMonth.containsInterval(dateTimeInterval) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getStartLocalDate())) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getEndLocalDate()))) {
+                            if (dateTimeInterval.containsInterval(dateTimeIntervalForMonth) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getStartLocalDate())) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getEndLocalDate()))) {
                                 count++;
                             }
                         }
