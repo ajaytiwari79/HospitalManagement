@@ -157,7 +157,7 @@ public class ActivitySchedulerJobService extends MongoBaseService {
     private Set<LocalDateTime> calculateRepeatTriggerDateTimeList(ActivityReminderSettings activityCutoffReminderSetting, CutOffInterval cutOffInterval, LocalDateTime reminderDateTime) {
         Set<LocalDateTime> repeatTriggerDateTimes = new HashSet<>();
         reminderDateTime = addDurationInLocalDateTime(reminderDateTime, activityCutoffReminderSetting.getRepeatReminder().getTimeValue(), activityCutoffReminderSetting.getRepeatReminder().getDurationType(), 1);
-        while (reminderDateTime.isBefore(cutOffInterval.getEndDate().atStartOfDay())){
+        while (reminderDateTime.isBefore(cutOffInterval.getEndDate().plusDays(1).atStartOfDay())){
             repeatTriggerDateTimes.add(reminderDateTime);
             reminderDateTime = addDurationInLocalDateTime(reminderDateTime, activityCutoffReminderSetting.getRepeatReminder().getTimeValue(), activityCutoffReminderSetting.getRepeatReminder().getDurationType(), 1);
         }
