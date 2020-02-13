@@ -1,9 +1,12 @@
 package com.kairos.service.auth;
 
+import com.kairos.config.env.EnvConfig;
 import com.kairos.enums.user.UserType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.auth.UserPrincipal;
+import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.repository.user.auth.UserGraphRepository;
+import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.utils.HttpRequestHolder;
@@ -23,7 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 import static com.kairos.commons.utils.ObjectUtils.isNull;
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
 import static com.kairos.constants.UserMessagesConstants.MESSAGE_USER_USERNAME_NOTFOUND;
 
 @Service
@@ -39,6 +44,9 @@ public class UserOauth2Service implements UserDetailsService {
     private ExceptionService exceptionService;
     @Inject
     private PasswordEncoder passwordEncoder;
+    @Inject private StaffGraphRepository staffGraphRepository;
+    @Inject
+    private EnvConfig envConfig;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -57,7 +65,12 @@ public class UserOauth2Service implements UserDetailsService {
             return new UserPrincipal(user, getPermission(user));
         }
         Optional<Integer> optInt = OptionalUtility.stringToInt(otpString);
-
+        if(isNotNull(user.getLastSelectedOrganizationId())){
+            Staff staff = staffGraphRepository.getByUser(user.getId());
+            if(isNotNull(staff)){
+                user.setProfilePic(envConfig.getServerHost() + FORWARD_SLASH + envConfig.getImagesPath() + staff.getProfilePic());
+            }
+        }
         if (loggedUser.filter(u -> optInt.get().equals(u.getOtp())).isPresent()) {
             logger.info("user opt match{}", user.getOtp());
             return new UserPrincipal(user, getPermission(user));

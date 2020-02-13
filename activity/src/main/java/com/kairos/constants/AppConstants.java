@@ -101,6 +101,7 @@ public class AppConstants {
     public static final String YEAR = "year";
     public static final String WEEKLY = "weekly";
     public static final String MONTHLY = "monthly";
+    public static final String CAMEL_CASE_MONTHLY = "Monthly";
     public static final String REQUEST_TO_CREATE_NEW_UTILITY = "Request to create new utility";
     public static final String ABSENCE_PLANNING = "Absence Planning";
     public static final String UNIT = "unit";
