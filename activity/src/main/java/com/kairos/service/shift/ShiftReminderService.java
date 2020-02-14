@@ -54,21 +54,9 @@ public class ShiftReminderService{
     private SchedulerServiceRestClient schedulerServiceRestClient;
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
-    @Inject
-    private ActivityToSchedulerQueueService activityToSchedulerQueueService;
-    @Inject private ActivitySchedulerJobService activitySchedulerJobService;
     @Inject private EnvConfig envConfig;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ShiftReminderService.class);
-
-    public void updateReminderTrigger(Map<BigInteger, ActivityWrapper> activityWrapperMap, Shift shift) {
-        // TODO Find better approach
-        List<BigInteger> jobIds = shift.getActivities().stream().map(ShiftActivity::getId).collect(Collectors.toList());
-        deleteReminderTrigger(jobIds, shift.getUnitId());
-        activitySchedulerJobService.updateJobForShiftReminder(activityWrapperMap, shift);
-    }
-
-
 
     public void deleteReminderTrigger(List<BigInteger> jobIds, Long unitId) {
         // TODO VIPUL please verify when needed

@@ -247,6 +247,7 @@ public class ShiftSickService extends MongoBaseService {
                     shift.setDeleted(true);
                     break;
                 case PUBLISHED_ACTIVITY:
+
                     break;
                 case UNPUBLISHED_ACTIVITY:
                     break;

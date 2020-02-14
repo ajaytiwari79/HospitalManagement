@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
-public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerPanel, BigInteger> {
+public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerPanel, BigInteger>, CustomSchedulerPanelRepository {
 
     List<SchedulerPanel> findAllByUnitIdAndDeletedFalse(long unitId);
 
@@ -23,5 +23,8 @@ public interface SchedulerPanelRepository extends MongoBaseRepository<SchedulerP
     List<SchedulerPanel> findByIdsIn(Set<BigInteger> schedulerPanelIds);
 
     SchedulerPanel findByIdAndDeletedFalse(BigInteger schedulerPanelId);
+
+    @Query("{unitId:?0, entityId:?1, jobSubType:?2, deleted:false}")
+    List<SchedulerPanel> findAllJobByEntityIdAndJobSubtypeAndUnitId(Long unitId, BigInteger entityId, JobSubType jobSubType);
 
 }

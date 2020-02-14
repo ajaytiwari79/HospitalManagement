@@ -29,6 +29,7 @@ import com.kairos.enums.OrganizationCategory;
 import com.kairos.enums.TimeSlotType;
 import com.kairos.enums.reason_code.ReasonCodeType;
 import com.kairos.persistence.model.client.ContactAddress;
+import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.default_data.*;
@@ -86,6 +87,7 @@ import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.getDate;
@@ -211,18 +213,15 @@ public class OrganizationService {
     }
 
     public boolean deleteOrganization(long organizationId) {
-        Organization organization = organizationGraphRepository.findOne(organizationId);
+        OrganizationBaseEntity organization = organizationBaseRepository.findOne(organizationId);
         boolean success;
-        if (organization != null && organization.isBoardingCompleted()) {
+        if (organization.isBoardingCompleted()) {
             organization.setEnable(false);
             organization.setDeleted(true);
-            organizationGraphRepository.save(organization);
+            organizationBaseRepository.save(organization);
             success = true;
         } else {
-            List<Long> organizationIdsToDelete = new ArrayList<>();
-            organizationIdsToDelete.add(organization.getId());
-            organizationIdsToDelete.addAll(organization.getChildren().stream().map(child -> child.getId()).collect(Collectors.toList()));
-            organizationIdsToDelete.addAll(organization.getUnits().stream().map(child -> child.getId()).collect(Collectors.toList()));
+            List<Long> organizationIdsToDelete = getAllOrganizationIdsToDelete(organization);
             unitGraphRepository.removeOrganizationCompletely(organizationIdsToDelete);
             success = true;
         }
@@ -343,14 +342,15 @@ public class OrganizationService {
     public List<OrganizationBasicResponse> getOrganizationGdprAndWorkcenter(Long organizationId) {
         List<OrganizationBasicResponse> organizationQueryResult = unitGraphRepository.getOrganizationGdprAndWorkCenter(organizationId);
         List<Long> unitIds = organizationQueryResult.stream().map(organizationBasicResponse -> organizationBasicResponse.getId()).collect(Collectors.toList());
-        List<Map<String, Object>> organizationContactAddress = unitGraphRepository.getContactAddressOfParentOrganization(unitIds);
+        List<OrganizationContactAddress> organizationContactAddresses = unitGraphRepository.getContactAddressOfOrganizations(unitIds);
+        Map<Long,OrganizationContactAddress> organizationContactAddressMap=organizationContactAddresses.stream().collect(Collectors.toMap(k->k.getOrganizationId(), Function.identity()));
         List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = userGraphRepository.getUnitManagerOfOrganization(unitIds, organizationId);
         for (OrganizationBasicResponse organizationData : organizationQueryResult) {
-            for (Map<String, Object> address : organizationContactAddress) {
-                if (address.get("organizationId").equals(organizationData.getId())) {
-                    organizationData.setContactAddress(address);
-                    break;
-                }
+                if (organizationContactAddressMap.containsKey(organizationData.getId())) {
+                    AddressDTO addressDTO=ObjectMapperUtils.copyPropertiesByMapper(organizationContactAddressMap.get(organizationData.getId()).getContactAddress(),AddressDTO.class);
+                    organizationData.setContactAddress(addressDTO);
+                    addressDTO.setMunicipality(ObjectMapperUtils.copyPropertiesByMapper(organizationContactAddressMap.get(organizationData.getId()).getMunicipality(),MunicipalityDTO.class));
+                    addressDTO.setZipCode(ObjectMapperUtils.copyPropertiesByMapper(organizationContactAddressMap.get(organizationData.getId()).getZipCode(),ZipCodeDTO.class));
             }
             Optional<StaffPersonalDetailQueryResult> currentStaff = staffPersonalDetailQueryResults.stream().filter(staffPersonalDetailDTO -> staffPersonalDetailDTO.getOrganizationId().equals(organizationData.getId())).findFirst();
             organizationData.setUnitManager(currentStaff.isPresent() ? currentStaff.get() : null);
@@ -907,6 +907,19 @@ public class OrganizationService {
 
     public List<Organization> getAllUnionsByOrganizationOrCountryId(Long organizationId,Long countryId){
         return organizationGraphRepository.getAllUnionsByOrganizationOrCountryId(organizationId,countryId);
+    }
+
+    private List<Long> getAllOrganizationIdsToDelete(OrganizationBaseEntity organizationBaseEntity){
+        if(organizationBaseEntity instanceof Unit){
+            return Collections.singletonList(organizationBaseEntity.getId());
+        }else {
+            List<Long> organizationIdsToDelete=new ArrayList<>();
+            Organization organization=(Organization) organizationBaseEntity;
+            organizationIdsToDelete.add(organization.getId());
+            organizationIdsToDelete.addAll(organization.getChildren().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
+            organizationIdsToDelete.addAll(organization.getUnits().stream().map(UserBaseEntity::getId).collect(Collectors.toList()));
+            return organizationIdsToDelete;
+        }
     }
 
 }
