@@ -80,6 +80,9 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
     @Query("{deleted:false,employmentId:{$in:?0},disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
     List<Shift> findAllOverlappedShiftsAndEmploymentId(Collection<Long> employmentIds, Date startDate, Date endDate);
 
+    @Query("{deleted:false,employmentId:?0,disabled:false,startDate:{$lte:?2},endDate:{$gte:?1}}")
+    List<Shift> getAllOverlappedShiftsAndEmploymentId(Long employmentId, Date startDate, Date endDate);
+
     @Query(value = "{disabled:false,deleted:false,planningPeriodId:{$exists:false},shiftType:?0}")
     List<Shift> findAllAbsenceShifts(String shiftType);
 
@@ -94,6 +97,9 @@ public interface ShiftMongoRepository extends MongoBaseRepository<Shift, BigInte
 
     @Query("{deleted:false,employmentId:?0, 'disabled':false, startDate:{$gte:?1,$lt:?2}}")
     List<Shift> findAllShiftsByEmploymentIdBetweenDate(Long employmentId, Date startDate, Date endDate);
+
+    @Query("{deleted:false, 'disabled':false, startDate:{$gte:?1,$lt:?2}}")
+    List<Shift> findAllShiftsBetweenDate(Date startDate, Date endDate);
 
     @Query("{deleted:false,employmentId:?0, startDate:{$gte:?1}}")
     List<Shift> findAllShiftsByEmploymentIdAfterDate(Long employmentId, Date startDate);

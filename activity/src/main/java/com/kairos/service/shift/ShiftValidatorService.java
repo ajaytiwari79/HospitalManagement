@@ -925,8 +925,15 @@ public class ShiftValidatorService {
 
     //This method is being used to check overlapping shift with full day and full week activity
     public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
-        Date startDate;
-        Date endDate;
+        Date startDate = null;
+        Date endDate = null;
+        List<Shift> shiftList = new ArrayList<>();
+        startDate = isNull(shiftDTO.getStartDate()) ? asDateStartOfDay(shiftDTO.getShiftDate()) : shiftDTO.getStartDate();
+        endDate = isNull(shiftDTO.getEndDate()) ? asDateEndOfDay(shiftDTO.getShiftDate()) : shiftDTO.getEndDate();
+
+        shiftList = shiftMongoRepository.getAllOverlappedShiftsAndEmploymentId(shiftDTO.getEmploymentId(),startDate,endDate);
+
+
         if (shiftDTO.getStartDate() != null && asLocalDate(shiftDTO.getEndDate()).isAfter(asLocalDate(shiftDTO.getStartDate()))) {
             startDate = DateUtils.getStartOfDay(shiftDTO.getStartDate());
             endDate = DateUtils.getEndOfDay(shiftDTO.getEndDate());
@@ -935,6 +942,9 @@ public class ShiftValidatorService {
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
+        if(isCollectionEmpty(shiftList)){
+            absenceShiftExists =false;
+        }
         if (absenceShiftExists) {
             exceptionService.actionNotPermittedException(MESSAGE_SHIFT_OVERLAP_WITH_FULL_DAY);
         }
@@ -990,7 +1000,7 @@ public class ShiftValidatorService {
         for (ShiftWithActivityDTO shift : shifts) {
             if (isNotNull(shift) && isNotNull(shift.getActivities().get(0).getActivity()) && shift.getActivities().get(0).getActivity().isFullDayOrFullWeekActivity()) {
                 Date startDate = getStartOfDay(shift.getStartDate());
-                Date endDate = getMidNightOfDay(shift.getEndDate());
+                Date endDate = shift.isOverNightShift() ? shift.getEndDate() : getMidNightOfDay(shift.getEndDate());
                 shift.getActivities().get(0).setStartDate(startDate);
                 shift.getActivities().get(0).setEndDate(endDate);
                 shift.setStartDate(startDate);
