@@ -1,5 +1,6 @@
 package com.kairos.dto.activity.activity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.constants.CommonConstants;
@@ -14,6 +15,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 
 
@@ -26,7 +28,7 @@ import static com.kairos.commons.utils.ObjectUtils.isNotNull;
 @Setter
 @Builder
 @AllArgsConstructor
-public class ActivityDTO  {
+public class ActivityDTO implements Comparable<ActivityDTO> {
     private BigInteger id;
     @NotBlank(message = "message.activity.name.notEmpty")
     private String name;
@@ -97,15 +99,33 @@ public class ActivityDTO  {
     public boolean isFullDayOrFullWeekActivity() {
         return isNotNull(this.getTimeCalculationActivityTab()) && ((CommonConstants.FULL_WEEK).equals(this.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getTimeCalculationActivityTab().getMethodForCalculatingTime())); }
 
-        public ActivityDTO maergeContineousActivity(){
-         for(int i=0;i<this.childActivities.size();i++){
-           if(childActivities.get(i).getId().equals(childActivities.get(i+1).getId())&&childActivities.get(i).endDate.equals(childActivities.get(i+1).startDate)){
-
-           }
+    @JsonIgnore
+    public void mergeShiftActivity(){
+        if(isCollectionNotEmpty(childActivities)) {
+            Collections.sort(childActivities);
+            ActivityDTO activityDTO = childActivities.get(0);
+            BigInteger id = activityDTO.getId();
+            List<ActivityDTO> activityDTOList = new ArrayList<>();
+            for (ActivityDTO activityDTO1 : childActivities) {
+                if (activityDTO.getEndDate().equals(activityDTO1.getStartDate()) && activityDTO.getId().equals(activityDTO1.getId())) {
+                    activityDTO.setEndDate(activityDTO1.getEndDate());
+                } else if (activityDTO.getEndDate().equals(activityDTO1.getStartDate()) && !activityDTO.getId().equals(activityDTO1.getId())) {
+                    activityDTOList.add(activityDTO);
+                    activityDTO = activityDTO1;
+                } else if (activityDTO.getEndDate().isBefore(activityDTO1.getStartDate())) {
+                    activityDTOList.add(activityDTO);
+                    activityDTO = activityDTO1;
+                }
+            }
+            //to add last one
+            activityDTOList.add(activityDTO);
+            childActivities = activityDTOList;
         }
-
-        }
-
+    }
 
 
+    @Override
+    public int compareTo(ActivityDTO activityDTO) {
+        return 0;
+    }
 }
