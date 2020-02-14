@@ -139,7 +139,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
     @Query("MATCH(u:User)-[:" + BELONGS_TO + "]-(s:Staff)-[:" + HAS_CONTACT_DETAIL + "]->(c:ContactDetail) WHERE c.privatePhone={0} OR c.mobilePhone={0} RETURN u")
     List<User> getStaffByMobileNumber(String number);
 
-    @Query("MATCH (s:Staff)-[:" + BELONGS_TO + "]->(u:User) WHERE id(u)={0} RETURN s")
+    @Query("MATCH (s:Staff)-[:" + BELONGS_TO + "]->(u:User) WHERE id(u)={0} RETURN s LIMIT 1")
     Staff getByUser(Long userId);
 
     @Query("MATCH (organization:Organization),(unit:Unit) WHERE id(organization)={0} AND id(unit)={1} WITH organization,unit\n" +
