@@ -276,7 +276,8 @@ public class StaffRetrievalService {
 
 
     public List<StaffPersonalDetail> getStaffDetailByIds(Set<Long> staffIds) {
-        return employmentGraphRepository.getStaffDetailByIds(staffIds, DateUtils.getCurrentLocalDate());
+        List<StaffPersonalDetailQueryResult> staffPersonalDetailQueryResults = employmentGraphRepository.getStaffDetailByIds(staffIds, DateUtils.getCurrentLocalDate());
+        return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(staffPersonalDetailQueryResults,StaffPersonalDetail.class);
     }
 
     public Long getStaffIdOfLoggedInUser(Long unitId) {

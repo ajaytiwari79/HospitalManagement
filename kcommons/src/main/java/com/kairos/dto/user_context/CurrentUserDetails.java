@@ -32,6 +32,7 @@ public class CurrentUserDetails {
     private Long lastSelectedOrganizationId;
     private OrganizationCategory lastSelectedOrganizationCategory;
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
+    private String profilePic;
 
 
     public CurrentUserDetails(Long id, String userName, String nickName,

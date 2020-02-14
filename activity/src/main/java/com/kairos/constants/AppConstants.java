@@ -101,6 +101,7 @@ public class AppConstants {
     public static final String YEAR = "year";
     public static final String WEEKLY = "weekly";
     public static final String MONTHLY = "monthly";
+    public static final String CAMEL_CASE_MONTHLY = "Monthly";
     public static final String REQUEST_TO_CREATE_NEW_UTILITY = "Request to create new utility";
     public static final String ABSENCE_PLANNING = "Absence Planning";
     public static final String UNIT = "unit";
@@ -170,6 +171,7 @@ public class AppConstants {
     public static final String ABSENCE_ACTIVITY_REMINDER_EMAIL_BODY = "Please plan  activity %s before it expires on %s.\n Count left is %s.";
     public static final String OPENSHIFT_SUBJECT = "Open Shift";
     public static final String SHIFT_NOTIFICATION="Shift Reminder";
+    public static final String ACTIVITY_REMINDER="Activity Reminder";
     public static final String SHIFT_NOTIFICATION_MESSAGE="SHIFT_NOTIFICATION_MESSAGE";
     public static final String NORMAL_TIME="Normal Time";
     public static final String EXTRA_TIME="Extra Time";

@@ -42,6 +42,7 @@ public class Activity {
     private List<Tag> tags;
 
 
+
     public Activity(String id, List<Skill> skills, int priority, String name, TimeType timeType, int order, int rank, List<Long> expertises, List<Tag> tags) {
         this.id = id;
         this.skills = skills;
