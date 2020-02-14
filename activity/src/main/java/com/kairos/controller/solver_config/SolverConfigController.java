@@ -2,7 +2,7 @@
 package com.kairos.controller.solver_config;
 
 import com.kairos.constants.ApiConstants;
-import com.kairos.service.planner.vrpPlanning.VRPPlanningService;
+import com.kairos.services.planner.vrpPlanning.VRPPlanningService;
 import com.kairos.service.solver_config.SolverConfigService;
 import com.kairos.utils.response.ResponseHandler;
 import com.kairos.dto.planner.solverconfig.SolverConfigDTO;

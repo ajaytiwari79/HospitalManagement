@@ -16,9 +16,6 @@ public class ActivityMessagesConstants {
     public static final String OPENSHIFTRULETEMPLATE = "openShiftRuleTemplate";
     public static final String EXCEPTION_DUPLICATE_OPENSHIFTRULETEMPLATE = "exception.duplicate.openShiftRuleTemplate";
     public static final String ERROR_DAY_INVALID = "error.day.invalid";
-    public static final String ERROR_VISITOUR_WORKTIME_ENGINEER_UPDATE = "error.visitour.worktime.engineer.update";
-    public static final String ERROR_VISITOUR_TASK_CREATE = "error.visitour.task.create";
-    public static final String ERROR_CLIENT_NOTFOUND = "error.client.notfound";
     public static final String ERROR_KAIROS_EMPLOYMENT = "error.kairos.employment";
     public static final String ERROR_ORGANIZATION_TYPE = "error.organization.type";
     public static final String ERROR_ORGANIZATION_TEAM_NOTFOUND = "error.organization.team.notfound";
@@ -35,8 +32,6 @@ public class ActivityMessagesConstants {
     public static final String ERROR_NAME_DUPLICATE = "error.name.duplicate";
     public static final String ERROR_USER_PASSCODE_NOTNULL = "error.User.password.notnull";
     public static final String ERROR_USER_PASSCODE_SIZE = "error.User.password.size";
-    public static final String ERROR_TASKDEMAND_PRIORITY_RANGE = "error.TaskDemand.priority.range";
-    public static final String ERROR_TASKDEMAND_STAFFCOUNT_MINIMUMONE = "error.TaskDemand.staffCount.minimumOne";
     public static final String MESSAGE_CTA_RULETEMPLATE_ALREADYEXIST = "message.cta.ruleTemplate.alreadyExist";
     public static final String MESSAGE_CTA_NAME_ALREADYEXIST = "message.cta.name.alreadyExist";
     public static final String MESSAGE_CTA_ID_NOTFOUND = "message.cta.id.notFound";
@@ -69,33 +64,6 @@ public class ActivityMessagesConstants {
     public static final String EXCEPTION_DUPLICATEDATA = "exception.duplicateData";
     public static final String ERROR_EXCEPTION_TYPE_NOTEXIST = "error.exception.type.notexist";
     public static final String ERROR_EXCEPTION_NOTFOUND = "error.exception.notfound";
-    public static final String ERROR_EXCEPTION_DATE_NOTFOUND = "error.exception.date.notfound";
-    public static final String ERROR_TASK_DURATION = "error.task.duration";
-    public static final String ERROR_TASK_VISITOUR_CREATE = "error.task.visitour.create";
-    public static final String ERROR_TASK_VISITOUR_UPDATE = "error.task.visitour.update";
-    public static final String ERROR_TASK_DEMAND_DATE_STARTANDEND = "error.task.demand.date.startandend";
-    public static final String ERROR_TASK_DAY_CREATE = "error.task.day.create";
-    public static final String ERROR_TASK_DAY_MOVE = "error.task.day.move";
-    public static final String ERROR_TASK_MAIN_UPDATE = "error.task.main.update";
-    public static final String ERROR_TASK_SINGLE = "error.task.single";
-    public static final String ERROR_TASK_TYPE = "error.task.type";
-    public static final String ERROR_TASK_TYPE_NOTNULL = "error.task.type.notnull";
-    public static final String MESSAGE_TASK_UPDATE = "message.task.update";
-    public static final String MESSAGE_TASK_ID = "message.task.id";
-    public static final String MEASSAGE_TASK_TYPE_ID = "meassage.task.type.id";
-    public static final String MESSAGE_TASKPACKAGE_ID = "message.taskpackage.id";
-    public static final String MESSAGE_TASKDEMAND_ID = "message.taskdemand.id";
-    public static final String MESSAGE_TASKDEMAND_STARTDATE = "message.taskdemand.startdate";
-    public static final String MESSAGE_TASKDEMAND_STARTDAY = "message.taskdemand.startday";
-    public static final String MESSAGE_TASKDEMAND_WEEK = "message.taskdemand.week";
-    public static final String MESSAGE_TASKDEMAND_MONTH = "message.taskdemand.month";
-    public static final String MESSAGE_TASKDEMAND_VISITDATE = "message.taskdemand.visitdate";
-    public static final String MESSAGE_TASKDEMANDEND_DATE_NUMBEROFOCCURENCE = "message.taskdemandend-date.numberofoccurence";
-    public static final String MESSAGE_TASKDEMAND_DEMANDSTATUS_UPDATE = "message.taskdemand.demandstatus.update";
-    public static final String MESSAGE_TASKDEMAND_END_DATE = "message.taskdemand.end-date";
-    public static final String MESSAGE_TASKDEMAND_STATUS = "message.taskdemand.status";
-    public static final String MESSAGE_TASKDEMAND_STARTDATE_ENDDATE = "message.taskdemand.startdate.enddate";
-    public static final String MESSAGE_CITIZEN_ID = "message.citizen.id";
     public static final String MESSAGE_CATEGORY_RENAME = "message.category.rename";
     public static final String MESSAGE_CATEGORY_UPDATE = "message.category.update";
     public static final String MESSAGE_CATEGORY_COUNTRY_UPDATE = "message.category.country.update";
@@ -106,8 +74,6 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_CATEGORY_NULL_LIST = "message.category.null-list";
     public static final String MESSAGE_CATEGORY_NOT_MATCHED = "message.category.not-matched";
     public static final String MESSAGE_DATA_NOTFOUND = "message.data.notFound";
-    public static final String MESSAGE_RESTRICTIONFREQUENCY_ID = "message.restrictionfrequency.id";
-    public static final String ERROR_ACTIVITY_FULLWEEK_START  = "error.activity.fullweek.start";
     public static final String MESSAGE_ACTIVITY_ID = "message.activity.id";
     public static final String MESSAGE_PARENT_SETTING_FALSE = "message.parent.setting.false";
     public static final String ACTIVITY_USED_AT_UNIT="activity.used.unit";
@@ -236,8 +202,8 @@ public class ActivityMessagesConstants {
     public static final String ACTIVITY_NOT_ELIGIBLE_DAYTYPE = "activity.not.eligible.dayType";
     public static final String DATE_OUT_OF_RANGE = "date.out.of.range";
     public static final String STAFFINGLEVELTEMPLATE_NOT_FOUND = "staffingLevelTemplate.not.found";
-    public static final String MESSAGE_EXCEPTION_TASK_NOTFOUND = "message.exception.task.notfound";
-    public static final String MESSAGE_EXCEPTION_TIMESLOT_CREATE = "message.exception.timeslot.create";
+
+
     public static final String MESSAGE_EXCEPTION_SCHEDULER = "message.exception.scheduler";
     public static final String MESSAGE_EXCEPTION_RUNTIME = "message.exception.runtime";
     public static final String MESSAGE_STAFFINGLEVEL_ABSENT = "message.staffingLevel.absent";
