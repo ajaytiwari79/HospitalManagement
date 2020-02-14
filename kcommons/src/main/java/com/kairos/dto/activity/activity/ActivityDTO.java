@@ -97,4 +97,15 @@ public class ActivityDTO  {
     public boolean isFullDayOrFullWeekActivity() {
         return isNotNull(this.getTimeCalculationActivityTab()) && ((CommonConstants.FULL_WEEK).equals(this.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || (CommonConstants.FULL_DAY_CALCULATION).equals(this.getTimeCalculationActivityTab().getMethodForCalculatingTime())); }
 
+        public ActivityDTO maergeContineousActivity(){
+         for(int i=0;i<this.childActivities.size();i++){
+           if(childActivities.get(i).getId().equals(childActivities.get(i+1).getId())&&childActivities.get(i).endDate.equals(childActivities.get(i+1).startDate)){
+
+           }
+        }
+
+        }
+
+
+
 }
