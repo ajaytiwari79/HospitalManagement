@@ -154,7 +154,8 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         if (Optional.ofNullable(activities).isPresent() && activities.size()>1) {
             activities = activities.stream().filter(shiftActivityDTO -> Optional.ofNullable(shiftActivityDTO.getStartDate()).isPresent()).sorted((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate())).collect(Collectors.toList());
         }
-        this.activities = mergeShiftActivity(activities);
+        this.activities=activities;
+        mergeShiftActivity();
     }
 
 
