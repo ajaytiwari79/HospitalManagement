@@ -96,13 +96,13 @@ public class FunctionController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getAllDateByFunctionIds(unitId, functionIds));
     }
 
-    @ApiOperation(value = "get all date by function ids")
+    @ApiOperation(value = "add translated data")
     @PostMapping(API_V1 + UNIT_URL + "/function/{functionId}/update_translation")
     public ResponseEntity<Map<String, Object>> updateTranslation(@PathVariable Long functionId, @RequestBody TranslationDTO translationData) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.updateTranslation(functionId, translationData));
     }
 
-    @ApiOperation(value = "get all date by function ids")
+    @ApiOperation(value = "get translated data")
     @GetMapping(API_V1 + UNIT_URL + "/function/{functionId}/translation")
     public ResponseEntity<Map<String, Object>> getTranslatedData(@PathVariable Long functionId) {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, functionService.getTranslatedData(functionId));
