@@ -236,7 +236,7 @@ public class ShiftService extends MongoBaseService {
         mainShift.setPlanningPeriodId(planningPeriod.getId());
         mainShift.setPhaseId(phase.getId());
 
-            List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(false,mainShift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),mainShift);
+            List<ShiftActivity> breakActivities = shiftBreakService.updateBreakInShift(shiftDTO.getId()!=null,mainShift, activityWrapperMap, staffAdditionalInfoDTO,wtaQueryResultDTO.getBreakRule(),staffAdditionalInfoDTO.getTimeSlotSets(),mainShift);
             mainShift.setBreakActivities(breakActivities);
 
         activityConfigurationService.addPlannedTimeInShift(mainShift, activityWrapperMap, staffAdditionalInfoDTO);
@@ -623,7 +623,7 @@ public class ShiftService extends MongoBaseService {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
 
         ActivityWrapper absenceActivityWrapper = getAbsenceTypeOfActivityIfPresent(shiftDTO.getActivities(), activityWrapperMap);
-        boolean updatingSameActivity = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(absenceActivityWrapper.getActivity().getId())).findAny().isPresent();
+        boolean updatingSameActivity = shift.getActivities().stream().anyMatch(shiftActivity -> shiftActivity.getActivityId().equals(absenceActivityWrapper.getActivity().getId()));
         if (!updatingSameActivity) {
             shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(absenceActivityWrapper, shiftDTO, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType, shiftAction);
         }
