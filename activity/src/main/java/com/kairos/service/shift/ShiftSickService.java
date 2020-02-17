@@ -11,6 +11,7 @@ import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.shift.ShiftActionType;
 import com.kairos.enums.shift.ShiftStatus;
+import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.tabs.rules_activity_tab.SicknessSetting;
@@ -214,6 +215,7 @@ public class ShiftSickService extends MongoBaseService {
         if(isCollectionEmpty(shifts)){
             exceptionService.dataNotFoundException("Data not found");
         }
+        Map<LocalDate,List<Shift>> shiftMap = shifts.stream().collect(Collectors.groupingBy(shift->asLocalDate(shift.getStartDate())));
         BigInteger activityId = shifts.get(0).getActivities().get(0).getActivityId();
         Optional<Activity> activityOptional = sicknessActivity.stream().filter(activity -> activity.getId().equals(activityId)).findFirst();
         LocalDate startDate = localDate;
@@ -240,8 +242,9 @@ public class ShiftSickService extends MongoBaseService {
     }
 
 
-    private void UpdateSickShift(Activity activity, List<Shift> shifts, Activity protectedDaysOffActivity) {
-        for (Shift shift : shifts) {
+    private void UpdateSickShift(Activity activity, Map<LocalDate,List<Shift>> shiftMap, Activity protectedDaysOffActivity) {
+        shiftMap.forEach((date,shifts)->{
+            Shift shift=shifts.stream().filter(k->k.getShiftType().equals(ShiftType.SICK)).findAny().orElse(null);
             switch (activity.getRulesActivityTab().getSicknessSetting().getReplaceSickShift()) {
                 case PROTECTED_DAYS_OFF:
                     shift.getActivities().forEach(shiftActivity -> shiftActivity.setActivityId(protectedDaysOffActivity.getId()));
@@ -257,7 +260,8 @@ public class ShiftSickService extends MongoBaseService {
                 default:
                     break;
             }
-        }
+        });
+
     }
 }
 
