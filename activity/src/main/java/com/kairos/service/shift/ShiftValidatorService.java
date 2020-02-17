@@ -94,7 +94,6 @@ import static com.kairos.enums.wta.WTATemplateType.NUMBER_OF_PARTOFDAY;
 import static com.kairos.utils.CPRUtil.getAgeByCPRNumberAndStartDate;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getIntervalByRuleTemplates;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
-import static java.util.Collections.singletonList;
 
 /**
  * @author pradeep
@@ -210,10 +209,10 @@ public class ShiftValidatorService {
         List<ActivityRuleViolation> activityRuleViolations = validateTimingOfActivity(shift, new ArrayList<>(activityWrapperMap.keySet()), activityWrapperMap);
         ruleTemplateSpecificInfo.getViolatedRules().getActivities().addAll(activityRuleViolations);
         List<ShiftActivity>[] shiftActivities = mainShift.getShiftActivitiesForValidatingStaffingLevel(oldShift);
-        for (ShiftActivity shiftActivity : shiftActivities[0]) {
+        for (ShiftActivity shiftActivity : shiftActivities[1]) {
             validateStaffingLevel(phase, mainShift, activityWrapperMap, true, shiftActivity, ruleTemplateSpecificInfo,new StaffingLevelHelper());
         }
-        for (ShiftActivity shiftActivity : shiftActivities[1]) {
+        for (ShiftActivity shiftActivity : shiftActivities[0]) {
             validateStaffingLevel(phase, mainShift, activityWrapperMap, false, shiftActivity, ruleTemplateSpecificInfo,new StaffingLevelHelper());
         }
         validateAbsenceReasonCodeRule(activityWrapperMap, shift, ruleTemplateSpecificInfo);
@@ -273,7 +272,7 @@ public class ShiftValidatorService {
             ShiftWithActivityDTO shiftWithActivityDTO = shiftService.buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class), activityWrapperMap,null);
             RuleTemplateSpecificInfo ruleTemplateSpecificInfo = getRuleTemplateSpecificInfo(phase, shiftWithActivityDTO, wtaQueryResultDTO, staffAdditionalInfoDTO, activityWrapperMap, ShiftOperationType.DELETE);
             List<ShiftActivity>[] shiftActivities = shift.getShiftActivitiesForValidatingStaffingLevel(shift);
-            for (ShiftActivity shiftActivity : shiftActivities[1]) {
+            for (ShiftActivity shiftActivity : shiftActivities[0]) {
                 validateStaffingLevel(phase, shift, activityWrapperMap, false, shiftActivity,  ruleTemplateSpecificInfo,new StaffingLevelHelper());
             }
             Specification<ShiftWithActivityDTO> wtaRulesSpecification = new WTARulesSpecification(ruleTemplateSpecificInfo, wtaBaseRuleTemplates);
@@ -320,7 +319,7 @@ public class ShiftValidatorService {
         if (ReasonCodeRequiredState.MANDATORY.equals(activity.getRulesActivityTab().getReasonCodeRequiredState()) && !Optional.ofNullable(childActivity.getAbsenceReasonCodeId()).isPresent()) {
             activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getId())).findAny().orElse(null);
             if (activityRuleViolation == null) {
-                activityRuleViolation = new ActivityRuleViolation(activity.getId(), activity.getName(), 0, singletonList(exceptionService.
+                activityRuleViolation = new ActivityRuleViolation(activity.getId(), activity.getName(), 0, newHashSet(exceptionService.
                         convertMessage(MESSAGE_SHIFT_REASONCODE_REQUIRED, activity.getId())));
                 ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
             } else {
@@ -410,7 +409,7 @@ public class ShiftValidatorService {
             getErrorMessages(shiftTimeDetails, errorMessages, shortestTime, longestTime, earliestStartTime, latestStartTime);
             if (!errorMessages.isEmpty()) {
                 Activity activity = activityWrapperMap.get(activityId).getActivity();
-                activityRuleViolations.add(new ActivityRuleViolation(activityId, activity.getName(), 0, errorMessages));
+                activityRuleViolations.add(new ActivityRuleViolation(activityId, activity.getName(), 0, new HashSet<>(errorMessages)));
             }
 
         });
@@ -684,29 +683,58 @@ public class ShiftValidatorService {
                 }
                 int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
                 if (checkOverStaffing && totalCount >= 0) {
-                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING))));
+
+                    ActivityRuleViolation activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivity.getActivityId())).findAny().orElse(null);
+                    if(activityRuleViolation==null){
+                        ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, newHashSet(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING))));
+                    }else {
+                        activityRuleViolation.getErrorMessages().add(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING));
+                    }
                     staffingLevelHelper.setStaffingLevelForNew(OVERSTAFFING);
                     break;
                 }
                 if (!checkOverStaffing && totalCount <= 0) {
-                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING))));
+
+                    ActivityRuleViolation activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivity.getActivityId())).findAny().orElse(null);
+                    if(activityRuleViolation==null){
+                        ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, newHashSet(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING))));
+                    }else {
+                        String errorMessage=exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING);
+                        activityRuleViolation.getErrorMessages().add(errorMessage);
+                    }
                     staffingLevelHelper.setStaffingLevelForOld(UNDERSTAFFING);
                     break;
                 }
                 if (isNotNull(parentActivity)) {
                     for (StaffingLevelActivity staffingLevelActivityObj : applicableIntervals.get(currentIndex).getStaffingLevelActivities()) {
                         if (checkOverStaffing && staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() >= staffingLevelActivityObj.getMaxNoOfStaff()) {
-                            ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING))));
+                            ActivityRuleViolation activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivity.getActivityId())).findAny().orElse(null);
+                            if(activityRuleViolation==null){
+                                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, newHashSet(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING, shiftActivity.getActivityName()))));
+                            }else {
+                                activityRuleViolation.getErrorMessages().add(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING, shiftActivity.getActivityName()));
+                            }
                             break outerLoop;
                         } else if (!checkOverStaffing && staffingLevelActivityObj.getActivityId().equals(parentActivity.getId()) && staffingLevelActivityObj.getAvailableNoOfStaff() <= staffingLevelActivityObj.getMinNoOfStaff()) {
-                            ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING))));
+                            ActivityRuleViolation activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivity.getActivityId())).findAny().orElse(null);
+                            if(activityRuleViolation==null){
+                                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, newHashSet(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING, shiftActivity.getActivityName()))));
+                            }else {
+                                activityRuleViolation.getErrorMessages().add(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING, shiftActivity.getActivityName()));
+                            }
                             break outerLoop;
                         }
 
                     }
                 }
             } else {
-                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName()))));
+                ActivityRuleViolation activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivity.getActivityId())).findAny().orElse(null);
+                if(activityRuleViolation==null){
+                    ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, newHashSet(exceptionService.convertMessage(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName()))));
+                }else {
+                    activityRuleViolation.getErrorMessages().add(exceptionService.convertMessage(MESSAGE_STAFFINGLEVEL_ACTIVITY, shiftActivity.getActivityName()));
+                }
+
                 break;
             }
         }
@@ -914,10 +942,21 @@ public class ShiftValidatorService {
         }
         int totalCount = shiftsCount - (checkOverStaffing ? staffingLevelActivity.get().getMaxNoOfStaff() : staffingLevelActivity.get().getMinNoOfStaff());
         if ((checkOverStaffing && totalCount >= 0)) {
-            ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING))));
+            ActivityRuleViolation activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivity.getActivityId())).findAny().orElse(null);
+            if(activityRuleViolation==null){
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0,newHashSet(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING))));
+            }else {
+                activityRuleViolation.getErrorMessages().add(exceptionService.convertMessage(MESSAGE_SHIFT_OVERSTAFFING));
+            }
         }
         else if(!checkOverStaffing && totalCount <= 0) {
-            ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, Arrays.asList(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING))));
+
+            ActivityRuleViolation activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(shiftActivity.getActivityId())).findAny().orElse(null);
+            if(activityRuleViolation==null){
+                ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(new ActivityRuleViolation(shiftActivity.getActivityId(), shiftActivity.getActivityName(), 0, newHashSet(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING))));
+            }else {
+                activityRuleViolation.getErrorMessages().add(exceptionService.convertMessage(MESSAGE_SHIFT_UNDERSTAFFING));
+            }
         }
     }
 

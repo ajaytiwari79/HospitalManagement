@@ -15,10 +15,7 @@ import lombok.*;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
@@ -115,4 +112,7 @@ public class RuleTemplateSpecificInfo {
         return violatedRules.getWorkTimeAgreements().stream().anyMatch(workTimeAgreementRuleViolation -> workTimeAgreementRuleViolation.getRuleTemplateId().equals(wtaRuletemplateId) && workTimeAgreementRuleViolation.isBroken());
     }
 
+    public ViolatedRulesDTO getViolatedRules() {
+        return violatedRules = Optional.ofNullable(this.violatedRules).orElse(new ViolatedRulesDTO());
+    }
 }
