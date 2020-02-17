@@ -91,6 +91,7 @@ public class ObjectUtils {
             Collections.sort(activities);
             ShiftActivityDTO activityDTO = activities.get(0);
             BigInteger id = activityDTO.getActivityId();
+
             List<ShiftActivityDTO> mergedShiftActivityDTOS = new ArrayList<>();
             for (ShiftActivityDTO shiftActivityDTO : activities) {
                 if (activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
