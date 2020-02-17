@@ -1,7 +1,9 @@
 package com.kairos.commons.utils;
 
+import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import org.springframework.lang.Nullable;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -84,5 +86,28 @@ public class ObjectUtils {
         return o1 == null && o2 == null;
     }
 
+    public static List<ShiftActivityDTO> mergeShiftActivity(List<ShiftActivityDTO> activities){
+        if(isCollectionNotEmpty(activities)) {
+            Collections.sort(activities);
+            ShiftActivityDTO activityDTO = activities.get(0);
+            BigInteger id = activityDTO.getActivityId();
+            List<ShiftActivityDTO> mergedShiftActivityDTOS = new ArrayList<>();
+            for (ShiftActivityDTO shiftActivityDTO : activities) {
+                if (activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
+                    activityDTO.setEndDate(shiftActivityDTO.getEndDate());
+                } else if (activityDTO.getEndDate().equals(shiftActivityDTO.getStartDate()) && !activityDTO.getActivityId().equals(shiftActivityDTO.getActivityId())) {
+                    mergedShiftActivityDTOS.add(activityDTO);
+                    activityDTO = shiftActivityDTO;
+                } else if (activityDTO.getEndDate().before(shiftActivityDTO.getStartDate())) {
+                    mergedShiftActivityDTOS.add(activityDTO);
+                    activityDTO = shiftActivityDTO;
+                }
+            }
+            //to add last one
+            mergedShiftActivityDTOS.add(activityDTO);
+            return mergedShiftActivityDTOS;
+        }
+        return new ArrayList<>();
+    }
 
 }
