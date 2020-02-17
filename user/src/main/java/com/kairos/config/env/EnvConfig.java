@@ -11,12 +11,6 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 public class EnvConfig {
 
-    @Value("${fls.package.name}")
-    private String flsPackageName;
-
-    @Value("${fls.username.password}")
-    private String flsUsernamePassword;
-
     @Value("${twillio.accountsid}")
     private String twillioAccountId;
 
@@ -63,13 +57,7 @@ public class EnvConfig {
         return wsUrl;
     }
 
-    public String getFlsPackageName() {
-        return flsPackageName;
-    }
 
-    public String getFlsUsernamePassword() {
-        return flsUsernamePassword;
-    }
 
 
 
@@ -93,9 +81,6 @@ public class EnvConfig {
         return carteServerHost;
     }
 
-    public void setFlsPackageName(String flsPackageName) {
-        this.flsPackageName = flsPackageName;
-    }
 
     public String getImagesPath() {
         return imagesPath;
