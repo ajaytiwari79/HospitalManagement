@@ -3,6 +3,7 @@ package com.kairos.service.wta;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffIntervalUnit;
+import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.shift.ProtectedDaysOffSetting;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
@@ -12,6 +13,7 @@ import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementRuleTemplateBalancesDTO;
 import com.kairos.dto.activity.wta.templates.ActivityCareDayCount;
 import com.kairos.dto.activity.wta.templates.ActivityCutOffCount;
+import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.expertise.CareDaysDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
@@ -45,6 +47,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,8 +55,7 @@ import java.util.stream.Collectors;
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
-import static com.kairos.constants.AppConstants.ORGANIZATION;
-import static com.kairos.constants.AppConstants.STOP_BRICK_BLOCKING_POINT;
+import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.wta.WTATemplateType.*;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
@@ -87,6 +89,7 @@ public class WorkTimeAgreementBalancesCalculationService {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private WTABaseRuleTemplateMongoRepository wtaBaseRuleTemplateRepository;
+
 
 
     public DateTimeInterval getIntervalByRuletemplates(Map<BigInteger, ActivityWrapper> activityWrapperMap, List<WTABaseRuleTemplate> WTARuleTemplates, LocalDate startDate, LocalDate planningPeriodEndDate, Long unitId) {
@@ -188,13 +191,23 @@ public class WorkTimeAgreementBalancesCalculationService {
         PlanningPeriod planningPeriod = planningPeriodMongoRepository.getLastPlanningPeriod(unitId);
         DateTimeInterval dateTimeInterval = getIntervalByRuletemplates(activityWrapperMap, wtaBaseRuleTemplates, startDate, planningPeriod.getEndDate(), unitId);
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsBetweenDurationByEmploymentAndActivityIds(employmentId, dateTimeInterval.getStartDate(), dateTimeInterval.getEndDate(), activityIds);
+        List<ShiftWithActivityDTO> validShiftActivityDTOSByDayType =new ArrayList<>();
+        Map<Long ,DayTypeDTO> dayTypeDTOMap =staffAdditionalInfoDTO.getDayTypes().stream().collect(Collectors.toMap(DayTypeDTO::getId, dayTypeDTO -> dayTypeDTO));
+        for(ShiftWithActivityDTO shiftWithActivityDTO :shiftWithActivityDTOS){
+            for(ShiftActivityDTO shiftActivityDTO :shiftWithActivityDTO.getActivities()) {
+                if (isDayTypeValid(shiftWithActivityDTO.getStartDate(), activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getTimeCalculationActivityTab().getDayTypes(),dayTypeDTOMap)) {
+                   validShiftActivityDTOSByDayType.add(shiftWithActivityDTO);
+                }
+            }
+        }
         Set<BigInteger> timeTypeIds = activityWrappers.stream().map(activityWrapper -> activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeTypeId()).collect(Collectors.toSet());
         List<TimeType> timeTypes = timeTypeMongoRepository.findAllByTimeTypeIds(timeTypeIds);
         Map<BigInteger, TimeType> timeTypeMap = timeTypes.stream().collect(Collectors.toMap(TimeType::getId, v -> v));
-        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances = getWorkTimeAgreementRuleTemplateBalancesDtos(unitId, startDate, endDate, staffAdditionalInfoDTO, wtaBaseRuleTemplates, activityWrapperMap, planningPeriod, shiftWithActivityDTOS, timeTypeMap,wtaTemplateTypes);
+        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances = getWorkTimeAgreementRuleTemplateBalancesDtos(unitId, startDate, endDate, staffAdditionalInfoDTO, wtaBaseRuleTemplates, activityWrapperMap, planningPeriod, validShiftActivityDTOSByDayType, timeTypeMap,wtaTemplateTypes);
         WorkTimeAgreementBalance workTimeAgreementBalance = new WorkTimeAgreementBalance(workTimeAgreementRuleTemplateBalances);
         return workTimeAgreementBalance;
     }
+
 
     public List<WorkTimeAgreementRuleTemplateBalancesDTO> getWorkTimeAgreementRuleTemplateBalancesDtos(Long unitId, LocalDate startDate, LocalDate endDate, StaffAdditionalInfoDTO staffAdditionalInfoDTO, List<WTABaseRuleTemplate> wtaBaseRuleTemplates, Map<BigInteger, ActivityWrapper> activityWrapperMap, PlanningPeriod planningPeriod, List<ShiftWithActivityDTO> shiftWithActivityDTOS, Map<BigInteger, TimeType> timeTypeMap,Set<WTATemplateType> wtaTemplateTypes) {
         List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances=new ArrayList<>();
@@ -713,6 +726,28 @@ public class WorkTimeAgreementBalancesCalculationService {
 
     public List<ShiftWithActivityDTO> filterShiftsByDateTimeIntervalAndActivityId(List<ShiftWithActivityDTO> shiftWithActivityDTOS, DateTimeInterval dateTimeInterval, BigInteger activityId) {
         return shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> dateTimeInterval.contains(shiftWithActivityDTO.getStartDate()) && shiftWithActivityDTO.getActivities().stream().anyMatch(shiftActivityDTO -> shiftActivityDTO.getActivityId().equals(activityId))).collect(Collectors.toList());
+    }
+
+    public boolean isDayTypeValid(Date shiftDate, List<Long> daytypeIds, Map<Long, DayTypeDTO> dayTypeDTOMap) {
+        List<DayTypeDTO> dayTypeDTOS = daytypeIds.stream().map(dayTypeDTOMap::get).collect(Collectors.toList());
+        boolean valid = false;
+        for (DayTypeDTO dayTypeDTO : dayTypeDTOS) {
+            if (dayTypeDTO.isHolidayType()) {
+                valid = timeBankCalculationService.isPublicHolidayValid(shiftDate, valid, dayTypeDTO);
+            } else {
+                List<DayOfWeek> dayOfWeeks = new ArrayList<>();
+                dayTypeDTO.getValidDays().forEach(day -> {
+                    if (!day.name().equals(EVERYDAY)) {
+                        dayOfWeeks.add(DayOfWeek.valueOf(day.name()));
+                    }
+                });
+                valid = dayOfWeeks.contains(asLocalDate(shiftDate).getDayOfWeek());
+            }
+            if (valid) {
+                break;
+            }
+        }
+        return valid;
     }
 
 }
