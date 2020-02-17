@@ -322,6 +322,8 @@ public class StaffRetrievalService {
         roles = accessGroupService.getAccessGroups(unitId);
         map.put("roles", roles);
         List<Map<String, Object>> teams = teamGraphRepository.getTeams(unitId);
+        Organization organization=organizationService.fetchParentOrganization(unitId);
+        map.put("loggedInStaffId",staffGraphRepository.findStaffIdByUserId(UserContext.getUserDetails().getId(), organization.getId()));
         map.put("teamList", (teams.size() != 0) ? teams.get(0).get("teams") : Collections.emptyList());
         return map;
     }
