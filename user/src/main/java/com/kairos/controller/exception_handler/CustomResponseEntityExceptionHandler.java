@@ -7,6 +7,7 @@ import com.kairos.custom_exception.UnitNotFoundException;
 import com.kairos.wrapper.ResponseEnvelope;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -42,7 +43,7 @@ import java.util.Set;
 import static com.kairos.constants.UserMessagesConstants.INTERNAL_SERVER_ERROR;
 
 @RestControllerAdvice
-@Order(1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
 
