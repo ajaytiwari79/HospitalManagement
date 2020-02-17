@@ -6,6 +6,7 @@ import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.kairos.persistence.model.constants.RelationshipConstants.DAY_TYPE;
@@ -31,6 +32,8 @@ public interface CountryHolidayCalenderGraphRepository extends Neo4jBaseReposito
             "RETURN ch.holidayDate as holidayDate, dt as dayType ")
     CountryHolidayCalendarQueryResult findByCountryId(Long countryId);
 
-
+    @Query("MATCH (c:Country)-[:HAS_HOLIDAY]-(ch:CountryHolidayCalender) where id(c) = {0} AND date(ch.holidayDate) >=DATE({1}) AND date(ch.holidayDate) <=DATE({2}) AND ch.isEnabled = true " +
+            "return ch")
+    List<CountryHolidayCalender> findAllByCountryIdAndHolidayDateBetween(Long countryId, String startDate, String endDate);
 
 }

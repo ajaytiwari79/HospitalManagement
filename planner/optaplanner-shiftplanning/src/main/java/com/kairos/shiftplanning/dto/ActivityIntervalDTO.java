@@ -38,4 +38,8 @@ public class ActivityIntervalDTO {
         this.duration = lineInterval.getDuration();
         this.staffNo = lineInterval.getStaffNo();
     }
+
+    public Interval getInterval(){
+        return start==null?null:new Interval(start,start.plusMinutes(duration));
+    }
 }

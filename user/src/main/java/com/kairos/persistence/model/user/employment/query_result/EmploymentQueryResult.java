@@ -56,7 +56,7 @@ public class EmploymentQueryResult {
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
     private Long expertiseId;
     private List<ProtectedDaysOffSetting> protectedDaysOffSettings;
-    private ExpertiseQueryResult expertiseQueryResult;
+
 
 
 

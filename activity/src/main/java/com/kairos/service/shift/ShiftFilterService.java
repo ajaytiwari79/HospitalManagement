@@ -81,8 +81,7 @@ public class ShiftFilterService {
     private <G> ShiftFilter getTimeBankBalanceFilter(Long unitId, Map<FilterType, Set<G>> filterTypeMap, Set<Long> employmentIds) {
         //Update loop in a single call
         Map<Long,Long> employmentIdAndActualTimeBankData = new HashMap<>();
-        boolean validFilter = filterTypeMap.containsKey(TIME_BANK_BALANCE) && isCollectionNotEmpty(filterTypeMap.get(TIME_BANK_BALANCE));
-        if(validFilter){
+        if(filterTypeMap.containsKey(TIME_BANK_BALANCE) && isCollectionNotEmpty(filterTypeMap.get(TIME_BANK_BALANCE))) {
             for (Long employmentId : employmentIds) {
                 Long timeBank = timeBankService.getAccumulatedTimebankAndDelta(employmentId, unitId, true);
                 employmentIdAndActualTimeBankData.put(employmentId, timeBank);
@@ -92,8 +91,11 @@ public class ShiftFilterService {
     }
 
     private <G> ShiftFilter getEscalationFilter(List<BigInteger> shiftIds, Map<FilterType, Set<G>> filterTypeMap){
-        List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shiftIds,false);
-        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = new HashMap<>();
+        if(filterTypeMap.containsKey(ESCALATION_CAUSED_BY) && isCollectionNotEmpty(filterTypeMap.get(ESCALATION_CAUSED_BY))) {
+            List<ShiftViolatedRules> shiftViolatedRules = shiftValidatorService.findAllViolatedRulesByShiftIds(shiftIds, false);
+            shiftViolatedRulesMap = shiftViolatedRules.stream().collect(Collectors.toMap(k -> k.getShiftId(), v -> v));
+        }
         return new EscalationFilter(shiftViolatedRulesMap, filterTypeMap);
     }
 

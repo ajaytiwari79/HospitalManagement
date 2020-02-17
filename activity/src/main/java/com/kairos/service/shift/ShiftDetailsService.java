@@ -59,7 +59,7 @@ public class ShiftDetailsService extends MongoBaseService {
     public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds , boolean showDraft) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS;
         if(showDraft){
-            List<ShiftWithActivityDTO> originalShift=new ArrayList<>(shiftMongoRepository.findAllShiftsByIds(shiftIds));
+            List<ShiftWithActivityDTO> originalShift=shiftMongoRepository.findAllShiftsByIds(shiftIds);
             Map<BigInteger,Boolean>  shiftIdAndOriginalShiftMap=originalShift.stream().collect(Collectors.toMap(k->k.getId(),v-> (!v.isDraft() && isNotNull(v.getDraftShift()))));
             shiftWithActivityDTOS  = new ArrayList<>(shiftMongoRepository.findAllDraftShiftsByIds(shiftIds,showDraft));
             shiftWithActivityDTOS.stream().forEach(shiftWithActivityDTO -> shiftWithActivityDTO.setHasOriginalShift(shiftIdAndOriginalShiftMap.get(shiftWithActivityDTO.getId())));

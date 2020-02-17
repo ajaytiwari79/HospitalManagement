@@ -24,6 +24,7 @@ import com.kairos.persistence.repository.user.staff.PositionGraphRepository;
 import com.kairos.scheduler.queue.producer.KafkaProducer;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.integration.ActivityIntegrationService;
+import com.kairos.service.scheduler.UserSchedulerJobService;
 import com.kairos.service.scheduler.UserToSchedulerQueueService;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,7 @@ public class EmploymentJobService {
     @Inject
     private EmploymentService employmentService;
     @Inject private ActivityIntegrationService activityIntegrationService;
+    @Inject private UserSchedulerJobService userSchedulerJobService;
 
     public void updateSeniorityLevelOnJobTrigger(BigInteger schedulerPanelId, Long unitId) {
 
@@ -134,9 +136,7 @@ public class EmploymentJobService {
 
         stopped = LocalDateTime.now();
 
-        schedulerLogsDTO = new KairosSchedulerLogsDTO(result, log, schedulerPanelId, unitId, DateUtils.getMillisFromLocalDateTime(started), DateUtils.getMillisFromLocalDateTime(stopped), JobSubType.SENIORITY_LEVEL);
-
-        kafkaProducer.pushToSchedulerLogsQueue(schedulerLogsDTO);
+        userSchedulerJobService.createJobForEmploymentEnd(schedulerPanelId, unitId, started, stopped, log, result);
 
 
     }

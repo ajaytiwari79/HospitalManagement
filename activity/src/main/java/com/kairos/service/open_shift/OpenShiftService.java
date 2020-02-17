@@ -1,6 +1,6 @@
 package com.kairos.service.open_shift;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.custom_exception.DataNotFoundByIdException;
@@ -69,7 +69,7 @@ public class OpenShiftService extends MongoBaseService {
     @Inject
     private ShiftMongoRepository shiftMongoRepository;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     @Inject
     private OpenShiftNotificationMongoRepository openShiftNotificationMongoRepository;
 
@@ -234,7 +234,7 @@ public class OpenShiftService extends MongoBaseService {
         } else if (OpenShiftAction.NOTIFY.name().equals(action)) {
             List<String> emails = userIntegrationService.getEmailsOfStaffByStaffIds(unitId, staffIds);
             String[] recievers = emails.toArray(new String[emails.size()]);
-            mailService.sendMailWithAttachment(recievers, SHIFT_NOTIFICATION, SHIFT_NOTIFICATION_MESSAGE, null);
+            sendGridMailService.sendMailWithAttachment(recievers, SHIFT_NOTIFICATION, SHIFT_NOTIFICATION_MESSAGE, null);
             List<OpenShiftNotification> openShiftNotifications = new ArrayList<>();
             staffIds.forEach(staffId -> openShiftNotifications.add(new OpenShiftNotification(openShiftId, staffId)));
             save(openShiftNotifications);

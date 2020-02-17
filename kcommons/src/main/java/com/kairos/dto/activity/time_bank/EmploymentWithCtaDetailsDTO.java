@@ -41,7 +41,7 @@ public class EmploymentWithCtaDetailsDTO {
     private Long employmentTypeId;
     private Long expertiseId;
     private SeniorAndChildCareDaysDTO seniorAndChildCareDays;
-    private ExpertiseDTO expertiseQueryResult;
+    private ExpertiseDTO expertise;
 
 
 

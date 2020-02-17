@@ -1,7 +1,7 @@
 package com.kairos.shiftplanning.domain.activity;
 
-import com.kairos.commons.planning_setting.PlanningSetting;
-import com.kairos.shiftplanning.constraints.activityConstraint.ActivityConstraints;
+import com.kairos.enums.constraint.ConstraintSubType;
+import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.skill.Skill;
 import com.kairos.shiftplanning.domain.tag.Tag;
@@ -9,6 +9,9 @@ import com.kairos.shiftplanning.domain.timetype.TimeType;
 import com.kairos.shiftplanning.domain.wta.WorkingTimeConstraints;
 import com.kairos.shiftplanning.executioner.ShiftPlanningGenerator;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.kie.api.runtime.rule.RuleContext;
@@ -16,9 +19,12 @@ import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftL
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @XStreamAlias("Activity")
 public class Activity {
 
@@ -28,7 +34,7 @@ public class Activity {
     private List<Skill> skills;
     private int priority;
     private String name;
-    private ActivityConstraints activityConstraints;
+    private Map<ConstraintSubType, Constraint> constraintMap;
     private TimeType timeType;
     private int order;
     private int rank;
@@ -47,68 +53,6 @@ public class Activity {
         this.expertises = expertises;
         this.tags = tags;
     }
-    public Activity() {
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public TimeType getTimeType() {
-        return timeType;
-    }
-
-    public void setTimeType(TimeType timeType) {
-        this.timeType = timeType;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public List<Skill> getSkills() {
-        return skills;
-    }
-
-    public void setSkills(List<Skill> skills) {
-        this.skills = skills;
-    }
-
-
-    public ActivityConstraints getActivityConstraints() {
-        return activityConstraints;
-    }
-
-    public void setActivityConstraints(ActivityConstraints activityConstraints) {
-        this.activityConstraints = activityConstraints;
-    }
-
-
 
     public boolean isBlankActivity(){
         return this.name== ShiftPlanningGenerator.BLANK_ACTIVITY;
@@ -133,58 +77,15 @@ public class Activity {
         return absence;
     }
 
-    public int checkActivityConstraints(ShiftImp shift, int index) {
+    public int checkActivityConstraints(ShiftImp shift, ConstraintSubType constraintSubType) {
         if(shift.isLocked()) return 0;
-            switch (index){
-                /*case 1:return activityConstraints.getLongestDuration().checkConstraints(this,shift);
-                case 2:return activityConstraints.getShortestDuration().checkConstraints(this,shift);*/
-                case 3:return activityConstraints.getMaxAllocationPerShift().checkConstraints(this,shift);
-                case 4:return activityConstraints.getMaxDiffrentActivity().checkConstraints(shift);
-                //case 5:return skillsSatisFaction(shift);
-                case 6:return activityConstraints.getMinimumLengthofActivity().checkConstraints(this,shift);
-                case 7:return activityConstraints.getActivityDayType().checkConstraints(shift);
-                case 8:return activityConstraints.getActivityRequiredTag().checkConstraints(this,shift);
-                default:
-                    break;
-
-            }
-        return 0;
+        return constraintMap.get(constraintSubType).checkConstraints(this,shift);
     }
-   /* public boolean checkActivityConstraints(ActivityLineInterval lineInterval, int index) {
-        return activityConstraints.getContinousActivityPerShift().checkConstraints(lineInterval);
-    }*/
 
 
-    public void breakActivityContraints(ShiftImp shift, HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, int index) {
-        log.debug("breaking Activity constraint: {}",index);
-        switch (index) {
-            /*case 1:
-                activityConstraints.getLongestDuration().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
-                break;
-            case 2:
-                activityConstraints.getShortestDuration().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
-                break;*/
-            case 3:
-                activityConstraints.getMaxAllocationPerShift().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
-                break;
-            case 4:
-                activityConstraints.getMaxDiffrentActivity().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
-                break;
-            case 5:
-                brokeActivitySkillConstraints(constraintPenality,scoreHolder, kContext);
-                break;
-            case 6:
-                activityConstraints.getMinimumLengthofActivity().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
-                break;
-            case 7:
-                activityConstraints.getActivityDayType().breakLevelConstraints(scoreHolder, kContext,constraintPenality);
-                break;
-            case 8:
-                activityConstraints.getActivityRequiredTag().breakLevelConstraints(scoreHolder,kContext,constraintPenality);
-                break;
-            default:
-                break;
-        }
+    public void breakActivityContraints(ShiftImp shift, HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintSubType constraintSubType) {
+        log.debug("breaking Activity constraint: {}",constraintSubType);
+        constraintMap.get(constraintSubType).breakLevelConstraints(scoreHolder,kContext,constraintPenality);
     }
 
     public void broketaskPriorityConstraints(HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext){
@@ -238,7 +139,7 @@ public class Activity {
                 .append(skills)
                 .append(priority)
                 .append(name)
-                .append(activityConstraints)
+                .append(constraintMap)
                 .toHashCode();
     }
 

@@ -1,6 +1,6 @@
 package com.kairos.controller.client;
 
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.dto.activity.task.TaskDemandRequestWrapper;
 import com.kairos.dto.user.client.ClientExceptionDTO;
 import com.kairos.dto.user.organization.AddressDTO;
@@ -58,7 +58,7 @@ public class ClientController {
     @Inject
     private ClientExtendedService clientExtendedService;
     @Inject
-    private MailService mailService;
+    private SendGridMailService sendGridMailService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 

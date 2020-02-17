@@ -1,8 +1,10 @@
 package com.kairos.shiftplanning.executioner;
 
 import com.kairos.enums.Day;
-import com.kairos.enums.MasterDataTypeEnum;
+import com.kairos.enums.TimeTypeEnum;
+import com.kairos.enums.constraint.ConstraintSubType;
 import com.kairos.enums.shift.PaidOutFrequencyEnum;
+import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.constraints.activityConstraint.*;
 import com.kairos.shiftplanning.constraints.unitConstraint.PreferedEmployementType;
@@ -284,7 +286,7 @@ public class ShiftPlanningGenerator {
     }
 
 
-    public ActivityConstraints getActivityContraints(){
+    public Map<ConstraintSubType, Constraint> getActivityContraints(){
         LongestDuration longestDuration = new LongestDuration(80, ScoreLevel.SOFT,-5);
         ShortestDuration shortestDuration = new ShortestDuration(60,ScoreLevel.HARD,-2);
         MaxAllocationPerShift maxAllocationPerShift = new MaxAllocationPerShift(3,ScoreLevel.MEDIUM,-1);//3
@@ -294,8 +296,15 @@ public class ShiftPlanningGenerator {
         List<DayType> dayTypes = getDayTypes();
         ActivityDayType activityDayType = new ActivityDayType(dayTypes,ScoreLevel.SOFT,5);
         ActivityRequiredTag activityRequiredTag = new ActivityRequiredTag(requiredTagId(),ScoreLevel.HARD,1);
-        ActivityConstraints activityConstraints = new ActivityConstraints(longestDuration,shortestDuration,maxAllocationPerShift,maxDiffrentActivity,minimumLengthofActivity,activityDayType,activityRequiredTag);
-        return activityConstraints;
+        Map<ConstraintSubType, Constraint> constraintMap = new HashMap<>();
+        constraintMap.put(ConstraintSubType.ACTIVITY_LONGEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,longestDuration);
+        constraintMap.put(ConstraintSubType.ACTIVITY_SHORTEST_DURATION_RELATIVE_TO_SHIFT_LENGTH,shortestDuration);
+        constraintMap.put(ConstraintSubType.MAXIMUM_ALLOCATIONS_PER_SHIFT_FOR_THIS_ACTIVITY_PER_STAFF,maxAllocationPerShift);
+        constraintMap.put(ConstraintSubType.ACTIVITY_MUST_CONTINUOUS_NUMBER_OF_HOURS,maxDiffrentActivity);
+        constraintMap.put(ConstraintSubType.MINIMUM_LENGTH_OF_ACTIVITY,minimumLengthofActivity);
+        constraintMap.put(ConstraintSubType.ACTIVITY_VALID_DAYTYPE,activityDayType);
+        constraintMap.put(ConstraintSubType.ACTIVITY_REQUIRED_TAG,activityRequiredTag);
+        return constraintMap;
     }
     public  Tag requiredTagId(){
         Tag tag = new Tag(new BigInteger("1"),"StaffTag", STAFF, false, 958);;
@@ -788,8 +797,8 @@ public class ShiftPlanningGenerator {
     }
     public TimeType[] createTimeTypes(){
         TimeType[] timeTypes= new TimeType[4];
-        timeTypes[0]= new TimeType(UUID.randomUUID().toString(),"presence" );
-        timeTypes[1]= new TimeType(UUID.randomUUID().toString(),"absence");
+        timeTypes[0]= new TimeType(UUID.randomUUID().toString(),"presence", TimeTypeEnum.PRESENCE );
+        timeTypes[1]= new TimeType(UUID.randomUUID().toString(),"absence",TimeTypeEnum.ABSENCE);
         return timeTypes;
     }
     private List<Activity> getActivities(){
@@ -800,13 +809,13 @@ public class ShiftPlanningGenerator {
         List<Tag> tags4 = createTags4();
         List<Activity> activityPlannerEntities = new ArrayList<>();
         Activity activity = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet()),2,"Team A",timeTypes[0], 1,10, null,tags1);
-        activity.setActivityConstraints(getActivityContraints());
+        activity.setConstraintMap(getActivityContraints());
         Activity activity2 =new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Team B",timeTypes[0], 2,9, null, tags2);
-        activity2.setActivityConstraints(getActivityContraints());
+        activity2.setConstraintMap(getActivityContraints());
         Activity activity3 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2,"Day Off",timeTypes[1], 3,2, null,tags3 );
-        activity3.setActivityConstraints(getActivityContraints());
+        activity3.setConstraintMap(getActivityContraints());
         Activity activity4 = new Activity(UUID.randomUUID().toString(),new ArrayList<>(createSkillSet2()),2, BLANK_ACTIVITY,timeTypes[0], 4,1, null,tags4);
-        activity4.setActivityConstraints(getActivityContraints());
+        activity4.setConstraintMap(getActivityContraints());
         activityPlannerEntities.add(activity);
         activityPlannerEntities.add(activity2);
         activityPlannerEntities.add(activity3);

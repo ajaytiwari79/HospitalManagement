@@ -37,14 +37,9 @@ public class NumberOfWeekendShiftsInPeriodWTATemplateDTO extends WTABaseRuleTemp
     private String intervalUnit;
     private boolean restingTimeAllowed;
     private int restingTime;
-
-
     private float recommendedValue;
     private MinMaxSetting minMaxSetting = MinMaxSetting.MINIMUM;
-
     public NumberOfWeekendShiftsInPeriodWTATemplateDTO() {
         this.wtaTemplateType = WTATemplateType.NUMBER_OF_WEEKEND_SHIFT_IN_PERIOD;
     }
-
-
 }

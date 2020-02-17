@@ -47,6 +47,7 @@ import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.shift.ShiftService;
 import com.kairos.service.shift.ShiftStateService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -111,6 +112,7 @@ public class PlanningPeriodService extends MongoBaseService {
     private ShiftStateService shiftStateService;
     @Inject
     private TimeBankService timeBankService;
+    @Inject private ActivitySchedulerJobService activitySchedulerJobService;
 
     // To get list of phases with duration in days
     public Map<Long, List<PhaseDTO>> getPhasesWithDurationInDays(List<Long> unitIds) {
@@ -377,40 +379,34 @@ public class PlanningPeriodService extends MongoBaseService {
     private void createScheduleJobOfPanningPeriod(List<PlanningPeriod> planningPeriods) {
         Map<Long, String> unitAndTimeZoneMap = userIntegrationService.getTimeZoneByUnitIds(planningPeriods.stream().distinct().map(PlanningPeriod::getUnitId).collect(Collectors.toSet()));
         List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
-        planningPeriods.parallelStream().forEach(planningPeriod -> planningPeriod.getPhaseFlippingDate().parallelStream().forEach(periodPhaseFlippingDate -> {
-            if (periodPhaseFlippingDate.getFlippingDate() != null && periodPhaseFlippingDate.getFlippingTime() != null)
-                schedulerPanelDTOS.add(new SchedulerPanelDTO(planningPeriod.getUnitId(), JobType.FUNCTIONAL, JobSubType.FLIP_PHASE, true, LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()), planningPeriod.getId(), unitAndTimeZoneMap.get(planningPeriod.getUnitId())));
-        }));
-        if (!schedulerPanelDTOS.isEmpty()) {
-            List<SchedulerPanelDTO> schedulerPanelRestDTOS = new ArrayList<>();
-            try {
-                LOGGER.info("send rest call for create job of planning period flippng date of unit");
-                schedulerPanelRestDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, -1l, true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-                });
-                LOGGER.info("successfully created job of planning period flippng date");
-            } catch (Exception e) {
-                LOGGER.info("error while created job of planning period flippng date",e);
-                planningPeriodMongoRepository.deleteAll(planningPeriods);
-                exceptionService.internalError(INTERNAL_SERVER_ERROR);
-            }
-            if (isCollectionNotEmpty(schedulerPanelRestDTOS)) {
-                Map<String, SchedulerPanelDTO> schedulerPanelDTOMap = schedulerPanelRestDTOS.stream().collect(Collectors.toMap(schedulerPanelDTO -> schedulerPanelDTO.getEntityId() + "-" + schedulerPanelDTO.getOneTimeTriggerDate(), schedulerPanelDTO -> schedulerPanelDTO));
-                planningPeriods.stream().forEach(planningPeriod -> {
-                    try {
-                        planningPeriod.getPhaseFlippingDate().stream().forEach(periodPhaseFlippingDate -> {
-                            if (periodPhaseFlippingDate.getFlippingDate() != null && periodPhaseFlippingDate.getFlippingTime() != null) {
-                                SchedulerPanelDTO schedulerPanelDTO = schedulerPanelDTOMap.get(planningPeriod.getId() + "-" + LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()));
-                                periodPhaseFlippingDate.setSchedulerPanelId(schedulerPanelDTO.getId());
-                            }
-                        });
-                    } catch (Exception e) {
-                        LOGGER.info("error in set schedulerPanel job id in planning period via job in unit id {}" , planningPeriod.getUnitId() , e);
-                    }
-                });
-                planningPeriodMongoRepository.saveEntities(planningPeriods);
-            }
+        try {
+            LOGGER.info("send rest call for create job of planning period flippng date of unit");
+            schedulerPanelDTOS = activitySchedulerJobService.createScheduleJobForFlipPhase(planningPeriods, unitAndTimeZoneMap);
+            LOGGER.info("successfully created job of planning period flippng date");
+        } catch (Exception e) {
+            LOGGER.info("error while created job of planning period flippng date",e);
+            planningPeriodMongoRepository.deleteAll(planningPeriods);
+            exceptionService.internalError(INTERNAL_SERVER_ERROR);
+        }
+        if (isCollectionNotEmpty(schedulerPanelDTOS)) {
+            Map<String, SchedulerPanelDTO> schedulerPanelDTOMap = schedulerPanelDTOS.stream().collect(Collectors.toMap(schedulerPanelDTO -> schedulerPanelDTO.getEntityId() + "-" + schedulerPanelDTO.getOneTimeTriggerDate(), schedulerPanelDTO -> schedulerPanelDTO));
+            planningPeriods.stream().forEach(planningPeriod -> {
+                try {
+                    planningPeriod.getPhaseFlippingDate().stream().forEach(periodPhaseFlippingDate -> {
+                        if (periodPhaseFlippingDate.getFlippingDate() != null && periodPhaseFlippingDate.getFlippingTime() != null) {
+                            SchedulerPanelDTO schedulerPanelDTO = schedulerPanelDTOMap.get(planningPeriod.getId() + "-" + LocalDateTime.of(periodPhaseFlippingDate.getFlippingDate(), periodPhaseFlippingDate.getFlippingTime()));
+                            periodPhaseFlippingDate.setSchedulerPanelId(schedulerPanelDTO.getId());
+                        }
+                    });
+                } catch (Exception e) {
+                    LOGGER.info("error in set schedulerPanel job id in planning period via job in unit id {}", planningPeriod.getUnitId(), e);
+                }
+            });
+            planningPeriodMongoRepository.saveEntities(planningPeriods);
         }
     }
+
+
 
 
     public PlanningPeriod updatePhaseFlippingDateOfPeriod(PlanningPeriod planningPeriod, PlanningPeriodDTO planningPeriodDTO, Long unitId) {
@@ -776,16 +772,6 @@ public class PlanningPeriodService extends MongoBaseService {
 
     public PlanningPeriodDTO getStartDateAndEndDateOfPlanningPeriodByUnitId(Long unitId) {
         return planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
-    }
-
-    //get current date for test use after test getLocalDateTime(getFirstDayOfMonth(getLocalDate()), 02, 00, 00)
-    public boolean createJobOfPlanningPeriod() {
-        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PLANNING_PERIOD, JobFrequencyType.MONTHLY, getLocalDateTime((getLocalDate()), 07, 00, 00), false));
-        LOGGER.info("create job for add planning period");
-        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-        });
-        LOGGER.info("job registered of add planning period");
-        return isCollectionNotEmpty(schedulerPanelDTOS);
     }
 
     //add planning period in unit via job

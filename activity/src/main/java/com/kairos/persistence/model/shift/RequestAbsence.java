@@ -14,7 +14,6 @@ import java.util.Date;
  **/
 @Getter
 @Setter
-@Document
 public class RequestAbsence {
     private BigInteger shiftId;
     private BigInteger activityId;

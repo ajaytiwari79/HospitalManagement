@@ -4,6 +4,7 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.custom_exception.DuplicateDataException;
 import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.service.locale.LocaleService;
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,9 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Inject
     private LocaleService localeService;
+
+    @Inject
+    private RaygunClient raygunClient;
 
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
@@ -95,6 +99,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
+        raygunClient.send(ex);
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 

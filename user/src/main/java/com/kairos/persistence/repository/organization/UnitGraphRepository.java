@@ -500,11 +500,11 @@ public interface UnitGraphRepository extends Neo4jBaseRepository<Unit, Long>, Cu
             "org.companyUnitType as companyUnitType,id(accountType) as accountTypeId, id(hub) as hubId ")
     OrganizationBasicResponse getOrganizationDetailsById(Long organizationId);
 
-    @Query("MATCH (organization:Unit) WHERE id(organization) IN {0} " +
+    @Query("MATCH (organization) WHERE id(organization) IN {0} " +
             "OPTIONAL MATCH (organization)-[:" + CONTACT_ADDRESS + "]->(contactAddress:ContactAddress) WITH organization,contactAddress \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + ZIP_CODE + "]->(zipCode:ZipCode) WITH zipCode,contactAddress,organization \n" +
             "OPTIONAL MATCH (contactAddress)-[:" + MUNICIPALITY + "]->(municipality:Municipality) \n" +
-            "RETURN organization as organization, municipality as municipality,contactAddress as contactAddress,zipCode as zipCode")
+            "RETURN organization as organization, municipality as municipality,contactAddress as contactAddress,zipCode as zipCode,id(organization) as organizationId")
     List<OrganizationContactAddress> getContactAddressOfOrganizations(List<Long> unitIds);
 
 

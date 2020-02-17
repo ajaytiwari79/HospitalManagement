@@ -150,15 +150,6 @@ public class UnitPayrollSettingService extends MongoBaseService {
         return unitPayrollSettings;
     }
 
-    public boolean createJobForAddPayrollPeriod() {
-        List<SchedulerPanelDTO> schedulerPanelDTOS = Arrays.asList(new SchedulerPanelDTO(JobType.SYSTEM, JobSubType.ADD_PAYROLL_PERIOD, JobFrequencyType.MONTHLY, getLocalDateTime(getFirstDayOfMonth(getLocalDate()), 01, 00, 00), false));
-        LOGGER.info("create job for add payroll period");
-        schedulerPanelDTOS = schedulerRestClient.publishRequest(schedulerPanelDTOS, null, true, IntegrationOperation.CREATE, "/scheduler_panel", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {
-        });
-        LOGGER.info("job registered of add payroll period");
-        return isCollectionNotEmpty(schedulerPanelDTOS);
-    }
-
 
     //use for add payroll period via job or manually
     private List<UnitPayrollSetting> addPayrollPeriodInUnits(List<UnitPayrollSetting> unitPayrollSettings) {

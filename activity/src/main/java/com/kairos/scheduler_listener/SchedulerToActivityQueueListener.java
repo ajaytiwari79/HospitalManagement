@@ -1,7 +1,7 @@
 package com.kairos.scheduler_listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kairos.commons.service.mail.MailService;
+import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.commons.service.scheduler.queue.JobQueueExecutor;
 import com.kairos.dto.scheduler.queue.KairosSchedulerExecutorDTO;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ public class SchedulerToActivityQueueListener {
     private static final Logger logger = LoggerFactory.getLogger(SchedulerToActivityQueueListener.class);
     @Inject
     private JobQueueExecutor schedulerToActivityQueueService;
-    @Inject private MailService mailService;
+    @Inject private SendGridMailService sendGridMailService;
 
     //Todo Yatharth uncomment this code when it kafka is ready
     //@KafkaListener(topics=SCHEDULER_TO_ACTIVITY_QUEUE_TOPIC)
@@ -28,7 +28,7 @@ public class SchedulerToActivityQueueListener {
         }
         catch(Exception e) {
             logger.error(e.getMessage(),e);
-            mailService.sendMailToBackendOnException(e);
+            sendGridMailService.sendMailToBackendOnException(e);
 
         }
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.commons.audit_logging.IgnoreLogging;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.shift.ShiftActivityLineInterval;
+import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.shift.ShiftType;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -31,50 +33,42 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 @Document(collection = "shifts")
 public class Shift extends MongoBaseEntity {
 
-    private Date startDate;
-    private Date endDate;
-    private boolean disabled = false;
-    private long bid;
-    private long pId;
-    private long bonusTimeBank = 0;
-    private long amount;
-    private long probability = 0;
-    private long accumulatedTimeBankInMinutes = 0;
-    private String remarks;
+    protected Date startDate;
+    protected Date endDate;
+    protected boolean disabled = false;
     @NotNull(message = "error.ShiftDTO.staffId.notnull")
-    private Long staffId;
-    private BigInteger phaseId;
-    private BigInteger planningPeriodId;
-    private Integer weekCount;
+    protected Long staffId;
+    protected BigInteger phaseId;
+    protected BigInteger planningPeriodId;
     @Indexed
-
-    private Long unitId;
-    private int scheduledMinutes;
-    private int durationMinutes;
+    protected Long unitId;
+    protected int scheduledMinutes;
+    protected int durationMinutes;
     @NotEmpty(message = "message.shift.activity.empty")
-    private List<ShiftActivity> activities;
-    //time care id
-    private String externalId;
+    protected List<ShiftActivity> activities;
+    protected String externalId;
+    protected String remarks;
     @NotNull(message = "error.ShiftDTO.employmentId.notnull")
-    private Long employmentId;
-    private BigInteger parentOpenShiftId;
+    protected Long employmentId;
+    protected BigInteger parentOpenShiftId;
     // from which shift it is copied , if we need to undo then we need this
-    private BigInteger copiedFromShiftId;
-    private boolean sickShift;
-    private Long functionId;
-    private Long staffUserId;
-    private ShiftType shiftType;
-    private int timeBankCtaBonusMinutes;
-    private int plannedMinutesOfTimebank;
-    private int payoutCtaBonusMinutes;
-    private int plannedMinutesOfPayout;
-    private int scheduledMinutesOfTimebank;
-    private int scheduledMinutesOfPayout;
-    private Shift draftShift;
-    private boolean draft;
-    private RequestAbsence requestAbsence;
-    private List<ShiftActivity> breakActivities;
-
+    protected BigInteger copiedFromShiftId;
+    protected boolean sickShift;
+    protected Long functionId;
+    protected Long staffUserId;
+    protected ShiftType shiftType;
+    protected int timeBankCtaBonusMinutes;
+    protected int plannedMinutesOfTimebank;
+    protected int payoutCtaBonusMinutes;
+    protected int plannedMinutesOfPayout;
+    protected int scheduledMinutesOfTimebank;
+    protected int scheduledMinutesOfPayout;
+    protected Shift draftShift;
+    protected boolean draft;
+    protected RequestAbsence requestAbsence;
+    protected List<ShiftActivity> breakActivities;
+    protected AccessGroupRole accessGroupRole;
+    protected LocalDate validated;
 
     public Shift() {
         //Default Constructor
@@ -86,25 +80,6 @@ public class Shift extends MongoBaseEntity {
         this.endDate = endDate;
         this.employmentId = employmentId;
         this.activities = shiftActivities;
-    }
-
-    public Shift(BigInteger id, Date startDate, Date endDate, long bid, long pId, long bonusTimeBank,
-                 long amount, long probability, long accumulatedTimeBankInMinutes, String remarks, @NotEmpty(message = "message.shift.activity.empty") List<ShiftActivity> activities, @NotNull(message = "error.ShiftDTO.staffId.notnull") Long staffId, Long unitId, Long employmentId) {
-        this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.bid = bid;
-        this.pId = pId;
-        this.bonusTimeBank = bonusTimeBank;
-        this.amount = amount;
-        this.probability = probability;
-        this.accumulatedTimeBankInMinutes = accumulatedTimeBankInMinutes;
-        this.remarks = remarks;
-        this.activities = activities;
-        this.staffId = staffId;
-        this.unitId = unitId;
-        this.employmentId = employmentId;
-
     }
 
     // This is used in absance shift
@@ -204,7 +179,7 @@ public class Shift extends MongoBaseEntity {
         return new List[] {shiftActivitiesForOverStaffing,shiftActivitiesForUnderStaffing};
     }
 
-    private List<ShiftActivityLineInterval> getShiftActivityLineIntervals(Shift shift){
+    protected List<ShiftActivityLineInterval> getShiftActivityLineIntervals(Shift shift){
         List<ShiftActivityLineInterval> shiftActivityLineIntervals=new ArrayList<>();
         for (ShiftActivity shiftActivity:shift.getActivities()) {
             Date endDateToBeSet=shiftActivity.getStartDate();
@@ -218,7 +193,7 @@ public class Shift extends MongoBaseEntity {
         return shiftActivityLineIntervals;
     }
 
-    private List<ShiftActivity> getActivitiesForValidatingStaffingLevel(List<ShiftActivityLineInterval> currentActivityLines, List<ShiftActivityLineInterval> shiftActivityLines){
+    protected List<ShiftActivity> getActivitiesForValidatingStaffingLevel(List<ShiftActivityLineInterval> currentActivityLines, List<ShiftActivityLineInterval> shiftActivityLines){
         List<ShiftActivity> shiftActivitiesForCheckingStaffingLevel = new ArrayList<>();
         for (ShiftActivityLineInterval activityLineInterval:currentActivityLines){
             if(shiftActivityLines.stream().noneMatch(k->k.getStartDate().equals(activityLineInterval.getStartDate()) && k.getActivityId().equals(activityLineInterval.getActivityId()))){
@@ -230,7 +205,7 @@ public class Shift extends MongoBaseEntity {
         return shiftActivitiesForCheckingStaffingLevel;
     }
 
-    private List<ShiftActivity> mergeShiftActivityList(List<ShiftActivity> shiftActivities){
+    protected List<ShiftActivity> mergeShiftActivityList(List<ShiftActivity> shiftActivities){
         List<ShiftActivity> shiftActivitiesList=new ArrayList<>();
         ShiftActivity shiftActivity=shiftActivities.get(0);
         boolean activityAdded=false;
@@ -264,15 +239,8 @@ public class Shift extends MongoBaseEntity {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", disabled=" + disabled +
-                ", bid=" + bid +
-                ", pId=" + pId +
-                ", bonusTimeBank=" + bonusTimeBank +
-                ", amount=" + amount +
-                ", probability=" + probability +
-                ", accumulatedTimeBankInMinutes=" + accumulatedTimeBankInMinutes +
                 ", remarks='" + remarks + '\'' +
                 ", staffId=" + staffId +
-                ", weekCount=" + weekCount +
                 ", unitId=" + unitId +
                 '}';
     }

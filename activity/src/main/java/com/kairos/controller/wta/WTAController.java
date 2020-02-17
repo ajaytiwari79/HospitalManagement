@@ -288,12 +288,7 @@ public class WTAController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, workTimeAgreementBalancesCalculationService.updateWTALeaveCountByJob(countryId));
     }
 
-    @ApiOperation(value = "Update Phases in Ruletemplates")
-    @GetMapping(value =  COUNTRY_URL+ "/register_job_for_wta_leave_count")
-    public ResponseEntity<Map<String, Object>> regidterJobForWTALeaveCount(@PathVariable long countryId){
-        activitySchedulerJobService.registerJobForWTALeaveCount(countryId);
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, null);
-    }
+
 
 
 }

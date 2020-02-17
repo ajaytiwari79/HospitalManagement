@@ -77,12 +77,7 @@ public class UnitPayrollSettingController {
     }
 
 
-    @ApiOperation(value = "create job for PayRoll Period ")
-    @PutMapping(value="/payroll_period_job")
-    public ResponseEntity<Map<String, Object>> createJobForPayrollPeriod() {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, unitPayrollSettingService.createJobForAddPayrollPeriod());
 
-    }
 
 
 }

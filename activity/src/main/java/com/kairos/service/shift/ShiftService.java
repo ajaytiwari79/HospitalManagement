@@ -59,6 +59,7 @@ import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.service.phase.PhaseService;
+import com.kairos.service.scheduler_service.ActivitySchedulerJobService;
 import com.kairos.service.staffing_level.StaffingLevelService;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import com.kairos.service.time_bank.TimeBankService;
@@ -170,6 +171,7 @@ public class ShiftService extends MongoBaseService {
     private ActivityPriorityMongoRepository activityPriorityMongoRepository;
     @Inject
     private StaffingLevelMongoRepository staffingLevelMongoRepository;
+    @Inject private ActivitySchedulerJobService activitySchedulerJobService;
 
     static String staffingLevelForOld = BALANCED;
     static String staffingLevelForNew = BALANCED;
@@ -245,7 +247,7 @@ public class ShiftService extends MongoBaseService {
             mainShift = saveShiftWithActivity(activityWrapperMap, mainShift, staffAdditionalInfoDTO, false, functionId, phase, shiftActionType);
             todoService.createOrUpdateTodo(mainShift, TodoType.APPROVAL_REQUIRED, isNotNull(shiftDTO.getId()),staffAdditionalInfoDTO);
             payOutService.updatePayOut(staffAdditionalInfoDTO, mainShift, activityWrapperMap);
-            //shiftReminderService.setReminderTrigger(activityWrapperMap, mainShift);
+            //shiftReminderService.updateJobForShiftReminder(activityWrapperMap, mainShift);
             shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(isNotNull(mainShift.getDraftShift()) ? mainShift.getDraftShift() : mainShift, ShiftDTO.class);
             shiftDTO.setId(mainShift.getId());
             shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
@@ -449,6 +451,7 @@ public class ShiftService extends MongoBaseService {
                 if (isNotNull(todoType)) {
                     Todo todo = todoRepository.findByEntityIdAndType(shift.getId(), TodoType.REQUEST_ABSENCE);
                     todo.setStatus(TodoStatus.APPROVE);
+                    todo.setApprovedOn(getDate());
                     todoRepository.save(todo);
                 }
                 todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, isNotNull(shiftDTO.getId()),staffAdditionalInfoDTO);
@@ -458,7 +461,7 @@ public class ShiftService extends MongoBaseService {
                     shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
                 }
                 updateShiftViolatedOnIgnoreCounter(shift, shiftOverLappedWithNonWorkingTime, updatedShiftWithViolatedInfo);
-                shiftReminderService.setReminderTrigger(activityWrapperMap, shift);
+                activitySchedulerJobService.updateJobForShiftReminder(activityWrapperMap, shift);
                 if (updateShiftState) {
                     shiftDTO = shiftStateService.updateShiftStateAfterValidatingWtaRule(shiftDTO, shiftDTO.getId(), shiftDTO.getShiftStatePhaseId());
                 } else if (isNotNull(validatedByStaff)) {

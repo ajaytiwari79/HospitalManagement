@@ -1,5 +1,6 @@
 package com.kairos.shiftplanning.domain.timetype;
 
+import com.kairos.enums.TimeTypeEnum;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,5 +17,6 @@ public class TimeType {
 
     private String id;
     private String name;
+    private TimeTypeEnum timeTypeEnum;
 
 }

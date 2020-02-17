@@ -22,6 +22,7 @@ public class  ExpertiseLineDTO implements Comparable<ExpertiseLineDTO> {
     private UnionIDNameDTO union;
     private int fullTimeWeeklyMinutes;
     private Integer numberOfWorkingDaysInWeek;
+
     private List<SeniorityLevelDTO> seniorityLevels = new ArrayList<>();
     private Boolean editable;
     private BreakPaymentSetting breakPaymentSetting;

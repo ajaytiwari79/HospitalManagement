@@ -117,7 +117,6 @@ public interface TeamGraphRepository extends Neo4jBaseRepository<Team,Long>{
             "RETURN DISTINCT activities")
     List<BigInteger> getTeamActivityIdsByTeamIds(List<Long> teamIds);
 
-
     @Query("MATCH (team:Team)-[r:"+TEAM_HAS_SERVICES+"]->(os:OrganizationService) WHERE id(team)={0} AND id(os)={1} SET r.customName={2} \n"+
             "RETURN id(os) as id, os.name as name, r.customName as customName, os.description as description")
     OrganizationServiceQueryResult addCustomNameOfSubServiceForTeam(Long teamId, Long organizationServiceId, String customName);

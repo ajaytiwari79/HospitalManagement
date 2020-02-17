@@ -1,5 +1,6 @@
 package com.planner.controller.custom_responseEntityExceptionHandler;
 
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import com.planner.common.custum_exceptions.DataNotFoundByIdException;
 import com.planner.common.custum_exceptions.FieldAlreadyExistsException;
 import com.planner.component.exception.ExceptionService;
@@ -34,6 +35,8 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @Autowired
     private ExceptionService exceptionService;
+    @Autowired
+    private RaygunClient raygunClient;
 
 
     @Override
@@ -66,6 +69,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(exceptionService.convertMessage(INTERNAL_SERVER_ERROR));
+        raygunClient.send(ex);
         return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 

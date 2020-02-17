@@ -805,6 +805,7 @@ public class ShiftValidatorService {
             shiftState.getActivities().forEach(activity -> activity.setId(mongoSequenceRepository.nextSequence(ShiftActivity.class.getSimpleName())));
             shiftStateMongoRepository.save(shiftState);
         }
+        shiftMongoRepository.updateValidateDetailsOfShift(shiftState.getShiftId(),shiftState.getAccessGroupRole(),shiftState.getValidated());
         shiftDTO = ObjectMapperUtils.copyPropertiesByMapper(shiftState, ShiftDTO.class);
         if (validatedByStaff) {
             shiftDTO.setEditable(true);
