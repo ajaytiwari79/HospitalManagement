@@ -2,7 +2,6 @@ package com.kairos.controller.pay_out;
 
 
 import com.kairos.constants.ApiConstants;
-import com.kairos.controller.task.TaskController;
 import com.kairos.service.pay_out.PayOutService;
 import com.kairos.utils.response.ResponseHandler;
 import org.slf4j.Logger;
@@ -19,7 +18,7 @@ import java.util.Map;
 @RequestMapping(ApiConstants.PAYOUT_URL)
 public class PayOutController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskController.class);
+    private static final Logger logger = LoggerFactory.getLogger(PayOutController.class);
 
     @Autowired
     private PayOutService payOutService;

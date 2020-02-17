@@ -6,6 +6,7 @@ apply plugin: 'maven-publish'
 
 ext {
     versionlogback="1.2.3"
+    jacksonVersion = '2.9.2'
 }
 
 sourceCompatibility = 1.8
@@ -56,7 +57,8 @@ dependencies {
 //    compile group: 'com.mindscapehq', name: 'raygun4java', version: '3.0.0', ext: 'pom'
 // https://mvnrepository.com/artifact/com.mindscapehq/webprovider
     compile group: 'com.mindscapehq', name: 'webprovider', version: '3.0.0'
-
+    compile group: 'org.json', name: 'json', version: '20160810'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: jacksonVersion
 }
 sonarqube {
     properties {
