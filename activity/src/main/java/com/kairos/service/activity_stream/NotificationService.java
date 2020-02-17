@@ -5,7 +5,6 @@ import com.kairos.dto.activity.response.RequestComponent;
 import com.kairos.dto.user.staff.ClientStaffInfoDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.activity_stream.Notification;
-import com.kairos.persistence.model.task.Task;
 import com.kairos.persistence.repository.activity_stream.NotificationMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kairos.constants.AppConstants.ABSENCE_PLANNING;
 import static com.kairos.constants.AppConstants.REQUEST_TO_CREATE_NEW_UTILITY;
 
 /**
@@ -49,16 +47,7 @@ public class NotificationService {
     }
 
 
-    public void addStaffMissingNotification(Task task, String message, String name){
-        Notification notification = new Notification();
-        notification.setOrganizationId(task.getUnitId());
-        notification.setSource(ABSENCE_PLANNING);
-        notification.setName(name);
-        notification.setMessage(message);
-        notificationMongoRepository.save(notification);
-        //mailService.sendPlainMail("jasgeet.eden@oodlestechnologies.com", message, message);
 
-    }
 
     /**
      * This method is used to add notification when request come to create new skills/service/...etc.
