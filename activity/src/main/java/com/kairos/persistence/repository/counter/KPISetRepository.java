@@ -18,7 +18,7 @@ import java.util.List;
 @Repository
 public interface KPISetRepository extends MongoBaseRepository<KPISet,BigInteger>,CustomKPISetRepository {
 
-    List<KPISetDTO> findAllByReferenceIdAndDeletedFalse(Long countryId);
+    List<KPISetDTO> findAllByReferenceIdAndDeletedFalse(Long referenceId);
 
     @Query("{'deleted':false,'_id':?0}")
     KPISetDTO findOneById(BigInteger kpiSetId);
