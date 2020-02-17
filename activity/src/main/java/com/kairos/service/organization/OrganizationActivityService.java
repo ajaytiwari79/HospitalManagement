@@ -1,6 +1,5 @@
 package com.kairos.service.organization;
 
-import com.kairos.commons.custom_exception.DataNotFoundException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
 import com.kairos.dto.activity.activity.ActivityDTO;

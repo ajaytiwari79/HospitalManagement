@@ -1,0 +1,1086 @@
+package com.kairos.services.task_type;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.CaseFormat;
+import com.kairos.commons.utils.DateUtils;
+import com.kairos.config.env.EnvConfig;
+import com.kairos.constants.AppConstants;
+import com.kairos.dto.activity.task_type.*;
+import com.kairos.dto.user.country.basic_details.CountryDTO;
+import com.kairos.dto.user.country.day_type.DayType;
+import com.kairos.dto.user.country.tag.TagDTO;
+import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
+import com.kairos.dto.user.organization.OrganizationDTO;
+import com.kairos.dto.user.organization.OrganizationTypeHierarchyQueryResult;
+import com.kairos.dto.user.organization.TimeSlot;
+import com.kairos.dto.user.organization.skill.Skill;
+import com.kairos.enums.task_type.TaskTypeEnum;
+import com.kairos.persistence.model.task.Task;
+import com.kairos.persistence.model.task_type.*;
+import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
+import com.kairos.persistence.repository.tag.TagMongoRepository;
+import com.kairos.repositories.task_type.TaskMongoRepository;
+import com.kairos.repositories.task_type.TaskTypeMongoRepository;
+import com.kairos.repositories.task_type.TaskTypeSettingMongoRepository;
+import com.kairos.repositories.task_type.TaskTypeSlaConfigMongoRepository;
+import com.kairos.rest_client.UserIntegrationService;
+import com.kairos.service.MongoBaseService;
+import com.kairos.service.exception.ExceptionService;
+import com.kairos.utils.FileUtil;
+import com.kairos.wrapper.task_type.TaskTypeResourceDTO;
+import org.apache.commons.validator.GenericValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.math.BigInteger;
+import java.text.ParseException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.AppConstants.FORWARD_SLASH;
+import static com.kairos.constants.AppConstants.IMAGES_PATH;
+import static com.kairos.utils.FileUtil.createDirectory;
+
+/**
+ * Created by prabjot on 4/10/16.
+ */
+@Service
+public class TaskTypeService extends MongoBaseService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTypeService.class);
+    public static final String ORGANIZATION_TYPES = "organizationTypes";
+    public static final String IS_ARRIVAL = "isArrival";
+    @Inject
+    private TaskTypeMongoRepository taskTypeMongoRepository;
+    @Inject
+    private TaskTypeSettingMongoRepository taskTypeSettingMongoRepository;
+    @Inject
+    private TaskTypeSlaConfigMongoRepository taskTypeSlaConfigMongoRepository;
+    @Inject
+    private EnvConfig envConfig;
+    @Inject
+    private UserIntegrationService userIntegrationService;
+    @Inject
+    private CustomTaskTypeRepositoryImpl customTaskTypeRepository;
+    @Inject
+    private TagMongoRepository tagMongoRepository;
+    @Inject
+    private ExceptionService exceptionService;
+    @Inject
+    private TaskMongoRepository taskMongoRepository;
+
+    public TaskTypeDTO createTaskType(TaskTypeDTO taskTypeDTO, long subServiceId) throws ParseException {
+        TaskType taskType = new TaskType(taskTypeDTO.getTitle(), taskTypeDTO.getDescription(), subServiceId, taskTypeDTO.getExpiresOn(), taskTypeDTO.getDuration());
+        taskType.setTags(taskTypeDTO.getTags());
+        save(taskType);
+        return taskType.getBasicTaskTypeInfo();
+    }
+
+    public List<TaskTypeDTO> getTaskTypes(Long subServiceId) {
+        List<TaskType> taskTypes = (subServiceId == null) ? taskTypeMongoRepository.findAll() : taskTypeMongoRepository.findBySubServiceIdAndOrganizationId(subServiceId, 0L);
+        List<TaskTypeDTO> response = new ArrayList<>(taskTypes.size());
+        for (TaskType taskType : taskTypes) {
+            response.add(taskType.getBasicTaskTypeInfo());
+        }
+        return response;
+    }
+
+    public List<TaskTypeResponseDTO> getAllTaskTypes(Long subServiceId) {
+        return (subServiceId == null) ? customTaskTypeRepository.getAllTaskType() : customTaskTypeRepository.findAllBySubServiceIdAndOrganizationId(subServiceId, 0L);
+    }
+
+    public void updateStatus(String taskTypeId, boolean status) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (taskType == null) {
+            return;
+        }
+        taskType.setEnabled(status);
+        save(taskType);
+    }
+
+    public Map<String, Object> saveAgreementSetting(String taskId, String union, String agreement, Date startPeriod, Date endPeriod) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        taskType.saveAgreementSettings(union, agreement, startPeriod, endPeriod);
+        save(taskType);
+
+        Map<String, Object> agreementSettings = taskType.getAgreementSettings();
+        CountryDTO countryDTO = userIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
+        agreementSettings.put("contractTypes", userIntegrationService.getAllContractType(countryDTO.getId()));
+        return agreementSettings;
+    }
+
+    public Map<String, Object> getAgreementSettings(String id) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(id));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        return taskType.getAgreementSettings();
+    }
+
+    public Map<String, Object> saveBalanceSettings(String taskTypeId, Map<String, Object> balanceSettings) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        taskType.saveBalanceSettings(balanceSettings);
+        List<TaskTypeEnum.TaskTypeCount> taskTypeCounts = new ArrayList<>();
+        for (String taskTypeCount : (List<String>) balanceSettings.get("taskTypeCount")) {
+            taskTypeCounts.add(TaskTypeEnum.TaskTypeCount.getByValue(taskTypeCount));
+        }
+
+        List<TaskTypeEnum.TaskTypeInclude> taskTypeIncludes = new ArrayList<>();
+        for (String taskTypeInculde : (List<String>) balanceSettings.get("taskTypeIncluded")) {
+            taskTypeIncludes.add(TaskTypeEnum.TaskTypeInclude.getByValue(taskTypeInculde));
+        }
+
+        List<TaskTypeEnum.TaskTypeDate> taskTypeDates = new ArrayList<>();
+        for (String taskTypeDate : (List<String>) balanceSettings.get("taskTypeDate")) {
+            taskTypeDates.add(TaskTypeEnum.TaskTypeDate.getByValue(taskTypeDate));
+        }
+
+        taskType.setTaskTypeIncluded(taskTypeIncludes);
+        taskType.setTaskTypeCount(taskTypeCounts);
+        taskType.setTaskTypeDate(taskTypeDates);
+        save(taskType);
+        return taskType.getBalanceSettings();
+    }
+
+    public Map<String, Object> getBalanceSettings(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        return taskType.getBalanceSettings();
+    }
+
+    public Map<String, Object> saveCommunicationSettings(String taskTypeId, boolean reminderBySms, boolean notificationBySms, String reminderByText, String smsBeforeArrival, boolean isArrival, String time) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        taskType.saveCommunicationSettings(reminderBySms, notificationBySms, reminderByText, smsBeforeArrival, isArrival, time);
+
+        save(taskType);
+        return taskType.getCommunicationSettings();
+    }
+
+    public Map<String, Object> getCommunicationSettings(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        return taskType.getCommunicationSettings();
+    }
+
+    public Map<String, Object> saveCostIncomeSettings(String taskTypeId, Map<String, Object> incomeSettings) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        taskType.saveIncomeCostSettings(incomeSettings);
+        save(taskType);
+        return taskType.getIncomeSettings();
+    }
+
+    public Map<String, Object> getCostIncomeSettings(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        return taskType.getIncomeSettings();
+    }
+
+    public List<String> saveTaskTypeRules(String taskTypeId, List<String> rules) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<TaskTypeEnum.TaskTypeCreation> creationRules = new ArrayList<>(rules.size());
+        for (String rule : rules) {
+            creationRules.add(TaskTypeEnum.TaskTypeCreation.getByValue(rule));
+        }
+        taskType.setCreators(creationRules);
+        save(taskType);
+        return rules;
+    }
+
+    public List<String> getTaskTypeRules(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<TaskTypeEnum.TaskTypeCreation> rules = taskType.getCreators();
+        List<String> response = new ArrayList<>();
+        for (TaskTypeEnum.TaskTypeCreation type : rules) {
+            response.add(type.value);
+        }
+        return response;
+    }
+
+    public TaskTypeDefination saveTaskTypeDefinations(String taskTypeId, TaskTypeDefination taskTypeDefination) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        taskType.setDefinations(taskTypeDefination);
+        save(taskType);
+        return taskType.getDefinations();
+    }
+
+    public TaskTypeDefination getTaskTypeDefinitions(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        return taskType.getDefinations();
+    }
+
+    public void saveTaskTypeDependencies(String taskTypeId, boolean finishToStart) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return;
+        }
+        taskType.setHasFinishToStart(finishToStart);
+        save(taskType);
+    }
+
+    public Map<String, Boolean> getTaskTypeDependencies(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        Map<String, Boolean> map = new HashMap<>();
+        map.put("finishToStart", taskType.isHasFinishToStart());
+        return map;
+    }
+
+    public Map<String, Object> saveGeneralSettings(String taskTypeId, Map<String, Object> settings) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<Long> organizationTypes = new ArrayList<>();
+        for (Integer organizationType : (List<Integer>) settings.get(ORGANIZATION_TYPES)) {
+            organizationTypes.add(organizationType.longValue());
+        }
+        settings.put(ORGANIZATION_TYPES, organizationTypes);
+        List<BigInteger> tagsList = new ArrayList<BigInteger>();
+        List<Object> tagList = (List<Object>) settings.get("tags");
+        for (Object tag : tagList) {
+            tagsList.add(new BigInteger(tag.toString()));
+        }
+        taskType.setTags(tagsList);
+        taskType.saveGeneralSettings(settings);
+        save(taskType);
+        return taskType.getCommunicationSettings();
+    }
+
+    public Map<String, Object> getGeneralSettings(String taskTypeId, String type) {
+        String filePath = envConfig.getServerHost() + FORWARD_SLASH;
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        Map<String, Object> response = new HashMap<>();
+        CountryDTO countryDTO = userIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
+        OrganizationTypeHierarchyQueryResult organizationTypeHierarchyQueryResult =
+                userIntegrationService.getOrgTypesHierarchy(countryDTO.getId(), taskType.getOrganizationSubTypes());
+        Map<String, Object> generalSettings = taskType.getGeneralSettings(filePath);
+        List<TagDTO> tags = tagMongoRepository.getTagsById(taskType.getTags());
+        generalSettings.put("tags", tags);
+        response.put("generalSettings", generalSettings);
+        response.put("taskTypes", taskTypeMongoRepository.getTaskTypesForCopySettings(taskTypeId));
+        response.put(ORGANIZATION_TYPES, organizationTypeHierarchyQueryResult.getOrganizationTypes());
+        return response;
+
+    }
+
+    public Map<String, Object> saveLoggingSettings(String taskTypeId, boolean hasDateOfChange, boolean hasDateOfCreation) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        taskType.saveLoggingSettings(hasDateOfChange, hasDateOfCreation);
+        save(taskType);
+        return taskType.getLoggingSettings();
+    }
+
+    public Map<String, Object> getLoggingSettings(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        return taskType.getLoggingSettings();
+    }
+
+
+    public Map<String, Object> saveMainTaskSettings(String taskTypeId, boolean isMainTask, boolean hasCompositeShift, List<String> subTask, boolean finishToStart) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        taskType.saveMainTaskSettings(isMainTask, hasCompositeShift, subTask);
+        taskType.setHasFinishToStart(finishToStart);
+        save(taskType);
+        return taskType.getMainTaskSettings();
+    }
+
+    public Map<String, Object> getMainTaskSettings(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("taskTypes", taskTypeMongoRepository.getTaskTypesForCopySettings(taskTypeId));
+        response.put("main_task", taskType.getMainTaskSettings());
+        return response;
+    }
+
+    public Map<String, Object> saveNotificationSettings(String taskTypeId, Map<String, Object> settings) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+
+        if ((boolean) settings.get(IS_ARRIVAL)) {
+            String time = (String) settings.get("time");
+            String[] args = time.split(":");
+            taskType.setHours(Integer.parseInt(args[0]));
+            taskType.setMinutes(Integer.parseInt(args[1]));
+        }
+        taskType.setArrival((boolean) settings.get(IS_ARRIVAL));
+        save(taskType);
+        return settings;
+    }
+
+    public Map<String, Object> getNotificationSettings(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        Map<String, Object> response = new HashMap<>(4);
+        response.put(IS_ARRIVAL, taskType.isArrival());
+        response.put("time", taskType.getHours() + ":" + taskType.getMinutes());
+        return response;
+    }
+
+    public void savePlanningRules(String taskTypeId, boolean isAssignedToClipBoard, boolean useInShiftPlanning, List<String> shiftPlanningPhases) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return;
+        }
+        List<TaskTypeEnum.ShiftPlanningPhase> planningPhases = null;
+        if (useInShiftPlanning) {
+            planningPhases = new ArrayList<>();
+            for (String phase : shiftPlanningPhases) {
+                planningPhases.add(TaskTypeEnum.ShiftPlanningPhase.getByValue(phase));
+            }
+        }
+        taskType.savePlanningRules(isAssignedToClipBoard, useInShiftPlanning, planningPhases);
+        save(taskType);
+    }
+
+    public Map<String, Object> getPlanningRules(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("isAssignedToClipBoard", taskType.isAssignedToClipBoard());
+        map.put("useInShiftPlanning", taskType.isUseInShiftPlanning());
+        List<String> planningPhases = new ArrayList<>();
+        for (TaskTypeEnum.ShiftPlanningPhase phase : taskType.getShiftPlanningPhases()) {
+            planningPhases.add(phase.value);
+        }
+        map.put("shiftPlanningPhases", planningPhases);
+        return map;
+    }
+
+    public List<String> saveMethodsForPoints(String taskTypeId, List<String> methods) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<TaskTypeEnum.Points> pointMethods = new ArrayList<>();
+        for (String method : methods) {
+            pointMethods.add(TaskTypeEnum.Points.getByValue(method));
+        }
+        taskType.setPointMethods(pointMethods);
+        save(taskType);
+        return methods;
+    }
+
+    public List<String> getMethodsForPoints(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<String> pointMethods = new ArrayList<>();
+        for (TaskTypeEnum.Points point : taskType.getPointMethods()) {
+            pointMethods.add(point.value);
+        }
+        return pointMethods;
+    }
+
+    public Boolean saveResources(String taskTypeId, TaskTypeResourceDTO taskTypeResourceDTO) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return false;
+        }
+        taskType.setVehicleRequired(taskTypeResourceDTO.isVehicleRequired());
+        taskType.addResources(taskTypeResourceDTO.getResources());
+        save(taskType);
+        return true;
+    }
+
+    public TaskTypeResourceDTO getResources(String taskTypeId) {
+        // anil maurya
+        // OfficeResourceTypeMetadata are in beacon module currently not used
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            exceptionService.internalError(ERROR_TASK_TYPE);
+        }
+        TaskTypeResourceDTO taskTypeResourceDTO = new TaskTypeResourceDTO();
+        taskTypeResourceDTO.setVehicleRequired(taskType.isVehicleRequired());
+        taskTypeResourceDTO.setResources(taskType.getResources());
+        return taskTypeResourceDTO;
+    }
+
+    public void saveRestingTime(String taskTypeId, String time) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return;
+        }
+        String[] args = time.split(":");
+        int hours = (args.length == 0) ? 0 : Integer.parseInt(args[0]);
+        int minutes = (args.length == 0) ? 0 : Integer.parseInt(args[1]);
+        taskType.setRestingHours(hours);
+        taskType.setRestingMinutes(minutes);
+        save(taskType);
+    }
+
+    public Map<String, String> getRestingTime(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        Map<String, String> map = new HashMap<>();
+        map.put("restTime", taskType.getRestingHours() + ":" + taskType.getRestingMinutes());
+        return map;
+
+    }
+
+    public void saveSkillsForTaskType(String taskTypeId, List<Map<String, Object>> data) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return;
+        }
+        List<TaskTypeSkill> taskTypeSkills = new ArrayList<>();
+        TaskTypeSkill taskTypeSkill;
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (Map<String, Object> skill : data) {
+            taskTypeSkill = objectMapper.convertValue(skill, TaskTypeSkill.class);
+            if (skill.get("id") != null && GenericValidator.isLong(skill.get("id").toString())) {
+                taskTypeSkill.setSkillId(Long.valueOf(skill.get("id").toString()));
+            }
+            taskTypeSkills.add(taskTypeSkill);
+        }
+        taskType.setTaskTypeSkills(taskTypeSkills);
+        save(taskType);
+    }
+
+    public Map<String, Object> getSkills(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        //anil maurya move this code in user micro service and call via rest template
+        List<Map<String, Object>> skills;
+        if (taskType.getOrganizationId() == 0) {
+            CountryDTO countryDTO = userIntegrationService.getCountryByOrganizationService(taskType.getSubServiceId());
+            skills = userIntegrationService.getSkillsByCountryForTaskType(countryDTO.getId());
+        } else {
+            skills = userIntegrationService.getSkillsOfOrganization(taskType.getOrganizationId());
+        }
+        List<Map<String, Object>> filterSkillData = new ArrayList<>();
+        for (Map<String, Object> map : skills) {
+            filterSkillData.add((Map<String, Object>) map.get("data"));
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("showData", taskType.getTaskTypeSkills());
+        response.put("treeData", filterSkillData);
+        response.put("skillLevel", Skill.SkillLevel.values());
+        return response;
+    }
+
+    public void saveTaskTypeStaff(String taskTypeId, Map<String, Object> data) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return;
+        }
+        List<String> assigneeList = (List<String>) data.get("assignee");
+        List<String> employees = (List<String>) data.get("employees");
+        boolean hasSubcontractors = (boolean) data.get("hasSubcontractors");
+        List<TaskTypeEnum.TaskTypeStaff> assigneeEnums = new ArrayList<>();
+        List<TaskTypeEnum.TaskTypeStaff> employeeEnums = new ArrayList<>();
+        for (String assignee : assigneeList) {
+            assigneeEnums.add(TaskTypeEnum.TaskTypeStaff.getByValue(assignee));
+        }
+        for (String employee : employees) {
+            employeeEnums.add(TaskTypeEnum.TaskTypeStaff.getByValue(employee));
+        }
+        taskType.saveTaskTypeStaff(assigneeEnums, hasSubcontractors, employeeEnums);
+        save(taskType);
+    }
+
+    public Map<String, Object> getTaskTypeStaff(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<String> assigneeList = new ArrayList<>();
+        List<String> employeeList = new ArrayList<>();
+
+        for (TaskTypeEnum.TaskTypeStaff taskTypeStaff : taskType.getAssignee()) {
+            if (taskTypeStaff.value != null) {
+                assigneeList.add(taskTypeStaff.value);
+            }
+        }
+
+        for (TaskTypeEnum.TaskTypeStaff taskTypeStaff : taskType.getEmployees()) {
+            if (taskTypeStaff.value != null) {
+                employeeList.add(taskTypeStaff.value);
+            }
+        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("assignee", assigneeList);
+        response.put("employees", employeeList);
+        response.put("hasSubcontractors", taskType.isHasSubcontractors());
+        return response;
+    }
+
+    public void saveTimeFrames(String taskTypeId, Map<String, Object> data) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (!isNullOrDeleted(taskType)) {
+            taskType.saveTimeFrames((List<Long>) data.get("forbiddenDayTypeIds"), (boolean) data.get("clientPresenceRequired"), (boolean) data.get("deliverOutsideUnitHours"));
+            save(taskType);
+        }
+    }
+
+    public Map<String, Object> getDayTypeMapList(List<DayType> dayTypes, TaskType taskType) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("dayTypeList", dayTypes);
+        map.put("forbiddenDayTypeIds", taskType.getForbiddenDayTypeIds());
+        map.put("clientPresenceRequired", taskType.isClientPresenceRequired());
+        map.put("deliverOutsideUnitHours", taskType.isDeliverOutsideUnitHours());
+        return map;
+    }
+
+    public Map<String, Object> getTimeFrames(Long unitId, String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<DayType> dayTypes = userIntegrationService.getDayTypes(unitId);
+        return getDayTypeMapList(dayTypes, taskType);
+    }
+
+    public Map<String, Object> getTimeFramesByCountryIdAndTaskTypeId(Long countryId, String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<DayType> dayTypes = userIntegrationService.getDayTypesByCountryId(countryId);
+        return getDayTypeMapList(dayTypes, taskType);
+    }
+
+    public Map<String, Object> saveTimeRules(String taskTypeId, Map<String, Object> data) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        List<TaskTypeEnum.TimeTypes> timeTypes = new ArrayList<>();
+        for (String value : (List<String>) data.get("timeTypes")) {
+            timeTypes.add(TaskTypeEnum.TimeTypes.getByValue(value));
+        }
+        taskType.saveTimeRules(TaskTypeEnum.DurationType.getByValue((String) data.get("durationType")), timeTypes, data);
+        save(taskType);
+        return taskType.retrieveTimeRules();
+
+    }
+
+    public Map<String, Object> getTimeRules(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        return taskType.retrieveTimeRules();
+    }
+
+    public Map<String, Boolean> saveVisitationSettings(String taskTypeId, boolean onlyVisitatorCanAssignDuration, boolean onlyVisitatorCanTaskFrequency, boolean onlyVisitatorCanAssignToClients) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        taskType.saveVisitationSettings(onlyVisitatorCanAssignDuration, onlyVisitatorCanTaskFrequency, onlyVisitatorCanAssignToClients);
+        save(taskType);
+        return taskType.getVisitationSettings();
+    }
+
+    public Map<String, Boolean> getVisitationSettings(String taskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        return taskType.getVisitationSettings();
+    }
+
+    public Map<String, Object> copySettings(String taskTypeId, String sourceTaskTypeId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        String filePath = envConfig.getServerHost() + FORWARD_SLASH;
+        TaskType sourceTaskType = taskTypeMongoRepository.findOne(new BigInteger(sourceTaskTypeId));
+        if (isNullOrDeleted(taskType) || sourceTaskType == null) {
+            return null;
+        }
+        taskType = taskType.copyAllSettings(sourceTaskType);
+        taskType.setSourceTaskId(sourceTaskTypeId);
+        taskType.setSourceTaskTypeTitle(sourceTaskType.getTitle());
+        save(taskType);
+        return taskType.getGeneralSettings(filePath);
+    }
+
+    /**
+     * @param taskTypeId
+     * @param organizationId
+     * @param subServiceId
+     * @return
+     * @auther anil maurya
+     * used rest template to check organization
+     */
+    public TaskTypeDTO linkTaskTypesWithOrg(String taskTypeId, long organizationId,
+                                            long subServiceId) {
+
+        boolean exist = userIntegrationService.isExistOrganization(organizationId);
+        if (!exist) {
+            return null;
+        }
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+
+        TaskType copyObj = taskTypeMongoRepository.findByOrganizationIdAndRootIdAndSubServiceId(organizationId, new BigInteger(taskTypeId), subServiceId);
+        if (copyObj == null) {
+            copyObj = taskType.cloneObject();
+        }
+        copyProperties(taskType, copyObj, organizationId, subServiceId);
+        save(copyObj);
+        copySlaValues(taskType, Arrays.asList(copyObj), organizationId);
+        return copyObj.getBasicTaskTypeInfo();
+    }
+
+    public TaskType copyProperties(TaskType source, TaskType target, long organizationId, long subServiceId) {
+        target.setOrganizationId(organizationId);
+        target.setSubServiceId(subServiceId);
+        target.setRootId(source.getId().toString());
+        target.setEnabled(true);
+        return target;
+    }
+
+    public List<TaskTypeDTO> getTaskTypesOfOrganizations(long organizationId, long subService) {
+        List<TaskTypeDTO> data = new ArrayList<>();
+        for (TaskType taskType : taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(organizationId, true)) {
+            data.add(taskType.getBasicTaskTypeInfo());
+        }
+        return data;
+    }
+
+    public List<TaskType> getAvailableTaskToSubServiceOfOrganization(Long subServiceId) {
+        return taskTypeMongoRepository.findBySubServiceIdAndOrganizationIdAndIsEnabled(subServiceId, 0L, true);
+    }
+
+    public TaskType getTaskTypeById(String taskTypeId) {
+        return taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+
+    }
+
+    public List<TaskType> getAllTaskTypes() {
+        return taskTypeMongoRepository.findAll();
+    }
+
+    public TaskType findByExternalId(String externalId) {
+        return taskTypeMongoRepository.findByExternalId(externalId);
+    }
+
+    public boolean deleteTaskType(String taskTypeId, long organizationId, long subServiceId) {
+        TaskType taskType = taskTypeMongoRepository.findByRootIdAndOrganizationIdAndSubServiceIdAndIsEnabled(taskTypeId, organizationId, subServiceId, true);
+        if (isNullOrDeleted(taskType)) {
+            return false;
+        }
+        taskType.setEnabled(false);
+        save(taskType);
+        return true;
+    }
+
+    public List<TaskType> getByOrganization(Long org) {
+        return taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(org, true);
+    }
+
+    public Object linkWithOrganizationTypes(String taskTypeId, Set<Long> organizationSubTypeId, boolean isSelected) {
+        //anil maurya code commented due to wrong implementation
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        if (isNullOrDeleted(taskType)) {
+            return null;
+        }
+        Long organizationTypeId = null;
+        for (long organizationType : organizationSubTypeId) {
+            organizationTypeId = organizationType;
+        }
+
+        if (organizationTypeId == null) {
+            exceptionService.internalError(ERROR_ORGANIZATION_TYPE);
+        }
+        List<OrganizationDTO> organizations = userIntegrationService.getOrganizationsByOrganizationType(organizationTypeId);
+        if (isSelected) {
+            Set<Long> subTypes = taskType.getOrganizationSubTypes();
+            subTypes.addAll(organizationSubTypeId);
+            taskType.setOrganizationSubTypes(subTypes);
+            userIntegrationService.linkOrganizationTypeWithService(organizationSubTypeId, taskType.getSubServiceId());
+            List<TaskType> taskTypes = new ArrayList<>();
+            organizations.forEach(organization -> {
+                TaskType copyObj = taskTypeMongoRepository.findByOrganizationIdAndRootIdAndSubServiceId(organization.getId(), new BigInteger(taskTypeId), taskType.getSubServiceId());
+                if (copyObj == null) {
+                    copyObj = taskType.cloneObject();
+                }
+                copyProperties(taskType, copyObj, organization.getId(), taskType.getSubServiceId());
+                taskTypes.add(copyObj);
+            });
+            if (!taskTypes.isEmpty()) {
+                save(taskTypes);
+            }
+        } else {
+            userIntegrationService.deleteLinkingOfOrganizationTypeAndService(organizationSubTypeId, taskType.getSubServiceId());
+            taskType.getOrganizationSubTypes().removeAll(organizationSubTypeId);
+            organizations.forEach(organization -> {
+                deleteTaskType(taskTypeId, organization.getId(), taskType.getSubServiceId());
+            });
+        }
+        save(taskType);
+        return true;
+    }
+
+    public boolean saveTaskTypeSlaConfig(Long unitId, String taskTypeId, TaskTypeSlaConfigDTO taskTypeSlaConfigDTO) {
+        TaskTypeSlaConfig taskTypeSlaConfig = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeIdAndTimeSlotId(unitId, new BigInteger(taskTypeId),
+                taskTypeSlaConfigDTO.getTimeSlotId());
+        if (taskTypeSlaConfig == null) {
+            Map<String, Object> timeSlotMap = userIntegrationService.getTimeSlotByUnitIdAndTimeSlotId(taskTypeSlaConfigDTO.getTimeSlotId());
+            taskTypeSlaConfig = new TaskTypeSlaConfig(new BigInteger(taskTypeId), unitId, taskTypeSlaConfigDTO.getTimeSlotId(), timeSlotMap.get("name").toString());
+        }
+        List<SlaPerDayInfo> slaPerDayInfoList = taskTypeSlaConfig.getSlaPerDayInfo() != null ? taskTypeSlaConfig.getSlaPerDayInfo() : new ArrayList<>();
+        return updateSlaValues(slaPerDayInfoList, taskTypeSlaConfig, taskTypeSlaConfigDTO);
+    }
+
+    public boolean saveTaskTypeSlaConfigForCountry(Long countryId, BigInteger taskTypeId, TaskTypeSlaConfigDTO taskTypeSlaConfigDTO) {
+        TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
+        if (!Optional.ofNullable(taskType).isPresent()) {
+            exceptionService.internalError(ERROR_TASK_TYPE);
+        }
+        TaskTypeSlaConfig taskTypeSlaConfig = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeIdAndTimeSlotId(taskType.getOrganizationId(), taskTypeId, taskTypeSlaConfigDTO.getTimeSlotId());
+        if (taskTypeSlaConfig == null) {
+            List<TimeSlot> timeSlots = userIntegrationService.getTimeSlotSetsOfCountry(countryId);
+            Optional<TimeSlot> result = timeSlots.stream().filter(timeSlot -> timeSlot.getId().equals(taskTypeSlaConfigDTO.getTimeSlotId())).findFirst();
+            if (result.isPresent()) {
+                taskTypeSlaConfig = new TaskTypeSlaConfig(taskTypeId, taskType.getOrganizationId(),
+                        taskTypeSlaConfigDTO.getTimeSlotId(), result.get().getName());
+            } else {
+                exceptionService.dataNotFoundByIdException(MESSAGE_TIMESLOT_ID);
+            }
+        }
+        List<SlaPerDayInfo> slaPerDayInfoList = taskTypeSlaConfig.getSlaPerDayInfo() != null ? taskTypeSlaConfig.getSlaPerDayInfo() : new ArrayList<>();
+        return updateSlaValues(slaPerDayInfoList, taskTypeSlaConfig, taskTypeSlaConfigDTO);
+    }
+
+    private boolean updateSlaValues(List<SlaPerDayInfo> slaPerDayInfoList, TaskTypeSlaConfig taskTypeSlaConfig, TaskTypeSlaConfigDTO taskTypeSlaConfigDTO) {
+        boolean createNewEntry = true;
+        for (SlaPerDayInfo slaPerDayInfo : slaPerDayInfoList) {
+            if (slaPerDayInfo.getTaskTypeSlaDay().equals(taskTypeSlaConfigDTO.getTaskTypeSlaDay())) {
+                createNewEntry = false;
+                slaPerDayInfo.setSlaStartDuration(taskTypeSlaConfigDTO.getSlaStartDuration());
+                slaPerDayInfo.setSlaEndDuration(taskTypeSlaConfigDTO.getSlaEndDuration());
+            }
+        }
+        if (createNewEntry) {
+            SlaPerDayInfo addSlaPerDayInfo = new SlaPerDayInfo();
+            addSlaPerDayInfo.setTaskTypeSlaDay(taskTypeSlaConfigDTO.getTaskTypeSlaDay());
+            addSlaPerDayInfo.setSlaStartDuration(taskTypeSlaConfigDTO.getSlaStartDuration());
+            addSlaPerDayInfo.setSlaEndDuration(taskTypeSlaConfigDTO.getSlaEndDuration());
+            slaPerDayInfoList.add(addSlaPerDayInfo);
+        }
+        taskTypeSlaConfig.setSlaPerDayInfo(slaPerDayInfoList);
+        save(taskTypeSlaConfig);
+        return true;
+    }
+
+
+    public Map<String, Object> getTaskTypeSlaConfig(Long unitId, String taskTypeId) {
+        Map<String, Object> responseMap = new HashMap();
+        List<TimeSlotWrapper> currentTimeSlots = userIntegrationService.getCurrentTimeSlot();
+        List<TimeSlotWrapper> timeSlots = new ArrayList<>(currentTimeSlots.size());
+        List<Long> timeSlotIds = new ArrayList<>(currentTimeSlots.size());
+        for (TimeSlotWrapper standredTimeSlot : currentTimeSlots) {
+            timeSlots.add(standredTimeSlot);
+            timeSlotIds.add(standredTimeSlot.getId());
+        }
+        List<Map<String, Object>> response = new ArrayList<>();
+        List<TaskTypeSlaConfig> taskTypeSlaConfigList = taskTypeSlaConfigMongoRepository.findAllByUnitIdAndTaskTypeIdAndTimeSlotIdIn(unitId, new BigInteger(taskTypeId), timeSlotIds);
+        for (TaskTypeSlaConfig taskTypeSlaConfig : taskTypeSlaConfigList) {
+            Map<String, Object> customResult = new HashMap<>();
+            customResult.put("id", taskTypeSlaConfig.getTimeSlotId());
+            customResult.put("name", taskTypeSlaConfig.getTimeSlotName());
+            for (SlaPerDayInfo slaPerDayInfo : taskTypeSlaConfig.getSlaPerDayInfo()) {
+                customResult.put(CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_UNDERSCORE, slaPerDayInfo.getTaskTypeSlaDay().name()),
+                        slaPerDayInfo);
+            }
+            response.add(customResult);
+        }
+        responseMap.put("taskTypeSlaConfig", response);
+        responseMap.put("currentTimeSlots", timeSlots);
+        responseMap.put("taskTypeSlaDays", TaskTypeEnum.TaskTypeSlaDay.values());
+        return responseMap;
+    }
+
+    public Map<String, Object> getTaskTypeSlaConfigForCountry(BigInteger taskTypeId, Long countryId) {
+        TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
+        if (!Optional.ofNullable(taskType).isPresent()) {
+            exceptionService.internalError("task type not found");
+        }
+        List<TimeSlot> currentTimeSlots = userIntegrationService.getTimeSlotSetsOfCountry(countryId);
+        List<Long> timeSlotIds = currentTimeSlots.stream().map(currentTimeSlot -> currentTimeSlot.getId()).collect(Collectors.toList());
+        List<TaskTypeSlaConfig> taskTypeSlaConfigList = taskTypeSlaConfigMongoRepository.findAllByUnitIdAndTaskTypeIdAndTimeSlotIdIn(taskType.getOrganizationId(),
+                taskTypeId, timeSlotIds);
+        List<Map<String, Object>> response = new ArrayList<>();
+        for (TaskTypeSlaConfig taskTypeSlaConfig : taskTypeSlaConfigList) {
+            Map<String, Object> customResult = new HashMap<>();
+            customResult.put("id", taskTypeSlaConfig.getTimeSlotId());
+            customResult.put("name", taskTypeSlaConfig.getTimeSlotName());
+            for (SlaPerDayInfo slaPerDayInfo : taskTypeSlaConfig.getSlaPerDayInfo()) {
+                customResult.put(CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_UNDERSCORE, slaPerDayInfo.getTaskTypeSlaDay().name()), slaPerDayInfo);
+            }
+            response.add(customResult);
+        }
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("taskTypeSlaConfig", response);
+        responseMap.put("currentTimeSlots", currentTimeSlots);
+        responseMap.put("taskTypeSlaDays", TaskTypeEnum.TaskTypeSlaDay.values());
+        return responseMap;
+    }
+
+    private boolean isNullOrDeleted(TaskType taskType) {
+        if (taskType == null || !taskType.isEnabled()) {
+            return true;
+        }
+        return false;
+    }
+
+    public Map<String, Object> uploadPhoto(String taskTypeId, MultipartFile multipartFile) {
+        TaskType taskType = taskTypeMongoRepository.findOne(new BigInteger(taskTypeId));
+        String filePath = envConfig.getServerHost() + FORWARD_SLASH;
+        if (taskType == null) {
+            return null;
+        }
+        createDirectory(IMAGES_PATH);
+        String fileName = DateUtils.getDate().getTime() + multipartFile.getOriginalFilename();
+        final String path = IMAGES_PATH + File.separator + fileName;
+        try {
+            FileUtil.writeFile(path, multipartFile);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
+        taskType.setIcon(fileName);
+        save(taskType);
+        Map<String, Object> map = new HashMap<>();
+        map.put("filePath", filePath);
+        map.put("icon", fileName);
+        return map;
+
+    }
+
+    /**
+     * @param id
+     * @param subServiceId
+     * @return
+     */
+    public HashMap<String, Object> getTaskTypes(long id, long subServiceId) {
+        List<TaskTypeResponseDTO> visibleTaskTypes = new ArrayList<>();
+        ;
+        List<TaskTypeResponseDTO> selectedTaskTypes = new ArrayList<>();
+        OrganizationDTO organization = userIntegrationService.getOrganization();
+        if (organization == null) {
+            return null;
+        }
+        //Todo why we use parent id when we don't set organisatio id on creating taskType @yasir
+        visibleTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId, 0, true));
+        selectedTaskTypes.addAll(customTaskTypeRepository.getAllTaskTypeBySubServiceAndOrganizationAndIsEnabled(subServiceId, id, true));
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("parentOrganizationTypes", visibleTaskTypes);
+        response.put("unitTaskTypes", selectedTaskTypes);
+        return response;
+    }
+
+    /**
+     * anil maurya
+     *
+     * @param id           id of organization or team will be decided by type parameter
+     * @param subServiceId
+     * @param taskTypeId
+     * @param isSelected   if true task type will be added otherwise
+     * @return
+     * @author prabjot
+     * to update task type in organization/team based on type of node
+     */
+    public Map<String, Object> updateTaskType(long id, long subServiceId, String taskTypeId, boolean isSelected) {
+            if (isSelected) {
+                linkTaskTypesWithOrg(taskTypeId, id, subServiceId);
+            } else {
+                deleteTaskType(taskTypeId, id, subServiceId);
+            }
+        return getTaskTypes(id, subServiceId);
+    }
+
+
+    /**
+     * @param serviceIds
+     * @param orgId
+     * @return
+     * @auther anil maurya
+     */
+    public Map<String, Object> getTaskTypeList(List<Long> serviceIds, long orgId) {
+        Map<String, Object> response = new HashMap<>();
+        List<TaskType> taskTypes = taskTypeMongoRepository.findByOrganizationIdAndIsEnabled(orgId, true);
+        List<Map<String, Object>> taskTypeList = new ArrayList<>(taskTypes.size());
+        for (TaskType taskType : taskTypes) {
+            Map<String, Object> taskTypesMap = new HashMap<>();
+            taskTypesMap.put("id", taskType.getId());
+            taskTypesMap.put("name", taskType.getTitle());
+            taskTypesMap.put("colorForGantt", taskType.getColorForGantt());
+            taskTypeList.add(taskTypesMap);
+        }
+        response.put("taskTypeList", taskTypeList);
+        return response;
+    }
+
+    public List<String> getTaskTypeIdsByServiceIds(List<Long> serviceIds, Long unitId) {
+        List<String> taskTypeIds = new ArrayList<>();
+        List<TaskType> taskTypes = taskTypeMongoRepository.findBySubServiceIdInAndOrganizationIdAndIsEnabled(serviceIds, unitId, true);
+        if (!taskTypes.isEmpty()) {
+            taskTypeIds.addAll(taskTypes.stream().map(taskType -> taskType.getId().toString()).collect(Collectors.toList()));
+        }
+        return taskTypeIds;
+    }
+
+    public List<TaskTypeDTO> createCopiesForTaskType(BigInteger taskTypeId, List<String> taskTypeNames) {
+        TaskType taskType = taskTypeMongoRepository.findOne(taskTypeId);
+        if (!Optional.ofNullable(taskType).isPresent()) {
+            LOGGER.error("Incorrect task type id " + taskType);
+            exceptionService.dataNotFoundByIdException(MEASSAGE_TASK_TYPE_ID);
+        }
+        List<TaskType> newTaskTypes = new ArrayList<>(taskTypeNames.size());
+        taskTypeNames.forEach(taskTypeName -> {
+            TaskType clonedObject;
+            clonedObject = taskType.cloneObject();
+            clonedObject.setTitle(taskTypeName);
+            newTaskTypes.add(clonedObject);
+        });
+        save(newTaskTypes);
+        copySlaValues(taskType, newTaskTypes, taskType.getOrganizationId());
+        return newTaskTypes.stream().map(newTaskType -> new TaskTypeDTO(newTaskType.getTitle(),
+                newTaskType.getExpiresOn(), newTaskType.getDescription(), newTaskType.getId(), newTaskType.isEnabled())).collect(Collectors.toList());
+    }
+
+
+    private void copySlaValues(TaskType taskType, List<TaskType> clonedTaskTypes, Long unitId) {
+        List<TaskTypeSlaConfig> slaPerDayInfos = taskTypeSlaConfigMongoRepository.findByUnitIdAndTaskTypeId(taskType.getOrganizationId(), taskType.getId());
+        List<TaskTypeSlaConfig> clonedTaskTypeSlaDayConfigs = new ArrayList<>(slaPerDayInfos.size());
+        for (TaskType clonedTaskType : clonedTaskTypes) {
+            for (TaskTypeSlaConfig taskTypeSlaConfig : slaPerDayInfos) {
+                TaskTypeSlaConfig clonedTaskTypeSlaConfig = taskTypeSlaConfig.copyObject();
+                clonedTaskTypeSlaConfig.setTaskTypeId(clonedTaskType.getId());
+                clonedTaskTypeSlaConfig.setUnitId(unitId);
+                clonedTaskTypeSlaDayConfigs.add(clonedTaskTypeSlaConfig);
+            }
+        }
+        if (!clonedTaskTypeSlaDayConfigs.isEmpty()) {
+            save(clonedTaskTypeSlaDayConfigs);
+        }
+    }
+
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForStaff(Long staffId, TaskTypeSettingDTO taskTypeSettingDTO) {
+        TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByStaffIdAndTaskType(staffId, taskTypeSettingDTO.getTaskTypeId());
+        if (taskTypeSetting == null) {
+            taskTypeSetting = new TaskTypeSetting(staffId, taskTypeSettingDTO.getTaskTypeId(), taskTypeSettingDTO.getEfficiency());
+        }
+        taskTypeSetting.setEfficiency(taskTypeSettingDTO.getEfficiency());
+        save(taskTypeSetting);
+        taskTypeSettingDTO.setId(taskTypeSetting.getId());
+        return taskTypeSettingDTO;
+    }
+
+
+    public TaskTypeSettingDTO updateOrCreateTaskTypeSettingForClient(Long clientId, TaskTypeSettingDTO taskTypeSettingDTO) {
+        TaskTypeSetting taskTypeSetting = taskTypeSettingMongoRepository.findByClientIdAndTaskType(clientId, taskTypeSettingDTO.getTaskTypeId());
+        if (taskTypeSetting == null) {
+            taskTypeSetting = new TaskTypeSetting(taskTypeSettingDTO.getTaskTypeId(), clientId);
+        }
+        taskTypeSetting.setDuration(taskTypeSettingDTO.getDuration());
+        save(taskTypeSetting);
+        List<Task> tasks = taskMongoRepository.findAllBycitizenIdAndTaskTypeId(clientId, taskTypeSetting.getTaskTypeId());
+        if (!tasks.isEmpty()) {
+            tasks.forEach(t -> {
+                t.setDuration(taskTypeSettingDTO.getDuration());
+            });
+            save(tasks);
+        }
+        taskTypeSettingDTO.setId(taskTypeSetting.getId());
+        return taskTypeSettingDTO;
+    }
+
+    public TaskTypeSettingWrapper getTaskTypeByOrganisationAndStaffSetting(Long organisationId, Long staffId) {
+        List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByStaffId(staffId);
+        List<Long> serviceIds = getServiceIds(organisationId);
+        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId, serviceIds);
+        return new TaskTypeSettingWrapper(taskTypes, taskTypeSettings);
+    }
+
+    public TaskTypeSettingWrapper getTaskTypeByOrganisationAndClientSetting(Long organisationId, Long clientId) {
+        List<TaskTypeSettingDTO> taskTypeSettings = taskTypeSettingMongoRepository.findByClientId(clientId);
+        Map<BigInteger, TaskTypeSettingDTO> taskTypeSettingDTOMap = taskTypeSettings.stream().collect(Collectors.toMap(k -> k.getTaskTypeId(), v -> v));
+        List<Long> serviceIds = getServiceIds(organisationId);
+        List<TaskTypeDTO> taskTypes = taskTypeMongoRepository.getTaskTypesOfOrganisation(organisationId, serviceIds);
+        taskTypes.forEach(t -> {
+            if (!taskTypeSettingDTOMap.containsKey(t.getId())) {
+                taskTypeSettings.add(new TaskTypeSettingDTO(t.getId(), t.getTitle(), clientId, t.getDuration()));
+            }
+        });
+        return new TaskTypeSettingWrapper(taskTypes, taskTypeSettings);
+    }
+
+    public List<Long> getServiceIds(Long organisationId) {
+        List<Long> serviceIds = new ArrayList<>();
+        Map<String, Object> services = userIntegrationService.getOrganizationServices(organisationId, AppConstants.ORGANIZATION);
+        List<Map> service = (List<Map>) services.get("selectedServices");
+        service.get(0).get("children");
+        service.forEach(t -> {
+            List<Map> children = (List<Map>) t.get("children");
+            children.forEach(c -> {
+                serviceIds.add(((Integer) c.get("id")).longValue());
+            });
+        });
+        return serviceIds;
+    }
+
+}
+

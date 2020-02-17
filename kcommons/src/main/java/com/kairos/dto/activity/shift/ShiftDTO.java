@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.shift.ShiftEscalationReason;
 import com.kairos.enums.shift.ShiftType;
 import lombok.Getter;
@@ -153,9 +152,9 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
     public void setActivities(List<ShiftActivityDTO> activities) {
         if (Optional.ofNullable(activities).isPresent() && activities.size()>1) {
             activities = activities.stream().filter(shiftActivityDTO -> Optional.ofNullable(shiftActivityDTO.getStartDate()).isPresent()).sorted((s1, s2) -> s1.getStartDate().compareTo(s2.getStartDate())).collect(Collectors.toList());
+            mergeShiftActivity();
         }
-        this.activities=activities;
-        mergeShiftActivity();
+        this.activities = activities;
     }
 
 
@@ -241,6 +240,7 @@ public class ShiftDTO implements Comparable<ShiftDTO>{
         this.endDate = endDate;
     }
 
+    @JsonIgnore
     public boolean isOverNightShift(){
         return !asLocalDate(this.startDate).equals(asLocalDate(this.endDate));
     }

@@ -1,7 +1,9 @@
 package com.kairos.service.country;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.activity.activity.TranslationInfo;
 import com.kairos.dto.activity.shift.FunctionDTO;
+import com.kairos.dto.user.TranslationDTO;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.organization.Level;
@@ -218,4 +220,21 @@ public class FunctionService {
     public List<LocalDate> getAllDateByFunctionIds(Long unitId, List<Long> functionIds) {
         return functionGraphRepository.findAllDateByFunctionIds(unitId, functionIds);
     }
+
+    public Map<String, TranslationInfo> updateTranslation(Long functionId, TranslationDTO translationData) {
+        Function function = functionGraphRepository.findOne(functionId);
+        function.setTranslatedNames(translationData.getTranslatedNames());
+        function.setTranslatedDescriptions(translationData.getTranslatedDescriptions());
+        functionGraphRepository.save(function);
+        return function.getTranslatedData();
+    }
+
+    public Map<String, TranslationInfo> getTranslatedData(Long functionId) {
+        Function function = functionGraphRepository.findOne(functionId);
+        return function.getTranslatedData();
+    }
+
+
+
+
 }
