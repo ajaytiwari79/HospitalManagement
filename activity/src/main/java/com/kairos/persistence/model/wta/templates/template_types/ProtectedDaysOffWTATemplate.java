@@ -15,6 +15,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 @Getter
 @Setter
 public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
+    @NotNull(message = "message.mismatched-ids")
     private BigInteger activityId;
 
     public ProtectedDaysOffWTATemplate() {

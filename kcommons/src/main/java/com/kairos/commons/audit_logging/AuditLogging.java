@@ -1,6 +1,7 @@
 package com.kairos.commons.audit_logging;
 
 import com.kairos.commons.utils.ObjectMapperUtils;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.audit_logging.LoggingType;
 import de.danielbechler.diff.ObjectDifferBuilder;
 import de.danielbechler.diff.node.DiffNode;
@@ -65,6 +66,7 @@ public class AuditLogging {
             });
             if(newEntity.getClass().getSimpleName().equals("Shift")){
                 diffResult.put("staffId", newEntity.getClass().getMethod("getStaffId").invoke(newEntity));
+                diffResult.put("management", UserContext.getUserDetails().isManagement());
                 if((Boolean) newEntity.getClass().getMethod("isDraft").invoke(newEntity)){
                     return null;
                 }
