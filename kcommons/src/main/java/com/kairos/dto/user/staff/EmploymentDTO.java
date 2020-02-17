@@ -1,6 +1,7 @@
 package com.kairos.dto.user.staff;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kairos.enums.EmploymentSubType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,4 +26,5 @@ public class EmploymentDTO {
 
     private float salary;
     private Long timeCareExternalId;
+    private EmploymentSubType employmentSubType;
 }

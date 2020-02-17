@@ -4,6 +4,7 @@ import com.kairos.commons.service.mail.SendGridMailService;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.activity.wta.IntervalBalance;
 import com.kairos.dto.activity.wta.WorkTimeAgreementBalance;
+import com.kairos.dto.user.staff.EmploymentDTO;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
@@ -49,21 +50,23 @@ public class ActivityReminderService {
     @Inject
     private WorkTimeAgreementBalancesCalculationService workTimeAgreementBalancesCalculationService;
 
-    public void sendActivityCutoffReminderViaEmail(Long unitId, BigInteger entityId) {
+    public void sendActivityReminderViaEmail(Long unitId, BigInteger entityId) {
         Activity activity = activityMongoRepository.findOne(entityId);
         if (isNull(activity)) {
             LOGGER.info("Unable to find activity by id {}", entityId);
         }
         List<StaffActivitySetting> staffActivitySettings = staffActivitySettingRepository.findByActivityIdAndDeletedFalse(activity.getId());
-        Set<Long> staffId = staffActivitySettings.stream().map(StaffActivitySetting::getStaffId).collect(Collectors.toSet());
-        List<StaffPersonalDetail> staffPersonalDetails = userIntegrationService.getStaffDetailByIds(unitId, staffId);
+        Set<Long> staffIds = staffActivitySettings.stream().map(StaffActivitySetting::getStaffId).collect(Collectors.toSet());
+        List<StaffPersonalDetail> staffPersonalDetails = userIntegrationService.getStaffDetailByIds(unitId, staffIds);
         for (StaffPersonalDetail staffPersonalDetail : staffPersonalDetails) {
-            if(isNotNull(staffPersonalDetail.getMainEmploymentId()) && isNotNull(staffPersonalDetail.getPrivateEmail())) {
+            if(isCollectionNotEmpty(staffPersonalDetail.getEmployments()) && isNotNull(staffPersonalDetail.getPrivateEmail())) {
                 try {
-                    WorkTimeAgreementBalance workTimeAgreementBalance = workTimeAgreementBalancesCalculationService.getWorkTimeAgreementBalance(unitId, staffPersonalDetail.getMainEmploymentId(), getCurrentLocalDate(), getCurrentLocalDate(), newHashSet(WTATemplateType.SENIOR_DAYS_PER_YEAR,CHILD_CARE_DAYS_CHECK,WTA_FOR_CARE_DAYS), activity.getId());
-                    List<IntervalBalance> intervalBalances = workTimeAgreementBalance.getWorkTimeAgreementRuleTemplateBalances().stream().flatMap(workTimeAgreementRuleTemplateBalancesDTO -> workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().stream()).filter(intervalBalance -> (int) intervalBalance.getAvailable()>0).collect(Collectors.toList());
-                    for (IntervalBalance intervalBalance : intervalBalances) {
-                        sendEmail(staffPersonalDetail, activity, intervalBalance);
+                    for (EmploymentDTO employment : staffPersonalDetail.getEmployments()) {
+                        WorkTimeAgreementBalance workTimeAgreementBalance = workTimeAgreementBalancesCalculationService.getWorkTimeAgreementBalance(unitId, employment.getId(), getCurrentLocalDate(), getCurrentLocalDate(), newHashSet(WTATemplateType.SENIOR_DAYS_PER_YEAR,CHILD_CARE_DAYS_CHECK,WTA_FOR_CARE_DAYS), activity.getId());
+                        List<IntervalBalance> intervalBalances = workTimeAgreementBalance.getWorkTimeAgreementRuleTemplateBalances().stream().flatMap(workTimeAgreementRuleTemplateBalancesDTO -> workTimeAgreementRuleTemplateBalancesDTO.getIntervalBalances().stream()).filter(intervalBalance -> (int) intervalBalance.getAvailable()>0).collect(Collectors.toList());
+                        for (IntervalBalance intervalBalance : intervalBalances) {
+                            sendEmail(staffPersonalDetail, activity, intervalBalance);
+                        }
                     }
                 }catch (Exception ex){
                     ex.printStackTrace();
