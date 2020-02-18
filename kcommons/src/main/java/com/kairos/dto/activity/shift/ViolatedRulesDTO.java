@@ -8,6 +8,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+
 /**
  * @author pradeep
  * @date - 29/8/18
@@ -26,4 +28,8 @@ public class ViolatedRulesDTO {
         return workTimeAgreements;
     }
 
+    public List<ActivityRuleViolation> getActivities() {
+        this.activities =  isNullOrElse(activities,new ArrayList<>());
+        return this.activities;
+    }
 }
