@@ -5,7 +5,6 @@ import com.google.common.base.CaseFormat;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.config.env.EnvConfig;
 import com.kairos.constants.AppConstants;
-import com.kairos.dto.activity.task_type.*;
 import com.kairos.dto.user.country.basic_details.CountryDTO;
 import com.kairos.dto.user.country.day_type.DayType;
 import com.kairos.dto.user.country.tag.TagDTO;
@@ -38,7 +37,6 @@ import javax.inject.Inject;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.ParseException;
-import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;

@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.kpermissions;
 
-import com.kairos.dto.kpermissions.ActionDTO;
 import com.kairos.enums.OrganizationCategory;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import lombok.Getter;

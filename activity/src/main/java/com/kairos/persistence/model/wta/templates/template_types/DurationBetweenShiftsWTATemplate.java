@@ -17,7 +17,8 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.util.*;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.AppConstants.NOT_VALID_VALUE;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 import static org.apache.commons.collections.CollectionUtils.containsAny;

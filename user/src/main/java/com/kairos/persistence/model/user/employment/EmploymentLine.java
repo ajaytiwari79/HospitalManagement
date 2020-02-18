@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.employment;
 
-import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.country.functions.Function;
 import com.kairos.persistence.model.user.expertise.SeniorityLevel;

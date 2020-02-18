@@ -3,7 +3,6 @@ package com.kairos.persistence.model.shift;
 import com.kairos.enums.shift.TodoStatus;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
 import java.util.Date;

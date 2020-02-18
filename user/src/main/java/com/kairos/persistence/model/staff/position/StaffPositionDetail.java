@@ -1,12 +1,10 @@
 package com.kairos.persistence.model.staff.position;
 
-import com.kairos.dto.activity.tags.TagDTO;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.List;
 
 import static com.kairos.constants.UserMessagesConstants.ERROR_STAFF_EMPLOYEDSINCE_NOTNULL;
 

@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
-import static com.kairos.constants.ActivityMessagesConstants.*;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_BLOCKED_FOR_SHIFT_ENTER_AT_DATE;
 
 /**
  * Created By G.P.Ranjan on 3/12/19

@@ -2,6 +2,7 @@ package com.kairos.service.shift;
 
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.enums.FilterType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

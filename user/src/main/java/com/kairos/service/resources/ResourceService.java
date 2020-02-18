@@ -5,6 +5,7 @@ package com.kairos.service.resources;
  */
 
 import com.kairos.commons.utils.DateUtils;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.organization.Unit;
 import com.kairos.persistence.model.user.resources.*;
 import com.kairos.persistence.repository.organization.UnitGraphRepository;
@@ -14,7 +15,6 @@ import com.kairos.persistence.repository.user.resources.ResourceUnavailabilityRe
 import com.kairos.persistence.repository.user.resources.VehicleGraphRepository;
 import com.kairos.service.country.CountryService;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.dto.user_context.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

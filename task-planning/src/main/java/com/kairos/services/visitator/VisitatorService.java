@@ -10,8 +10,8 @@ import com.kairos.persistence.model.task.TaskPackage;
 import com.kairos.persistence.model.task_demand.TaskDemand;
 import com.kairos.persistence.model.task_demand.TaskDemandVisit;
 import com.kairos.persistence.model.task_type.TaskType;
-import com.kairos.repositories.client_aggregator.ClientAggregatorMongoRepository;
 import com.kairos.persistence.repository.common.MongoSequenceRepository;
+import com.kairos.repositories.client_aggregator.ClientAggregatorMongoRepository;
 import com.kairos.repositories.task_type.TaskDemandMongoRepository;
 import com.kairos.repositories.task_type.TaskMongoRepository;
 import com.kairos.repositories.task_type.TaskPackageMongoRepository;
@@ -41,7 +41,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.constants.ActivityMessagesConstants.*;

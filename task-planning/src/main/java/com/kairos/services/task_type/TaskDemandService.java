@@ -9,10 +9,10 @@ import com.kairos.persistence.model.task_demand.MonthlyFrequency;
 import com.kairos.persistence.model.task_demand.TaskDemand;
 import com.kairos.persistence.model.task_demand.TaskDemandVisit;
 import com.kairos.persistence.model.task_type.TaskType;
-import com.kairos.repositories.client_aggregator.ClientAggregatorMongoRepository;
-import com.kairos.repositories.client_exception.ClientExceptionTypeMongoRepository;
 import com.kairos.persistence.repository.common.CustomAggregationOperation;
 import com.kairos.persistence.repository.repository_impl.CustomTaskTypeRepositoryImpl;
+import com.kairos.repositories.client_aggregator.ClientAggregatorMongoRepository;
+import com.kairos.repositories.client_exception.ClientExceptionTypeMongoRepository;
 import com.kairos.repositories.task_type.TaskDemandMongoRepository;
 import com.kairos.repositories.task_type.TaskTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
@@ -37,8 +37,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.*;
-import java.util.*;
+import java.util.List;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 

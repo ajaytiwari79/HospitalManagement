@@ -6,7 +6,6 @@ package com.kairos.persistence.model.staff;
 
 import com.kairos.enums.team.LeaderType;
 import com.kairos.enums.team.TeamType;
-import com.kairos.persistence.model.organization.StaffTeamRelationship;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
