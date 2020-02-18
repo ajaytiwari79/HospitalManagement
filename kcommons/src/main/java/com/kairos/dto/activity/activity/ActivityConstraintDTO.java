@@ -1,7 +1,6 @@
 package com.kairos.dto.activity.activity;
 
 import com.kairos.commons.planning_setting.PlanningSetting;
-import com.kairos.commons.utils.NotNullOrEmpty;
 import com.kairos.enums.constraint.ConstraintSubType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

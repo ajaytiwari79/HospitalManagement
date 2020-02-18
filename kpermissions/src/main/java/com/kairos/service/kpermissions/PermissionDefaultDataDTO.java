@@ -7,7 +7,6 @@ import com.kairos.dto.user.organization.union.UnionDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.StaffStatusEnum;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 

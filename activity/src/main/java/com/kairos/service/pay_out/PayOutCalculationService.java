@@ -26,7 +26,6 @@ import com.kairos.persistence.model.pay_out.PayOutPerShiftCTADistribution;
 import com.kairos.service.time_bank.TimeBankCalculationService;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.Interval;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

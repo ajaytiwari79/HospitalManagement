@@ -3,14 +3,9 @@ package com.kairos.shiftplanning.constraints.unitConstraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.wta.ConstraintHandler;
-import org.kie.api.runtime.rule.RuleContext;
-import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScoreHolder;
 
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class ShiftOnWeekend implements ConstraintHandler {

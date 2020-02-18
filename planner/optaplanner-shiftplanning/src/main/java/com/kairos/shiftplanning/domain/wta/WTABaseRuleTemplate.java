@@ -1,12 +1,10 @@
 package com.kairos.shiftplanning.domain.wta;
 
-import com.kairos.commons.planning_setting.PlanningSetting;
 import com.kairos.dto.activity.wta.templates.PhaseTemplateValue;
 import com.kairos.enums.wta.WTATemplateType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
 
 import java.math.BigInteger;
 import java.util.List;

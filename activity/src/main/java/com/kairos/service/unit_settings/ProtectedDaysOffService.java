@@ -3,31 +3,19 @@ package com.kairos.service.unit_settings;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.ActivityMessagesConstants;
 import com.kairos.dto.activity.unit_settings.ProtectedDaysOffSettingDTO;
-import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
-import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.ProtectedDaysOffUnitSettings;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
 import com.kairos.persistence.model.unit_settings.ProtectedDaysOffSetting;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.shift.ShiftMongoRepository;
 import com.kairos.persistence.repository.unit_settings.ProtectedDaysOffRepository;
-import com.kairos.rest_client.RestTemplateResponseEnvelope;
-import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.service.exception.ExceptionService;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
-
-import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 
 /**
  * Created By G.P.Ranjan on 1/7/19

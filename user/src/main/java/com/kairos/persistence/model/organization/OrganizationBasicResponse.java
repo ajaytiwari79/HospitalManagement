@@ -8,7 +8,6 @@ import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by vipul on 26/2/18.

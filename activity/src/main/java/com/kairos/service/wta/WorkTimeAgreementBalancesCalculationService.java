@@ -334,7 +334,7 @@ public class WorkTimeAgreementBalancesCalculationService {
             }
             if (isCollectionNotEmpty(intervalBalances)) {
                 int sequence = activityWrapper.getActivityPriority()==null?Integer.MAX_VALUE:activityWrapper.getActivityPriority().getSequence();
-                workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityWrapper.getActivity().getId(), activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, false,activityWrapper.getTimeType(),sequence);
+                workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityWrapper.getActivity().getId(), activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, false,activityWrapper.getActivity().getBalanceSettingsActivityTab().getTimeType().toString(),sequence);
             }
         }
         return workTimeAgreementRuleTemplateBalancesDTO;
@@ -406,7 +406,7 @@ public class WorkTimeAgreementBalancesCalculationService {
         }
         if (isCollectionNotEmpty(intervalBalances)) {
             int sequence = activityWrapperMap.get(activityId).getActivityPriority()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getActivityPriority().getSequence();
-            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, CutOffIntervalUnit.WEEKS, borrowLeave,activityWrapperMap.get(activityId).getTimeType(),sequence);
+            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, CutOffIntervalUnit.WEEKS, borrowLeave,activityWrapperMap.get(activityId).getActivity().getBalanceSettingsActivityTab().getTimeType().toString(),sequence);
         }
         return workTimeAgreementRuleTemplateBalancesDTO;
     }
@@ -447,7 +447,7 @@ public class WorkTimeAgreementBalancesCalculationService {
         }
         if (isCollectionNotEmpty(intervalBalances)) {
             int sequence = activityWrapperMap.get(activityId).getActivityPriority()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getActivityPriority().getSequence();
-            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getTimeType(),sequence);
+            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getActivity().getBalanceSettingsActivityTab().getTimeType().toString(),sequence);
         }
         return workTimeAgreementRuleTemplateBalancesDTO;
     }
@@ -485,7 +485,7 @@ public class WorkTimeAgreementBalancesCalculationService {
         }
         if (isCollectionNotEmpty(intervalBalances)) {
             int sequence = activityWrapperMap.get(activityId).getActivityPriority()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getActivityPriority().getSequence();
-            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getTimeType(),sequence);
+            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getActivity().getBalanceSettingsActivityTab().getTimeType().toString(),sequence);
         }
         return workTimeAgreementRuleTemplateBalancesDTO;
     }
@@ -522,7 +522,7 @@ public class WorkTimeAgreementBalancesCalculationService {
         }
         if (isCollectionNotEmpty(intervalBalances)) {
             int sequence = activityWrapperMap.get(activityId).getActivityPriority()==null?Integer.MAX_VALUE:activityWrapperMap.get(activityId).getActivityPriority().getSequence();
-            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getTimeType(),sequence);
+            workTimeAgreementRuleTemplateBalancesDTO = new WorkTimeAgreementRuleTemplateBalancesDTO(activityId, activityName, timetypeColor, intervalBalances, cutOffIntervalUnit, borrowLeave,activityWrapperMap.get(activityId).getActivity().getBalanceSettingsActivityTab().getTimeType().toString(),sequence);
         }
         return workTimeAgreementRuleTemplateBalancesDTO;
     }

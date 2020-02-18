@@ -1,7 +1,5 @@
 package com.kairos.aspects;
 
-import com.kairos.annotations.KPermissionModel;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.kpermissions.FieldLevelPermission;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.service.access_permisson.AccessPageService;
@@ -14,13 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.utils.PermissionMapperUtils.checkAndReturnValidModel;
 
 @Aspect
