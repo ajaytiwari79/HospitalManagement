@@ -137,16 +137,26 @@ public class PayOutService extends MongoBaseService {
     }
 
     private void updatePayoutDetailInShift(ShiftWithActivityDTO shiftWithActivityDTO,Shift shift){
-        for (int index = 0; index < shift.getActivities().size(); index++) {
-            ShiftActivity shiftActivity = shift.getActivities().get(index);
-            ShiftActivityDTO shiftActivityDTO = shiftWithActivityDTO.getActivities().get(index);
+        int totalPlannerMinutesOfPayout = updatePayDetailsInShiftActivity(shiftWithActivityDTO.getActivities(), shift.getActivities());
+        shift.setPlannedMinutesOfPayout(shift.getPlannedMinutesOfPayout()+totalPlannerMinutesOfPayout);
+        totalPlannerMinutesOfPayout = updatePayDetailsInShiftActivity(shiftWithActivityDTO.getBreakActivities(), shift.getBreakActivities());
+        shift.setPlannedMinutesOfPayout(shift.getPlannedMinutesOfPayout()+totalPlannerMinutesOfPayout);
+        shift.setPayoutCtaBonusMinutes(shift.getActivities().stream().mapToInt(shiftActivity -> shiftActivity.getPayoutCtaBonusMinutes()).sum());
+        shift.setPayoutCtaBonusMinutes(shift.getPayoutCtaBonusMinutes() + shift.getBreakActivities().stream().mapToInt(shiftActivity -> shiftActivity.getPayoutCtaBonusMinutes()).sum());
+    }
+
+    private int updatePayDetailsInShiftActivity(List<ShiftActivityDTO> shiftActivityDTOS, List<ShiftActivity> shiftActivities) {
+        int totalPlannerMinutesOfPayout=0;
+        for (int index = 0; index < shiftActivityDTOS.size(); index++) {
+            ShiftActivity shiftActivity = shiftActivities.get(index);
+            ShiftActivityDTO shiftActivityDTO = shiftActivityDTOS.get(index);
             shiftActivity.setPayoutCtaBonusMinutes(shiftActivityDTO.getPayoutCtaBonusMinutes());
             shiftActivity.setPlannedMinutesOfPayout(shiftActivityDTO.getScheduledMinutesOfPayout() + shiftActivityDTO.getPayoutCtaBonusMinutes());
             shiftActivity.setScheduledMinutesOfPayout(shiftActivityDTO.getScheduledMinutesOfPayout());
             shiftActivity.setPayoutPerShiftCTADistributions(ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftActivityDTO.getPayoutPerShiftCTADistributions(), PayOutPerShiftCTADistribution.class));
-            shift.setPlannedMinutesOfPayout(shift.getPlannedMinutesOfPayout()+shiftActivity.getPlannedMinutesOfPayout());
+            totalPlannerMinutesOfPayout = shiftActivity.getPlannedMinutesOfPayout();
         }
-        shift.setPayoutCtaBonusMinutes(shift.getActivities().stream().mapToInt(shiftActivity -> shiftActivity.getPayoutCtaBonusMinutes()).sum());
+        return totalPlannerMinutesOfPayout;
     }
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(Shift shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
