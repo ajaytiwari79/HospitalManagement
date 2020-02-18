@@ -148,7 +148,7 @@ public class KPISetService {
         List<KPISet> unitKPISets = new ArrayList<>();
         kpiSets.forEach(kpiSet -> {
             if(isCollectionNotEmpty(kpiSet.getKpiIds())) {
-                unitKPISets.add(new KPISet(null,kpiSet.getName(),unitPhaseMap.containsKey(kpiSet.getPhaseId())?unitPhaseMap.get(kpiSet.getPhaseId()).getId():null,unitId,ConfLevel.UNIT,kpiSet.getTimeType(),kpiSet.getKpiIds()));
+                unitKPISets.add(new KPISet(null,kpiSet.getName(),unitPhaseMap.containsKey(kpiSet.getPhaseId())?unitPhaseMap.get(kpiSet.getPhaseId()).getId():null,unitId,ConfLevel.UNIT,kpiSet.getTimeType(),kpiSet.getKpiIds(),kpiSet.getShortName()));
             }
         });
         if (isCollectionNotEmpty(unitKPISets)) {
@@ -167,6 +167,7 @@ public class KPISetService {
                 for (KPISetDTO kpiSet : kpiSetDTOList) {
                     KPISetResponseDTO kpiSetResponseDTO = new KPISetResponseDTO();
                     kpiSetResponseDTO.setKpiSetType(kpiSet.getKpiSetType());
+                    kpiSetResponseDTO.setShortName(kpiSet.getShortName());
                     List<KPIResponseDTO> kpiResponseDTOList = new ArrayList<>();
                     Map<BigInteger, KPIResponseDTO> kpiResponseDTOMap = new HashMap<>();
                     if (isCollectionNotEmpty(kpiSet.getKpiIds())) {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.enums.Gender;
 import com.kairos.persistence.model.country.default_data.EmploymentTypeDTO;
+import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.utils.CPRUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,7 +62,7 @@ public class StaffPersonalDetailQueryResult {
     private List<EmploymentTypeDTO> employmentTypes;
     private Long staffUserId;
     private List<Long> expertiseIds;
-    private Long mainEmploymentId;
+    private List<Employment> employments;
     private String privateEmail;
 
     public Integer getAge() {

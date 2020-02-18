@@ -522,9 +522,11 @@ public class StaffFilterService {
         for (Map employment : employments) {
             for (Map employmentLines : (List<Map>) employment.get(EMPLOYMENT_LINES)) {
                 for (Map payGrades : (List<Map>) employmentLines.get(PAY_GRADES)) {
-                    long payGradeLevel = Long.valueOf(payGrades.get(PAY_GRADE_LEVEL).toString());
-                    if(from <= payGradeLevel && to >= payGradeLevel){
-                        return true;
+                    if(payGrades.containsKey(AppConstants.PAY_GRADE_LEVEL)) {
+                        long payGradeLevel = Long.valueOf(payGrades.get(AppConstants.PAY_GRADE_LEVEL).toString());
+                        if (from <= payGradeLevel && to >= payGradeLevel) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -535,7 +537,7 @@ public class StaffFilterService {
     private boolean validateSeniority(List<Map> expertiseList, AgeRangeDTO expertiseRange) {
         for (Map map : expertiseList) {
             if(map.containsKey(EXPERTISE_START_DATE_IN_MILLIS) && isNotNull(map.get(EXPERTISE_START_DATE_IN_MILLIS))) {
-                Date expertiseStartDate = new Date(Long.getLong(map.get(EXPERTISE_START_DATE_IN_MILLIS).toString()));
+                Date expertiseStartDate = new Date(Long.valueOf(map.get(EXPERTISE_START_DATE_IN_MILLIS).toString()));
                 if (validate(asLocalDate(expertiseStartDate), getCurrentLocalDate(), expertiseRange)) {
                     return true;
                 }

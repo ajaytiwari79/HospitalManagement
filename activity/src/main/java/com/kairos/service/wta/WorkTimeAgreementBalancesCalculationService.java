@@ -57,6 +57,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.enums.wta.WTATemplateType.*;
+import static com.kairos.service.shift.ShiftValidatorService.throwException;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.*;
 
 
@@ -576,6 +577,9 @@ public class WorkTimeAgreementBalancesCalculationService {
 
 
     public static DateTimeInterval getCutoffInterval(LocalDate dateFrom, CutOffIntervalUnit cutOffIntervalUnit, Integer dayValue, Date shiftDate, LocalDate planningPeriodEndDate) {
+        if(isNull(dateFrom) || isNull(cutOffIntervalUnit)){
+            throwException(CUT_OFF_CONFIGUATION);
+        }
         LocalDate startDate = dateFrom;
         DateTimeInterval dateTimeInterval = null;
         LocalDate endDate = planningPeriodEndDate;

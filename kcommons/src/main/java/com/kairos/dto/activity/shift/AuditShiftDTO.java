@@ -26,16 +26,22 @@ public class AuditShiftDTO {
     private List<AuditShiftActivityDTO> activities;
     private List<AuditShiftActivityDTO> old_activities;
     private LoggingType loggingType;
+    private boolean management;
 
     public boolean isChanged(){
-        activities = isNullOrElse(activities,new ArrayList<>());
-        old_activities = isNullOrElse(old_activities,new ArrayList<>());
-        boolean isChanged = LoggingType.DELETED.equals(this.loggingType) || activities.size()!=old_activities.size();
-        for (int i = 0; i < activities.size(); i++) {
-            if (!isChanged) {
-                AuditShiftActivityDTO activityDTO = activities.get(i);
-                AuditShiftActivityDTO shiftActivityDTO = old_activities.get(i);
-                isChanged = activityDTO.isChanged(shiftActivityDTO);
+        boolean isChanged;
+        if(!management){
+            isChanged = false;
+        }else {
+            activities = isNullOrElse(activities, new ArrayList<>());
+            old_activities = isNullOrElse(old_activities, new ArrayList<>());
+            isChanged = LoggingType.DELETED.equals(this.loggingType) || activities.size() != old_activities.size();
+            for (int i = 0; i < activities.size(); i++) {
+                if (!isChanged) {
+                    AuditShiftActivityDTO activityDTO = activities.get(i);
+                    AuditShiftActivityDTO shiftActivityDTO = old_activities.get(i);
+                    isChanged = activityDTO.isChanged(shiftActivityDTO);
+                }
             }
         }
         return isChanged;

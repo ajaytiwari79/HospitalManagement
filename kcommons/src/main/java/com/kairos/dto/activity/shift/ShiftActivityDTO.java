@@ -151,11 +151,13 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     }
 
     public List<TimeBankDistributionDTO> getTimeBankCTADistributions() {
-        return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>());
+        this.timeBankCTADistributions = Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>());
+        return this.timeBankCTADistributions;
     }
 
     public List<PayOutPerShiftCTADistributionDTO> getPayoutPerShiftCTADistributions() {
-        return Optional.ofNullable(payoutPerShiftCTADistributions).orElse(new ArrayList<>());
+        this.payoutPerShiftCTADistributions = Optional.ofNullable(this.payoutPerShiftCTADistributions).orElse(new ArrayList<>());
+        return this.payoutPerShiftCTADistributions;
     }
 
     public List<PlannedTime> getPlannedTimes() {

@@ -7,8 +7,10 @@ import com.kairos.custom_exception.UnitNotFoundException;
 import com.kairos.wrapper.ResponseEnvelope;
 
 //import com.mindscapehq.raygun4java.core.RaygunClient;
+import com.mindscapehq.raygun4java.core.RaygunClient;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -44,7 +46,7 @@ import java.util.Set;
 import static com.kairos.constants.UserMessagesConstants.INTERNAL_SERVER_ERROR;
 
 @RestControllerAdvice
-@Order(1)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
 
@@ -56,6 +58,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 
     @Inject
     private SendGridMailService mailService;
+    @Inject private RaygunClient raygunClient;
 
     private String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
@@ -362,15 +365,14 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class, IllegalStateException.class, Exception.class, MessagingException.class})
-    public ResponseEntity<Object> handleInternal(final Exception ex, final WebRequest request) {
+    public ResponseEnvelope handleInternal(final Exception ex, final WebRequest request) {
         logger.error(ERROR_IN_USER_SERVICE + " ", ex);
         ResponseEnvelope errorMessage = new ResponseEnvelope();
         errorMessage.setSuccess(false);
         errorMessage.setMessage(convertMessage(INTERNAL_SERVER_ERROR));
         mailService.sendMailToBackendOnException(ex);
-
-        //raygunClient.send(ex);
-        return handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+        raygunClient.send(ex);
+        return errorMessage;//handleExceptionInternal(ex, errorMessage, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
 

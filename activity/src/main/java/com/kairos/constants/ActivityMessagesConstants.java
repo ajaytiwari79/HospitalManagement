@@ -369,4 +369,5 @@ public class ActivityMessagesConstants {
     public static final String SHORTCUT_ALREADY_EXISTS_NAME="message.shortcut.already.exists.name";
     public static final String ERROR_BLOCK_SETTING_NOT_FOUND = "error.block.setting.not.found";
     public static final String MESSAGE_BLOCKED_FOR_SHIFT_ENTER_AT_DATE = "message.blocked.for.shift.entered.at.date";
+    public static final String CUT_OFF_CONFIGUATION = "activity.cutoff.configuration";
 }

@@ -157,7 +157,7 @@ public class Shift extends MongoBaseEntity {
         return false;
     }
 
-    public List<ShiftActivity>[] getShiftActivitiesForValidatingStaffingLevel(Shift shift) {
+    public List[] getShiftActivitiesForValidatingStaffingLevel(Shift shift) {
         List<ShiftActivity> shiftActivitiesForUnderStaffing = new ArrayList<>();
         List<ShiftActivity> shiftActivitiesForOverStaffing = new ArrayList<>();
         if (shift == null) {
@@ -171,12 +171,12 @@ public class Shift extends MongoBaseEntity {
         } else {
             List<ShiftActivityLineInterval> shiftActivityLines=getShiftActivityLineIntervals(shift);
             List<ShiftActivityLineInterval> currentShiftActivityLines=getShiftActivityLineIntervals(this);
-            shiftActivitiesForUnderStaffing= getActivitiesForValidatingStaffingLevel(currentShiftActivityLines,shiftActivityLines);
-            shiftActivitiesForOverStaffing= getActivitiesForValidatingStaffingLevel(shiftActivityLines,currentShiftActivityLines);
+            shiftActivitiesForOverStaffing = getActivitiesForValidatingStaffingLevel(currentShiftActivityLines,shiftActivityLines);
+            shiftActivitiesForUnderStaffing = getActivitiesForValidatingStaffingLevel(shiftActivityLines,currentShiftActivityLines);
 
         }
 
-        return new List[] {shiftActivitiesForOverStaffing,shiftActivitiesForUnderStaffing};
+        return new List[] {shiftActivitiesForUnderStaffing,shiftActivitiesForOverStaffing};
     }
 
     protected List<ShiftActivityLineInterval> getShiftActivityLineIntervals(Shift shift){
@@ -201,7 +201,7 @@ public class Shift extends MongoBaseEntity {
             }
         }
         if(isCollectionNotEmpty(shiftActivitiesForCheckingStaffingLevel))
-          mergeShiftActivityList(shiftActivitiesForCheckingStaffingLevel);
+            shiftActivitiesForCheckingStaffingLevel= mergeShiftActivityList(shiftActivitiesForCheckingStaffingLevel);
         return shiftActivitiesForCheckingStaffingLevel;
     }
 
@@ -209,13 +209,16 @@ public class Shift extends MongoBaseEntity {
         List<ShiftActivity> shiftActivitiesList=new ArrayList<>();
         ShiftActivity shiftActivity=shiftActivities.get(0);
         boolean activityAdded=false;
-        for (int i = 0; i < shiftActivities.size()-2; i++) {
+        for (int i = 0; i < shiftActivities.size()-1; i++) {
             if(activityAdded){
                 shiftActivity=shiftActivities.get(i);
                 activityAdded=false;
             }
             if(shiftActivities.get(i).getEndDate().equals(shiftActivities.get(i+1).getStartDate()) && shiftActivities.get(i).getActivityId().equals(shiftActivities.get(i+1).getActivityId())){
                 shiftActivity.setEndDate(shiftActivities.get(i+1).getEndDate());
+                if(i+1==shiftActivities.indexOf(shiftActivities.get(shiftActivities.size()-1))){
+                    shiftActivitiesList.add(shiftActivity);
+                }
             }else {
                 shiftActivitiesList.add(shiftActivity);
                 activityAdded=true;

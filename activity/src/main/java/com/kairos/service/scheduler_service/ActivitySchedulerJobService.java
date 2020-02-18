@@ -3,7 +3,6 @@ package com.kairos.service.scheduler_service;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.activity_tabs.CutOffInterval;
 import com.kairos.dto.activity.activity.activity_tabs.communication_tab.ActivityReminderSettings;
-import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.scheduler.scheduler_panel.SchedulerPanelDTO;
 import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.scheduler.JobFrequencyType;
@@ -17,8 +16,6 @@ import com.kairos.persistence.model.shift.Shift;
 import com.kairos.rest_client.RestTemplateResponseEnvelope;
 import com.kairos.rest_client.SchedulerServiceRestClient;
 import com.kairos.service.MongoBaseService;
-import com.kairos.service.activity.ActivityService;
-import com.kairos.service.shift.ActivityReminderService;
 import com.kairos.service.shift.ShiftReminderService;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
@@ -34,7 +31,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.DateUtils.substractDurationInLocalDateTime;
@@ -126,12 +122,12 @@ public class ActivitySchedulerJobService extends MongoBaseService {
     @Async
     public void registerJobForActivityCutoff(List<Activity> activities) {
         for (Activity activity : activities) {
-            BasicNameValuePair jobSubType = new BasicNameValuePair("jobSubType", JobSubType.ACTIVITY_CUTOFF.toString());
+            BasicNameValuePair jobSubType = new BasicNameValuePair("jobSubType", JobSubType.ACTIVITY_REMINDER.toString());
             schedulerRestClient.publishRequest(null, activity.getUnitId(), true, IntegrationOperation.DELETE, "/scheduler_panel/entity/{entityId}/delete_job", newArrayList(jobSubType), new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {}, activity.getId());
             List<SchedulerPanelDTO> schedulerPanelDTOS = new ArrayList<>();
             if(activity.getCommunicationActivityTab().isAllowActivityCutoffReminder()) {
                 calculateTriggerDateTimeList(activity).forEach(reminderDateTime ->
-                        schedulerPanelDTOS.add(new SchedulerPanelDTO(activity.getUnitId(), JobType.SYSTEM, JobSubType.ACTIVITY_CUTOFF, activity.getId(), reminderDateTime, true, null))
+                        schedulerPanelDTOS.add(new SchedulerPanelDTO(activity.getUnitId(), JobType.SYSTEM, JobSubType.ACTIVITY_REMINDER, activity.getId(), reminderDateTime, true, null))
                 );
                 if (isCollectionNotEmpty(schedulerPanelDTOS)) {
                     schedulerRestClient.publishRequest(schedulerPanelDTOS, activity.getUnitId(), true, IntegrationOperation.CREATE, SCHEDULER_PANEL, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<SchedulerPanelDTO>>>() {});

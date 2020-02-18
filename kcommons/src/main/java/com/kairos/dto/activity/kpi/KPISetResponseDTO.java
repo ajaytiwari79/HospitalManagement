@@ -18,6 +18,7 @@ public class KPISetResponseDTO extends KPIResponseDTO {
     private BigInteger kpiSetId;
 
     private KPISetType kpiSetType;
+    private String shortName;
 
     private List<KPIResponseDTO> kpiData;
 
