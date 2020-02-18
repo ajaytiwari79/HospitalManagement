@@ -1,6 +1,5 @@
 package com.kairos.rule_validator.functional_paymment;
 
-import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ExpertiseLine;
 import com.kairos.persistence.model.user.expertise.response.FunctionalPaymentDTO;
 import com.kairos.rule_validator.AbstractSpecification;

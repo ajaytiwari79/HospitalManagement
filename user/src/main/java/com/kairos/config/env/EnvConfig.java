@@ -1,5 +1,6 @@
 package com.kairos.config.env;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.PropertySource;
  * Created by Rama.Shankar on 27/9/16.
  */
 @Configuration
+@Getter
 @PropertySource({ "classpath:application-${spring.profiles.active}.properties" })
 public class EnvConfig {
 
@@ -46,65 +48,11 @@ public class EnvConfig {
 
     @Value("${sendgrid.api.key}")
     private String sendGridApiKey;
+    @Value("${spring.profiles.active}")
+    private String currentProfile;
 
     public String getGoogleCalendarAPIV3Url(String vCardId){
-
         return googleCalendarAPIV3Url.replace("{countryVCard}" ,vCardId);
-    }
-
-
-    public String getWsUrl() {
-        return wsUrl;
-    }
-
-
-
-
-
-    public String getTwillioAccountId() {
-        return twillioAccountId;
-    }
-
-    public String getTwillioAuthToken() {
-        return twillioAuthToken;
-    }
-
-    public String getGetTwillioNumber() {
-        return getTwillioNumber;
-    }
-
-    public String getServerHost() {
-        return serverHost;
-    }
-
-    public String getCarteServerHost(){
-        return carteServerHost;
-    }
-
-
-    public String getImagesPath() {
-        return imagesPath;
-    }
-
-    public void setImagesPath(String imagesPath) {
-        this.imagesPath = imagesPath;
-    }
-
-    public String getTomtomGeoCodeUrl() {
-        return tomtomGeoCodeUrl;
-    }
-
-    public String getTomtomKey() {
-        return tomtomKey;
-    }
-
-    public String getSendGridApiKey() {
-        return sendGridApiKey;
-    }
-
-
-    public String getForgotPasswordApiLink() {
-        return forgotPasswordApiLink;
     }
 
 }

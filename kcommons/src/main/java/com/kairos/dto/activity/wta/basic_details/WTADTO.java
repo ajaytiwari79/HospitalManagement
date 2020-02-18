@@ -3,7 +3,6 @@ package com.kairos.dto.activity.wta.basic_details;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.kairos.commons.annotation.ValidateIgnoreCounter;
-import com.kairos.commons.planning_setting.PlanningSetting;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

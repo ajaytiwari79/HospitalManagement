@@ -1,7 +1,6 @@
 package com.kairos.dto.user.access_permission;
 
 import com.kairos.dto.user.country.filter.FilterDetailDTO;
-import com.kairos.enums.Gender;
 
 import java.util.*;
 

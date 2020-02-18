@@ -1,7 +1,6 @@
 package com.kairos.commons.utils;
 
 import com.kairos.enums.DurationType;
-import com.kairos.enums.wta.IntervalUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

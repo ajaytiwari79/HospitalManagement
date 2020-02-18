@@ -2,7 +2,6 @@ package com.kairos.service.filter;
 
 import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.service.cta.CostTimeAgreementService;
 import com.kairos.service.wta.WorkTimeAgreementService;

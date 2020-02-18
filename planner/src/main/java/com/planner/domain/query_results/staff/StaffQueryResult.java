@@ -1,6 +1,5 @@
 package com.planner.domain.query_results.staff;
 
-import com.planner.domain.query_results.expertise.ExpertiseQueryResult;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.annotation.QueryResult;

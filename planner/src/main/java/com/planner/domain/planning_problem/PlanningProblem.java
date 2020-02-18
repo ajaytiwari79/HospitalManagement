@@ -5,7 +5,6 @@ import com.planner.domain.common.MongoBaseEntity;
 import com.planner.enums.PlanningProblemStatus;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Document

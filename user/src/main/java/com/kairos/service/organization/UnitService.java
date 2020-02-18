@@ -2,7 +2,6 @@ package com.kairos.service.organization;
 
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.*;
-import com.kairos.persistence.model.access_permission.AccessGroup;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.BusinessType;
 import com.kairos.persistence.model.organization.Organization;

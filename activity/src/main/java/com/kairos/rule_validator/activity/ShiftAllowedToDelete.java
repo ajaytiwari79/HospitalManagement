@@ -8,7 +8,9 @@ import com.kairos.persistence.model.shift.ShiftActivity;
 import com.kairos.rule_validator.AbstractSpecification;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_PHASE_AUTHORITY_ABSENT;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;

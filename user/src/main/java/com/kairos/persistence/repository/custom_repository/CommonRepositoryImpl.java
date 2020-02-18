@@ -1,6 +1,5 @@
 package com.kairos.persistence.repository.custom_repository;
 
-import com.kairos.service.kpermissions.PermissionService;
 import org.neo4j.ogm.context.GraphEntityMapper;
 import org.neo4j.ogm.context.MappingContext;
 import org.neo4j.ogm.cypher.query.DefaultGraphModelRequest;

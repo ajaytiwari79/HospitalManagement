@@ -10,8 +10,8 @@ import com.kairos.repositories.task_type.TaskMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.MongoBaseService;
 import com.kairos.services.task_type.TaskService;
-import com.kairos.wrappers.task.TaskGanttDTO;
 import com.kairos.wrapper.task_demand.TaskDemandVisitWrapper;
+import com.kairos.wrappers.task.TaskGanttDTO;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,6 @@ import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.kairos.commons.utils.DateUtils.ISO_FORMAT;

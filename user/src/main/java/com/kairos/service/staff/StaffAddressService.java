@@ -1,11 +1,9 @@
 package com.kairos.service.staff;
 
 import com.kairos.dto.user.organization.AddressDTO;
-import com.kairos.dto.user.organization.ZipCodeDTO;
-import com.kairos.dto.user.staff.client.ContactAddressDTO;
+import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.client.ContactAddress;
 import com.kairos.persistence.model.organization.Organization;
-import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.staff.personal_details.Staff;
 import com.kairos.persistence.model.user.region.Municipality;
 import com.kairos.persistence.model.user.region.ZipCode;
@@ -18,9 +16,7 @@ import com.kairos.persistence.repository.user.region.RegionGraphRepository;
 import com.kairos.persistence.repository.user.region.ZipCodeGraphRepository;
 import com.kairos.persistence.repository.user.staff.StaffGraphRepository;
 import com.kairos.service.exception.ExceptionService;
-import com.kairos.utils.DistanceCalculator;
 import com.kairos.utils.FormatUtil;
-import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

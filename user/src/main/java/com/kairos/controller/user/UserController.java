@@ -1,6 +1,5 @@
 package com.kairos.controller.user;
 
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.auth.GoogleCalenderTokenDTO;
 import com.kairos.dto.user.user.password.PasswordUpdateDTO;
 import com.kairos.enums.user.ChatStatus;
@@ -23,7 +22,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.kairos.constants.ApiConstants.API_V1;
 import static com.kairos.constants.ApiConstants.UNIT_URL;

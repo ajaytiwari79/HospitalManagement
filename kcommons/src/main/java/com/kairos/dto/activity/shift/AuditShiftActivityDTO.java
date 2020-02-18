@@ -3,14 +3,12 @@ package com.kairos.dto.activity.shift;
 import com.kairos.commons.utils.DateTimeInterval;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
 
 @Getter

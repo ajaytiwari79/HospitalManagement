@@ -1,14 +1,14 @@
 package com.kairos.persistence.repository.organization;
 
 import com.kairos.persistence.model.organization.group.Group;
-import com.kairos.persistence.model.organization.group.GroupDTO;
 import com.kairos.persistence.repository.custom_repository.Neo4jBaseRepository;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FILTERS;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_GROUPS;
 
 /**
  * Created By G.P.Ranjan on 19/11/19
