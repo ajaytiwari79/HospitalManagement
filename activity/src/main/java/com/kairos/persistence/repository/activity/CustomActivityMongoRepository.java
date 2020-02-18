@@ -103,5 +103,5 @@ public interface CustomActivityMongoRepository {
     List<ActivityTagDTO> findAllActivityByUnitIdAndNotPartOfTeam(Long unitId);
     TimeTypeEnum findTimeTypeByActivityId(BigInteger activityId);
 
-    List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId);
+    List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId,TimeTypeEnum timeTypeEnum,Set<BigInteger> activityIds);
 }

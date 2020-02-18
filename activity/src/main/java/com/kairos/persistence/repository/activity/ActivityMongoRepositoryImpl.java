@@ -36,8 +36,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.TimeTypeEnum.PAID_BREAK;
 import static com.kairos.enums.TimeTypeEnum.UNPAID_BREAK;
 import static com.kairos.enums.TimeTypes.WORKING_TYPE;
@@ -838,9 +837,10 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId) {
+    public List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId,TimeTypeEnum timeTypeEnum,Set<BigInteger> activityIds) {
+        Criteria criteria=timeTypeEnum==null?Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and("activityIds").in(activityIds):Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and("balanceSettingsActivityTab.timeType").is(timeTypeEnum);
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and("balanceSettingsActivityTab.timeType").is(TimeTypeEnum.ABSENCE)),
+                match(criteria),
                 lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, "_id", ACTIVITY_PRIORITY),
                 project("name", DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
@@ -850,4 +850,5 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         AggregationResults<ActivityDTO> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityDTO.class);
         return result.getMappedResults();
     }
+
 }

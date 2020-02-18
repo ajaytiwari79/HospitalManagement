@@ -1140,7 +1140,7 @@ public class ActivityService {
     }
 
     public List<ActivityDTO> getAllAbsenceActivity(Long unitId) {
-        List<ActivityDTO> activityDTOS = new ArrayList<>(activityMongoRepository.findAbsenceActivityByUnitId(unitId));
+        List<ActivityDTO> activityDTOS = new ArrayList<>(activityMongoRepository.findAbsenceActivityByUnitId(unitId,TimeTypeEnum.ABSENCE,new HashSet<>()));
         List<ActivityDTO> filterActivityDto=activityDTOS.stream().filter(activityDTO -> activityDTO.getActivitySequence()>0).collect(Collectors.toList());
         activityDTOS.removeAll(filterActivityDto);
         filterActivityDto.sort(Comparator.comparing(ActivityDTO :: getActivitySequence));
