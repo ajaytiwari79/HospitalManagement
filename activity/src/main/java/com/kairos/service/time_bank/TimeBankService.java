@@ -771,21 +771,4 @@ public class TimeBankService{
         return timeBankRepository.findAllByEmploymentIdsAndBetweenDate(employmentIds,asDate(startDate),asDate(endDate));
     }
 
-    public void updateTimeBanOnApproveTimebankOFF(ShiftActivity shiftActivity,Long employmentId,Map<BigInteger, ActivityWrapper> activityIdAndActivityMap,StaffAdditionalInfoDTO staffAdditionalInfoDTO){
-        Activity activity = activityIdAndActivityMap.get(shiftActivity.getActivityId()).getActivity();
-        if(TimeTypeEnum.TIME_BANK.equals(activity.getBalanceSettingsActivityTab().getTimeType()) && ((CommonConstants.FULL_WEEK.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime()) || CommonConstants.FULL_DAY_CALCULATION.equals(activity.getTimeCalculationActivityTab().getMethodForCalculatingTime())))){
-            timeBankCalculationService.calculateScheduledAndDurationInMinutes(shiftActivity,activity,staffAdditionalInfoDTO.getEmployment(),true);
-            DailyTimeBankEntry dailyTimeBankEntry = timeBankRepository.findByEmploymentAndDate(employmentId, asLocalDate(shiftActivity.getStartDate()));
-            if(isNull(dailyTimeBankEntry)){
-                DateTimeInterval planningPeriodInterval = planningPeriodService.getPlanningPeriodIntervalByUnitId(staffAdditionalInfoDTO.getUnitId());
-                int contractualMinutes = timeBankCalculationService.getContractualMinutesByDate(planningPeriodInterval, asLocalDate(shiftActivity.getStartDate()), staffAdditionalInfoDTO.getEmployment().getEmploymentLines());
-                dailyTimeBankEntry = new DailyTimeBankEntry(staffAdditionalInfoDTO.getEmployment().getId(), staffAdditionalInfoDTO.getId(),asLocalDate(shiftActivity.getStartDate()),contractualMinutes,-contractualMinutes);
-            }
-            dailyTimeBankEntry.setTimeBankOffMinutes(shiftActivity.getDurationMinutes());
-            shiftActivity.setDurationMinutes(0);
-            shiftActivity.setScheduledMinutes(0);
-            timeBankRepository.save(dailyTimeBankEntry);
-        }
-    }
-
 }
