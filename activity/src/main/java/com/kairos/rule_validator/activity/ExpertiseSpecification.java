@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
+import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_EXPERTISE_MATCH;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
@@ -65,7 +66,7 @@ public class ExpertiseSpecification extends AbstractSpecification<ShiftWithActiv
             errorMessages.add(convertMessage(MESSAGE_ACTIVITY_EXPERTISE_MATCH, childActivity.getActivity().getName(), expertise.getName()));
             activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(childActivity.getActivity().getId())).findAny().orElse(null);
             if (activityRuleViolation == null) {
-                activityRuleViolation = new ActivityRuleViolation(childActivity.getActivity().getId(), childActivity.getActivity().getName(), 0, errorMessages);
+                activityRuleViolation = new ActivityRuleViolation(childActivity.getActivity().getId(), childActivity.getActivity().getName(), 0, new HashSet<>(errorMessages));
                 ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
             } else {
                 activityRuleViolation.getErrorMessages().addAll(errorMessages);

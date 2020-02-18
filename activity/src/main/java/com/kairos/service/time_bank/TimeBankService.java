@@ -304,7 +304,7 @@ public class TimeBankService{
             intervals = timeBankCalculationService.getAllIntervalsBetweenDates(startDate, endDate, query);
             payOutPerShifts = payOutRepository.findAllByEmploymentAndDate(employmentWithCtaDetailsDTO.getId(), startDate, endDate);
         }else {
-            Interval todayInterval = new Interval(startDate.getTime(), getEndTimeStampByQueryParam(query, startDate));
+            Interval todayInterval = new Interval(getStartDateByQueryParam(startDate,query), getEndTimeStampByQueryParam(query, startDate));
             Interval planningPeriodInterval = new Interval(asDate(planningPeriod.getStartDate()).getTime(),getEndOfDay(asDate(planningPeriod.getEndDate())).getTime());
             Interval yearTillDate = new Interval(asDate(planningPeriod.getStartDate().with(TemporalAdjusters.firstDayOfYear())).getTime(),getEndOfDay(startDate).getTime());
             intervals = newArrayList(todayInterval,planningPeriodInterval,yearTillDate);
@@ -330,15 +330,22 @@ public class TimeBankService{
         return timeBankCalculationService.getTimeBankAdvanceView(intervals, unitId, totalTimeBankBeforeStartDate, startDate, endDate, query, shiftQueryResultWithActivities, dailyTimeBanks, employmentDetails, timeTypeDTOS, payoutTransactionIntervalMap,sequenceIntervalMap,payOutPerShifts);
     }
 
+    private long getStartDateByQueryParam(Date startDate,String query) {
+        long timeStamp = startDate.getTime();
+        if(query.equals(WEEK)){
+            timeStamp = asDate(asZoneDateTime(startDate).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))).getTime();
+        }else if(query.equals(CAMEL_CASE_MONTHLY)){
+            timeStamp = asDate(asZoneDateTime(startDate).with(TemporalAdjusters.firstDayOfMonth())).getTime();
+        }
+        return timeStamp;
+    }
+
     private long getEndTimeStampByQueryParam(String query, Date startDate) {
-        long timeStamp = 0;
+        long timeStamp = getEndOfDay(startDate).getTime();
         if(query.equals(WEEK)){
             timeStamp = getEndOfDay(asDate(asZoneDateTime(startDate).with(TemporalAdjusters.next(DayOfWeek.SUNDAY)))).getTime();
         }else if(query.equals(CAMEL_CASE_MONTHLY)){
             timeStamp = getEndOfDay(asDate(asZoneDateTime(startDate).with(TemporalAdjusters.lastDayOfMonth()))).getTime();
-        }
-        else {
-            timeStamp = getEndOfDay(startDate).getTime();
         }
         return timeStamp;
     }

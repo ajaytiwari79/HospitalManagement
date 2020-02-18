@@ -5,6 +5,7 @@ import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
+import com.kairos.dto.user.staff.EmploymentDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.Gender;
@@ -84,7 +85,7 @@ public class StaffPersonalDetail {
     private Long staffUserId;
     private Long externalId;
     private Set<AccessGroupRole> roles;
-    private Long mainEmploymentId;
+    private List<EmploymentDTO> employments;
     private String privateEmail;
 
     public StaffPersonalDetail(Long id, List<SkillLevelDTO> skills) {
