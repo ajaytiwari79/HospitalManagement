@@ -1,16 +1,8 @@
 package com.kairos.service.dashboard;
 
-import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.activity.activity.ActivityDTO;
 import com.kairos.dto.activity.dashboard.UserSickDataWrapper;
-import com.kairos.dto.activity.period.PeriodDTO;
-import com.kairos.dto.user.staff.staff.StaffResultDTO;
-import com.kairos.dto.user_context.UserContext;
-import com.kairos.enums.DurationType;
-import com.kairos.persistence.model.activity.Activity;
-import com.kairos.persistence.model.attendence_setting.SickSettings;
 import com.kairos.persistence.model.common.MongoBaseEntity;
-import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.attendence_setting.SickSettingsRepository;
 import com.kairos.persistence.repository.period.PlanningPeriodMongoRepository;
@@ -19,7 +11,6 @@ import com.kairos.persistence.repository.time_type.TimeTypeMongoRepository;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.exception.ExceptionService;
 import com.kairos.service.shift.ShiftSickService;
-import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.function.Function;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.ObjectUtils.*;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.ActivityMessagesConstants.ERROR_EMPTY_STAFF_OR_UNIT_SETTING;
-import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_STAFF_NOTFOUND;
 
 /**
  * CreatedBy vipulpandey on 30/8/18
@@ -62,7 +53,7 @@ public class SickService {
 
     public UserSickDataWrapper getDefaultDataOnUserSick(Long unitId) {
         UserSickDataWrapper userSickDataWrapper = new UserSickDataWrapper();
-        Set<BigInteger> sickTimeTypeIds = timeTypeMongoRepository.findAllSickTimeTypes().stream().map(timeType -> timeType.getId()).collect(Collectors.toSet());
+        Set<BigInteger> sickTimeTypeIds = timeTypeMongoRepository.findAllSickTimeTypes().stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
         List<ActivityDTO> activities = activityMongoRepository.findAllByTimeTypeIdAndUnitId(sickTimeTypeIds, unitId);
         userSickDataWrapper.setActivities(activities);
         return userSickDataWrapper;

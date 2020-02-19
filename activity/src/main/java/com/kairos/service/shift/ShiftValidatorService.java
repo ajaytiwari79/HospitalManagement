@@ -971,7 +971,7 @@ public class ShiftValidatorService {
     public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
         Date startDate = null;
         Date endDate = null;
-        List<Shift> shiftList = new ArrayList<>();
+        List<Shift> shiftList;
         startDate = isNull(shiftDTO.getStartDate()) ? asDateStartOfDay(shiftDTO.getShiftDate()) : shiftDTO.getStartDate();
         endDate = isNull(shiftDTO.getEndDate()) ? asDateEndOfDay(shiftDTO.getShiftDate()) : shiftDTO.getEndDate();
 

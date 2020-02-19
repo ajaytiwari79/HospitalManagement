@@ -150,7 +150,7 @@ public class ShiftDetailsService extends MongoBaseService {
         shiftsMap.forEach((date,shifts)->{
             ShiftDTO sickShift=shifts.stream().filter(k->k.getShiftType().equals(SICK)).findAny().orElse(null);
             if(sickShift!=null){
-                Activity activity=activityWrapperMap.get(sickShift.getActivities().get(0).getActivityId()).getActivity();
+                Activity activity=getWorkingSickActivity(sickShift,activityWrapperMap);
                 if(!activity.getRulesActivityTab().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()){
                     shifts.removeAll(shifts.stream().filter(k->k.getActivities().stream().anyMatch(act->act.getStatus().contains(ShiftStatus.PUBLISH) && k.isDisabled())).collect(Collectors.toList()));
                 }
@@ -161,7 +161,7 @@ public class ShiftDetailsService extends MongoBaseService {
         });
     }
 
-    private Set<BigInteger> getAllActivityIds(Map<LocalDate, List<ShiftDTO>> shiftsMap) {
+    public Set<BigInteger> getAllActivityIds(Map<LocalDate, List<ShiftDTO>> shiftsMap) {
         Set<BigInteger> activityIds=new HashSet<>();
         shiftsMap.forEach((date,shifts)->{
             shifts.forEach(shiftDTO -> {
@@ -169,6 +169,16 @@ public class ShiftDetailsService extends MongoBaseService {
             });
         });
         return activityIds;
+    }
+
+    public Activity getWorkingSickActivity(ShiftDTO shift,Map<BigInteger, ActivityWrapper> activityWrapperMap){
+        Activity activity=null;
+            for (ShiftActivityDTO shiftActivity:shift.getActivities()){
+                if(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getLabel().equals("Sickness")){
+                    return activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
+                }
+            }
+            return activity;
     }
 
 
