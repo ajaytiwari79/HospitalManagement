@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.enums.FilterType.*;
+import static com.kairos.enums.FilterType.GROUPS;
 
 /**
  * Created By G.P.Ranjan on 10/12/19

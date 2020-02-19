@@ -2,11 +2,9 @@ package com.kairos.service.counter;
 
 
 import com.kairos.commons.utils.DateTimeInterval;
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.dto.activity.counter.enums.XAxisConfig;
 import com.kairos.dto.activity.shift.ShiftActivityDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
-import com.kairos.enums.TimeTypeEnum;
 import com.kairos.service.activity.TimeTypeService;
 import com.kairos.utils.counter.KPIUtils;
 import org.springframework.stereotype.Service;
@@ -21,7 +19,6 @@ import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectMapperUtils.copyPropertiesOfCollectionByMapper;
 import static com.kairos.enums.FilterType.CALCULATION_UNIT;
-import static com.kairos.enums.FilterType.TIME_TYPE;
 
 @Service
 public class UnavailabilityCalculationKPIService {

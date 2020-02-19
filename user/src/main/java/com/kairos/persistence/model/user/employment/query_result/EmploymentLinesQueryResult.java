@@ -4,7 +4,6 @@ import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.enums.EmploymentSubType;
-import com.kairos.persistence.model.pay_table.PayGrade;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -47,7 +47,8 @@ import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.enums.EmploymentSubType.MAIN;
-import static com.kairos.enums.sickness.ReplaceSickShift.*;
+import static com.kairos.enums.sickness.ReplaceSickShift.PROTECTED_DAYS_OFF;
+
 
 /**
  * CreatedBy vipulpandey on 31/8/18

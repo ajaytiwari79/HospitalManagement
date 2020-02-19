@@ -2,7 +2,6 @@ package com.planner.repository.constraint;
 
 import com.kairos.enums.constraint.ConstraintSubType;
 import com.planner.domain.constraint.activity.ActivityConstraint;
-import com.planner.domain.constraint.common.Constraint;
 import com.planner.repository.common.MongoBaseRepository;
 import org.springframework.stereotype.Repository;
 

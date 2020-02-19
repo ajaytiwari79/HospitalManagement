@@ -7,14 +7,11 @@ import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.rule_validator.AbstractSpecification;
 import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
 import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_ACTIVITY_EXPERTISE_MATCH;
-import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN;
 import static com.kairos.service.shift.ShiftValidatorService.convertMessage;
 import static com.kairos.service.shift.ShiftValidatorService.throwException;
 

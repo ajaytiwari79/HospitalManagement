@@ -3,7 +3,6 @@ package com.kairos.shiftplanning.constraints.activityConstraint;
 import com.kairos.shiftplanning.constraints.Constraint;
 import com.kairos.shiftplanning.constraints.ScoreLevel;
 import com.kairos.shiftplanning.domain.activity.Activity;
-import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.tag.Tag;
 import lombok.Getter;

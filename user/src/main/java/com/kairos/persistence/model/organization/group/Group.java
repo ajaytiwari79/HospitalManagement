@@ -2,7 +2,6 @@ package com.kairos.persistence.model.organization.group;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.user.filter.FilterSelection;
 import lombok.Getter;
@@ -14,7 +13,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FILTERS;
 
 /**
  * Created By G.P.Ranjan on 19/11/19

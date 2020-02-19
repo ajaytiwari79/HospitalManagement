@@ -1,6 +1,5 @@
 package com.kairos.shiftplanning.domain.activity;
 
-import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
 import com.kairos.shiftplanning.domain.staffing_level.SkillLineInterval;
 import com.kairos.shiftplanning.domain.staffing_level.StaffingLineInterval;

@@ -2,8 +2,8 @@ package com.kairos.persistence.model.task_type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.json_view_handler.TaskTypeViewHandler;
+import com.kairos.persistence.model.common.MongoBaseEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;

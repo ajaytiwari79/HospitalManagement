@@ -1,8 +1,8 @@
 package com.kairos.persistence.model.staff;
 
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
+import com.kairos.persistence.model.country.tag.TagQueryResult;
 import com.kairos.persistence.model.organization.team.TeamDTO;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
 import lombok.Getter;

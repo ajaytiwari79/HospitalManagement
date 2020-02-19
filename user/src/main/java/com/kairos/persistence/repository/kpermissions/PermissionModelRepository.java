@@ -12,7 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import static com.kairos.persistence.model.constants.RelationshipConstants.*;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_FIELD;
+import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_PERMISSION;
 
 public interface PermissionModelRepository  extends Neo4jBaseRepository<KPermissionModel,Long> {
 

@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.DateUtils;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.constants.AppConstants;
-import com.kairos.constants.CommonConstants;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.cta.CTARuleTemplateDTO;
 import com.kairos.dto.activity.period.PlanningPeriodDTO;
@@ -16,8 +15,6 @@ import com.kairos.dto.activity.time_bank.*;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.enums.TimeTypeEnum;
-import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
 import com.kairos.persistence.model.activity.TimeType;
 import com.kairos.persistence.model.pay_out.PayOutPerShift;
@@ -477,39 +474,43 @@ public class TimeBankService{
 
                 }
             }
-            for (Shift shift : shifts) {
-                if (!shift.isDeleted()) {
-                    if (isNotNull(shift.getDraftShift())) {
-                        shift = shift.getDraftShift();
-                    }
-                    int timeBankCtaBonusMinutes = 0;
-                    int plannedMinutesOfTimebank = 0;
-                    int timeBankScheduledMinutes = 0;
-                    for (ShiftActivity shiftActivity : shift.getActivities()) {
-                        updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, shiftActivity);
-                        timeBankCtaBonusMinutes += shiftActivity.getTimeBankCtaBonusMinutes();
-                        plannedMinutesOfTimebank += shiftActivity.getPlannedMinutesOfTimebank();
-                        timeBankScheduledMinutes += shiftActivity.getScheduledMinutesOfTimebank();
-                        if (Optional.ofNullable(shiftActivity.getChildActivities()).isPresent()) {
-                            for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
-                                updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, childActivity);
-                            }
-                        }
-                    }
-                    if (isCollectionNotEmpty(shift.getBreakActivities())) {
-                        for (ShiftActivity breakActivity : shift.getBreakActivities()) {
-                            updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, breakActivity);
-                            timeBankCtaBonusMinutes += breakActivity.getTimeBankCtaBonusMinutes();
-                            plannedMinutesOfTimebank += breakActivity.getPlannedMinutesOfTimebank();
-                            timeBankScheduledMinutes += breakActivity.getScheduledMinutesOfTimebank();
-                        }
-                    }
-                    shift.setScheduledMinutesOfTimebank(timeBankScheduledMinutes);
-                    shift.setTimeBankCtaBonusMinutes(timeBankCtaBonusMinutes);
-                    shift.setPlannedMinutesOfTimebank(plannedMinutesOfTimebank);
-                }
-            }
+            updateTimebankDetailsInShifts(shifts, shiftActivityDTOMap);
             //shiftMongoRepository.saveEntities(shifts);
+        }
+    }
+
+    private void updateTimebankDetailsInShifts(List<Shift> shifts, Map<String, ShiftActivityDTO> shiftActivityDTOMap) {
+        for (Shift shift : shifts) {
+            if (!shift.isDeleted()) {
+                if (isNotNull(shift.getDraftShift())) {
+                    shift = shift.getDraftShift();
+                }
+                int timeBankCtaBonusMinutes = 0;
+                int plannedMinutesOfTimebank = 0;
+                int timeBankScheduledMinutes = 0;
+                for (ShiftActivity shiftActivity : shift.getActivities()) {
+                    updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, shiftActivity);
+                    timeBankCtaBonusMinutes += shiftActivity.getTimeBankCtaBonusMinutes();
+                    plannedMinutesOfTimebank += shiftActivity.getPlannedMinutesOfTimebank();
+                    timeBankScheduledMinutes += shiftActivity.getScheduledMinutesOfTimebank();
+                    if (Optional.ofNullable(shiftActivity.getChildActivities()).isPresent()) {
+                        for (ShiftActivity childActivity : shiftActivity.getChildActivities()) {
+                            updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, childActivity);
+                        }
+                    }
+                }
+                if (isCollectionNotEmpty(shift.getBreakActivities())) {
+                    for (ShiftActivity breakActivity : shift.getBreakActivities()) {
+                        updateTimebankDetailsInShiftActivity(shiftActivityDTOMap, breakActivity);
+                        timeBankCtaBonusMinutes += breakActivity.getTimeBankCtaBonusMinutes();
+                        plannedMinutesOfTimebank += breakActivity.getPlannedMinutesOfTimebank();
+                        timeBankScheduledMinutes += breakActivity.getScheduledMinutesOfTimebank();
+                    }
+                }
+                shift.setScheduledMinutesOfTimebank(timeBankScheduledMinutes);
+                shift.setTimeBankCtaBonusMinutes(timeBankCtaBonusMinutes);
+                shift.setPlannedMinutesOfTimebank(plannedMinutesOfTimebank);
+            }
         }
     }
 
@@ -683,7 +684,8 @@ public class TimeBankService{
             List<CTARuleTemplateDTO> ruleTemplates = costTimeAgreementService.getCtaRuleTemplatesByEmploymentId(employmentId, startDate, endDate);
             ruleTemplates = ruleTemplates.stream().filter(distinctByKey(CTARuleTemplateDTO::getName)).collect(toList());
             dailyTimeBankEntries = timeBankRepository.findAllByEmploymentIdAndBeforeDate(employmentId, asDate(periodEndDate));
-            java.time.LocalDate firstRequestPhasePlanningPeriodEndDate = planningPeriodService.findFirstRequestPhasePlanningPeriodByUnitId(unitId).getEndDate();
+            PlanningPeriod firstRequestPhasePlanningPeriodByUnitId = planningPeriodService.findFirstRequestPhasePlanningPeriodByUnitId(unitId);
+            java.time.LocalDate firstRequestPhasePlanningPeriodEndDate = isNull(firstRequestPhasePlanningPeriodByUnitId) ? periodEndDate : firstRequestPhasePlanningPeriodByUnitId.getEndDate();
             object = (T)timeBankCalculationService.getAccumulatedTimebankDTO(firstRequestPhasePlanningPeriodEndDate,planningPeriodInterval, dailyTimeBankEntries, employmentWithCtaDetailsDTO, employmentStartDate, periodEndDate,(Long)object,ruleTemplates);
         }
         return object;

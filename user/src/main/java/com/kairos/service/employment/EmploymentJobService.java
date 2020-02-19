@@ -4,7 +4,6 @@ import com.kairos.commons.utils.DateUtils;
 import com.kairos.dto.scheduler.queue.KairosSchedulerLogsDTO;
 import com.kairos.dto.user.employment.EmploymentIdDTO;
 import com.kairos.dto.user.employment.PositionDTO;
-import com.kairos.enums.scheduler.JobSubType;
 import com.kairos.enums.scheduler.Result;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.reason_code.ReasonCode;

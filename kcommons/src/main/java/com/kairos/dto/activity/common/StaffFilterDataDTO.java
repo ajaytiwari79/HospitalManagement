@@ -1,7 +1,6 @@
 package com.kairos.dto.activity.common;
 
 import com.kairos.dto.activity.cta.CTAResponseDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

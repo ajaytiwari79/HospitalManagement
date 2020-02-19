@@ -8,7 +8,6 @@ import com.kairos.enums.wta.WTATemplateType;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;

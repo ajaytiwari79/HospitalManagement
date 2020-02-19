@@ -1,14 +1,8 @@
 package com.kairos.shiftplanning.constraints.activityConstraint;
 
-import com.kairos.enums.constraint.ConstraintSubType;
-import com.kairos.shiftplanning.constraints.Constraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import java.util.Map;
 
 @Getter
 @Setter

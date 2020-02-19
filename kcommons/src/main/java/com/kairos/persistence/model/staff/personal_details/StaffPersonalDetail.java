@@ -16,7 +16,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.List;

@@ -1,6 +1,5 @@
 package com.planner.domain.activity;
 
-import com.kairos.commons.planning_setting.PlanningSetting;
 import com.planner.domain.common.MongoBaseEntity;
 
 import java.math.BigInteger;
