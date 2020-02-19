@@ -837,10 +837,9 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     @Override
-    public List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId,TimeTypeEnum timeTypeEnum,Set<BigInteger> activityIds) {
-        Criteria criteria=timeTypeEnum==null?Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and("activityIds").in(activityIds):Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and("balanceSettingsActivityTab.timeType").is(timeTypeEnum);
+    public List<ActivityDTO> findAbsenceActivityByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(criteria),
+                match(Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false).and("balanceSettingsActivityTab.timeType").is(TimeTypeEnum.ABSENCE)),
                 lookup(ACTIVITY_PRIORITY, ACTIVITY_PRIORITY_ID, "_id", ACTIVITY_PRIORITY),
                 project("name", DESCRIPTION, UNIT_ID, RULES_ACTIVITY_TAB, PARENT_ID, GENERAL_ACTIVITY_TAB)
                         .and(ACTIVITY_PRIORITY).arrayElementAt(0).as(ACTIVITY_PRIORITY),
