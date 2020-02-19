@@ -22,8 +22,6 @@ public class WorkTimeAgreementBalance {
     private List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalances;
 
     public List<WorkTimeAgreementRuleTemplateBalancesDTO> getWorkTimeAgreementRuleTemplateBalances() {
-//        Map<String,List<WorkTimeAgreementRuleTemplateBalancesDTO>> workTimeAgreementBalanceDtoListMap =workTimeAgreementRuleTemplateBalances.stream().collect(Collectors.groupingBy(WorkTimeAgreementRuleTemplateBalancesDTO::getTimeType,Collectors.toList()));
-//        List<WorkTimeAgreementRuleTemplateBalancesDTO> workTimeAgreementRuleTemplateBalancesDTOS = new ArrayList<>();
         return isNullOrElse(workTimeAgreementRuleTemplateBalances,new ArrayList());
     }
 

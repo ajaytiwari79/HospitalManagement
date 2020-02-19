@@ -327,7 +327,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                         long scheduled = count > 0 ? scheduledAndApproveActivityCount[0] : count;
                         long available = (count - scheduledAndApproveActivityCount[0]) > 0 ? count - scheduledAndApproveActivityCount[0] : 0;
                         long approved = count > 0 ? scheduledAndApproveActivityCount[1] : count;
-                        intervalBalances.add(new IntervalBalance(count, scheduled, available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), approved));
+                            if(count!=0) {
+                                intervalBalances.add(new IntervalBalance(count, scheduled, available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), approved));
+                            }
                     }
                 }
                 startDate = startDate.plusDays(1);
@@ -399,7 +401,7 @@ public class WorkTimeAgreementBalancesCalculationService {
                         }
                     }
                     float available = vetoAndStopBricksWTATemplate.getTotalBlockingPoints() - scheduledActivityCount;
-                    intervalBalances.add(new IntervalBalance(vetoAndStopBricksWTATemplate.getTotalBlockingPoints(), scheduledActivityCount, available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), approveActivityCount));
+                        intervalBalances.add(new IntervalBalance(vetoAndStopBricksWTATemplate.getTotalBlockingPoints(), scheduledActivityCount, available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), approveActivityCount));
                 }
                 startDate = startDate.plusDays(1);
             }
@@ -438,7 +440,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                             ActivityCutOffCount activityLeaveCount = seniorDaysPerYearWTATemplate.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(dateTimeInterval.getStartLocalDate())).findFirst().orElse(new ActivityCutOffCount());
                             int total = careDays.getLeavesAllowed() + activityLeaveCount.getTransferLeaveCount();
                             int available = (careDays.getLeavesAllowed() + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - scheduledAndApproveActivityCount[0];
-                            intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
+                            if(total !=0 && available!=0) {
+                                intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
+                            }
                         }
                     }
                 }
@@ -477,7 +481,9 @@ public class WorkTimeAgreementBalancesCalculationService {
                         ActivityCutOffCount activityLeaveCount = childCareDaysCheckWTATemplate.getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(dateTimeInterval.getStartLocalDate())).findFirst().orElse(new ActivityCutOffCount());
                         long total = totalLeaves + activityLeaveCount.getTransferLeaveCount();
                         long available = (totalLeaves + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - scheduledAndApproveActivityCount[0];
-                        intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
+                        if (total != 0 && available != 0) {
+                            intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
+                        }
                     }
                 }
                 startDate = startDate.plusDays(1);
@@ -514,7 +520,7 @@ public class WorkTimeAgreementBalancesCalculationService {
                         ActivityCutOffCount activityLeaveCount = wtaForCareDays.getCareDayCounts().get(0).getActivityCutOffCounts().stream().filter(activityCutOffCount -> new DateTimeInterval(activityCutOffCount.getStartDate(), activityCutOffCount.getEndDate()).contains(dateTimeInterval.getStartLocalDate())).findFirst().orElse(new ActivityCutOffCount());
                         int total = activityLeaveCount.getCount() + activityLeaveCount.getTransferLeaveCount();
                         int available = (activityLeaveCount.getCount() + activityLeaveCount.getTransferLeaveCount() - activityLeaveCount.getBorrowLeaveCount()) - scheduledAndApproveActivityCount[0];
-                        intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
+                            intervalBalances.add(new IntervalBalance(total, scheduledAndApproveActivityCount[0], available, dateTimeInterval.getStartLocalDate(), dateTimeInterval.getEndLocalDate().minusDays(1), scheduledAndApproveActivityCount[1]));
                     }
                 }
                 startDate = startDate.plusDays(1);
