@@ -7,6 +7,7 @@ import org.springframework.cloud.gateway.discovery.DiscoveryClientRouteDefinitio
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
