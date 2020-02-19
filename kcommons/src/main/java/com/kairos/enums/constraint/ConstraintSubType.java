@@ -14,6 +14,7 @@ public enum ConstraintSubType {
     MINIMUM_LENGTH_OF_ACTIVITY("Minimum Length of Activity"),
     ACTIVITY_REQUIRED_TAG("Activity Required Tag"),
     PRESENCE_AND_ABSENCE_SAME_TIME("Presence and Absence at same time"),
+    MAX_SHIFT_OF_STAFF("Maximum shift of staff"),
 
     //For Shifts
 
