@@ -9,6 +9,7 @@ import com.kairos.shiftplanning.constraints.activityConstraint.CountryHolidayCal
 import com.kairos.shiftplanning.constraints.activityConstraint.DayType;
 import com.kairos.shiftplanning.domain.activity.Activity;
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
+import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.shift.Shift;
 import com.kairos.shiftplanning.domain.shift.ShiftBreak;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
@@ -623,6 +624,32 @@ public class ShiftPlanningUtility {
         //to add last one
         mergedIntervals.add(mergedInterval);
         return mergedIntervals;
+    }
+
+    public static List<ShiftActivity> getMergedShiftActivitys(List<ActivityLineInterval> intervals) {
+        if (intervals.size() == 0) {
+            return new ArrayList<>();
+        }
+        List<ShiftActivity> shiftActivities = new ArrayList<>();
+        intervals.sort(Comparator.comparing(ActivityLineInterval::getStart));
+        ShiftActivity shiftActivity = intervals.get(0).getShiftActivity();
+        String id = intervals.get(0).getActivity().getId();
+        for (ActivityLineInterval ali : intervals) {
+            if (shiftActivity.getInterval().getEnd().equals(ali.getStart()) && id.equals(ali.getActivity().getId())) {
+                shiftActivity.setEndTime(ali.getEnd());
+            } else if (shiftActivity.getEndTime().equals(ali.getStart()) && !id.equals(ali.getActivity().getId())) {
+                shiftActivities.add(shiftActivity);
+                shiftActivity = ali.getShiftActivity();
+                id = ali.getActivity().getId();
+            } else if (shiftActivity.getEndTime().isBefore(ali.getStart())) {
+                shiftActivities.add(shiftActivity);
+                shiftActivity = ali.getShiftActivity();
+                id = ali.getActivity().getId();
+            }
+        }
+        //to add last one
+        shiftActivities.add(shiftActivity);
+        return shiftActivities;
     }
 
     public static int getMinutes(DateTime start, DateTime end) {

@@ -2,10 +2,12 @@ package com.kairos.shiftplanning.listeners;
 
 import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.shift.ShiftImp;
+import com.kairos.shiftplanning.utils.ShiftPlanningUtility;
 import org.joda.time.DateTime;
 import org.optaplanner.core.impl.domain.variable.listener.VariableListener;
 import org.optaplanner.core.impl.score.director.ScoreDirector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
@@ -45,10 +47,12 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
         if(shiftImp.getActivityLineIntervals().isEmpty()){
             scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
             shiftImp.setStartTime(null);
+            shiftImp.setShiftActivities(new ArrayList<>());
             scoreDirector.afterVariableChanged(shiftImp, START_TIME);
             shiftImp.setEndTime(null);
             return;
         }
+        shiftImp.setShiftActivities(ShiftPlanningUtility.getMergedShiftActivitys(shiftImp.getActivityLineIntervals()));
         DateTime[] startAndEnd=getEarliestStartAndLatestEnd(shiftImp.getActivityLineIntervals());
         scoreDirector.beforeVariableChanged(shiftImp, START_TIME);
         shiftImp.setStartTime(startAndEnd[0].toLocalTime());
