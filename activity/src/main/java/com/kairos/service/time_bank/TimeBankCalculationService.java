@@ -323,7 +323,7 @@ public class TimeBankCalculationService {
         return valid;
     }
 
-    private boolean isPublicHolidayValid(Date shiftDate, boolean valid, DayTypeDTO dayTypeDTO) {
+    public boolean isPublicHolidayValid(Date shiftDate, boolean valid, DayTypeDTO dayTypeDTO) {
         for (CountryHolidayCalenderDTO countryHolidayCalenderDTO : dayTypeDTO.getCountryHolidayCalenderData()) {
             DateTimeInterval dateTimeInterval;
             if (dayTypeDTO.isAllowTimeSettings()) {

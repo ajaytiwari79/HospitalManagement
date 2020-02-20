@@ -19,6 +19,7 @@ import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.staff.StaffFilterDTO;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.*;
+import com.kairos.enums.cta.AccountType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.access_permission.AccessPage;
 import com.kairos.persistence.model.access_permission.query_result.AccessGroupStaffQueryResult;
@@ -131,6 +132,7 @@ public class StaffFilterService {
     @Inject
     private UnitService unitService;
 
+
     public FiltersAndFavouriteFiltersDTO getAllAndFavouriteFilters(String moduleId, Long unitId) {
 
         return getAllAndFavouriteFiltersFromParent(moduleId, unitId);
@@ -218,6 +220,8 @@ public class StaffFilterService {
                 return dtoToQueryesultConverter(SkillLevel.getListOfSkillLevelForFilters(), objectMapper);
             case ACCESS_GROUPS:
                 return unitService.getAllAccessGroupByUnitIdForFilter(unitId);
+            case CTA_ACCOUNT_TYPE:
+                return getCTAAccounts();
             /*case WTA_RULES:
                 return getWTARules(staffFilterDataDTO.getWtadtos());
             case CTA_RULES:
@@ -244,6 +248,10 @@ public class StaffFilterService {
     private List<FilterSelectionQueryResult> getGroups(Long unitId) {
         List<GroupDTO> groups = groupService.getAllGroupsOfUnit(unitId);
         return groups.stream().map(group  -> new FilterSelectionQueryResult(group.getId().toString(),group.getName())).collect(Collectors.toList());
+    }
+
+    private List<FilterSelectionQueryResult> getCTAAccounts() {
+        return Arrays.stream(AccountType.values()).map(accountType -> new FilterSelectionQueryResult(accountType.name(),accountType.toString())).collect(Collectors.toList());
     }
 
     private List<FilterSelectionQueryResult> getTAStatus(){
@@ -479,6 +487,7 @@ public class StaffFilterService {
     }
 
     private <T> List<Map> getFilteredStaffs(List<Map> staffListMap, FilterType filterType, Map<FilterType, Set<T>> filterData){
+
         Map ageRangeMap = (Map) filterData.get(filterType).iterator().next();
         final AgeRangeDTO ageRange = new AgeRangeDTO(Integer.parseInt(ageRangeMap.get(FROM.toLowerCase()).toString()), isNotNull(ageRangeMap.get(TO.toLowerCase())) ? Integer.parseInt(ageRangeMap.get(TO.toLowerCase()).toString()) : null, isNull(ageRangeMap.get(DURATION_TYPE)) ? DurationType.DAYS : DurationType.valueOf(ageRangeMap.get(DURATION_TYPE).toString()));
         switch (filterType){
