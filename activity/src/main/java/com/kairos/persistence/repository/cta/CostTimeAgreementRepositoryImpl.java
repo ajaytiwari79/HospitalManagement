@@ -115,7 +115,6 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public List<CTAResponseDTO> getCTAByUpIds(Set<Long> employmentIds) {
         Query query = new Query(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds));
-        query.fields().include("name").include(DESCRIPTION).include(EMPLOYMENT_ID).include(START_DATE).include(END_DATE).include(PARENT_ID).include(ORGANIZATION_PARENT_ID);
         return ObjectMapperUtils.copyPropertiesOfCollectionByMapper(mongoTemplate.find(query,CostTimeAgreement.class),CTAResponseDTO.class);
     }
 
@@ -208,7 +207,8 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     @Override
     public List<CTAResponseDTO> getCTAByEmploymentIds(List<Long> employmentIds, Date date) {
-        Criteria criteria = Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date));
+
+        Criteria criteria = date==null?(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds)):(Criteria.where(DELETED).is(false).and(EMPLOYMENT_ID).in(employmentIds).orOperator(Criteria.where(START_DATE).lte(date).and(END_DATE).gte(date),Criteria.where(END_DATE).exists(false).and(START_DATE).lte(date)));
         Aggregation aggregation = Aggregation.newAggregation(
                 match(criteria),
                 lookup(C_TA_RULE_TEMPLATE, RULE_TEMPLATE_IDS, "_id", RULE_TEMPLATES),
