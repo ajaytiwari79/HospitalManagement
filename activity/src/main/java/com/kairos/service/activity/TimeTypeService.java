@@ -325,9 +325,11 @@ public class TimeTypeService extends MongoBaseService {
         TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, PRESENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.PRESENCE, countryId, Collections.EMPTY_SET);
         TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, ABSENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.ABSENCE, countryId, Collections.EMPTY_SET);
         TimeType breakTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR, PAID_BREAK, countryId, Collections.EMPTY_SET);
+        TimeType sickTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Sickness", "", AppConstants.WORKING_TYPE_COLOR, PAID_BREAK, countryId, Collections.EMPTY_SET);
         workingTimeTypes.add(presenceTimeType);
         workingTimeTypes.add(absenceTimeType);
         workingTimeTypes.add(breakTimeType);
+        workingTimeTypes.add(sickTimeType);
 
         List<TimeType> nonWorkingTimeTypes = new ArrayList<>();
         TimeType volunteerTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Volunteer Time", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.EMPTY_SET);

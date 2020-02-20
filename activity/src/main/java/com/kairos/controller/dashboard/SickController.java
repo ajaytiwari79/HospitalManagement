@@ -35,9 +35,9 @@ public class SickController {
     @ApiOperation("API is used to call the user as fine")
     @GetMapping("/fine")
     public ResponseEntity<Map<String, Object>> markUserAsFine(@RequestParam(value = "unitId", required = false) Long unitId,
-                                                              @RequestParam Long employmentId,
+                                                              @RequestParam Long staffId,
                                                               @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate) {
-        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.markUserAsFine(employmentId, unitId,startDate));
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, sickService.markUserAsFine(staffId, unitId,startDate));
     }
 
     @ApiOperation("API is used to call the user as fine")

@@ -96,6 +96,7 @@ import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.*;
 import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.enums.TimeTypeEnum.GAP;
+import static com.kairos.enums.TimeTypeEnum.PLANNED_SICK_ON_FREE_DAYS;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.getValidDays;
 import static com.kairos.utils.worktimeagreement.RuletemplateUtils.setDayTypeToCTARuleTemplate;
 
@@ -400,7 +401,10 @@ public class ShiftService extends MongoBaseService {
         for (ShiftActivity shiftActivity : shift.getActivities()) {
             Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
             TimeTypeEnum timeTypeEnum = activity.getBalanceSettingsActivityTab().getTimeType();
-            if (TimeTypeEnum.PRESENCE.equals(timeTypeEnum)) {
+            if(PLANNED_SICK_ON_FREE_DAYS.equals(timeTypeEnum)){
+                shiftType=ShiftType.SICK;
+            }
+           else if (TimeTypeEnum.PRESENCE.equals(timeTypeEnum)) {
                 shiftType = ShiftType.PRESENCE;
                 break;
             } else if (TimeTypeEnum.ABSENCE.equals(timeTypeEnum)) {
@@ -409,7 +413,8 @@ public class ShiftService extends MongoBaseService {
                 }else {
                     shiftType = ShiftType.ABSENCE;
                 }
-            } else if (isNull(shiftType)) {
+            }
+           else if (isNull(shiftType)) {
                 shiftType = ShiftType.NON_WORKING;
             }
         }

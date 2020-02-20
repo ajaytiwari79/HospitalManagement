@@ -59,15 +59,15 @@ public class SickService {
         return userSickDataWrapper;
     }
 
-    public Map<String, Long> markUserAsFine(Long employmentId, Long unitId, LocalDate startDate) {
+    public Map<String, Long> markUserAsFine(Long staffId, Long unitId, LocalDate startDate) {
         Map<String, Long> response = new HashMap<>();
-        if (isNull(unitId) || isNull(employmentId)) {
+        if (isNull(unitId) || isNull(staffId)) {
             exceptionService.actionNotPermittedException(ERROR_EMPTY_STAFF_OR_UNIT_SETTING);
         }
-        shiftSickService.disableSicknessShiftsOfStaff(employmentId, unitId,startDate);
-        sickSettingsRepository.markUserAsFine(employmentId, unitId);  //set end date of user sick table.
+        shiftSickService.disableSicknessShiftsOfStaff(staffId, unitId,startDate);
+        sickSettingsRepository.markUserAsFine(staffId, unitId);  //set end date of user sick table.
         response.put("unitId", unitId);
-        response.put("employmentId", employmentId);
+        response.put("staffId", staffId);
         return response;
     }
 

@@ -5,6 +5,7 @@ import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftWithActivityDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeDTO;
 import com.kairos.dto.user.reason_code.ReasonCodeWrapper;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.enums.shift.TodoStatus;
 import com.kairos.persistence.model.activity.Activity;
@@ -65,22 +66,22 @@ public class ShiftDetailsService extends MongoBaseService {
     @Inject
     private ActivityMongoRepository activityMongoRepository;
 
-    public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds , boolean showDraft) {
+    public List<ShiftWithActivityDTO> shiftDetailsById(Long unitId, List<BigInteger> shiftIds, boolean showDraft) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS;
-        if(showDraft){
-            List<ShiftWithActivityDTO> originalShift=shiftMongoRepository.findAllShiftsByIds(shiftIds);
-            Map<BigInteger,Boolean>  shiftIdAndOriginalShiftMap=originalShift.stream().collect(Collectors.toMap(k->k.getId(),v-> (!v.isDraft() && isNotNull(v.getDraftShift()))));
-            shiftWithActivityDTOS  = new ArrayList<>(shiftMongoRepository.findAllDraftShiftsByIds(shiftIds,showDraft));
+        if (showDraft) {
+            List<ShiftWithActivityDTO> originalShift = shiftMongoRepository.findAllShiftsByIds(shiftIds);
+            Map<BigInteger, Boolean> shiftIdAndOriginalShiftMap = originalShift.stream().collect(Collectors.toMap(k -> k.getId(), v -> (!v.isDraft() && isNotNull(v.getDraftShift()))));
+            shiftWithActivityDTOS = new ArrayList<>(shiftMongoRepository.findAllDraftShiftsByIds(shiftIds, showDraft));
             shiftWithActivityDTOS.stream().forEach(shiftWithActivityDTO -> shiftWithActivityDTO.setHasOriginalShift(shiftIdAndOriginalShiftMap.get(shiftWithActivityDTO.getId())));
-            List<BigInteger> draftShiftIds=shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList());
+            List<BigInteger> draftShiftIds = shiftWithActivityDTOS.stream().map(shiftWithActivityDTO -> shiftWithActivityDTO.getId()).collect(Collectors.toList());
             shiftIds.removeAll(draftShiftIds);
-            if(isCollectionNotEmpty(shiftIds)){
+            if (isCollectionNotEmpty(shiftIds)) {
                 shiftWithActivityDTOS.addAll(shiftMongoRepository.findAllShiftsByIds(shiftIds));
             }
-        }else {
+        } else {
             shiftWithActivityDTOS = shiftMongoRepository.findAllShiftsByIds(shiftIds);
         }
-        setReasonCodeAndRuleViolationsInShifts(shiftWithActivityDTOS, unitId, shiftIds,showDraft);
+        setReasonCodeAndRuleViolationsInShifts(shiftWithActivityDTOS, unitId, shiftIds, showDraft);
         return shiftWithActivityDTOS;
     }
 
@@ -88,9 +89,9 @@ public class ShiftDetailsService extends MongoBaseService {
         shiftMongoRepository.updateRemarkInShiftActivity(shiftActivityId, shiftActivityDTO.getRemarks());
         Shift shift = shiftMongoRepository.findShiftByShiftActivityId(shiftActivityId);
         List<ShiftActivity> activities = shift.getActivities();
-        for(ShiftActivity activity:activities){
-            if(activity.getId().equals(shiftActivityId)){
-                Todo todo=todoRepository.findTodoBySubEntityId(activity.getActivityId(),shift.getId(),newHashSet(TodoStatus.PENDING,TodoStatus.VIEWED,TodoStatus.REQUESTED));
+        for (ShiftActivity activity : activities) {
+            if (activity.getId().equals(shiftActivityId)) {
+                Todo todo = todoRepository.findTodoBySubEntityId(activity.getActivityId(), shift.getId(), newHashSet(TodoStatus.PENDING, TodoStatus.VIEWED, TodoStatus.REQUESTED));
                 todo.setRemark(shiftActivityDTO.getRemarks());
                 todoRepository.save(todo);
             }
@@ -99,9 +100,9 @@ public class ShiftDetailsService extends MongoBaseService {
         return true;
     }
 
-    private void setReasonCodeAndRuleViolationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds ,boolean showDraft) {
+    private void setReasonCodeAndRuleViolationsInShifts(List<ShiftWithActivityDTO> shiftWithActivityDTOS, Long unitId, List<BigInteger> shiftIds, boolean showDraft) {
         ReasonCodeWrapper reasonCodeWrapper = findReasonCodes(shiftWithActivityDTOS, unitId);
-        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = findAllShiftViolatedRules(shiftIds,showDraft);
+        Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = findAllShiftViolatedRules(shiftIds, showDraft);
         Map<Long, ReasonCodeDTO> reasonCodeDTOMap = reasonCodeWrapper.getReasonCodes().stream().collect(toMap(ReasonCodeDTO::getId, Function.identity()));
         for (ShiftWithActivityDTO shift : shiftWithActivityDTOS) {
             for (ShiftActivityDTO shiftActivityDTO : shift.getActivities()) {
@@ -110,7 +111,7 @@ public class ShiftDetailsService extends MongoBaseService {
                 }
                 shiftActivityDTO.setLocation(reasonCodeWrapper.getContactAddressData());
             }
-            if(shiftViolatedRulesMap.containsKey(shift.getId())) {
+            if (shiftViolatedRulesMap.containsKey(shift.getId())) {
                 shift.setWtaRuleViolations(shiftViolatedRulesMap.get(shift.getId()).getWorkTimeAgreements());
             }
         }
@@ -119,17 +120,17 @@ public class ShiftDetailsService extends MongoBaseService {
     private Map<BigInteger, ShiftViolatedRules> findAllShiftViolatedRules(List<BigInteger> shiftIds, boolean showDraft) {
         Map<BigInteger, ShiftViolatedRules> shiftViolatedRulesMap = new HashMap<>();
         List<ShiftViolatedRules> shiftViolatedRules = shiftViolatedRulesMongoRepository.findAllViolatedRulesByShiftIds(shiftIds);
-        Map<BigInteger,ShiftViolatedRules> draftShiftViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isDraft).collect(Collectors.toMap(ShiftViolatedRules::getShiftId,Function.identity()));
-        Map<BigInteger,ShiftViolatedRules> originalShiftViolatedRules = shiftViolatedRules.stream().filter(shiftViolatedRule -> !shiftViolatedRule.isDraft()).collect(Collectors.toMap(ShiftViolatedRules::getShiftId,Function.identity()));
-        if(showDraft){
+        Map<BigInteger, ShiftViolatedRules> draftShiftViolatedRules = shiftViolatedRules.stream().filter(ShiftViolatedRules::isDraft).collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
+        Map<BigInteger, ShiftViolatedRules> originalShiftViolatedRules = shiftViolatedRules.stream().filter(shiftViolatedRule -> !shiftViolatedRule.isDraft()).collect(Collectors.toMap(ShiftViolatedRules::getShiftId, Function.identity()));
+        if (showDraft) {
             for (BigInteger shiftId : originalShiftViolatedRules.keySet()) {
-                if(draftShiftViolatedRules.containsKey(shiftId)){
-                    shiftViolatedRulesMap.put(shiftId,draftShiftViolatedRules.get(shiftId));
-                }else{
-                    shiftViolatedRulesMap.put(shiftId,originalShiftViolatedRules.get(shiftId));
+                if (draftShiftViolatedRules.containsKey(shiftId)) {
+                    shiftViolatedRulesMap.put(shiftId, draftShiftViolatedRules.get(shiftId));
+                } else {
+                    shiftViolatedRulesMap.put(shiftId, originalShiftViolatedRules.get(shiftId));
                 }
             }
-        }else {
+        } else {
             shiftViolatedRulesMap = originalShiftViolatedRules;
         }
         return shiftViolatedRulesMap;
@@ -143,27 +144,27 @@ public class ShiftDetailsService extends MongoBaseService {
         return userIntegrationService.getUnitInfoAndReasonCodes(unitId, requestParam);
     }
 
-    public void setLayerInShifts(Map<LocalDate, List<ShiftDTO>> shiftsMap){
-        Set<BigInteger> activityIds=getAllActivityIds(shiftsMap);
-        List<ActivityWrapper> activityWrappers=activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
+    public void setLayerInShifts(Map<LocalDate, List<ShiftDTO>> shiftsMap) {
+        Set<BigInteger> activityIds = getAllActivityIds(shiftsMap);
+        List<ActivityWrapper> activityWrappers = activityMongoRepository.findActivitiesAndTimeTypeByActivityId(activityIds);
         Map<BigInteger, ActivityWrapper> activityWrapperMap = activityWrappers.stream().collect(Collectors.toMap(k -> k.getActivity().getId(), v -> v));
-        shiftsMap.forEach((date,shifts)->{
-            ShiftDTO sickShift=shifts.stream().filter(k->k.getShiftType().equals(SICK)).findAny().orElse(null);
-            if(sickShift!=null){
-                Activity activity=getWorkingSickActivity(sickShift,activityWrapperMap);
-                if(!activity.getRulesActivityTab().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()){
-                    shifts.removeAll(shifts.stream().filter(k->k.getActivities().stream().anyMatch(act->act.getStatus().contains(ShiftStatus.PUBLISH) && k.isDisabled())).collect(Collectors.toList()));
+        shiftsMap.forEach((date, shifts) -> {
+            ShiftDTO sickShift = shifts.stream().filter(k -> k.getShiftType().equals(SICK)).findAny().orElse(null);
+            if (sickShift != null) {
+                Activity activity = getWorkingSickActivity(sickShift, activityWrapperMap);
+                if (!activity.getRulesActivityTab().getSicknessSetting().isShowAslayerOnTopOfPublishedShift()) {
+                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> act.getStatus().contains(ShiftStatus.PUBLISH) && k.isDisabled())).collect(Collectors.toList()));
                 }
-                if(!activity.getRulesActivityTab().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()){
-                    shifts.removeAll(shifts.stream().filter(k->k.getActivities().stream().anyMatch(act->!act.getStatus().contains(ShiftStatus.PUBLISH) && k.isDisabled())).collect(Collectors.toList()));
+                if (!activity.getRulesActivityTab().getSicknessSetting().isShowAslayerOnTopOfUnPublishedShift()) {
+                    shifts.removeAll(shifts.stream().filter(k -> k.getActivities().stream().anyMatch(act -> !act.getStatus().contains(ShiftStatus.PUBLISH) && k.isDisabled())).collect(Collectors.toList()));
                 }
             }
         });
     }
 
     public Set<BigInteger> getAllActivityIds(Map<LocalDate, List<ShiftDTO>> shiftsMap) {
-        Set<BigInteger> activityIds=new HashSet<>();
-        shiftsMap.forEach((date,shifts)->{
+        Set<BigInteger> activityIds = new HashSet<>();
+        shiftsMap.forEach((date, shifts) -> {
             shifts.forEach(shiftDTO -> {
                 activityIds.addAll(shiftDTO.getActivities().stream().map(ShiftActivityDTO::getActivityId).collect(Collectors.toSet()));
             });
@@ -171,14 +172,17 @@ public class ShiftDetailsService extends MongoBaseService {
         return activityIds;
     }
 
-    public Activity getWorkingSickActivity(ShiftDTO shift,Map<BigInteger, ActivityWrapper> activityWrapperMap){
-        Activity activity=null;
-            for (ShiftActivityDTO shiftActivity:shift.getActivities()){
-                if(activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getLabel().equals("Sickness")){
-                    return activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
-                }
+    public Activity getWorkingSickActivity(ShiftDTO shift, Map<BigInteger, ActivityWrapper> activityWrapperMap) {
+        Activity activity = null;
+        if (shift.getActivities().size() == 1) {
+            return activityWrapperMap.get(shift.getActivities().get(0).getActivityId()).getActivity();
+        }
+        for (ShiftActivityDTO shiftActivity : shift.getActivities()) {
+            if (activityWrapperMap.get(shiftActivity.getActivityId()).getTimeTypeInfo().getSecondLevelType().equals(TimeTypeEnum.SICK)) {
+                return activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
             }
-            return activity;
+        }
+        return activity;
     }
 
 

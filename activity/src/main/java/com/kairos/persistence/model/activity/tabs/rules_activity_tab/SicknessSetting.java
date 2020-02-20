@@ -5,6 +5,7 @@ import com.kairos.enums.sickness.SickStaffNotApplicableFor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -17,7 +18,7 @@ public class SicknessSetting {
     private boolean validForChildCare;
     private boolean usedOnFreeDays;
     private boolean usedOnProtecedDaysOff;
-    private Set<SickStaffNotApplicableFor> sickStaffNotApplicableFor;
+    private Set<SickStaffNotApplicableFor> sickStaffNotApplicableFor=new HashSet<>();
     private boolean showAslayerOnTopOfPublishedShift;
     private boolean showAslayerOnTopOfUnPublishedShift;
     private ReplaceSickShift replaceSickShift;

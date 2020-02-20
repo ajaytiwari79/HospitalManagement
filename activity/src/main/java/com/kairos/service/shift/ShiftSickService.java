@@ -209,10 +209,10 @@ public class ShiftSickService extends MongoBaseService {
         return publishedShiftOverlayEnabled || unpublisedShiftOverlayEnabled;
     }
 
-    public void disableSicknessShiftsOfStaff(Long employmentId, Long unitId,LocalDate localDate) {
+    public void disableSicknessShiftsOfStaff(Long staffId, Long unitId,LocalDate localDate) {
         List<Activity> sicknessActivity = activityRepository.findAllSicknessActivity(unitId);
         Set<BigInteger> activityIds = sicknessActivity.stream().map(MongoBaseEntity::getId).collect(Collectors.toSet());
-        List<Shift> shifts = shiftMongoRepository.findAllSicknessShiftByEmploymentIdAndActivityIds(employmentId,activityIds,asDate(localDate));
+        List<Shift> shifts = shiftMongoRepository.findAllSicknessShiftByEmploymentIdAndActivityIds(staffId,activityIds,asDate(localDate));
         if(isCollectionEmpty(shifts)){
             exceptionService.dataNotFoundException("Data not found");
         }
