@@ -2,14 +2,12 @@ package com.kairos.persistence.model.user.employment.query_result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
-import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
 import com.kairos.dto.user.expertise.SeniorAndChildCareDaysDTO;
 import com.kairos.enums.EmploymentSubType;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
 import com.kairos.persistence.model.organization.Organization;
 import com.kairos.persistence.model.user.expertise.Expertise;
 import com.kairos.persistence.model.user.expertise.ProtectedDaysOffSetting;
-import com.kairos.persistence.model.user.expertise.response.ExpertiseQueryResult;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

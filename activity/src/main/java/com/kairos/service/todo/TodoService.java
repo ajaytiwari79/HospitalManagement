@@ -38,7 +38,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.SHIFT_NOT_EXISTS;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
-import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
 import static com.kairos.enums.shift.TodoStatus.*;
 import static org.apache.commons.collections.CollectionUtils.containsAny;
 
@@ -127,7 +126,6 @@ public class TodoService {
     private void updateStatusIfApprovalRequired(Map<BigInteger,ActivityWrapper> activityMap, ShiftActivity shiftActivity,Shift shift,StaffAdditionalInfoDTO staffAdditionalInfoDTO) {
         if (activityMap.containsKey(shiftActivity.getActivityId())) {
             shiftActivity.getStatus().add(ShiftStatus.APPROVE);
-            timeBankService.updateTimeBanOnApproveTimebankOFF(shiftActivity,shift.getEmploymentId(),activityMap,staffAdditionalInfoDTO);
         }
     }
 

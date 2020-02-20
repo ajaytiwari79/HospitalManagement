@@ -1,6 +1,5 @@
 package com.kairos.commons.audit_logging;
 
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.audit_logging.LoggingType;
 import de.danielbechler.diff.ObjectDifferBuilder;

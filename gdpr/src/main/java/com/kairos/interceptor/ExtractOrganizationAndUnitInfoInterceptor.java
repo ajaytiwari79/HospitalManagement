@@ -1,7 +1,6 @@
 package com.kairos.interceptor;
 
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +59,7 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         if (unitIdString != null) {
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.setUnitId(unitId);
-            UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
+            //UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
         }
 
         ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

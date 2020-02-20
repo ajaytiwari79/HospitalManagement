@@ -1,7 +1,6 @@
 package com.kairos.persistence.repository.wta;
 
 
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.persistence.model.wta.WorkingTimeAgreement;
 import com.kairos.persistence.repository.custom_repository.MongoBaseRepository;

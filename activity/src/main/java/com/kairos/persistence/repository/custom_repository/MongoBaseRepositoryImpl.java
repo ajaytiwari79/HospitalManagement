@@ -2,7 +2,6 @@ package com.kairos.persistence.repository.custom_repository;
 
 import com.kairos.commons.audit_logging.AuditLogging;
 import com.kairos.commons.utils.DateUtils;
-import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.common.UserInfo;
 import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.common.MongoBaseEntity;

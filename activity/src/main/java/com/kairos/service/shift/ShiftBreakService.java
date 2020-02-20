@@ -4,10 +4,8 @@ import com.kairos.commons.custom_exception.DataNotFoundByIdException;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.commons.utils.TimeInterval;
 import com.kairos.dto.activity.wta.templates.BreakAvailabilitySettings;
-import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotWrapper;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.enums.BreakAction;
 import com.kairos.persistence.model.activity.Activity;
 import com.kairos.persistence.model.activity.ActivityWrapper;
@@ -15,7 +13,6 @@ import com.kairos.persistence.model.break_settings.BreakSettings;
 import com.kairos.persistence.model.phase.Phase;
 import com.kairos.persistence.model.shift.Shift;
 import com.kairos.persistence.model.shift.ShiftActivity;
-import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.wta.templates.template_types.BreakWTATemplate;
 import com.kairos.persistence.repository.activity.ActivityMongoRepository;
 import com.kairos.persistence.repository.break_settings.BreakSettingMongoRepository;
@@ -40,8 +37,6 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.*;
 import static com.kairos.constants.AppConstants.ONE_HOUR_MINUTES;
 import static com.kairos.constants.AppConstants.TIME_AND_ATTENDANCE;
-import static com.kairos.dto.user.access_permission.AccessGroupRole.MANAGEMENT;
-import static com.kairos.enums.shift.ShiftEscalationReason.BREAK_NOT_HELD;
 
 /**
  * @author pradeep

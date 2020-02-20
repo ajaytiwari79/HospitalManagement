@@ -6,7 +6,6 @@ import com.kairos.dto.user.organization.union.SectorDTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.neo4j.ogm.annotation.typeconversion.DateLong;
 
 import java.util.Date;
 import java.util.List;

@@ -1,7 +1,6 @@
 package com.planner.controller.activity;
 
 import com.kairos.dto.activity.activity.ActivityConstraintDTO;
-import com.kairos.dto.planner.constarints.country.CountryConstraintDTO;
 import com.planner.commonUtil.ResponseHandler;
 import com.planner.service.constraint.activity.ActivityConstraintService;
 import io.swagger.annotations.ApiOperation;
@@ -13,7 +12,6 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigInteger;
 import java.util.Map;
-
 
 import static com.planner.constants.ApiConstants.API_UNIT_URL;
 

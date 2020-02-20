@@ -33,11 +33,9 @@ import java.time.ZoneId;
 import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.*;
-import static com.kairos.commons.utils.DateUtils.substractDurationInLocalDateTime;
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
 import static com.kairos.service.period.PlanningPeriodService.SCHEDULER_PANEL;
-import static java.util.Comparator.comparing;
 
 @Service
 public class ActivitySchedulerJobService extends MongoBaseService {

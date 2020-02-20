@@ -5,7 +5,6 @@ import com.kairos.shiftplanning.domain.activity.ActivityLineInterval;
 import com.kairos.shiftplanning.domain.activity.ShiftActivity;
 import com.kairos.shiftplanning.domain.staff.Employee;
 import com.kairos.shiftplanning.domain.staff.IndirectActivity;
-import com.kairos.shiftplanning.domain.unit.Unit;
 import com.kairos.shiftplanning.listeners.ShiftStartTimeListener;
 import com.kairos.shiftplanning.utils.JodaLocalDateConverter;
 import com.kairos.shiftplanning.utils.JodaLocalTimeConverter;

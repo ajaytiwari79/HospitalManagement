@@ -7,11 +7,8 @@ import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
-
-import static com.kairos.dto.activity.counter.enums.XAxisConfig.HOURS;
 
 @Service
 public class WeeklyEmploymentHoursKPIService {

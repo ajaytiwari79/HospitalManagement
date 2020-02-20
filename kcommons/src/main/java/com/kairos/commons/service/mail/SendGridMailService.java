@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import static com.kairos.commons.utils.ObjectUtils.isMapNotEmpty;
+import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.constants.CommonConstants.*;
 
 
@@ -80,6 +81,11 @@ public class SendGridMailService implements EmailService{
      */
     public void sendMailWithSendGrid(String templateName,Map<String,Object> templateParam,String body, String subject, String... receiver) {
         Mail mail = getMail(templateName, templateParam, body, subject, receiver);
+        sendMailBySendGrid(mail);
+
+    }
+
+    private void sendMailBySendGrid(Mail mail) {
         SendGrid sendGrid = new SendGrid(SEND_GRID_API_KEY);
         Request request = new Request();
         try {
@@ -91,7 +97,6 @@ public class SendGridMailService implements EmailService{
         } catch (IOException ex) {
             LOGGER.error("exception occured {}", ex);
         }
-
     }
 
 
@@ -133,14 +138,7 @@ public class SendGridMailService implements EmailService{
         if(StringUtils.isBlank(subject)){
             throw new InvalidRequestException("Subject should not be blank");
         }
-        Personalization personalization = new Personalization();
-        for (String receiver : receivers) {
-            if(StringUtils.isBlank(receiver) || StringUtils.containsWhitespace(receiver)){
-                LOGGER.info("Receiver is {}",receiver);
-                throw new InvalidRequestException("Receiver E-mail id is not correct");
-            }
-            personalization.addTo(new Email(receiver));
-        }
+        Personalization personalization = getPersonalization(receivers);
         Email from=new Email(NO_REPLY_EMAIL);
         Content content= getContent(templateName,templateParam,body);
         Mail mail = new Mail();
@@ -149,6 +147,18 @@ public class SendGridMailService implements EmailService{
         mail.addContent(content);
         mail.addPersonalization(personalization);
         return mail;
+    }
+
+    private Personalization getPersonalization(String[] receivers) {
+        Personalization personalization = new Personalization();
+        for (String receiver : receivers) {
+            if(StringUtils.isBlank(receiver) || StringUtils.containsWhitespace(receiver)){
+                LOGGER.info("Receiver is {}",receiver);
+                throw new InvalidRequestException("Receiver E-mail id is not correct");
+            }
+            personalization.addTo(new Email(receiver));
+        }
+        return personalization;
     }
 
     private Content getContent(String templateName,Map<String,Object> templateParam,String body){
@@ -201,7 +211,14 @@ public class SendGridMailService implements EmailService{
     }
 
     @Override
-    public void sendMail(String from, String to, String subject, String htmlBody, String textBody) {
-      throw new NotImplementedException("This has not been implemented yet ");
+    public void sendMail(String from, String subject, String htmlBody, String textBody,String... to) {
+        Email fromEmail=new Email(isNull(from) ? NO_REPLY_EMAIL : from);
+        Content content= new Content(HTML_CONTENT_TYPE,htmlBody);
+        Mail mail = new Mail();
+        mail.setSubject(subject);
+        mail.setFrom(fromEmail);
+        mail.addContent(content);
+        mail.addPersonalization(getPersonalization(to));
+        sendMailBySendGrid(mail);
     }
 }

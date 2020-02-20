@@ -5,7 +5,6 @@ import com.kairos.persistence.model.task.TaskReport;
 import com.kairos.repositories.task_type.TaskReportMongoRepository;
 import com.kairos.services.MongoBaseService;
 import com.kairos.utils.external_plateform_shift.TaskReportWrapper;
-import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

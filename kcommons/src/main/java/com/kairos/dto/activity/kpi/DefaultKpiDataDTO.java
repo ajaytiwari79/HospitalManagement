@@ -3,7 +3,6 @@ package com.kairos.dto.activity.kpi;
 import com.kairos.commons.utils.DateTimeInterval;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
 import com.kairos.dto.user.country.agreement.cta.cta_response.DayTypeDTO;
-import com.kairos.dto.user.country.basic_details.CountryHolidayCalender;
 import com.kairos.dto.user.country.tag.TagDTO;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
 import com.kairos.dto.user.organization.OrganizationCommonDTO;

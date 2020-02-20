@@ -3,8 +3,6 @@ package com.kairos.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kairos.dto.kpermissions.ModelDTO;
 import com.kairos.service.kpermissions.PermissionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 import java.util.ArrayList;

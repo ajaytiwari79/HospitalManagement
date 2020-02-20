@@ -10,7 +10,6 @@ import com.kairos.dto.activity.common.StaffFilterDataDTO;
 import com.kairos.dto.activity.cta.CTAResponseDTO;
 import com.kairos.dto.activity.presence_type.PresenceTypeDTO;
 import com.kairos.dto.activity.time_type.TimeTypeDTO;
-import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
@@ -70,8 +69,8 @@ import static com.kairos.constants.AppConstants.*;
 import static com.kairos.constants.CommonConstants.FULL_DAY_CALCULATION;
 import static com.kairos.constants.CommonConstants.FULL_WEEK;
 import static com.kairos.constants.UserMessagesConstants.*;
-import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.FilterType.PAY_GRADE_LEVEL;
+import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.shift.ShiftStatus.*;
 
 /**
@@ -531,9 +530,11 @@ public class StaffFilterService {
         for (Map employment : employments) {
             for (Map employmentLines : (List<Map>) employment.get(EMPLOYMENT_LINES)) {
                 for (Map payGrades : (List<Map>) employmentLines.get(PAY_GRADES)) {
-                    long payGradeLevel = Long.valueOf(payGrades.get(PAY_GRADE_LEVEL).toString());
-                    if(from <= payGradeLevel && to >= payGradeLevel){
-                        return true;
+                    if(payGrades.containsKey(AppConstants.PAY_GRADE_LEVEL)) {
+                        long payGradeLevel = Long.valueOf(payGrades.get(AppConstants.PAY_GRADE_LEVEL).toString());
+                        if (from <= payGradeLevel && to >= payGradeLevel) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -544,7 +545,7 @@ public class StaffFilterService {
     private boolean validateSeniority(List<Map> expertiseList, AgeRangeDTO expertiseRange) {
         for (Map map : expertiseList) {
             if(map.containsKey(EXPERTISE_START_DATE_IN_MILLIS) && isNotNull(map.get(EXPERTISE_START_DATE_IN_MILLIS))) {
-                Date expertiseStartDate = new Date(Long.getLong(map.get(EXPERTISE_START_DATE_IN_MILLIS).toString()));
+                Date expertiseStartDate = new Date(Long.valueOf(map.get(EXPERTISE_START_DATE_IN_MILLIS).toString()));
                 if (validate(asLocalDate(expertiseStartDate), getCurrentLocalDate(), expertiseRange)) {
                     return true;
                 }

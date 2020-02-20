@@ -1,6 +1,5 @@
 package com.kairos.persistence.model.user.expertise;
 
-import com.kairos.commons.utils.ObjectUtils;
 import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.persistence.model.pay_table.PayGrade;
 import lombok.Getter;
@@ -13,7 +12,6 @@ import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import static com.kairos.commons.utils.ObjectUtils.isEquals;
 import static com.kairos.persistence.model.constants.RelationshipConstants.HAS_BASE_PAY_GRADE;
 
 /**
