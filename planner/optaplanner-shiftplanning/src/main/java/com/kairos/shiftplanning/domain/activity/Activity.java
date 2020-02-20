@@ -83,6 +83,10 @@ public class Activity {
         return constraintMap.get(constraintSubType).checkConstraints(this,shift);
     }
 
+    public int checkActivityConstraints(List<ShiftImp> shifts, ConstraintSubType constraintSubType) {
+        return constraintMap.get(constraintSubType).checkConstraints(this,shifts);
+    }
+
 
     public void breakActivityContraints(ShiftImp shift, HardMediumSoftLongScoreHolder scoreHolder, RuleContext kContext, int constraintPenality, ConstraintSubType constraintSubType) {
         log.debug("breaking Activity constraint: {}",constraintSubType);
