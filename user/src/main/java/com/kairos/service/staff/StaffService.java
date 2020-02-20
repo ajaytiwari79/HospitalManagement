@@ -1127,4 +1127,11 @@ public class StaffService {
     public Long getStaffIdByUserId(Long userId,Long parentOrganizationId){
         return staffGraphRepository.getStaffIdByUserId(userId,parentOrganizationId);
     }
+
+    public List<StaffEmploymentWithTag> getAllStaffForUnitWithEmploymentStatus(long unitId){
+        LocalDate localDate = LocalDate.now();
+       String dateToday = DateUtils.formatLocalDate(localDate,"dd-MM-yyyy");
+
+        return staffGraphRepository.getAllStaffForUnitWithEmploymentStatus(unitId,dateToday);
+    }
 }

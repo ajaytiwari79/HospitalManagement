@@ -11,6 +11,7 @@ import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.staff.PartialLeaveDTO;
 import com.kairos.persistence.model.staff.StaffSkillDTO;
 import com.kairos.persistence.model.staff.personal_details.Staff;
+import com.kairos.persistence.model.staff.personal_details.StaffEmploymentWithTag;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.staff.position.EmploymentAndPositionDTO;
 import com.kairos.persistence.model.staff.position.StaffPositionDetail;
@@ -659,5 +660,9 @@ public class StaffController {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getStaffsDataForPermissionByUnitId(unitId));
     }
 
-
+    @GetMapping(value = "/get_all_planning_staff")
+    @ApiOperation("Get all staff eligible for planning")
+    public List<StaffEmploymentWithTag>  getStaffEligibleForPlanning(@PathVariable Long unitId){
+        return staffService.getAllStaffForUnitWithEmploymentStatus(unitId);
+    }
 }

@@ -78,16 +78,12 @@ import static com.kairos.constants.ApiConstants.*;
 @Transactional
 public class UserIntegrationService {
 
-    private static GenericRestClient genericRestClient;
+    @Inject
+    private GenericRestClient genericRestClient;
     @Inject
     private ExceptionService exceptionService;
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
-
-    @Inject
-    public void setGenericRestClient(GenericRestClient genericRestClient) {
-        this.genericRestClient = genericRestClient;
-    }
 
     public Long getEmploymentId(Long unitId, Long staffId, Long expertiseId) {
         Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
@@ -908,7 +904,7 @@ public class UserIntegrationService {
         return genericRestClient.publishRequest(groupIds, unitId, RestClientUrlType.UNIT, HttpMethod.POST, "/groups", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<Long>>>() {});
     }
 
-    public static CurrentUserDetails getCurrentUser(){
+    public CurrentUserDetails getCurrentUser(){
         return genericRestClient.publishRequest(null, null, RestClientUrlType.ORGANIZATION, HttpMethod.GET, "/get_current_user", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<CurrentUserDetails>>() {});
     }
 
@@ -917,6 +913,10 @@ public class UserIntegrationService {
 //        queryParamList.add(new BasicNameValuePair("selectedDate", selectedDate.toString()));
 //        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
 //    }
+    public Set<StaffPersonalDetail> getAllPlanningStaffForUnit(long unitId){
+        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<StaffPersonalDetail>>>() {
+        });
+    }
 }
 
 

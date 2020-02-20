@@ -121,21 +121,15 @@ public class UserService {
     private OrganizationService organizationService;
     @Inject private UnitService unitService;
     @Inject private PermissionService permissionService;
-    private static UserGraphRepository userRepository;
+    @Inject
+    private  UserGraphRepository userRepository;
 
-    private static AccessPageService accessPageService;
+    @Inject
+    private AccessPageService accessPageService;
 
     @Inject
     private KMailService kMailService;
 
-    @Inject
-    public void setUserRepository(UserGraphRepository userRepository) {
-        UserService.userRepository = userRepository;
-    }
-    @Inject
-    public void setAccessPageService(AccessPageService accessPageService) {
-        UserService.accessPageService = accessPageService;
-    }
 
     /**
      * Calls UserGraphRepository,
@@ -677,7 +671,7 @@ public class UserService {
         return true;
     }
 
-    public static User getCurrentUser(){
+    public User getCurrentUser(){
         User user = null;
         if(isNotNull(UserContext.getUserDetails())) {
             user = userRepository.findOne(UserContext.getUserDetails().getId());
