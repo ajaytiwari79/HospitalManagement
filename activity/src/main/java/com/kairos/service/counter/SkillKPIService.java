@@ -82,26 +82,22 @@ public class SkillKPIService {
 
         for(StaffPersonalDetail staffPersonalDetail :staffPersonalDetails) {
             if (staffPersonalDetail.getId().equals(staffId)) {
-                    for (SkillLevelDTO skillLevelDTO : staffPersonalDetail.getSkills()) {
-                        if(isNotNull(skillLevelDTO.getEndDate())) {
-                            dateTimeInterval = new DateTimeInterval(skillLevelDTO.getStartDate(), skillLevelDTO.getEndDate());
-                            if (dateTimeInterval.containsInterval(dateTimeIntervalForMonth) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getStartLocalDate())) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getEndLocalDate()))) {
-                                count++;
-                            }
+                for (SkillLevelDTO skillLevelDTO : staffPersonalDetail.getSkills()) {
+                    if(isNotNull(skillLevelDTO.getEndDate())) {
+                        dateTimeInterval = new DateTimeInterval(skillLevelDTO.getStartDate(), skillLevelDTO.getEndDate());
+                        if (dateTimeInterval.containsInterval(dateTimeIntervalForMonth) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getStartLocalDate())) || dateTimeIntervalForMonth.containsAndEqualsEndDate(asDate(dateTimeInterval.getEndLocalDate()))) {
+                            count++;
                         }
-                        else if (ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
-                            if ((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
-                                count++;
-                            }
+                    }
+                    else if (ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
+                        if ((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
+                            count++;
                         }
                     }
                 }
             }
-      return count;
+        }
+        return count;
     }
-
-
-
-
 
 }
