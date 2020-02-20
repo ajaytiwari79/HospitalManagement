@@ -29,7 +29,7 @@ public class TimeBankBalanceFilter <G> implements ShiftFilter {
         if(validFilter){
             Map timeBankRangeMap = (Map) filterCriteriaMap.get(TIME_BANK_BALANCE).iterator().next();
             long from = Long.getLong(timeBankRangeMap.get("from").toString());
-            Long to = isNotNull(timeBankRangeMap.get("to")) ? Long.getLong(timeBankRangeMap.get("to").toString()) : null;
+            Long to = timeBankRangeMap.containsKey("to") ? Long.getLong(timeBankRangeMap.get("to").toString()) : null;
             for (ShiftDTO shiftDTO : shiftDTOS) {
                 if(from <= employmentIdAndActualTimeBankData.get(shiftDTO.getEmploymentId()) && isNull(to) || to >= employmentIdAndActualTimeBankData.get(shiftDTO.getEmploymentId())) {
                     filteredShifts.add((T) shiftDTO);
