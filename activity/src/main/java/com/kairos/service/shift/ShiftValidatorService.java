@@ -902,6 +902,11 @@ public class ShiftValidatorService {
         List<ShiftWithActivityDTO> overlappedShifts = shiftMongoRepository.findOverlappedShiftsByEmploymentId(byTandAPhase ?
                         shiftDTO.getShiftId() : shiftDTO.getId(), staffAdditionalInfoDTO.getId(), startDate,
                 endDate);
+        if(isCollectionNotEmpty(overlappedShifts)) {
+            if (ShiftType.ABSENCE.equals(overlappedShifts.get(0).getShiftType())) {
+                overlappedShifts.get(0).setEndDate(asDateEndOfDay(asLocalDate(overlappedShifts.get(0).getStartDate())));
+            }
+        }
         if (!CommonConstants.FULL_WEEK.equals(activityWrapper.getActivity().getTimeCalculationActivityTab().getMethodForCalculatingTime()) && isShiftOverlap(overlappedShifts, shiftInterval) && WORKING_TYPE.name().equals(activityWrapper.getTimeType()) && staffAdditionalInfoDTO.getUserAccessRoleDTO().getManagement()) {
             shiftOverlappedWithNonWorkingType = true;
         }
@@ -980,7 +985,7 @@ public class ShiftValidatorService {
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
-        if(isCollectionEmpty(shiftList)){
+        if(isCollectionEmpty(shiftList)||(ShiftType.ABSENCE.equals(shiftList.get(0).getShiftType())&&(isNotNull(shiftDTO.getShiftType())&&ShiftType.ABSENCE.equals(shiftDTO.getShiftType())))){
             absenceShiftExists =false;
         }
         if (absenceShiftExists) {
