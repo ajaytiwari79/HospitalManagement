@@ -22,7 +22,7 @@ public class AmazonSesEmailService implements EmailService {
 
 
     @Override
-    public void sendMail(@Null final String from, final String to, final String subject, final String htmlBody, final String textBody) {
+    public void sendMail(@Null final String from, final String subject, final String htmlBody, final String textBody,String... to) {
         SendEmailRequest request = new SendEmailRequest()
                 .withDestination(
                         new Destination().withToAddresses(to))

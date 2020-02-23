@@ -11,6 +11,7 @@ import lombok.Setter;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,7 +72,7 @@ public class ShiftWithActivityDTO extends ShiftDTO{
 
     public void setActivities(List<ShiftActivityDTO> activities) {
         if(isNotNull(activities)){
-            activities.sort((a1,a2)->a1.getStartDate().compareTo(a2.getStartDate()));
+            activities.sort(Comparator.comparing(ShiftActivityDTO::getStartDate));
             this.activities = activities;
             this.startDate = activities.get(0).getStartDate();
             this.endDate = activities.get(activities.size()-1).getEndDate();

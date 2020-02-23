@@ -54,13 +54,6 @@ public class ShiftStartTimeListener implements VariableListener<ShiftImp> {
         shiftImp.setStartTime(startAndEnd[0].toLocalTime());
         scoreDirector.afterVariableChanged(shiftImp, START_TIME);
         shiftImp.setEndTime(startAndEnd[1].toLocalTime());
-        /*if(new Interval(startAndEnd[0],startAndEnd[1]).toDuration().toStandardMinutes().getMinutes()!=ShiftPlanningUtility.getMinutesFromIntervals(shiftImp.getActivityLineIntervalsList())){
-            log.info("problematic");
-        }*/
-        //log.info("{} setting start and end as: {}--{}",shiftImp.getPrettyId(),startAndEnd[0],startAndEnd[1]);
-        /*if(shiftImp!=null && shiftImp.getActivityLineIntervalsList().size()==1 && shiftImp.getInterval().toDuration().getStandardMinutes()!=15l){
-            log.info("+++++++++++++++++++++++++"+ ShiftPlanningUtility.getIntervalAsString(shiftImp.getInterval()));
-        }*/
 
     }
     private DateTime[] getEarliestStartAndLatestEnd(List<ActivityLineInterval> activityLineIntervals){

@@ -61,7 +61,7 @@ dependencies {
     compile('redis.clients:jedis:2.9.0')
     compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.424'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.424'
-    compile('org.apache.commons:commons-lang3:3.0')
+    compile('org.apache.commons:commons-lang3:3.8')
     compile('org.springframework.cloud:spring-cloud-starter-oauth2')
     // swagger
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.6.1'

@@ -113,6 +113,7 @@ public class RuleTemplateSpecificInfo {
     }
 
     public ViolatedRulesDTO getViolatedRules() {
-        return violatedRules = Optional.ofNullable(this.violatedRules).orElse(new ViolatedRulesDTO());
+        this.violatedRules = isNullOrElse(violatedRules,new ViolatedRulesDTO());
+        return this.violatedRules;
     }
 }
