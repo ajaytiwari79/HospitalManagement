@@ -51,6 +51,16 @@ public class MongoBaseService {
         /**
          *  Set Id if entity don't have Id
          * */
+        updateEntityDetails(entity, className);
+        /**
+         *  Set updatedAt time as current time
+         * */
+        entity.setUpdatedAt(DateUtils.getDate());
+        mongoTemplate.save(entity);
+        return entity;
+    }
+
+    private <T extends MongoBaseEntity> void updateEntityDetails(@Valid T entity, String className) {
         if(entity.getId() == null){
             if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
                 //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
@@ -62,101 +72,20 @@ public class MongoBaseService {
         }else {
             entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
         }
-        /**
-         *  Set updatedAt time as current time
-         * */
-        entity.setUpdatedAt(DateUtils.getDate());
-        mongoTemplate.save(entity);
-        return entity;
     }
 
     @Deprecated
     public <T extends MongoBaseEntity> List<T> save(@Valid List<T> entities){
         Assert.notNull(entities, ENTITY_MUST_NOT_BE_NULL);
         Assert.notEmpty(entities, "Entity must not be Empty!");
-
         String collectionName = mongoTemplate.getCollectionName(entities.get(0).getClass());
-
-        /**
-         *  Creating BulkWriteOperation object
-         * */
-
         BulkWriteOperation bulkWriteOperation= database.getCollection(collectionName).initializeUnorderedBulkOperation();
-
-        /**
-         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
-         * */
         MongoConverter converter = mongoTemplate.getConverter();
-
         BasicDBObject dbObject;
-
-        /**
-         *  Handling bulk write exceptions
-         * */
         try{
-
             for (T entity: entities) {
-                /**
-                 *  Get class name for sequence class
-                 * */
-                String className = entity.getClass().getSimpleName();
-                /**
-                 *  Set updatedAt time as current time
-                 * */
-                entity.setUpdatedAt(DateUtils.getDate());
-
-
-                if(entity.getId() == null){
-                    entity.setCreatedAt(DateUtils.getDate());
-                    /**
-                     *  Set Id if entity don't have Id
-                     * */
-                    if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
-                        //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
-                        className = entity.getClass().getSuperclass().getSimpleName();
-                    }
-                    entity.setId(mongoSequenceRepository.nextSequence(className));
-                    entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
-                    dbObject = new BasicDBObject();
-
-                    /*
-                    *  Converting entity object to BasicDBObject
-                    * */
-                    converter.write(entity, dbObject);
-
-                    /*
-                    *  Adding entity (BasicDBObject)
-                    * */
-                    bulkWriteOperation.insert(dbObject);
-                }else {
-                    entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
-                    dbObject = new BasicDBObject();
-
-                    /*
-                    *  Converting entity object to BasicDBObject
-                    * */
-                    converter.write(entity, dbObject);
-
-                    /**
-                     *  Creating BasicDbObject for find query
-                     * */
-                    BasicDBObject query = new BasicDBObject();
-
-                    /**
-                     *  Adding query (find by ID)
-                     * */
-                    query.put("_id", dbObject.get("_id"));
-
-                    /**
-                     *  Replacing whole Object
-                     * */
-                    bulkWriteOperation.find(query).replaceOne(dbObject);
-                }
+                updateBulkWriteOperation(bulkWriteOperation, converter, entity);
             }
-
-            /**
-             * Executing the Operation
-             * */
             bulkWriteOperation.execute();
             return entities;
 
@@ -166,100 +95,45 @@ public class MongoBaseService {
         }
     }
 
-    @Deprecated
-    public <T extends MongoBaseEntity> Set<T> save(@Valid Set<T> entities){
-        Assert.notNull(entities, ENTITY_MUST_NOT_BE_NULL);
-        Assert.notEmpty(entities, "Entity must not be Empty!");
-
-        String collectionName = mongoTemplate.getCollectionName(entities.iterator().next().getClass());
-
+    private <T extends MongoBaseEntity> void updateBulkWriteOperation(BulkWriteOperation bulkWriteOperation, MongoConverter converter, T entity) {
         /**
-         *  Creating BulkWriteOperation object
+         *  Get class name for sequence class
          * */
-
-        BulkWriteOperation bulkWriteOperation= database.getCollection(collectionName).initializeUnorderedBulkOperation();
-
+        String className = entity.getClass().getSimpleName();
         /**
-         *  Creating MongoConverter object (We need converter to convert Entity Pojo to BasicDbObject)
+         *  Set updatedAt time as current time
          * */
-        MongoConverter converter = mongoTemplate.getConverter();
-
-        BasicDBObject dbObject;
-
-        /**
-         *  Handling bulk write exceptions
-         * */
-        try{
-
-            for (T entity: entities) {
-                /**
-                 *  Get class name for sequence class
-                 * */
-                String className = entity.getClass().getSimpleName();
-
-                /**
-                 *  Set updatedAt time as current time
-                 * */
-                entity.setUpdatedAt(DateUtils.getDate());
+        entity.setUpdatedAt(DateUtils.getDate());
 
 
-                if(entity.getId() == null){
-                    entity.setCreatedAt(DateUtils.getDate());
-                    /**
-                     *  Set Id if entity don't have Id
-                     * */
-                    if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
-                        //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
-                        className = entity.getClass().getSuperclass().getSimpleName();
-                    }
-                    entity.setId(mongoSequenceRepository.nextSequence(className));
-
-                    dbObject = new BasicDBObject();
-
-                    /*
-                     *  Converting entity object to BasicDBObject
-                     * */
-                    converter.write(entity, dbObject);
-
-                    /*
-                     *  Adding entity (BasicDBObject)
-                     * */
-                    bulkWriteOperation.insert(dbObject);
-                }else {
-
-                    dbObject = new BasicDBObject();
-
-                    /*
-                     *  Converting entity object to BasicDBObject
-                     * */
-                    converter.write(entity, dbObject);
-
-                    /**
-                     *  Creating BasicDbObject for find query
-                     * */
-                    BasicDBObject query = new BasicDBObject();
-
-                    /**
-                     *  Adding query (find by ID)
-                     * */
-                    query.put("_id", dbObject.get("_id"));
-
-                    /**
-                     *  Replacing whole Object
-                     * */
-                    bulkWriteOperation.find(query).replaceOne(dbObject);
-                }
-            }
-
-            /**
-             * Executing the Operation
-             * */
-            bulkWriteOperation.execute();
-            return entities;
-
-        } catch(Exception ex){
-            logger.error("BulkWriteOperation Exception ::  ", ex);
-            return null;
+        if(entity.getId() == null){
+            updateEntityDetailsWithBulkOperation(bulkWriteOperation, converter, entity, className);
+        }else {
+            updateBasicDBObject(bulkWriteOperation, converter, entity);
         }
+    }
+
+    private <T extends MongoBaseEntity> void updateBasicDBObject(BulkWriteOperation bulkWriteOperation, MongoConverter converter, T entity) {
+        BasicDBObject dbObject;
+        entity.setLastModifiedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+        dbObject = new BasicDBObject();
+        converter.write(entity, dbObject);
+        BasicDBObject query = new BasicDBObject();
+        query.put("_id", dbObject.get("_id"));
+        bulkWriteOperation.find(query).replaceOne(dbObject);
+    }
+
+    private <T extends MongoBaseEntity> void updateEntityDetailsWithBulkOperation(BulkWriteOperation bulkWriteOperation, MongoConverter converter, T entity, String className) {
+        BasicDBObject dbObject;
+        entity.setCreatedAt(DateUtils.getDate());
+        if(entity.getClass().getSuperclass().equals(WTABaseRuleTemplate.class)){
+            //Because WTABaseRuleTemplateDTO extends by All RuleTemaplete
+            className = entity.getClass().getSuperclass().getSimpleName();
+        }
+        entity.setId(mongoSequenceRepository.nextSequence(className));
+        entity.setCreatedBy(new UserInfo(UserContext.getUserDetails().getId(),UserContext.getUserDetails().getEmail(),UserContext.getUserDetails().getFullName()));
+        dbObject = new BasicDBObject();
+         converter.write(entity, dbObject);
+        bulkWriteOperation.insert(dbObject);
     }
 }
