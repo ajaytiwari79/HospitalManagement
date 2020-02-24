@@ -370,7 +370,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
             }
         }
-        return getHourByMinutes(calculateValue);
+        return HOURS.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0)) ? getHourByMinutes(calculateValue) : calculateValue;
     }
 
     private double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -1109,7 +1109,7 @@ public class KPIBuilderCalculationService implements CounterService {
             if(CollectionUtils.containsAny(newHashSet(CARE_BUBBLE),calculationTypes) && filterBasedCriteria.containsKey(TAGS) && isCollectionNotEmpty(filterBasedCriteria.get(TAGS))){
                 tagIds = getLongValueSet(filterBasedCriteria.get(TAGS));
                 List<Long> validStaffIds = staffKpiFilterDTOS.stream().filter(staffKpiFilterDTO -> staffKpiFilterDTO.isTagValid(tagIds)).map(staffKpiFilterDTO -> staffKpiFilterDTO.getId()).collect(Collectors.toList());
-                List<Map> shiftsLog = auditLoggingService.getAuditLogOfStaff(validStaffIds,asLocalDate(startDate),asLocalDate(endDate).plusDays(1));
+                List<Map> shiftsLog = auditLoggingService.getAuditLogOfStaff(validStaffIds,startDate,endDate);
                 List<AuditShiftDTO> auditShiftDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftsLog,AuditShiftDTO.class);
                 staffAuditLog = auditShiftDTOS.stream().collect(Collectors.groupingBy(auditShiftDTO -> auditShiftDTO.getStaffId()));
             }
