@@ -18,6 +18,7 @@ import com.kairos.dto.user.staff.employment.StaffEmploymentUnitDataWrapper;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.user.staff.StaffAdditionalInfoDTO;
 import com.kairos.dto.user_context.UserContext;
+import com.kairos.enums.TimeTypeEnum;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.reason_code.ReasonCodeRequiredState;
 import com.kairos.enums.shift.*;
@@ -967,7 +968,7 @@ public class ShiftValidatorService {
 
 
     //This method is being used to check overlapping shift with full day and full week activity
-    public void checkAbsenceTypeShift(ShiftDTO shiftDTO) {
+    public void checkAbsenceTypeShift(ShiftDTO shiftDTO, ActivityWrapper activityWrapper) {
         Date startDate = null;
         Date endDate = null;
         List<Shift> shiftList = new ArrayList<>();
@@ -985,8 +986,7 @@ public class ShiftValidatorService {
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
-
-        if(isCollectionEmpty(shiftList)||(ShiftType.ABSENCE.equals(shiftList.get(0).getShiftType())&&(isNotNull()&&ShiftType.ABSENCE.equals(shiftDTO.getShiftType())))){
+        if(isCollectionEmpty(shiftList)||(shiftList.get(0).getActivities().get(0).getTimeType().equals(activityWrapper.getTimeType())&&TimeTypeEnum.ABSENCE.equals(activityWrapper.getTimeTypeInfo().getSecondLevelType()))){
             absenceShiftExists =false;
         }
         if (absenceShiftExists) {
