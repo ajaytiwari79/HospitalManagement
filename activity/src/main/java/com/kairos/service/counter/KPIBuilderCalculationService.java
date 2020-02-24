@@ -784,8 +784,6 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
 
-
-
     private LocalDate getApproveOrDisApproveDateFromTODO(LocalDate localDate, TodoDTO todoDTO) {
         switch (todoDTO.getStatus()) {
             case APPROVE:
@@ -842,6 +840,9 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
     private <T, E> Map<T, E> getStaffTotalByRepresentPerInterval(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+        if(newHashSet(PRESENCE_UNDER_STAFFING,PRESENCE_OVER_STAFFING).contains(kpiCalculationRelatedInfo.getCalculationType())){
+            return staffingLevelCalculationKPIService.getPresenceStaffingLevelCalculationPerHour(kpiCalculationRelatedInfo);
+        }
         Map<T, E> staffTotalHours = new HashMap<>();
         for (DateTimeInterval dateTimeInterval : kpiCalculationRelatedInfo.getDateTimeIntervals()) {
             Double totalHours = 0d;
