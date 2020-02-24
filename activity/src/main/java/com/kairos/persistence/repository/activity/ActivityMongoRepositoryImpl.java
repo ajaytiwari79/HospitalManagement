@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -444,30 +445,34 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                 match(Criteria.where("id").is(activityId).and(DELETED).is(false)),
                 lookup(TIME_TYPE, BALANCE_SETTINGS_ACTIVITY_TAB_TIME_TYPE_ID, "_id",
                         TIME_TYPE1),
-                project().and("id").as(ACTIVITY_ID).and("name").as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
-                        .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
-                        .and("id").as("activity.id")
-                        .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
-                        .and("regions").as("activity.regions").and("levels").as("activity.levels")
-                        .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
-                        .and(STATE).as(ACTIVITY_STATE).and(UNIT_ID).as(ACTIVITY_UNIT_ID)
-                        .and(PARENT_ID).as(ACTIVITY_PARENT_ID).and(IS_PARENT_ACTIVITY).as(ACTIVITY_IS_PARENT_ACTIVITY).and(GENERAL_ACTIVITY_TAB).as(ACTIVITY_GENERAL_ACTIVITY_TAB)
-                        .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB)
-                        .and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB).and(INDIVIDUAL_POINTS_ACTIVITY_TAB).as(ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB)
-                        .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB)
-                        .and(NOTES_ACTIVITY_TAB).as(ACTIVITY_NOTES_ACTIVITY_TAB)
-                        .and(COMMUNICATION_ACTIVITY_TAB).as(ACTIVITY_COMMUNICATION_ACTIVITY_TAB)
-                        .and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
-                        .and(SKILL_ACTIVITY_TAB).as(ACTIVITY_SKILL_ACTIVITY_TAB)
-                        .and(OPTA_PLANNER_SETTING_ACTIVITY_TAB).as(ACTIVITY_OPTA_PLANNER_SETTING_ACTIVITY_TAB)
-                        .and(CTA_AND_WTA_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_CTA_AND_WTA_SETTINGS_ACTIVITY_TAB)
-                        .and(LOCATION_ACTIVITY_TAB).as(ACTIVITY_LOCATION_ACTIVITY_TAB)
-                        .and(PHASE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_PHASE_SETTINGS_ACTIVITY_TAB)
-                        .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1)
-                        .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
+                getProject()
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
         return (result.getMappedResults().isEmpty()) ? null : result.getMappedResults().get(0);
+    }
+
+    private ProjectionOperation getProject() {
+        return project().and("id").as(ACTIVITY_ID).and("name").as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
+                .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
+                .and("id").as("activity.id")
+                .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
+                .and("regions").as("activity.regions").and("levels").as("activity.levels")
+                .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
+                .and(STATE).as(ACTIVITY_STATE).and(UNIT_ID).as(ACTIVITY_UNIT_ID)
+                .and(PARENT_ID).as(ACTIVITY_PARENT_ID).and(IS_PARENT_ACTIVITY).as(ACTIVITY_IS_PARENT_ACTIVITY).and(GENERAL_ACTIVITY_TAB).as(ACTIVITY_GENERAL_ACTIVITY_TAB)
+                .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB)
+                .and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB).and(INDIVIDUAL_POINTS_ACTIVITY_TAB).as(ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB)
+                .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB)
+                .and(NOTES_ACTIVITY_TAB).as(ACTIVITY_NOTES_ACTIVITY_TAB)
+                .and(COMMUNICATION_ACTIVITY_TAB).as(ACTIVITY_COMMUNICATION_ACTIVITY_TAB)
+                .and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
+                .and(SKILL_ACTIVITY_TAB).as(ACTIVITY_SKILL_ACTIVITY_TAB)
+                .and(OPTA_PLANNER_SETTING_ACTIVITY_TAB).as(ACTIVITY_OPTA_PLANNER_SETTING_ACTIVITY_TAB)
+                .and(CTA_AND_WTA_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_CTA_AND_WTA_SETTINGS_ACTIVITY_TAB)
+                .and(LOCATION_ACTIVITY_TAB).as(ACTIVITY_LOCATION_ACTIVITY_TAB)
+                .and(PHASE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_PHASE_SETTINGS_ACTIVITY_TAB)
+                .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1)
+                .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO);
     }
 
     @Override
@@ -478,31 +483,35 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
                         TIME_TYPE1),
                 lookup("activityPriority", "activityPriorityId", "_id",
                         "activityPriority"),
-                project().and("id").as(ACTIVITY_ID).and("name").as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
-                        .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
-                        .and("id").as("activity.id").and("activityPriorityId").as("activity.activityPriorityId")
-                        .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
-                        .and("regions").as("activity.regions").and("levels").as("activity.levels")
-                        .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
-                        .and(STATE).as(ACTIVITY_STATE).and(UNIT_ID).as(ACTIVITY_UNIT_ID)
-                        .and(PARENT_ID).as(ACTIVITY_PARENT_ID).and(IS_PARENT_ACTIVITY).as(ACTIVITY_IS_PARENT_ACTIVITY).and(GENERAL_ACTIVITY_TAB).as(ACTIVITY_GENERAL_ACTIVITY_TAB)
-                        .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB)
-                        .and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB).and(INDIVIDUAL_POINTS_ACTIVITY_TAB).as(ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB)
-                        .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB)
-                        .and(NOTES_ACTIVITY_TAB).as(ACTIVITY_NOTES_ACTIVITY_TAB)
-                        .and(COMMUNICATION_ACTIVITY_TAB).as(ACTIVITY_COMMUNICATION_ACTIVITY_TAB)
-                        .and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
-                        .and(SKILL_ACTIVITY_TAB).as(ACTIVITY_SKILL_ACTIVITY_TAB)
-                        .and(OPTA_PLANNER_SETTING_ACTIVITY_TAB).as(ACTIVITY_OPTA_PLANNER_SETTING_ACTIVITY_TAB)
-                        .and(CTA_AND_WTA_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_CTA_AND_WTA_SETTINGS_ACTIVITY_TAB)
-                        .and(LOCATION_ACTIVITY_TAB).as(ACTIVITY_LOCATION_ACTIVITY_TAB)
-                        .and(PHASE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_PHASE_SETTINGS_ACTIVITY_TAB)
-                        .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1)
-                        .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
-                        .and("activityPriority").arrayElementAt(0).as("activityPriority")
+                getProjectForActivityWrapper()
         );
         AggregationResults<ActivityWrapper> result = mongoTemplate.aggregate(aggregation, Activity.class, ActivityWrapper.class);
         return result.getMappedResults();
+    }
+
+    private ProjectionOperation getProjectForActivityWrapper() {
+        return project().and("id").as(ACTIVITY_ID).and("name").as(ACTIVITY_NAME).and(DESCRIPTION).as("activity.description")
+                .and(COUNTRY_ID).as(ACTIVITY_COUNTRY_ID).and(EXPERTISES).as(ACTIVITY_EXPERTISES)
+                .and("id").as("activity.id").and("activityPriorityId").as("activity.activityPriorityId")
+                .and(ORGANIZATION_TYPES).as("activity.organizationTypes").and(ORGANIZATION_SUB_TYPES).as("activity.organizationSubTypes")
+                .and("regions").as("activity.regions").and("levels").as("activity.levels")
+                .and(EMPLOYMENT_TYPES).as(ACTIVITY_EMPLOYMENT_TYPES).and("tags").as("activity.tags")
+                .and(STATE).as(ACTIVITY_STATE).and(UNIT_ID).as(ACTIVITY_UNIT_ID)
+                .and(PARENT_ID).as(ACTIVITY_PARENT_ID).and(IS_PARENT_ACTIVITY).as(ACTIVITY_IS_PARENT_ACTIVITY).and(GENERAL_ACTIVITY_TAB).as(ACTIVITY_GENERAL_ACTIVITY_TAB)
+                .and(BALANCE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_BALANCE_SETTINGS_ACTIVITY_TAB)
+                .and(RULES_ACTIVITY_TAB).as(ACTIVITY_RULES_ACTIVITY_TAB).and(INDIVIDUAL_POINTS_ACTIVITY_TAB).as(ACTIVITY_INDIVIDUAL_POINTS_ACTIVITY_TAB)
+                .and(TIME_CALCULATION_ACTIVITY_TAB).as(ACTIVITY_TIME_CALCULATION_ACTIVITY_TAB)
+                .and(NOTES_ACTIVITY_TAB).as(ACTIVITY_NOTES_ACTIVITY_TAB)
+                .and(COMMUNICATION_ACTIVITY_TAB).as(ACTIVITY_COMMUNICATION_ACTIVITY_TAB)
+                .and(BONUS_ACTIVITY_TAB).as(ACTIVITY_BONUS_ACTIVITY_TAB)
+                .and(SKILL_ACTIVITY_TAB).as(ACTIVITY_SKILL_ACTIVITY_TAB)
+                .and(OPTA_PLANNER_SETTING_ACTIVITY_TAB).as(ACTIVITY_OPTA_PLANNER_SETTING_ACTIVITY_TAB)
+                .and(CTA_AND_WTA_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_CTA_AND_WTA_SETTINGS_ACTIVITY_TAB)
+                .and(LOCATION_ACTIVITY_TAB).as(ACTIVITY_LOCATION_ACTIVITY_TAB)
+                .and(PHASE_SETTINGS_ACTIVITY_TAB).as(ACTIVITY_PHASE_SETTINGS_ACTIVITY_TAB)
+                .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE1).and(TIME_TYPE_TIME_TYPES).as(TIME_TYPE1)
+                .and(TIME_TYPE1).arrayElementAt(0).as(TIME_TYPE_INFO)
+                .and("activityPriority").arrayElementAt(0).as("activityPriority");
     }
 
     public List<TimeTypeAndActivityIdDTO> findAllTimeTypeByActivityIds(Set<BigInteger> activityIds) {
@@ -675,26 +684,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
     }
 
     private List<AggregationOperation> getCustomAgregationForCompositeActivityWithCategory(boolean isChildActivityEligibleForStaffingLevel) {
-        if (isChildActivityEligibleForStaffingLevel) {
-
-        }
-        String group = "{  \n" +
-                "      \"$group\":{  \n" +
-                "         \"_id\":{  \n" +
-                "            \"timeCalculationActivityTab\":\"$timeCalculationActivityTab\",\n" +
-                "            \"balanceSettingsActivityTab\":\"$balanceSettingsActivityTab\",\n" +
-                "            \"name\":\"$name\",\n" +
-                "            'timeTypeInfo':'$timeTypeInfo',\n" +
-                "            'compositeTimeTypeInfo':'$compositeTimeTypeInfo',\n" +
-                "             \"id\":\"$_id\",\n" +
-                "            \"categoryId\":\"$categoryId\",\n" +
-                "            \"categoryName\":\"$categoryName\"\n" +
-                "         },\n" +
-                "         \"childActivities\":{  \n" +
-                "            \"$addToSet\":\"$childActivities\"\n" +
-                "         }\n" +
-                "      }\n" +
-                "   }";
+        String group = getGroup();
         String projection = new StringBuffer("{'$project':{'childActivities':").append(isChildActivityEligibleForStaffingLevel ? "{'$filter':{  'input':'$childActivities','as':'childActivity','cond':{'$eq':['$$childActivity.rulesActivityTab.eligibleForStaffingLevel',true]} }}" : "'$childActivities'").append(",'timeCalculationActivityTab':'$_id.timeCalculationActivityTab','balanceSettingsActivityTab':'$_id.balanceSettingsActivityTab','_id':'$_id.id','name':'$_id.name','timeTypeInfo':'$_id.timeTypeInfo','allowChildActivities':'$_id.timeTypeInfo.allowChildActivities','categoryId':'$_id.categoryId','categoryName':'$_id.categoryName'}}").toString();
 
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
@@ -722,6 +712,26 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         return aggregationOperations;
     }
 
+    private String getGroup() {
+        return "{  \n" +
+                    "      \"$group\":{  \n" +
+                    "         \"_id\":{  \n" +
+                    "            \"timeCalculationActivityTab\":\"$timeCalculationActivityTab\",\n" +
+                    "            \"balanceSettingsActivityTab\":\"$balanceSettingsActivityTab\",\n" +
+                    "            \"name\":\"$name\",\n" +
+                    "            'timeTypeInfo':'$timeTypeInfo',\n" +
+                    "            'compositeTimeTypeInfo':'$compositeTimeTypeInfo',\n" +
+                    "             \"id\":\"$_id\",\n" +
+                    "            \"categoryId\":\"$categoryId\",\n" +
+                    "            \"categoryName\":\"$categoryName\"\n" +
+                    "         },\n" +
+                    "         \"childActivities\":{  \n" +
+                    "            \"$addToSet\":\"$childActivities\"\n" +
+                    "         }\n" +
+                    "      }\n" +
+                    "   }";
+    }
+
     public List<ActivityWithCompositeDTO> findAllActivityByUnitIdWithCompositeActivities(Long unitId) {
         Criteria criteria = Criteria.where(UNIT_ID).is(unitId).and(DELETED).is(false);
         Aggregation aggregation = getParentActivityAggregation(criteria);
@@ -746,16 +756,7 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
 
     @Override
     public List<PhaseSettingsActivityTab> findActivityIdAndStatusByUnitAndAccessGroupIds(Long unitId, List<Long> accessGroupIds) {
-        String group = " {  \n" +
-                "      \"$group\":{  \n" +
-                "         \"_id\":{  \n" +
-                "            \"_id\":\"$_id\"\n" +
-                "         },\n" +
-                "         \"phaseTemplateValues\":{  \n" +
-                "            \"$addToSet\":\"$phaseTemplateValues\"\n" +
-                "         }\n" +
-                "      }\n" +
-                "   }";
+        String group = getGroupString();
         String project = "{  \n" +
                 "      \"$project\":{  \n" +
                 "         \"activityId\":\"$_id._id\",\n" +
@@ -779,6 +780,19 @@ public class ActivityMongoRepositoryImpl implements CustomActivityMongoRepositor
         );
         AggregationResults<PhaseSettingsActivityTab> results = mongoTemplate.aggregate(aggregation, Activity.class, PhaseSettingsActivityTab.class);
         return results.getMappedResults();
+    }
+
+    private String getGroupString() {
+        return " {  \n" +
+                    "      \"$group\":{  \n" +
+                    "         \"_id\":{  \n" +
+                    "            \"_id\":\"$_id\"\n" +
+                    "         },\n" +
+                    "         \"phaseTemplateValues\":{  \n" +
+                    "            \"$addToSet\":\"$phaseTemplateValues\"\n" +
+                    "         }\n" +
+                    "      }\n" +
+                    "   }";
     }
 
     @Override

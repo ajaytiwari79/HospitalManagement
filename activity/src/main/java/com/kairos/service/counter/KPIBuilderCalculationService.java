@@ -344,7 +344,7 @@ public class KPIBuilderCalculationService implements CounterService {
             case ABSENCE_UNDER_STAFFING:
                 return staffingLevelCalculationKPIService.getStaffingLevelCalculationData(staffId, dateTimeInterval, kpiCalculationRelatedInfo);
             case CARE_BUBBLE:
-                return calculateCareBubble(kpiCalculationRelatedInfo,staffId);
+                return calculateCareBubble(kpiCalculationRelatedInfo,dateTimeInterval,staffId);
             case TOTAL_WEEKLY_HOURS:
                 return getWeeklyHoursOfEmployment(staffId, kpiCalculationRelatedInfo);
             case STAFF_SKILLS_COUNT:
@@ -358,12 +358,12 @@ public class KPIBuilderCalculationService implements CounterService {
         return getTotalValueByByType(staffId, dateTimeInterval, kpiCalculationRelatedInfo, methodParam);
     }
 
-    public int calculateCareBubble(KPICalculationRelatedInfo kpiCalculationRelatedInfo, Long staffId){
+    public int calculateCareBubble(KPICalculationRelatedInfo kpiCalculationRelatedInfo,DateTimeInterval dateTimeInterval, Long staffId){
         int calculateValue = 0;
-        List<AuditShiftDTO> shifts = kpiCalculationRelatedInfo.getStaffAuditLog().getOrDefault(staffId,new ArrayList<>());
+        List<AuditShiftDTO> shifts = kpiCalculationRelatedInfo.getShiftAuditByStaffIdAndInterval(staffId,dateTimeInterval);
         Optional<TagDTO> optionalTagDTO = kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffId).stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getTags().stream()).filter(tagDTO -> kpiCalculationRelatedInfo.getTagIds().contains(tagDTO.getId())).findFirst();
         if(optionalTagDTO.isPresent()){
-            DateTimeInterval interval = optionalTagDTO.get().getOverlapInterval(kpiCalculationRelatedInfo.startDate,kpiCalculationRelatedInfo.endDate);
+            DateTimeInterval interval = optionalTagDTO.get().getOverlapInterval(dateTimeInterval);
             for (AuditShiftDTO shift : shifts) {
                 if(shift.isChanged() && interval.contains(shift.getActivities().get(0).getStartDate())){
                     calculateValue += HOURS.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0)) ? shift.getChangedHours() : 1;
@@ -1227,6 +1227,14 @@ public class KPIBuilderCalculationService implements CounterService {
             if(includeFilter){
                 StaffFilterDTO staffFilterDTO = getStaffFilterDto(filterBasedCriteria, this.timeSlotDTOS, this.unitId);
                 shifts = shiftFilterService.getShiftsByFilters(shifts, staffFilterDTO);
+            }
+            return shiftWithActivityDTOS;
+        }
+
+        public List<AuditShiftDTO> getShiftAuditByStaffIdAndInterval(Long staffId, DateTimeInterval dateTimeInterval) {
+            List<AuditShiftDTO> shiftWithActivityDTOS = isNull(staffId) ? staffAuditLog.values().stream().flatMap(auditShiftDTOS -> auditShiftDTOS.stream()).collect(Collectors.toList()) : staffAuditLog.getOrDefault(staffId, new ArrayList<>());
+            if (isNotNull(dateTimeInterval)) {
+                shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> DurationType.HOURS.equals(applicableKPI.getFrequencyType()) ? dateTimeInterval.overlaps(new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate())) : dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
             }
             return shiftWithActivityDTOS;
         }

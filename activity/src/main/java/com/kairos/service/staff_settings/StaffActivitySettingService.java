@@ -215,7 +215,7 @@ public class StaffActivitySettingService extends MongoBaseService {
        });
 
        if(!staffActivitySettingSet.isEmpty()){
-           save(staffActivitySettingSet);
+           staffActivitySettingRepository.saveEntities(staffActivitySettingSet);
        }
 
        responseMap.put(SUCCESS,success);

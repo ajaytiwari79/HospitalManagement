@@ -59,9 +59,9 @@ public class TagDTO {
         this.masterDataType = masterDataType;
     }
 
-    public DateTimeInterval getOverlapInterval(Date startDate,Date endDate){
-        Date intervalStartDate = isNull(this.startDate) ? startDate : this.startDate.before(startDate) ? startDate : this.startDate;
-        Date intervalEndDate = isNull(this.endDate) ? endDate : this.endDate.after(endDate) ? endDate : this.endDate;
+    public DateTimeInterval getOverlapInterval(DateTimeInterval dateTimeInterval){
+        Date intervalStartDate = isNull(this.startDate) ? dateTimeInterval.getStartDate() : this.startDate.before(startDate) ? dateTimeInterval.getStartDate() : this.startDate;
+        Date intervalEndDate = isNull(this.endDate) ? dateTimeInterval.getEndDate() : this.endDate.after(endDate) ? dateTimeInterval.getEndDate() : this.endDate;
         return new DateTimeInterval(intervalStartDate,intervalEndDate);
     }
 }
