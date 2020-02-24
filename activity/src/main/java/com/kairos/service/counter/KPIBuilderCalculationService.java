@@ -370,7 +370,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
             }
         }
-        return calculateValue;
+        return getHourByMinutes(calculateValue);
     }
 
     private double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
