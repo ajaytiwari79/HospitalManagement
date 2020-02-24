@@ -152,6 +152,9 @@ public class TimeBankService{
                 payOutService.updatePayOut(staffAdditionalInfoDTO,shift,activityWrapperMap);
                 dailyTimeBankEntries.add(renewDailyTimeBank(staffAdditionalInfoDTO,shift,false));
             }
+            if(isCollectionNotEmpty(shiftList)){
+                shiftMongoRepository.saveEntities(shiftList);
+            }
         }
         if(isCollectionNotEmpty(dailyTimeBankEntries)){
             timeBankRepository.saveEntities(dailyTimeBankEntries);
@@ -239,7 +242,10 @@ public class TimeBankService{
             for (Shift shift : shifts) {
                 shift.setScheduledMinutesOfPayout(0);
                 shift.setScheduledMinutesOfTimebank(0);
-                renewDailyTimeBank(staffAdditionalInfoDTO,shift,false);
+                dailyTimeBankEntries.add(renewDailyTimeBank(staffAdditionalInfoDTO,shift,false));
+            }
+            if(isCollectionNotEmpty(shifts)){
+                shiftMongoRepository.saveEntities(shifts);
             }
         }
         if(isCollectionNotEmpty(dailyTimeBankEntries)){
@@ -444,6 +450,9 @@ public class TimeBankService{
             dailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
             ctaResponseDTOMap.put(shiftDate, ctaResponseDTO);
         }
+        if(isCollectionNotEmpty(shifts)){
+            shiftMongoRepository.saveEntities(shifts);
+        }
         if(!dailyTimeBanks.isEmpty()) {
             timeBankRepository.saveEntities(dailyTimeBanks);
         }
@@ -646,6 +655,7 @@ public class TimeBankService{
                 setDayTypeToCTARuleTemplate(staffAdditionalInfoDTO);
                 updateDailyTimeBanks.add(renewDailyTimeBank(staffAdditionalInfoDTO, shift, false));
             }
+            shiftMongoRepository.saveEntities(shifts);
             if(isCollectionNotEmpty(updateDailyTimeBanks)) {
                 timeBankRepository.saveEntities(updateDailyTimeBanks);
             }

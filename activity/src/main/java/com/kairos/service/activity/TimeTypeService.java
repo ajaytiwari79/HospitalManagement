@@ -68,21 +68,25 @@ public class TimeTypeService extends MongoBaseService {
         }
         TimeType upperTimeType = timeTypeMongoRepository.findOneById(upperLevelTimeTypeId);
         timeTypeDTOs.forEach(timeTypeDTO -> {
-            TimeType timeType;
-            if (timeTypeDTO.getTimeTypes() != null && timeTypeDTO.getUpperLevelTimeTypeId() != null) {
-                timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(), timeTypeDTO.getBackgroundColor(), upperTimeType.getSecondLevelType(), countryId, timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy());
-                timeType.setCountryId(countryId);
-                timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
-                timeType = save(timeType);
-                if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
-                    upperTimeType.getChildTimeTypeIds().add(timeType.getId());
-                    upperTimeType.setLeafNode(false);
-                    save(upperTimeType);
-                }
-                timeTypeDTO.setId(timeType.getId());
-            }
+            saveTimeType(countryId, upperTimeType, timeTypeDTO);
         });
         return timeTypeDTOs;
+    }
+
+    private void saveTimeType(Long countryId, TimeType upperTimeType, TimeTypeDTO timeTypeDTO) {
+        TimeType timeType;
+        if (timeTypeDTO.getTimeTypes() != null && timeTypeDTO.getUpperLevelTimeTypeId() != null) {
+            timeType = new TimeType(TimeTypes.getByValue(timeTypeDTO.getTimeTypes()), timeTypeDTO.getLabel(), timeTypeDTO.getDescription(), timeTypeDTO.getBackgroundColor(), upperTimeType.getSecondLevelType(), countryId, timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy());
+            timeType.setCountryId(countryId);
+            timeType.setUpperLevelTimeTypeId(timeTypeDTO.getUpperLevelTimeTypeId());
+            timeType = save(timeType);
+            if (timeTypeDTO.getUpperLevelTimeTypeId() != null) {
+                upperTimeType.getChildTimeTypeIds().add(timeType.getId());
+                upperTimeType.setLeafNode(false);
+                timeTypeMongoRepository.save(upperTimeType);
+            }
+            timeTypeDTO.setId(timeType.getId());
+        }
     }
 
     public TimeTypeDTO updateTimeType(TimeTypeDTO timeTypeDTO, Long countryId) {
@@ -107,24 +111,8 @@ public class TimeTypeService extends MongoBaseService {
             exceptionService.actionNotPermittedException(MESSAGE_TIMETYPE_RENAME_NOTALLOWED, timeType.getLabel());
         }
         activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), timeType.getBackgroundColor(),timeType.getId());
-        timeType.setLabel(timeTypeDTO.getLabel());
-        timeType.setDescription(timeTypeDTO.getDescription());
-        timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
-        timeType.setActivityPriorityId(timeTypeDTO.getActivityPriorityId());
-        timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
-        timeType.setPriorityFor(timeTypeDTO.getPriorityFor());
-        timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
-        timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
-        timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
-        Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
-        if (isCollectionNotEmpty(activityCanBeCopiedForOrganizationHierarchy)) {
-            if (activityCanBeCopiedForOrganizationHierarchy.size() == 1 && activityCanBeCopiedForOrganizationHierarchy.contains(OrganizationHierarchy.UNIT)) { //user cannot allow copy acitivity for Unit, without allowing copy activity for Organization
-                exceptionService.actionNotPermittedException("message.timetype.copy.activity.withoutOrganization.notAllowed");
-            }
-            timeType.setActivityCanBeCopiedForOrganizationHierarchy(activityCanBeCopiedForOrganizationHierarchy);
-        } else {
-            timeType.setActivityCanBeCopiedForOrganizationHierarchy(Collections.EMPTY_SET);
-        }
+        updateDetailsTimeType(timeTypeDTO, timeType);
+        updateOrganizationHierarchyDetailsInTimeType(timeTypeDTO, timeType);
         List<TimeType> childTimeTypeList = childTimeTypesMap.get(timeTypeDTO.getId());
         if (Optional.ofNullable(childTimeTypeList).isPresent()) {
             setPropertiesInChildren(timeTypeDTO, timeType, timeTypes, leafTimeTypesMap, childTimeTypeList);
@@ -138,6 +126,29 @@ public class TimeTypeService extends MongoBaseService {
         return timeTypeDTO;
     }
 
+    private void updateOrganizationHierarchyDetailsInTimeType(TimeTypeDTO timeTypeDTO, TimeType timeType) {
+        Set<OrganizationHierarchy> activityCanBeCopiedForOrganizationHierarchy = timeTypeDTO.getActivityCanBeCopiedForOrganizationHierarchy();
+        if (isCollectionNotEmpty(activityCanBeCopiedForOrganizationHierarchy)) {
+            if (activityCanBeCopiedForOrganizationHierarchy.size() == 1 && activityCanBeCopiedForOrganizationHierarchy.contains(OrganizationHierarchy.UNIT)) { //user cannot allow copy acitivity for Unit, without allowing copy activity for Organization
+                exceptionService.actionNotPermittedException("message.timetype.copy.activity.withoutOrganization.notAllowed");
+            }
+            timeType.setActivityCanBeCopiedForOrganizationHierarchy(activityCanBeCopiedForOrganizationHierarchy);
+        } else {
+            timeType.setActivityCanBeCopiedForOrganizationHierarchy(Collections.EMPTY_SET);
+        }
+    }
+
+    private void updateDetailsTimeType(TimeTypeDTO timeTypeDTO, TimeType timeType) {
+        timeType.setLabel(timeTypeDTO.getLabel());
+        timeType.setDescription(timeTypeDTO.getDescription());
+        timeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
+        timeType.setActivityPriorityId(timeTypeDTO.getActivityPriorityId());
+        timeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+        timeType.setPriorityFor(timeTypeDTO.getPriorityFor());
+        timeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
+        timeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
+        timeType.setBreakNotHeldValid(timeTypeDTO.isBreakNotHeldValid());
+    }
 
 
     private void setPropertiesInChildren(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> timeTypes, Map<BigInteger, List<TimeType>> leafTimeTypesMap, List<TimeType> childTimeTypeList) {
@@ -147,22 +158,10 @@ public class TimeTypeService extends MongoBaseService {
         boolean priorityForUpdate = false;
         for (TimeType childTimeType : childTimeTypeList) {
             activityService.updateBackgroundColorInShifts(timeTypeDTO.getBackgroundColor(), childTimeType.getBackgroundColor(),childTimeType.getId());
-            if (childTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && childTimeType.getChildTimeTypeIds().isEmpty()) {
-                childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
-                partOfTeamUpdated = true;
-            }
-            if (childTimeType.isAllowChildActivities() != timeTypeDTO.isAllowChildActivities() && childTimeType.getChildTimeTypeIds().isEmpty()) {
-                childTimeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
-                allowedChildActivityUpdated = true;
-            }
-            if (childTimeType.isAllowedConflicts() != timeTypeDTO.isAllowedConflicts() && childTimeType.getChildTimeTypeIds().isEmpty()) {
-                childTimeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
-                allowedConflictsUpdate = true;
-            }
-            if (isNotNull(childTimeType.getPriorityFor()) && isNotNull(timeTypeDTO.getPriorityFor()) && !childTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && childTimeType.getChildTimeTypeIds().isEmpty()) {
-                childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
-                priorityForUpdate = true;
-            }
+            partOfTeamUpdated = isPartOfTeamUpdated(timeTypeDTO, partOfTeamUpdated, childTimeType);
+            allowedChildActivityUpdated = isAllowedChildActivityUpdated(timeTypeDTO, allowedChildActivityUpdated, childTimeType);
+            allowedConflictsUpdate = isAllowedConflictsUpdate(timeTypeDTO, allowedConflictsUpdate, childTimeType);
+            priorityForUpdate = isPriorityForUpdate(timeTypeDTO, priorityForUpdate, childTimeType);
             childTimeType.setBackgroundColor(timeTypeDTO.getBackgroundColor());
             List<TimeType> leafTimeTypeList = leafTimeTypesMap.get(childTimeType.getId());
             if (Optional.ofNullable(leafTimeTypeList).isPresent()) {
@@ -170,6 +169,38 @@ public class TimeTypeService extends MongoBaseService {
                 timeTypes.addAll(leafTimeTypeList);
             }
         }
+    }
+
+    private boolean isPriorityForUpdate(TimeTypeDTO timeTypeDTO, boolean priorityForUpdate, TimeType childTimeType) {
+        if (isNotNull(childTimeType.getPriorityFor()) && isNotNull(timeTypeDTO.getPriorityFor()) && !childTimeType.getPriorityFor().equals(timeTypeDTO.getPriorityFor()) && childTimeType.getChildTimeTypeIds().isEmpty()) {
+            childTimeType.setPriorityFor(timeTypeDTO.getPriorityFor());
+            priorityForUpdate = true;
+        }
+        return priorityForUpdate;
+    }
+
+    private boolean isAllowedConflictsUpdate(TimeTypeDTO timeTypeDTO, boolean allowedConflictsUpdate, TimeType childTimeType) {
+        if (childTimeType.isAllowedConflicts() != timeTypeDTO.isAllowedConflicts() && childTimeType.getChildTimeTypeIds().isEmpty()) {
+            childTimeType.setAllowedConflicts(timeTypeDTO.isAllowedConflicts());
+            allowedConflictsUpdate = true;
+        }
+        return allowedConflictsUpdate;
+    }
+
+    private boolean isAllowedChildActivityUpdated(TimeTypeDTO timeTypeDTO, boolean allowedChildActivityUpdated, TimeType childTimeType) {
+        if (childTimeType.isAllowChildActivities() != timeTypeDTO.isAllowChildActivities() && childTimeType.getChildTimeTypeIds().isEmpty()) {
+            childTimeType.setAllowChildActivities(timeTypeDTO.isAllowChildActivities());
+            allowedChildActivityUpdated = true;
+        }
+        return allowedChildActivityUpdated;
+    }
+
+    private boolean isPartOfTeamUpdated(TimeTypeDTO timeTypeDTO, boolean partOfTeamUpdated, TimeType childTimeType) {
+        if (childTimeType.isPartOfTeam() != timeTypeDTO.isPartOfTeam() && childTimeType.getChildTimeTypeIds().isEmpty()) {
+            childTimeType.setPartOfTeam(timeTypeDTO.isPartOfTeam());
+            partOfTeamUpdated = true;
+        }
+        return partOfTeamUpdated;
     }
 
     private void setPropertiesInLeafTimeTypes(TimeTypeDTO timeTypeDTO, TimeType timeType, List<TimeType> childTimeTypeList, boolean partOfTeamUpdated, boolean allowedChildActivityUpdated, boolean allowedConflictsUpdate, boolean priorityForUpdate, TimeType childTimeType) {
@@ -205,24 +236,28 @@ public class TimeTypeService extends MongoBaseService {
         List<TimeTypeDTO> parentOfWorkingTimeType = new ArrayList<>();
         List<TimeTypeDTO> parentOfNonWorkingTimeType = new ArrayList<>();
         for (TimeType timeType : topLevelTimeTypes) {
-            TimeTypeDTO timeTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class);
-            timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
-            if ( timeType.getId().equals(timeTypeId)) {
-                timeTypeDTO.setSelected(true);
-            }
-            timeTypeDTO.setTimeTypes(timeType.getTimeTypes().toValue());
-            timeTypeDTO.setChildren(getLowerLevelTimeTypeDTOs(timeTypeId, timeType.getId(), timeTypes));
-            if (timeType.getTimeTypes().equals(TimeTypes.WORKING_TYPE)) {
-                parentOfWorkingTimeType.add(timeTypeDTO);
-            } else {
-                parentOfNonWorkingTimeType.add(timeTypeDTO);
-            }
+            updateChildTimeTypeDetailsBeforeResponse(timeTypeId, timeTypes, parentOfWorkingTimeType, parentOfNonWorkingTimeType, timeType);
         }
         workingTimeTypeDTO.setChildren(parentOfWorkingTimeType);
         nonWorkingTimeTypeDTO.setChildren(parentOfNonWorkingTimeType);
         timeTypeDTOS.add(workingTimeTypeDTO);
         timeTypeDTOS.add(nonWorkingTimeTypeDTO);
         return timeTypeDTOS;
+    }
+
+    private void updateChildTimeTypeDetailsBeforeResponse(BigInteger timeTypeId, List<TimeType> timeTypes, List<TimeTypeDTO> parentOfWorkingTimeType, List<TimeTypeDTO> parentOfNonWorkingTimeType, TimeType timeType) {
+        TimeTypeDTO timeTypeDTO = ObjectMapperUtils.copyPropertiesByMapper(timeType, TimeTypeDTO.class);
+        timeTypeDTO.setSecondLevelType(timeType.getSecondLevelType());
+        if ( timeType.getId().equals(timeTypeId)) {
+            timeTypeDTO.setSelected(true);
+        }
+        timeTypeDTO.setTimeTypes(timeType.getTimeTypes().toValue());
+        timeTypeDTO.setChildren(getLowerLevelTimeTypeDTOs(timeTypeId, timeType.getId(), timeTypes));
+        if (timeType.getTimeTypes().equals(TimeTypes.WORKING_TYPE)) {
+            parentOfWorkingTimeType.add(timeTypeDTO);
+        } else {
+            parentOfNonWorkingTimeType.add(timeTypeDTO);
+        }
     }
 
     public Map<String, List<TimeType>> getPresenceAbsenceTimeType(Long countryId) {
@@ -313,46 +348,42 @@ public class TimeTypeService extends MongoBaseService {
     public Boolean createDefaultTimeTypes(Long countryId) {
         List<TimeType> allTimeTypes = new ArrayList<>();
         List<TimeType> workingTimeTypes = new ArrayList<>();
-        TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, PRESENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.PRESENCE, countryId, Collections.EMPTY_SET);
-        TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, ABSENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.ABSENCE, countryId, Collections.EMPTY_SET);
-        TimeType breakTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR, PAID_BREAK, countryId, Collections.EMPTY_SET);
-        workingTimeTypes.add(presenceTimeType);
-        workingTimeTypes.add(absenceTimeType);
-        workingTimeTypes.add(breakTimeType);
+        getWorkingTimeType(countryId, workingTimeTypes);
 
-        List<TimeType> nonWorkingTimeTypes = new ArrayList<>();
-        TimeType volunteerTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Volunteer Time", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.EMPTY_SET);
-        TimeType timeBankOffTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Timebank Off Time", "", AppConstants.NON_WORKING_TYPE_COLOR, TIME_BANK, countryId, Collections.EMPTY_SET);
-        TimeType unPaidBreakTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid Break", "", AppConstants.NON_WORKING_TYPE_COLOR, UNPAID_BREAK, countryId, Collections.EMPTY_SET);
-        TimeType timeSplitInShiftTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Time between Split Shifts", "", AppConstants.NON_WORKING_TYPE_COLOR, SHIFT_SPLIT_TIME, countryId, Collections.EMPTY_SET);
-        TimeType dutyFreeTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Duty-free, Self-Paid", "", AppConstants.NON_WORKING_TYPE_COLOR, SELF_PAID, countryId, Collections.EMPTY_SET);
-        TimeType sicknessTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Planned Sickness on Freedays", "", AppConstants.NON_WORKING_TYPE_COLOR, PLANNED_SICK_ON_FREE_DAYS, countryId, Collections.EMPTY_SET);
-        TimeType unavailableTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Unavailable Time", "", AppConstants.NON_WORKING_TYPE_COLOR, UNAVAILABLE_TIME, countryId, Collections.EMPTY_SET);
-        TimeType restingTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Resting Time", "", AppConstants.NON_WORKING_TYPE_COLOR, RESTING_TIME, countryId, Collections.EMPTY_SET);
-        TimeType vetoTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", AppConstants.NON_WORKING_TYPE_COLOR, VETO, countryId, Collections.EMPTY_SET);
-        TimeType stopBrickTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", AppConstants.NON_WORKING_TYPE_COLOR, STOP_BRICK, countryId, Collections.EMPTY_SET);
-        TimeType availableTimeType = new TimeType(TimeTypes.NON_WORKING_TYPE, "Available Time", "", AppConstants.NON_WORKING_TYPE_COLOR, AVAILABLE_TIME, countryId, Collections.EMPTY_SET);
-        TimeType protectedDaysOff = new TimeType(TimeTypes.NON_WORKING_TYPE, "Protected Days off", "", AppConstants.NON_WORKING_TYPE_COLOR, GAP, countryId, Collections.EMPTY_SET);
-        TimeType gap = new TimeType(TimeTypes.NON_WORKING_TYPE, "Gap", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.EMPTY_SET);
-        nonWorkingTimeTypes.add(volunteerTimeType);
-        nonWorkingTimeTypes.add(timeBankOffTimeType);
-        nonWorkingTimeTypes.add(unPaidBreakTimeType);
-        nonWorkingTimeTypes.add(timeSplitInShiftTimeType);
-        nonWorkingTimeTypes.add(dutyFreeTimeType);
-        nonWorkingTimeTypes.add(sicknessTimeType);
-        nonWorkingTimeTypes.add(unavailableTimeType);
-        nonWorkingTimeTypes.add(restingTimeType);
-        nonWorkingTimeTypes.add(vetoTimeType);
-        nonWorkingTimeTypes.add(stopBrickTimeType);
-        nonWorkingTimeTypes.add(availableTimeType);
-        nonWorkingTimeTypes.add(protectedDaysOff);
-        nonWorkingTimeTypes.add(gap);
+        List<TimeType> nonWorkingTimeTypes = getNonWorkingTimeTypeTimeTypes(countryId);
         allTimeTypes.addAll(workingTimeTypes);
         allTimeTypes.addAll(nonWorkingTimeTypes);
 
         timeTypeMongoRepository.saveEntities(allTimeTypes);
 
         return true;
+    }
+
+    private void getWorkingTimeType(Long countryId, List<TimeType> workingTimeTypes) {
+        TimeType presenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, PRESENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.PRESENCE, countryId, Collections.EMPTY_SET);
+        TimeType absenceTimeType = new TimeType(TimeTypes.WORKING_TYPE, ABSENCE, "", AppConstants.WORKING_TYPE_COLOR, TimeTypeEnum.ABSENCE, countryId, Collections.EMPTY_SET);
+        TimeType breakTimeType = new TimeType(TimeTypes.WORKING_TYPE, "Paid Break", "", AppConstants.WORKING_TYPE_COLOR, PAID_BREAK, countryId, Collections.EMPTY_SET);
+        workingTimeTypes.add(presenceTimeType);
+        workingTimeTypes.add(absenceTimeType);
+        workingTimeTypes.add(breakTimeType);
+    }
+
+    private List<TimeType> getNonWorkingTimeTypeTimeTypes(Long countryId) {
+        List<TimeType> nonWorkingTimeTypes = new ArrayList<>();
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Volunteer Time", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Timebank Off Time", "", AppConstants.NON_WORKING_TYPE_COLOR, TIME_BANK, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Unpaid Break", "", AppConstants.NON_WORKING_TYPE_COLOR, UNPAID_BREAK, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Time between Split Shifts", "", AppConstants.NON_WORKING_TYPE_COLOR, SHIFT_SPLIT_TIME, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Duty-free, Self-Paid", "", AppConstants.NON_WORKING_TYPE_COLOR, SELF_PAID, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Planned Sickness on Freedays", "", AppConstants.NON_WORKING_TYPE_COLOR, PLANNED_SICK_ON_FREE_DAYS, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Unavailable Time", "", AppConstants.NON_WORKING_TYPE_COLOR, UNAVAILABLE_TIME, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Resting Time", "", AppConstants.NON_WORKING_TYPE_COLOR, RESTING_TIME, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Veto", "", AppConstants.NON_WORKING_TYPE_COLOR, VETO, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Stopbrick", "", AppConstants.NON_WORKING_TYPE_COLOR, STOP_BRICK, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Available Time", "", AppConstants.NON_WORKING_TYPE_COLOR, AVAILABLE_TIME, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Protected Days off", "", AppConstants.NON_WORKING_TYPE_COLOR, GAP, countryId, Collections.EMPTY_SET));
+        nonWorkingTimeTypes.add(new TimeType(TimeTypes.NON_WORKING_TYPE, "Gap", "", AppConstants.NON_WORKING_TYPE_COLOR, VOLUNTEER, countryId, Collections.EMPTY_SET));
+        return nonWorkingTimeTypes;
     }
 
 
