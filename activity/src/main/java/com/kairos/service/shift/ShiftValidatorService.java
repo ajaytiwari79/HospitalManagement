@@ -985,7 +985,8 @@ public class ShiftValidatorService {
             endDate = asDateEndOfDay(shiftDTO.getShiftDate());
         }
         boolean absenceShiftExists = shiftMongoRepository.absenceShiftExistsByDate(shiftDTO.getUnitId(), startDate, endDate, shiftDTO.getStaffId());
-        if(isCollectionEmpty(shiftList)||(ShiftType.ABSENCE.equals(shiftList.get(0).getShiftType())&&(isNotNull(shiftDTO.getShiftType())&&ShiftType.ABSENCE.equals(shiftDTO.getShiftType())))){
+
+        if(isCollectionEmpty(shiftList)||(ShiftType.ABSENCE.equals(shiftList.get(0).getShiftType())&&(isNotNull()&&ShiftType.ABSENCE.equals(shiftDTO.getShiftType())))){
             absenceShiftExists =false;
         }
         if (absenceShiftExists) {
