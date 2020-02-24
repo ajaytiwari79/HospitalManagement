@@ -52,21 +52,7 @@ public class ClauseTagService{
         List<Long> existClauseTagIds = new ArrayList<>();
         Set<String> clauseTagsName = new HashSet<>();
         for (ClauseTagDTO tagDto : tagList) {
-            if (tagDto.getId() == null) {
-                if (clauseTagsName.contains(tagDto.getName())) {
-                    exceptionService.duplicateDataException("message.duplicate", "message.tag", tagDto.getName());
-                }
-                clauseTagsName.add(tagDto.getName());
-                ClauseTag clauseTag = new ClauseTag(tagDto.getName());
-                if (isOrganization)
-                    clauseTag.setOrganizationId(referenceId);
-                else
-                    clauseTag.setCountryId(referenceId);
-                clauseTagList.add(clauseTag);
-
-            } else {
-                existClauseTagIds.add(tagDto.getId());
-            }
+            updateClauseDetails(referenceId, isOrganization, clauseTagList, existClauseTagIds, clauseTagsName, tagDto);
         }
         if(!clauseTagsName.isEmpty()){
         Set<String> nameInLowerCase = clauseTagsName.stream().map(String::toLowerCase)
@@ -82,6 +68,24 @@ public class ClauseTagService{
         }
 
         return clauseTagList;
+    }
+
+    private void updateClauseDetails(Long referenceId, boolean isOrganization, List<ClauseTag> clauseTagList, List<Long> existClauseTagIds, Set<String> clauseTagsName, ClauseTagDTO tagDto) {
+        if (tagDto.getId() == null) {
+            if (clauseTagsName.contains(tagDto.getName())) {
+                exceptionService.duplicateDataException("message.duplicate", "message.tag", tagDto.getName());
+            }
+            clauseTagsName.add(tagDto.getName());
+            ClauseTag clauseTag = new ClauseTag(tagDto.getName());
+            if (isOrganization)
+                clauseTag.setOrganizationId(referenceId);
+            else
+                clauseTag.setCountryId(referenceId);
+            clauseTagList.add(clauseTag);
+
+        } else {
+            existClauseTagIds.add(tagDto.getId());
+        }
     }
 
 
