@@ -133,7 +133,8 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
 
     public List<ShiftActivityDTO> getChildActivities() {
         this.childActivities = isNullOrElse(this.childActivities,new ArrayList<>());
-        return mergeShiftActivity(this.childActivities);
+        this.childActivities = mergeShiftActivity(this.childActivities);
+        return this.childActivities;
     }
 
     @JsonIgnore
