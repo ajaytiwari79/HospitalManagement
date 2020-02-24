@@ -73,9 +73,9 @@ public class PayOutCalculationService {
             for (ShiftActivityDTO shiftActivity : shiftActivities) {
                 ShiftActivityDTO shiftActivityDTO = timeBankCalculationService.new CalculatePlannedHoursAndScheduledHours().getShiftActivityDTO(shift,shiftActivity);
                 Activity activity = activityWrapperMap.get(shiftActivity.getActivityId()).getActivity();
-                ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(dayTypeDTOMap, ruleTemplate, staffEmploymentDetails, shift.getPhaseId(), activity.getId(), activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getStartDate(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
+                ruleTemplateValid = timeBankCalculationService.validateCTARuleTemplate(ruleTemplate, staffEmploymentDetails, shift.getPhaseId(), activity.getId(), activity.getBalanceSettingsActivityTab().getTimeTypeId(), shiftActivity.getPlannedTimes()) && ruleTemplate.getPlannedTimeWithFactor().getAccountType().equals(PAID_OUT);
                 if (ruleTemplateValid) {
-                    if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS)) {
+                    if (ruleTemplate.getCalculationFor().equals(CalculationFor.SCHEDULED_HOURS) && timeBankCalculationService.isDayTypeValid(shiftActivity.getStartDate(),ruleTemplate,dayTypeDTOMap)) {
                         scheduledMinutesOfPayout += shiftActivity.getScheduledMinutes();
                         ctaScheduledOrCompensationMinutes = shiftActivity.getScheduledMinutes();
                         shiftActivityDTO.setScheduledMinutesOfPayout(shiftActivity.getScheduledMinutes() + shiftActivityDTO.getScheduledMinutesOfPayout());
@@ -136,9 +136,9 @@ public class PayOutCalculationService {
      * @param employmentWithCtaDetailsDTOS
      * @return PayOutDTO
      */
-    public PayOutDTO getAdvanceViewPayout(List<Interval> intervals, List<PayOutPerShift> payOutPerShifts, long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query,Map<Interval,Integer> sequenceIntervalMap) {
+    public PayOutDTO getAdvanceViewPayout(List<Interval> intervals, List<PayOutPerShift> payOutPerShifts, long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query) {
         Map<Interval, List<PayOutPerShift>> payoutsIntervalMap = getPayoutIntervalsMap(intervals, payOutPerShifts);
-        List<PayOutIntervalDTO> payoutIntervalDTOS = getPayoutIntervals(intervals, payoutsIntervalMap,payoutMinutesBefore, payoutTransactionAndIntervalMap, employmentWithCtaDetailsDTOS, query,sequenceIntervalMap);
+        List<PayOutIntervalDTO> payoutIntervalDTOS = getPayoutIntervals(intervals, payoutsIntervalMap,payoutMinutesBefore, payoutTransactionAndIntervalMap, employmentWithCtaDetailsDTOS, query);
         List<CTADistributionDTO> scheduledCTADistributions = payoutIntervalDTOS.stream().flatMap(ti -> ti.getPayOutDistribution().getScheduledCTADistributions().stream()).collect(Collectors.toList());
         Map<String, Integer> ctaDistributionMap = scheduledCTADistributions.stream().collect(Collectors.groupingBy(CTADistributionDTO::getName, Collectors.summingInt(CTADistributionDTO::getMinutes)));
         scheduledCTADistributions = getScheduledCTADistributions(ctaDistributionMap, employmentWithCtaDetailsDTOS.get(0));
@@ -213,10 +213,11 @@ public class PayOutCalculationService {
      * @param employmentWithCtaDetailsDTOS
      * @return List<PayOutIntervalDTO>
      */
-    private List<PayOutIntervalDTO> getPayoutIntervals(List<Interval> intervals, Map<Interval, List<PayOutPerShift>> payoutsIntervalMap, long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query,Map<Interval,Integer> sequenceIntervalMap) {
+    private List<PayOutIntervalDTO> getPayoutIntervals(List<Interval> intervals, Map<Interval, List<PayOutPerShift>> payoutsIntervalMap, long payoutMinutesBefore, Map<Interval, List<PayOutTransaction>> payoutTransactionAndIntervalMap, List<EmploymentWithCtaDetailsDTO> employmentWithCtaDetailsDTOS, String query) {
         List<PayOutIntervalDTO> payOutIntervalDTOS = new ArrayList<>(intervals.size());
         Map<Long,List<EmploymentLinesDTO>> employmentWithCtaDetailsHourlyCostMap = employmentWithCtaDetailsDTOS.stream().filter(distinctByKey(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getId())).collect(Collectors.toMap(k->k.getId(), v->v.getEmploymentLines()));
         List<CTARuleTemplateDTO> ctaRuleTemplateDTOS = employmentWithCtaDetailsDTOS.stream().flatMap(employmentWithCtaDetailsDTO -> employmentWithCtaDetailsDTO.getCtaRuleTemplates().stream()).filter(distinctByKey(ctaRuleTemplateDTO -> ctaRuleTemplateDTO.getName())).collect(Collectors.toList());
+        int sequence=1;
         for (Interval interval : intervals) {
             List<PayOutPerShift> payOutPerShifts = payoutsIntervalMap.get(interval);
             List<PayOutTransaction> payOutTransactionList = payoutTransactionAndIntervalMap.get(interval);
@@ -236,7 +237,7 @@ public class PayOutCalculationService {
             PayOutIntervalDTO payOutIntervalDTO = new PayOutIntervalDTO(interval.getStart().toDate(), interval.getEnd().toDate(), payoutAfter, payoutMinutesBefore, payoutChange, payOutCTADistributionDTO, DayOfWeek.of(interval.getStart().getDayOfWeek()), title,payoutCost.floatValue());
             payoutMinutesBefore+=payoutChange;
             payOutIntervalDTO.setProtectedDaysOffMinutes(protectedDaysOffMinutes);
-            payOutIntervalDTO.setSequence(sequenceIntervalMap.getOrDefault(interval,0));
+            payOutIntervalDTO.setSequence(sequence++);
             payOutIntervalDTOS.add(payOutIntervalDTO);
         }
         Collections.reverse(payOutIntervalDTOS);
