@@ -827,6 +827,9 @@ public class PlanningPeriodService extends MongoBaseService {
 
     public DateTimeInterval getPlanningPeriodIntervalByUnitId(Long unitId) {
         PlanningPeriodDTO planningPeriodDTO = planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        if(isNull(planningPeriodDTO)){
+            exceptionService.dataNotFoundException(MESSAGE_PERIOD_UNIT_ID,unitId);
+        }
         return new DateTimeInterval(planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
     }
 
