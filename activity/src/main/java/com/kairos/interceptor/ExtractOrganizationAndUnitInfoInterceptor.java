@@ -25,10 +25,6 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
     @Inject
     private UserIntegrationService userIntegrationService;
 
-    public void setUserIntegrationService(UserIntegrationService userIntegrationService) {
-        this.userIntegrationService = userIntegrationService;
-    }
-
     @Override
     public boolean preHandle(
             HttpServletRequest request,

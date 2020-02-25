@@ -51,6 +51,7 @@ import com.kairos.persistence.model.counter.AccessGroupKPIEntry;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.persistence.model.tag.Tag;
 import com.kairos.service.exception.ExceptionService;
+import com.kairos.wrapper.shift.StaffShiftDetails;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -58,6 +59,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import java.math.BigInteger;
@@ -84,6 +86,8 @@ public class UserIntegrationService {
     private ExceptionService exceptionService;
     @Inject
     private UserRestClientForScheduler userRestClientForScheduler;
+    @Inject
+    private RestTemplate restTemplate;
 
     public Long getEmploymentId(Long unitId, Long staffId, Long expertiseId) {
         Long value = genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, STAFF_ID_EXPERTISE_ID_UNIT_EMPLOYMENT_ID, null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {
@@ -913,10 +917,14 @@ public class UserIntegrationService {
 //        queryParamList.add(new BasicNameValuePair("selectedDate", selectedDate.toString()));
 //        return genericRestClient.publishRequest(employmentIds, countryId, RestClientUrlType.COUNTRY, HttpMethod.POST, "/get_total_sum_of_paylevel", queryParamList, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Long>>() {});
 //    }
-    public Set<StaffPersonalDetail> getAllPlanningStaffForUnit(long unitId){
-        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<Set<StaffPersonalDetail>>>() {
-        });
+    public List<StaffShiftDetails> getAllPlanningStaffForUnit(Long unitId){
+       StaffShiftDetails[] staffShiftDetails = restTemplate.getForObject("http://localdev.kairosplanning.com/kairos/user/api/v1/unit/1172/staff/get_all_planning_staff?moduleId=12",StaffShiftDetails[].class);
+//        return genericRestClient.publishRequest(null, unitId, RestClientUrlType.UNIT, HttpMethod.GET, "/staff/get_all_planning_staff", null, new ParameterizedTypeReference<RestTemplateResponseEnvelope<List<StaffShiftDetails>>>() {
+//        });
+        return Arrays.asList(staffShiftDetails);
     }
+
+
 }
 
 

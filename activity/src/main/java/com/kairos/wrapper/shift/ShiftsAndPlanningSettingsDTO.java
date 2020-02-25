@@ -8,4 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ShiftsAndPlanningSettingsDTO {
+
+
 }

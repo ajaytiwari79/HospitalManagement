@@ -486,7 +486,7 @@ public interface StaffGraphRepository extends Neo4jBaseRepository<Staff, Long>, 
 
     @Query("MATCH (employments:Employment)-[:IN_UNIT]-(unit:Unit) WHERE id(unit)={0} AND employments.endDate > {1}" +
             "WITH employments MATCH (staff:Staff)-[:BELONGS_TO_STAFF]-(employments)" +
-            "WITH staff,employments MATCH (staff)-[:BELONGS_TO_TAGS]-(tags:Tag)"+
+            "WITH staff,employments OPTIONAL MATCH (staff)-[:BELONGS_TO_TAGS]-(tags:Tag)"+
             "RETURN id(staff) as id,staff.firstName as firstName,staff.lastName as lastName," +
             "collect(employments) as employments," +
             "collect(tags) as tags " +
