@@ -1,21 +1,12 @@
 package com.kairos.aspects;
 
-import com.kairos.enums.kpermissions.FieldLevelPermission;
-import com.kairos.persistence.model.common.UserBaseEntity;
 import com.kairos.service.access_permisson.AccessPageService;
 import com.kairos.service.kpermissions.PermissionService;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.List;
-
-import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
-import static com.kairos.commons.utils.ObjectUtils.newHashSet;
-import static com.kairos.utils.PermissionMapperUtils.checkAndReturnValidModel;
 
 @Aspect
 @Component

@@ -1,7 +1,6 @@
 package com.kairos.interceptor;
 
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.dto.user_context.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,27 +41,7 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-        String unitIdString=isNull(pathVariables) ? null : pathVariables.get("unitId");
-        String orgIdString=isNull(pathVariables) ? null : pathVariables.get("organizationId");
-        String countryIdString = isNull(pathVariables) ? null : pathVariables.get("countryId");
-        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI() + "[ organizationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
-
-        if (orgIdString!=null && !"null".equalsIgnoreCase(orgIdString)) {
-            final Long orgId = Long.valueOf(orgIdString);
-            UserContext.setOrgId(orgId);
-        }
-        if (countryIdString != null) {
-            final Long countryId = Long.valueOf(countryIdString);
-            UserContext.setCountryId(countryId);
-
-        }
-        if (unitIdString != null) {
-            final Long unitId = Long.valueOf(unitIdString);
-            UserContext.setUnitId(unitId);
-            UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
-        }
-
+        updateUserInfo(request, pathVariables);
         ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest httpServletRequest = servletRequest.getRequest();
 
@@ -71,6 +50,40 @@ class ExtractOrganizationAndUnitInfoInterceptor extends HandlerInterceptorAdapte
             UserContext.setTabId(tabId);
         }
         return isNotNull(httpServletRequest);
+    }
+
+    private void updateUserInfo(HttpServletRequest request, Map<String, String> pathVariables) {
+        String unitIdString=isNull(pathVariables) ? null : pathVariables.get("unitId");
+        String orgIdString=isNull(pathVariables) ? null : pathVariables.get("organizationId");
+        String countryIdString = isNull(pathVariables) ? null : pathVariables.get("countryId");
+        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
+                + "]" + request.getRequestURI() + "[ organizationID ,Unit Id " + orgIdString + " ," + unitIdString + " ]");
+        updateOrganizationId(orgIdString);
+        updateCountryId(countryIdString);
+        updateUnitId(unitIdString);
+    }
+
+    private void updateOrganizationId(String orgIdString) {
+        if (orgIdString!=null && !"null".equalsIgnoreCase(orgIdString)) {
+            final Long orgId = Long.valueOf(orgIdString);
+            UserContext.setOrgId(orgId);
+        }
+    }
+
+    private void updateCountryId(String countryIdString) {
+        if (countryIdString != null) {
+            final Long countryId = Long.valueOf(countryIdString);
+            UserContext.setCountryId(countryId);
+
+        }
+    }
+
+    private void updateUnitId(String unitIdString) {
+        if (unitIdString != null) {
+            final Long unitId = Long.valueOf(unitIdString);
+            UserContext.setUnitId(unitId);
+            //UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
+        }
     }
 
 

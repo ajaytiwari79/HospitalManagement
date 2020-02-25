@@ -12,7 +12,6 @@ import java.util.Set;
 
 import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.enums.FilterType.ESCALATION_CAUSED_BY;
-import static com.kairos.enums.FilterType.GROUPS;
 
 /**
  * Created By G.P.Ranjan on 17/12/19

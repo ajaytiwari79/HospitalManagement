@@ -1,6 +1,5 @@
 package com.kairos.config.interceptor;
 
-import com.kairos.commons.custom_exception.InvalidRequestException;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.user_context.CurrentUserDetails;
 import com.kairos.dto.user_context.UserContext;
@@ -17,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.kairos.commons.utils.ObjectUtils.isNotNull;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
 import static com.kairos.service.auth.UserService.getCurrentUser;
 
 
@@ -32,11 +30,27 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
             HttpServletRequest request,
             HttpServletResponse response,
             Object handler) {
-
         if(request.getRequestURL().toString().contains("/scheduler_execute_job")) return true;
         if(request.getRequestURI().indexOf("swagger-ui")>-1) return true;
         final Map<String, String> pathVariables = (Map<String, String>) request
                 .getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        getCurrentUserDetails();
+        String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
+        String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
+        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
+                + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
+        updateOrganizationId(orgIdString);
+        updateUnitId(unitIdString);
+        ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest httpServletRequest = servletRequest.getRequest();
+        String tabId = httpServletRequest.getParameter("moduleId");
+        if(Optional.ofNullable(tabId).isPresent()){
+            UserContext.setTabId(tabId);
+        }
+        return isNotNull(httpServletRequest);
+    }
+
+    private void getCurrentUserDetails() {
         try {
             CurrentUserDetails currentUserDetails = ObjectMapperUtils.copyPropertiesByMapper(getCurrentUser(), CurrentUserDetails.class);
             if(isNotNull(UserContext.getUserDetails()) && isNotNull(currentUserDetails)) {
@@ -45,29 +59,21 @@ public class ExtractOrganizationAndUnitInfoInterceptor extends HandlerIntercepto
         } catch (Exception e) {
             LOGGER.error("exception {}",e);
         }
-        String orgIdString=isNotNull(pathVariables) ? pathVariables.get("organizationId") : null;
-        String unitIdString=isNotNull(pathVariables) ? pathVariables.get("unitId") : null;
-        LOGGER.info("[preHandle][" + request + "]" + "[" + request.getMethod()
-                + "]" + request.getRequestURI()+"[ organizationID ,Unit Id " +orgIdString+" ,"+unitIdString+" ]") ;
+    }
 
-
+    private void updateOrganizationId(String orgIdString) {
         if(orgIdString!=null && !"null".equalsIgnoreCase(orgIdString)){
             final Long orgId = Long.valueOf(orgIdString);
             UserContext.setOrgId(orgId);
         }
+    }
+
+    private void updateUnitId(String unitIdString) {
         if(unitIdString!=null){
             final Long unitId = Long.valueOf(unitIdString);
             UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
             UserContext.setUnitId(unitId);
             UserContext.getUserDetails().setLastSelectedOrganizationId(unitId);
         }
-
-        ServletRequestAttributes servletRequest = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest httpServletRequest = servletRequest.getRequest();
-        String tabId = httpServletRequest.getParameter("moduleId");
-        if(Optional.ofNullable(tabId).isPresent()){
-            UserContext.setTabId(tabId);
-        }
-        return isNotNull(httpServletRequest);
     }
 }

@@ -4,7 +4,6 @@ import com.kairos.commons.client.RestTemplateResponseEnvelope;
 import com.kairos.commons.utils.ObjectMapperUtils;
 import com.kairos.dto.activity.cta.CTATableSettingWrapper;
 import com.kairos.dto.activity.cta.CTAWTAAndAccumulatedTimebankWrapper;
-import com.kairos.dto.activity.shift.StaffEmploymentDetails;
 import com.kairos.dto.activity.wta.basic_details.WTABaseRuleTemplateDTO;
 import com.kairos.dto.activity.wta.basic_details.WTADTO;
 import com.kairos.dto.activity.wta.basic_details.WTAResponseDTO;
@@ -14,7 +13,6 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.wta.WTATemplateType;
 import com.kairos.persistence.model.auth.User;
 import com.kairos.persistence.model.country.functions.FunctionDTO;
-import com.kairos.persistence.model.organization.OrganizationBaseEntity;
 import com.kairos.persistence.model.user.employment.Employment;
 import com.kairos.persistence.model.user.employment.query_result.CtaWtaQueryResult;
 import com.kairos.persistence.model.user.employment.query_result.EmploymentQueryResult;
@@ -55,7 +53,6 @@ import static com.kairos.commons.utils.ObjectUtils.isCollectionNotEmpty;
 import static com.kairos.constants.ApiConstants.GET_VERSION_CTA;
 import static com.kairos.constants.ApiConstants.GET_VERSION_WTA;
 import static com.kairos.constants.UserMessagesConstants.*;
-import static com.kairos.service.employment.EmploymentUtility.convertEmploymentObject;
 
 /**
  * CreatedBy vipulpandey on 28/11/18

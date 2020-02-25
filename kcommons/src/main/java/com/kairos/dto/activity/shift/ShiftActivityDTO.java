@@ -20,8 +20,7 @@ import java.util.*;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
 import static com.kairos.commons.utils.DateUtils.roundDateByMinutes;
-import static com.kairos.commons.utils.ObjectUtils.isNull;
-import static com.kairos.commons.utils.ObjectUtils.isNullOrElse;
+import static com.kairos.commons.utils.ObjectUtils.*;
 
 /**
  * @author pradeep
@@ -133,7 +132,9 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     }
 
     public List<ShiftActivityDTO> getChildActivities() {
-        return isNullOrElse(this.childActivities,new ArrayList<>());
+        this.childActivities = isNullOrElse(this.childActivities,new ArrayList<>());
+        this.childActivities = mergeShiftActivity(this.childActivities);
+        return this.childActivities;
     }
 
     @JsonIgnore
@@ -150,11 +151,13 @@ public class ShiftActivityDTO implements Comparable<ShiftActivityDTO>{
     }
 
     public List<TimeBankDistributionDTO> getTimeBankCTADistributions() {
-        return Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>());
+        this.timeBankCTADistributions = Optional.ofNullable( timeBankCTADistributions).orElse(new ArrayList<>());
+        return this.timeBankCTADistributions;
     }
 
     public List<PayOutPerShiftCTADistributionDTO> getPayoutPerShiftCTADistributions() {
-        return Optional.ofNullable(payoutPerShiftCTADistributions).orElse(new ArrayList<>());
+        this.payoutPerShiftCTADistributions = Optional.ofNullable(this.payoutPerShiftCTADistributions).orElse(new ArrayList<>());
+        return this.payoutPerShiftCTADistributions;
     }
 
     public List<PlannedTime> getPlannedTimes() {

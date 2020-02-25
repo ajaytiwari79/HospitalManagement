@@ -9,13 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.neo4j.annotation.EnableNeo4jAuditing;
-import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
 
 import static com.kairos.constants.Neo4jConstant.*;
-import static com.kairos.constants.Neo4jConstant.NEO4J_PASSCODE;
 
 
 /**

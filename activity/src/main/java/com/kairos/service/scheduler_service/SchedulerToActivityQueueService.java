@@ -85,9 +85,9 @@ public class SchedulerToActivityQueueService implements JobQueueExecutor {
                 LOGGER.info("Job to Unassign expertise from activity ");
                 activityService.unassighExpertiseFromActivities(job.getEntityId());
                 break;
-            case ACTIVITY_CUTOFF:
+            case ACTIVITY_REMINDER:
                 LOGGER.info("Job to Reminders to be sent to the staff for not planning the absences within the cutoff period. ");
-                activityReminderService.sendActivityCutoffReminderViaEmail(job.getUnitId(), job.getEntityId());
+                activityReminderService.sendActivityReminderViaEmail(job.getUnitId(), job.getEntityId());
                 break;
             default:
                 LOGGER.error("No exceution route found for jobsubtype");

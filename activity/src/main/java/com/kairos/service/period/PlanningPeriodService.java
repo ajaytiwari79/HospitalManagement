@@ -21,9 +21,6 @@ import com.kairos.enums.IntegrationOperation;
 import com.kairos.enums.employment_type.EmploymentCategory;
 import com.kairos.enums.phase.PhaseDefaultName;
 import com.kairos.enums.planning_period.PlanningPeriodAction;
-import com.kairos.enums.scheduler.JobFrequencyType;
-import com.kairos.enums.scheduler.JobSubType;
-import com.kairos.enums.scheduler.JobType;
 import com.kairos.enums.shift.ShiftStatus;
 import com.kairos.persistence.model.common.MongoBaseEntity;
 import com.kairos.persistence.model.period.PeriodPhaseFlippingDate;
@@ -830,6 +827,9 @@ public class PlanningPeriodService extends MongoBaseService {
 
     public DateTimeInterval getPlanningPeriodIntervalByUnitId(Long unitId) {
         PlanningPeriodDTO planningPeriodDTO = planningPeriodMongoRepository.findStartDateAndEndDateOfPlanningPeriodByUnitId(unitId);
+        if(isNull(planningPeriodDTO)){
+            exceptionService.dataNotFoundException(MESSAGE_PERIOD_UNIT_ID,unitId);
+        }
         return new DateTimeInterval(planningPeriodDTO.getStartDate(), planningPeriodDTO.getEndDate());
     }
 

@@ -1,7 +1,5 @@
 package com.kairos.enums.shift;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

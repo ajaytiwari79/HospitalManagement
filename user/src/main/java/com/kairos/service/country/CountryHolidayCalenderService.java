@@ -2,7 +2,6 @@ package com.kairos.service.country;
 
 import com.kairos.config.env.EnvConfig;
 import com.kairos.dto.user.country.agreement.cta.cta_response.CountryHolidayCalenderDTO;
-import com.kairos.dto.user_context.UserContext;
 import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.country.default_data.DayType;
 import com.kairos.persistence.model.country.holiday.CountryHolidayCalender;

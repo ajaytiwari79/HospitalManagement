@@ -8,6 +8,7 @@ import com.kairos.wrapper.wta.RuleTemplateSpecificInfo;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -46,7 +47,7 @@ public class StaffActivitySpecification extends AbstractSpecification<ShiftWithA
             errorMessages.add(convertMessage(MESSAGE_TEAM_ACTIVITY_NOT_ASSIGN, activity.getActivity().getName()));
             activityRuleViolation = ruleTemplateSpecificInfo.getViolatedRules().getActivities().stream().filter(k -> k.getActivityId().equals(activity.getActivity().getId())).findAny().orElse(null);
             if (activityRuleViolation == null) {
-                activityRuleViolation = new ActivityRuleViolation(activity.getActivity().getId(), activity.getActivity().getName(), 0, errorMessages);
+                activityRuleViolation = new ActivityRuleViolation(activity.getActivity().getId(), activity.getActivity().getName(), 0, new HashSet<>(errorMessages));
                 ruleTemplateSpecificInfo.getViolatedRules().getActivities().add(activityRuleViolation);
             } else {
                 activityRuleViolation.getErrorMessages().addAll(errorMessages);

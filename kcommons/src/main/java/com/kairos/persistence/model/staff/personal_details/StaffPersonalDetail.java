@@ -5,6 +5,7 @@ import com.kairos.dto.activity.tags.TagDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.organization.AddressDTO;
 import com.kairos.dto.user.skill.SkillLevelDTO;
+import com.kairos.dto.user.staff.EmploymentDTO;
 import com.kairos.dto.user.staff.staff.StaffChildDetailDTO;
 import com.kairos.dto.user.team.TeamDTO;
 import com.kairos.enums.Gender;
@@ -15,7 +16,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.List;
@@ -84,7 +84,7 @@ public class StaffPersonalDetail {
     private Long staffUserId;
     private Long externalId;
     private Set<AccessGroupRole> roles;
-    private Long mainEmploymentId;
+    private List<EmploymentDTO> employments;
     private String privateEmail;
 
     public StaffPersonalDetail(Long id, List<SkillLevelDTO> skills) {

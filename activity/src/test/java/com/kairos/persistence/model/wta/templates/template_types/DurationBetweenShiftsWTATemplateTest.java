@@ -19,7 +19,6 @@ import java.util.TimeZone;
 
 import static com.kairos.commons.utils.DateUtils.asDate;
 import static com.kairos.commons.utils.ObjectUtils.newArrayList;
-import static org.junit.Assert.*;
 
 public class DurationBetweenShiftsWTATemplateTest {
 

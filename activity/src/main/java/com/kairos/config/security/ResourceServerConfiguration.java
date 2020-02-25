@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 
 import javax.inject.Inject;
 
-import static com.kairos.constants.ApiConstants.*;
+import static com.kairos.constants.ApiConstants.API_UNIT_URL;
 import static com.kairos.constants.AppConstants.API_CREATE_KMD_TASK_DEMAND;
 
 /**

@@ -597,7 +597,7 @@ public class UserService {
             templateParam.put("hyperLink", config.getForgotPasswordApiLink() + token);
             templateParam.put("hyperLinkName", RESET_PASSCODE);
 //            sendGridMailService.sendMailWithSendGrid(DEFAULT_EMAIL_TEMPLATE, templateParam, null, AppConstants.MAIL_SUBJECT, currentUser.getEmail());
-            kMailService.sendMail(null,currentUser.getEmail(),AppConstants.MAIL_SUBJECT,templateParam.get("description").toString(),templateParam.get("description").toString(),templateParam,DEFAULT_EMAIL_TEMPLATE);
+            kMailService.sendMail(null,AppConstants.MAIL_SUBJECT,templateParam.get("description").toString(),templateParam.get("description").toString(),templateParam,DEFAULT_EMAIL_TEMPLATE,currentUser.getEmail());
             return true;
         }
 
