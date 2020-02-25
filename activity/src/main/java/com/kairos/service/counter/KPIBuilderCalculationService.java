@@ -371,7 +371,7 @@ public class KPIBuilderCalculationService implements CounterService {
                 }
             }
         }
-        return calculateValue;
+        return HOURS.equals(kpiCalculationRelatedInfo.getXAxisConfigs().get(0)) ? getHourByMinutes(calculateValue) : calculateValue;
     }
 
     private double getPayLevelGradeOfMainEmploymentOfStaff(Long staffId, KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
@@ -1111,7 +1111,7 @@ public class KPIBuilderCalculationService implements CounterService {
             if(CollectionUtils.containsAny(newHashSet(CARE_BUBBLE),calculationTypes) && filterBasedCriteria.containsKey(TAGS) && isCollectionNotEmpty(filterBasedCriteria.get(TAGS))){
                 tagIds = getLongValueSet(filterBasedCriteria.get(TAGS));
                 List<Long> validStaffIds = staffKpiFilterDTOS.stream().filter(staffKpiFilterDTO -> staffKpiFilterDTO.isTagValid(tagIds)).map(staffKpiFilterDTO -> staffKpiFilterDTO.getId()).collect(Collectors.toList());
-                List<Map> shiftsLog = auditLoggingService.getAuditLogOfStaff(validStaffIds,asLocalDate(startDate),asLocalDate(endDate).plusDays(1));
+                List<Map> shiftsLog = auditLoggingService.getAuditLogOfStaff(validStaffIds,startDate,endDate);
                 List<AuditShiftDTO> auditShiftDTOS = ObjectMapperUtils.copyPropertiesOfCollectionByMapper(shiftsLog,AuditShiftDTO.class);
                 staffAuditLog = auditShiftDTOS.stream().collect(Collectors.groupingBy(auditShiftDTO -> auditShiftDTO.getStaffId()));
             }
@@ -1229,7 +1229,7 @@ public class KPIBuilderCalculationService implements CounterService {
         public List<AuditShiftDTO> getShiftAuditByStaffIdAndInterval(Long staffId, DateTimeInterval dateTimeInterval) {
             List<AuditShiftDTO> shiftWithActivityDTOS = isNull(staffId) ? staffAuditLog.values().stream().flatMap(auditShiftDTOS -> auditShiftDTOS.stream()).collect(Collectors.toList()) : staffAuditLog.getOrDefault(staffId, new ArrayList<>());
             if (isNotNull(dateTimeInterval)) {
-                shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> DurationType.HOURS.equals(applicableKPI.getFrequencyType()) ? dateTimeInterval.overlaps(new DateTimeInterval(shiftWithActivityDTO.getStartDate(), shiftWithActivityDTO.getEndDate())) : dateTimeInterval.contains(shiftWithActivityDTO.getStartDate())).collect(Collectors.toList());
+                shiftWithActivityDTOS = shiftWithActivityDTOS.stream().filter(shiftWithActivityDTO -> DurationType.HOURS.equals(applicableKPI.getFrequencyType()) ? dateTimeInterval.overlaps(new DateTimeInterval(shiftWithActivityDTO.getActivities().get(0).getStartDate(), shiftWithActivityDTO.getActivities().get(0).getEndDate())) : dateTimeInterval.contains(shiftWithActivityDTO.getActivities().get(0).getStartDate())).collect(Collectors.toList());
             }
             return shiftWithActivityDTOS;
         }

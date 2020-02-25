@@ -312,10 +312,12 @@ public class ShiftService extends MongoBaseService {
             } else {
                 exceptionService.actionNotPermittedException(ERROR_FUNCTION_CAN_NOT_APPLY_WITH_ABSENCE_ACTIVITY);
             }
-        } else {
+        }
+        //TODO pavan please verify it is required or not as I discussed with sakshi we can't remove function at the time of shift update
+        /* else {
             BasicNameValuePair appliedDate = new BasicNameValuePair("appliedDate", asLocalDate(shift.getStartDate()).toString());
             userIntegrationService.applyFunction(shift.getUnitId(), shift.getEmploymentId(), null, HttpMethod.DELETE, Arrays.asList(appliedDate));
-        }
+        }*/
     }
 
     private boolean isValidForDraftShiftFunctionality(StaffAdditionalInfoDTO staffAdditionalInfoDTO, boolean updateShift, Phase phase, ShiftActionType shiftAction, PlanningPeriod planningPeriod) {
@@ -623,16 +625,10 @@ public class ShiftService extends MongoBaseService {
         ShiftWithViolatedInfoDTO shiftWithViolatedInfoDTO = null;
 
         ActivityWrapper absenceActivityWrapper = getAbsenceTypeOfActivityIfPresent(shiftDTO.getActivities(), activityWrapperMap);
-        if(isNotNull(absenceActivityWrapper)) {
-            boolean updatingSameActivity = shift.getActivities().stream().filter(shiftActivity -> shiftActivity.getActivityId().equals(absenceActivityWrapper.getActivity().getId())).findAny().isPresent();
-            if (!updatingSameActivity) {
-                shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(absenceActivityWrapper, shiftDTO, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType, shiftAction);
-            }
+        boolean updatingSameActivity = shift.getActivities().stream().filter(shiftActivity -> isNotNull(absenceActivityWrapper) && shiftActivity.getActivityId().equals(absenceActivityWrapper.getActivity().getId())).findAny().isPresent();
+        if(isNotNull(absenceActivityWrapper) && !updatingSameActivity) {
+            shiftWithViolatedInfoDTO = absenceShiftService.createAbsenceTypeShift(absenceActivityWrapper, shiftDTO, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType, shiftAction);
         }
-       /*
-         if(isNotNull(absenceActivityWrapper)){
-            shiftWithViolatedInfoDTO = updateAbsenceTypeShift(shiftDTO, shiftAction, shift, staffAdditionalInfoDTO, shiftOverlappedWithNonWorkingType, absenceActivityWrapper);
-        }*/
         else {
             if (isNull(staffAdditionalInfoDTO.getUnitId())) {
                 exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNIT, shiftDTO.getStaffId(), shiftDTO.getUnitId());
@@ -673,8 +669,6 @@ public class ShiftService extends MongoBaseService {
             if (PhaseDefaultName.TIME_ATTENDANCE.equals(phase.getPhaseEnum()) || (shiftWithViolatedInfoDTO.getViolatedRules().getActivities().isEmpty() && shiftWithViolatedInfoDTO.getViolatedRules().getWorkTimeAgreements().isEmpty())) {
                 shift = saveShiftWithActivity(activityWrapperMap, shift, staffAdditionalInfoDTO, true, functionId, phase, shiftAction);
                 wtaRuleTemplateCalculationService.updateWTACounter(shift, staffAdditionalInfoDTO);
-                /*todoService.createOrUpdateTodo(shift, TodoType.APPROVAL_REQUIRED, true,staffAdditionalInfoDTO);
-                payOutService.updatePayOut(staffAdditionalInfoDTO, shift, activityWrapperMap);*/
                 shiftDTO = UserContext.getUserDetails().isManagement() ? ObjectMapperUtils.copyPropertiesByMapper(isNotNull(shift.getDraftShift()) ? shift.getDraftShift() : shift, ShiftDTO.class) : ObjectMapperUtils.copyPropertiesByMapper(shift, ShiftDTO.class);
                 timeBankService.updateTimeBank(staffAdditionalInfoDTO, shift, validatedByPlanner);
                 shiftDTO = timeBankService.updateTimebankDetailsInShiftDTO(newArrayList(shiftDTO)).get(0);
