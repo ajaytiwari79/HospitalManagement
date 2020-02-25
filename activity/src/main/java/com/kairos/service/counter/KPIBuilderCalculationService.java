@@ -861,7 +861,7 @@ public class KPIBuilderCalculationService implements CounterService {
         String key;
         if (DurationType.HOURS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())) {
             key = getLocalTimeByFormat(asLocalDateTime(dateTimeInterval.getStartDate()));
-        } else if (DAYS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())) {
+        } else if (DurationType.DAYS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())) {
             key = getStartDateTimeintervalString(dateTimeInterval);
         } else {
             key = getDateTimeintervalString(dateTimeInterval);
