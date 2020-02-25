@@ -96,6 +96,7 @@ import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.constants.ActivityMessagesConstants.CALCULATION_TYPE_NOT_VALID;
 import static com.kairos.constants.ActivityMessagesConstants.EXCEPTION_INVALIDREQUEST;
 import static com.kairos.dto.activity.counter.enums.XAxisConfig.*;
+import static com.kairos.enums.DurationType.DAYS;
 import static com.kairos.enums.FilterType.*;
 import static com.kairos.enums.kpi.CalculationType.*;
 import static com.kairos.enums.kpi.KPIRepresentation.INDIVIDUAL_STAFF;
@@ -840,7 +841,7 @@ public class KPIBuilderCalculationService implements CounterService {
     }
 
     private <T, E> Map<T, E> getStaffTotalByRepresentPerInterval(KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
-        if(newHashSet(PRESENCE_UNDER_STAFFING,PRESENCE_OVER_STAFFING).contains(kpiCalculationRelatedInfo.getCalculationType())){
+        if(newHashSet(PRESENCE_UNDER_STAFFING,PRESENCE_OVER_STAFFING).contains(kpiCalculationRelatedInfo.getCalculationType()) && DurationType.HOURS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType()) && asLocalDate(kpiCalculationRelatedInfo.getStartDate()).plusDays(1).equals(asLocalDate(kpiCalculationRelatedInfo.getEndDate()))){
             return staffingLevelCalculationKPIService.getPresenceStaffingLevelCalculationPerHour(kpiCalculationRelatedInfo);
         }
         Map<T, E> staffTotalHours = new HashMap<>();
@@ -860,7 +861,7 @@ public class KPIBuilderCalculationService implements CounterService {
         String key;
         if (DurationType.HOURS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())) {
             key = getLocalTimeByFormat(asLocalDateTime(dateTimeInterval.getStartDate()));
-        } else if (DurationType.DAYS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())) {
+        } else if (DAYS.equals(kpiCalculationRelatedInfo.getApplicableKPI().getFrequencyType())) {
             key = getStartDateTimeintervalString(dateTimeInterval);
         } else {
             key = getDateTimeintervalString(dateTimeInterval);
@@ -1171,12 +1172,6 @@ public class KPIBuilderCalculationService implements CounterService {
                 Set<String> teamIds = getStringByList(new HashSet<>(filterBasedCriteria.get(TEAM)));
                 ShiftFilterDefaultData shiftFilterDefaultData = userIntegrationService.getShiftFilterDefaultData(new SelfRosteringFilterDTO(UserContext.getUserDetails().getLastSelectedOrganizationId(), teamIds));
                 teamActivityIds.addAll(shiftFilterDefaultData.getTeamActivityIds());
-            }else {
-                List<String> validKPIS = newArrayList(PRESENCE_UNDER_STAFFING.toString(), PRESENCE_OVER_STAFFING.toString(), ABSENCE_UNDER_STAFFING.toString(), ABSENCE_OVER_STAFFING.toString());
-                if(filterBasedCriteria.containsKey(FilterType.CALCULATION_TYPE) && CollectionUtils.containsAny(validKPIS, filterBasedCriteria.get(FilterType.CALCULATION_TYPE))){
-                    List<ActivityDTO> activityDTOS = activityService.getActivitiesByUnitId(UserContext.getUserDetails().getLastSelectedOrganizationId());
-                    teamActivityIds.addAll(activityDTOS.stream().map(activity-> activity.getId()).collect(Collectors.toSet()));
-                }
             }
             Set<Long> reasonCodeIds = filterBasedCriteria.containsKey(REASON_CODE) ? KPIUtils.getLongValueSet(filterBasedCriteria.get(REASON_CODE)) : new HashSet<>();
             Set<ShiftStatus> shiftStatuses = filterBasedCriteria.containsKey(ACTIVITY_STATUS) ? (Set<ShiftStatus>) filterBasedCriteria.get(ACTIVITY_STATUS).stream().map(o -> ShiftStatus.valueOf(o.toString())).collect(Collectors.toSet()) : new HashSet<>();

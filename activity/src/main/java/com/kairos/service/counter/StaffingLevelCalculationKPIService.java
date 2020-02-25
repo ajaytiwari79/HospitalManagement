@@ -21,8 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.kairos.commons.utils.DateUtils.asLocalDate;
-import static com.kairos.commons.utils.DateUtils.getHoursByMinutes;
+import static com.kairos.commons.utils.DateUtils.*;
 import static com.kairos.commons.utils.ObjectUtils.*;
 import static com.kairos.enums.FilterType.TEAM_TYPE;
 import static com.kairos.enums.kpi.CalculationType.*;
@@ -50,7 +49,7 @@ public class StaffingLevelCalculationKPIService {
             StaffKpiFilterDTO staff = kpiCalculationRelatedInfo.getStaffIdAndStaffKpiFilterMap().get(staffId);
             if(isCollectionEmpty(staff.getTeams())){
                 return 0;
-            }else if(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TEAM_TYPE).size() == 1){
+            }else if(kpiCalculationRelatedInfo.getFilterBasedCriteria().containsKey(TEAM_TYPE) && kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TEAM_TYPE).size() == 1){
                 activityIds = staff.getTeams().stream().filter(teamDTO -> teamDTO.getTeamType().toString().equals(kpiCalculationRelatedInfo.getFilterBasedCriteria().get(TEAM_TYPE).get(0))).flatMap(teamDTO -> teamDTO.getActivityIds().stream()).collect(Collectors.toSet());
             } else{
                 activityIds = staff.getTeams().stream().flatMap(teamDTO -> teamDTO.getActivityIds().stream()).collect(Collectors.toSet());
@@ -61,7 +60,7 @@ public class StaffingLevelCalculationKPIService {
         }else {
             activityIds = shiftActivityCriteria.getTeamActivityIds();
         }
-        List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate());
+        List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(),asDate(asLocalDate(dateTimeInterval.getEndDate()).minusDays(1)));
         long staffingLevelData = 0;
         boolean isPresenceStaffingLevelData = PRESENCE_UNDER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType()) || PRESENCE_OVER_STAFFING.equals(kpiCalculationRelatedInfo.getCalculationType());
         for (StaffingLevel staffingLevel : staffingLevels) {
@@ -126,12 +125,12 @@ public class StaffingLevelCalculationKPIService {
         return overStaffingLevelData;
     }
 
-    private Map<Integer, Long> getPresenceStaffingLevelDataPerHour(DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
+    public Map<Integer, Long> getPresenceStaffingLevelDataPerHour(DateTimeInterval dateTimeInterval, KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo) {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShifts().stream().filter(shift -> dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
         KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
-        Set<BigInteger> activityIds = shiftActivityCriteria.getTeamActivityIds();
-        List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(),dateTimeInterval.getEndDate());
+        Set<BigInteger> activityIds = shiftActivityCriteria.getActivityIds();
+        List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(),asDate(asLocalDate(dateTimeInterval.getEndDate()).minusDays(1)));
         Map<Integer,Long> staffingLevelDataMap = new HashMap<>();
         for (StaffingLevel staffingLevel : staffingLevels) {
             setStaffingLevelDataPerHour(kpiCalculationRelatedInfo, activityIds, filterShiftActivity, staffingLevel, staffingLevelDataMap);
@@ -166,7 +165,8 @@ public class StaffingLevelCalculationKPIService {
         Map<Integer,Long> staffingLevelDataMap = getPresenceStaffingLevelDataPerHour(totalDataInterval, kpiCalculationRelatedInfo);
         Map<T,E> staffingLevelMapPerHour = new HashMap<>();
         for (Integer key : staffingLevelDataMap.keySet()) {
-            staffingLevelMapPerHour.put((T) key, (E) getValueWithDecimalFormat(getHoursByMinutes(staffingLevelDataMap.get(key))));
+            String dateTime = getLocalTimeByFormat(getLocalDateTime(kpiCalculationRelatedInfo.getApplicableKPI().getDateForKPISetCalculation(),key,0,0));
+            staffingLevelMapPerHour.put((T) dateTime, (E) getValueWithDecimalFormat(getHoursByMinutes(staffingLevelDataMap.get(key))));
         }
         return staffingLevelMapPerHour;
     }
