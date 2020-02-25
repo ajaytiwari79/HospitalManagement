@@ -150,7 +150,9 @@ public class TimeBankService{
             for (Shift shift : shiftList) {
                 shiftService.updateCTADetailsOfEmployement(asLocalDate(shift.getStartDate()),staffAdditionalInfoDTO);
                 payOutService.updatePayOut(staffAdditionalInfoDTO,shift,activityWrapperMap);
-                dailyTimeBankEntries.add(renewDailyTimeBank(staffAdditionalInfoDTO,shift,false));
+                DailyTimeBankEntry dailyTimeBankEntry = renewDailyTimeBank(staffAdditionalInfoDTO,shift,false);
+                dailyTimeBankEntries.removeIf(dailyTimeBankEntry1 -> dailyTimeBankEntry.getEmploymentId().equals(dailyTimeBankEntry1.getEmploymentId()) && dailyTimeBankEntry.getDate().equals(dailyTimeBankEntry1.getDate()));
+                dailyTimeBankEntries.add(dailyTimeBankEntry);
             }
             if(isCollectionNotEmpty(shiftList)){
                 shiftMongoRepository.saveEntities(shiftList);
