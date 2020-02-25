@@ -56,7 +56,7 @@ public class ShiftFilterService {
             staffFilterDTO.setFiltersData(new ArrayList<>());
         }
         List<TimeSlotDTO> timeSlotDTOS = userIntegrationService.getUnitTimeSlot(unitId);
-        Map<FilterType, Set<T>> filterTypeMap = staffFilterDTO.getFiltersData().stream().collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
+        Map<FilterType, Set<T>> filterTypeMap = staffFilterDTO.getFiltersData().stream().filter(distinctByKey(filterSelectionDTO -> filterSelectionDTO.getName())).collect(Collectors.toMap(FilterSelectionDTO::getName, v -> v.getValue()));
         ShiftFilter timeTypeFilter = getTimeTypeFilter(filterTypeMap);
         ShiftFilter activityTimecalculationTypeFilter = new ActivityTimeCalculationTypeFilter(filterTypeMap);
         ShiftFilter activityStatusFilter = new ActivityStatusFilter(filterTypeMap);

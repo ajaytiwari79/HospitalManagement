@@ -1209,9 +1209,11 @@ public class KPIBuilderCalculationService implements CounterService {
             if (filterTypeListEntry.getKey().equals(TIME_SLOT)) {
                 Set<String> timeSlotName = new HashSet<>();
                 for (Object timeSlotId : filterTypeListEntry.getValue()) {
-                    for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
-                        if (timeSlotDTO.getId().equals(((Integer) timeSlotId).longValue())) {
-                            timeSlotName.add(timeSlotDTO.getName());
+                    if(isCollectionNotEmpty(timeSlotDTOS)) {
+                        for (TimeSlotDTO timeSlotDTO : timeSlotDTOS) {
+                            if (timeSlotDTO.getId().equals(((Integer) timeSlotId).longValue())) {
+                                timeSlotName.add(timeSlotDTO.getName());
+                            }
                         }
                     }
                 }
