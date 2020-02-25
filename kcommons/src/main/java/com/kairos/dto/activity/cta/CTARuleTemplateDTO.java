@@ -243,6 +243,7 @@ public class CTARuleTemplateDTO {
 
 
     public List<Long> getDayTypeIds() {
+        this.dayTypeIds = isNull(dayTypeIds) ? new ArrayList<>() : this.dayTypeIds;
         return dayTypeIds;
     }
 

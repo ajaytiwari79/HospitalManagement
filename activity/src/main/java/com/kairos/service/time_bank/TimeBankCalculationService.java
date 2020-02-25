@@ -1246,7 +1246,7 @@ public class TimeBankCalculationService {
                 ctaBonusAndScheduledMinutes = shiftActivity.getScheduledMinutes();
                 shiftActivityDTO.setScheduledMinutesOfTimebank(shiftActivity.getScheduledMinutes() + shiftActivityDTO.getScheduledMinutesOfTimebank());
             } else if (ruleTemplate.getCalculationFor().equals(BONUS_HOURS)) {
-                ctaBonusAndScheduledMinutes = (int) Math.round(getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivity, staffAdditionalInfoDTO.getEmployment()));
+                ctaBonusAndScheduledMinutes = (int) Math.round(getAndUpdateCtaBonusMinutes(dateTimeInterval, ruleTemplate, shiftActivity, staffAdditionalInfoDTO.getEmployment(),dayTypeDTOMap));
                 Optional<TimeBankDistributionDTO> optionalTimeBankDistributionDTO = shiftActivityDTO.getTimeBankCTADistributions().stream().filter(distributionDTO -> distributionDTO.getCtaRuleTemplateId().equals(ruleTemplate.getId())).findAny();
                 if (optionalTimeBankDistributionDTO.isPresent()) {
                     optionalTimeBankDistributionDTO.get().setMinutes(optionalTimeBankDistributionDTO.get().getMinutes() + ctaBonusAndScheduledMinutes);
@@ -1354,7 +1354,7 @@ public class TimeBankCalculationService {
             return scheduledHourAdded;
         }
 
-        public Double getAndUpdateCtaBonusMinutes(DateTimeInterval dateTimeInterval, CTARuleTemplateDTO ruleTemplate, ShiftActivityDTO shiftActivity, StaffEmploymentDetails staffEmploymentDetails) {
+        public Double getAndUpdateCtaBonusMinutes(DateTimeInterval dateTimeInterval, CTARuleTemplateDTO ruleTemplate, ShiftActivityDTO shiftActivity, StaffEmploymentDetails staffEmploymentDetails,Map<Long,DayTypeDTO> dayTypeDTOMap) {
             Double ctaBonusAndScheduledMinutes = 0.0;
             for (PlannedTime plannedTime : shiftActivity.getPlannedTimes()) {
                 if (ruleTemplate.getPlannedTimeIds().contains(plannedTime.getPlannedTimeId()) && isDayTypeValid(plannedTime.getStartDate(),ruleTemplate,dayTypeDTOMap)) {
