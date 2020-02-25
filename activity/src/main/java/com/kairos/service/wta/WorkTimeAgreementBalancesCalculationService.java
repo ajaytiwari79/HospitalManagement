@@ -126,7 +126,10 @@ public class WorkTimeAgreementBalancesCalculationService {
         return interval;
     }
 
-    private static DateTimeInterval getIntervalByProtectedDaysOffRuleTemplate(LocalDate startDate, ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, Map<BigInteger, ActivityWrapper> activityWrapperMap, ProtectedDaysOffSettingDTO protectedDaysOffSetting, LocalDate planningPeriodEndDate) {
+    private DateTimeInterval getIntervalByProtectedDaysOffRuleTemplate(LocalDate startDate, ProtectedDaysOffWTATemplate protectedDaysOffWTATemplate, Map<BigInteger, ActivityWrapper> activityWrapperMap, ProtectedDaysOffSettingDTO protectedDaysOffSetting, LocalDate planningPeriodEndDate) {
+        if(isNull(protectedDaysOffWTATemplate.getActivityId())){
+            exceptionService.invalidRequestException(ACTIVITY_NOT_ASSIGN_IN_PROTECTED_DAYS_OFF_RULE_TEMPLATE);
+        }
         ActivityWrapper activityWrapper = activityWrapperMap.get(protectedDaysOffWTATemplate.getActivityId());
         return getCutoffInterval(activityWrapper.getActivity().getRulesActivityTab().getCutOffStartFrom(), activityWrapper.getActivity().getRulesActivityTab().getCutOffIntervalUnit(), activityWrapper.getActivity().getRulesActivityTab().getCutOffdayValue(), asDate(startDate), ProtectedDaysOffUnitSettings.ONCE_IN_A_YEAR.equals(protectedDaysOffSetting.getProtectedDaysOffUnitSettings()) ? planningPeriodEndDate : DateUtils.getLocalDate());
     }

@@ -1,8 +1,10 @@
 package com.kairos.service.shift;
 
+import com.kairos.dto.activity.kpi.StaffKpiFilterDTO;
 import com.kairos.dto.activity.shift.SelfRosteringFilterDTO;
 import com.kairos.dto.activity.shift.ShiftDTO;
 import com.kairos.dto.activity.shift.ShiftFilterDefaultData;
+import com.kairos.dto.activity.time_bank.EmploymentWithCtaDetailsDTO;
 import com.kairos.dto.gdpr.FilterSelectionDTO;
 import com.kairos.dto.user.access_permission.AccessGroupRole;
 import com.kairos.dto.user.country.time_slot.TimeSlotDTO;
@@ -14,6 +16,7 @@ import com.kairos.persistence.model.shift.ShiftViolatedRules;
 import com.kairos.persistence.model.staff.personal_details.StaffPersonalDetail;
 import com.kairos.rest_client.UserIntegrationService;
 import com.kairos.service.activity.TimeTypeService;
+import com.kairos.service.counter.KPIBuilderCalculationService;
 import com.kairos.service.night_worker.NightWorkerService;
 import com.kairos.service.time_bank.TimeBankService;
 import com.kairos.utils.counter.KPIUtils;
@@ -47,6 +50,8 @@ public class ShiftFilterService {
     private ShiftValidatorService shiftValidatorService;
     @Inject
     private TimeBankService timeBankService;
+    @Inject
+    private KPIBuilderCalculationService.KPICalculationRelatedInfo kpiCalculationRelatedInfo;
 
     public <T extends ShiftDTO> List<T> getShiftsByFilters(List<T> shiftWithActivityDTOS, StaffFilterDTO staffFilterDTO) {
         List<BigInteger> shiftStateIds=new ArrayList<>();
@@ -72,9 +77,11 @@ public class ShiftFilterService {
         ShiftFilter escalationFilter = getEscalationFilter(shiftWithActivityDTOS.stream().map(shift->shift.getId()).collect(Collectors.toList()), filterTypeMap);
         Set<Long> employmentIds = shiftWithActivityDTOS.stream().map(s->s.getEmploymentId()).collect(Collectors.toSet());
         ShiftFilter timeBankBalanceFilter = getTimeBankBalanceFilter(unitId, filterTypeMap, employmentIds);
+        List<StaffKpiFilterDTO> staffKpiFilterDTOS = kpiCalculationRelatedInfo.getStaffKPIFilterDTO(staffFilterDTO.getId());
+        ShiftFilter employmentTypeFilter = getEmploymentTypeFilter(unitId,filterTypeMap,employmentIds,staffKpiFilterDTOS);
         ShiftFilter shiftFilter = new AndShiftFilter(timeTypeFilter, activityTimecalculationTypeFilter).and(activityStatusFilter).and(timeSlotFilter).and(activityFilter).and(plannedTimeTypeFilter).and(timeAndAttendanceFilter)
                                     .and(functionsFilter).and(realTimeStatusFilter).and(phaseFilter).and(plannedByFilter).and(groupFilter).and(escalationFilter)
-                                    .and(timeBankBalanceFilter);
+                                    .and(timeBankBalanceFilter).and(employmentTypeFilter);
         return shiftFilter.meetCriteria(shiftWithActivityDTOS);
     }
 
@@ -147,6 +154,7 @@ public class ShiftFilterService {
         return new ActivityFilter(filterTypeMap, selectedActivityIds);
     }
 
+
     private <G> ShiftFilter getTimeTypeFilter(Map<FilterType, Set<G>> filterTypeMap) {
         Set<BigInteger> timeTypeIds = new HashSet<>();
         if(filterTypeMap.containsKey(TIME_TYPE) && isCollectionNotEmpty(filterTypeMap.get(TIME_TYPE))) {
@@ -154,6 +162,15 @@ public class ShiftFilterService {
             timeTypeIds = timeTypeService.getAllTimeTypeWithItsLowerLevel(UserContext.getUserDetails().getCountryId(), ids).keySet();
         }
         return new TimeTypeFilter(filterTypeMap, timeTypeIds);
+    }
+
+    private <G> ShiftFilter getEmploymentTypeFilter(Long unitId,Map<FilterType, Set<G>> filterTypeMap,Set<Long> employmentIds,List<StaffKpiFilterDTO> staffKpiFilterDTOS){
+        Map<Long,Long> employmentIdAndEmploymentTypeIdMap = new HashMap<>();
+        if(filterTypeMap.containsKey(EMPLOYMENT_TYPE)&&isCollectionNotEmpty(filterTypeMap.get(EMPLOYMENT_TYPE))){
+            employmentIdAndEmploymentTypeIdMap = staffKpiFilterDTOS.stream().flatMap(staffKpiFilterDTO -> staffKpiFilterDTO.getEmployment().stream()).collect(Collectors.toMap(EmploymentWithCtaDetailsDTO::getId,EmploymentWithCtaDetailsDTO::getEmploymentTypeId));
+
+       }
+       return new EmploymentTypeFilter(filterTypeMap,employmentIdAndEmploymentTypeIdMap);
     }
 
     private <T> List<BigInteger> getBigInteger(Collection<T> objects) {
