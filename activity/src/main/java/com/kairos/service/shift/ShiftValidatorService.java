@@ -666,7 +666,7 @@ public class ShiftValidatorService {
             activity = activityMongoRepository.findByIdAndChildActivityEligibleForStaffingLevelTrue(shiftActivity.getActivityId());
         }
         outerLoop:
-        for (int currentIndex = lowerLimit; currentIndex <= upperLimit; currentIndex++) {
+        for (int currentIndex = lowerLimit; currentIndex <= upperLimit && currentIndex < applicableIntervals.size(); currentIndex++) {
             int shiftsCount = 0;
             Optional<StaffingLevelActivity> staffingLevelActivity = applicableIntervals.get(currentIndex).getStaffingLevelActivities().stream()
                     .filter(sa -> sa.getActivityId().equals(shiftActivity.getActivityId()))
