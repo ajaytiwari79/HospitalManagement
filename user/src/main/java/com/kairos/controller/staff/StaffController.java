@@ -662,7 +662,7 @@ public class StaffController {
 
     @GetMapping(value = "/get_all_planning_staff")
     @ApiOperation("Get all staff eligible for planning")
-    public List<StaffEmploymentWithTag>  getStaffEligibleForPlanning(@PathVariable Long unitId){
-        return staffService.getAllStaffForUnitWithEmploymentStatus(unitId);
+    public ResponseEntity<Map<String, Object>>  getStaffEligibleForPlanning(@PathVariable Long unitId){
+        return ResponseHandler.generateResponse(HttpStatus.OK, true, staffService.getAllStaffForUnitWithEmploymentStatus(unitId));
     }
 }
