@@ -127,6 +127,7 @@ public class ActivityMessagesConstants {
     public static final String MESSAGE_PERIOD_STARTDATE_ENDDATE_NOTUPDATE = "message.period.startdate.enddate.notupdate";
     public static final String MESSAGE_PERIOD_REQUEST_PHASE_NOTFOUND = "message.period.request.phase.notfound";
     public static final String MESSAGE_PERIODSETTING_NOTFOUND = "message.periodsetting.notFound";
+    public static final String MESSAGE_CURRENT_PLANNING_PERIOD = "message.current.planning.period";
     public static final String MESSAGE_ORGANIZATION_PHASE_NOTFOUND = "message.organization.phase.notfound";
     public static final String MESSAGE_EMPLOYMENTTYPE_NOTFOUND="message.employmenttype.notfound";
     public static final String MESSAGE_VALID_DURATION="message.valid.duration";
