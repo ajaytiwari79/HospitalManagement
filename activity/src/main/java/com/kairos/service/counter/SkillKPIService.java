@@ -89,10 +89,7 @@ public class SkillKPIService {
                         }
                     }
                     else if (ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
-                        if ((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())) {
-                            count++;
-                        }
-                        if(dateTimeIntervalForMonth.contains(skillLevelDTO.getStartDate())){
+                        if ((dateTimeIntervalForMonth.contains(skillLevelDTO.getStartDate())||((selectedFromDate.isAfter(skillLevelDTO.getStartDate())||selectedFromDate.equals(skillLevelDTO.getStartDate())) && ObjectUtils.isNull(skillLevelDTO.getEndDate())))) {
                             count++;
                         }
                     }
