@@ -16,9 +16,7 @@ import com.kairos.persistence.model.country.Country;
 import com.kairos.persistence.model.system_setting.SystemLanguage;
 import com.kairos.persistence.model.user.profile.Profile;
 import com.kairos.persistence.model.user_personalized_settings.UserPersonalizedSettings;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Properties;
@@ -49,6 +47,8 @@ import static com.kairos.utils.CPRUtil.getGenderFromCPRNumber;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class User extends UserBaseEntity {
     @KPermissionField
@@ -95,6 +95,7 @@ public class User extends UserBaseEntity {
     private boolean isPasswordUpdated;
 
     private Long kmdExternalId;
+    @Builder.Default
     private UserType userType = UserType.USER_ACCOUNT;
 
     @Transient
@@ -115,6 +116,7 @@ public class User extends UserBaseEntity {
     private String googleCalenderTokenId;
     //define for personal google calender
     private String googleCalenderAccessToken;
+    @Builder.Default
     @Properties
     private Map<String, String> unitWiseAccessRole=new HashMap<>();
     private ChatStatus chatStatus;
