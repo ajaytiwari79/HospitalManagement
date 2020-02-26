@@ -2,6 +2,7 @@ package com.kairos.commons.utils;
 
 import com.kairos.commons.custom_exception.*;
 import com.kairos.commons.service.locale.LocaleService;
+import jdk.nashorn.internal.runtime.regexp.joni.exception.InternalException;
 
 import javax.inject.Inject;
 
@@ -11,9 +12,14 @@ import javax.inject.Inject;
  */
 public class CommonsExceptionUtil {
     @Inject
-    private LocaleService localeService;
+    private static LocaleService localeService;
 
-    public String convertMessage(String message, Object... params) {
+    @Inject
+    public void setLocaleService(LocaleService localeService) {
+        this.localeService = localeService;
+    }
+
+    public static String convertMessage(String message, Object... params) {
         for (int i = 0; i < params.length; i++) {
             try {
                 params[i] = localeService.getMessage(params[i].toString());
@@ -72,5 +78,9 @@ public class CommonsExceptionUtil {
 
     public void userNotFoundInRedis(String message, Object... params) {
         throw new InternalError(convertMessage(message, params));
+    }
+
+    public static void throwException(String message,Object... params){
+        throw new InvalidRequestException(convertMessage(message, params));
     }
 }
