@@ -249,6 +249,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_ORGANIZATIONADDRESS_TEAMADDRESS_NOTBELONGS = "message.organizationAddress.teamAddress.notBelongs";
     public static final String MESSAGE_ORGANIZATIONADDRESS_CONTACTADDRESS_NOTFOUND = "message.organizationAddress.contactAddress.notFound";
     public static final String MESSAGE_ORGANIZATIONADDRESS_TEAM_NOTFOUND = "message.organizationAddress.team.notFound";
+    public static final String MESSAGE_PUBLISH_ORGANIZATION_CONNOT_DELETE = "message.publish.organization.connot.delete";
     public static final String MESSAGE_ORGANIZATIONADDRESS_CONTACTAADDRESS_NOTNULL = "message.organizationAddress.contactaAddress.notNull";
     public static final String MESSAGE_ORGANIZATIONADDRESS_CURRENCYORPAYMENTID_INCORRECT = "message.organizationAddress.currencyorpaymentid.incorrect";
     public static final String MESSAGE_ORGANIZATION_UNION_NOTFOUND = "message.organization.union.notFound";
