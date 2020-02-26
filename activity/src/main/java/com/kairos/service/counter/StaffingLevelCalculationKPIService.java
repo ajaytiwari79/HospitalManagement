@@ -129,7 +129,7 @@ public class StaffingLevelCalculationKPIService {
         List<ShiftWithActivityDTO> shiftWithActivityDTOS = kpiCalculationRelatedInfo.getShifts().stream().filter(shift -> dateTimeInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
         KPIBuilderCalculationService.ShiftActivityCriteria shiftActivityCriteria = kpiBuilderCalculationService.getShiftActivityCriteria(kpiCalculationRelatedInfo);
         KPIBuilderCalculationService.FilterShiftActivity filterShiftActivity = kpiBuilderCalculationService.new FilterShiftActivity(shiftWithActivityDTOS,shiftActivityCriteria,false).invoke();
-        Set<BigInteger> activityIds = shiftActivityCriteria.getActivityIds();
+        Set<BigInteger> activityIds = shiftActivityCriteria.getTeamActivityIds();
         List<StaffingLevel> staffingLevels = staffingLevelService.findByUnitIdAndDates(kpiCalculationRelatedInfo.getUnitId(),dateTimeInterval.getStartDate(),asDate(asLocalDate(dateTimeInterval.getEndDate()).minusDays(1)));
         Map<Integer,Long> staffingLevelDataMap = new HashMap<>();
         for (StaffingLevel staffingLevel : staffingLevels) {
