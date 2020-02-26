@@ -1112,14 +1112,10 @@ public class ShiftService extends MongoBaseService {
 
     public ShiftWithActivityDTO buildShiftWithActivityDTOAndUpdateShiftDTOWithActivityName(ShiftDTO shiftDTO, Map<BigInteger, ActivityWrapper> activityWrapperMap,Shift shift) {
         ShiftWithActivityDTO shiftWithActivityDTO = ObjectMapperUtils.copyPropertiesByMapper(isNull(shiftDTO) ? shift : shiftDTO, ShiftWithActivityDTO.class);
-        shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
-            shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
-            shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
-            shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
-                childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
-                childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
-            });
-        });
+        updateActivityDetails(activityWrapperMap, shiftWithActivityDTO);
+        if(isNotNull(shiftWithActivityDTO.getDraftShift())){
+            updateActivityDetails(activityWrapperMap, shiftWithActivityDTO.getDraftShift());
+        }
         if(isNotNull(shiftDTO)){
             shiftDTO.getActivities().forEach(shiftActivityDTO ->
                     shiftActivityDTO.setActivityName(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity().getName())
@@ -1128,6 +1124,17 @@ public class ShiftService extends MongoBaseService {
             shiftWithActivityDTO.setEndDate(shiftDTO.getActivities().get(shiftDTO.getActivities().size() - 1).getEndDate());
         }
         return shiftWithActivityDTO;
+    }
+
+    private void updateActivityDetails(Map<BigInteger, ActivityWrapper> activityWrapperMap, ShiftWithActivityDTO shiftWithActivityDTO) {
+        shiftWithActivityDTO.getActivities().forEach(shiftActivityDTO -> {
+            shiftActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+            shiftActivityDTO.setTimeType(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getTimeType());
+            shiftActivityDTO.getChildActivities().forEach(childActivityDTO -> {
+                childActivityDTO.setActivity(ObjectMapperUtils.copyPropertiesByMapper(activityWrapperMap.get(shiftActivityDTO.getActivityId()).getActivity(), ActivityDTO.class));
+                childActivityDTO.setTimeType(activityWrapperMap.get(childActivityDTO.getActivityId()).getTimeType());
+            });
+        });
     }
 
     public void deleteShiftsAndOpenShiftsOnEmploymentEnd(Long staffId, LocalDateTime employmentEndDate, Long unitId) {
