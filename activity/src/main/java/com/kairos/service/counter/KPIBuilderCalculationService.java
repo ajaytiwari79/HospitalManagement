@@ -889,7 +889,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Getter
     @Setter
-    class FilterShiftActivity {
+    public class FilterShiftActivity {
         private List<ShiftWithActivityDTO> shifts;
         private List<ShiftActivityDTO> shiftActivityDTOS;
         private ShiftActivityCriteria shiftActivityCriteria;

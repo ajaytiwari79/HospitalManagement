@@ -143,7 +143,7 @@ public class StaffingLevelCalculationKPIService {
             DateTimeInterval staffingLevelInterval = new DateTimeInterval(asLocalDate(staffingLevel.getCurrentDate()), asLocalDate(staffingLevel.getCurrentDate()).plusDays(1));
             List<ShiftWithActivityDTO> currentDateShifts = filterShiftActivity.getShifts().stream().filter(shift -> staffingLevelInterval.overlaps(new DateTimeInterval(shift.getStartDate(), shift.getEndDate()))).collect(Collectors.toList());
             if (isCollectionNotEmpty(currentDateShifts)) {
-                Map<Long, List<SkillLevelDTO>> staffSkillsMap = kpiCalculationRelatedInfo.getSelectedDatesAndStaffDTOSMap().get(asLocalDate(staffingLevel.getCurrentDate()).toString()).stream().collect(toMap(StaffPersonalDetail::getId, StaffPersonalDetail::getSkills));
+                Map<Long, List<SkillLevelDTO>> staffSkillsMap = isMapNotEmpty(kpiCalculationRelatedInfo.getSelectedDatesAndStaffDTOSMap()) ? kpiCalculationRelatedInfo.getSelectedDatesAndStaffDTOSMap().get(asLocalDate(staffingLevel.getCurrentDate()).toString()).stream().collect(toMap(StaffPersonalDetail::getId, StaffPersonalDetail::getSkills)) : new HashMap<>();
                 staffingLevelService.updatePresenceStaffingLevelAvailableStaffCount(staffingLevel, ObjectMapperUtils.copyPropertiesOfCollectionByMapper(currentDateShifts, Shift.class), staffSkillsMap);
             }
         }
