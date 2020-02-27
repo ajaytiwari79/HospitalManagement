@@ -74,6 +74,7 @@ import com.kairos.service.wta.WorkTimeAgreementService;
 import com.kairos.utils.counter.KPIUtils;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.Interval;
@@ -929,6 +930,7 @@ public class KPIBuilderCalculationService implements CounterService {
 
     @Getter
     @Setter
+    @NoArgsConstructor
     public class KPICalculationRelatedInfo {
         private Map<FilterType, List> filterBasedCriteria;
         private List<ShiftWithActivityDTO> shifts;

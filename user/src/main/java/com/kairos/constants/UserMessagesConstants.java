@@ -391,6 +391,7 @@ public class UserMessagesConstants {
     public static final String MESSAGE_FUNCTIONALPAYMENT_ALREADYACTIVE = "message.functionalPayment.alreadyactive";
     public static final String MESSAGE_FUNCTIONALPAYMENT_UNEDITABLE = "message.functionalPayment.uneditable";
     public static final String MESSAGE_CPRNUMBEREMAIL_NOTNULL = "message.cprNumberEmail.notNull";
+    public static final String MESSAGE_CPRNUMBER_NOT_VALID = "error.cpr.number.not.valid";
     public static final String MESSAGE_EMAIL_ALREADYEXIST = "message.email.alreadyExist";
     public static final String MESSAGE_FUNCTIONALPAYMENT_ALREADYPUBLISHED = "message.functionalPayment.alreadyPublished";
     public static final String MESSAGE_PUBLISHDATE_NOTLESSTHAN_STARTDATE = "message.publishDate.notlessthan.startDate";

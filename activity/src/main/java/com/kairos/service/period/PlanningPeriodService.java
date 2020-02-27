@@ -678,6 +678,9 @@ public class PlanningPeriodService extends MongoBaseService {
         if (!Optional.ofNullable(planningPeriod).isPresent()) {
             exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_NOTFOUND);
         }
+        if(planningPeriod.contains(LocalDate.now())){
+            exceptionService.dataNotFoundException(MESSAGE_PERIODSETTING_NOTFOUND);
+        }
         BigInteger planningPeriodPhaseId = getPlanningPeriodPreviousPhaseId(planningPeriod, unitId);
         if (isNotNull(planningPeriodPhaseId)) {
             List<ShiftState> shiftStates = shiftStateMongoRepository.getShiftsState(planningPeriodId, planningPeriodPhaseId, unitId);

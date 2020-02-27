@@ -206,6 +206,9 @@ public class PayOutService extends MongoBaseService {
                     activityIds.add(childActivity.getActivityId());
                 }
             }
+            if(!activityWrapperMap.containsKey(shiftActivity.getActivityId())){
+                activityIds.add(shiftActivity.getActivityId());
+            }
         }
         return activityIds;
     }
