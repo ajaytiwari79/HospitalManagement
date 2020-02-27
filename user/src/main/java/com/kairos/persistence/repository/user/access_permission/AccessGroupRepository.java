@@ -329,6 +329,9 @@ public interface AccessGroupRepository extends Neo4jBaseRepository<AccessGroup, 
             "MATCH (up)-[:HAS_ACCESS_GROUP]-(ag:AccessGroup) " +
             "OPTIONAL MATCH(ag)-[r:DAY_TYPES]->(dayType:DayType) RETURN ag,collect(r),collect(dayType)")
     List<AccessGroup> getAccessGroupWithDayTypesByStaffIdAndUnitId(Long staffId, Long unitId);
+
+    @Query("MATCH (n:AccessGroup) where n.name='SUPER_ADMIN' return id(n)")
+    Long findSuperAdminAccessGroup();
 }
 
 
