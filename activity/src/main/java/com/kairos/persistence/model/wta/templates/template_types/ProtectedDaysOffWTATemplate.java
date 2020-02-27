@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 import static com.kairos.commons.utils.DateUtils.asLocalDate;
+import static com.kairos.constants.ActivityMessagesConstants.MESSAGE_MISMATCHED_IDS;
 import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 
 /**
@@ -32,7 +33,7 @@ import static com.kairos.enums.wta.WTATemplateType.PROTECTED_DAYS_OFF;
 @Getter
 @Setter
 public class ProtectedDaysOffWTATemplate extends WTABaseRuleTemplate {
-    @NotNull(message = "message.mismatched-ids")
+    @NotNull(message = MESSAGE_MISMATCHED_IDS)
     private BigInteger activityId;
 
     public ProtectedDaysOffWTATemplate() {

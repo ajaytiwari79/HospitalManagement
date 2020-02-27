@@ -1,0 +1,5 @@
+db.kPICategory.createIndex({ unitId:1,level:1,deleted:1,countryId:1}, { unique: true });
+db.nightWorker.createIndex({ staffId:1,deleted:1}, { unique: true });
+
+db.nightWorker.aggregate([ { $group: { _id: { staffId: "$staffId",deleted:"$deleted"}, dups: { "$addToSet": "$_id" }, count: { "$sum": 1 } }}, { $match: { count: { "$gt": 1 } }} ], {allowDiskUse: true} );
+db.kPICategory.aggregate([ { $group: { _id: { unitId: "$unitId",deleted:"$deleted",name:"$name"}, dups: { "$addToSet": "$_id" }, count: { "$sum": 1 } }}, { $match: { count: { "$gt": 1 } }} ], {allowDiskUse: true} );

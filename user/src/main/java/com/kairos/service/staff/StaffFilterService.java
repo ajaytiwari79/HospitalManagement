@@ -153,6 +153,9 @@ public class StaffFilterService {
         }
         Long countryId = UserContext.getUserDetails().getCountryId();
         Staff staff = staffGraphRepository.getStaffByUserId(userId, organization.getId());
+        if(isNull(staff)){
+            exceptionService.dataNotFoundByIdException(MESSAGE_STAFF_UNITID_NOTFOUND);
+        }
         StaffFilterDataDTO staffFilterDataDTO = activityIntegrationService.getStaffFilterDataByUnitId(unitId);
         return new FiltersAndFavouriteFiltersDTO(
                 getAllFilters(moduleId, countryId, unitId, staffFilterDataDTO),
