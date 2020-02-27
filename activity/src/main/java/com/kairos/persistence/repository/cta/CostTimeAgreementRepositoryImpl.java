@@ -50,7 +50,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
 
     public List<CTAResponseDTO> findCTAByCountryId(Long countryId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false)),
+                match(Criteria.where(COUNTRY_ID).is(countryId).and(DELETED).is(false)),
                 lookup("tag", "tags", "_id", "tags")
         );
         AggregationResults<CTAResponseDTO> result = mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class);
@@ -88,7 +88,7 @@ public class CostTimeAgreementRepositoryImpl implements CustomCostTimeAgreementR
     @Override
     public List<CTAResponseDTO> findCTAByUnitId(Long unitId) {
         Aggregation aggregation = Aggregation.newAggregation(
-                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and(CommonConstants.DISABLED).is(false).and(EMPLOYMENT_ID).exists(false)),
+                match(Criteria.where(ORGANIZATION_ID).is(unitId).and(DELETED).is(false).and(EMPLOYMENT_ID).exists(false)),
                 lookup("tag", "tags", "_id", "tags")
         );
         return mongoTemplate.aggregate(aggregation, CostTimeAgreement.class, CTAResponseDTO.class).getMappedResults();
