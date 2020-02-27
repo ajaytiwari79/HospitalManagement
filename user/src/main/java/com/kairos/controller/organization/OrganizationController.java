@@ -909,7 +909,7 @@ public class OrganizationController {
     @ApiOperation(value = "on board a unit ")
     @PostMapping(value = UNIT_URL + "/on_boarding_done")
     // @PreAuthorize("@customPermissionEvaluator.isAuthorized()")
-    public ResponseEntity<Map<String, Object>> onBoardUnit(@PathVariable long unitId, @RequestBody OrganizationBasicDTO organizationBasicDTO)  {
+    public ResponseEntity<Map<String, Object>> onBoardUnit(@PathVariable long unitId, @RequestBody @Validated OrganizationBasicDTO organizationBasicDTO)  {
         return ResponseHandler.generateResponse(HttpStatus.OK, true, unitService.onBoardOrganization(organizationBasicDTO, unitId));
     }
 
